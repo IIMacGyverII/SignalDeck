@@ -4,6 +4,12 @@ Newest first. Each entry: what changed, the files, and how it was tested (host t
 the move to this repository (2026-10-17 to 2026-10-22, beta.1 to beta.11 and after) are in
 [phonedmrapp/CHANGELOG_DRAFT.md](https://github.com/IIMacGyverII/phonedmrapp/blob/main/CHANGELOG_DRAFT.md).
 
+## 2026-10-27 — Module firmware: test images off the list, the factory backup read without shell tools
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Beta tester report (beta.20 screenshot) | The Module firmware page listed the built-in bench image DMR003.FW22.V022 to every user, which read like a firmware offer (it could never load: its file is not distributed and the hash check refused it). Built-in bench rows now appear only when their exact file is already in Download/DMR/Firmware or the module runs that image; the factory image and the signed catalogue's stock and released rows are listed as before. The same tester's page said the factory backup could not be read: the stock app's firmware asset was read by running `unzip` through root, which not every phone has; it is now read in-process from the stock APK (`StockApk.paths`/`readable` + `java.util.zip`), with the shell path kept as a fallback. Help: Device → Radio firmware says what the list holds. | `fw/FirmwareVault.java`, `ui/FirmwareScreen.java`, `ui/HelpView.java` | Host: `FirmwareVaultAssetTest` 2/2 (one asset read, none or two refused), `FirmwareScreenRowsTest` 1/1 (factory always, FW22 only with its file or running), full suite green. **Device test owed** (Armor: list without FW22, backup verified from the stock app). |
+
 ## 2026-10-26 — Firmware the catalogue does not list yet: asked once, noticed on the Device page
 
 | Backlog | Change | Files | Test |

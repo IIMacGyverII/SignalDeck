@@ -238,6 +238,7 @@ public final class FirmwareScreen extends LinearLayout {
                 images.removeAllViews();
                 for (ImageTable.Row row : FirmwareCatalog.rows(getContext())) {
                     if (recovery && !row.factory) continue;
+                    if (!showRow(row, present, now)) continue;
                     TextView t = Neo.button(getContext(), row.tag, row.factory ? "restore" : "update", row == selected ? Neo.GREEN : Neo.CYAN);
                     t.setOnClickListener(v -> { if (!running) { selected = row; showChosen(); refreshFacts(); } });
                     images.addView(t, buttonPad());
@@ -251,6 +252,17 @@ public final class FirmwareScreen extends LinearLayout {
                 showChosen();
             });
         }, "fw-facts").start();
+    }
+
+    /**
+     * A built-in bench image (FW22) is ours, not a release: it is listed only when its exact file is already on this
+     * phone or it is what the module runs now. The factory image and the signed catalogue's stock and released rows
+     * are always listed. Without its file a bench row could never load anyway, and listing it read like an offer.
+     */
+    static boolean showRow(ImageTable.Row row, java.util.Set<String> present, String running) {
+        if (row.factory) return true;
+        if (ImageTable.byTag(row.tag) == null) return true;                 // from the signed catalogue (stock or released)
+        return present.contains(row.tag) || row.tag.equals(running);
     }
 
     private void showChosen() {

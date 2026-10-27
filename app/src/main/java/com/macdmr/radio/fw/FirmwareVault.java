@@ -119,8 +119,35 @@ public final class FirmwareVault {
         } catch (Exception ignored) { }
     }
 
-    /** The single DMR*.bin asset in the stock APK, or null. */
+    /** The single DMR*.bin asset in the stock APK, or null. Reads the APK in-process first (no shell tools needed), then falls back to root unzip. */
     static byte[] readStockAsset(Context c, String pkg) {
+        for (String apk : com.macdmr.radio.StockApk.paths(c, pkg)) {
+            File f = com.macdmr.radio.StockApk.readable(c, apk, "stock-fw.apk");
+            if (f == null) continue;
+            try { byte[] b = dmrAsset(f); if (b != null) return b; }
+            finally { if (!f.getAbsolutePath().equals(apk)) f.delete(); }
+        }
+        return readStockAssetUnzip(c, pkg);
+    }
+
+    /** The single assets/DMR*.bin entry of an APK, or null when there is none or more than one. */
+    static byte[] dmrAsset(File apk) {
+        try (java.util.zip.ZipFile z = new java.util.zip.ZipFile(apk)) {
+            java.util.zip.ZipEntry one = null; int n = 0;
+            for (java.util.Enumeration<? extends java.util.zip.ZipEntry> e = z.entries(); e.hasMoreElements(); ) {
+                java.util.zip.ZipEntry en = e.nextElement();
+                if (en.getName().startsWith("assets/DMR") && en.getName().endsWith("bin")) { n++; one = en; }
+            }
+            if (n != 1) return null;
+            try (java.io.InputStream in = z.getInputStream(one)) {
+                java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+                byte[] buf = new byte[16384]; int r; while ((r = in.read(buf)) > 0) out.write(buf, 0, r);
+                return out.toByteArray();
+            }
+        } catch (Exception e) { return null; }
+    }
+
+    static byte[] readStockAssetUnzip(Context c, String pkg) {
         String listed = RootSetup.run("pm path " + pkg + " 2>/dev/null");
         if (listed == null) return null;
         File out = new File(c.getCacheDir(), "factory-asset.bin");

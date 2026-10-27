@@ -4,6 +4,12 @@ Newest first. Each entry: what changed, the files, and how it was tested (host t
 the move to this repository (2026-10-17 to 2026-10-22, beta.1 to beta.11 and after) are in
 [phonedmrapp/CHANGELOG_DRAFT.md](https://github.com/IIMacGyverII/phonedmrapp/blob/main/CHANGELOG_DRAFT.md).
 
+## 2026-10-27 — Heat watchdog stops with its transmission; temperature read without root
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Owner report (Magisk "superuser granted" toasts every few seconds with nothing on the air) | The in-key heat watchdog of long transmissions could outlive its transmission: it started before the radio keyed (a failed key never stopped it), and the stop interrupt was swallowed when it landed inside a root read, so the loop polled the processor temperature over su every 5 s until the app restarted. Now the watchdog starts after the key inside the block whose `finally` stops it, has its own stop flag, and `RootSetup.run` passes an interrupt on (and ends the su child) instead of swallowing it. The temperature (mtktsAP) is read straight from /sys when the phone allows it and over root only when it must, so a long key no longer raises a Magisk toast every 5 s on phones with readable zones. The temperature is only read around long transmissions (over 30 s), never in the background. | `RadioService.java`, `ThermalGuard.java`, `RootSetup.java` | Host: `ThermalParseTest` 2/2, `ThermalGuardTest` 3/3, full suite green. **Device test owed** (a long SSTV send, then no su calls after it ends; direct read on the Armor). |
+
 ## 2026-10-26 — Firmware the catalogue does not list yet: asked once, noticed on the Device page
 
 | Backlog | Change | Files | Test |

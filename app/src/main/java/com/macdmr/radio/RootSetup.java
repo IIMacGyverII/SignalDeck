@@ -35,13 +35,18 @@ public final class RootSetup {
      */
     private static String run(String cmd, boolean magiskContext) {
         StringBuilder sb = new StringBuilder();
+        Process p = null;
         try {
-            Process p = (magiskContext ? new ProcessBuilder("su", "--mount-master", "--context", "u:r:magisk:s0", "-c", cmd) : new ProcessBuilder("su", "-c", cmd)).redirectErrorStream(true).start();
+            p = (magiskContext ? new ProcessBuilder("su", "--mount-master", "--context", "u:r:magisk:s0", "-c", cmd) : new ProcessBuilder("su", "-c", cmd)).redirectErrorStream(true).start();
             BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line; while ((line = r.readLine()) != null) sb.append(line).append('\n');
             int rc = p.waitFor();
             if (magiskContext && (sb.toString().contains("Unknown option") || sb.toString().contains("Invalid option") || sb.toString().contains("unrecognized"))) return run(cmd, false);
             if (rc != 0) sb.append("(rc=").append(rc).append(")");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();                      // pass the interrupt on: a caller looping on isInterrupted() must see it
+            if (p != null) p.destroy();
+            sb.append("su interrupted");
         } catch (Exception e) { sb.append("su failed: ").append(e.getMessage()); }
         return sb.toString().trim();
     }

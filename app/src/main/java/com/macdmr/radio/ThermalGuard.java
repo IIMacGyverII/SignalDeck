@@ -29,6 +29,7 @@ public final class ThermalGuard {
     /** A long key adds about 11 C to the AP zone (bench, 120 s high power) and 2 C to the battery: it does not start closer than that to the stops. */
     public static final double ZONE_START_C = 60.0, BATTERY_START_C = 45.0;
 
+    private volatile boolean directRead;          // the zone reads without root on this phone
     private volatile int zoneIndex = -1;          // the mtktsAP zone, found once; -2 = none on this phone
     private volatile double beforeC = Double.NaN; // the zone before the last long key
     private volatile long lastLongEnd;            // when the last long key ended (0 = none)
@@ -38,6 +39,15 @@ public final class ThermalGuard {
     public double readC() {
         try {
             if (zoneIndex == -2) return Double.NaN;
+            if (zoneIndex < 0) {
+                int direct = findZoneDirect();                         // most kernels let any app read the zones: no root, no Magisk toast
+                if (direct >= 0) { zoneIndex = direct; directRead = true; }
+            }
+            if (directRead) {
+                double v = readDirect(zoneIndex);
+                if (!Double.isNaN(v)) return v;
+                directRead = false;                                    // refused after all: fall back to root from now on
+            }
             if (zoneIndex < 0) {
                 String types = RootSetup.run("for z in /sys/class/thermal/thermal_zone*; do echo \"$z $(cat $z/type 2>/dev/null)\"; done");
                 int found = -2;
@@ -51,6 +61,38 @@ public final class ThermalGuard {
             double v = Double.parseDouble(s);
             return v > 1000 ? v / 1000.0 : v;          // millidegrees on this kernel; degrees on some others
         } catch (Throwable e) { return Double.NaN; }
+    }
+
+    /** The mtktsAP zone found by reading /sys directly, or -1 when the app cannot read it. */
+    static int findZoneDirect() {
+        java.io.File[] zs = new java.io.File("/sys/class/thermal").listFiles();
+        if (zs == null) return -1;
+        for (java.io.File z : zs) {
+            String n = z.getName();
+            if (!n.startsWith("thermal_zone")) continue;
+            String type = readLine(new java.io.File(z, "type"));
+            if ("mtktsAP".equals(type)) {
+                try { int idx = Integer.parseInt(n.substring("thermal_zone".length())); return Double.isNaN(readDirect(idx)) ? -1 : idx; }
+                catch (NumberFormatException ignored) { }
+            }
+        }
+        return -1;
+    }
+
+    static double readDirect(int zone) {
+        String t = readLine(new java.io.File("/sys/class/thermal/thermal_zone" + zone + "/temp"));
+        return parseC(t);
+    }
+
+    /** A zone's temp text in C: millidegrees on most kernels, degrees on some; NaN when empty or not a number. */
+    static double parseC(String t) {
+        if (t == null) return Double.NaN;
+        try { double v = Double.parseDouble(t.trim()); return v > 1000 ? v / 1000.0 : v; } catch (NumberFormatException e) { return Double.NaN; }
+    }
+
+    private static String readLine(java.io.File f) {
+        try (java.io.BufferedReader r = new java.io.BufferedReader(new java.io.FileReader(f))) { String l = r.readLine(); return l == null ? null : l.trim(); }
+        catch (Exception e) { return null; }
     }
 
     /** The battery in C from the sticky battery broadcast (tenths of a degree), or NaN. */

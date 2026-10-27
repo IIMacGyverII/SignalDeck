@@ -68,7 +68,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         profileText.setOnClickListener(v -> profileDialog());
         firmwareText = Neo.text(c, "", 0xFF9FB4C8, 13, Neo.mono(c)); firmwareText.setPadding(0, (int) (3 * d), 0, 0);
         tc.addView(firmwareText);
-        firmwareText.setOnClickListener(v -> { if (host != null) host.openFirmware(); });
+        firmwareText.setOnClickListener(v -> { if (host != null && svc != null && svc.adminAllowed("firmware")) host.openFirmware(); });
         variantText = Neo.text(c, "", Neo.AMBER_LIGHT, 13, Neo.ui(c)); variantText.setPadding(0, (int) (5 * d), 0, 0); variantText.setVisibility(GONE);
         tc.addView(variantText);
         variantText.setOnClickListener(v -> { com.macdmr.radio.FirmwareVariantCheck.Finding f = com.macdmr.radio.FirmwareVariantCheck.finding(getContext()); if (f != null) offerVariant(getContext(), f, this::refresh); });
@@ -92,6 +92,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         LayoutParams el = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); el.topMargin = (int) (8 * d);
         hero.addView(exit, el);
         exit.setOnClickListener(v -> exitSheet());
+        if (svc != null && !svc.adminAllowed("exit")) exit.setVisibility(GONE);
         TextView boot = Neo.button(c, "Keep access after reboot", "shield", Neo.CYAN);
         LayoutParams bl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); bl.topMargin = (int) (8 * d);
         hero.addView(boot, bl);
@@ -164,7 +165,12 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         styleSw.setOnChange(on -> { IntercomView.setNewLook(c, on); if (host != null) host.intercomStyleChanged(); });
 
         // ---- SignalDeck Web ----
+        LinearLayout restricted = card(body, "Restricted mode");
+        restrictedRow = Neo.switchRow(c, "shield", Neo.AMBER, "Restricted mode", "", null);
+        restrictedRow.setOnClickListener(v -> { if (svc != null) RestrictedDialog.show(c, svc, this::refresh); });
+        addRow(restricted, restrictedRow);
         LinearLayout web = card(body, "SignalDeck Web");
+        if (svc != null && !svc.adminAllowed("web")) web.setVisibility(GONE);
         webSw = sw(); webTxSw = sw();
         LinearLayout webRow = Neo.switchRow(c, WEB_ICON, Neo.CYAN, "Web access", "Use SignalDeck from a browser on the same Wi-Fi", webSw);
         webSub = (TextView) ((LinearLayout) webRow.getChildAt(1)).getChildAt(1);
@@ -210,7 +216,13 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         LinearLayout diag = Neo.tile(c, "diag", Neo.AMBER, "Diagnostics", "Live protocol log");
         LinearLayout widget = Neo.tile(c, "widget", Neo.VIOLET, "Home widget", "Channel, scan and Talk");
         LinearLayout sos = Neo.tile(c, "alert", Neo.RED, "Emergency", "Send your position");
-        LinearLayout[] tiles = { backup, restore, reimport, radioIdTile, report, upd, help, diag, widget, sos };
+        if (svc != null) {                                                     // Restricted mode: hidden admin items are not offered
+            com.macdmr.radio.Restriction rr = svc.restriction();
+            if (!rr.adminAllowed("backup")) { backup = null; restore = null; reimport = null; }
+            if (!rr.adminAllowed("report")) { report = null; diag = null; }
+            if (!rr.modeAllowed("aprs")) sos = null;
+        }
+        LinearLayout[] tiles = tilesOf(backup, restore, reimport, radioIdTile, report, upd, help, diag, widget, sos);
         for (int i = 0; i < tiles.length; i += 2) {
             LinearLayout r = new LinearLayout(c); r.setBaselineAligned(false);
             LayoutParams l1 = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); l1.setMargins(0, 0, (int) (4 * d), (int) (8 * d));
@@ -218,16 +230,16 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
             r.addView(tiles[i], l1); r.addView(tiles[i + 1] != null ? tiles[i + 1] : new android.view.View(c), l2);
             body.addView(r);
         }
-        backup.setOnClickListener(v -> doBackup());
-        restore.setOnClickListener(v -> doRestore());
-        reimport.setOnClickListener(v -> doReimport());
+        if (backup != null) backup.setOnClickListener(v -> doBackup());
+        if (restore != null) restore.setOnClickListener(v -> doRestore());
+        if (reimport != null) reimport.setOnClickListener(v -> doReimport());
         radioIdTile.setOnClickListener(v -> doRadioId());
-        report.setOnClickListener(v -> reportMenu());
+        if (report != null) report.setOnClickListener(v -> reportMenu());
         upd.setOnClickListener(v -> com.macdmr.radio.Updater.show(c));
         help.setOnClickListener(v -> { if (host != null) host.openHelp(); });
-        diag.setOnClickListener(v -> { if (host != null) host.openDiagnostics(); });
+        if (diag != null) diag.setOnClickListener(v -> { if (host != null) host.openDiagnostics(); });
         widget.setOnClickListener(v -> widgetSheet());
-        sos.setOnClickListener(v -> EmergencyDialog.show(c, svc));
+        if (sos != null) sos.setOnClickListener(v -> EmergencyDialog.show(c, svc));
 
         TextView foot = Neo.text(c, "Backups are the five CSV files (Contacts, TG_Lists, Channels, Zones, DTMF) the DMRModHooks module and the OpenGD77 CPS fork use, in Download/DMR/DMR_Backups.\n\nSignalDeck " + com.macdmr.radio.BuildConfig.VERSION_NAME + ", the standalone edition of DMRModHooks.", Neo.DIM, 12.5f, Neo.uiMedium(c));
         foot.setLineSpacing(0, 1.1f); foot.setPadding((int) (2 * d), (int) (8 * d), (int) (2 * d), 0);
@@ -296,6 +308,21 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     }
 
     private Neo.NeonSwitch sw() { return new Neo.NeonSwitch(getContext()); }
+
+    /** The tiles that exist, in order (null entries are left out, so the two-per-row layout stays full). */
+    private static LinearLayout[] tilesOf(LinearLayout... all) {
+        java.util.List<LinearLayout> out = new java.util.ArrayList<>(); for (LinearLayout t : all) if (t != null) out.add(t);
+        if (out.size() % 2 == 1) out.add(null);
+        return out.toArray(new LinearLayout[0]);
+    }
+    private LinearLayout restrictedRow;
+    /** The Restricted mode row's second line: off, on (locked), or unlocked for a while. */
+    void updateRestricted() {
+        if (restrictedRow == null || svc == null) return;
+        TextView sub = (TextView) ((LinearLayout) restrictedRow.getChildAt(1)).getChildAt(1);
+        boolean on = svc.restrictedOn();
+        sub.setText(!on ? "Off. A PIN lock on zones, transmit, modes and tools, set by you for you" : com.macdmr.radio.Restricted.unlocked(getContext()) ? "On, unlocked for a while" : "On and locked. Tap for the PIN");
+    }
 
     private LinearLayout card(LinearLayout body, String title) {
         Context c = getContext(); float d = Theme.dp(c);
@@ -981,6 +1008,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     }
 
     private void refresh() {
+        updateRestricted();
         if (svc == null) return;
         Context c = getContext(); float d = Theme.dp(c);
         Neo.headerSubtitle(header).setText(svc.profile().name.toUpperCase(java.util.Locale.US));

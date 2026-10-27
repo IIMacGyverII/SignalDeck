@@ -364,6 +364,40 @@ public final class WebHost {
         JSONArray d = new JSONArray(); for (int i = 0; i < com.macdmr.radio.dsp.ToneTable.DCS_COUNT; i++) d.put("DCS D" + com.macdmr.radio.dsp.ToneTable.dcsCode(i));   // the index the MCU gets; N/I comes from the type
         return new JSONObject().put("ctcss", c).put("dcs", d);
     }
+    // ---- Restricted mode on the web: the same policy, the same refusals ----
+    private static final String[][] ROUTE_MODES = {
+        { "/api/aprs", "aprs" }, { "/api/sstv/send", "sstv" }, { "/api/sstv/monitor", "sstv" }, { "/api/ft8", "ft8" }, { "/api/textmodes", "textmodes" }, { "/api/terminal", "terminal" },
+        { "/api/winlink", "winlink" }, { "/api/keyer", "keyer" }, { "/api/trainer", "morse" }, { "/api/cwid", "morse" }, { "/api/schedules", "schedules" }, { "/api/sat", "satellites" },
+        { "/api/iss", "satellites" }, { "/api/scope", "scope" }, { "/api/exam", "exam" }, { "/api/logbook", "logbook" }, { "/api/pota", "pota" }, { "/api/nets", "nets" },
+        { "/api/forms", "forms" }, { "/api/mission", "forms" }, { "/api/dtmf", "dtmf" }, { "/api/m17", "m17" }, { "/api/finder", "finder" }, { "/api/captions", "captions" } };
+    private static final String[][] ROUTE_ADMIN = {
+        { "/api/channel/save", "editChannels" }, { "/api/channel/delete", "editChannels" }, { "/api/zones/delete", "editZones" }, { "/api/contacts/delete", "editContacts" },
+        { "/api/backup", "backup" }, { "/api/restore", "backup" }, { "/api/vfo", "vfo" }, { "/api/scan", "scan" }, { "/api/log", "report" } };
+    /** The refusal for a route the policy hides, else null. Reads (GET) of lists stay allowed; starts, sends and edits are refused. */
+    private String restrictedRoute(String p, boolean post) {
+        com.macdmr.radio.Restriction r = svc.restriction();
+        if (r.isEmpty()) return null;
+        for (String[] m : ROUTE_MODES) if (p.startsWith(m[0]) && !r.modeAllowed(m[1]) && (post || p.equals(m[0]))) return com.macdmr.radio.Restriction.REFUSED;
+        for (String[] a : ROUTE_ADMIN) if (p.startsWith(a[0]) && !r.adminAllowed(a[1])) return com.macdmr.radio.Restriction.REFUSED;
+        if (p.equals("/api/zones") && post && !r.adminAllowed("editZones")) return com.macdmr.radio.Restriction.REFUSED;
+        if (p.equals("/api/contacts") && post && !r.adminAllowed("editContacts")) return com.macdmr.radio.Restriction.REFUSED;
+        if (p.equals("/api/packet/tool") && post) return null;             // judged per tool below (parrot, fox, kiss, is)
+        return null;
+    }
+    /** What the browser hides: pages whose every tool is hidden, plus the lists the policy limits. */
+    private JSONObject restrictedJson() throws Exception {
+        com.macdmr.radio.Restriction r = svc.restriction();
+        JSONArray pages = new JSONArray();
+        if (!r.modeAllowed("aprs")) pages.put("aprs"); if (!r.modeAllowed("sstv")) pages.put("sstv"); if (!r.modeAllowed("satellites")) pages.put("sat");
+        if (!r.modeAllowed("scope")) pages.put("scope"); if (!r.modeAllowed("exam")) pages.put("exam"); if (!r.modeAllowed("logbook")) pages.put("log");
+        if (!r.modeAllowed("captions")) pages.put("trans"); if (!r.modeAllowed("dmrtext") && !r.modeAllowed("m17") && !r.modeAllowed("forms") && !r.modeAllowed("winlink")) pages.put("messages");
+        boolean anyPkt = false; for (String m : com.macdmr.radio.Restriction.MODES) if (r.modeAllowed(m)) { anyPkt = true; break; }
+        if (!anyPkt) pages.put("pkt");
+        JSONArray modes = new JSONArray(); for (String m : r.hiddenModes) modes.put(m);
+        JSONArray admin = new JSONArray(); for (String a : r.hiddenAdmin) admin.put(a);
+        return new JSONObject().put("on", svc.restrictedOn()).put("active", !r.isEmpty()).put("hiddenPages", pages).put("hiddenModes", modes).put("hiddenAdmin", admin);
+    }
+
     private JSONObject statusJson() throws Exception {
         JSONObject o = new JSONObject();
         o.put("link", svc.link()).put("ready", svc.isReady()).put("channel", channelObj(svc.current()));
@@ -373,6 +407,7 @@ public final class WebHost {
                 .put("txInhibited", svc.txInhibited()).put("webTx", allowTx()).put("tls", tlsRunning()).put("tlsPort", TLS_PORT);
         o.put("mode", modeJson()).put("sat", satJson()).put("sstv", sstvJson());
         o.put("version", com.macdmr.radio.BuildConfig.VERSION_NAME).put("captions", svc.captionsOn());
+        o.put("restricted", restrictedJson());
         return o;
     }
     private JSONObject modeJson() throws Exception {
@@ -511,6 +546,8 @@ public final class WebHost {
     private WebServer.Response api(WebServer.Request r) throws Exception {
         String p = r.path; boolean post = "POST".equals(r.method);
         final JSONObject b = post ? body(r) : new JSONObject();
+        String deny = restrictedRoute(p, post);
+        if (deny != null) return WebServer.Response.error(403, deny);
         switch (p) {
             case "/api/status": return ok(statusJson());
             case "/api/phone": return ok(phone().json());                       // battery, cell and Wi-Fi of the phone itself
@@ -573,9 +610,9 @@ public final class WebHost {
             }
             case "/api/channels": {
                 java.util.Set<Integer> favs = svc.store().favourites();
-                JSONArray a = new JSONArray(); for (ChannelStore.Channel ch : "1".equals(r.param("all")) ? svc.store().all() : svc.zoneChannels()) a.put(channelObj(ch).put("fav", favs.contains(ch.number)));   // all=1: every channel (the map)
+                JSONArray a = new JSONArray(); for (ChannelStore.Channel ch : "1".equals(r.param("all")) ? svc.visibleChannels() : svc.zoneChannels()) a.put(channelObj(ch).put("fav", favs.contains(ch.number)));   // all=1: every channel (the map)
                 JSONArray z = new JSONArray(); z.put(new JSONObject().put("id", 0).put("name", "ALL"));
-                for (ChannelStore.Zone zz : svc.store().zones()) z.put(new JSONObject().put("id", zz.id).put("name", zz.name));
+                for (ChannelStore.Zone zz : svc.visibleZones()) z.put(new JSONObject().put("id", zz.id).put("name", zz.name));
                 return ok(new JSONObject().put("channels", a).put("zones", z).put("zoneId", svc.zoneId()));
             }
             case "/api/channel/star": if (!post) break; {                    // star / unstar: the ★ Favourites zone
@@ -1138,7 +1175,8 @@ public final class WebHost {
                 onMain(() -> { svc.packet().applySettings(); return null; });
                 return ok("APRS settings saved");
             }
-            case "/api/packet/tool": if (!post) break; {                       // {tool: is|kiss|parrot, on}
+            case "/api/packet/tool": if (!post) break; {
+                { String tool = b.optString("tool", ""); String mid = "parrot".equals(tool) ? "parrot" : "fox".equals(tool) ? "fox" : "kiss".equals(tool) ? "kiss" : "is".equals(tool) ? "aprsis" : null; if (mid != null && b.optBoolean("on", false) && !svc.modeAllowed(mid)) return WebServer.Response.error(403, com.macdmr.radio.Restriction.REFUSED); }                       // {tool: is|kiss|parrot, on}
                 com.macdmr.radio.PacketEngine pe = svc.packet(); String tool = b.optString("tool", ""); boolean on = b.optBoolean("on", false);
                 if (on && (tool.equals("parrot") || tool.equals("fox")) && !allowTx()) return WebServer.Response.error(403, TX_OFF);     // both transmit
                 String msg = onMain(() -> {

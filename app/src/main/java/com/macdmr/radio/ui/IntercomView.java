@@ -673,6 +673,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
             if (scanState == lastScanState) return;   // pushModes runs on every Soft SQ gate change: rebuild the SCAN key only when it changes
             lastScanState = scanState;
             Context c = getContext(); int col = scanning ? Neo.AMBER : Neo.CYAN;
+            applyRestriction();
             scanBtn.setText(scanning ? (holding ? "HOLD" : "SCANNING") : "SCAN"); scanBtn.setTextColor(scanning ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);
             Neo.IconDrawable ic = new Neo.IconDrawable(scanning ? "stop" : "scan", scanBtn.getCurrentTextColor()); int sz = Theme.dp(c, 18); ic.setBounds(0, 0, sz, sz); scanBtn.setCompoundDrawables(ic, null, null, null);
             android.graphics.drawable.StateListDrawable st = new android.graphics.drawable.StateListDrawable();
@@ -689,5 +690,14 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         StringBuilder sb = new StringBuilder();
         for (String l : history) { if (sb.length() > 0) sb.append('\n'); sb.append(l); }
         historyText.setText(sb.toString());
+    }
+    /** Restricted mode: hidden satellites are not shown (the engine refuses them too). */
+    private void applyRestriction() {
+        if (svc == null) return;
+        com.macdmr.radio.Restriction r = svc.restriction();
+        if (vfo != null) vfo.setVisibility(r.adminAllowed("vfo") ? VISIBLE : GONE);
+        if (scanBtn != null) scanBtn.setVisibility(r.adminAllowed("scan") ? VISIBLE : GONE);
+        boolean anyMode = false; for (String m : com.macdmr.radio.Restriction.MODES) if (r.modeAllowed(m)) { anyMode = true; break; }
+        if (pkt != null) pkt.setVisibility(anyMode ? VISIBLE : GONE);
     }
 }

@@ -32,3 +32,6 @@ before touching radio behaviour; it wins over guesses.
 - All development testing that transmits is done inside a Faraday cage by a licensed RF expert. Never ask for, plan
   or assume an on-air test outside that setup; when a change needs a transmit test, say so and leave it to the owner.
 
+## Restricted mode (owner rule, 2026-10-27)
+
+Every new page, mode, tool or transmit path is wired into Restricted mode in the same change: an id in `Restriction.MODES` (or `ADMIN`), the guard at its service start (`modeAllowed` / `adminAllowed` / `txInhibited`), its hiding on the PKT sheet or the Device page, its route in `WebHost.ROUTE_MODES` / `ROUTE_ADMIN`, and a switch label in `ui/RestrictedDialog`. A feature that is not wired in is a bug, since the user who turned the mode on expects it to cover the whole app. Design: phonedmrapp `docs/plan-restricted-mode.md`; the help topic "Restricted mode" must stay true to the code.

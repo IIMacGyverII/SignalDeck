@@ -116,6 +116,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public com.macdmr.radio.ham.VoiceKeyer keyer() { return keyer; }
     /** Transmit a recorded keyer message (with the Morse ID after it when set and on an amateur channel). Error or null. */
     public String sendKeyer(int slot) {
+        if (!modeAllowed("keyer")) return Restriction.REFUSED;
         short[] p = keyer.pcm(slot);
         if (p == null || p.length == 0) return "Nothing recorded in " + keyer.name(slot);
         ChannelStore.Channel c = current;
@@ -207,6 +208,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
     /** Track a pass: at AOS minus a minute the VFO takes the satellite's channel, corrected for Doppler every 2 s, until LOS. */
     public String trackSat(final com.macdmr.radio.ham.Satellites.Sat sat, final com.macdmr.radio.ham.Sgp4 el, final com.macdmr.radio.ham.SatTrack.Pass pass) {
+        if (!modeAllowed("satellites")) return Restriction.REFUSED;
         final android.location.Location me = lastKnownLocation();
         if (me == null) return "No position fix: turn on location";
         stopSatTrack();
@@ -300,6 +302,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public boolean foxTxOn() { return foxThread != null; }
     /** Start or stop the fox beacon (5 s of beeps every minute on the current channel). Returns a message. */
     public String setFoxTx(boolean on) {
+        if (on && !modeAllowed("fox")) return Restriction.REFUSED;
         Thread t = foxThread; foxThread = null; if (t != null) t.interrupt();
         if (!on) { if (t != null) history("pkt", "\uD83E\uDD8A Fox beacon off"); pushModes(); return "Fox beacon off"; }
         ChannelStore.Channel ch = current;
@@ -336,6 +339,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public com.macdmr.radio.ham.Parrot parrot() { return parrot; }
     /** Turn the parrot on for the current channel (or off). Returns what happened, for a toast. */
     public String setParrot(boolean on) {
+        if (on && !modeAllowed("parrot")) return Restriction.REFUSED;
         if (!on) { if (parrot.enabled()) history("pkt", "\uD83E\uDD9C Parrot off (" + parrot.played() + " repeated)"); parrot.setEnabled(false); parrotChannel = -1; pushModes(); return "Parrot off"; }
         ChannelStore.Channel ch = current;
         if (ch == null || ch.isDigital()) return "The parrot needs an analog FM channel";
@@ -463,6 +467,7 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** SSTV receive: on the SSTV calling frequency (through the VFO) or on the current channel. */
     public String sstvMonitor(boolean on, boolean park) {
+        if (on && !modeAllowed("sstv")) return Restriction.REFUSED;
         if (packet == null) return "not ready";
         if (on) {
             if (park) {
@@ -606,6 +611,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** ISS APRS or ISS SSTV: track the pass that is up now, or the next one above 10\u00B0 in the next day; the pass page
      *  shows the countdown and the decoding. Returns an error, or null when tracking starts. */
     public String startIssMode(int mode) {
+        if (!modeAllowed("satellites")) return Restriction.REFUSED;
         android.location.Location me = lastKnownLocation();
         if (me == null) return "No position fix: turn on location";
         com.macdmr.radio.ham.Sgp4 el = satellites().elements().get(com.macdmr.radio.ham.Satellites.ISS_CATALOG);
@@ -711,6 +717,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public int aprsMonitorHz() { return aprsMonitorHz; }
     /** APRS monitoring on another frequency (the ISS digipeater on 145.825). */
     public String aprsMonitorAt(boolean on, int hz, String name) {
+        if (on && !modeAllowed("aprs")) return Restriction.REFUSED;
         if (packet == null) return "not ready";
         if (on) {
             aprsMonitorHz = hz;
@@ -1270,6 +1277,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     public void setCaptions(boolean on) {
+        if (on && !modeAllowed("captions")) { log("restricted: captions"); return; }
         captionsOn = on;
         if (on) { if (captions == null) captions = newVoskCaptions(); captions.setModel(captionModel()); }
         else if (captions != null) captions.stop();
@@ -1277,6 +1285,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     public String toggleScan() {
+        if (!scanner.isScanning() && !adminAllowed("scan")) return Restriction.REFUSED;
         if (scanner.isScanning()) { scanner.stop(); return "Scan stopped"; }
         if (vfo != null) return "Turn VFO off to scan channels";
         String err = scanner.start(); pushModes();      // the scanner tunes its first channel at once, which applies the scan-time Soft SQ
@@ -1287,6 +1296,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public long zoneId() { return zoneId; }
     public String zoneName() { if (zoneId <= 0) return "ALL"; ChannelStore.Zone z = store.zone(zoneId); return z == null ? "ALL" : z.name; }
     public void setZone(long id) {
+        if (id > 0) { ChannelStore.Zone zz = store.zone(id); if (zz != null && !Restricted.zoneVisible(restriction(), zz)) { log("restricted: zone hidden"); return; } }
         zoneId = id; getSharedPreferences("radio", MODE_PRIVATE).edit().putLong("zone", id).apply(); pushModes();
         // tune the channel last used in this zone (or stay, when the current channel is in it; else its first channel)
         if (pttDown || scanner.isScanning() || vfo != null) return;              // not while talking, scanning (it carries on in the new zone) or on the VFO
@@ -1305,8 +1315,14 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Channels in the selected zone, in channel order (all channels when no zone is selected). */
     public java.util.List<ChannelStore.Channel> zoneChannels() {
         java.util.List<ChannelStore.Channel> all = store.all();
+        Restriction r = restriction();
+        if (!r.allZones) {                                                     // Restricted mode: only channels of a visible zone exist for stepping, scan, lists and roaming
+            java.util.List<ChannelStore.Zone> zones = store.zones();
+            java.util.List<ChannelStore.Channel> vis = new java.util.ArrayList<>(); for (ChannelStore.Channel ch : all) if (Restricted.channelVisible(r, zones, ch.number)) vis.add(ch);
+            all = vis;
+        }
         if (zoneId <= 0) return all;
-        ChannelStore.Zone z = store.zone(zoneId); if (z == null) return all;
+        ChannelStore.Zone z = store.zone(zoneId); if (z == null || !Restricted.zoneVisible(r, z)) return all;
         java.util.Set<Integer> in = new java.util.HashSet<>(); for (int n : z.numbers) in.add(n);
         java.util.List<ChannelStore.Channel> out = new java.util.ArrayList<>(); for (ChannelStore.Channel ch : all) if (in.contains(ch.number)) out.add(ch);
         return out;
@@ -1369,6 +1385,11 @@ public class RadioService extends Service implements RadioEngine.Events {
     private synchronized void selectChannelNow(int number) {
         ChannelStore.Channel ch = store.byNumber(number);
         if (ch == null) { log("no channel " + number); return; }
+        if (!channelVisible(ch)) {                                             // Restricted mode: a hidden channel is never selected; the zone's first visible one is
+            java.util.List<ChannelStore.Channel> in = zoneChannels();
+            if (in.isEmpty()) { log("restricted: channel " + number + " hidden, nothing visible"); return; }
+            log("restricted: channel " + number + " hidden, using " + in.get(0).number); ch = in.get(0); number = ch.number;
+        }
         vfo = null;
         applyChannelNow(ch, true);
         rememberZoneChannel(number);
@@ -1602,6 +1623,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Tune the VFO (enters VFO mode if not in it); the previous real channel is remembered for {@link #exitVfo}. */
     public void applyVfo(final ChannelStore.Channel in) { applyVfo(in, true); }
     public void applyVfo(final ChannelStore.Channel in, boolean remember) {
+        if (!adminAllowed("vfo")) { log("restricted: VFO hidden"); return; }
         final ChannelStore.Channel v = vfoCopy(in);
         v.id = -1; v.number = 0;
         if (v.name == null || v.name.isEmpty()) v.name = "VFO " + String.format(Locale.US, "%.4f", v.rxFreq / 1e6) + (v.isDigital() ? " DMR" : " FM");
@@ -1656,10 +1678,26 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     // ---- PTT ----------------------------------------------------------------------------------------
 
+    // ---- Restricted mode: the policy in force, asked by every transmit, channel, mode and admin path ----
+    public Restriction restriction() { return Restricted.effective(this); }
+    public boolean restrictedOn() { return Restricted.on(this); }
+    public boolean modeAllowed(String id) { return restriction().modeAllowed(id); }
+    public boolean adminAllowed(String id) { return restriction().adminAllowed(id); }
+    /** Is this stored channel visible under the policy (every channel when zones are not limited). */
+    public boolean channelVisible(ChannelStore.Channel ch) { Restriction r = restriction(); if (r.allZones) return true; return ch != null && ch.number > 0 && Restricted.channelVisible(r, store.zones(), ch.number); }
+    private boolean restrictedTx() { Restriction r = restriction(); return r.transmit != Restriction.TX_ALL && !Restricted.mayTransmitOn(r, store.zones(), current); }
+    /** The zones the policy lets the user see (all of them when it limits none). */
+    /** Every channel the policy lets the user see, in channel order (all of them when zones are not limited). */
+    public java.util.List<ChannelStore.Channel> visibleChannels() { return Restricted.filterChannels(this, store.zones(), store.all()); }
+    /** After the mode was turned on, off, edited, unlocked or locked: the screens and the car redraw. */
+    public void restrictionChanged() { pushModes(); if (current != null && !channelVisible(current) && vfo == null) { java.util.List<ChannelStore.Channel> in = zoneChannels(); if (!in.isEmpty()) selectChannel(in.get(0).number); } }
+    public java.util.List<ChannelStore.Zone> visibleZones() { Restriction r = restriction(); java.util.List<ChannelStore.Zone> out = new java.util.ArrayList<>(); for (ChannelStore.Zone z : store.zones()) if (Restricted.zoneVisible(r, z)) out.add(z); return out; }
+
     public boolean txInhibited() {
         if (!profile.verified || ProfileRegistry.transmitBlocked()) return true;   // an untested profile never transmits; an advisory can switch it off (the Xplore 1 keys through a GPIO line)
         ChannelStore.Channel ch = current;
         if (ch == null) return true;
+        if (restrictedTx()) return true;                           // Restricted mode: receive only, or a channel outside the visible zones
         if (ch.isM17() && !m17CanSend()) return true;             // stock firmware: an M17 channel is receive-only
         SatState ss = satState;
         if (ss != null && ss.listenOnly && vfo != null && ss.name.equals(vfo.name)) return true;     // a satellite downlink (ISS SSTV)
@@ -1767,6 +1805,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public void diagSym(java.io.File f) { diagSym(f, false, false, false); }
     public void diagSym(java.io.File f, boolean eot) { diagSym(f, eot, false, false); }
     public void diagSym(java.io.File f, boolean eot, boolean forceKey, boolean nounkey) {
+        if (txInhibited()) { log("sym: transmit inhibited"); return; }
         Thread old = symThread;
         if (old != null && old.isAlive()) { log("sym busy"); return; }
         Thread t = new Thread(() -> streamSym(f, eot, forceKey, nounkey), "m17-sym");
@@ -1781,6 +1820,7 @@ public class RadioService extends Service implements RadioEngine.Events {
      * out the retune.
      */
     public String sendPage(int baud, int hz, int[] rics, int func, String text, boolean sign) {
+        if (!modeAllowed("pocsag")) return Restriction.REFUSED;
         if (rics == null || rics.length == 0) return "Add at least one RIC";
         if (text == null || text.trim().isEmpty()) return "Write the message";
         if (!ChannelStore.inBand(hz)) return "Frequency must be 136–174 or 400–480 MHz";
@@ -2085,6 +2125,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Hold to talk on the M17 screen. The voice limit stays 28 s. Does nothing on stock firmware. */
     public void m17Voice(boolean down) {
         if (!down) { m17Down = false; return; }
+        if (txInhibited()) { log("m17 voice: transmit inhibited"); history("warn", "\u26A0\uFE0F Transmit is not allowed on this channel"); return; }
         if (!m17CanSend()) { log("m17 voice: stock firmware"); history("warn", "⚠️ M17 transmit needs the module firmware with the symbol engine"); return; }
         if (current != null && current.isDigital()) { log("m17 voice: digital channel"); history("warn", "⚠️ M17 transmit needs an analog channel"); return; }
         if (symThread != null && symThread.isAlive()) { log("m17 voice: busy"); return; }
@@ -2613,6 +2654,7 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Send a DMR text to a contact (private / group / all) over the current digital channel. */
     public void sendSms(final ChannelStore.Contact to, final String text) {
+        if (!modeAllowed("dmrtext") || restrictedTx()) { history("warn", "\u26A0\uFE0F " + Restriction.REFUSED); ui.post(() -> { for (Listener l : listeners) l.onSmsResult(false); }); return; }
         final long id = store.addMessage(to.number, to.type, true, text, 0);
         try { ChannelStore.Contact pc = to.id > 0 ? to : store.contactByNumber(to.number, to.type); if (pc != null) store.contactSent(pc.id, System.currentTimeMillis(), "DMR text", text); } catch (Throwable e) { }
         worker.execute(() -> {
@@ -3211,6 +3253,7 @@ public class RadioService extends Service implements RadioEngine.Events {
      *             False keeps the calibrated equalizer and releases a hold. The M17 screen's button uses true.
      */
     public synchronized String setM17(boolean on, boolean hold) {
+        if (on && !modeAllowed("m17")) return Restriction.REFUSED;
         M17Station s = m17();
         if (!on) { s.stop(); dataReceive = false; scheduleDataHold(false); return null; }
         ChannelStore.Channel c = current;
@@ -3283,6 +3326,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public boolean ft8Running() { com.macdmr.radio.ham.Ft8Station f = ft8; return f != null && f.running(); }
     /** Start or stop listening for FT8; the scheduler ticks four times a second while it runs. */
     public synchronized void setFt8(boolean on) {
+        if (on && !modeAllowed("ft8")) { log("restricted: ft8"); return; }
         final com.macdmr.radio.ham.Ft8Station s = ft8();
         if (on) { s.start(); if (ft8Ticks == null) ft8Ticks = ft8Exec.scheduleAtFixedRate(() -> { try { s.tick(); } catch (Throwable t) { log("ft8: " + t); } }, 0, 250, java.util.concurrent.TimeUnit.MILLISECONDS); }
         else { s.stop(); if (ft8Ticks != null) { ft8Ticks.cancel(false); ft8Ticks = null; } }
@@ -3339,6 +3383,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
     /** Send a form: "aprs" to a callsign (67-character parts, one every 12 s) or "dmr" to a contact (120-character parts). Null or an error. */
     public String sendForm(final com.macdmr.radio.ham.Forms.Form f, String via, final String toCall, final ChannelStore.Contact toContact) {
+        if (!modeAllowed("forms")) return Restriction.REFUSED;
         if (f.id == null || f.id.isEmpty()) f.id = com.macdmr.radio.ham.Forms.newId(new java.util.Random());
         final com.macdmr.radio.ham.FormStore.Row r = new com.macdmr.radio.ham.FormStore.Row(); r.ts = System.currentTimeMillis(); r.outgoing = true; r.form = f;
         if ("aprs".equals(via)) {
@@ -3422,6 +3467,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     volatile int scopeSq = 9;                                                 // the squelch byte for sweep steps (bench: DIAG scope --ei sq)
     /** Start a sweep (null) or why not: never around a tracked satellite pass or while talking. */
     public String scopeStart(int from, int to, int step, int settleMs) {
+        if (!modeAllowed("scope")) return Restriction.REFUSED;
         if (!isReady()) return "The radio is not ready";
         if (pttDown) return "Not while transmitting";
         long now = System.currentTimeMillis();
@@ -3434,7 +3480,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public void scopeStop() { scope.stop(); }
 
     // ---- scheduled operations (Scheduler): start, then put the radio back when the time is up ----
-    public void runSchedule(int id) { ui.post(() -> runScheduleNow(id, 0)); }
+    public void runSchedule(int id) { if (!modeAllowed("schedules")) return; ui.post(() -> runScheduleNow(id, 0)); }
     public void endSchedule(int id) { ui.post(() -> endScheduleNow(id)); }
     private void runScheduleNow(final int id, final int tries) {
         Scheduler.Entry e = Scheduler.byId(this, id); if (e == null) return;

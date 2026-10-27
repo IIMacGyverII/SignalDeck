@@ -263,7 +263,52 @@ public final class PktDialog {
         button(r5, "Alerts heard", Theme.REC, x -> wxLog());
         body.addView(r5);
         body.addView(hint("SAME alert headers on the 162.400–162.550 MHz weather channels are decoded automatically and raise a notification" + (pe.wxEnabled() ? "." : " (off in Settings).")));
+        hideRestricted(body);
         dlg = dialog(body);
+    }
+
+    /** Which PKT section (by its title) belongs to which Restricted-mode id, and which single buttons do. */
+    private static final String[][] SECTION_MODES = {
+        { "Digital voice", "m17" }, { "APRS", "aprs" }, { "Simplex repeater (parrot)", "parrot" }, { "Text modes", "textmodes" },
+        { "Packet terminal", "terminal" }, { "Packet finder", "finder" }, { "Winlink e-mail", "winlink" }, { "Licence exam practice", "exam" },
+        { "Logbook", "logbook" }, { "Fox hunt", "fox" }, { "Message forms", "forms" }, { "Nets", "nets" }, { "Voice keyer and ID timer", "keyer" },
+        { "Morse", "morse" }, { "Scheduled operations", "schedules" }, { "Pager", "pocsag" }, { "SSTV pictures", "sstv" }, { "DTMF", "dtmf" },
+        { "NOAA weather alerts", "wx" } };
+    private static String buttonMode(String label) {
+        if (label == null) return null;
+        if (label.contains("KISS TNC")) return "kiss";
+        if (label.contains("APRS-IS")) return "aprsis";
+        if (label.startsWith("Satellite")) return "satellites";
+        if (label.equals("Band scope")) return "scope";
+        if (label.startsWith("FT8")) return "ft8";
+        if (label.startsWith("POTA") || label.startsWith("Activating ")) return "pota";
+        if (label.contains("pages") || label.contains("Hear pages")) return "pages";
+        return null;
+    }
+    /** Restricted mode: remove hidden sections (the title through to the next title) and hidden single buttons; empty rows go too. */
+    private void hideRestricted(LinearLayout body) {
+        com.macdmr.radio.Restriction r = svc.restriction();
+        if (r.isEmpty()) return;
+        String gate = null;                                   // the mode id of the section being walked, when it is hidden
+        java.util.List<View> drop = new java.util.ArrayList<>();
+        for (int i = 0; i < body.getChildCount(); i++) {
+            View v = body.getChildAt(i);
+            Object tag = v.getTag();
+            if (tag instanceof String && ((String) tag).startsWith("section:")) {
+                String title = ((String) tag).substring(8); gate = null;
+                for (String[] sm : SECTION_MODES) if (sm[0].equals(title) && !r.modeAllowed(sm[1])) gate = sm[1];
+                if (gate != null) drop.add(v);
+                continue;
+            }
+            if (gate != null) { drop.add(v); continue; }
+            if (v instanceof LinearLayout) {                   // a row of buttons: drop the hidden ones, then the row if nothing is left
+                LinearLayout row = (LinearLayout) v; java.util.List<View> gone = new java.util.ArrayList<>();
+                for (int k = 0; k < row.getChildCount(); k++) { View b = row.getChildAt(k); Object bt = b.getTag(); String m = bt instanceof String ? buttonMode((String) bt) : null; if (m != null && !r.modeAllowed(m)) gone.add(b); }
+                for (View b : gone) row.removeView(b);
+                if (!gone.isEmpty() && row.getChildCount() == 0) drop.add(v);
+            }
+        }
+        for (View v : drop) body.removeView(v);
     }
 
     private TextView status() {
@@ -640,13 +685,13 @@ public final class PktDialog {
     private LinearLayout page(String title) { return Neo.sheetBody(c, title); }
     private AlertDialog dialog(LinearLayout body) { return Neo.showSheet(c, body); }
     private TextView hint(String s) { return Neo.sheetHint(c, s); }
-    private TextView section(String s) { return Neo.sheetSection(c, s); }
+    private TextView section(String s) { TextView t = Neo.sheetSection(c, s); t.setTag("section:" + s); return t; }
     private LinearLayout row() {
         LinearLayout r = new LinearLayout(c); r.setOrientation(LinearLayout.HORIZONTAL); r.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.topMargin = dp(2); lp.bottomMargin = dp(4); r.setLayoutParams(lp);
         return r;
     }
-    private TextView button(LinearLayout row, String text, int[] accent, View.OnClickListener l) { TextView b = Neo.button(c, text, null, Neo.accentOf(accent)); b.setTextSize(14); Neo.fit(b); b.setOnClickListener(l); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins(dp(3), dp(4), dp(3), dp(2)); row.setBaselineAligned(false); row.addView(b, lp); return b; }
+    private TextView button(LinearLayout row, String text, int[] accent, View.OnClickListener l) { TextView b = Neo.button(c, text, null, Neo.accentOf(accent)); b.setTextSize(14); b.setTag(text); Neo.fit(b); b.setOnClickListener(l); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins(dp(3), dp(4), dp(3), dp(2)); row.setBaselineAligned(false); row.addView(b, lp); return b; }
     private LinearLayout shell() {
         LinearLayout r = new LinearLayout(c); r.setOrientation(LinearLayout.VERTICAL);
         r.setBackground(Neo.rowCard(c)); r.setPadding(dp(12), dp(8), dp(12), dp(8));

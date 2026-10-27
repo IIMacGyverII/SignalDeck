@@ -51,12 +51,12 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
         RadioService s = RadioService.running;
         ChannelStore store = s != null ? s.store() : new ChannelStore(this);
         if (ROOT.equals(parentId)) {
-            List<ChannelStore.Zone> zones = new ArrayList<>(store.zones());
+            List<ChannelStore.Zone> zones = new ArrayList<>(com.macdmr.radio.Restricted.filterZones(this, store.zones()));
             zones.sort((a, b) -> Boolean.compare(!com.macdmr.radio.ui.ChannelsView.FAV_ZONE.equals(a.name), !com.macdmr.radio.ui.ChannelsView.FAV_ZONE.equals(b.name)));   // Favourites first
             out.add(folder(HEARD, "Last heard", "Who and what was received, newest first", CarArt.zoneTile(this, "last heard")));
             for (ChannelStore.Zone z : zones)
                 out.add(folder(ZONE + z.id, z.name, z.numbers.length + (z.numbers.length == 1 ? " channel" : " channels"), CarArt.zoneTile(this, z.name)));
-            out.add(folder(ALL, "All channels", store.all().size() + " channels", CarArt.zoneTile(this, "all")));
+            out.add(folder(ALL, "All channels", com.macdmr.radio.Restricted.filterChannels(this, store.zones(), store.all()).size() + " channels", CarArt.zoneTile(this, "all")));
         } else if (HEARD.equals(parentId)) {
             if (s != null) {
                 int i = 0;
@@ -69,13 +69,13 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
                 }
             }
         } else if (ALL.equals(parentId)) {
-            for (ChannelStore.Channel c : store.all()) out.add(channel(this, c));
+            for (ChannelStore.Channel c : com.macdmr.radio.Restricted.filterChannels(this, store.zones(), store.all())) out.add(channel(this, c));
         } else if (parentId.startsWith(ZONE)) {
             long id; try { id = Long.parseLong(parentId.substring(ZONE.length())); } catch (NumberFormatException e) { id = -1; }
             ChannelStore.Zone z = store.zone(id);
             if (z != null) {
                 java.util.Set<Integer> in = new java.util.HashSet<>(); for (int n : z.numbers) in.add(n);
-                for (ChannelStore.Channel c : store.all()) if (in.contains(c.number)) out.add(channel(this, c));
+                for (ChannelStore.Channel c : com.macdmr.radio.Restricted.filterChannels(this, store.zones(), store.all())) if (in.contains(c.number)) out.add(channel(this, c));
             }
         }
         result.sendResult(out);
@@ -86,7 +86,7 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
         RadioService s = RadioService.running;
         ChannelStore store = s != null ? s.store() : new ChannelStore(this);
         String q = query.toLowerCase(Locale.US).trim();
-        for (ChannelStore.Channel c : store.all())
+        for (ChannelStore.Channel c : com.macdmr.radio.Restricted.filterChannels(this, store.zones(), store.all()))
             if (c.name.toLowerCase(Locale.US).contains(q) || String.valueOf(c.number).equals(q) || c.freqText(c.rxFreq).startsWith(q)) out.add(channel(this, c));
         result.sendResult(out);
     }

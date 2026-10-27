@@ -53,6 +53,7 @@ public class ContactsView extends LinearLayout {
         float d = Theme.dp(c);
         header = Neo.header(c, "Contacts", "");
         ImageView add = Neo.iconButton(c, "plus", Neo.GREEN, "Add contact");
+        if (svc != null && !svc.adminAllowed("editContacts")) add.setVisibility(GONE);
         add.setOnClickListener(v -> edit(null));
         Neo.addAction(header, add);
         addView(header);
@@ -158,7 +159,7 @@ public class ContactsView extends LinearLayout {
 
     private void menu(final ChannelStore.Contact ct) { ContactEditor.sheet(getContext(), svc, ct, this::reload); }
 
-    private void edit(final ChannelStore.Contact existing) { ContactEditor.edit(getContext(), svc, existing != null ? existing : new ChannelStore.Contact(), x -> reload()); }
+    private void edit(final ChannelStore.Contact existing) { if (svc != null && !svc.adminAllowed("editContacts")) return; ContactEditor.edit(getContext(), svc, existing != null ? existing : new ChannelStore.Contact(), x -> reload()); }
 
     private final class Adapter extends BaseAdapter {
         @Override public int getCount() { return shown.size(); }

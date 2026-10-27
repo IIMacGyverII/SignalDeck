@@ -53,7 +53,7 @@ public class ChannelListScreen extends Screen {
         if (s == null) {
             list.addItem(new Row.Builder().setTitle("The radio is off").addText("Open SignalDeck on the phone").build());
         } else if (zoneId < 0 && !all) {
-            List<ChannelStore.Zone> zones = new ArrayList<>(s.store().zones());
+            List<ChannelStore.Zone> zones = new ArrayList<>(s.visibleZones());
             ChannelStore.Zone fav = null;
             for (ChannelStore.Zone z : zones) if (FAV.equals(z.name)) fav = z;
             if (fav != null) zones.remove(fav);
@@ -77,12 +77,12 @@ public class ChannelListScreen extends Screen {
                         .setImage(icon(CarArt.zoneTilePublic(getCarContext(), z.name))).setBrowsable(true)
                         .setOnClickListener(() -> getScreenManager().push(new ChannelListScreen(getCarContext(), z.id, false, z.name))).build());
             }
-            list.addItem(new Row.Builder().setTitle("All channels").addText(s.store().all().size() + " channels").setImage(icon(CarArt.zoneTilePublic(getCarContext(), "all"))).setBrowsable(true)
+            list.addItem(new Row.Builder().setTitle("All channels").addText(s.visibleChannels().size() + " channels").setImage(icon(CarArt.zoneTilePublic(getCarContext(), "all"))).setBrowsable(true)
                     .setOnClickListener(() -> getScreenManager().push(new ChannelListScreen(getCarContext(), -1, true, "All channels"))).build());
         } else {
             List<ChannelStore.Channel> chans = new ArrayList<>();
-            if (all) chans.addAll(s.store().all());
-            else { ChannelStore.Zone z = s.store().zone(zoneId); if (z != null) { Set<Integer> in = new HashSet<>(); for (int x : z.numbers) in.add(x); for (ChannelStore.Channel c : s.store().all()) if (in.contains(c.number)) chans.add(c); } }
+            if (all) chans.addAll(s.visibleChannels());
+            else { ChannelStore.Zone z = s.store().zone(zoneId); if (z != null) { Set<Integer> in = new HashSet<>(); for (int x : z.numbers) in.add(x); for (ChannelStore.Channel c : s.visibleChannels()) if (in.contains(c.number)) chans.add(c); } }
             ChannelStore.Channel cur = s.current();
             int start = 0;
             if (chans.size() > max && cur != null) for (int i = 0; i < chans.size(); i++) if (chans.get(i).number == cur.number) start = Math.max(0, Math.min(i - max / 2, chans.size() - max));   // long list: centred on the current channel

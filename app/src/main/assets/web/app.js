@@ -100,7 +100,14 @@ async function refresh() { try { S.status = await api('status'); renderStatus();
 function setConn(ok) { $('connDot').className = 'dot ' + (ok ? 'ok' : 'bad'); $('connText').textContent = ok ? 'Live' : 'Reconnecting…'; }
 
 // ---- intercom ----
+// Restricted mode (set on the phone): pages the policy hides leave the menu; a hidden page in view goes back to the intercom.
+function applyRestricted(s) {
+  const hidden = (s && s.restricted && s.restricted.hiddenPages) || [];
+  document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('hidden', hidden.includes(a.dataset.page)));
+  if (hidden.includes(S.page)) location.hash = '#intercom';
+}
 function renderStatus() {
+  applyRestricted(S.status);
   const s = S.status; if (!s) return; const ch = s.channel || {};
   $('chNum').textContent = s.vfo ? 'VFO' : (ch.number != null ? String(ch.number).padStart(2, '0') : '--');
   $('chName').textContent = ch.name || (ch.digital ? 'Digital' : 'Analog');

@@ -63,6 +63,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         ImageView zone = Neo.iconButton(c, "zone", Neo.CYAN, "Zones");
         zone.setOnClickListener(v -> { if (svc != null) ZonesDialog.show(c, svc, this::reload); });
         ImageView add = Neo.iconButton(c, "plus", Neo.GREEN, "Add channel");
+        if (svc != null && !svc.adminAllowed("editChannels")) add.setVisibility(GONE);
         add.setOnClickListener(v -> { if (host != null) host.openEditor(null, true); });
         ImageView mapBtn = Neo.iconButton(c, "map", Neo.CYAN, "Map");
         mapBtn.setOnClickListener(v -> MapDialog.show(c, svc));
@@ -193,7 +194,9 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         final boolean fav = favs.contains(ch.number);
         String[] names = { "Use", "Edit", fav ? "Unstar" : "Star", "Delete" };
         int[] accents = { Neo.GREEN, Neo.CYAN, Neo.AMBER, Neo.RED };
+        boolean canEdit = svc == null || svc.adminAllowed("editChannels");
         for (int i = 0; i < 4; i++) {
+            if (!canEdit && (i == 1 || i == 3)) continue;                       // Restricted mode: no Edit, no Delete
             final int k = i;
             TextView b = Neo.button(c, names[i], null, accents[i]); b.setTextSize(14);
             LayoutParams lp = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (16 * d), (int) (3 * d), 0);

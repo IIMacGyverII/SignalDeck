@@ -107,8 +107,9 @@ public final class FirmwareScreen extends LinearLayout {
         download.setOnClickListener(v -> downloadFactory());
         body.addView(download, buttonPad());
 
-        body.addView(Neo.caps(c, "Advanced"));
+        TextView advCaps = Neo.caps(c, "Advanced"); body.addView(advCaps);
         allowUnlisted = Neo.button(c, "Allow unlisted images · off", "lock", Neo.AMBER);
+        if (!svc.adminAllowed("advanced")) { advCaps.setVisibility(GONE); allowUnlisted.setVisibility(GONE); }
         allowUnlisted.setOnClickListener(v -> toggleUnlisted());
         body.addView(allowUnlisted, buttonPad());
         hashEntry = new EditText(c);

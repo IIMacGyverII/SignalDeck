@@ -42,12 +42,13 @@ public final class ZonesDialog {
         Runnable done = () -> { if (self[0] != null) self[0].dismiss(); if (changed != null) changed.run(); };
 
         body.addView(zoneRow(c, svc, null, svc.zoneId() <= 0, svc.store().count(), done, self), rowLp(d));
-        for (ChannelStore.Zone z : svc.store().zones()) body.addView(zoneRow(c, svc, z, svc.zoneId() == z.id, z.numbers.length, done, self), rowLp(d));
+        for (ChannelStore.Zone z : svc.visibleZones()) body.addView(zoneRow(c, svc, z, svc.zoneId() == z.id, z.numbers.length, done, self), rowLp(d));
 
         TextView add = Neo.button(c, "Add a zone", "plus", Neo.GREEN);
         LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); bl.topMargin = (int) (10 * d);
         body.addView(add, bl);
         add.setOnClickListener(v -> addSheet(c, svc, done));
+        if (!svc.adminAllowed("editZones")) add.setVisibility(android.view.View.GONE);
         self[0] = Neo.showSheet(c, body);
     }
 

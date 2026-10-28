@@ -1185,12 +1185,14 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** MON is on and the module is admitting every call (talkgroup, ID and colour code ignored), so the caller line carries CC and slot. */
     public boolean promiscuousOn() { return monitorOn && promiscuousCapable(); }
     /** Command 0x40 op 15: body {15, 1} on / {15, 0} off; the reply body echoes the flag. Stock firmware has no 0x40, so this is sent only behind promiscuousCapable(). */
-    private void sendPromiscuous(final boolean on) { worker.execute(() -> sendPromiscuousNow(on)); }
-    private void sendPromiscuousNow(boolean on) {
+    private void sendPromiscuous(final boolean on) { worker.execute(() -> sendPromiscuousNow(on, true)); }
+    private void sendPromiscuousNow(boolean on) { sendPromiscuousNow(on, false); }   // the callers that write a channel next anyway
+    private void sendPromiscuousNow(boolean on, boolean reapply) {
         try {
             Frame f = engine.diag40(new byte[] { 15, (byte) (on ? 1 : 0) }, 1000);
             log("promiscuous " + (on ? "on" : "off") + (f == null ? ": no answer" : ": sr=" + f.sr + (f.body != null && f.body.length > 0 ? " flag=" + (f.body[0] & 0xFF) : "")));
             if (f == null || f.sr != 0) history("warn", "WARN The module did not take the promiscuous flag (MON is the radio's own monitor only)".replace("WARN", String.valueOf(WARN_CHAR)));
+            else if (!on && reapply && current != null && current.isDigital()) applyChannelNow(current, current.id > 0);   // FW26-FW30: clearing the flag leaves the receiver deaf to the channel's own calls until a channel write (bench 2026-10-28)
         } catch (java.io.IOException e) { log("promiscuous: " + e); }
     }
     private static final char WARN_CHAR = (char) 0x26A0;
@@ -2531,7 +2533,11 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (uiLog) ui.post(() -> { for (Listener l : listeners) l.onLog(s); });
     }
 
+    /** FW26+ in promiscuous mode reports a call it admitted outside the channel's lists as 10 / 11 (MIX_DIGITAL_RX_START / _STOP, bench 2026-10-28); on a digital channel that is a reception like 1 / 2. */
+    static int rxStatusFor(int code, boolean digital) { return digital && (code == 10 || code == 11) ? code - 9 : code; }
+
     @Override public void status(int code, String name) {
+        code = rxStatusFor(code, current != null && current.isDigital());
         switch (code) {
             case 1: receiving = true; dmrEvent("start", 0, 0, 0);
                 if (current != null && current.isDigital()) {           // a DMR call: forget the last talker, ask who this is now and again a second later

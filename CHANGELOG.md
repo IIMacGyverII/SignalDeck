@@ -4,6 +4,12 @@ Newest first. Each entry: what changed, the files, and how it was tested (host t
 the move to this repository (2026-10-17 to 2026-10-22, beta.1 to beta.11 and after) are in
 [phonedmrapp/CHANGELOG_DRAFT.md](https://github.com/IIMacGyverII/phonedmrapp/blob/main/CHANGELOG_DRAFT.md).
 
+## 2026-10-28 — Promiscuous MON: calls admitted outside the lists show up, and MON off leaves the radio hearing
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| phonedmrapp `radio_firmware/results.md` (promiscuous A/B on FW30, 2026-10-28) | With MON on at FW26+, the module reports the calls it admits as status 10 / 11 (mixed digital receive start / stop), which the app ignored: no receive light, no caller query, no history. On a digital channel they are now a reception like 1 / 2. Switching MON off sends the current channel again, because clearing the flag leaves the receiver deaf to the channel's own calls until a channel write (firmware bug, queued for the firmware). Help: Monitor | `RadioService.java`, `HelpView.java`, `PromiscuousStatusTest.java` | Host suite; the device A/B on FW30 with the hotspot is next |
+
 ## 2026-10-28 — Data modes: decoders below the squelch, speaker quiet; the W6 keeps a squelch for data
 
 | Backlog | Change | Files | Test |

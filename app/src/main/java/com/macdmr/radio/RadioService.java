@@ -688,10 +688,12 @@ public class RadioService extends Service implements RadioEngine.Events {
                 }
                 pttDown = true;
                 if (audio != null) audio.stopRx();
+                dropHoldForFmKey();
                 engine.ptt(true);
                 log("TX " + label + " (" + ms + " ms)");
                 try { Thread.sleep(200); if (audio != null) log(audio.playPcm(pcm)); }
                 finally { if (heatWatch != null) heatWatch.interrupt(); engine.ptt(false); pttDown = false; thermal.after(ms); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); holdAfterTx(); }
+                holdAfterTx();                                   // the hold was dropped for the FM key
                 if (ms > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(ms / 1000.0) + " s (" + label + "); " + thermal.state());
                 if (onDone != null) onDone.run();
             } catch (Throwable t) { log("TX " + label + ": " + t); try { engine.ptt(false); } catch (Throwable ignored) { } pttDown = false; }
@@ -1932,6 +1934,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         audio.setTxLevel(pk -> { if (vox == v && v.level(pk, System.currentTimeMillis())) { vox = null; log("stopped: quiet for " + VOX_NAMES[vi]); ptt(false); } });
                     } else if (audio != null) { vox = null; audio.setTxLevel(null); }
                     if (carMic) log("TX with the car microphone"); else if (fromWheel && inCar && carMic()) log("TX from the wheel: phone microphone (keeps the wheel's buttons working)");
+                    dropHoldForFmKey();
                     engine.ptt(true);
                     if (audio != null) log(audio.startTx());
                     ui.removeCallbacks(txWatchdog); ui.postDelayed(txWatchdog, 28000);
@@ -3806,6 +3809,15 @@ public class RadioService extends Service implements RadioEngine.Events {
      *  sent again (seen 2026-10-27 on the hotspot bench: after an M17 key the signal bar moved but no M17 was decoded until a
      *  channel change). Every transmit path calls this once its carrier is down. */
     private void holdAfterTx() { if (dataReceive) scheduleDataHold(true); }
+    /** A plain FM key with the M17 voice-filter hold set: bench images route a 0x26 on with the hold byte set into the symbol
+     *  engine's setup, so the carrier never comes (FW30 and FW38, bench 2026-10-29 12:30). The hold only helps receive: release
+     *  it for the key, on the radio worker, and holdAfterTx() puts it back after. */
+    private void dropHoldForFmKey() {
+        ChannelStore.Channel c = current;
+        if (!dataReceive || c == null || c.isDigital() || !Firmware.stubTag(moduleVersion)) return;
+        dataHoldGen.incrementAndGet();                                  // a hold still queued must not land during the key
+        sendDataHold(false);
+    }
 
     /** After a symbol-engine transmission (M17 voice and texts, pages, symbol streams) the module leaves its receive audio
      *  muted: measured 2026-10-27 on FW26, the receive RMS fell from about 5600 to 1.3 after the unkey and stayed there while
@@ -3815,7 +3827,15 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** The first bench image that clears the module's own receive mute after a symbol key (FW31, phonedmrapp
      *  radio_firmware/reviews.md 2026-10-28): there a channel write would put the mute back, so only the hold is re-sent. */
     static final int SYM_UNMUTE_FW = 31;
-    static boolean rewriteAfterSym(String moduleVersion) { return !(Firmware.stubTag(moduleVersion) && Firmware.tagNumber(moduleVersion) >= SYM_UNMUTE_FW); }
+    /** The first bench image without that clear again (FW37 restores the symbol key's RF_MODE itself, FW38 also WORK_MODE and the
+     *  FM bandwidth): from there the unkey and one channel write are as on FW30 and earlier. On FW38 the FW31-era path (no 0x26 off)
+     *  left the next FM key unanswered for about a minute (bench 2026-10-29 12:00). */
+    static final int SYM_UNMUTE_END_FW = 37;
+    static boolean rewriteAfterSym(String moduleVersion) {
+        if (!Firmware.stubTag(moduleVersion)) return true;
+        int n = Firmware.tagNumber(moduleVersion);
+        return n < SYM_UNMUTE_FW || n >= SYM_UNMUTE_END_FW;
+    }
     private void rxAfterSym() {
         ChannelStore.Channel c = current;
         if (c == null) return;

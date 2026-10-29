@@ -19,6 +19,9 @@ public class SymUnmuteTest {
         assertTrue("unnumbered bench tag", RadioService.rewriteAfterSym("DMR003.F30C.V022"));
         assertFalse(RadioService.rewriteAfterSym("DMR003.FW31.V022"));
         assertFalse(RadioService.rewriteAfterSym("DMR003.FW32.V022"));
+        assertFalse(RadioService.rewriteAfterSym("DMR003.FW36.V022"));
+        assertTrue("FW37+: the firmware restores the key state; unkey and one write again", RadioService.rewriteAfterSym("DMR003.FW37.V022"));
+        assertTrue(RadioService.rewriteAfterSym("DMR003.FW38.V022"));
         assertTrue("stock", RadioService.rewriteAfterSym("DMR003.UV4T.V022"));
     }
 }

@@ -4,7 +4,7 @@
 
 | Backlog | Change | Files | Test |
 |---|---|---|---|
-| FW55 bisect (firmware agent) | The M17/data receive hold (0x40 op 6) is never applied on a DMR channel; selecting a DMR channel while it runs stops M17/page receive and releases the hold before the DMR write (its release writes the analog 0x58 value, so never after). The hold's WORK_MODE 0x80 took the sync off the first DMR key until a key/unkey rewrote it | RadioService.java, ui/HelpView.java, DataHoldTest | host suite; bench confirmation by Grok pending |
+| FW55 bisect (firmware agent) | On the firmware the phone shipped with (DMR003.UV4T.V022) no new frame reaches the module and DMR writes are unchanged; the one visible change there is that selecting a DMR channel now stops M17 receive (it used to keep running and decode nothing). The M17/data receive hold (0x40 op 6) is never applied on a DMR channel; selecting a DMR channel while it runs stops M17/page receive and releases the hold before the DMR write (its release writes the analog 0x58 value, so never after). The hold's WORK_MODE 0x80 took the sync off the first DMR key until a key/unkey rewrote it | RadioService.java, ui/HelpView.java, DataHoldTest | host suite; bench confirmation by Grok pending |
 
 ## 2026-10-30 — Contribute: SignalDeck says it is free and open source, and asks for a donation if you like it
 

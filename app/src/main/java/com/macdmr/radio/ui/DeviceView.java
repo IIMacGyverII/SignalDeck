@@ -353,9 +353,9 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private void contributeSheet() {
         Context c = getContext();
         LinearLayout box = Neo.sheetBody(c, "Contribute");
-        box.addView(Neo.sheetHint(c, "SignalDeck is free, and it stays free. There are three ways to help it grow."));
+        box.addView(Neo.sheetHint(c, "SignalDeck is a free and open-source project (GPL-3.0): free to use, free to study and free to improve, and it stays that way. If you like it, there are three ways to help it grow."));
         box.addView(Neo.sheetSection(c, "1  Donate"));
-        box.addView(para(c, "Developing and maintaining SignalDeck is expensive. Donations buy more phones to develop for and make compatible, and keep new features coming."));
+        box.addView(para(c, "If SignalDeck is useful to you, please consider a donation. Developing and maintaining it is expensive: donations buy more phones to develop for and make compatible, and keep new features coming. Any amount helps, and thank you."));
         box.addView(linkButton(c, "Donate on Ko-fi", "heart", Neo.VIOLET, DONATE_KOFI));
         if (DONATE_SPONSORS != null) box.addView(linkButton(c, "GitHub Sponsors", "heart", Neo.VIOLET, DONATE_SPONSORS));
         box.addView(Neo.sheetSection(c, "2  Take part in the development"));

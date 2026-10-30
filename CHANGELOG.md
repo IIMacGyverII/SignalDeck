@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Contribute: SignalDeck says it is free and open source, and asks for a donation if you like it
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Contribute (owner) | The Contribute page and its help say SignalDeck is a free and open-source project (GPL-3.0) and ask users who like it to consider donating | ui/DeviceView.java, ui/HelpView.java | host suite; owner looked at the page on the Armor |
+
 ## 2026-10-30 — Region help says the country data may be inaccurate and how to report corrections; GitHub Sponsors on the Contribute page
 
 | Backlog | Change | Files | Test |

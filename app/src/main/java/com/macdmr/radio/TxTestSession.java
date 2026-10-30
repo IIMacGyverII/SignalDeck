@@ -16,7 +16,7 @@ import java.util.Locale;
 /**
  * The guided transmit test session (Device → Device report → Transmit test session), the steps of
  * docs/DEVICE_CERTIFICATION.md section 3.3 for a tester who made a fork to support their phone: FM voice key, release
- * check, the 28 s limit, frequency and deviation, a DMR group call (DMR phones), heat. SignalDeck keys the radio itself
+ * check, the limit check (the session's own 28 s limit), frequency and deviation, a DMR group call (DMR phones), heat. SignalDeck keys the radio itself
  * through its normal transmit path, so every guard of that path applies (receive-only channels, firmware loading, an
  * unverified profile); for each key it records what it saw ({@link TxReport.Key}), and asks the tester what only they
  * can know. The result is tx-report.json in the current device report folder plus a section in report.txt and
@@ -74,7 +74,7 @@ public final class TxTestSession {
 
     /**
      * Key once through SignalDeck's transmit path and record it. {@code ms} > 0: SignalDeck releases after that long;
-     * 0: SignalDeck does not release, its 28 s watchdog must (the tester can still release, and at 35 s the session does).
+     * 0: SignalDeck does not release, its watchdog must at the session's 28 s limit (the tester can still release, and at 35 s the session does).
      */
     TxReport.Key key(String what, long ms) throws InterruptedException {
         TxReport.Key k = new TxReport.Key(); k.plannedMs = ms; k.pttPath = pttPath(svc.profile());
@@ -126,8 +126,17 @@ public final class TxTestSession {
 
     private static final int GO = 0, SKIP = 1;
 
-    /** Run every step (session thread). The safety rules were confirmed on the screen before; {@code safetyUtc} is when. */
+    /**
+     * Run every step (session thread). The safety rules were confirmed on the screen before; {@code safetyUtc} is when.
+     * For the whole run the transmit limit is the session's own {@link TxLimit#TEST_SESSION_S} (28 s), whatever the
+     * user's Longest transmission says, so the limit check stays one short key; the setting is back when it ends.
+     */
     public void run(BuildIdentity.Info build, long safetyMs) throws InterruptedException {
+        svc.setTxLimitOverride(TxLimit.TEST_SESSION_S);
+        try { steps(build, safetyMs); } finally { svc.setTxLimitOverride(0); }
+    }
+
+    private void steps(BuildIdentity.Info build, long safetyMs) throws InterruptedException {
         TxReport r = report;
         r.created = TxReport.utc(System.currentTimeMillis()); r.build = build; r.module = svc.moduleVersion().trim(); r.safetyUtc = TxReport.utc(safetyMs);
         for (String s : TxReport.SAFETY) r.safety.add(s);
@@ -158,9 +167,9 @@ public final class TxTestSession {
             if (TxReport.PASS.equals(s.result) && "no".equals(s.heard)) s.result = TxReport.FAIL;
         } else if (stopped) { finish(); return; }
 
-        // 3 The 28 s limit
+        // 3 The limit check: the session's own 28 s limit, whatever Longest transmission is set to
         s = r.step("watchdog");
-        if (fmChannel(s) && ask(s, "Hold one key", "One key that SignalDeck does not release: its 28 s limit must end it. This is the only long key of the session; stay with the phone and tap Release now if anything looks wrong (the step then counts as skipped).")) {
+        if (fmChannel(s) && ask(s, "Hold one key", "One key that SignalDeck does not release: its transmit limit must end it. For this session the limit is 28 seconds, whatever Device \u2192 Longest transmission says. This is the only long key of the session; stay with the phone and tap Release now if anything looks wrong (the step then counts as skipped).")) {
             TxReport.Key k = key(s.title, 0); s.keys.add(k);
             s.auto = TxReport.keyFinding(k); s.result = TxReport.watchdogVerdict(k);
             heard(s, "Did the receiving radio go quiet after about 28 seconds?", false);

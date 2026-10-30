@@ -18,7 +18,7 @@ import android.widget.Toast;
 /**
  * Home-screen widget and the notification's buttons. Both send {@link #ACTION} broadcasts here; the commands go to
  * the running {@link RadioService}. Talk is tap-to-start / tap-to-stop (a widget cannot see a held finger) and the
- * service's 28 s transmit watchdog ends it before the firmware's 30 s limit.
+ * service's transmit limit (Device → Longest transmission) ends it.
  */
 public class RadioWidget extends AppWidgetProvider {
     public static final String ACTION = "com.macdmr.radio.CONTROL";

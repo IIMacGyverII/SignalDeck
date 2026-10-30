@@ -81,7 +81,7 @@ The radio delivers its audio at 8 kHz and removes almost everything below about 
 
 ### Long transmissions
 
-SignalDeck releases the transmitter after 28 seconds of talk. A long high-power transmission warms the phone noticeably, and SignalDeck's heat guard stops long transmissions when the phone gets too hot.
+SignalDeck releases the transmitter at its transmit limit (2 minutes unless changed on the Device page). A long high-power transmission warms the phone noticeably, and SignalDeck's heat guard stops long transmissions when the phone gets too hot.
 
 ## Measured on our test unit
 

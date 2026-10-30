@@ -76,7 +76,7 @@ public final class TxReport {
     public static final String[] SAFETY = {
             "I hold a licence for this frequency, or it is a licence-free service this radio may use",
             "Into a dummy load, or at low power on a quiet simplex frequency I am allowed to use",
-            "Keys stay short (10 s or less); only the 28 s limit check holds one key longer",
+            "Keys stay short (10 s or less); only the limit check holds one key longer (the session's own 28 s limit)",
             "I stay with the phone for the whole session and stop if anything looks wrong",
             "I watch the heat and stop if the phone gets hot" };
 
@@ -85,7 +85,7 @@ public final class TxReport {
         List<Step> s = new ArrayList<>();
         s.add(new Step("fm", "FM voice key (5 s)"));
         s.add(new Step("release", "Release check (three 2 s keys)"));
-        s.add(new Step("watchdog", "28 s limit check (one held key)"));
+        s.add(new Step("watchdog", "Transmit limit check (one held key, the session's 28 s limit)"));
         s.add(new Step("measure", "Frequency and deviation"));
         if (dmr) s.add(new Step("dmr", "DMR group call (5 s)"));
         s.add(new Step("heat", "Heat (five 3 s keys)"));
@@ -112,7 +112,7 @@ public final class TxReport {
         return PASS;
     }
 
-    /** 28 s limit: SignalDeck's watchdog (not the tester) released the key between 27 and 30 s, and the module stopped. */
+    /** The limit check: SignalDeck's watchdog (not the tester) released the key at the session's 28 s limit (27 to 30 s), and the module stopped. */
     public static String watchdogVerdict(Key k) {
         if (k == null || !k.keyed()) return NOT_RUN;
         if (!"watchdog".equals(k.releasedBy)) return "tester".equals(k.releasedBy) ? SKIPPED : FAIL;

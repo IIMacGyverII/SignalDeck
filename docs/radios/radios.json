@@ -38,7 +38,7 @@
         {"title": "Use wide on VHF", "text": "Setting a VHF channel to narrow made the receiver deaf on our test unit, and only a phone reboot brought it back. SignalDeck's built-in VHF channels (APRS, SSTV, weather) use wide. On UHF both settings receive."},
         {"title": "Talkgroups you hear", "text": "On a DMR channel the radio only passes group calls for the talkgroups in that channel's receive list, which holds up to 32. Private calls to your own DMR ID always come through."},
         {"title": "Receive audio is telephone-quality", "text": "The radio delivers its audio at 8 kHz and removes almost everything below about 250 Hz. Voice is fine; digital modes that need the low tones, such as M17, are decoded through a calibrated equalizer."},
-        {"title": "Long transmissions", "text": "SignalDeck releases the transmitter after 28 seconds of talk. A long high-power transmission warms the phone noticeably, and SignalDeck's heat guard stops long transmissions when the phone gets too hot."}
+        {"title": "Long transmissions", "text": "SignalDeck releases the transmitter at its transmit limit (2 minutes unless changed on the Device page). A long high-power transmission warms the phone noticeably, and SignalDeck's heat guard stops long transmissions when the phone gets too hot."}
       ],
       "measured": [
         {"what": "Tuning step", "value": "500 Hz", "note": "Requested offsets of 500 Hz to 5 kHz landed within 2 Hz of the target (2026-10-22), so Doppler correction in 500 Hz steps is real."},

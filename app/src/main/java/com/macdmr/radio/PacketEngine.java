@@ -55,10 +55,14 @@ public final class PacketEngine {
         boolean txBusy();
         /** Key, play the 8 kHz mono PCM, release; {@code onDone} runs after release (on the service worker). */
         void transmitPcm(short[] pcm, String label, Runnable onDone);
-        /** The same with the caller's own limit (the long SSTV modes, up to the radio's 120 s less a margin); the cool-down guard applies past 30 s. */
+        /** The same with the caller's own limit as well as the transmit limit; the cool-down guard applies past 30 s. */
         default void transmitPcmLong(short[] pcm, String label, int maxMs, Runnable onDone) { transmitPcm(pcm, label, onDone); }
         /** The cool-down guard's answer for a transmission of {@code ms}: why it must wait, or null. */
         default String longTxWait(int ms) { return null; }
+        /** The transmit limit in ms (Device → Longest transmission), Integer.MAX_VALUE for no limit. */
+        default int txCapMs() { return TxLimit.capMs(TxLimit.DEFAULT_S); }
+        /** The transmit limit's name for a refusal ("2 min", "No limit"). */
+        default String txLimitName() { return TxLimit.name(TxLimit.DEFAULT_S); }
         /** True when the module's tone generator is there (bench firmware FW22 or later): Morse and RTTY go out through it. */
         default boolean tonePath() { return false; }
         /** Plays a pair list through the module's tone generator; the reason it cannot, or null when it is on its way. */
@@ -221,16 +225,16 @@ public final class PacketEngine {
     }
 
     /**
-     * Encode and transmit a picture. The short Robot modes go as before; the long modes (Robot 36, Martin, Scottie,
-     * PD 90) run up to the radio's own 120 s time-out less a margin and pass the cool-down guard first. Returns an
-     * error, the guard's wait, or null when the picture is on its way.
+     * Encode and transmit a picture. A mode longer than the transmit limit (Device → Longest transmission) is refused;
+     * the long modes (Robot 36, Martin, Scottie, PD 90) pass the cool-down guard first. Returns an error, the guard's
+     * wait, or null when the picture is on its way.
      */
     public String sendSstv(android.graphics.Bitmap bmp, int mode) {
         if (bmp == null) return "No picture";
         if (!SSTVEncoder.isSupported(mode)) return "Unsupported mode";
         if (!host.analogRx()) return "SSTV needs an analog channel";
         final int total = SSTVEncoder.durationMs(mode) + TX_LEAD_MS;
-        if (total > 118_000) return SSTVEncoder.name(mode) + " runs " + Math.round(total / 1000.0) + " s, past what this radio allows (118 s)";
+        if (total > host.txCapMs()) return SSTVEncoder.name(mode) + " runs " + Math.round(total / 1000.0) + " s, past the transmit limit (" + host.txLimitName() + "; Device \u2192 Longest transmission)";
         if (total > 30_000) { String wait = host.longTxWait(total); if (wait != null) { host.event("\u23F3 " + SSTVEncoder.name(mode) + " not sent: " + wait); return wait; } }
         new Thread(() -> {
             short[] pcm = SSTVEncoder.encode(bmp, mode);
@@ -238,7 +242,7 @@ public final class PacketEngine {
             short[] src = new short[lead + pcm.length];
             for (int i = 0; i < lead; i++) src[i] = (short) (30000 * Math.sin(2.0 * Math.PI * 1900 * i / SR));   // leader tone while the TX path settles
             System.arraycopy(pcm, 0, src, lead, pcm.length);
-            host.transmitPcmLong(src, "SSTV " + SSTVEncoder.name(mode), total > 30_000 ? 118_000 : 28_500, () -> host.event("\uD83D\uDCFA Sent SSTV " + SSTVEncoder.name(mode)));
+            host.transmitPcmLong(src, "SSTV " + SSTVEncoder.name(mode), Integer.MAX_VALUE, () -> host.event("\uD83D\uDCFA Sent SSTV " + SSTVEncoder.name(mode)));   // the transmit limit is the cap
         }, "sstv-encode").start();
         return null;
     }

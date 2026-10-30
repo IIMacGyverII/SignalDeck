@@ -337,6 +337,9 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
         return new int[] { type, caller, target, cc, slot };
     }
     public void setTot(int seconds) throws IOException { send(Frame.request(CMD_TOT, (byte) seconds)); }
+    /** What the boot handshake sends on 0x3B: SignalDeck's transmit limit plus a margin, 0 (off) for none or over 255 s (TxLimit.moduleTot). */
+    private volatile int bootTot = TxLimit.moduleTot(TxLimit.DEFAULT_S);
+    @Override public void setBootTot(int seconds) { bootTot = Math.max(0, Math.min(255, seconds)); }
     public void setVolume(int v) throws IOException { send(Frame.request(CMD_VOLUME, (byte) v)); }
     public void setMic(int gain) throws IOException { send(Frame.request(CMD_MIC, (byte) gain)); }
     /** Monitor: 1 = hear every decodable digital call, 2 = normal filtering (enum 1/2 like the rest). */
@@ -360,7 +363,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
         queryVersion(); pause(150);
         setChannel.run(); pause(250);
         if (digital) setInterrupt(false); else setMic(4); pause(150);
-        setTot(120); pause(150);   // 0 turns the module timer off; 120 is its own default and FW19's ceiling
+        setTot(bootTot); pause(150);   // 0 turns the module timer off (its own start-up value is 120); FW19 to FW31 bench images raise 0 and anything over 120 to 120
         ev.log("boot handshake sent");
     }
 

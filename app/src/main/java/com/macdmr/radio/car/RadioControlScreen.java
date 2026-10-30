@@ -35,7 +35,7 @@ import com.macdmr.radio.ui.Neo;
 
 /**
  * The control screen: the live intercom panel as the picture, the channel and what is happening, a wide TALK button
- * (green, red while transmitting; tap to talk, tap to stop, 28 s watchdog) and Scan, with channel down / up at the
+ * (green, red while transmitting; tap to talk, tap to stop, the transmit limit ends it) and Scan, with channel down / up at the
  * top. Redrawn whenever the radio's state changes (checked twice a second while the screen is shown).
  */
 public class RadioControlScreen extends Screen {

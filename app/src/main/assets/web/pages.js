@@ -1188,7 +1188,7 @@ function renderSettings(j) {
 }
 async function saveSetting(i, value) { const s = S.settings[i]; const j = await act('settings', { key: s.key, value }); if (j) renderSettings(j); else loadSettings(); }
 $('setList').addEventListener('click', e => { const b = e.target.closest('.switch'); if (b) saveSetting(+b.dataset.i, !S.settings[+b.dataset.i].value); });
-$('setList').addEventListener('change', e => { const el = e.target; if (el.tagName === 'SELECT') saveSetting(+el.dataset.i, +el.value); else if (el.tagName === 'INPUT') { const s = S.settings[+el.dataset.i]; saveSetting(+el.dataset.i, s.kind === 'int' ? parseInt(el.value, 10) : el.value); } });
+$('setList').addEventListener('change', e => { const el = e.target; if (el.tagName === 'SELECT') { const w = (S.settings[+el.dataset.i].warn || [])[+el.value]; if (w && !confirm(w)) { loadSettings(); return; } saveSetting(+el.dataset.i, +el.value); } else if (el.tagName === 'INPUT') { const s = S.settings[+el.dataset.i]; saveSetting(+el.dataset.i, s.kind === 'int' ? parseInt(el.value, 10) : el.value); } });
 // backup and restore
 async function loadBackups() {
   try {

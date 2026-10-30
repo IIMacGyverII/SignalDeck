@@ -16,7 +16,7 @@ On the media screen, the arrow at the top left opens the channel list: Last hear
 
 ## Talk
 
-The microphone button on the media screen transmits: tap to start, tap again to stop; it ends by itself after 28 seconds. The radio's own limit is 120 seconds. Receive-only channels refuse it. With Device → Car microphone in Android Auto on (the default) and the car connected over Bluetooth too, the car's own microphone is used through its hands-free link (the link takes a second to come up before the radio keys); otherwise the phone's microphone. The phone's side PTT key works as always.
+The microphone button on the media screen transmits: tap to start, tap again to stop; it ends by itself at the transmit limit (Device → Longest transmission, 2 minutes unless you change it). Receive-only channels refuse it. With Device → Car microphone in Android Auto on (the default) and the car connected over Bluetooth too, the car's own microphone is used through its hands-free link (the link takes a second to come up before the radio keys); otherwise the phone's microphone. The phone's side PTT key works as always.
 
 ## Radio controls (big Talk button)
 
@@ -44,7 +44,7 @@ Device → Steering-wheel Next talks (tap to choose Off, Hold or Double-press; D
 
 ## Steering-wheel Talk
 
-Device → Steering-wheel play/pause talks (off by default): in Android Auto the wheel's play/pause button starts transmitting and a second press stops (28-second limit as always). The play/pause button on the car screen still pauses the radio's sound. Only the wheel's media buttons reach an app (play/pause, previous, next): the voice button belongs to Google's assistant (it needs the Google app enabled on the phone; "Voice commands are not available right now" means it is not) and the phone button to the car's dialer.
+Device → Steering-wheel play/pause talks (off by default): in Android Auto the wheel's play/pause button starts transmitting and a second press stops (the transmit limit as always). The play/pause button on the car screen still pauses the radio's sound. Only the wheel's media buttons reach an app (play/pause, previous, next): the voice button belongs to Google's assistant (it needs the Google app enabled on the phone; "Voice commands are not available right now" means it is not) and the phone button to the car's dialer.
 
 ## Last heard
 

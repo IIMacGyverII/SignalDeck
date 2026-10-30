@@ -24,6 +24,6 @@ Tap a CQ in the list to answer it: the app transmits in the other period and run
 
 ## Settings and clock
 
-FT8 settings: the grid sent with your messages (4 characters, about 100 by 200 km: empty uses the phone's location, a typed one is fixed, - sends none) and Clear list. FT8 needs both stations' clocks within about a second: the phone sets its clock from the network, and the settings show the average DT of recent decodes, which tells how far apart the clocks are. Each transmission is 14 seconds with the lead-in this radio needs, under its 30-second limit. Stop FT8 ends it; the back arrow keeps it running, with a bar on the intercom to come back. SignalDeck Web has the same on its Packet page.
+FT8 settings: the grid sent with your messages (4 characters, about 100 by 200 km: empty uses the phone's location, a typed one is fixed, - sends none) and Clear list. FT8 needs both stations' clocks within about a second: the phone sets its clock from the network, and the settings show the average DT of recent decodes, which tells how far apart the clocks are. Each transmission is 14 seconds with the lead-in this radio needs. Stop FT8 ends it; the back arrow keeps it running, with a bar on the intercom to come back. SignalDeck Web has the same on its Packet page.
 
 [All topics](README.md)

@@ -51,6 +51,8 @@ public interface ModuleEngine {
 
     // settings and channel
     void setTot(int seconds) throws IOException;
+    /** The module timer value the boot handshake sends (TxLimit.moduleTot of the setting); engines without a timer ignore it. */
+    default void setBootTot(int seconds) { }
     void setVolume(int v) throws IOException;
     void setMic(int gain) throws IOException;
     void setSquelch(int level) throws IOException;

@@ -482,7 +482,27 @@ public final class WebHost {
     private interface Set { void set(JSONObject b) throws Exception; }
     private static final class Setting {
         final String key, group, label, sub, kind; final String[] choices; final Get get; final Set set;
+        /** Per choice, a warning the browser confirms before saving it (null: none). */
+        String[] warn;
         Setting(String key, String group, String label, String sub, String kind, String[] choices, Get get, Set set) { this.key = key; this.group = group; this.label = label; this.sub = sub; this.kind = kind; this.choices = choices; this.get = get; this.set = set; }
+        Setting warn(String[] w) { warn = w; return this; }
+    }
+    /**
+     * Longest transmission, as on the phone: the presets and No limit (a custom value set on the phone shows as one
+     * more choice and stays when chosen); the heat warning is confirmed in the browser; locked in Restricted mode.
+     */
+    private Setting txLimitSetting() {
+        final int[] p = com.macdmr.radio.TxLimit.PRESETS_S;
+        final int cur = svc.txLimitSetting(), at = com.macdmr.radio.TxLimit.presetIndex(cur);
+        String[] names = new String[p.length + (at < 0 ? 1 : 0)], warn = new String[names.length];
+        for (int i = 0; i < p.length; i++) { names[i] = com.macdmr.radio.TxLimit.name(p[i]) + (p[i] == com.macdmr.radio.TxLimit.DEFAULT_S ? " (default)" : ""); warn[i] = com.macdmr.radio.TxLimit.needsWarning(p[i]) ? com.macdmr.radio.TxLimit.HEAT_WARNING : null; }
+        if (at < 0) { names[p.length] = "Custom: " + com.macdmr.radio.TxLimit.name(cur); warn[p.length] = null; }
+        return new Setting("txLimit", "Radio", "Longest transmission", "SignalDeck ends any transmission after this long; the heat guard still stops a long one if the phone gets hot", "choice", names,
+                () -> at < 0 ? p.length : at, b -> {
+                    int i = b.getInt("value");
+                    if (i < 0 || i >= p.length) return;                              // the custom value: kept as it is
+                    String err = svc.setTxLimit(p[i]); if (err != null) throw new IllegalArgumentException(err);
+                }).warn(warn);
     }
     private java.util.List<Setting> settings() {
         java.util.List<Setting> l = new java.util.ArrayList<>();
@@ -493,6 +513,7 @@ public final class WebHost {
         l.add(new Setting("volPtt", "Radio", "Volume-up transmits", "While the Intercom page is open on the phone", "bool", null, () -> rp.getBoolean("volPtt", false), b -> rp.edit().putBoolean("volPtt", b.getBoolean("value")).apply()));
         l.add(new Setting("customPtt", "Radio", "Custom PTT key", "The button learned on the phone (Device → Custom PTT key) transmits; learning needs the phone in hand", "bool", null, () -> com.macdmr.radio.CustomPttKey.enabled(svc), b -> { if (com.macdmr.radio.CustomPttKey.saved(svc) != null) { com.macdmr.radio.CustomPttKey.setEnabled(svc, b.getBoolean("value")); svc.customPttChanged(); } }));
         l.add(new Setting("scanSoftSq", "Radio", "Soft SQ while scanning", "Every analog channel, each at its own level (5 if never set)", "bool", null, svc::scanSoftSq, b -> svc.setScanSoftSq(b.getBoolean("value"))));
+        l.add(txLimitSetting());
         l.add(new Setting("roger", "Radio", "Roger beep", "A short sound at the end of each transmission", "choice", RadioService.ROGER_NAMES, svc::rogerStyle, b -> svc.setRogerStyle(Math.max(0, Math.min(RadioService.ROGER_NAMES.length - 1, b.getInt("value"))))));
         l.add(new Setting("voice", "Radio", "Voice announcements", "Channel changes, caller names, keyword alerts", "bool", null, svc::voiceOn, b -> svc.setVoiceOn(b.getBoolean("value"))));
         l.add(new Setting("keywords", "Radio", "Keyword alerts", "Words in live captions that raise an alert, separated by commas", "text", null, svc::keywords, b -> svc.setKeywords(b.getString("value"))));
@@ -514,6 +535,7 @@ public final class WebHost {
         for (Setting s : settings()) {
             JSONObject o = new JSONObject().put("key", s.key).put("group", s.group).put("label", s.label).put("sub", s.sub).put("kind", s.kind).put("value", s.get.get());
             if (s.choices != null) o.put("choices", new JSONArray(java.util.Arrays.asList(s.choices)));
+            if (s.warn != null) { JSONArray w = new JSONArray(); for (String x : s.warn) w.put(x == null ? JSONObject.NULL : x); o.put("warn", w); }
             a.put(o);
         }
         return new JSONObject().put("settings", a).put("link", svc.link()).put("ready", svc.isReady()).put("profile", svc.profile() == null ? "" : svc.profile().name)

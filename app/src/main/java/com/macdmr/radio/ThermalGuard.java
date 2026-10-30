@@ -64,14 +64,16 @@ public final class ThermalGuard {
 
     /** Called before a key that will run longer than 30 s: remembers the zone's value. */
     public void beforeLong() { beforeC = readC(); }
+    /** The same with a reading taken earlier: a key whose length was not known at its start (voice) is judged from there. */
+    public void beforeLong(double c) { beforeC = c; }
 
     /**
      * Why a long key must not start now because of where the phone already is (not the cool-down): the AP zone at or
      * over {@link #ZONE_START_C} or the battery at or over {@link #BATTERY_START_C}; null when it may.
      */
     public static String tooHotToStart(double zoneC, double batteryC) {
-        if (!Double.isNaN(zoneC) && zoneC >= ZONE_START_C) return String.format(Locale.US, "The phone's radio zone is at %.1f \u00B0C; a long transmission would take it past the %.0f \u00B0C stop. Let it cool below %.0f \u00B0C first; a short mode can go now.", zoneC, ZONE_STOP_C, ZONE_START_C);
-        if (!Double.isNaN(batteryC) && batteryC >= BATTERY_START_C) return String.format(Locale.US, "The battery is at %.1f \u00B0C; a long transmission would take it near the %.0f \u00B0C stop. Let it cool below %.0f \u00B0C first; a short mode can go now.", batteryC, BATTERY_STOP_C, BATTERY_START_C);
+        if (!Double.isNaN(zoneC) && zoneC >= ZONE_START_C) return String.format(Locale.US, "The phone's radio zone is at %.1f \u00B0C; a long transmission would take it past the %.0f \u00B0C stop. Let it cool below %.0f \u00B0C first; a short one can go now.", zoneC, ZONE_STOP_C, ZONE_START_C);
+        if (!Double.isNaN(batteryC) && batteryC >= BATTERY_START_C) return String.format(Locale.US, "The battery is at %.1f \u00B0C; a long transmission would take it near the %.0f \u00B0C stop. Let it cool below %.0f \u00B0C first; a short one can go now.", batteryC, BATTERY_STOP_C, BATTERY_START_C);
         return null;
     }
 
@@ -106,11 +108,11 @@ public final class ThermalGuard {
         if (!Double.isNaN(now) && !Double.isNaN(beforeC)) {
             double excess = now - beforeC;
             if (excess <= WITHIN_C) return null;
-            return String.format(Locale.US, "Cooling down after the last %d s transmission: the phone's radio zone is still %.1f °C above where it was (%.1f °C now). Long pictures wait until it is within 1 °C; a short mode can go now.", lastLongMs / 1000, excess, now);
+            return String.format(Locale.US, "Cooling down after the last %d s transmission: the phone's radio zone is still %.1f °C above where it was (%.1f °C now). Long transmissions wait until it is within 1 °C; a short one can go now.", lastLongMs / 1000, excess, now);
         }
         if (since >= FALLBACK_MS) return null;
         long left = (FALLBACK_MS - since + 59_999) / 60_000;
-        return String.format(Locale.US, "Cooling down after the last %d s transmission: the phone's temperature cannot be read here, so long transmissions wait 17 minutes (about %d min left). A short mode can go now.", lastLongMs / 1000, left);
+        return String.format(Locale.US, "Cooling down after the last %d s transmission: the phone's temperature cannot be read here, so long transmissions wait 17 minutes (about %d min left). A short one can go now.", lastLongMs / 1000, left);
     }
 
     /** For the Device report and the history line: what the guard knows. */

@@ -130,6 +130,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         addRow(set, Neo.switchRow(c, "softsq", Neo.CYAN, "Soft SQ while scanning", "Every analog channel, each at its own level (5 if never set)", scanSqSw));
         addRow(set, Neo.switchRow(c, "voice", Neo.VIOLET, "Voice announcements", "Channel changes, caller names, keyword alerts", voiceSw));
         addRow(set, rogerRow(c));
+        addRow(set, txLimitRow(c));
         addRow(set, Neo.switchRow(c, "intercom", Neo.CYAN, "New intercom look", "Off: the classic intercom page", styleSw));
         addRow(set, layoutRow(c));
         addRow(set, Neo.switchRow(c, "diag", Neo.CYAN, "Animated panel when quiet", "Falling lines on an idle channel (uses a little battery)", animSw));
@@ -389,7 +390,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private void widgetSheet() {
         Context c = getContext(); float d = Theme.dp(c);
         LinearLayout box = Neo.sheetBody(c, "Home widget");
-        box.addView(Neo.sheetHint(c, "The channel, what the radio is doing, and previous / scan / next / Talk buttons on your home screen. Talk is tap to start, tap to stop, and ends by itself after 28 seconds. The notification has the same channel and scan buttons."));
+        box.addView(Neo.sheetHint(c, "The channel, what the radio is doing, and previous / scan / next / Talk buttons on your home screen. Talk is tap to start, tap to stop, and ends by itself at the transmit limit (Longest transmission, 2 minutes unless you change it). The notification has the same channel and scan buttons."));
         android.widget.FrameLayout holder = new android.widget.FrameLayout(c);
         try { holder.addView(com.macdmr.radio.RadioWidget.build(c, com.macdmr.radio.RadioService.running).apply(c.getApplicationContext(), holder)); /* app context: the activity inflater swaps in AppCompat views, which RemoteViews refuses */ } catch (Throwable t) { holder.addView(Neo.sheetHint(c, "Preview unavailable: " + t.getMessage())); }
         LayoutParams hl = new LayoutParams(LayoutParams.MATCH_PARENT, (int) (150 * d)); hl.setMargins(0, (int) (10 * d), 0, (int) (12 * d));
@@ -426,6 +427,47 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
             com.macdmr.radio.RadioService.previewRoger(s);
         });
         return row;
+    }
+
+    private TextView txLimitValue;
+    /**
+     * Longest transmission (owner, 2026-10-30): the presets, No limit and Custom…; anything over 2 minutes asks once with
+     * the heat warning. An admin setting in Restricted mode ({@code svc.setTxLimit} refuses there).
+     */
+    private LinearLayout txLimitRow(final Context c) {
+        LinearLayout row = Neo.switchRow(c, "ptt", Neo.AMBER, "Longest transmission", "SignalDeck ends any transmission after this long; the heat guard still stops a long one if the phone gets hot. Tap to change", null);
+        txLimitValue = Neo.chip(c, com.macdmr.radio.TxLimit.name(svc != null ? svc.txLimitSetting() : com.macdmr.radio.TxLimit.DEFAULT_S), Neo.AMBER); row.addView(txLimitValue);
+        row.setOnClickListener(v -> {
+            if (svc == null) return;
+            if (!svc.adminAllowed("txlimit")) { android.widget.Toast.makeText(c, "The transmit limit is locked in Restricted mode", android.widget.Toast.LENGTH_LONG).show(); return; }
+            final int[] presets = com.macdmr.radio.TxLimit.PRESETS_S;
+            int cur = svc.txLimitSetting(), sel = com.macdmr.radio.TxLimit.presetIndex(cur);
+            String[] names = new String[presets.length + 1];
+            for (int i = 0; i < presets.length; i++) names[i] = com.macdmr.radio.TxLimit.name(presets[i]) + (presets[i] == com.macdmr.radio.TxLimit.DEFAULT_S ? " (default)" : "");
+            names[presets.length] = sel < 0 ? "Custom: " + com.macdmr.radio.TxLimit.name(cur) : "Custom\u2026";
+            new android.app.AlertDialog.Builder(c).setTitle("Longest transmission")
+                    .setSingleChoiceItems(names, sel < 0 ? presets.length : sel, (dd, w) -> {
+                        dd.dismiss();
+                        if (w < presets.length) { confirmTxLimit(c, presets[w]); return; }
+                        final EditText e = new EditText(c); e.setInputType(InputType.TYPE_CLASS_NUMBER); e.setText(String.valueOf(cur == com.macdmr.radio.TxLimit.NONE ? com.macdmr.radio.TxLimit.DEFAULT_S : cur));
+                        new android.app.AlertDialog.Builder(c).setTitle("Custom limit").setMessage("Whole seconds, " + com.macdmr.radio.TxLimit.MIN_CUSTOM_S + " or more.").setView(e)
+                                .setPositiveButton("Save", (d2, w2) -> { int s = com.macdmr.radio.TxLimit.parseCustom(e.getText().toString()); if (s < 0) android.widget.Toast.makeText(c, "Enter " + com.macdmr.radio.TxLimit.MIN_CUSTOM_S + " seconds or more", android.widget.Toast.LENGTH_LONG).show(); else confirmTxLimit(c, s); })
+                                .setNegativeButton("Cancel", null).show();
+                    }).setNegativeButton("Cancel", null).show();
+        });
+        return row;
+    }
+    /** Longer than 2 minutes or No limit: the heat warning once, Continue / Cancel; then save. */
+    private void confirmTxLimit(final Context c, final int s) {
+        if (!com.macdmr.radio.TxLimit.needsWarning(s)) { saveTxLimit(c, s); return; }
+        new android.app.AlertDialog.Builder(c).setTitle(s == com.macdmr.radio.TxLimit.NONE ? "No time limit" : com.macdmr.radio.TxLimit.name(s) + " transmissions").setMessage(com.macdmr.radio.TxLimit.HEAT_WARNING)
+                .setPositiveButton("Continue", (dd, w) -> saveTxLimit(c, s)).setNegativeButton("Cancel", null).show();
+    }
+    private void saveTxLimit(Context c, int s) {
+        if (svc == null) return;
+        String err = svc.setTxLimit(s);
+        if (err != null) { android.widget.Toast.makeText(c, err, android.widget.Toast.LENGTH_LONG).show(); return; }
+        txLimitValue.setText(com.macdmr.radio.TxLimit.name(svc.txLimitSetting()));
     }
 
     private Neo.NeonSwitch sw() { return new Neo.NeonSwitch(getContext()); }
@@ -1172,6 +1214,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         takeOver.setAlpha(ready ? 0.55f : 1f); handBack.setAlpha(ready ? 1f : 0.55f);
         idText.setText("ID " + svc.localId());
         if (rogerValue != null) rogerValue.setText(com.macdmr.radio.RadioService.ROGER_NAMES[svc.rogerStyle()]);
+        if (txLimitValue != null) txLimitValue.setText(com.macdmr.radio.TxLimit.name(svc.txLimitSetting()));
         ownAtBoot.setChecked(svc.ownAtBoot()); voiceSw.setChecked(svc.voiceOn()); hwPttSw.setChecked(svc.hwPtt()); scanSqSw.setChecked(svc.scanSoftSq());
         volPttSw.setChecked(c.getSharedPreferences("radio", Context.MODE_PRIVATE).getBoolean("volPtt", false));
         refreshCustomPtt();

@@ -105,7 +105,11 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Every MCU/audio action runs here, in order — a PTT release can never overtake its press. */
     private final java.util.concurrent.ExecutorService worker = java.util.concurrent.Executors.newSingleThreadExecutor(r -> new Thread(r, "radio-worker"));
     private volatile boolean pttDown;
-    private final Runnable txWatchdog = () -> { if (pttDown) { log("TX watchdog: releasing PTT after 28 s"); ptt(false); } };
+    /** Ends a voice key at the transmit limit (Device → Longest transmission, {@link TxLimit}); not posted for No limit. */
+    private final Runnable txWatchdog = () -> { if (pttDown) { String n = TxLimit.name(txLimitS()); log("TX watchdog: releasing PTT after " + n); history("tx", "\u23F1 Transmission ended at the " + n + " limit"); ptt(false); } };
+    /** The heat watch of the voice key in progress, and a count of voice keys so a late watch never ends the next key. */
+    private volatile Thread voiceHeat;
+    private volatile long voiceKeys;
     private PacketEngine packet;
 
     // ---- simplex repeater (parrot): repeats each reception on the channel it was enabled on ----
@@ -171,6 +175,49 @@ public class RadioService extends Service implements RadioEngine.Events {
     public com.macdmr.radio.ham.CallLookup callLookup() { if (lookup == null) lookup = new com.macdmr.radio.ham.CallLookup(this); return lookup; }
     public boolean lookupOnline() { return getSharedPreferences("radio", MODE_PRIVATE).getBoolean("lookupOnline", true); }
     public void setLookupOnline(boolean on) { getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("lookupOnline", on).apply(); }
+
+    // ---- the longest transmission (Device → Longest transmission; owner, 2026-10-30) ----
+    /** The setting in whole seconds, {@link TxLimit#NONE} for no limit; 2 minutes until changed. */
+    public int txLimitSetting() { return TxLimit.valid(getSharedPreferences("radio", MODE_PRIVATE).getInt("txLimitS", -1)); }
+    /** The transmit test session's own limit while it runs (0 = none): its limit check must not depend on the setting. */
+    private volatile int txLimitOverrideS;
+    /** The limit in force now, in seconds (NONE for no limit). */
+    public int txLimitS() { return TxLimit.effective(txLimitSetting(), txLimitOverrideS); }
+    /** The limit in force now in ms, -1 for no limit. */
+    public long txLimitMs() { return TxLimit.limitMs(txLimitS()); }
+    /**
+     * Save the setting (whole seconds, at least 10, or NONE); null when saved, else why not. Changing it is an admin
+     * action in Restricted mode. The module's own timer follows at once when the radio is idle, else after the key.
+     */
+    public String setTxLimit(int s) {
+        if (!adminAllowed("txlimit")) return "The transmit limit is locked in Restricted mode";
+        if (s != TxLimit.NONE && s < TxLimit.MIN_CUSTOM_S) return "The limit is at least " + TxLimit.MIN_CUSTOM_S + " seconds";
+        getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("txLimitS", s).apply();
+        log("transmit limit: " + TxLimit.name(s));
+        applyModuleTot();
+        return null;
+    }
+    /** The transmit test session sets its own limit for its run ({@link TxLimit#TEST_SESSION_S}) and clears it (0) at the end. */
+    public void setTxLimitOverride(int s) { txLimitOverrideS = Math.max(0, s); applyModuleTot(); }
+    /** The module timer value last given to the module (0x3B), for the status-4 history line. */
+    private volatile int moduleTotS = TxLimit.moduleTot(TxLimit.DEFAULT_S);
+    private volatile boolean totPending;
+    /** The module's timer follows the limit in force: the boot handshake's value now, the module itself when it is up and not transmitting. */
+    private void applyModuleTot() {
+        ModuleEngine e = engine; if (e != null) e.setBootTot(TxLimit.moduleTot(txLimitS()));
+        worker.execute(this::sendModuleTot);
+    }
+    /** On the worker. While anything transmits, the 0x3B write waits for the end of that key ({@link #totAfterTx}). */
+    private void sendModuleTot() {
+        ModuleEngine e = engine; if (e == null) return;
+        int tot = TxLimit.moduleTot(txLimitS());
+        Thread st = symThread;
+        if (pttDown || m17Tx || transmitting || (st != null && st.isAlive())) { totPending = true; return; }
+        totPending = false;
+        if (!isReady() || !e.isOpen() || firmwareBusy) return;                    // the boot handshake sends it
+        try { e.setTot(tot); moduleTotS = tot; log("module transmit timer: " + (tot == 0 ? "off (SignalDeck's limit alone)" : tot + " s")); } catch (IOException ex) { log("module transmit timer: " + ex); }
+    }
+    private void totAfterTx() { if (totPending) worker.execute(this::sendModuleTot); }
     private final java.util.concurrent.ExecutorService lookups = java.util.concurrent.Executors.newSingleThreadExecutor(r -> { Thread t = new Thread(r, "call-lookup"); t.setDaemon(true); return t; });
     /** Look a callsign up in the background and fill in the logbook (and {@code then}, with the result, on the worker). */
     public void enrichCall(final String call, final java.util.function.Consumer<com.macdmr.radio.ham.CallLookup.Info> then) {
@@ -531,6 +578,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public boolean tonePath() { return RadioService.this.tonePath(); }
         @Override public String transmitTones(java.util.List<com.macdmr.radio.ham.ToneQueue.Pair> pairs, int amplitude, String label, Runnable done) { return RadioService.this.transmitTones(pairs, amplitude, label, done); }
         @Override public String longTxWait(int ms) { return thermal.gate(ms); }
+        @Override public int txCapMs() { return TxLimit.capMs(txLimitS()); }
+        @Override public String txLimitName() { return TxLimit.name(txLimitS()); }
         @Override public android.location.Location location() { return lastKnownLocation(); }
         @Override public void stationHeard(String call, double lat, double lon, long ts, String detail) { ChannelStore.Contact pc = store.contactByCallsign(call); if (pc != null) store.contactHeard(pc.id, ts, "APRS", detail, lat, lon); }
         @Override public void sentTo(String call, String source, String detail) { ChannelStore.Contact pc = store.contactByCallsign(call); if (pc != null) store.contactSent(pc.id, System.currentTimeMillis(), source, detail); }
@@ -673,18 +722,16 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Hands-free one-shot transmission: key, play the PCM through the TX path, release, resume RX. */
     public void transmitPcm(final short[] pcm, final String label, final Runnable onDone) { transmitPcm(pcm, label, onDone, false); }
-    /** liftLimit is the one bench tone that may run to 40 s. It uses engine.ptt, so the 28 s voice watchdog is not in this path. */
-    private void transmitPcm(final short[] pcm, final String label, final Runnable onDone, final boolean liftLimit) { transmitPcm(pcm, label, onDone, liftLimit ? 40000 : 28500); }
+    /** liftLimit is the bench tone that may run to 40 s (diagTestTone clamps it); the transmit limit still applies. */
+    private void transmitPcm(final short[] pcm, final String label, final Runnable onDone, final boolean liftLimit) { transmitPcm(pcm, label, onDone, liftLimit ? 40000 : Integer.MAX_VALUE); }
 
     /** The cool-down guard for transmissions longer than 30 s (the bench's heat table, 2026-10-25). */
     public final ThermalGuard thermal = new ThermalGuard();
-    /** The longest one transmission may run: the module's own 120 s time-out less a margin (FW19 ceiling 120.3 s, stock firmware 120 s start-up value, `setTot(120)` since 2026-10-25). */
-    public static final int TX_MAX_MS = 118_000;
 
     /**
-     * Key, play 8 kHz PCM, release. {@code maxMs} is the caller's limit: 28.5 s for everything that has not been
-     * measured longer (the voice watchdog stays 28 s), up to {@link #TX_MAX_MS} for the long SSTV modes, which also
-     * pass the cool-down guard first.
+     * Key, play 8 kHz PCM, release. Audio longer than the transmit limit ({@link #txLimitS}) or the caller's own
+     * {@code maxMs} is refused, not cut. Anything longer than 30 s passes the cool-down guard first and runs under the
+     * in-key heat watch, whatever the limit (No limit included).
      */
     private void transmitPcm(final short[] pcm, final String label, final Runnable onDone, final int maxMs) {
         worker.execute(() -> {
@@ -693,8 +740,8 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (txInhibited()) { log("TX " + label + " blocked: receive-only channel"); history("warn", "\u26D4 TX blocked on a receive-only channel"); return; }
                 if (pttDown) { log("TX " + label + " skipped: PTT busy"); return; }
                 int ms = pcm.length / 8;
-                int cap = Math.min(maxMs, TX_MAX_MS);
-                if (ms > cap) { log("TX " + label + " refused: " + ms + " ms over " + cap); history("warn", "\u26D4 Too long to send (" + label + ", " + Math.round(ms / 1000.0) + " s; the radio allows " + (cap / 1000) + " s)"); return; }
+                int limit = TxLimit.capMs(txLimitS()), cap = Math.min(maxMs, limit);
+                if (ms > cap) { log("TX " + label + " refused: " + ms + " ms over " + cap); history("warn", "\u26D4 Too long to send (" + label + ", " + Math.round(ms / 1000.0) + " s; " + (cap == limit ? "the transmit limit is " + TxLimit.name(txLimitS()) + ", Device \u2192 Longest transmission" : "this sender allows " + (cap / 1000) + " s") + ")"); return; }
                 Thread heatWatch = null;
                 if (ms > ThermalGuard.LONG_MS) {
                     String wait = thermal.gate(ms, ThermalGuard.batteryC(this));
@@ -707,7 +754,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 engine.ptt(true);
                 log("TX " + label + " (" + ms + " ms)");
                 try { Thread.sleep(200); if (audio != null) log(audio.playPcm(pcm)); }
-                finally { if (heatWatch != null) heatWatch.interrupt(); unkey(); pttDown = false; thermal.after(ms); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); holdAfterTx(); }
+                finally { if (heatWatch != null) heatWatch.interrupt(); unkey(); pttDown = false; thermal.after(ms); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); holdAfterTx(); totAfterTx(); }
                 if (ms > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(ms / 1000.0) + " s (" + label + "); " + thermal.state());
                 if (onDone != null) onDone.run();
             } catch (Throwable t) { log("TX " + label + ": " + t); try { engine.ptt(false); } catch (Throwable ignored) { } pttDown = false; }
@@ -789,6 +836,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         zoneId = getSharedPreferences("radio", MODE_PRIVATE).getLong("zone", 0);
         if (coverage().enabled()) { coverage.resume(); startForegroundTyped(true); }
         engine = "sa818".equals(profile.protocol) ? new AtModuleEngine(profile, this) : new RadioEngine(profile, this);   // the W6's AT module, else the DMR module
+        engine.setBootTot(moduleTotS = TxLimit.moduleTot(txLimitS()));            // the boot handshake gives the module the transmit limit
         if (profile.muteLines != null && !profile.appPlayback) {                                 // the module drives the speaker itself: follow Android's media volume, like the stock app
             followMediaVolume();
             try { registerReceiver(mediaVolume, new android.content.IntentFilter("android.media.VOLUME_CHANGED_ACTION")); } catch (Throwable t) { log("volume receiver: " + t); }
@@ -1995,7 +2043,10 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (carMic) log("TX with the car microphone"); else if (fromWheel && inCar && carMic()) log("TX from the wheel: phone microphone (keeps the wheel's buttons working)");
                     engine.ptt(true);
                     if (audio != null) log(audio.startTx());
-                    ui.removeCallbacks(txWatchdog); ui.postDelayed(txWatchdog, 28000);
+                    long lim = txLimitMs();
+                    ui.removeCallbacks(txWatchdog); if (lim > 0) ui.postDelayed(txWatchdog, lim);      // the transmit limit; none for No limit
+                    final long vk = ++voiceKeys; Thread oldHeat = voiceHeat; if (oldHeat != null) oldHeat.interrupt();
+                    voiceHeat = openKeyHeatWatch("Voice transmission", () -> pttDown && voiceKeys == vk, () -> ptt(false));   // past 30 s the heat guard applies, whatever the limit
                 } else {
                     if (current != null && current.isM17()) {
                         m17Voice(false);
@@ -2008,17 +2059,22 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (com.macdmr.radio.car.RadioCallService.active()) ui.post(com.macdmr.radio.car.RadioCallService::end);   // the talk call ends with the transmission
                     txEndedAt = System.currentTimeMillis();
                     ui.removeCallbacks(txWatchdog);
+                    Thread vh = voiceHeat; voiceHeat = null; if (vh != null) vh.interrupt();
                     try {
                         if (audio != null) audio.stopTx();
                         stopBluetoothMic();
                         short[] roger = rogerPcm(rogerStyle());
                         if (roger != null && audio != null) audio.playPcm(roger);    // still keyed: the tone goes out before the carrier drops
                         ChannelStore.Channel tc = current;
-                        short[] id = tc != null && !tc.isDigital() && amateurBand(tc.txFreq) && packet != null && System.currentTimeMillis() - txStartedAt < 25_000 ? packet.cwIdIfDue(System.currentTimeMillis()) : null;
+                        short[] id = tc != null && !tc.isDigital() && amateurBand(tc.txFreq) && packet != null && (txLimitMs() < 0 || System.currentTimeMillis() - txStartedAt < txLimitMs() - 3000) ? packet.cwIdIfDue(System.currentTimeMillis()) : null;
                         if (id != null && audio != null) { log("Morse ID after the transmission"); audio.playPcm(id); history("pkt", "\uD83D\uDD24 Morse ID " + packet.callsign()); }   // the station identification every ten minutes
                     } finally { unkey(); }
+                    int heldMs = (int) Math.min(Integer.MAX_VALUE, Math.max(0, txEndedAt - txStartedAt));
+                    thermal.after(heldMs);                                                    // a voice key past 30 s starts the cool-down like a long picture
+                    if (heldMs > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(heldMs / 1000.0) + " s (voice); " + thermal.state());
                     if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true);
                     if (dataReceive) scheduleDataHold(true, true);   // the unkey path rewrites the voice filter; put the hold back
+                    totAfterTx();
                 }
             } catch (Throwable t) { log("ptt: " + t); try { engine.ptt(false); } catch (Throwable ignored) { } pttDown = false; }
         });
@@ -2047,7 +2103,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     private volatile long status4At;
     private volatile short[] m17Script;
     /** Bench: stream a packed-symbol file on command 0x40. Paces on the returned fill.
-     *  eot or forceKey keys once eight chunks are in the ring (no 28 s watchdog, no microphone).
+     *  eot or forceKey keys once eight chunks are in the ring (no voice watchdog, no microphone).
      *  eot sends the last chunk as op 7 so the module drops the carrier. Unless nounkey, eot then sends the unkey after status byte 4. */
     public void diagSym(java.io.File f) { diagSym(f, false, false, false); }
     public void diagSym(java.io.File f, boolean eot) { diagSym(f, eot, false, false); }
@@ -2084,6 +2140,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         catch (IllegalArgumentException e) { return e.getMessage(); }
         int rate = baud == 512 || baud == 2400 ? baud : 1200;
         if (com.macdmr.radio.ham.Pocsag.seconds(bits, rate) > 25) return "That page is longer than 25 seconds";
+        if (com.macdmr.radio.ham.Pocsag.seconds(bits, rate) * 1000 > TxLimit.capMs(txLimitS())) return "That page is longer than the transmit limit (" + TxLimit.name(txLimitS()) + ", Device \u2192 Longest transmission)";
         final int[] packedBits = bits;
         Thread t = new Thread(() -> streamPage(rate, hz, packedBits, rics.length), "pocsag");
         symThread = t;
@@ -2132,6 +2189,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         finally {
             if (keyed) { try { engine.ptt(false); } catch (Throwable ignored) { } holdAfterTx(); }
             if (hopped) exitVfo();
+            totAfterTx();
         }
     }
     private volatile Thread fwThread;
@@ -2376,7 +2434,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** This firmware image has the symbol engine (command 0x40). Stock UV4T does not. */
     public boolean m17CanSend() { return Firmware.stubTag(moduleVersion); }
 
-    /** Hold to talk on the M17 screen. The voice limit stays 28 s. Does nothing on stock firmware. */
+    /** Hold to talk on the M17 screen. The transmit limit and, past 30 s, the heat guard apply as for voice. Does nothing on stock firmware. */
     public void m17Voice(boolean down) {
         if (!down) { m17Down = false; return; }
         if (!m17CanSend()) { log("m17 voice: stock firmware"); history("warn", "⚠️ M17 transmit needs the module firmware with the symbol engine"); return; }
@@ -2428,6 +2486,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         com.macdmr.radio.ham.Codec2 c2 = null;
         boolean keyed = false;
         m17Tx = true;
+        final Thread me = Thread.currentThread();
+        final long runStart = System.currentTimeMillis();
+        Thread heat = openKeyHeatWatch("M17 transmission", () -> m17Tx && symThread == me, () -> m17Down = false);   // a heat stop releases like the key: last frame, end of transmission
         try {
             Frame rst = sym40(new byte[] { 3 });
             if (rst == null || rst.sr != 0) { log("m17 voice: symbol engine did not answer"); history("warn", "⚠️ This firmware did not accept an M17 symbol reset"); return; }
@@ -2463,8 +2524,10 @@ public class RadioService extends Service implements RadioEngine.Events {
             int fn = 0, scriptAt = 0;
             long t0 = System.currentTimeMillis();
             boolean closed = false;
-            while (!closed && fn < 700) {
-                boolean release = !m17Down || System.currentTimeMillis() - t0 > 27500;
+            final long lim = txLimitMs();                                    // the transmit limit, -1 for none
+            final long maxFrames = lim > 0 ? lim / 40 : Long.MAX_VALUE;      // 40 ms per stream frame
+            while (!closed && fn < maxFrames) {
+                boolean release = !m17Down || (lim > 0 && System.currentTimeMillis() - t0 > lim - 500);
                 if (script != null) {
                     int n = Math.min(spf, script.length - scriptAt);
                     if (n <= 0) release = true;
@@ -2484,7 +2547,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 System.arraycopy(half, 0, pay, 0, Math.min(8, half.length));
                 System.arraycopy(enc, 0, pay, 8, Math.min(8, enc.length));
                 half = null;
-                int frameNo = fn | (release ? 0x8000 : 0);
+                int frameNo = (fn & 0x7FFF) | (release ? 0x8000 : 0);     // the 15-bit frame number wraps after about 22 minutes
                 if (script != null) {
                     StringBuilder hx = new StringBuilder(32);
                     for (byte b : pay) hx.append(String.format(java.util.Locale.US, "%02X", b & 0xFF));
@@ -2503,6 +2566,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     paceSym(fill, keyed);
                 }
                 if (release) closed = true;
+                if (sent >= 1 << 16) { byte[] rest = java.util.Arrays.copyOfRange(data, sent, data.length); pending.reset(); pending.write(rest); sent = 0; }   // drop what is sent: a long key must not grow the buffer
             }
             byte[] data = pending.toByteArray();
             if (sent < data.length) {
@@ -2516,7 +2580,10 @@ public class RadioService extends Service implements RadioEngine.Events {
         } catch (Throwable t) { log("m17 voice: " + t); }
         finally {
             if (keyed) { try { engine.ptt(false); } catch (Throwable ignored) { } holdAfterTx(); }
+            if (heat != null) heat.interrupt();
+            if (keyed) { int heldMs = (int) Math.min(Integer.MAX_VALUE, System.currentTimeMillis() - runStart); thermal.after(heldMs); if (heldMs > ThermalGuard.LONG_MS) history("m17", "\uD83D\uDCFB Long transmission " + Math.round(heldMs / 1000.0) + " s (M17); " + thermal.state()); }
             m17Down = false; m17Tx = false; m17Script = null;
+            totAfterTx();
             if (rec != null) { try { rec.stop(); } catch (Throwable ignored) { } rec.release(); }
             if (c2 != null) c2.close();
         }
@@ -2537,7 +2604,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (pttDown || m17Tx) return "Already transmitting";
         if (pairs == null || pairs.isEmpty()) return "Nothing to send";
         final int ms = com.macdmr.radio.ham.ToneQueue.durationMs(pairs);
-        if (ms > TX_MAX_MS) return "Too long for this radio (" + Math.round(ms / 1000.0) + " s; it allows " + (TX_MAX_MS / 1000) + " s)";
+        if (ms > TxLimit.capMs(txLimitS())) return "Longer than the transmit limit (" + Math.round(ms / 1000.0) + " s; Device \u2192 Longest transmission is " + TxLimit.name(txLimitS()) + ")";
         if (ms > ThermalGuard.LONG_MS) { String wait = thermal.gate(ms); if (wait != null) return wait; }
         worker.execute(() -> toneRun(pairs, amplitude, label, done, ms));
         return null;
@@ -2545,11 +2612,13 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     private void toneRun(java.util.List<com.macdmr.radio.ham.ToneQueue.Pair> pairs, int amplitude, String label, Runnable done, int ms) {
         boolean keyed = false;
+        final boolean[] heatStop = { false };
+        Thread heatWatch = null;
         try {
             if (pttDown) { log("tones " + label + " skipped: PTT busy"); return; }
             Frame rst = sym40(new byte[] { 3 });
             if (rst == null || rst.sr != 0) { log("tones: no symbol engine"); history("warn", "\u26A0\uFE0F This firmware did not accept a tone-queue reset"); return; }
-            if (ms > ThermalGuard.LONG_MS) thermal.beforeLong();
+            if (ms > ThermalGuard.LONG_MS) { thermal.beforeLong(); heatWatch = heatWatchdog(label, () -> heatStop[0] = true); }   // the in-key heat stops, as for a long picture
             pttDown = true; txStartedAt = System.currentTimeMillis(); pcmTxLabel = label; refreshControls();
             if (audio != null) audio.stopRx();
             java.util.List<byte[]> bodies = com.macdmr.radio.ham.ToneQueue.bodies(amplitude, pairs);
@@ -2561,19 +2630,23 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (!keyed) { engine.ptt(true); keyed = true; log("tone key " + label + " (" + ms + " ms, " + bodies.size() + " bodies)"); }
                 if (i + 1 < bodies.size()) {                                 // top up when the queue is below the mark; the queue only drains while keyed
                     int spins = 0;
-                    while (spins++ < 2400) { Thread.sleep(50); if (queued() <= com.macdmr.radio.ham.ToneQueue.TOP_UP_AT) break; }
+                    while (spins++ < 2400 && !heatStop[0]) { Thread.sleep(50); if (queued() <= com.macdmr.radio.ham.ToneQueue.TOP_UP_AT) break; }
                 }
+                if (heatStop[0]) return;                                     // the finally unkeys
             }
             long deadline = System.currentTimeMillis() + ms + 3000;        // the last pair plays out, then the module drops the carrier itself
-            while (System.currentTimeMillis() < deadline) { Thread.sleep(100); if (queued() == 0) break; }
+            while (System.currentTimeMillis() < deadline && !heatStop[0]) { Thread.sleep(100); if (queued() == 0) break; }
+            if (heatStop[0]) return;
             unkeyAfterStop();
             history("tx", "\uD83D\uDD09 " + label + " through the module's tone generator (" + Math.round(ms / 1000.0) + " s)");
             if (done != null) done.run();
         } catch (Throwable t) { log("tones " + label + ": " + t); }
         finally {
             if (keyed) { try { engine.ptt(false); } catch (Throwable ignored) { } holdAfterTx(); }
+            if (heatWatch != null) heatWatch.interrupt();
             pttDown = false; thermal.after(ms); refreshControls();
             if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true);
+            totAfterTx();
         }
     }
 
@@ -2582,7 +2655,9 @@ public class RadioService extends Service implements RadioEngine.Events {
      * ({@link ThermalGuard#stopNow}) the playback is ended at its next block and the history says why. Interrupted
      * by the sender when the transmission ends.
      */
-    private Thread heatWatchdog(final String label) {
+    private Thread heatWatchdog(final String label) { return heatWatchdog(label, () -> { if (audio != null) audio.abortPlay(); }); }
+    /** As {@link #heatWatchdog(String)}, with the sender's own way to end the key. */
+    private Thread heatWatchdog(final String label, final Runnable stopKey) {
         Thread t = new Thread(() -> {
             double pz = Double.NaN, pb = Double.NaN; int n = 0;
             try {
@@ -2593,13 +2668,55 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (stop != null) {
                         log("heat stop during " + label + ": " + stop);
                         history("warn", "\u26D4 " + label + " ended early: " + stop + ". Let the phone cool before the next long transmission.");
-                        if (audio != null) audio.abortPlay();
+                        stopKey.run();
                         return;
                     }
                     if (++n % 2 == 0) { pz = z; pb = b; }                      // the 10 s comparison
                 }
             } catch (InterruptedException ignored) { }
         }, "heat-watch");
+        t.setDaemon(true); t.start();
+        return t;
+    }
+
+    private interface KeyAlive { boolean alive(); }
+    /**
+     * The heat guard for a key whose length is not known when it starts (voice PTT incl. the car, the widget and the
+     * web, M17 Hold to talk). Such a key always starts (short keys are never held), but when it passes 30 s it must
+     * pass what a long picture passes before it starts, judged on the readings from the key's start: the cool-down
+     * after the last long key and the 60 °C / 45 °C start gate ({@link ThermalGuard#gate}). From then on the in-key
+     * stops apply every 5 s ({@link ThermalGuard#stopNow}: 70 °C radio zone, 48 °C battery, 2 °C in 10 s). A stop
+     * writes the history line and runs {@code stopKey}. Owner rule 2026-10-25, for every limit including No limit.
+     * Ends by itself when {@code alive} turns false or it is interrupted.
+     */
+    private Thread openKeyHeatWatch(final String label, final KeyAlive alive, final Runnable stopKey) {
+        Thread t = new Thread(() -> {
+            long t0 = System.currentTimeMillis();
+            double z0 = thermal.readC(), b0 = ThermalGuard.batteryC(RadioService.this);
+            String held = thermal.gate(ThermalGuard.LONG_MS + 1, b0);          // what a long key starting now would be told
+            double pz = Double.NaN, pb = Double.NaN; int n = 0; boolean longKey = false;
+            try {
+                while (alive.alive()) {
+                    Thread.sleep(1000);
+                    if (!alive.alive()) return;
+                    if (!longKey && System.currentTimeMillis() - t0 > ThermalGuard.LONG_MS) {
+                        longKey = true;
+                        if (held != null) { log("heat: " + label + " ended at 30 s: " + held); history("warn", "\u26D4 " + label + " ended at 30 s: " + held); stopKey.run(); return; }
+                        thermal.beforeLong(z0);                                    // the cool-down after this key is measured from where it started
+                    }
+                    if (++n % 5 != 0) continue;                                   // read every 5 s
+                    double z = thermal.readC(), b = ThermalGuard.batteryC(RadioService.this);
+                    String stop = longKey ? ThermalGuard.stopNow(z, b, pz, pb) : null;
+                    if (stop != null && alive.alive()) {
+                        log("heat stop during " + label + ": " + stop);
+                        history("warn", "\u26D4 " + label + " ended early: " + stop + ". Let the phone cool before the next long transmission.");
+                        stopKey.run();
+                        return;
+                    }
+                    if ((n / 5) % 2 == 0) { pz = z; pb = b; }                     // the 10 s comparison
+                }
+            } catch (InterruptedException ignored) { }
+        }, "heat-watch-key");
         t.setDaemon(true); t.start();
         return t;
     }
@@ -2653,7 +2770,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         holdAfterTx();
     }
     public void diagPowerCycle() { worker.execute(() -> { try { if (audio != null) audio.stopRx(); log("power-cycling the module"); powerCycleOrGiveUp(); if (!engine.waitBooted(12000)) log("no banner after power-cycle"); engine.queryVersion(); if (current != null) applyChannelNow(current, current.id > 0); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); } catch (Throwable t) { log("power-cycle: " + t); } }); }
-    /** Bench (DiagReceiver): transmit an 8 kHz mono 16-bit WAV from the app's cache on the current channel/VFO (at most 28 s). */
+    /** Bench (DiagReceiver): transmit an 8 kHz mono 16-bit WAV from the app's cache on the current channel/VFO (at most 28 s, a bench rule; the transmit limit also applies). */
     public String diagTxWav(java.io.File f) {
         try {
             byte[] b = java.nio.file.Files.readAllBytes(f.toPath()); int n = (b.length - 44) / 2;
@@ -2665,7 +2782,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Bench: the gateway route's sample factor until the next restart (the profile's txAudioScale otherwise). */
     public String diagTxScale(float v) { return audio instanceof CamcorderAudio ? ((CamcorderAudio) audio).setTxScale(v) : "no gateway route on this phone"; }
     public void diagTestTone(int ms) { diagTestTone(ms, false); }
-    /** lift is one bench run, at most 40 s, past the 28.5 s refusal. The voice watchdog stays 28 s for every other transmission. */
+    /** lift is one bench run of at most 40 s (5 s otherwise); the transmit limit and the heat guard still apply. */
     public void diagTestTone(int ms, boolean lift) { diagTestTone(ms, lift, 1000, 12000); }
     /** Bench: a test tone of {@code hz} at {@code amp} (of 32767). */
     public void diagTestTone(int ms, boolean lift, int hz, int amp) {
@@ -2789,7 +2906,8 @@ public class RadioService extends Service implements RadioEngine.Events {
             }
             case 3: transmitting = true; refreshControls(); if (coverage != null) coverage.onTxStart(); ui.post(() -> { for (Listener l : listeners) l.onTx(true); }); break;
             case 4: status4At = System.currentTimeMillis(); transmitting = false; refreshControls(); if (coverage != null) coverage.onTxEnd(); String pl = pcmTxLabel; pcmTxLabel = null; history(m17Tx ? "m17" : "tx", m17Tx ? "📻 M17 TX" : pl != null ? "📻 TX: " + pl : "📻 Voice TX");
-                if (pttDown && !m17Tx && !unkeying && System.currentTimeMillis() - txStartedAt > 100_000) history("warn", "\u23F1 The radio ended the transmission itself: its 120 s time-out"); ui.post(() -> { for (Listener l : listeners) l.onTx(false); }); break;
+                { int tot = moduleTotS; long el = System.currentTimeMillis() - txStartedAt;   // 0 = timer off, but FW19-FW31 bench images still end a key at 120 s
+                  if (pttDown && !m17Tx && !unkeying && (tot > 0 ? el > tot * 1000L - 3000 : el > 100_000)) history("warn", "\u23F1 The radio ended the transmission itself: its " + (tot > 0 ? tot : 120) + " s time-out"); } ui.post(() -> { for (Listener l : listeners) l.onTx(false); }); break;
             case 5: try { engine.fetchSms(); } catch (IOException ignored) { } break;             // SMS_RECEIVED -> ask for it
             case 8: smsResult(true); break;
             case 9: smsResult(false); break;

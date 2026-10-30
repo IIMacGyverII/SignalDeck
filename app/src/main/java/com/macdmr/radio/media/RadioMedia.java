@@ -86,7 +86,7 @@ public final class RadioMedia {
             @Override public void onCustomAction(String action, Bundle extras) {
                 RadioService s = service(); if (s == null) return;
                 if (ACTION_SCAN.equals(action)) s.toggleScan();
-                else if (ACTION_TALK.equals(action)) {               // tap to talk, tap to stop; the 28 s watchdog ends it before the radio's 30 s limit
+                else if (ACTION_TALK.equals(action)) {               // tap to talk, tap to stop; the transmit limit (Device → Longest transmission) ends it
                     if (s.pttHeld()) s.ptt(false); else s.ptt(true);   // a receive-only channel refuses and says so in the history
                 }
             }

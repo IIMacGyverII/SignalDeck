@@ -153,7 +153,7 @@ public final class CustomPttKey {
             if (s.wheelTalk) f.add(new Finding(false, "Steering-wheel play/pause talks is on. In the car that setting already uses play/pause; both together are fine but do the same thing."));
         }
         if ("KEY_CAMERA".equals(code) || "KEY_CAMERA_FOCUS".equals(code)) f.add(new Finding(false, "The camera button may open the camera."));
-        if ("0005".equals(dev == null ? "" : dev.bus)) f.add(new Finding(false, "A Bluetooth button: it works while it is connected, and SignalDeck finds it again when it reconnects. Its battery and range decide whether a release gets through; the 28 s transmit limit stops a stuck transmission."));
+        if ("0005".equals(dev == null ? "" : dev.bus)) f.add(new Finding(false, "A Bluetooth button: it works while it is connected, and SignalDeck finds it again when it reconnects. Its battery and range decide whether a release gets through; the transmit limit (Device \u2192 Longest transmission) stops a stuck transmission."));
         return f;
     }
     public static boolean blocked(List<Finding> f) { for (Finding x : f) if (x.block) return true; return false; }

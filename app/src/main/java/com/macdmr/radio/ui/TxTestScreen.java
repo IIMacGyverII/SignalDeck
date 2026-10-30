@@ -55,7 +55,7 @@ public final class TxTestScreen implements TxTestSession.Ui {
     /** The rules first: each one switched on by the tester, then Start. */
     private void safety(BuildIdentity.Info b, TxReport.Gate g) {
         LinearLayout body = Neo.sheetBody(c, "Transmit test session");
-        body.addView(Neo.sheetHint(c, "Guides the transmit tests of the certification guide (section 3.3): an FM key, the release check, the 28 s limit, frequency and deviation, a DMR group call on DMR phones, and heat. SignalDeck keys the radio itself and records every key; you say what the receiving radio heard. The result, tx-report.json, goes into the device report. Your callsign and DMR ID are removed from it."));
+        body.addView(Neo.sheetHint(c, "Guides the transmit tests of the certification guide (section 3.3): an FM key, the release check, the limit check (the session uses its own 28 s limit), frequency and deviation, a DMR group call on DMR phones, and heat. SignalDeck keys the radio itself and records every key; you say what the receiving radio heard. The result, tx-report.json, goes into the device report. Your callsign and DMR ID are removed from it."));
         TextView kind = Neo.label(c, (g.fork ? "⚠ " : "") + b.text().trim(), g.fork ? Neo.AMBER : Neo.MUTED, 12, false); kind.setTypeface(Neo.mono(c)); kind.setTextSize(11);
         body.addView(kind);
         if (g.fork) body.addView(Neo.sheetHint(c, "This is not an official build: the report says so, with the commit and repository above, so the maintainer can rebuild exactly what you tested."));

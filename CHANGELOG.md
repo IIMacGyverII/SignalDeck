@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Module firmware catalogue: its own signing key from serial 6
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| FW57 release (owner) | The firmware catalogue is verified with its own key (AndroidRadio_Firmware_Project KEYS.md, fingerprint 49:cc:c9:d6…:2f:01) from serial 6 on, and with the profile-list key before, so a cached serial 5 still loads. The profile list keeps the profile key. Builds before beta.22 cannot verify serial 6 and keep serial 5, a second gate (with released-min) that keeps FW57 from them | fw/FirmwareCatalog.java, FirmwareCatalogKeyTest | host suite |
+
 ## 2026-10-30 — Module firmware: a catalogue image can require a newer SignalDeck
 
 | Backlog | Change | Files | Test |

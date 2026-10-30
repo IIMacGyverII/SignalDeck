@@ -74,6 +74,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     private ChannelStore.Channel current;
     private volatile boolean receiving, transmitting, rxAudioOn;
     private volatile int rssi = -999;
+    private volatile long rxBeganAt;                                      // when the last reception began (AgoldUsb.historyLevelFresh, with rssiAt below)
     private volatile long rxStart;
     private volatile boolean rxCounts;   // decided at RECEIVE_START: the matching STOP can arrive after a retune, when "current" is already the next channel
     private volatile int lastCaller, lastCallType, lastTarget, lastCallerCc = -1;
@@ -2707,8 +2708,9 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** {@code chNum} is the channel the line belongs to. A page sent from a temporary VFO still records on the channel the radio left. */
     public void history(int chNum, String kind, String text) {
         text = text.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]", "\u00B7");   // no control characters on screen (they also break screen readers)
-        store.addHistory(chNum, kind, text, rssi, lastCaller);
-        String line = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US).format(new java.util.Date()) + " " + text + (rssi != -999 ? " " + rssi + " dBm" : "");
+        final int level = AgoldUsb.historyLevelFresh(agoldBridge(), rssiAt, rxBeganAt) ? rssi : -999;   // no stale level on the Atom XL
+        store.addHistory(chNum, kind, text, level, lastCaller);
+        String line = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US).format(new java.util.Date()) + " " + text + (level != -999 ? " " + level + " dBm" : "");
         ui.post(() -> { for (Listener l : listeners) l.onHistory(line); });
     }
 
@@ -2753,7 +2755,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         switch (code) {
             case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); if (!captureRunning()) bridgeCapture(true); } break; }   // a capture closed for silence reopens   // already open: an edge after a signal-started reception
                 if (agoldBridge() && !synthRx) lineReported();           // an edge from the line itself
-                receiving = true; dmrEvent("start", 0, 0, 0);
+                receiving = true; rxBeganAt = System.currentTimeMillis(); dmrEvent("start", 0, 0, 0);
                 if (current != null && current.isDigital()) {           // a DMR call: forget the last talker, ask who this is now and again a second later
                     lastCaller = 0; lastCallerCc = -1; callLogged = false;
                     if (!agoldBridge()) for (long ms : new long[] { 300, 1200 }) ui.postDelayed(() -> { if (receiving) worker.execute(() -> { try { engine.queryCallerInfo(); } catch (IOException ignored) { } }); }, ms);

@@ -192,6 +192,13 @@ final class AgoldUsb {
     }
     static final long CAPTURE_WAIT_SLACK_MS = 100;
     static boolean closeSilentSignalOnlyCapture(boolean signalOnly, boolean mon, long audioBytes) { return signalOnly && !mon && audioBytes == 0; }
+    /**
+     * Whether a history line may carry the last signal reading: on the Atom XL only when it was taken after the current
+     * (or last) reception began. The S-meter holds still during a reception ({@link #holdsRxRead}), so a line written
+     * then or right after it would show the idle level from before (2026-10-30: "Received 8 s -102 dBm" for a station
+     * that read 30 dB stronger). A measured reading during the reception (fox hunt, coverage) is fresh and is shown.
+     */
+    static boolean historyLevelFresh(boolean agold, long readAt, long rxBeganAt) { return !agold || readAt >= rxBeganAt; }
     static boolean holdsRxRead(boolean agold, boolean lineReception, boolean synthetic) { return agold && lineReception && !synthetic; }
     static boolean countsAsLineMiss(long heldMs) { return heldMs >= LINE_MISS_MIN_MS; }
     /** At least this long between two automatic bridge power-cycles of any kind. */

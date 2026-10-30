@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — M17: transmissions no longer missed when the preamble lands badly on the detector's windows
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| §3.7 item 8 on the W6 phones (2026-10-30) | The M17 receiver finds a transmission's 40 ms preamble with 160-sample windows (hop 80) and searched ±60 symbols around the end it estimated from the last window that still read as preamble. Depending on where that grid falls, the preamble spans three windows or only two; with two the estimate is a hop early and the link setup lies outside the search, so the whole transmission is missed: on the W6+ a recording identical to one that decodes 98/100 decoded nothing. The search now reaches 64 symbols further after the estimate (the true end is never before the last strong window). Affects every phone, at random. | M17Receiver, M17Test (+ test recording) | Host: `decodesTheW6WhenThePreambleSpansTwoWindows` (the W6+'s 2026-10-30 HackRF recording: 0/100 before, 99/100 and 99/100 now); every earlier M17 test unchanged (the 2026-10-27 recording still 98/99) |
+
 ## 2026-10-30 — Module firmware loading only on certified phones
 
 | Backlog | Change | Files | Test |

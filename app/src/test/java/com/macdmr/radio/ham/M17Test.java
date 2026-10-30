@@ -147,6 +147,29 @@ public class M17Test {
     }
 
     /**
+     * The same W6+ transmissions recorded later in a clip (2026-10-30): the 40 ms preamble then spans two of the detector's
+     * 160-sample windows instead of three, the end estimate is a hop early and the sync lay outside the old +-60 symbol search.
+     * With the shipped table both transmissions must decode, as the first recording does.
+     */
+    @Test public void decodesTheW6WhenThePreambleSpansTwoWindows() throws Exception {
+        short[] audio = wav(M17Test.class.getResourceAsStream("/m17/m17_rx_w6_late.wav"));
+        JSONArray parts = new JSONObject(new String(M17Test.class.getResourceAsStream("/m17/m17_rx_w6_late.json").readAllBytes(), "UTF-8")).getJSONArray("parts");
+        java.util.List<String> lines = java.nio.file.Files.readAllLines(java.nio.file.Paths.get("src/main/assets/m17/eq_anysecu-w6plus.txt"));
+        float[] cal = new float[M17Receiver.NCOEF]; for (int i = 0; i < cal.length; i++) cal[i] = Float.parseFloat(lines.get(i).trim());
+        final List<byte[]> payloads = new ArrayList<>(); final List<String> events = new ArrayList<>();
+        M17Receiver rx = new M17Receiver(cal, new M17Receiver.Listener() {
+            public void started(M17.Lsf l) { events.add("start " + l.src() + " " + l.crcOk); }
+            public void frame(M17.Stream s, float q) { payloads.add(s.payload); }
+            public void lsfFromLich(M17.Lsf l) { }
+            public void ended(int f, int g, String why) { }
+        });
+        rx.feed(audio, audio.length); rx.feed(new short[8000], 8000);
+        assertEquals(events.toString(), 2, events.stream().filter(e -> e.equals("start N0CALL true")).count());
+        int e1 = exactPayloads(new ArrayList<>(payloads), parts.getJSONObject(0)), e2 = exactPayloads(new ArrayList<>(payloads), parts.getJSONObject(1));
+        assertTrue("exact " + e1 + " and " + e2, e1 >= 90 && e2 >= 90);
+    }
+
+    /**
      * Unihertz Atom XL (the bridge's USB card records about 125 ppm fast: 2.4 symbols over a 4 s transmission). The fit
      * finds the clock offset itself; a table fitted on one HackRF transmission decodes another one recorded five hours
      * earlier (89 of 100 exact on the bench; the receiver follows the drift frame by frame). M17_AXL_OUT writes the fitted

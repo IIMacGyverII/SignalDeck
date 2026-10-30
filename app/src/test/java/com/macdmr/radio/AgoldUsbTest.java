@@ -158,6 +158,22 @@ public class AgoldUsbTest {
         assertTrue(AgoldUsb.coverageReadingUsable(false, 1000, 2500));    // other phones
     }
 
+    @Test public void aSignalOnlyReceptionOpensItsCaptureOnlyOnceItHasLasted() {
+        assertEquals(0, AgoldUsb.captureOpenDelay(false, false, 0));                         // the line reported it: open at once, as before
+        assertEquals(AgoldUsb.LINE_MISS_MIN_MS, AgoldUsb.captureOpenDelay(true, false, 0));  // found from the signal: wait the full 3 s
+        assertEquals(1000, AgoldUsb.captureOpenDelay(true, false, AgoldUsb.LINE_MISS_MIN_MS - 1000));
+        assertEquals(0, AgoldUsb.captureOpenDelay(true, false, AgoldUsb.LINE_MISS_MIN_MS + 500));   // a stuck line's station: open after 3 s
+        assertEquals(0, AgoldUsb.captureOpenDelay(true, true, 0));                           // MON opens at once
+    }
+
+    @Test public void aSilentSignalOnlyCaptureIsClosedBeforeTheBridgeTimesOut() {
+        assertTrue(AgoldUsb.closeSilentSignalOnlyCapture(true, false, 0));     // found from the signal, no audio: close it cleanly
+        assertFalse(AgoldUsb.closeSilentSignalOnlyCapture(true, false, 640));  // audio came: a real station on a stuck line
+        assertFalse(AgoldUsb.closeSilentSignalOnlyCapture(false, false, 0));   // the line reported it: its own recovery decides
+        assertFalse(AgoldUsb.closeSilentSignalOnlyCapture(true, true, 0));     // MON holds the reception open on purpose
+        assertTrue(AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS < 2000);                  // before the kernel's 2 s I/O error
+    }
+
     @Test public void theSMeterHoldsItsReadingOnlyDuringAReportedAtomXlReception() {
         assertTrue(AgoldUsb.holdsRxRead(true, true, false));      // the line reported it: no command while the audio streams
         assertFalse(AgoldUsb.holdsRxRead(true, true, true));      // found from the signal: the watchdog needs the readings to end it

@@ -170,6 +170,23 @@ final class AgoldUsb {
      * reading taken 24 ms after the power-cycle was stored as -109 dBm beside two of -74 from the same carrier.
      */
     static boolean coverageReadingUsable(boolean agold, long now, long ownCycleUntil) { return !agold || now >= ownCycleUntil; }
+    /**
+     * A capture opened for a reception found only from the signal is closed by SignalDeck when no audio came within this
+     * long and the line still has not reported it: energy from another transmitter close by makes the module play
+     * nothing, the bridge streams only while the module plays, and a capture left open hits the kernel's 2 s I/O error,
+     * after which the bridge streams nothing until it is power-cycled (2026-10-29 21:41 and 22:12: about 12 s without
+     * the radio each time; skipping that restart instead left the next real reception silent). A clean close, as at the
+     * end of every reception, keeps the bridge healthy; the capture reopens if the line reports the reception after all.
+     */
+    static final long SIGNAL_ONLY_AUDIO_WAIT_MS = 1500;
+    /**
+     * How long a reception waits before its capture opens: none when the line reported it (or MON opened it), and for a
+     * reception found only from the signal until it has lasted {@link #LINE_MISS_MIN_MS}, so a short burst from another
+     * transmitter never opens one. A station the line really missed loses only its first seconds, and the line's own
+     * catching up opens the capture at once.
+     */
+    static long captureOpenDelay(boolean signalOnly, boolean mon, long heldMs) { return !signalOnly || mon ? 0 : Math.max(0, LINE_MISS_MIN_MS - heldMs); }
+    static boolean closeSilentSignalOnlyCapture(boolean signalOnly, boolean mon, long audioBytes) { return signalOnly && !mon && audioBytes == 0; }
     static boolean holdsRxRead(boolean agold, boolean lineReception, boolean synthetic) { return agold && lineReception && !synthetic; }
     static boolean countsAsLineMiss(long heldMs) { return heldMs >= LINE_MISS_MIN_MS; }
     /** At least this long between two automatic bridge power-cycles of any kind. */

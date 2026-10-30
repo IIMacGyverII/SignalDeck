@@ -2751,7 +2751,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     @Override public void status(int code, String name) {
         java.util.function.BiConsumer<Integer, String> tap = statusTap; if (tap != null) try { tap.accept(code, name); } catch (Throwable ignored) { }
         switch (code) {
-            case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); } break; }   // already open: an edge after a signal-started reception
+            case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); if (!captureRunning()) bridgeCapture(true); } break; }   // a capture closed for silence reopens   // already open: an edge after a signal-started reception
                 if (agoldBridge() && !synthRx) lineReported();           // an edge from the line itself
                 receiving = true; dmrEvent("start", 0, 0, 0);
                 if (current != null && current.isDigital()) {           // a DMR call: forget the last talker, ask who this is now and again a second later
@@ -2795,6 +2795,15 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (!agoldBridge()) return;
         final AudioBackend a = rxAudioOn && audio instanceof AlsaDirectAudio ? audio : null;
         final boolean dmr = current != null && current.isDigital();
+        if (on && synthRx && !monRx) {                                       // found from the signal only: no capture yet (AgoldUsb.captureOpenDelay)
+            long wait = AgoldUsb.captureOpenDelay(true, false, System.currentTimeMillis() - synthStartAt);
+            if (wait > 0) {
+                if (a != null && ((AlsaDirectAudio) a).capturing()) worker.execute(() -> { try { a.stopRx(); } catch (Throwable ignored) { } });   // the last reception's tail: not this one's, and it would run into the bridge's I/O error
+                log("reception found from the signal: the capture waits " + wait + " ms for the line or for the reception to last");
+                ui.postDelayed(() -> { if (receiving && synthRx && !captureRunning()) bridgeCapture(true); }, wait);
+                return;
+            }
+        }
         worker.execute(() -> {
             try {
                 // while the bridge streams audio it cuts every frame on the port after 12 bytes (measured 2026-10-28), so
@@ -2804,8 +2813,14 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (!dmr && a != null && ((AlsaDirectAudio) a).capturing()) return;
                     if (a != null) a.stopRx(); if (dmr) { engine.queryCallerInfo(); Thread.sleep(150); }
                     if (a != null) {
+                        final long bytes0 = rxAudioBytes();
                         String r = a.startRx(true); log(r);
-                        if (r != null && r.contains("no audio block yet")) recoverBridgeAudio("the USB capture delivered nothing");
+                        if (synthRx) ui.postDelayed(() -> {
+                            if (!receiving || !AgoldUsb.closeSilentSignalOnlyCapture(synthRx, monRx, rxAudioBytes() - bytes0) || !captureRunning()) return;
+                            log("no audio " + AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS + " ms into a reception found from the signal (another transmitter close by, most likely): capture closed before the bridge times out");
+                            worker.execute(() -> { try { a.stopRx(); } catch (Throwable t) { log("capture close: " + t); } });
+                        }, AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS);
+                        if (r != null && r.contains("no audio block yet") && !(synthRx && !monRx)) recoverBridgeAudio("the USB capture delivered nothing");   // a signal-only one is closed for silence above instead
                     } }
                 else { if (a != null) a.stopRx(); if (packet != null && !dmr) packet.streamEnded(); if (dmr) { Thread.sleep(100); engine.queryCallerInfo(); } }
             } catch (Throwable t) { log("bridge capture: " + t); }

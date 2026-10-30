@@ -132,6 +132,11 @@
 | Backlog | Change | Files | Test |
 |---|---|---|---|
 | Atom XL coverage (2026-10-29) | The coverage log skips signal readings while SignalDeck restarts the radio's USB bridge and for 1.5 s after it (the module's reading needs ~0.7 s after a power-up). On the bench a reading taken 24 ms after a restart was stored as -109 dBm beside two of -74 from the same carrier | AgoldUsb, RadioService, AgoldUsbTest | Host tests |
+## 2026-10-29 — Atom XL: a burst from another transmitter no longer restarts the bridge
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Atom XL false starts (2026-10-29) | A signal well above the floor with the reception line silent starts a reception found from the signal, which opens the capture. For energy from another transmitter close by the module plays nothing, so the capture hit the kernel's 2 s I/O error, after which the bridge streams nothing until power-cycled (about 12 s without the radio). Now a reception found only from the signal opens no capture until it has lasted 3 s (the line's own report opens it at once, MON as before), and a capture still open from the last reception is closed when such a reception starts; if one that did open gets no audio within 1.5 s, SignalDeck closes it itself (a clean close, as at every reception's end) and reopens it if the line reports the reception after all. A station on a line that really missed it loses its first 3 s; the stuck-line restart is unchanged. A first version that only skipped the restart after the error left the next real reception silent on the bench, so the restart after an error stays | AgoldUsb, RadioService, AgoldUsbTest | Host tests; device: next HackRF slot (off-channel carriers +20 to +30 kHz at -x 47 with the amplifier make the signal-only case, then a plain reception) |
 
 ## 2026-10-29 — W6Plus DMR gateway route: the speaker amplifier comes back even without a snapshot
 

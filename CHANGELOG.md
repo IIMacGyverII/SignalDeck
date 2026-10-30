@@ -5,6 +5,11 @@
 | Backlog | Change | Files | Test |
 |---|---|---|---|
 | Contribute (owner) | The Contribute page and its help say SignalDeck is a free and open-source project (GPL-3.0) and ask users who like it to consider donating | ui/DeviceView.java, ui/HelpView.java | host suite; owner looked at the page on the Armor |
+## 2026-10-30 — Atom XL: no stale signal level in the history
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Atom XL history (2026-10-30) | Since the S-meter holds still during an Atom XL reception (a reading breaks the audio), history lines written during or right after a reception ("Received N s", a CTCSS tone, M17 calls) carried the idle level from before it (e.g. -102 dBm for a station 30 dB stronger). On the Atom XL a line now carries a level only when the reading was taken after the reception began (a fox hunt or coverage reading during it counts); otherwise it shows none. Other phones unchanged | AgoldUsb, RadioService, AgoldUsbTest | Host tests |
 
 ## 2026-10-30 — Region help says the country data may be inaccurate and how to report corrections; GitHub Sponsors on the Contribute page
 

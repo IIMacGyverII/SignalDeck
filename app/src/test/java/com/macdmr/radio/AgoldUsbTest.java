@@ -191,6 +191,13 @@ public class AgoldUsbTest {
         assertTrue(AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS < 2000);                  // before the kernel's 2 s I/O error
     }
 
+    @Test public void historyShowsOnlyALevelReadSinceTheReceptionBegan() {
+        assertFalse(AgoldUsb.historyLevelFresh(true, 1000, 2000));    // read before the reception: the idle level, not shown
+        assertTrue(AgoldUsb.historyLevelFresh(true, 2500, 2000));     // a measured reading during it: shown
+        assertTrue(AgoldUsb.historyLevelFresh(true, 1000, 0));        // no reception yet: the reading stands
+        assertTrue(AgoldUsb.historyLevelFresh(false, 1000, 2000));    // other phones read during receptions
+    }
+
     @Test public void theSMeterHoldsItsReadingOnlyDuringAReportedAtomXlReception() {
         assertTrue(AgoldUsb.holdsRxRead(true, true, false));      // the line reported it: no command while the audio streams
         assertFalse(AgoldUsb.holdsRxRead(true, true, true));      // found from the signal: the watchdog needs the readings to end it

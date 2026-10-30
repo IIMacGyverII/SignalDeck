@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — The M17 receive hold is sent only when it changes the module's state (DMR silent after M17)
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| FW57 release, step (d) | After M17 receive was started and stopped, the first DMR key on a DMR channel radiated nothing (FW57 channel 49 control, 2026-10-30). The module's hold command saves the live WORK_MODE and writes 0x80 every time it is sent, and the release writes the saved word back, so a second apply while held saved 0x80 and the release left DMR deaf. SignalDeck now tracks the hold (`holdActive`: set by an apply answered sr=0, cleared by a release's reply, a module boot, a power-cycle and a firmware load): an apply goes out only when nothing is held, a release only when something is, and the re-send after a channel, VFO, tone or unkey write is release-then-apply. A firmware backstop follows in FW58 | RadioService.java, HoldTrackingTest | host suite; device step (d) owed |
+
 ## 2026-10-30 — Module firmware: released images download from the catalogue
 
 | Backlog | Change | Files | Test |

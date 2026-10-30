@@ -1576,7 +1576,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             synchronized (tunes) { tunes.addLast(new Object[] { ch, false }); }   // answered like any channel write
             tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, 8, 2);
             if (profile.globalSquelch) engine.setSquelch(hardwareSq(ch));
-            if (dataReceive) scheduleDataHold(true);
+            if (dataReceive) scheduleDataHold(true, true);
         } catch (IOException e) { log("squelch rewrite: " + e); }
     }
 
@@ -1636,7 +1636,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             pushModes();
             describeLocation(ch);
             updateNotification();
-            if (dataReceive) scheduleDataHold(true);
+            if (dataReceive) scheduleDataHold(true, true);
             followM17Channel(ch);
             return true;
         } catch (IOException e) { log("select: " + e); return false; }
@@ -2018,7 +2018,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         if (id != null && audio != null) { log("Morse ID after the transmission"); audio.playPcm(id); history("pkt", "\uD83D\uDD24 Morse ID " + packet.callsign()); }   // the station identification every ten minutes
                     } finally { unkey(); }
                     if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true);
-                    if (dataReceive) scheduleDataHold(true);   // the unkey path rewrites the voice filter; put the hold back
+                    if (dataReceive) scheduleDataHold(true, true);   // the unkey path rewrites the voice filter; put the hold back
                 }
             } catch (Throwable t) { log("ptt: " + t); try { engine.ptt(false); } catch (Throwable ignored) { } pttDown = false; }
         });
@@ -2203,6 +2203,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (old != null && old.isAlive()) { ui.finished("A load is already running"); return; }
         if (profile == null || !profile.firmwareLoader()) { ui.finished("This phone's radio module cannot be loaded from SignalDeck"); return; }
         fwHalt.set(false);
+        holdActive = false;                                                     // the loader restarts the module; its hold is gone
         setFirmwareBusy(true);
         Thread job = new Thread(() -> {
             try { com.macdmr.radio.fw.FirmwareSession.run(this, row, image, ui, fwHalt, treatTagAsWrong); }
@@ -2985,6 +2986,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             log("bridge power-up held " + settle + " ms after a charger or USB change");
             try { Thread.sleep(settle); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         }
+        holdActive = false;                                                     // a power-cycled module holds nothing
         try { engine.powerCycle(); }
         catch (IOException e) { if (agoldBridge()) bridgeLost(e); throw e; }
         if (agoldBridge()) { ui.removeCallbacks(windowCheck); ui.postDelayed(windowCheck, AgoldUsb.POWER_UP_EDGES_MS + 300); }
@@ -3224,7 +3226,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Channel writes waiting for the module's answer (oldest first) and the last one it accepted. */
     private final java.util.ArrayDeque<Object[]> tunes = new java.util.ArrayDeque<>();
     private volatile ChannelStore.Channel confirmed;
-    @Override public void booted(String banner) { log("module booted: " + banner); }
+    @Override public void booted(String banner) { log("module booted: " + banner); holdActive = false; }   // a booted module holds nothing
 
     private volatile long pendingSmsId = -1;
 
@@ -3980,13 +3982,13 @@ public class RadioService extends Service implements RadioEngine.Events {
      */
     public synchronized String setM17(boolean on, boolean hold) {
         M17Station s = m17();
-        if (!on) { s.stop(); dataReceive = false; scheduleDataHold(false); pushModes(); return null; }
+        if (!on) { s.stop(); dataReceive = false; scheduleDataHold(false, false); pushModes(); return null; }
         ChannelStore.Channel c = current;
         if (c == null || c.isDigital()) return "M17 needs an analog (FM) channel or the VFO";
         String e = s.start();
         if (e != null) return e;
         dataReceive = hold;
-        scheduleDataHold(hold);
+        scheduleDataHold(hold, false);
         pushModes();
         return null;
     }
@@ -3994,7 +3996,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** After any unkey: the module's unkey path rewrites the voice filter, so a held M17 receive goes deaf until the hold is
      *  sent again (seen 2026-10-27 on the hotspot bench: after an M17 key the signal bar moved but no M17 was decoded until a
      *  channel change). Every transmit path calls this once its carrier is down. */
-    private void holdAfterTx() { if (dataReceive) scheduleDataHold(true); }
+    private void holdAfterTx() { if (dataReceive) scheduleDataHold(true, true); }
 
     /** After a symbol-engine transmission (M17 voice and texts, pages, symbol streams) the module leaves its receive audio
      *  muted: measured 2026-10-27 on FW26, the receive RMS fell from about 5600 to 1.3 after the unkey and stayed there while
@@ -4026,11 +4028,30 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
     private volatile boolean quietRewrite;
 
-    /** Re-send the voice-filter hold after a channel, VFO or tone write. Those writes put the filter back. */
-    private void scheduleDataHold(boolean apply) {
+    /**
+     * Apply or release the voice-filter hold. {@code refresh}: a channel, VFO, tone or unkey write has just put the voice
+     * filter back, so a hold already applied must be put on again (release, then apply; see {@link #holdSteps}).
+     */
+    private void scheduleDataHold(boolean apply, boolean refresh) {
         final int g = dataHoldGen.incrementAndGet();
         final boolean want = apply;
-        worker.execute(() -> { if (g == dataHoldGen.get()) sendDataHold(want && dataReceive); });
+        worker.execute(() -> { if (g == dataHoldGen.get()) sendDataHold(want && dataReceive, refresh); });
+    }
+
+    /**
+     * True while the module holds the voice filter (an apply answered sr=0, no release since, no module boot since). The op 6
+     * variant 3 apply saves the live WORK_MODE at 0x4B000 and writes 0x80 every time, with no check of its own, and the
+     * release writes the saved word back: a second apply while held saves 0x80, the release "restores" 0x80, and DMR stays
+     * deaf until a key (FW57, 2026-10-30, channel 49 control). So the host sends an apply only when nothing is held, a
+     * release only when something is, and a refresh as release-then-apply.
+     */
+    private volatile boolean holdActive;
+
+    /** The op 6 variant 3 actions to send (1 apply, 0 release), in order, for a request given whether a hold is active. */
+    static int[] holdSteps(boolean apply, boolean held, boolean refresh) {
+        if (!apply) return held ? new int[] { 0 } : new int[0];
+        if (!held) return new int[] { 1 };
+        return refresh ? new int[] { 0, 1 } : new int[0];
     }
 
     /** Whether the voice-filter hold may be applied now: never on a DMR channel (it stores WORK_MODE 0x80, which takes the
@@ -4048,22 +4069,32 @@ public class RadioService extends Service implements RadioEngine.Events {
         M17Station m = m17; if (m != null && m.running()) m.stop();
         PagerStation pg = pager; if (pagerHold && pg != null) { pg.stop(); pagerHold = false; }
         dataReceive = false;
-        sendDataHold(false);
+        sendDataHold(false, false);
         log("data hold released before a DMR channel");
         pushModes();
     }
 
-    private void sendDataHold(boolean apply) {
+    private final Object holdLock = new Object();
+    private void sendDataHold(boolean apply, boolean refresh) {
+        synchronized (holdLock) { sendDataHold0(apply, refresh); }
+    }
+    private void sendDataHold0(boolean apply, boolean refresh) {
         try {
             ChannelStore.Channel cur = current;
             if (!holdAllowed(apply, cur != null && cur.isDigital())) { log("data hold: not on a DMR channel"); return; }
             if (!engine.isOpen()) { log("data hold: radio not open"); return; }
             if (moduleVersion.trim().isEmpty()) versionHandshake(1500);
             if (!Firmware.stubTag(moduleVersion)) { log("data hold: stock firmware, not sent"); M17Station s = m17; if (s != null) s.setHeldPath(false); return; }
-            Frame pic = sym40(new byte[] { 6, 3, (byte) (apply ? 1 : 0) }, 1000);
-            log("data hold action=" + (apply ? 1 : 0) + (pic == null ? " missing" : " sr=" + pic.sr));
-            M17Station s = m17;
-            if (s != null) s.setHeldPath(apply && pic != null && pic.sr == 0);
+            int[] steps = holdSteps(apply, holdActive, refresh);
+            if (steps.length == 0) { log("data hold: " + (apply ? "already held" : "nothing held") + ", not sent"); return; }
+            for (int a : steps) {
+                Frame pic = sym40(new byte[] { 6, 3, (byte) a }, 1000);
+                log("data hold action=" + a + (pic == null ? " missing" : " sr=" + pic.sr));
+                if (a == 1) holdActive = pic != null && pic.sr == 0;
+                else if (pic != null) holdActive = false;                              // a missing reply leaves it marked, so a later release still goes out
+                M17Station s = m17;
+                if (s != null) s.setHeldPath(a == 1 && holdActive);
+            }
         } catch (Throwable t) { log("data hold: " + t); }
     }
 
@@ -4235,7 +4266,7 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     // ---- band scope (BandScope): receive-only sweeps ----
     final BandScope scope = new BandScope(new BandScope.Hooks() {
-        @Override public void tune(int hz) throws Exception { tunedAt = System.currentTimeMillis(); engine.setAnalog(hz, hz, hz < 300_000_000 ? 1 : 0, 0, scopeSq, 0, 0, 0, 0, 8, 2); if (dataReceive) scheduleDataHold(true); }   // low power, nothing keyed
+        @Override public void tune(int hz) throws Exception { tunedAt = System.currentTimeMillis(); engine.setAnalog(hz, hz, hz < 300_000_000 ? 1 : 0, 0, scopeSq, 0, 0, 0, 0, 8, 2); if (dataReceive) scheduleDataHold(true, true); }   // low power, nothing keyed
         @Override public void query() throws Exception { engine.queryRssi(); }
         @Override public void restore() {                                   // inline (Talk waits for it on the worker thread)
             ChannelStore.Channel ch = vfo != null ? vfo : current;

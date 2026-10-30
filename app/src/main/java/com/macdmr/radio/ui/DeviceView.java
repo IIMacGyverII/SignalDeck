@@ -903,7 +903,8 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
                 + "• with root, the stock walkie-talkie app is closed, then opened for 15 s so we can see how it starts the radio and what it sends to it (do not press PTT then), and closed again\n"
                 + "• with Magisk root, the radio probe (asks the module who it is on the serial ports the walkie-talkie app uses: the DMR version query and the SA818 AT handshake; switches the module on if it does not answer"
                 + (dp.supported ? "" : ", only on phones with a profile") + ")\n"
-                + (canTrial ? "• optionally a 30-second trial: SignalDeck takes the radio (receive only, nothing is transmitted), records what the module and the audio do, then gives it back to " + dp.stockApp + "\n" : "")
+                + (canTrial ? "• optionally a trial (30 seconds, about a minute and a half on an untested phone): SignalDeck takes the radio (receive only, nothing is transmitted), records what the module and the audio do"
+                        + (dp.verified ? "" : ", how its squelch, receive level and signal reading behave and which frequencies it tunes at the band edges") + ", then gives it back to " + dp.stockApp + "\n" : "")
                 + (dp.supported && !dp.stockApp.isEmpty() ? "\n" + dp.stockApp + " is closed for the checks; open it again afterwards as usual.\n" : "")
                 + "\nAt the end you get one zip to send us.";
         android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(c).setTitle(firstLaunch ? "Help us support this phone" : "Run all checks").setMessage(msg)

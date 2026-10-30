@@ -202,12 +202,12 @@
       "radio": {"module": "Armor DMR module family (version not read yet)", "modes": ["FM", "DMR Tier II"], "bands": [{"name": "VHF", "lowMHz": 136.0, "highMHz": 174.0}, {"name": "UHF", "lowMHz": 400.0, "highMHz": 480.0}], "txPowerW": null, "link": "A serial port inside the phone at 57600 baud (a different port from the Armor 26 Ultra); audio through the phone's radio audio service."},
       "features": [
         {"id": "fm_rx", "name": "FM receive", "state": "untested", "note": null},
-        {"id": "fm_tx", "name": "FM transmit", "state": "untested", "note": "Blocked until the profile is tested"},
+        {"id": "fm_tx", "name": "FM transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"},
         {"id": "dmr_rx", "name": "DMR receive", "state": "untested", "note": null},
-        {"id": "dmr_tx", "name": "DMR transmit", "state": "untested", "note": "Blocked until the profile is tested"}
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"}
       ],
       "quirks": [
-        {"title": "Untested profile", "text": "This profile comes from an owner's device report and the phone's stock app. It has not run on the phone yet, so SignalDeck does not take over the radio by itself and does not transmit. Owners can help with Device, Run all checks."},
+        {"title": "Untested profile", "text": "This profile comes from an owner's device report and the phone's stock app. It has not run on the phone yet, so SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session."},
         {"title": "Looks like an Armor 26 Ultra", "text": "The phone has the same radio control nodes as the Armor 26 Ultra but its module is on another port. SignalDeck recognises it by its model name."},
         {"title": "Driven as its own app does", "text": "Its stock walkie-talkie app is an older build than the Armor 26 Ultra's, with the same commands but fewer of them. SignalDeck follows it on this phone: a shorter start-up exchange with the module, the audio opened 0.6 s before the transmitter is keyed, no new key within 2 s of the last one, and its channel files for Import from the stock app. Whether the module answers the extra commands SignalDeck uses (signal strength, caller ID, monitor) is what Run all checks finds out."},
         {"title": "Bands not measured", "text": "The bands shown are the Armor family's; this model's limits have not been measured yet."}

@@ -794,7 +794,7 @@
           "id": "fm_tx",
           "name": "FM transmit",
           "state": "untested",
-          "note": "Blocked until the profile is tested"
+          "note": "Only in the guided Transmit test session until the profile is tested"
         },
         {
           "id": "dmr_rx",
@@ -806,13 +806,13 @@
           "id": "dmr_tx",
           "name": "DMR transmit",
           "state": "untested",
-          "note": "Blocked until the profile is tested"
+          "note": "Only in the guided Transmit test session until the profile is tested"
         }
       ],
       "quirks": [
         {
           "title": "Untested profile",
-          "text": "This profile comes from an owner's device report and the phone's stock app. It has not run on the phone yet, so SignalDeck does not take over the radio by itself and does not transmit. Owners can help with Device, Run all checks."
+          "text": "This profile comes from an owner's device report and the phone's stock app. It has not run on the phone yet, so SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session."
         },
         {
           "title": "Looks like an Armor 26 Ultra",

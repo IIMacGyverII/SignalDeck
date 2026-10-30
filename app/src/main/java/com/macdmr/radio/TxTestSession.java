@@ -50,14 +50,16 @@ public final class TxTestSession {
     public static TxReport.Gate gate(RadioService svc, BuildIdentity.Info b) {
         DeviceProfile p = svc.profile();
         boolean allowed = svc.modeAllowed("txtest") && svc.adminAllowed("txtest");   // Restricted mode (PR 26) is not merged yet: both are stubs that allow; the merge keeps these calls
-        return TxReport.gate(p.verified, p.txBlocked || ProfileRegistry.transmitBlocked(), allowed, b.kind);
+        return TxReport.gate(p.verified, p.txTestUnverified, p.txBlocked || ProfileRegistry.transmitBlocked(), allowed, b.kind);
     }
 
     static String pttPath(DeviceProfile p) {
         String app = "SignalDeck's own key (the same path as the on-screen Talk key)";
         if ("agold".equals(p.protocol)) return app + " -> the USB bridge's PTT line (" + AgoldUsb.HANDLE_PTT + ")";
         if ("sa818".equals(p.protocol) || p.rxLinesOn != null) return app + " -> phone lines " + lines(p.txLinesOn);
-        return app + " -> module command 0x26 (launch) on " + p.controlPort;
+        String t = (p.txAudioLeadMs > 0 ? "; the audio path opens " + p.txAudioLeadMs + " ms before the key, so the module keys that much after the press" : "")
+                + (p.minKeyGapMs > 0 ? "; a key within " + p.minKeyGapMs + " ms of the last release waits for the rest" : "");
+        return app + " -> module command 0x26 (launch) on " + p.controlPort + t;
     }
     private static String lines(String[][] l) { if (l == null) return "(none)"; StringBuilder s = new StringBuilder(); for (String[] x : l) s.append(s.length() > 0 ? ", " : "").append(x[0]).append('=').append(x[1]); return s.toString(); }
 
@@ -77,6 +79,11 @@ public final class TxTestSession {
      * 0: SignalDeck does not release, its watchdog must at the session's 28 s limit (the tester can still release, and at 35 s the session does).
      */
     TxReport.Key key(String what, long ms) throws InterruptedException {
+        svc.txTestKeying = true;                                                      // an untested profile with txTestUnverified keys only for this
+        try { return keyOnce(what, ms); } finally { svc.txTestKeying = false; }
+    }
+
+    private TxReport.Key keyOnce(String what, long ms) throws InterruptedException {
         TxReport.Key k = new TxReport.Key(); k.plannedMs = ms; k.pttPath = pttPath(svc.profile());
         ChannelStore.Channel ch = svc.current(); k.channel = channel(ch);
         long now0 = System.currentTimeMillis(); k.startUtc = TxReport.utc(now0);

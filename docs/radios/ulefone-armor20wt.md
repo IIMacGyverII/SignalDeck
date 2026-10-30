@@ -23,15 +23,15 @@ SignalDeck does not load module firmware on this phone: its stock app has no upd
 | Feature | State | Note |
 |---|---|---|
 | FM receive | Not tested |  |
-| FM transmit | Not tested | Blocked until the profile is tested |
+| FM transmit | Not tested | Only in the guided Transmit test session until the profile is tested |
 | DMR receive | Not tested |  |
-| DMR transmit | Not tested | Blocked until the profile is tested |
+| DMR transmit | Not tested | Only in the guided Transmit test session until the profile is tested |
 
 ## Known quirks
 
 ### Untested profile
 
-This profile comes from an owner's device report and the phone's stock app. It has not run on the phone yet, so SignalDeck does not take over the radio by itself and does not transmit. Owners can help with Device, Run all checks.
+This profile comes from an owner's device report and the phone's stock app. It has not run on the phone yet, so SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session.
 
 ### Looks like an Armor 26 Ultra
 

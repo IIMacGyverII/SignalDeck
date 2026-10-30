@@ -41,4 +41,25 @@ public class FirstRunCheckTest {
         assertFalse("not probed", FirstRunCheck.speedNotSet(probe, "/dev/ttyS3", 57600));
         assertFalse(FirstRunCheck.speedNotSet(null, "/dev/ttyS1", 57600));
     }
+
+    @Test public void readsTheSquelchCheck() {
+        assertTrue(FirstRunCheck.squelchVerdict(true, 8000, true, 8000).contains("audio path works"));
+        assertTrue(FirstRunCheck.squelchVerdict(false, 0, true, 8000).contains("only with monitor"));
+        assertTrue(FirstRunCheck.squelchVerdict(true, 0, true, 0).contains("audio path is the problem"));
+        assertTrue(FirstRunCheck.squelchVerdict(false, 0, false, 0).contains("still untested"));
+    }
+
+    @Test public void findsWhenTheReadingSettles() {
+        java.util.List<long[]> pts = new java.util.ArrayList<>();
+        pts.add(new long[] { 550, -121 }); pts.add(new long[] { 700, -105 }); pts.add(new long[] { 1000, -104 }); pts.add(new long[] { 1300, -103 });
+        assertEquals(700, FirstRunCheck.settledAtMs(pts, 2));          // 15-20 dB low until ~0.7 s, as on the Armor 26 Ultra
+        assertEquals(-1, FirstRunCheck.settledAtMs(new java.util.ArrayList<>(), 2));
+        assertEquals("700", FirstRunCheck.median(java.util.Arrays.asList(900L, 700L, 650L)));
+        assertEquals("?", FirstRunCheck.median(new java.util.ArrayList<>()));
+    }
+
+    @Test public void bandEdgesStraddleTheModuleLimits() {
+        for (int i = 0; i < FirstRunCheck.EDGES_HZ.length; i += 2)       // each edge, then 5 kHz outside it
+            assertEquals(5_000, Math.abs(FirstRunCheck.EDGES_HZ[i] - FirstRunCheck.EDGES_HZ[i + 1]));
+    }
 }

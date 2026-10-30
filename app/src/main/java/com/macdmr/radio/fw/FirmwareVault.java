@@ -63,6 +63,10 @@ public final class FirmwareVault {
     public static byte[] bytesFor(Context c, ImageTable.Row row) {
         if (row == null) return null;
         if (row.factory) { Copy f = factory(c); return f.verified ? f.bytes : null; }
+        try {                                                                   // a catalogue image this app downloaded
+            File own = downloaded(c, row.tag, row.sha256);
+            if (own.isFile()) { byte[] b = java.nio.file.Files.readAllBytes(own.toPath()); if (matches(b, row.tag, row.sha256, row.size)) return b; }
+        } catch (Exception ignored) { }
         String listed = RootSetup.run("ls /sdcard/Download/DMR/Firmware/ 2>/dev/null");
         if (listed == null) return null;
         File dst = new File(c.getCacheDir(), "fw-candidate.bin");
@@ -99,6 +103,27 @@ public final class FirmwareVault {
     private static byte[] readPrivate(Context c) {
         try { return java.nio.file.Files.readAllBytes(privateFile(c).toPath()); }
         catch (Exception e) { return null; }
+    }
+
+    /** The bytes are exactly the listed image: size, sha256 and the version string inside the file. */
+    static boolean matches(byte[] b, String tag, String sha256, int size) {
+        return b != null && tag != null && sha256 != null && b.length == size && sha256.equals(sha256(b)) && tag.equals(ImageTable.tagOf(b));
+    }
+    private static File downloaded(Context c, String tag, String sha256) { return new File(dir(c), tag + "-" + sha256.substring(0, 8) + ".bin"); }
+
+    /**
+     * Keep a downloaded catalogue image (not the factory one) that matches its catalogue row, in the app's files and a copy
+     * in Download/DMR/Firmware for the user. @return false when it does not match
+     */
+    public static boolean keepImage(Context c, byte[] image, String tag, String sha256, int size) {
+        if (!matches(image, tag, sha256, size)) return false;
+        try {
+            File f = downloaded(c, tag, sha256);
+            java.nio.file.Files.write(f.toPath(), image);
+            String mirror = "/sdcard/Download/DMR/Firmware/" + f.getName();
+            RootSetup.run("mkdir -p /sdcard/Download/DMR/Firmware && cp '" + f.getAbsolutePath() + "' '" + mirror + "' && chmod 644 '" + mirror + "'");
+            return true;
+        } catch (Exception e) { return false; }
     }
 
     /** Keep a downloaded factory image that already matches the known hash and tag. */

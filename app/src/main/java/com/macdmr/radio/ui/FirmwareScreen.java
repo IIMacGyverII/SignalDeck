@@ -104,7 +104,7 @@ public final class FirmwareScreen extends LinearLayout {
 
         download = Neo.button(c, "Download factory image", "update", Neo.AMBER);
         download.setVisibility(GONE);
-        download.setOnClickListener(v -> downloadFactory());
+        download.setOnClickListener(v -> { if (factoryMissing) downloadFactory(); else if (fetchChosen) downloadChosen(); else checkCatalogue(); });
         body.addView(download, buttonPad());
 
         body.addView(Neo.caps(c, "Advanced"));
@@ -123,6 +123,31 @@ public final class FirmwareScreen extends LinearLayout {
         restore.setOnClickListener(v -> { selected = ImageTable.FACTORY; showChosen(); ask(false); });
         stop.setOnClickListener(v -> svc.haltFirmware());
         refreshFacts();
+    }
+
+    /** The verified factory backup is missing (the download button fetches it); otherwise it fetches the chosen image. */
+    private boolean factoryMissing, fetchChosen;
+
+    /** Fetch the signed catalogue again (new released images show up in the list). */
+    private void checkCatalogue() {
+        if (running) return;
+        result.setText("Checking the firmware catalogue");
+        result.setTextColor(Neo.TEXT);
+        new Thread(() -> { String msg = FirmwareCatalog.fetch(getContext()); onUi(() -> { result.setText(msg); refreshFacts(); }); }, "fw-catalog").start();
+    }
+
+    /** Fetch the chosen catalogue image (signed row; size, hash and version string checked) so the pre-flight can see it. */
+    private void downloadChosen() {
+        if (running || selected.factory || selected.unlisted) return;
+        final ImageTable.Row want = selected;
+        result.setText("Downloading " + want.tag);
+        result.setTextColor(Neo.TEXT);
+        new Thread(() -> {
+            String msg = FirmwareCatalog.fetch(getContext());
+            byte[] got = FirmwareCatalog.download(getContext(), want.tag);
+            String line = got != null ? want.tag + " downloaded and checked" : msg.startsWith("Firmware catalogue") ? "Download failed: the file did not arrive or does not match its catalogue entry" : msg;
+            onUi(() -> { result.setText(line); result.setTextColor(got != null ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT); refreshFacts(); });
+        }, "fw-download").start();
     }
 
     private void downloadFactory() {
@@ -178,8 +203,17 @@ public final class FirmwareScreen extends LinearLayout {
         bar.setPhase("preparing");
         new Thread(() -> {
             byte[] image = FirmwareVault.bytesFor(getContext(), selected);
-            if (image == null) { onUi(() -> finishUi(selected.factory ? "The factory copy is not on this phone" : "That image is not in Download/DMR/Firmware")); return; }
-            svc.loadFirmware(selected, image, new FirmwareSession.Ui() {
+            if (image == null && !selected.factory && !selected.unlisted) {        // a catalogue image not on the phone yet: fetch it first
+                final String tag = selected.tag;
+                onUi(() -> { bar.setPhase("downloading"); log.append("Downloading " + tag + " from the firmware catalogue\n"); });
+                FirmwareCatalog.fetch(getContext());
+                image = FirmwareCatalog.download(getContext(), tag);
+                if (image != null) onUi(() -> log.append(tag + " downloaded; size, hash and version match\n"));
+            }
+            if (image == null) { onUi(() -> finishUi(selected.factory ? "The factory copy is not on this phone"
+                    : selected.unlisted ? "That image is not in Download/DMR/Firmware" : "Download failed: the file did not arrive or does not match its catalogue entry")); return; }
+            final byte[] chosenImage = image;
+            svc.loadFirmware(selected, chosenImage, new FirmwareSession.Ui() {
                 public void phase(String name) { onUi(() -> {
                     bar.setPhase(name);
                     if ("erasing".equals(name)) { eraseAt = System.currentTimeMillis(); ui.removeCallbacks(eraseTick); ui.post(eraseTick); }
@@ -234,12 +268,19 @@ public final class FirmwareScreen extends LinearLayout {
                 if (recovery) selected = ImageTable.FACTORY;
                 backupLine.setText(copy.verified ? "Verified · " + copy.source + "\nDownload/DMR/Firmware/factory-" + ImageTable.FACTORY.tag + "-" + ImageTable.FACTORY.sha256.substring(0, 8) + ".bin"
                         : "Not verified yet. " + (copy.sha256.isEmpty() ? "The stock app's copy could not be read." : "The stock copy does not match the known factory image."));
-                download.setVisibility(copy.verified || running ? GONE : VISIBLE);
+                factoryMissing = !copy.verified;
+                fetchChosen = copy.verified && !selected.factory && !selected.unlisted && !present.contains(selected.tag);
+                download.setText(factoryMissing ? "Download factory image" : fetchChosen ? "Download " + selected.tag : "Check for new firmware");
+                download.setVisibility(running ? GONE : VISIBLE);
                 images.removeAllViews();
                 for (ImageTable.Row row : FirmwareCatalog.rows(getContext())) {
                     if (recovery && !row.factory) continue;
                     TextView t = Neo.button(getContext(), row.tag, row.factory ? "restore" : "update", row == selected ? Neo.GREEN : Neo.CYAN);
-                    t.setOnClickListener(v -> { if (!running) { selected = row; showChosen(); refreshFacts(); } });
+                    t.setOnClickListener(v -> {
+                        if (running) return;
+                        selected = row; showChosen();
+                        if (!row.factory && !onPhone.contains(row.tag) && !factoryMissing) downloadChosen(); else refreshFacts();
+                    });
                     images.addView(t, buttonPad());
                 }
                 allowUnlisted.setText(Unlisted.allowed(getContext()) ? "Allow unlisted images · on" : "Allow unlisted images · off");

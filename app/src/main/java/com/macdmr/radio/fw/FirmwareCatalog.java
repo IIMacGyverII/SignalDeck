@@ -213,19 +213,25 @@ public final class FirmwareCatalog {
         } catch (Exception e) { return "Firmware catalogue check failed"; }
     }
 
-    /** Download one catalogue image and, for the factory row, keep it as the verified backup. @return the bytes, or null */
+    /**
+     * Download one catalogue image this build is offered and keep it: the factory row as the verified backup, any other
+     * image beside it ({@link FirmwareVault#keepImage}). Size, sha256 and the version string must all match the signed row.
+     * @return the bytes, or null
+     */
     public static byte[] download(Context c, String tag) {
         Doc doc = cached(c);
         if (doc == null || tag == null) return null;
         Image want = null;
         for (Image im : doc.images) if (tag.equals(im.tag)) want = im;
         if (want == null || want.url == null || want.url.isEmpty()) return null;
+        if (!want.factory && !offered(want.status, want.minAppVersionCode, com.macdmr.radio.BuildConfig.VERSION_CODE)) return null;
         try {
             com.macdmr.radio.repeaters.HttpClient.Response r = com.macdmr.radio.repeaters.HttpClient.get(want.url);
             if (!r.isOk() || r.body.length != want.size) return null;
             if (!want.sha256.equals(FirmwareVault.sha256(r.body))) return null;
             if (!want.tag.equals(ImageTable.tagOf(r.body))) return null;
             if (want.factory) FirmwareVault.keepFactory(c, r.body);
+            else if (!FirmwareVault.keepImage(c, r.body, want.tag, want.sha256, want.size)) return null;
             return r.body;
         } catch (Exception e) { return null; }
     }

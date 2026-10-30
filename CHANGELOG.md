@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Module firmware: released images download from the catalogue
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| FW57 release, step (d) | The Module firmware page never downloaded a released catalogue image: with no copy in Download/DMR/Firmware the FW57 row said "file not on this phone", the pre-flight went red and Load ended "That image is not in Download/DMR/Firmware". Choosing an offered image that is not on the phone now downloads it from the signed catalogue (size, sha256 and the version string must match the row; kept in the app's files with a copy in Download/DMR/Firmware), Download retries, Load downloads first if still missing, and a failed or mismatched download refuses the load with its reason. Check for new firmware refetches the catalogue once the factory backup is verified. Help updated | fw/FirmwareVault.java, fw/FirmwareCatalog.java, ui/FirmwareScreen.java, ui/HelpView.java, DownloadedImageTest | host suite; device step (d) owed |
+
 ## 2026-10-30 — Module firmware: the pre-flight accepts the catalogue images this build is offered
 
 | Backlog | Change | Files | Test |

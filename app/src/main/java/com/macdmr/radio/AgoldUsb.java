@@ -185,7 +185,12 @@ final class AgoldUsb {
      * transmitter never opens one. A station the line really missed loses only its first seconds, and the line's own
      * catching up opens the capture at once.
      */
-    static long captureOpenDelay(boolean signalOnly, boolean mon, long heldMs) { return !signalOnly || mon ? 0 : Math.max(0, LINE_MISS_MIN_MS - heldMs); }
+    static long captureOpenDelay(boolean signalOnly, boolean mon, long heldMs) {
+        if (!signalOnly || mon) return 0;
+        long left = LINE_MISS_MIN_MS - heldMs;
+        return left < CAPTURE_WAIT_SLACK_MS ? 0 : left;               // the re-check timer can fire a few ms early: open then, not after another 1 ms wait
+    }
+    static final long CAPTURE_WAIT_SLACK_MS = 100;
     static boolean closeSilentSignalOnlyCapture(boolean signalOnly, boolean mon, long audioBytes) { return signalOnly && !mon && audioBytes == 0; }
     static boolean holdsRxRead(boolean agold, boolean lineReception, boolean synthetic) { return agold && lineReception && !synthetic; }
     static boolean countsAsLineMiss(long heldMs) { return heldMs >= LINE_MISS_MIN_MS; }

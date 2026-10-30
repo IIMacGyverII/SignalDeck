@@ -164,6 +164,7 @@ public class AgoldUsbTest {
         assertEquals(1000, AgoldUsb.captureOpenDelay(true, false, AgoldUsb.LINE_MISS_MIN_MS - 1000));
         assertEquals(0, AgoldUsb.captureOpenDelay(true, false, AgoldUsb.LINE_MISS_MIN_MS + 500));   // a stuck line's station: open after 3 s
         assertEquals(0, AgoldUsb.captureOpenDelay(true, true, 0));                           // MON opens at once
+        assertEquals(0, AgoldUsb.captureOpenDelay(true, false, AgoldUsb.LINE_MISS_MIN_MS - 1));     // a timer that fired 1 ms early opens now
     }
 
     @Test public void aSilentSignalOnlyCaptureIsClosedBeforeTheBridgeTimesOut() {

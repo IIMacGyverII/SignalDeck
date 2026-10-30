@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Atom XL: the capture wait opens on its first re-check
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Atom XL false starts (2026-10-30) | The 3 s capture wait for a reception found from the signal counts a remainder under 100 ms as done, so a re-check timer that fires a few milliseconds early opens the capture instead of logging a second "waits 1 ms" and waiting again (seen on the bench, harmless) | AgoldUsb, AgoldUsbTest | Host tests |
+
 ## 2026-10-30 — Fox hunt asks before clearing marks; logbook counts read right
 
 | Backlog | Change | Files | Test |

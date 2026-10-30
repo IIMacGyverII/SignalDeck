@@ -23,16 +23,24 @@ A DMR phone with the Armor's module protocol and audio over a second serial port
 |---|---|---|
 | Signal meter | Works | Signal readings answer |
 | FM receive | Works | Voice clear in testers' reports |
-| FM transmit | Not tested | Blocked until the profile is verified |
+| FM transmit | Not tested | Only in the guided Transmit test session until the profile is tested |
 | DMR receive | Not tested |  |
-| DMR transmit | Not tested | Blocked until the profile is verified |
-| Module firmware loader | Not tested |  |
+| DMR transmit | Not tested | Only in the guided Transmit test session until the profile is tested |
+| Module firmware loader | No | Off: the stock app's updater carries no image, so this module's firmware has not been compared |
 
 ## Known quirks
 
 ### Profile in testing
 
-Testers have receive, MON, CTCSS and channel import working. Transmit stays blocked until the profile is verified, and SignalDeck does not take over the radio by itself.
+Testers have receive, MON, CTCSS and channel import working. SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session.
+
+### Keyed by its PTT line
+
+The stock app never sends the transmit command: it keys the radio by switching its PTT line, starts the microphone when the radio reports that it is transmitting, keeps it on a fifth of a second after the release, and takes no new key within 1.5 seconds of the last release. SignalDeck does the same; if the radio does not report transmitting within 2 seconds, no audio is sent.
+
+### DMR texts in the stock app's format
+
+The stock app sends texts with a shorter header than the Armor and in UTF-8 rather than UTF-16. SignalDeck sends them the same way on this phone and reads received texts in either encoding. Not checked on the air yet.
 
 ### Channel changes need a pause
 

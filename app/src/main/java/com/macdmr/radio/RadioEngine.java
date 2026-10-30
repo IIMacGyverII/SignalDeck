@@ -20,7 +20,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     // commands (A→M unless noted)
     public static final int CMD_SET_DIGITAL = 0x22, CMD_SET_ANALOG = 0x23, CMD_LAUNCH = 0x26, CMD_QUERY_INIT = 0x27,
             CMD_ENHANCE = 0x28, CMD_MIC = 0x2A, CMD_CALLER_INFO = 0x2B, CMD_SEND_SMS = 0x2C, CMD_FETCH_SMS = 0x2D, CMD_VOLUME = 0x2E, CMD_MONITOR = 0x2F,
-            CMD_SQUELCH = 0x30, CMD_RSSI = 0x32, CMD_VERSION = 0x34, CMD_INTERRUPT = 0x35, CMD_STATUS = 0x36,
+            CMD_SQUELCH = 0x30, CMD_RSSI = 0x32, CMD_VERSION = 0x34, CMD_INTERRUPT = 0x35, CMD_STATUS = 0x36, CMD_POLITE = 0x37,
             CMD_TOT = 0x3B, CMD_SPK_EN = 0x3C, CMD_INIT = 0xAA;
 
     public interface Events {
@@ -351,6 +351,8 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     public void setSpkEn(boolean on) throws IOException { send(Frame.request(CMD_SPK_EN, (byte) (on ? 1 : 0))); }
 
     public void setInterrupt(boolean on) throws IOException { send(Frame.request(CMD_INTERRUPT, (byte) (on ? 1 : 2))); }
+    /** 0x37 "polite" (busy-channel rule): QuickChat sends 0 = off, 1 = on after every channel (the Xplore 1's module). */
+    public void setPolite(int v) throws IOException { send(Frame.request(CMD_POLITE, (byte) v)); }
     public void queryInit() throws IOException { send(Frame.request(CMD_QUERY_INIT, (byte) 1)); }
 
     /**
@@ -376,6 +378,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      */
     public void sendSms(int msgType, int callNumber, int groupNumber, String text) throws IOException {
         if (agold()) { send(Frame.request(CMD_SEND_SMS, agoldSmsBody(msgType, callNumber, text))); return; }
+        if (profile.smsUtf8) { send(Frame.request(CMD_SEND_SMS, utf8SmsBody(msgType, callNumber, text))); return; }
         byte[] t = text.getBytes(java.nio.charset.StandardCharsets.UTF_16LE);
         // Body: type, callNumber, [second id], UTF-16LE text. The stock app writes the second int only for
         // group texts, but the firmware reads a 9-byte header for private texts too: a private text sent with the
@@ -400,6 +403,26 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
         return b.array();
     }
 
+    /** QuickChat's text body (DmrManager.sendMsg, the Xplore 1): type, the target little-endian, the text in UTF-8; no second ID. */
+    static byte[] utf8SmsBody(int msgType, int callNumber, String text) {
+        byte[] t = text.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        ByteBuffer b = ByteBuffer.allocate(5 + t.length).order(ByteOrder.LITTLE_ENDIAN);
+        b.put((byte) msgType).putInt(callNumber).put(t);
+        return b.array();
+    }
+
+    /**
+     * A received text's bytes: UTF-16LE (the Armor 26 Ultra's module, most DMR radios) or, when {@code utf8} is set and
+     * the bytes do not look like UTF-16LE, UTF-8 (QuickChat reads every text as UTF-8). UTF-16LE text from a Latin script
+     * has a zero in most odd bytes; UTF-8 text never contains a zero.
+     */
+    static String smsText(byte[] b, int off, boolean utf8) {
+        int n = b.length - off, zeros = 0;
+        for (int i = off + 1; i < b.length; i += 2) if (b[i] == 0) zeros++;
+        boolean wide = !utf8 || (n >= 2 && zeros * 4 >= n);   // at least half the odd bytes are zero
+        return new String(b, off, n, wide ? java.nio.charset.StandardCharsets.UTF_16LE : java.nio.charset.StandardCharsets.UTF_8).replace("\u0000", "").trim();
+    }
+
     public void fetchSms() throws IOException { send(Frame.request(CMD_FETCH_SMS, (byte) 1)); }
 
     /** PTT: launch=1 keys the transmitter, 2 releases (enum 1/2 again — 0 is NAKed and the TX keeps running; firmware caps a keyed TX at 30 s). */
@@ -409,8 +432,17 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
             RootSetup.run("setprop vendor.agui.extmodule.start " + (down ? 1 : 0));
             return;
         }
-        if (phoneLines()) { lines(down ? profile.txLinesOn : profile.txLinesOff); return; }
+        if (phoneLines() || keyLines()) { lines(down ? profile.txLinesOn : profile.txLinesOff); return; }
         send(Frame.request(CMD_LAUNCH, (byte) (down ? 1 : 2)));
+    }
+
+    /** A phone that keys its module with its own lines and never with 0x26 (the Xplore 1: intercom_ptt_control 0 = transmit). */
+    private boolean keyLines() { return profile.txLinesOn != null && !agold(); }
+    /** How this engine keys the module, for the device report. */
+    public String keyPath() {
+        if (agold()) return "the USB bridge's PTT line";
+        if (phoneLines() || keyLines()) return "phone lines";
+        return "module command 0x26";
     }
 
     /**
@@ -496,7 +528,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
                 if (b.length >= 5) {
                     ByteBuffer bb = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN);
                     int type = bb.get() & 0xFF; int from = bb.getInt() & 0xFFFFFF;   // a DMR ID is 24 bits (the Agold stock app reads three bytes)
-                    String text = new String(b, 5, b.length - 5, java.nio.charset.StandardCharsets.UTF_16LE).replace("\u0000", "").trim();
+                    String text = smsText(b, 5, profile.smsUtf8);
                     ev.sms(type, from, text);
                 }
                 break;

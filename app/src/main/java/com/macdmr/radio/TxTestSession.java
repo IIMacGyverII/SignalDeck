@@ -57,6 +57,10 @@ public final class TxTestSession {
         String app = "SignalDeck's own key (the same path as the on-screen Talk key)";
         if ("agold".equals(p.protocol)) return app + " -> the USB bridge's PTT line (" + AgoldUsb.HANDLE_PTT + ")";
         if ("sa818".equals(p.protocol) || p.rxLinesOn != null) return app + " -> phone lines " + lines(p.txLinesOn);
+        if (p.txLinesOn != null) return app + " -> phone lines " + lines(p.txLinesOn) + ", released with " + lines(p.txLinesOff) + "; no 0x26"
+                + (p.txAudioOnSendStart ? "; the audio starts at the module's SEND_START (none sent without it)" : "")
+                + (p.txAudioTailMs > 0 ? "; the microphone runs " + p.txAudioTailMs + " ms past the release" : "")
+                + (p.minKeyGapMs > 0 ? "; a key within " + p.minKeyGapMs + " ms of the last release waits for the rest" : "");
         String t = (p.txAudioLeadMs > 0 ? "; the audio path opens " + p.txAudioLeadMs + " ms before the key, so the module keys that much after the press" : "")
                 + (p.minKeyGapMs > 0 ? "; a key within " + p.minKeyGapMs + " ms of the last release waits for the rest" : "");
         return app + " -> module command 0x26 (launch) on " + p.controlPort + t;
@@ -149,7 +153,7 @@ public final class TxTestSession {
         for (String s : TxReport.SAFETY) r.safety.add(s);
         try { r.phone.put("manufacturer", android.os.Build.MANUFACTURER).put("model", android.os.Build.MODEL).put("device", android.os.Build.DEVICE).put("android", android.os.Build.VERSION.RELEASE); } catch (Throwable ignored) { }
         boolean dmr = svc.profile().dmr() && svc.engine().dmr();
-        r.steps.addAll(TxReport.plan(dmr));
+        r.steps.addAll(TxReport.plan(dmr, svc.profile().smsUtf8));
 
         String[] eq = ui.form("Your test equipment", "What checks your signal. Do not enter your callsign or DMR ID; SignalDeck removes them anyway.",
                 new String[] { "Measuring equipment (e.g. RTL-SDR v4, service monitor)", "Receiving radio (e.g. a handheld's make and model)" }, new String[] { "", "" }, new boolean[] { false, false });
@@ -213,6 +217,25 @@ public final class TxTestSession {
             } else if (stopped) { finish(); return; } else if (a == SKIP) s.result = TxReport.SKIPPED;
         }
 
+        // 5b DMR text (phones whose text body is QuickChat's, not the Armor's)
+        s = r.step("text");
+        if (s != null && !stopped) {
+            ChannelStore.Channel ch = svc.current();
+            int a = ch != null && ch.isDigital() ? GO : ui.choose(s.title, "Choose a DMR channel whose call number the other DMR radio receives texts on (its own ID for a private text, or a talkgroup it listens to), then come back and tap Ready.", "Ready", "Skip this step", "Stop the session");
+            if (a == 2 || a < 0) { stopped = true; finish(); return; }
+            ch = svc.current();
+            if (a == GO && (ch == null || !ch.isDigital())) { s.result = TxReport.SKIPPED; s.auto = "no DMR channel selected"; }
+            else if (a == GO && ask(s, "Send the text", String.format(Locale.US, "SignalDeck sends the text \"%s\" to %s %d. The module reports whether it was delivered; then check the other radio.", TEXT, ch.contactType == 1 ? "talkgroup" : "radio", ch.txContact))) {
+                int st = text(ch);
+                s.auto = "body " + svc.profile().textBody() + "; module: " + (st == 8 ? "status 8, delivered" : st == 9 ? "status 9, not delivered" : "no answer in 15 s");
+                int b = ui.choose(s.title, "Did the other radio show \"" + TEXT + "\" exactly (no missing or wrong characters)?", "Yes", "No", "Not checked");
+                s.heard = b == 0 ? "yes" : b == 1 ? "no" : "not checked";
+                String[] n = ui.form(s.title, "What the other radio showed, if it differed (optional).", new String[] { "Notes" }, new String[] { "" }, new boolean[] { false });
+                if (n != null) s.notes = n[0].trim();
+                s.result = TxReport.textVerdict(st, s.heard);
+            } else if (stopped) { finish(); return; } else if (a == SKIP) s.result = TxReport.SKIPPED;
+        }
+
         // 6 Heat
         s = r.step("heat");
         if (fmChannel(s) && ask(s, "Start (five keys)", "Five keys of 3 seconds with a 5 second pause. SignalDeck reads the battery and processor temperatures before the first and after the last. If the phone feels hot, tap Release now and stop.")) {
@@ -238,6 +261,22 @@ public final class TxTestSession {
     }
 
     private boolean stopped;
+    static final String TEXT = "SignalDeck test 1";
+
+    /** Send {@link #TEXT} to the channel's call number; the module's status 8 or 9, or 0 when neither came within 15 s. */
+    private int text(ChannelStore.Channel ch) throws InterruptedException {
+        final int[] st = { 0 };
+        ChannelStore.Contact to = new ChannelStore.Contact(); to.number = ch.txContact; to.type = ch.contactType; to.name = "Transmit test";
+        svc.statusTap = (code, name) -> { if (code == 8 || code == 9) synchronized (st) { if (st[0] == 0) st[0] = code; } };
+        svc.txTestKeying = true;                                                      // a text transmits too: the same session-only permission
+        try {
+            svc.sendSms(to, TEXT);
+            long end = System.currentTimeMillis() + 15_000;
+            while (System.currentTimeMillis() < end) { synchronized (st) { if (st[0] != 0) break; } ui.keying(sending(ch) + "\n\nWaiting for the module's answer\u2026"); Thread.sleep(200); }
+        } finally { svc.txTestKeying = false; svc.statusTap = null; ui.keyingDone(); }
+        synchronized (st) { return st[0]; }
+    }
+    private static String sending(ChannelStore.Channel ch) { return "Sending a DMR text to " + ch.txContact; }
     private static String d(Double v) { return v == null ? "?" : String.format(Locale.US, "%.1f", v); }
 
     /** An FM channel is needed: ask the tester to choose one, or skip. */

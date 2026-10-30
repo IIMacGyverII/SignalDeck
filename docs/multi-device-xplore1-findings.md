@@ -182,3 +182,19 @@ sends raw 160-byte PCM blocks on `ttyS1`; not tried — transmit stays off on th
 - **Next (beta.11):** analog channel writes on this profile send channel → monitor → squelch like QuickChat; the radio audio check
   detects "squelch open with no signal after MON off" and tries (1) channel + `0x2F` 2 + `0x30`, (2) `0x2F` 0, reporting which closed it.
 
+
+## 2026-10-30 review: QuickChat read line by line, transmit first
+
+Full write-up: phonedmrapp `docs/xplore1/stock-app-review.md`. The changes are in SignalDeck PR 159 (profile revision 3).
+
+- **QuickChat never sends `0x26`.** It keys with `intercom_ptt_control` 0 and releases with 1.
+  - It opens the microphone (`AudioRecord` MIC, 8 kHz mono) only when the module reports SEND_START (status 3).
+  - It sends raw 160-byte blocks on `ttyS1` at least 10 ms apart.
+  - It stops the microphone 200 ms after the release.
+  - It refuses a key within 1.5 s of the last release.
+- **Start-up:** banner → `0x27` → `0x34` → channel. It never sends `0x2A`.
+- **After every channel's acknowledgement:** `0x35` 2 → `0x37` 0, plus `0x2F`/`0x30` on analog.
+- **`0x3B`:** sent only when the user changes the transmit limit (default 120 s).
+- **Statuses:** `0x36` is never acknowledged.
+- **Texts:** type + target LE32 + **UTF-8**, with no 9-byte header. Received texts are read as UTF-8.
+- **Updater:** a hidden firmware-update screen uses the Armor's family of knock (ptt 0, power, ptt 1, `0x31`, YModem-1K). The APK carries no image, so the loader stays off.

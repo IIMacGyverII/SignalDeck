@@ -757,9 +757,15 @@ public class RadioService extends Service implements RadioEngine.Events {
                 }
                 pttDown = true; txStartedAt = System.currentTimeMillis(); pcmTxLabel = label;   // the history line and the time-out check are about this transmission
                 if (audio != null) audio.stopRx();
+                long keyedAt = System.currentTimeMillis();
                 engine.ptt(true);
                 log("TX " + label + " (" + ms + " ms)");
-                try { Thread.sleep(200); if (audio != null) log(audio.playPcm(pcm)); }
+                try {
+                    if (profile.txAudioOnSendStart) {                    // the Xplore 1: audio only once the module reports SEND_START
+                        if (!awaitSendStart(keyedAt, SEND_START_WAIT_MS, false)) { log("TX " + label + ": no SEND_START, nothing sent"); history("warn", "\u26A0\uFE0F " + label + " not sent: the radio did not report transmitting"); }
+                        else if (audio != null) log(audio.playPcm(pcm));
+                    } else { Thread.sleep(200); if (audio != null) log(audio.playPcm(pcm)); }
+                }
                 finally { if (heatWatch != null) heatWatch.interrupt(); unkey(); pttDown = false; thermal.after(ms); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); holdAfterTx(); totAfterTx(); }
                 if (ms > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(ms / 1000.0) + " s (" + label + "); " + thermal.state());
                 if (onDone != null) onDone.run();
@@ -1654,12 +1660,13 @@ public class RadioService extends Service implements RadioEngine.Events {
                 int[] call = tgOverride.call(ch);
                 tunedAt = System.currentTimeMillis(); engine.setDigital(ch.rxFreq, ch.txFreq, id, tgOverride.groups(ch), call[0], call[1], ch.power, ch.cc, ch.inSlot, ch.outSlot, 8, 4);
                 engine.setInterrupt(ch.interrupt == 1);
+                if (profile.politeAfterChannel >= 0) engine.setPolite(profile.politeAfterChannel);   // QuickChat follows every channel with 0x37 (0 = off)
             } else if (ch.isM17()) {
                 tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, 1, ch.power, hardwareSq(ch), 0, 0, 0, 0, profile.analogVolume, 2);   // wide FM; M17 is layered on top
                 lastChannelWrite = System.currentTimeMillis();
                 if (profile.globalSquelch) {
                     final boolean mon = monitorOn && !moved(ch); final int sq = hardwareSq(ch); final long token = ++postWriteToken;
-                    pendingPostWrite = () -> { if (postWriteToken != token) return; postWriteToken++; worker.execute(() -> { try { engine.setMonitor(mon); engine.setSquelch(sq); } catch (IOException e) { log("monitor/squelch: " + e); } }); };
+                    pendingPostWrite = () -> { if (postWriteToken != token) return; postWriteToken++; worker.execute(() -> { try { engine.setMonitor(mon); engine.setSquelch(sq); politeAfterChannel(); } catch (IOException e) { log("monitor/squelch: " + e); } }); };
                     ui.postDelayed(() -> { Runnable r = pendingPostWrite; if (r != null && postWriteToken == token) { log("no channel acknowledgement in 1.5 s: monitor and squelch sent anyway"); r.run(); } }, 1500);
                 }
             } else {
@@ -1668,7 +1675,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 lastChannelWrite = System.currentTimeMillis();
                 if (profile.globalSquelch) {                              // this module's squelch follows 0x30; QuickChat sends monitor and squelch 200 ms after the channel's acknowledgement
                     final boolean mon = monitorOn && !moved(ch); final int sq = hardwareSq(ch); final long token = ++postWriteToken;
-                    pendingPostWrite = () -> { if (postWriteToken != token) return; postWriteToken++; worker.execute(() -> { try { engine.setMonitor(mon); engine.setSquelch(sq); } catch (IOException e) { log("monitor/squelch: " + e); } }); };
+                    pendingPostWrite = () -> { if (postWriteToken != token) return; postWriteToken++; worker.execute(() -> { try { engine.setMonitor(mon); engine.setSquelch(sq); politeAfterChannel(); } catch (IOException e) { log("monitor/squelch: " + e); } }); };
                     ui.postDelayed(() -> { Runnable r = pendingPostWrite; if (r != null && postWriteToken == token) { log("no channel acknowledgement in 1.5 s: monitor and squelch sent anyway"); r.run(); } }, 1500);
                 }
             }
@@ -2018,6 +2025,22 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** The last PTT request (set at once, before the worker gets to it): a release during a key's wait cancels the key. */
     private volatile boolean pttWanted;
+    /** How long a key waits for the module's SEND_START before giving up on the audio (txAudioOnSendStart profiles). */
+    static final long SEND_START_WAIT_MS = 2000;
+    private volatile long sendStartAt;
+    /** Wait until the module reports SEND_START after {@code keyedAt}, at most {@code ms}; false when it did not (or, for {@code voice}, PTT was let go first). */
+    private boolean awaitSendStart(long keyedAt, long ms, boolean voice) {
+        long end = keyedAt + ms;
+        while (sendStartAt < keyedAt && System.currentTimeMillis() < end && pttDown && (!voice || pttWanted)) { try { Thread.sleep(10); } catch (InterruptedException e) { return false; } }
+        return sendStartAt >= keyedAt;
+    }
+
+    /** QuickChat (the Xplore 1) after every channel's acknowledgement: interrupt off (0x35 2), then 0x37 polite at its setting (0). */
+    private void politeAfterChannel() throws IOException {
+        if (profile.politeAfterChannel < 0) return;
+        engine.setInterrupt(false); engine.setPolite(profile.politeAfterChannel);
+    }
+
     /** Waits {@code ms} on the worker; false as soon as PTT is released meanwhile. */
     private boolean waitWhilePttWanted(long ms) {
         long end = System.currentTimeMillis() + ms;
@@ -2077,6 +2100,11 @@ public class RadioService extends Service implements RadioEngine.Events {
                             return;
                         }
                         engine.ptt(true);
+                    } else if (profile.txAudioOnSendStart && audio != null) {   // the Xplore 1's QuickChat: the microphone opens at the module's SEND_START
+                        long keyedAt = System.currentTimeMillis();
+                        engine.ptt(true);
+                        if (awaitSendStart(keyedAt, SEND_START_WAIT_MS, true)) log(audio.startTx() + " at SEND_START, " + (sendStartAt - keyedAt) + " ms after the key");
+                        else if (pttWanted) { log("no SEND_START " + SEND_START_WAIT_MS + " ms after the key: no audio sent"); history("warn", "\u26A0\uFE0F The radio did not report transmitting; no audio was sent"); }
                     } else {
                         engine.ptt(true);
                         if (audio != null) log(audio.startTx());
@@ -2098,15 +2126,19 @@ public class RadioService extends Service implements RadioEngine.Events {
                     txEndedAt = System.currentTimeMillis();
                     ui.removeCallbacks(txWatchdog);
                     Thread vh = voiceHeat; voiceHeat = null; if (vh != null) vh.interrupt();
+                    boolean tail = false;
                     try {
-                        if (audio != null) audio.stopTx();
-                        stopBluetoothMic();
                         short[] roger = rogerPcm(rogerStyle());
-                        if (roger != null && audio != null) audio.playPcm(roger);    // still keyed: the tone goes out before the carrier drops
                         ChannelStore.Channel tc = current;
                         short[] id = tc != null && !tc.isDigital() && amateurBand(tc.txFreq) && packet != null && (txLimitMs() < 0 || System.currentTimeMillis() - txStartedAt < txLimitMs() - 3000) ? packet.cwIdIfDue(System.currentTimeMillis()) : null;
+                        tail = profile.txAudioTailMs > 0 && audio != null && roger == null && id == null;   // the Xplore 1's QuickChat stops the microphone 200 ms after the release
+                        if (!tail) { if (audio != null) audio.stopTx(); stopBluetoothMic(); }
+                        if (roger != null && audio != null) audio.playPcm(roger);    // still keyed: the tone goes out before the carrier drops
                         if (id != null && audio != null) { log("Morse ID after the transmission"); audio.playPcm(id); history("pkt", "\uD83D\uDD24 Morse ID " + packet.callsign()); }   // the station identification every ten minutes
-                    } finally { unkey(); }
+                    } finally {
+                        unkey();
+                        if (tail) { try { Thread.sleep(profile.txAudioTailMs); } catch (InterruptedException ignored) { } audio.stopTx(); stopBluetoothMic(); }
+                    }
                     int heldMs = (int) Math.min(Integer.MAX_VALUE, Math.max(0, txEndedAt - txStartedAt));
                     thermal.after(heldMs);                                                    // a voice key past 30 s starts the cool-down like a long picture
                     if (heldMs > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(heldMs / 1000.0) + " s (voice); " + thermal.state());
@@ -2942,7 +2974,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 ui.post(() -> { for (Listener l : listeners) l.onRx(false); });
                 break;
             }
-            case 3: transmitting = true; refreshControls(); if (coverage != null) coverage.onTxStart(); ui.post(() -> { for (Listener l : listeners) l.onTx(true); }); break;
+            case 3: sendStartAt = System.currentTimeMillis(); transmitting = true; refreshControls(); if (coverage != null) coverage.onTxStart(); ui.post(() -> { for (Listener l : listeners) l.onTx(true); }); break;
             case 4: status4At = System.currentTimeMillis(); transmitting = false; totAfterTx(); refreshControls(); if (coverage != null) coverage.onTxEnd(); String pl = pcmTxLabel; pcmTxLabel = null; history(m17Tx ? "m17" : "tx", m17Tx ? "📻 M17 TX" : pl != null ? "📻 TX: " + pl : "📻 Voice TX");
                 { int tot = moduleTotS; long el = System.currentTimeMillis() - txStartedAt;   // 0 = timer off, but FW19-FW31 bench images still end a key at 120 s
                   if (pttDown && !m17Tx && !unkeying && (tot > 0 ? el > tot * 1000L - 3000 : el > 100_000)) history("warn", "\u23F1 The radio ended the transmission itself: its " + (tot > 0 ? tot : 120) + " s time-out"); } ui.post(() -> { for (Listener l : listeners) l.onTx(false); }); break;

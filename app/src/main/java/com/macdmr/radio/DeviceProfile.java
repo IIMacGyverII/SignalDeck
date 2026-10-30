@@ -154,6 +154,22 @@ public final class DeviceProfile {
      * web stay off until the profile is verified. The Armor 20WT (owner, 2026-10-30).
      */
     public boolean txTestUnverified;
+    /**
+     * Transmit audio starts when the module reports SEND_START (status 3) after the key, not at the key: the Xplore 1's
+     * QuickChat opens its microphone only on that report (2 s at most here; without it nothing is sent).
+     */
+    public boolean txAudioOnSendStart;
+    /** Voice transmit: the microphone keeps feeding the module this long after the release (QuickChat: 200 ms; 0 = stop first). */
+    public long txAudioTailMs;
+    /** After each channel's acknowledgement send 0x35 2 (interrupt off) and then 0x37 with this value (QuickChat: 0); -1 = neither. */
+    public int politeAfterChannel = -1;
+    /**
+     * DMR texts as QuickChat sends them: type, target little-endian, the text in UTF-8, no second ID; received texts are
+     * read as UTF-8 unless they look like UTF-16LE. False = the Armor 26 Ultra's body (9-byte header, UTF-16LE).
+     */
+    public boolean smsUtf8;
+    /** The text body this profile sends, for the reports. */
+    public String textBody() { return smsUtf8 ? "type, target, UTF-8 text (QuickChat's)" : "type, target, second ID, UTF-16LE text"; }
 
     /**
      * The radio's audio as plain ALSA streams on the phone's sound card, for a ROM without the vendor audio service
@@ -276,7 +292,22 @@ public final class DeviceProfile {
         ARMOR_20WT.moduleLoader = false;
         ARMOR_20WT.stockCommands = new int[] { 0x22, 0x23, 0x26, 0x27, 0x2C, 0x2D, 0x34, 0x36, 0x3B };
         ARMOR_20WT.txTestUnverified = true;    // owner, 2026-10-30: the device report's transmit tests may key it
-        XPLORE_1.id = "blackview-xplore1"; XPLORE_1.revision = 2;
+        XPLORE_1.id = "blackview-xplore1"; XPLORE_1.revision = 3;
+        // QuickChat, read 2026-10-30 (phonedmrapp docs/xplore1/stock-app-review.md): it never sends 0x26; it keys with
+        // intercom_ptt_control 0 and releases with 1, opens the microphone at the module's SEND_START, stops it 200 ms
+        // after the release, refuses a key within 1.5 s of the last release, sends neither 0x2A nor 0x35 at boot but 0x35 2
+        // and 0x37 0 after every channel, and sends texts as type + target + UTF-8. Its updater has no image (undiffed variant).
+        XPLORE_1.txLinesOn = new String[][] { { "/sys/devices/platform/intercom/intercom_ptt_control", "0" } };
+        XPLORE_1.txLinesOff = new String[][] { { "/sys/devices/platform/intercom/intercom_ptt_control", "1" } };
+        XPLORE_1.txAudioOnSendStart = true;
+        XPLORE_1.txAudioTailMs = 200;
+        XPLORE_1.minKeyGapMs = 1500;
+        XPLORE_1.bootMicInterrupt = false;
+        XPLORE_1.politeAfterChannel = 0;
+        XPLORE_1.smsUtf8 = true;
+        XPLORE_1.moduleLoader = false;
+        XPLORE_1.stockCommands = new int[] { 0x22, 0x23, 0x27, 0x28, 0x2C, 0x2D, 0x2F, 0x30, 0x34, 0x35, 0x37, 0x3B };
+        XPLORE_1.txTestUnverified = true;     // owner, 2026-10-30: the device report's transmit tests may key it (the guided session only)
         XPLORE_1.scanDwellMs = 2500;
         XPLORE_1.minWriteGapMs = 1000;        // QuickChat never writes channels less than 1 s apart; a burst of writes made the module refuse MON (2026-10-22)          // owner's tester 2026-10-22: the first scan stepped past an active channel; its receive report comes later than the Armor's
         XPLORE_1.globalSquelch = true;        // QuickChat sends 0x30 after each channel; the beta.3/5 trials showed the channel's sq 0 alone did not open it
@@ -504,6 +535,7 @@ public final class DeviceProfile {
         DeviceProfile p = new DeviceProfile(name, controlPort, baud, audio, pcmPort, pcmBaud, powerNode, pttNode, powerOnToken, pttActions, stockApp, sepolicy, serialLib, supported, verified);
         p.id = id; p.revision = revision; p.source = source; p.txBlocked = txBlocked; p.restrictedBy = restrictedBy; p.globalSquelch = globalSquelch; p.lineSetup = lineSetup; p.scanDwellMs = scanDwellMs; p.protocol = protocol; p.bandsHz = bandsHz.clone(); p.rssi = rssi; p.softSqInModule = softSqInModule; p.appPlayback = appPlayback; p.fixedModuleVolume = fixedModuleVolume; p.subaudible = subaudible; p.dataSquelch = dataSquelch; p.moduleLoader = moduleLoader; p.camcorderGain = camcorderGain; p.softSqThresholds = softSqThresholds; p.softSqCloseCap = softSqCloseCap; p.rxDetectNode = rxDetectNode; p.rxLinesOn = rxLinesOn; p.muteLines = muteLines; p.rxLinesOff = rxLinesOff; p.txLinesOn = txLinesOn; p.txLinesOff = txLinesOff; p.gatewayLinesOn = gatewayLinesOn; p.gatewayLinesOff = gatewayLinesOff; p.txAudioScale = txAudioScale; p.toneEnergyMin = toneEnergyMin; p.gatewayVolume = gatewayVolume; p.minWriteGapMs = minWriteGapMs; p.directAudio = directAudio;
         p.bootMicInterrupt = bootMicInterrupt; p.txAudioLeadMs = txAudioLeadMs; p.minKeyGapMs = minKeyGapMs; p.analogVolume = analogVolume; p.stockAreaPrefix = stockAreaPrefix; p.stockDefaultArea = stockDefaultArea; p.stockCommands = stockCommands; p.txTestUnverified = txTestUnverified;
+        p.txAudioOnSendStart = txAudioOnSendStart; p.txAudioTailMs = txAudioTailMs; p.politeAfterChannel = politeAfterChannel; p.smsUtf8 = smsUtf8;
         return p;
     }
 
@@ -536,6 +568,8 @@ public final class DeviceProfile {
         org.json.JSONObject da = o.optJSONObject("directAudio");
         if (da != null) p.directAudio = DirectAudio.fromJson(da);
         p.bootMicInterrupt = o.optBoolean("bootMicInterrupt", true); p.txTestUnverified = o.optBoolean("txTestUnverified", false);
+        p.txAudioOnSendStart = o.optBoolean("txAudioOnSendStart", false); p.txAudioTailMs = Math.max(0, Math.min(1000, o.optLong("txAudioTailMs", 0)));
+        p.politeAfterChannel = Math.max(-1, Math.min(1, o.optInt("politeAfterChannel", -1))); p.smsUtf8 = o.optBoolean("smsUtf8", false);
         p.txAudioLeadMs = Math.max(0, Math.min(2000, o.optLong("txAudioLeadMs", 0))); p.minKeyGapMs = Math.max(0, Math.min(5000, o.optLong("minKeyGapMs", 0)));
         p.analogVolume = Math.max(1, Math.min(8, o.optInt("analogVolume", 8)));
         p.stockAreaPrefix = o.optString("stockAreaPrefix", p.stockAreaPrefix); p.stockDefaultArea = o.optString("stockDefaultArea", p.stockDefaultArea);

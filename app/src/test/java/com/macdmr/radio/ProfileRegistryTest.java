@@ -41,6 +41,15 @@ public class ProfileRegistryTest {
         return new JSONObject().put("format", 1).put("serial", 3).put("profiles", profiles).put("advisories", advisories);
     }
 
+    /** A newer list revision of the 26 Ultra's profile keeps its loader on the 26 Ultra, never turns it on for a dmr009 fallback phone. */
+    @Test public void aListRevisionNeverTurnsTheLoaderOnForAFallbackPhone() throws Exception {
+        DeviceProfile armor = DeviceProfile.ARMOR_26_ULTRA;
+        JSONObject newer = list(new JSONArray().put(profile(armor.id, armor.revision + 1, "armor").put("moduleLoader", true)), new JSONArray());
+        assertTrue(ProfileRegistry.select(armor, newer, phone("Armor 26"), false, null, "2026-10-21").profile.firmwareLoader());
+        DeviceProfile fallback = DeviceProfile.detectBuiltIn("some phone x", true, false);
+        assertFalse(ProfileRegistry.select(fallback, newer, phone("Other phone"), false, null, "2026-10-21").profile.firmwareLoader());
+    }
+
     @Test public void builtInWinsUnlessTheListHasAHigherRevision() throws Exception {
         DeviceProfile armor = DeviceProfile.ARMOR_26_ULTRA;
         JSONObject same = list(new JSONArray().put(profile(armor.id, armor.revision, "armor")), new JSONArray());

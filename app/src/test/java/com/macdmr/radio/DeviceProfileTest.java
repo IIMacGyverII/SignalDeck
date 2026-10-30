@@ -131,10 +131,24 @@ public class DeviceProfileTest {
     }
 
     @Test public void moduleLoaderComesFromTheProfileList() throws Exception {
-        org.json.JSONObject o = new org.json.JSONObject("{\"id\":\"x\",\"revision\":1,\"name\":\"X\",\"controlPort\":\"/dev/ttyS2\",\"baud\":57600,\"audio\":\"CAMCORDER\",\"moduleLoader\":false}");
-        assertFalse(DeviceProfile.fromJson(o).firmwareLoader());
-        o.remove("moduleLoader");
-        assertTrue(DeviceProfile.fromJson(o).firmwareLoader());
+        org.json.JSONObject o = new org.json.JSONObject("{\"id\":\"x\",\"revision\":1,\"name\":\"X\",\"controlPort\":\"/dev/ttyS2\",\"baud\":57600,\"audio\":\"CAMCORDER\",\"moduleLoader\":true}");
+        assertFalse("the signed list cannot certify a phone", DeviceProfile.fromJson(o).firmwareLoader());
+        o.put("id", "ulefone-armor26ultra");
+        assertTrue("a certified phone keeps it", DeviceProfile.fromJson(o).firmwareLoader());
+        o.put("moduleLoader", false);
+        assertFalse("and the list can switch it off", DeviceProfile.fromJson(o).firmwareLoader());
+    }
+
+    /** Owner, 2026-10-30: the loader exists only on phones whose flash process was bench-tested (the Armor 26 Ultra so far). */
+    @Test public void onlyCertifiedPhonesHaveTheLoader() {
+        for (DeviceProfile p : new DeviceProfile[] { DeviceProfile.ARMOR_20WT, DeviceProfile.XPLORE_1, DeviceProfile.ATOM_XL, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.UNKNOWN })
+            assertFalse(p.name, p.firmwareLoader());
+        assertTrue(DeviceProfile.ARMOR_26_ULTRA.firmwareLoader());
+        assertEquals(java.util.Collections.singleton("ulefone-armor26ultra"), DeviceProfile.LOADER_CERTIFIED);
+        DeviceProfile other = DeviceProfile.detectBuiltIn("ulefone armor 24 something", true, false);    // the dmr009 fallback
+        assertFalse("a phone that only falls back to the 26 Ultra's profile gets no loader", other.firmwareLoader());
+        assertEquals(DeviceProfile.ARMOR_26_ULTRA.controlPort, other.controlPort);
+        assertTrue(DeviceProfile.detectBuiltIn("ulefone armor 26 ultra", true, false).firmwareLoader());
     }
 
     @Test public void atomXlIsTheAgoldBridgeProfile() {
@@ -157,7 +171,8 @@ public class DeviceProfileTest {
 
     @Test public void otherPhonesUnchanged() {
         assertSame(DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.detectBuiltIn("ulefone armor 26 ultra armor_26_ultra", true, false));
-        assertSame(DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.detectBuiltIn("some phone x", true, false));
+        DeviceProfile fallback = DeviceProfile.detectBuiltIn("some phone x", true, false);      // the dmr009 fallback: the 26 Ultra's radio path without its loader
+        assertEquals(DeviceProfile.ARMOR_26_ULTRA.id, fallback.id); assertEquals(DeviceProfile.ARMOR_26_ULTRA.controlPort, fallback.controlPort); assertFalse(fallback.firmwareLoader());
         assertSame(DeviceProfile.XPLORE_1, DeviceProfile.detectBuiltIn("blackview xplore 1 walkie talkie xplore_1_wt", false, true));
         assertSame(DeviceProfile.UNKNOWN, DeviceProfile.detectBuiltIn("some phone x", false, false));
     }

@@ -68,7 +68,11 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         profileText.setOnClickListener(v -> profileDialog());
         firmwareText = Neo.text(c, "", 0xFF9FB4C8, 13, Neo.mono(c)); firmwareText.setPadding(0, (int) (3 * d), 0, 0);
         tc.addView(firmwareText);
-        firmwareText.setOnClickListener(v -> { if (host != null && com.macdmr.radio.DeviceProfile.detect().firmwareLoader()) host.openFirmware(); });   // the loader speaks the Armor-family module's YModem path only
+        firmwareText.setOnClickListener(v -> {                               // the loader exists only on phones whose flash process was bench-tested
+            if (host == null) return;
+            if (com.macdmr.radio.DeviceProfile.detect().firmwareLoader()) host.openFirmware();
+            else android.widget.Toast.makeText(getContext(), "Loading module firmware is not certified on this phone yet: its flash process has not been tested. It is offered only on phones where it has been.", android.widget.Toast.LENGTH_LONG).show();
+        });
         variantText = Neo.text(c, "", Neo.AMBER_LIGHT, 13, Neo.ui(c)); variantText.setPadding(0, (int) (5 * d), 0, 0); variantText.setVisibility(GONE);
         tc.addView(variantText);
         variantText.setOnClickListener(v -> { com.macdmr.radio.FirmwareVariantCheck.Finding f = com.macdmr.radio.FirmwareVariantCheck.finding(getContext()); if (f != null) offerVariant(getContext(), f, this::refresh); });

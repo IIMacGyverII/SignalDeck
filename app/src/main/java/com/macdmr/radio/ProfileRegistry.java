@@ -77,7 +77,7 @@ public final class ProfileRegistry {
                 boolean sameId = builtIn.supported && id.equals(builtIn.id);
                 boolean newPhone = !builtIn.supported && matches(o.optJSONObject("match"), env);
                 if ((sameId && rev > builtIn.revision) || (newPhone && rev > (s.profile.supported ? s.profile.revision : -1))) {
-                    try { DeviceProfile p = DeviceProfile.fromJson(o); p.source = "updated"; s.profile = p; s.source = "updated"; } catch (Throwable ignored) { }
+                    try { DeviceProfile p = DeviceProfile.fromJson(o); p.source = "updated"; if (!builtIn.moduleLoader) p.moduleLoader = false; s.profile = p; s.source = "updated"; } catch (Throwable ignored) { }   // a list revision never turns the loader on where this release has it off (e.g. a dmr009 fallback phone)
                 }
             }
         }

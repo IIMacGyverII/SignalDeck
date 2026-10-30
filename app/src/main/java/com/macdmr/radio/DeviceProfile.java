@@ -96,10 +96,18 @@ public final class DeviceProfile {
      */
     public int dataSquelch;
     /**
-     * False when the module's image must stay the vendor's: SignalDeck's loader (and so the bench firmware's symbol engine)
-     * is off. The W6Plus DMR's module is outside the loader safety contract (no dmr009 knock, an undiffed image).
+     * True only on a phone whose firmware load was bench-tested end to end (owner, 2026-10-30: flashing must work only on
+     * certified phones): SignalDeck's loader (and so the bench firmware's symbol engine) is off everywhere else. Off by
+     * default, so a new profile, a profile from the signed list or a phone that only falls back to another phone's profile
+     * never gets it; see {@link #LOADER_CERTIFIED}.
      */
-    public boolean moduleLoader = true;
+    public boolean moduleLoader = false;
+    /**
+     * The profile ids whose firmware load is certified (bench-tested from the stock image through the Module firmware page,
+     * restore included). The signed profile list can switch a certified phone's loader off, never on for another phone;
+     * adding a phone here needs an app release.
+     */
+    static final java.util.Set<String> LOADER_CERTIFIED = java.util.Collections.singleton("ulefone-armor26ultra");
     /** Audio.CAMCORDER: the fixed gain on the camcorder input (the W6+'s module is ~21 dB quieter than the W6Plus DMR's). */
     public int camcorderGain = 12;
     /** sa818: the module's receive line, a GPIO input that reads 1 while the squelch is open (null = none). */
@@ -268,6 +276,7 @@ public final class DeviceProfile {
         // ptt_control 0 is its transmit state (setPttLaunch). So the PTT line goes to receive first, before the module is
         // powered, or a module left by QuickChat's power-off would come up with its PTT line asserted.
         ARMOR_26_ULTRA.id = "ulefone-armor26ultra"; ARMOR_26_ULTRA.revision = 1;
+        ARMOR_26_ULTRA.moduleLoader = true;     // certified: FW57 loaded from the stock image through the Module firmware page (2026-10-30)
         // Fitted on the 17-bit POCSAG padding run (bits 806–822 of the padded RESTORE B clip): τ ≈ 7.49 ms.
         ARMOR_26_ULTRA.pocsagTauSec = 0.0075;
         // Measured on the owner's Armor 2026-10-24 (stock ROM, mixer read while tinyserver received and while it sent a
@@ -472,7 +481,10 @@ public final class DeviceProfile {
         if (m.contains("w6+") && m.contains("sl8541e")) return ANYSECU_W6;          // "UNISOC W6+ sl8541e_3h10_32b"
         if (m.contains(" v69 ") && m.contains("sl8541e")) return ANYSECU_W6_DMR;     // "UNISOC V69 sl8541e_3h10_32b"
         if (m.contains("unihertz atom_xl")) return ATOM_XL;                         // "Unihertz Atom_XL Atom_XL"
-        if (dmr009 || m.contains("armor 26")) return ARMOR_26_ULTRA;
+        if (m.contains("armor 26")) return ARMOR_26_ULTRA;
+        if (dmr009) {                                                            // another phone with the same power node: the 26 Ultra's radio path, never its loader
+            DeviceProfile p = ARMOR_26_ULTRA.copy(ARMOR_26_ULTRA.supported, ARMOR_26_ULTRA.verified); p.moduleLoader = false; return p;
+        }
         if (intercom || m.contains("xplore")) return XPLORE_1;
         return UNKNOWN;
     }
@@ -556,7 +568,7 @@ public final class DeviceProfile {
             for (int i = 0; i < bands.length(); i++) p.bandsHz[i] = bands.getLong(i);
             for (int i = 0; i < bands.length(); i += 2) if (p.bandsHz[i] >= p.bandsHz[i + 1]) throw new org.json.JSONException("bandsHz: low below high");
         }
-        p.rssi = o.optBoolean("rssi", true); p.rssiStepDb = o.optDouble("rssiStepDb", p.rssiStepDb); p.rssiOffsetDb = o.optDouble("rssiOffsetDb", p.rssiOffsetDb); p.softSqInModule = o.optBoolean("softSqInModule", false); p.appPlayback = o.optBoolean("appPlayback", false); p.subaudible = o.optBoolean("subaudible", true); p.dataSquelch = Math.max(0, Math.min(8, o.optInt("dataSquelch", 0))); p.moduleLoader = o.optBoolean("moduleLoader", true); p.camcorderGain = Math.max(1, Math.min(32, o.optInt("camcorderGain", 12)));
+        p.rssi = o.optBoolean("rssi", true); p.rssiStepDb = o.optDouble("rssiStepDb", p.rssiStepDb); p.rssiOffsetDb = o.optDouble("rssiOffsetDb", p.rssiOffsetDb); p.softSqInModule = o.optBoolean("softSqInModule", false); p.appPlayback = o.optBoolean("appPlayback", false); p.subaudible = o.optBoolean("subaudible", true); p.dataSquelch = Math.max(0, Math.min(8, o.optInt("dataSquelch", 0))); p.moduleLoader = o.optBoolean("moduleLoader", true) && LOADER_CERTIFIED.contains(p.id);   // the list can switch it off, never on for an uncertified phone p.camcorderGain = Math.max(1, Math.min(32, o.optInt("camcorderGain", 12)));
         org.json.JSONArray sst = o.optJSONArray("softSqThresholds");
         if (sst != null && sst.length() == 9) { p.softSqThresholds = new double[9]; for (int i = 0; i < 9; i++) p.softSqThresholds[i] = sst.optDouble(i, 0); p.softSqCloseCap = o.optDouble("softSqCloseCap", 0); } p.fixedModuleVolume = Math.max(1, Math.min(8, o.optInt("fixedModuleVolume", 4)));
         p.rxLinesOn = pairs(o.optJSONArray("rxLinesOn")); p.rxLinesOff = pairs(o.optJSONArray("rxLinesOff")); p.muteLines = pairs(o.optJSONArray("muteLines"));

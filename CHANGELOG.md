@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Module firmware loading only on certified phones
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Owner request | The firmware loader (the Module firmware page, the load itself, and the bench symbol engine) is now opt-in per phone: off by default, on only for profiles in `DeviceProfile.LOADER_CERTIFIED` (the Ulefone Armor 26 Ultra, bench-tested from the stock image through the page). The signed profile list can switch a certified phone's loader off, never on for another phone. A phone that only falls back to the 26 Ultra's profile through the shared `dmr009` node (another model) gets that radio path without the loader, and a newer list revision of that profile does not turn it on there. On an uncertified phone tapping the firmware line says loading is not certified there. The existing pre-flight identity checks (model, stock app, factory image hash, module version) stay as the second layer. Help (Radio firmware) updated | DeviceProfile.java, ui/DeviceView.java, ui/HelpView.java, DeviceProfileTest | host suite |
+
 ## 2026-10-30 — Xplore 1: driven the way QuickChat drives the radio (keyed by its PTT line, texts in its format)
 
 | Backlog | Change | Files | Test |

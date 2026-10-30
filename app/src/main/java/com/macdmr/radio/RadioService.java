@@ -93,6 +93,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public boolean receiving() { return softSq.isEnabled() ? squelchOpen : receiving; }   // with Soft SQ on the module's squelch is open and it reports a reception all the time: the soft gate is the activity signal
         @Override public boolean softGated() { return softSq.isEnabled(); }
         @Override public long dwellMs() { return profile.scanDwellMs; }
+        @Override public long settleMs() { return profile.scanSettleMs; }
         @Override public ChannelStore.Channel priority() { int n = scanPriority(); return n > 0 ? store.byNumber(n) : null; }
         @Override public void status(boolean s, boolean h, ChannelStore.Channel on) {
             if (voiceOn()) {
@@ -995,7 +996,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 }
                 if (prizeStock && !getSharedPreferences("radio", MODE_PRIVATE).getBoolean("tgListsImported", false)) {   // installs imported before TG lists were read
                     StringBuilder err = new StringBuilder();
-                    int k = store.repairModuleTgLists(this, profile.stockApp, "default_uhf", err);
+                    int k = store.repairModuleTgLists(this, profile.stockApp, profile.stockAreaPrefix, profile.stockDefaultArea, err);
                     log(k >= 0 ? "module TG lists imported; " + k + " channels got their list" : "TG list import failed: " + err);
                     if (k >= 0) getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("tgListsImported", true).apply();
                 }
@@ -1270,7 +1271,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (step == 1) {
                     int band = ch.rxFreq < 300_000_000 ? 1 : ch.band;
                     synchronized (tunes) { tunes.addLast(new Object[] { ch, false }); }
-                    tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, 8, 2);
+                    tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, profile.analogVolume, 2);
                     engine.setMonitor(false); engine.setSquelch(hardwareSq(ch));
                     what[0] = "channel (0x23), monitor 2 (0x2F), squelch " + hardwareSq(ch) + " (0x30)";
                 } else { engine.setMonitorRaw(0); what[0] = "monitor 0 (0x2F)"; }
@@ -1628,7 +1629,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         try {
             int band = ch.rxFreq < 300_000_000 ? 1 : ch.band;
             synchronized (tunes) { tunes.addLast(new Object[] { ch, false }); }   // answered like any channel write
-            tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, 8, 2);
+            tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, profile.analogVolume, 2);
             if (profile.globalSquelch) engine.setSquelch(hardwareSq(ch));
             if (dataReceive) scheduleDataHold(true, true);
         } catch (IOException e) { log("squelch rewrite: " + e); }
@@ -1654,7 +1655,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 tunedAt = System.currentTimeMillis(); engine.setDigital(ch.rxFreq, ch.txFreq, id, tgOverride.groups(ch), call[0], call[1], ch.power, ch.cc, ch.inSlot, ch.outSlot, 8, 4);
                 engine.setInterrupt(ch.interrupt == 1);
             } else if (ch.isM17()) {
-                tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, 1, ch.power, hardwareSq(ch), 0, 0, 0, 0, 8, 2);   // wide FM; M17 is layered on top
+                tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, 1, ch.power, hardwareSq(ch), 0, 0, 0, 0, profile.analogVolume, 2);   // wide FM; M17 is layered on top
                 lastChannelWrite = System.currentTimeMillis();
                 if (profile.globalSquelch) {
                     final boolean mon = monitorOn && !moved(ch); final int sq = hardwareSq(ch); final long token = ++postWriteToken;
@@ -1663,7 +1664,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 }
             } else {
                 int band = ch.rxFreq < 300_000_000 ? 1 : ch.band;      // VHF must be band=1 (band=0 deafens the RX)
-                tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, 8, 2);
+                tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, profile.analogVolume, 2);
                 lastChannelWrite = System.currentTimeMillis();
                 if (profile.globalSquelch) {                              // this module's squelch follows 0x30; QuickChat sends monitor and squelch 200 ms after the channel's acknowledgement
                     final boolean mon = monitorOn && !moved(ch); final int sq = hardwareSq(ch); final long token = ++postWriteToken;
@@ -1913,11 +1914,11 @@ public class RadioService extends Service implements RadioEngine.Events {
             return a;
         }
         java.util.List<String> out = new java.util.ArrayList<>();
-        for (String l : RootSetup.run("ls /data/data/" + profile.stockApp + "/databases/ 2>/dev/null").split("\\s+")) { java.util.regex.Matcher m = java.util.regex.Pattern.compile("database_channel_area_(\\w+)\\.db").matcher(l); if (m.matches()) out.add(m.group(1)); }
-        if (out.isEmpty()) out.add("default_uhf");
+        for (String l : RootSetup.run("ls /data/data/" + profile.stockApp + "/databases/ 2>/dev/null").split("\\s+")) { java.util.regex.Matcher m = java.util.regex.Pattern.compile(java.util.regex.Pattern.quote(profile.stockAreaPrefix) + "(\\w+)\\.db").matcher(l); if (m.matches()) out.add(m.group(1)); }
+        if (out.isEmpty()) out.add(profile.stockDefaultArea);
         return out;
     }
-    public String reimportFromStock() { return reimportFromStock("default_uhf"); }
+    public String reimportFromStock() { return reimportFromStock(profile.stockDefaultArea); }
     /** The stock app keeps its channels in areas (the DMR phones' app); the W6's and the Xplore 1's have one list. */
     public boolean stockHasAreas() { return !"sa818".equals(profile.protocol) && !"com.chamsion.quickchat".equals(profile.stockApp) && !flyscaleDmr(); }
     /** The W6Plus DMR's stock app: one channel database (128 slots), the DMR ID in its in-use slot. */
@@ -1944,7 +1945,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             java.util.regex.Matcher m = areaKey == null ? null : java.util.regex.Pattern.compile("^(\\d+)").matcher(areaKey.trim());
             n = store.importFromAgold(this, profile.stockApp, m != null && m.find() ? Integer.parseInt(m.group(1)) : agoldCurrentArea(), err);
         }
-        else n = store.importFromStock(this, profile.stockApp, areaKey == null ? "default_uhf" : areaKey, err);
+        else n = store.importFromStock(this, profile.stockApp, profile.stockAreaPrefix, areaKey == null ? profile.stockDefaultArea : areaKey, err);
         if (n >= 0) {
             getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("tgListsImported", true).putBoolean("stockImportDeclined", false).apply();   // imported: an empty list asks again later
             stockImportPending = false; int keep = store.activeNumber(); selectChannel(keep);
@@ -2010,7 +2011,17 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Key or unkey with a browser's microphone as the audio (SignalDeck Web). */
     public void pttFromWeb(boolean down, AudioBackend.TxFeed feed) { if (down) webFeedNext = feed; ptt(down); }
 
+    /** The last PTT request (set at once, before the worker gets to it): a release during a key's wait cancels the key. */
+    private volatile boolean pttWanted;
+    /** Waits {@code ms} on the worker; false as soon as PTT is released meanwhile. */
+    private boolean waitWhilePttWanted(long ms) {
+        long end = System.currentTimeMillis() + ms;
+        while (pttWanted && System.currentTimeMillis() < end) { try { Thread.sleep(20); } catch (InterruptedException e) { return false; } }
+        return pttWanted;
+    }
+
     public void ptt(final boolean down) {
+        pttWanted = down;
         worker.execute(() -> {
             try {
                 if (down) {
@@ -2034,6 +2045,11 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (txInhibited()) { log("PTT blocked: receive-only channel"); history("warn", "⛔ TX blocked on a receive-only channel"); return; }
                     if (pttDown) return;
                     pttDown = true; refreshControls();
+                    long gap = profile.minKeyGapMs - (System.currentTimeMillis() - txEndedAt);   // the Armor 20WT's stock app never keys sooner than 2 s after a release
+                    if (profile.minKeyGapMs > 0 && txEndedAt > 0 && gap > 0) {
+                        log("key waits " + gap + " ms (this phone keys no sooner than " + profile.minKeyGapMs + " ms after a release)");
+                        if (!waitWhilePttWanted(gap)) { pttDown = false; refreshControls(); log("released before the key"); return; }
+                    }
                     txChannel = current; txInCar = inCar; txCharging = charging(); txDropNoted = false; txStartedAt = System.currentTimeMillis(); pcmTxLabel = null;
                     try { ChannelStore.Channel tc = current; int[] tcall = tc != null ? tgOverride.call(tc) : null; if (tc != null && tc.isDigital() && tcall[0] > 0) { ChannelStore.Contact pc = store.contactByNumber(tcall[0], tcall[1] == 0 ? 0 : 1); if (pc != null) store.contactSent(pc.id, txStartedAt, "DMR voice", "on " + tc.name); } } catch (Throwable e) { }
                     idTimerOnKey();
@@ -2047,8 +2063,19 @@ public class RadioService extends Service implements RadioEngine.Events {
                         audio.setTxLevel(pk -> { if (vox == v && v.level(pk, System.currentTimeMillis())) { vox = null; log("stopped: quiet for " + VOX_NAMES[vi]); ptt(false); } });
                     } else if (audio != null) { vox = null; audio.setTxLevel(null); }
                     if (carMic) log("TX with the car microphone"); else if (fromWheel && inCar && carMic()) log("TX from the wheel: phone microphone (keeps the wheel's buttons working)");
-                    engine.ptt(true);
-                    if (audio != null) log(audio.startTx());
+                    if (profile.txAudioLeadMs > 0 && audio != null) {          // the Armor 20WT's stock app: audio path first, the key 600 ms later
+                        log(audio.startTx());
+                        if (!waitWhilePttWanted(profile.txAudioLeadMs)) {     // released before the key: nothing went out
+                            audio.stopTx(); stopBluetoothMic(); vox = null; audio.setTxLevel(null);
+                            pttDown = false; refreshControls(); log("released before the key");
+                            if (rxAudioOn && (!agoldBridge() || receiving)) audio.startRx(true);
+                            return;
+                        }
+                        engine.ptt(true);
+                    } else {
+                        engine.ptt(true);
+                        if (audio != null) log(audio.startTx());
+                    }
                     long lim = txLimitMs();
                     ui.removeCallbacks(txWatchdog); if (lim > 0) ui.postDelayed(txWatchdog, lim);      // the transmit limit; none for No limit
                     final long vk = ++voiceKeys; Thread oldHeat = voiceHeat; if (oldHeat != null) oldHeat.interrupt();
@@ -4400,7 +4427,7 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     // ---- band scope (BandScope): receive-only sweeps ----
     final BandScope scope = new BandScope(new BandScope.Hooks() {
-        @Override public void tune(int hz) throws Exception { tunedAt = System.currentTimeMillis(); engine.setAnalog(hz, hz, hz < 300_000_000 ? 1 : 0, 0, scopeSq, 0, 0, 0, 0, 8, 2); if (dataReceive) scheduleDataHold(true, true); }   // low power, nothing keyed
+        @Override public void tune(int hz) throws Exception { tunedAt = System.currentTimeMillis(); engine.setAnalog(hz, hz, hz < 300_000_000 ? 1 : 0, 0, scopeSq, 0, 0, 0, 0, profile.analogVolume, 2); if (dataReceive) scheduleDataHold(true, true); }   // low power, nothing keyed
         @Override public void query() throws Exception { engine.queryRssi(); }
         @Override public void restore() {                                   // inline (Talk waits for it on the worker thread)
             ChannelStore.Channel ch = vfo != null ? vfo : current;
@@ -4409,6 +4436,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         }
         @Override public void sweep(int from, int step, float[] dbm, int n) { ui.post(() -> { for (Listener l : listeners) l.onScope(from, step, dbm); }); }
         @Override public void state(String s) { ui.post(() -> { for (Listener l : listeners) l.onScopeState(s); }); }
+        @Override public double stepDb() { return profile.rssiStepDb; }
+        @Override public double offsetDb() { return profile.rssiOffsetDb; }
+        @Override public int readMs() { return profile.scopeReadMs; }
     });
     public BandScope scope() { return scope; }
     volatile int scopeSq = 9;                                                 // the squelch byte for sweep steps (bench: DIAG scope --ei sq)

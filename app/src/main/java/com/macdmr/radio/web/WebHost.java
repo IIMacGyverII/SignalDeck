@@ -899,7 +899,7 @@ public final class WebHost {
             case "/api/scope/start": if (!post) break; {
                 String bad = com.macdmr.radio.BandScope.problem(b.optInt("from"), b.optInt("to"), b.optInt("step", 25_000));
                 if (bad != null) return WebServer.Response.error(400, bad);
-                String e = svc.scopeStart(b.optInt("from"), b.optInt("to"), b.optInt("step", 25_000), com.macdmr.radio.BandScope.DEFAULT_SETTLE_MS);
+                String e = svc.scopeStart(b.optInt("from"), b.optInt("to"), b.optInt("step", 25_000), svc.profile().scopeSettleMs);
                 return e == null ? ok("Sweeping") : WebServer.Response.error(409, e);
             }
             case "/api/scope/stop": if (!post) break; { new Thread(svc::scopeStop, "scope-stop").start(); return ok("Stopping"); }

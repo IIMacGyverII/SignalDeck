@@ -73,6 +73,7 @@ public final class FirmwareScreen extends LinearLayout {
         sv.addView(body);
         addView(sv, new LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f));
 
+        section(body, "At your own risk").setText(DISCLAIMER);
         installed = section(body, "Installed");
         chosen = section(body, "Chosen image");
         backupLine = section(body, "Factory backup");
@@ -184,7 +185,7 @@ public final class FirmwareScreen extends LinearLayout {
             }
         }
         confirm.removeAllViews();
-        TextView q = Neo.text(getContext(), "Load " + selected.tag + "? The module keeps that image until you load another one, including after a reboot. While it loads, the radio shows busy and Talk does nothing.",
+        TextView q = Neo.text(getContext(), "Load " + selected.tag + "? The module keeps that image until you load another one, including after a reboot. While it loads, the radio shows busy and Talk does nothing. At your own risk: no warranty.",
                 Neo.TEXT, 15, Neo.uiMedium(getContext()));
         confirm.addView(q);
         LinearLayout r = new LinearLayout(getContext());
@@ -309,6 +310,11 @@ public final class FirmwareScreen extends LinearLayout {
             checks.addView(t);
         }
     }
+
+    /** The owner's disclaimer for loading module firmware (2026-10-30), shown on the page and in every Load confirmation. */
+    static final String DISCLAIMER = "Loading module firmware is at your own risk. The released images are tested on the bench, the page checks the "
+            + "phone, the module and the file before anything is written, and you can always load the factory image again. Still, SignalDeck and its "
+            + "contributors give no warranty, and are not responsible for a radio module that stops working or for what it transmits.";
 
     private TextView section(LinearLayout body, String title) {
         body.addView(Neo.caps(getContext(), title));

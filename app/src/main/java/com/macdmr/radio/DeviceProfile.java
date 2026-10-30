@@ -42,6 +42,14 @@ public final class DeviceProfile {
     public boolean globalSquelch;        // the module follows its global squelch (0x30) rather than the channel's sq byte: send it with every analog channel
     /** How long the scanner listens on each channel before moving on (the module's "receiving" report must arrive in time). */
     public long scanDwellMs = 1500;
+    /**
+     * Timing of the module after a retune, per phone (DEVICE_CERTIFICATION 3.7): how long the scanner waits before it
+     * trusts the reception report, how long the band scope waits before it reads the signal, and how long a reading
+     * takes. The defaults are the Armor's (2026-10-22: the reading is 15-20 dB low until 0.7 s after a retune, a reading
+     * takes 0.1-0.5 s). The Atom XL settles in about 50 ms and answers in 6-7 ms (2026-10-30).
+     */
+    public long scanSettleMs = 700;
+    public int scopeSettleMs = 700, scopeReadMs = 300;
     /** High-pass time constant of this phone's pager audio, seconds. 0 means no DC restoration. The Armor 26 Ultra's is from a 512 baud clip. */
     public double pocsagTauSec;
     /** Least time between two channel writes (0 = none); quicker channel changes collapse into the last one. */
@@ -122,6 +130,24 @@ public final class DeviceProfile {
      * go through the media stream, so at the user's volume 0 nothing would be sent); the user's volume comes back afterwards.
      */
     public float gatewayVolume = 0.4f;
+    /**
+     * The boot handshake's third step: interrupt off (digital) or mic gain (analog), as the Armor 26 Ultra's stock app does.
+     * The Armor 20WT's stock app never sends either (its handshake is channel, version, time-out), so it is left out there.
+     */
+    public boolean bootMicInterrupt = true;
+    /** Voice transmit: open the audio path this long before the key command (the Armor 20WT's stock app opens it 600 ms early; 0 = key first). */
+    public long txAudioLeadMs;
+    /** Voice transmit: a key less than this long after the last release waits for the rest (the Armor 20WT's stock app: 2 s; 0 = none). */
+    public long minKeyGapMs;
+    /** The volume byte in analog channel writes (the Armor 26 Ultra's stock app sends 8, the Armor 20WT's 5). */
+    public int analogVolume = 8;
+    /** The stock app's per-area channel files: {@code <prefix><area>.db} holding table {@code <prefix><area>}, and the area to use when none is chosen. */
+    public String stockAreaPrefix = "database_channel_area_", stockDefaultArea = "default_uhf";
+    /**
+     * The module commands the stock app is seen to send (null = not listed). The device report lists every other command
+     * SignalDeck sent with the module's answers, since nothing shows that this module implements them.
+     */
+    public int[] stockCommands;
 
     /**
      * The radio's audio as plain ALSA streams on the phone's sound card, for a ROM without the vendor audio service
@@ -186,6 +212,8 @@ public final class DeviceProfile {
      * device), the serial library is libserial_port_app.so in the stock app's own folder, bound to
      * com.serial.port.SerialPort, and the side key arrives as keycode 301 with com.interphone.ptt.down/up. The report's
      * probe got no answer because the module was powered off at the time. Not run on the phone yet: unverified.
+     * Revision 2 (stock-app review, phonedmrapp docs/armor20wt/stock-app-review.md): the stock app is an older build
+     * with a smaller command set; see the fields set in the static block.
      */
     public static final DeviceProfile ARMOR_20WT = new DeviceProfile(
             "Ulefone Armor 20WT", "/dev/ttyS1", 57600, Audio.TINY_SERVICE, null, 0,
@@ -229,7 +257,18 @@ public final class DeviceProfile {
                 new String[] { "UL2_CH1 I2S2_CH1=0", "UL2_CH2 I2S2_CH2=0" },
                 new String[] { "I2S1_HD_Mux=Low_Jitter", "I2S1_CH1 DL8_CH1=1", "I2S1_Out_Mux=Output_Widget", "ADC SDP MUTE=1", "DAC VOLUME=163", "DAC SDP SRC MUX=SELECT SDP LEFT DATA" },
                 new String[] { "I2S1_CH1 DL8_CH1=0", "I2S1_Out_Mux=Normal", "I2S1_HD_Mux=Normal", "DAC VOLUME=0", "ADC SDP MUTE=0", "DAC SDP SRC MUX=SELECT SDP RIGHT DATA" });
-        ARMOR_20WT.id = "ulefone-armor20wt"; ARMOR_20WT.revision = 1;
+        ARMOR_20WT.id = "ulefone-armor20wt"; ARMOR_20WT.revision = 2;
+        // Its stock app (review 2026-10-30): channel, version, time-out at boot and nothing else; opens the audio path and
+        // waits 600 ms before keying; keys no sooner than 2 s after a release; analog volume byte 5; channel files
+        // channel_database_<area>.db (areas Default, USA_FRS, …); no firmware updater and no image in the app, so the
+        // loader stays off (an undiffed variant).
+        ARMOR_20WT.bootMicInterrupt = false;
+        ARMOR_20WT.txAudioLeadMs = 600;
+        ARMOR_20WT.minKeyGapMs = 2000;
+        ARMOR_20WT.analogVolume = 5;
+        ARMOR_20WT.stockAreaPrefix = "channel_database_"; ARMOR_20WT.stockDefaultArea = "Default";
+        ARMOR_20WT.moduleLoader = false;
+        ARMOR_20WT.stockCommands = new int[] { 0x22, 0x23, 0x26, 0x27, 0x2C, 0x2D, 0x34, 0x36, 0x3B };
         XPLORE_1.id = "blackview-xplore1"; XPLORE_1.revision = 2;
         XPLORE_1.scanDwellMs = 2500;
         XPLORE_1.minWriteGapMs = 1000;        // QuickChat never writes channels less than 1 s apart; a burst of writes made the module refuse MON (2026-10-22)          // owner's tester 2026-10-22: the first scan stepped past an active channel; its receive report comes later than the Armor's
@@ -370,6 +409,8 @@ public final class DeviceProfile {
         // the bridge's USB Audio Class card: S16_LE, 2 channels, 32 kHz both ways, no mixer controls (the HAL's pcm_open)
         ATOM_XL.directAudio = new DirectAudio(1, 0, 0, new String[0], new String[0], new String[0], new String[0]);
         ATOM_XL.rssiStepDb = 1.0; ATOM_XL.rssiOffsetDb = -17;                  // one step per dB, idle 0x22 = -103 dBm as before
+        ATOM_XL.scopeSettleMs = 100; ATOM_XL.scopeReadMs = 20;               // settles in ~50 ms, answers in 6-7 ms (2026-10-30, HackRF); 100 ms leaves margin
+        ATOM_XL.scanSettleMs = 100; ATOM_XL.scanDwellMs = 500;               // the reception line reports 0.22 s after a retune onto an active channel
         ATOM_XL.directAudio.capturePeriod = 1280; ATOM_XL.directAudio.capturePeriods = 4;   // what the stock HAL opens (vendor.mediatek.hardware.aguiextmodule@1.0-service: 32 kHz, 2 ch, 1280 x 4)
         ATOM_XL.directAudio.rate = 32000;
     }
@@ -455,6 +496,7 @@ public final class DeviceProfile {
     DeviceProfile copy(boolean supported, boolean verified) {
         DeviceProfile p = new DeviceProfile(name, controlPort, baud, audio, pcmPort, pcmBaud, powerNode, pttNode, powerOnToken, pttActions, stockApp, sepolicy, serialLib, supported, verified);
         p.id = id; p.revision = revision; p.source = source; p.txBlocked = txBlocked; p.restrictedBy = restrictedBy; p.globalSquelch = globalSquelch; p.lineSetup = lineSetup; p.scanDwellMs = scanDwellMs; p.protocol = protocol; p.bandsHz = bandsHz.clone(); p.rssi = rssi; p.softSqInModule = softSqInModule; p.appPlayback = appPlayback; p.fixedModuleVolume = fixedModuleVolume; p.subaudible = subaudible; p.dataSquelch = dataSquelch; p.moduleLoader = moduleLoader; p.camcorderGain = camcorderGain; p.softSqThresholds = softSqThresholds; p.softSqCloseCap = softSqCloseCap; p.rxDetectNode = rxDetectNode; p.rxLinesOn = rxLinesOn; p.muteLines = muteLines; p.rxLinesOff = rxLinesOff; p.txLinesOn = txLinesOn; p.txLinesOff = txLinesOff; p.gatewayLinesOn = gatewayLinesOn; p.gatewayLinesOff = gatewayLinesOff; p.txAudioScale = txAudioScale; p.toneEnergyMin = toneEnergyMin; p.gatewayVolume = gatewayVolume; p.minWriteGapMs = minWriteGapMs; p.directAudio = directAudio;
+        p.bootMicInterrupt = bootMicInterrupt; p.txAudioLeadMs = txAudioLeadMs; p.minKeyGapMs = minKeyGapMs; p.analogVolume = analogVolume; p.stockAreaPrefix = stockAreaPrefix; p.stockDefaultArea = stockDefaultArea; p.stockCommands = stockCommands;
         return p;
     }
 
@@ -464,7 +506,7 @@ public final class DeviceProfile {
                 o.optString("pcmPort", null), o.optInt("pcmBaud", 0), o.optString("powerNode", null), o.optString("pttNode", null), o.optString("powerOnToken", "1"),
                 strings(o.optJSONArray("pttActions")), o.optString("stockApp", ""), strings(o.optJSONArray("sepolicy")), o.optString("serialLib", null),
                 o.optBoolean("supported", true), o.optBoolean("verified", false));
-        p.id = o.getString("id"); p.revision = o.getInt("revision"); p.globalSquelch = o.optBoolean("globalSquelch", false); p.scanDwellMs = o.optLong("scanDwellMs", 1500); p.minWriteGapMs = o.optLong("minWriteGapMs", 0);
+        p.id = o.getString("id"); p.revision = o.getInt("revision"); p.globalSquelch = o.optBoolean("globalSquelch", false); p.scanSettleMs = o.optLong("scanSettleMs", p.scanSettleMs); p.scopeSettleMs = o.optInt("scopeSettleMs", p.scopeSettleMs); p.scopeReadMs = o.optInt("scopeReadMs", p.scopeReadMs); p.scanDwellMs = o.optLong("scanDwellMs", 1500); p.minWriteGapMs = o.optLong("minWriteGapMs", 0);
         org.json.JSONArray ls = o.optJSONArray("lineSetup");
         if (ls != null) { p.lineSetup = new String[ls.length()][]; for (int i = 0; i < ls.length(); i++) p.lineSetup[i] = strings(ls.getJSONArray(i)); }
         p.protocol = o.optString("protocol", "mcu68"); p.rxDetectNode = o.optString("rxDetectNode", null);
@@ -486,6 +528,14 @@ public final class DeviceProfile {
         p.gatewayVolume = (float) Math.max(0.05, Math.min(1, o.optDouble("gatewayVolume", 0.4)));
         org.json.JSONObject da = o.optJSONObject("directAudio");
         if (da != null) p.directAudio = DirectAudio.fromJson(da);
+        p.bootMicInterrupt = o.optBoolean("bootMicInterrupt", true);
+        p.txAudioLeadMs = Math.max(0, Math.min(2000, o.optLong("txAudioLeadMs", 0))); p.minKeyGapMs = Math.max(0, Math.min(5000, o.optLong("minKeyGapMs", 0)));
+        p.analogVolume = Math.max(1, Math.min(8, o.optInt("analogVolume", 8)));
+        p.stockAreaPrefix = o.optString("stockAreaPrefix", p.stockAreaPrefix); p.stockDefaultArea = o.optString("stockDefaultArea", p.stockDefaultArea);
+        // both end up in root shell command lines (cp, ls)
+        if (!p.stockAreaPrefix.matches("[A-Za-z0-9_]{1,40}") || !p.stockDefaultArea.matches("\\w{1,40}")) throw new org.json.JSONException("stockAreaPrefix / stockDefaultArea: letters, digits and _ only");
+        org.json.JSONArray sc = o.optJSONArray("stockCommands");
+        if (sc != null) { p.stockCommands = new int[sc.length()]; for (int i = 0; i < sc.length(); i++) p.stockCommands[i] = sc.getInt(i) & 0xFF; }
         return p;
     }
     /** [[node, value], …] from the profile list; only /sys paths and short digit values (they end up on a root command line). */

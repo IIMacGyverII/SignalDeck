@@ -58,4 +58,13 @@ public class BandScopeTest {
         assertFalse("past the top of the band", BandScope.oneBand(atom, 479_000_000L, 481_000_000L));
         assertTrue("the Armor tunes 2 m", BandScope.oneBand(com.macdmr.radio.DeviceProfile.ARMOR_26_ULTRA, 146_400_000L, 146_640_000L));
     }
+
+    @Test public void sweepReadingsFollowThePhonesScale() {
+        assertEquals("the Armor, as before", -88f, BandScope.dbm(64), 0);
+        assertTrue("the Armor's no-reading byte", Float.isNaN(BandScope.dbm(200)));
+        assertEquals(BandScope.dbm(64), BandScope.dbm(64, 0.5, 0), 0);
+        assertEquals("the Atom XL: one dB per step", -52f, BandScope.dbm(0x55, 1.0, -17), 0);
+        assertTrue("above -20 dBm is no reading there too", Float.isNaN(BandScope.dbm(117, 1.0, -17)));
+        assertTrue(Float.isNaN(BandScope.dbm(0, 1.0, -17)));
+    }
 }

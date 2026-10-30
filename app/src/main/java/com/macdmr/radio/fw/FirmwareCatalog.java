@@ -155,13 +155,17 @@ public final class FirmwareCatalog {
 
     /** Built-in rows, plus catalogue rows that are stock or released (and, for "released-min", new enough) and not already listed. */
     public static List<ImageTable.Row> rows(Context c) {
+        Doc doc = c == null ? null : cached(c);
+        return rows(doc == null ? null : doc.images, com.macdmr.radio.BuildConfig.VERSION_CODE);
+    }
+    /** {@link #rows(Context)} for a given catalogue image list and app versionCode. */
+    static List<ImageTable.Row> rows(List<Image> images, int appVersionCode) {
         List<ImageTable.Row> out = new ArrayList<>();
         java.util.Collections.addAll(out, ImageTable.rows());
-        Doc doc = c == null ? null : cached(c);
-        if (doc == null) return out;
-        for (Image im : doc.images) {
+        if (images == null) return out;
+        for (Image im : images) {
             if (im.tag == null || im.sha256 == null || im.sha256.length() != 64) continue;
-            if (!offered(im.status, im.minAppVersionCode, com.macdmr.radio.BuildConfig.VERSION_CODE)) continue;
+            if (!offered(im.status, im.minAppVersionCode, appVersionCode)) continue;
             boolean have = false;
             for (ImageTable.Row r : out) if (r.sha256.equals(im.sha256)) have = true;
             if (have) continue;

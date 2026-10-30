@@ -227,7 +227,7 @@ public final class FirmwareScreen extends LinearLayout {
             onUi(() -> {
                 onPhone.clear(); onPhone.addAll(present);
                 if (!running) showChecks(preview);
-                ImageTable.Row runningRow = ImageTable.byTag(now);
+                ImageTable.Row runningRow = ImageTable.byTag(now, FirmwareCatalog.rows(getContext()));
                 installed.setText(now.isEmpty() ? "The module has not answered yet. Recovery can load the factory image."
                         : now + (runningRow == null ? "\nThis version is not in the known list." : "\n" + runningRow.summary));
                 recovery = now.isEmpty();

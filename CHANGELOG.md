@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Module firmware: the pre-flight accepts the catalogue images this build is offered
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| FW57 release, step (d) | The load pre-flight looked up the chosen file and the module's running image in the built-in rows only, so every catalogue-only image (FW57) was refused as "not a known module image", and with FW57 running any load but the factory restore would have been refused as an unsupported variant. `ImageTable.refuse`/`unlistedPolicy`/`byTag`/`bySha` now take the known list: the built-in rows plus `FirmwareCatalog.rows` (signed, stock or released, "released-min" only for new enough builds); the Module firmware page names a running catalogue image with its summary | fw/ImageTable.java, fw/FirmwareCatalog.java, fw/FirmwareSession.java, ui/FirmwareScreen.java, CatalogPreflightTest | host suite; device step (d) owed |
+
 ## 2026-10-30 — Region data: Belgium reviewed (issue #95)
 
 | Backlog | Change | Files | Test |

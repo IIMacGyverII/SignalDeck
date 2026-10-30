@@ -5,6 +5,8 @@
 package com.macdmr.radio.fw;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -60,17 +62,20 @@ public final class ImageTable {
 
     public static Row[] rows() { return ROWS.clone(); }
 
-    public static Row byTag(String tag) {
+    public static Row byTag(String tag) { return byTag(tag, Arrays.asList(ROWS)); }
+    /** The row for a module tag among {@code known} (the built-in rows plus the offered catalogue rows, {@link FirmwareCatalog#rows}). */
+    public static Row byTag(String tag, List<Row> known) {
         if (tag == null) return null;
         String t = tag.trim();
-        for (Row r : ROWS) if (r.tag.equals(t)) return r;
+        for (Row r : known) if (r.tag.equals(t)) return r;
         return null;
     }
 
-    public static Row bySha(String sha) {
+    public static Row bySha(String sha) { return bySha(sha, Arrays.asList(ROWS)); }
+    public static Row bySha(String sha, List<Row> known) {
         if (sha == null) return null;
         String s = sha.trim().toLowerCase(Locale.US);
-        for (Row r : ROWS) if (r.sha256.equals(s)) return r;
+        for (Row r : known) if (r.sha256.equals(s)) return r;
         return null;
     }
 
@@ -93,8 +98,18 @@ public final class ImageTable {
      */
     public static String refuse(Row image, String moduleTag, String assetSha, String assetTag,
                                 String model, String pkg, String pkgVersion, boolean backupVerified, boolean stockPresent) {
+        return refuse(image, moduleTag, assetSha, assetTag, model, pkg, pkgVersion, backupVerified, stockPresent, Arrays.asList(ROWS));
+    }
+    /**
+     * As above, with {@code known} the images this build may load: the built-in rows plus the catalogue rows it offers
+     * ({@link FirmwareCatalog#rows}: signed, stock or released, "released-min" only when this build is new enough).
+     * Both the file and the module's running image are looked up there, so a released catalogue image can be loaded
+     * from the factory image, and another image (or the factory one) can be loaded while it runs.
+     */
+    public static String refuse(Row image, String moduleTag, String assetSha, String assetTag,
+                                String model, String pkg, String pkgVersion, boolean backupVerified, boolean stockPresent, List<Row> known) {
         if (image == null) return "That file is not a known module image";
-        if (!FACTORY.sha256.equals(image.sha256) && bySha(image.sha256) == null) return "That file is not a known module image";
+        if (!FACTORY.sha256.equals(image.sha256) && bySha(image.sha256, known) == null) return "That file is not a known module image";
         boolean silent = moduleTag == null || moduleTag.trim().isEmpty();
         if (silent) {
             if (!image.factory) return "The module did not answer. Recovery loads the factory image only";
@@ -104,7 +119,7 @@ public final class ImageTable {
             return null;
         }
         String tag = moduleTag.trim();
-        Row running = byTag(tag);
+        Row running = byTag(tag, known);
         if (running == null) {
             if (!(image.factory && backupVerified)) return "Firmware variant not yet supported (" + tag + ")";
         } else if (!FACTORY.tag.equals(running.baseTag) && !FACTORY.tag.equals(running.tag)) {
@@ -127,10 +142,13 @@ public final class ImageTable {
      * The file is not in the catalogue, so the known-image check does not apply. The factory backup does.
      */
     public static String unlistedPolicy(String moduleTag, boolean backupVerified, String model, String pkg) {
+        return unlistedPolicy(moduleTag, backupVerified, model, pkg, Arrays.asList(ROWS));
+    }
+    public static String unlistedPolicy(String moduleTag, boolean backupVerified, String model, String pkg, List<Row> known) {
         if (!backupVerified) return "Load the factory backup onto this phone before any other image";
         if (moduleTag == null || moduleTag.trim().isEmpty()) return "The module did not answer. Recovery loads the factory image only";
         String tag = moduleTag.trim();
-        Row running = byTag(tag);
+        Row running = byTag(tag, known);
         if (running == null) return "Firmware variant not yet supported (" + tag + ")";
         if (!FACTORY.tag.equals(running.baseTag) && !FACTORY.tag.equals(running.tag)) return "Firmware variant not yet supported (" + tag + ")";
         if (!modelMatches(model)) return "This phone model is not the one that image was built for";

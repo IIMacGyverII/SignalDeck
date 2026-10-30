@@ -15,6 +15,8 @@
 
 **Download:** the newest build is on the [Releases](https://github.com/IIMacGyverII/SignalDeck/releases) page (`SignalDeck-<version>.apk`). Once installed, **Device → Updates** finds later builds, with a Release path and a Beta path and the changes since your version.
 
+**Website:** [signaldeckradio.com](https://signaldeckradio.com) has the features, the [supported phones](https://signaldeckradio.com/phones/) with what works on each, the [guide](https://signaldeckradio.com/docs/) and the [certification guide](https://signaldeckradio.com/phones/certification/).
+
 **Help is built in:** every screen and feature is explained in the app (**Device → Help & how-to**, and the ⓘ buttons next to fields and settings).
 
 ## Getting started

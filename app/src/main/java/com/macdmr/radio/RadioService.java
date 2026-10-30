@@ -212,12 +212,17 @@ public class RadioService extends Service implements RadioEngine.Events {
         ModuleEngine e = engine; if (e == null) return;
         int tot = TxLimit.moduleTot(txLimitS());
         Thread st = symThread;
-        if (pttDown || m17Tx || transmitting || (st != null && st.isAlive())) { totPending = true; return; }
-        totPending = false;
+        if (pttDown || m17Tx || transmitting || (st != null && st.isAlive())) {
+            totPending = true;                                                    // try again shortly: the key's own end path can run before
+            ui.removeCallbacks(totRetry); ui.postDelayed(totRetry, 2000);          // its status 4 or its thread has finished (PR 153 device pass, row D)
+            return;
+        }
+        totPending = false; ui.removeCallbacks(totRetry);
         if (!isReady() || !e.isOpen() || firmwareBusy) return;                    // the boot handshake sends it
         try { e.setTot(tot); moduleTotS = tot; log("module transmit timer: " + (tot == 0 ? "off (SignalDeck's limit alone)" : tot + " s")); } catch (IOException ex) { log("module transmit timer: " + ex); }
     }
     private void totAfterTx() { if (totPending) worker.execute(this::sendModuleTot); }
+    private final Runnable totRetry = () -> { if (totPending) worker.execute(this::sendModuleTot); };
     private final java.util.concurrent.ExecutorService lookups = java.util.concurrent.Executors.newSingleThreadExecutor(r -> { Thread t = new Thread(r, "call-lookup"); t.setDaemon(true); return t; });
     /** Look a callsign up in the background and fill in the logbook (and {@code then}, with the result, on the worker). */
     public void enrichCall(final String call, final java.util.function.Consumer<com.macdmr.radio.ham.CallLookup.Info> then) {
@@ -1005,6 +1010,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 selectChannel(store.activeNumber());
                 startRxAudio();
                 setLink("ready");
+                applyModuleTot();                                                     // a module that stayed powered had no boot handshake: give it the limit now
                 if (agold) {                                  // Agold's App block would stop SignalDeck a few minutes after the screen goes off
                     String blocked = AgoldUsb.appBlockProblem(getPackageName());
                     if (blocked != null) {
@@ -2905,7 +2911,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 break;
             }
             case 3: transmitting = true; refreshControls(); if (coverage != null) coverage.onTxStart(); ui.post(() -> { for (Listener l : listeners) l.onTx(true); }); break;
-            case 4: status4At = System.currentTimeMillis(); transmitting = false; refreshControls(); if (coverage != null) coverage.onTxEnd(); String pl = pcmTxLabel; pcmTxLabel = null; history(m17Tx ? "m17" : "tx", m17Tx ? "📻 M17 TX" : pl != null ? "📻 TX: " + pl : "📻 Voice TX");
+            case 4: status4At = System.currentTimeMillis(); transmitting = false; totAfterTx(); refreshControls(); if (coverage != null) coverage.onTxEnd(); String pl = pcmTxLabel; pcmTxLabel = null; history(m17Tx ? "m17" : "tx", m17Tx ? "📻 M17 TX" : pl != null ? "📻 TX: " + pl : "📻 Voice TX");
                 { int tot = moduleTotS; long el = System.currentTimeMillis() - txStartedAt;   // 0 = timer off, but FW19-FW31 bench images still end a key at 120 s
                   if (pttDown && !m17Tx && !unkeying && (tot > 0 ? el > tot * 1000L - 3000 : el > 100_000)) history("warn", "\u23F1 The radio ended the transmission itself: its " + (tot > 0 ? tot : 120) + " s time-out"); } ui.post(() -> { for (Listener l : listeners) l.onTx(false); }); break;
             case 5: try { engine.fetchSms(); } catch (IOException ignored) { } break;             // SMS_RECEIVED -> ask for it

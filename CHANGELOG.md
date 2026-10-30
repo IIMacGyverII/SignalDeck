@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Longest transmission: a limit changed during a key reaches the module after it
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| PR 153 device pass (row D) | Changing the limit during a key queued the module timer (0x3B) for after the key, but the end path could run before the key's status 4 or its thread had finished, and nothing tried again, so the module kept the old value. The write now retries every 2 s while anything transmits and is also sent on status 4; and SignalDeck sends the module timer when it takes over a module that stayed powered (no boot handshake then) | RadioService.java | host suite; device row D owed |
+
 ## 2026-10-30 — Longest transmission: a setting, 2 minutes by default, one rule for every transmit path
 
 | Backlog | Change | Files | Test |

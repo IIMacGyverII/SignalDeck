@@ -35,7 +35,7 @@ IARU Region 1. Units: km.
 | Station ID interval | - | - |
 | BrandMeister country TG | - | - |
 
-**Unverified:** none
+**Unverified:** `dapnetHz` (a national usage note, not a Region 1 value; countries without their own value keep the mark)
 
 Notes: Regional band-plan values. 439.9875 MHz POCSAG is a national-usage note in the plan; several countries cannot transmit there.
 
@@ -288,18 +288,18 @@ IARU Region 1, falls back to `iaru1`. Units: km.
 | Field | Value | Source |
 |---|---|---|
 | APRS | 144.8 | [UBA V/U/SHF Bandplan (links the IARU Region 1 plans)](https://www.uba.be/nl/v-u-shf/bandplan)<br>[IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)](https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf) |
-| FM calling 2 m / 70 cm | 145.5 / 433.5 | [UBA V/U/SHF Bandplan (links the IARU Region 1 plans)](https://www.uba.be/nl/v-u-shf/bandplan)<br>[IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)](https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf) |
-| FM SSTV | 433.4 | [UBA V/U/SHF Bandplan (links the IARU Region 1 plans)](https://www.uba.be/nl/v-u-shf/bandplan)<br>[IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)](https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf) |
-| DAPNET | 439.9875 | [IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)](https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf) |
+| FM calling 2 m / 70 cm | 145.5 / 433.5 | [IARU Region 1 VHF Handbook v10.02, 430 MHz plan (iaru-r1.org), checked 2026-10-30](https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf)<br>[UBA V/U/SHF Bandplan (links the IARU Region 1 plans)](https://www.uba.be/nl/v-u-shf/bandplan)<br>[IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)](https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf) |
+| FM SSTV | 433.4 | [IARU Region 1 VHF Handbook v10.02, 430 MHz plan (iaru-r1.org), checked 2026-10-30](https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf) (433.400 SSTV (FM/AFSK); 144.500 is the SSB image-mode centre)<br>[UBA V/U/SHF Bandplan (links the IARU Region 1 plans)](https://www.uba.be/nl/v-u-shf/bandplan)<br>[IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)](https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf) |
+| DAPNET | 439.9875 | [IARU Region 1 VHF Handbook v10.02, 430 MHz plan (iaru-r1.org), checked 2026-10-30](https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf) (national usage note q)<br>[ON4WX source review, ON0LG paging installation (issue #95, 2026-10-30)](https://github.com/IIMacGyverII/SignalDeck/issues/95)<br>[IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)](https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf) |
 | Weather radio (162 MHz, SAME) | no | - |
-| Amateur bands | 144-146, 430-440 | [BIPT Frequency bands and technical characteristics authorised for radio amateurs (2019)](https://www.bipt.be/file/cc73d96153bbd5448a56f19d925d05b1379c7f21/dd6ba0d4094625ded08277255de9ac1143f4976c/freq-en.pdf) |
-| Licence-free | PMR446: 446-446.2, 16 ch, 0.5 W<br>LPD433: 433.05-434.79, 69 ch, 0.01 W | [ECC/DEC/(15)05 on PMR446 (amended March 2018)](https://docdb.cept.org/document/448)<br>[ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A](https://docdb.cept.org/document/845) |
+| Amateur bands | 144-146, 430-440 | [BIPT/IBPT national frequency plan](https://www.bipt.be/secteurs/telecoms/spectre/plan-des-frequences)<br>[BIPT Frequency bands and technical characteristics authorised for radio amateurs (2019)](https://www.bipt.be/file/cc73d96153bbd5448a56f19d925d05b1379c7f21/dd6ba0d4094625ded08277255de9ac1143f4976c/freq-en.pdf) |
+| Licence-free | PMR446: 446-446.2, 16 ch, 0.5 W<br>LPD433: 433.05-434.79, 69 ch, 0.01 W | [BIPT/IBPT licence-free private use (PMR446)](https://www.bipt.be/utilisateurs/frequences-radio/utilisation-privee-de-loisir/utilisation-libre-de-radio)<br>[BIPT/IBPT interface specifications CB, PMR446, amateur](https://www.bipt.be/secteurs/telecoms/equipements-hertziens/specifications-d-interfaces/cb-pmr446-amateur)<br>[ECC/DEC/(15)05 on PMR446 (amended March 2018)](https://docdb.cept.org/document/448)<br>[ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A](https://docdb.cept.org/document/845) |
 | Station ID interval | - | - |
 | BrandMeister country TG | 206 | [BrandMeister API v2 talkgroup list (TG number = MCC; names as published)](https://api.brandmeister.network/v2/talkgroup) |
 
-**Unverified:** `dapnetHz`, `licenseFree`
+**Unverified:** `licenseFree.LPD433` (PMR446 confirmed)
 
-Notes: UBA's band plan is the IARU Region 1 plan. No ID interval found in the BIPT 2019 decision.
+Notes: UBA's band plan is the IARU Region 1 plan. Reviewed by ON4WX 2026-10-30 (issue #95): 2 m and 70 cm allocations, APRS 144.800, FM calling 145.500, DAPNET 439.9875 and PMR446 confirmed. 433.500 (70 cm FM calling) and 433.400 (FM SSTV) are in the Region 1 430 MHz plan itself; 144.500 is the 2 m image-mode centre in the all-mode (SSB) segment, so this FM radio's SSTV default is 433.400. LPD433: the national plan lists short-range devices at 433.05-434.79 MHz, but the channel plan and voice use are not confirmed for Belgium. No ID interval found in the BIPT 2019 decision; none is inferred (the app's 10-minute reminder is only a reminder).
 
 ## Italy (IT)
 

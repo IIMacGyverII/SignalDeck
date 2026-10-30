@@ -32,6 +32,6 @@ Changing the region never transmits, never starts monitoring and never changes a
 
 ## How accurate it is
 
-The country values come from public band plans and national rules, and some are not yet confirmed: they may be wrong or out of date for your country. Check them against your own licence and band plan. If you find a wrong value, please report it on GitHub (Issues, title "Region data: \<country\>") with the correct value and a source, such as your national society's band plan or the regulator's page, so the next release can fix it for everyone.
+The country values come from public band plans and national rules, and some are not yet confirmed: they may be wrong or out of date for your country. Check them against your own licence and band plan. If you find a wrong value, please report it on GitHub (Issues, title "Region data: \<country\>") with the correct value and a source, such as your national society's band plan or the regulator's page, so the next release can fix it for everyone. A licence-free service in the list means the band is licence-free there for radios approved for it, not that this phone is one: such services usually need approved equipment, a power limit and a fixed antenna.
 
 [All topics](README.md)

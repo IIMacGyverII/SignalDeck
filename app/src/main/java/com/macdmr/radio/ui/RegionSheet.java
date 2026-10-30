@@ -71,7 +71,7 @@ public final class RegionSheet {
             row.setPadding((int) (14 * d), (int) (8 * d), (int) (8 * d), (int) (8 * d));
             LinearLayout col = new LinearLayout(c); col.setOrientation(LinearLayout.VERTICAL);
             col.addView(Neo.text(c, Region.label(k), Neo.MUTED, 13, Neo.uiMedium(c)));
-            boolean own = r.overridden.contains(k), unv = r.unverified.contains(key(k));
+            boolean own = r.overridden.contains(k), unv = r.unconfirmed(key(k), part(k));
             col.addView(Neo.text(c, r.show(k) + (own ? "  (yours)" : unv ? "  (to be confirmed)" : ""), own ? Neo.AMBER_LIGHT : Neo.TEXT, 16, Neo.ui(c)));
             row.addView(col, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
             if (own) { TextView reset = Neo.chip(c, "Reset", Neo.AMBER); row.addView(reset); reset.setOnClickListener(v -> { if (allowed(c, svc)) { Region.setOverride(c, k, null); redo.run(); } }); }
@@ -87,12 +87,16 @@ public final class RegionSheet {
         else if (r.licenseFree.isEmpty()) body.addView(Neo.sheetHint(c, "None listed for " + r.name + " yet."));
         else for (Region.Service s : r.licenseFree)
             body.addView(Neo.sheetHint(c, s.name + ": " + String.format(Locale.US, "%.4f–%.4f MHz", s.lowHz / 1e6, s.highHz / 1e6) + (s.channels > 0 ? ", " + s.channels + " ch" : "")
-                    + (s.maxPowerW > 0 ? ", " + (s.maxPowerW < 1 ? Math.round(s.maxPowerW * 1000) + " mW" : trim(s.maxPowerW) + " W") : "") + ". " + s.notes));
+                    + (s.maxPowerW > 0 ? ", " + (s.maxPowerW < 1 ? Math.round(s.maxPowerW * 1000) + " mW" : trim(s.maxPowerW) + " W") : "") + ". " + s.notes
+                    + (r.unconfirmed("licenseFree", s.name) ? " (To be confirmed for " + r.name + ".)" : "")));
+        if (r.chosen && !r.licenseFree.isEmpty()) body.addView(Neo.sheetHint(c, "A service listed here means the band is licence-free in " + r.name + " for radios approved for it. It does not mean this phone is one: licence-free use usually needs approved equipment, a power limit and a fixed antenna. Check before you transmit."));
         body.addView(Neo.sheetHint(c, "Add a zone (Channels) offers these lists first; the others are still there, marked \"not legal here\". Values marked \"to be confirmed\" are still being checked against the regulator's own pages."));
         self[0] = Neo.showSheet(c, body);
     }
     /** The regions.json field an overridable value belongs to (for "unverified"). */
     private static String key(String k) { return k.equals(Region.CALL2) || k.equals(Region.CALL70) ? "callingHz" : k.equals(Region.UNITS) ? "units" : k; }
+    /** The part of that field ("callingHz.2m" / "callingHz.70cm"), or null. */
+    private static String part(String k) { return k.equals(Region.CALL2) ? "2m" : k.equals(Region.CALL70) ? "70cm" : null; }
     private static String trim(double w) { return w == Math.rint(w) ? String.valueOf((int) w) : String.valueOf(w); }
 
     /** Pick a region; asks first whether the user's own values go when they have any. */

@@ -59,7 +59,10 @@
      "checked": "2026-10-29"
     }
    ],
-   "notes": "Regional band-plan values. 439.9875 MHz POCSAG is a national-usage note in the plan; several countries cannot transmit there."
+   "notes": "Regional band-plan values. 439.9875 MHz POCSAG is a national-usage note in the plan; several countries cannot transmit there.",
+   "unverified": [
+    "dapnetHz"
+   ]
   },
   {
    "id": "iaru2",
@@ -1275,13 +1278,54 @@
      "url": "https://api.brandmeister.network/v2/talkgroup",
      "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
      "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02, 430 MHz band plan: 433.400 SSTV (FM/AFSK), 433.500 FM calling; national usage note q: 439.9875 POCSAG",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02, 430 MHz band plan: 433.400 SSTV (FM/AFSK), 433.500 FM calling; national usage note q: 439.9875 POCSAG",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02, 430 MHz band plan: 433.400 SSTV (FM/AFSK), 433.500 FM calling; national usage note q: 439.9875 POCSAG",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://github.com/IIMacGyverII/SignalDeck/issues/95",
+     "title": "ON4WX source review for Belgium (ON0LG paging installation), 2026-10-30",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.bipt.be/secteurs/telecoms/spectre/plan-des-frequences",
+     "title": "BIPT/IBPT national frequency plan",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.bipt.be/utilisateurs/frequences-radio/utilisation-privee-de-loisir/utilisation-libre-de-radio",
+     "title": "BIPT/IBPT licence-free private use (PMR446)",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.bipt.be/secteurs/telecoms/equipements-hertziens/specifications-d-interfaces/cb-pmr446-amateur",
+     "title": "BIPT/IBPT interface specifications CB, PMR446, amateur",
+     "checked": "2026-10-30"
     }
    ],
    "unverified": [
-    "dapnetHz",
-    "licenseFree"
+    "licenseFree.LPD433"
    ],
-   "notes": "UBA's band plan is the IARU Region 1 plan. No ID interval found in the BIPT 2019 decision."
+   "notes": "UBA's band plan is the IARU Region 1 plan. Reviewed by ON4WX 2026-10-30 (issue #95): 2 m and 70 cm allocations, APRS 144.800, FM calling 145.500, DAPNET 439.9875 and PMR446 confirmed. 433.500 (70 cm FM calling) and 433.400 (FM SSTV) are in the Region 1 430 MHz plan itself; 144.500 is the 2 m image-mode centre in the all-mode (SSB) segment, so this FM radio's SSTV default is 433.400. LPD433: the national plan lists short-range devices at 433.05-434.79 MHz, but the channel plan and voice use are not confirmed for Belgium. No ID interval found in the BIPT 2019 decision; none is inferred (the app's 10-minute reminder is only a reminder)."
   },
   {
    "id": "IT",

@@ -208,8 +208,16 @@ public class RegionsDataTest {
             }
             if (r.has("unverified")) {
                 JSONArray u = r.getJSONArray("unverified");
-                for (int i = 0; i < u.length(); i++)
-                    assertTrue(id + ": unverified names unknown field " + u.getString(i), FIELDS.contains(u.getString(i)));
+                for (int i = 0; i < u.length(); i++) {
+                    String uv = u.getString(i), field = uv.contains(".") ? uv.substring(0, uv.indexOf('.')) : uv;
+                    assertTrue(id + ": unverified names unknown field " + uv, FIELDS.contains(field));
+                    if (!uv.equals(field)) {                                       // a part: a calling band or a licence-free service the entry has
+                        String part = uv.substring(field.length() + 1); boolean known = false;
+                        if (field.equals("callingHz")) known = part.equals("2m") || part.equals("70cm");
+                        else if (field.equals("licenseFree") && r.has("licenseFree")) { JSONArray l = r.getJSONArray("licenseFree"); for (int j = 0; j < l.length(); j++) known |= l.getJSONObject(j).getString("service").equals(part); }
+                        assertTrue(id + ": unverified names an unknown part " + uv, known);
+                    }
+                }
             }
         }
     }

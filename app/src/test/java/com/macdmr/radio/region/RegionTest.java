@@ -44,6 +44,20 @@ public class RegionTest {
         assertEquals("a country's own APRS frequency does not inherit the default's second one", 0, cn.aprsAltHz);
     }
 
+    /** Belgium after ON4WX's source review (issue #95, 2026-10-30). */
+    @Test public void belgiumReviewed() {
+        Region be = t.resolve("BE");
+        assertEquals(144_800_000, be.aprsHz); assertEquals(145_500_000, be.call2mHz); assertEquals(433_500_000, be.call70Hz);
+        assertEquals("FM SSTV is 433.400 (70 cm plan); 144.500 is the SSB image-mode centre", 433_400_000, be.sstvHz);
+        assertEquals(439_987_500, be.dapnetHz); assertFalse(be.unconfirmed("dapnetHz", null));
+        assertFalse(be.unconfirmed("callingHz", "70cm")); assertFalse(be.unconfirmed("sstvHz", null));
+        assertFalse(be.unconfirmed("licenseFree", "PMR446")); assertTrue(be.unconfirmed("licenseFree", "LPD433"));
+        assertEquals("no station-ID interval is inferred", 0, be.stationIdMinutes);
+        assertTrue(be.amateur(144_000_000)); assertTrue(be.amateur(440_000_000)); assertFalse(be.amateur(146_520_000));
+        assertTrue("the Region 1 default's DAPNET is a national note", t.resolve("iaru1").unconfirmed("dapnetHz", null));
+        assertTrue("a country without its own DAPNET value keeps the default's mark", t.resolve("LU").unconfirmed("dapnetHz", null));
+    }
+
     @Test public void usMatchesTheOldBehaviour() {
         Region us = t.resolve("US"), old = t.unchosen();
         assertFalse(old.chosen); assertTrue(us.chosen);

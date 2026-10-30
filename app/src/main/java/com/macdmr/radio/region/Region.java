@@ -42,7 +42,10 @@ public final class Region {
     public int stationIdMinutes, dmrCountryTg;
     public long[][] amateurBands = new long[0][];
     public List<Service> licenseFree = new ArrayList<>();
+    /** regions.json fields not yet confirmed from a national source: a field ("dapnetHz"), or one part of it ("callingHz.70cm", "licenseFree.LPD433"). */
     public Set<String> unverified = new HashSet<>();
+    /** One value is still to be confirmed: the whole field or this part of it. */
+    public boolean unconfirmed(String field, String part) { return unverified.contains(field) || (part != null && unverified.contains(field + "." + part)); }
     /** True when the region has no entry of its own and uses its IARU region's default values. */
     public boolean generic;
     /** False while the user has not chosen (and the phone did not tell) a region: everything behaves as before regions. */

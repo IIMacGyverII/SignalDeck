@@ -79,7 +79,10 @@ public final class RegionTable {
             JSONObject s = l.getJSONObject(i);
             r.licenseFree.add(new Region.Service(s.getString("service"), (int) s.getLong("lowHz"), (int) s.getLong("highHz"), s.isNull("channels") ? 0 : s.getInt("channels"), s.isNull("maxPowerW") ? 0 : s.getDouble("maxPowerW"), s.optString("notes", "")));
         }
-        r.unverified = new HashSet<>(); JSONArray u = o.optJSONArray("unverified"); if (u != null) for (int i = 0; i < u.length(); i++) r.unverified.add(u.getString(i));
+        // a value inherited from the default keeps the default's "unverified" mark; a value set here is judged by this entry's own list
+        Set<String> inherited = new HashSet<>();
+        if (fb != null) for (String k : fb.unverified) { String f = k.contains(".") ? k.substring(0, k.indexOf('.')) : k; if (!o.has(f) || o.isNull(f)) inherited.add(k); }
+        r.unverified = inherited; JSONArray u = o.optJSONArray("unverified"); if (u != null) for (int i = 0; i < u.length(); i++) r.unverified.add(u.getString(i));
         r.overridden = new HashSet<>();
         return r;
     }

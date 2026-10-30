@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Region data: Belgium reviewed (issue #95)
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| #95 (ON4WX review) | Belgium checked against ON4WX's source review and the IARU Region 1 VHF Handbook v10.02: DAPNET 439.9875 and PMR446 confirmed; 433.500 FM calling and 433.400 FM SSTV confirmed from the 430 MHz plan itself (144.500 is the SSB image-mode centre, so the FM SSTV default stays 433.400); LPD433 alone stays "to be confirmed"; no station-ID interval inferred. "Unverified" can now name one part of a field (`callingHz.70cm`, `licenseFree.LPD433`); a country keeps the default's mark on a value it inherits (Region 1's DAPNET is a national usage note). Region sheet marks each unconfirmed licence-free service and says a listed service is for radios approved for it, not necessarily this phone; Region help says the same | regions.json, docs/regions/SOURCES.md, region/Region.java, region/RegionTable.java, ui/RegionSheet.java, ui/HelpView.java, RegionTest, RegionsDataTest | host suite |
+
 ## 2026-10-30 — Promiscuous DMR receive hidden until a module firmware proves it
 
 | Backlog | Change | Files | Test |

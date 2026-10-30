@@ -377,9 +377,9 @@ public final class DeviceProfile {
         ATOM_XL.bandsHz = new long[] { 400_000_000L, 480_000_000L };          // the UHF module (DMR006.U4A); to be measured
         // the bridge's USB Audio Class card: S16_LE, 2 channels, 32 kHz both ways, no mixer controls (the HAL's pcm_open)
         ATOM_XL.directAudio = new DirectAudio(1, 0, 0, new String[0], new String[0], new String[0], new String[0]);
-        ATOM_XL.rssiStepDb = 1.0; ATOM_XL.rssiOffsetDb = -17;
+        ATOM_XL.rssiStepDb = 1.0; ATOM_XL.rssiOffsetDb = -17;                  // one step per dB, idle 0x22 = -103 dBm as before
         ATOM_XL.scopeSettleMs = 100; ATOM_XL.scopeReadMs = 20;               // settles in ~50 ms, answers in 6-7 ms (2026-10-30, HackRF); 100 ms leaves margin
-        ATOM_XL.scanSettleMs = 100; ATOM_XL.scanDwellMs = 500;               // the reception line reports 0.22 s after a retune onto an active channel                  // one step per dB, idle 0x22 = -103 dBm as before
+        ATOM_XL.scanSettleMs = 100; ATOM_XL.scanDwellMs = 500;               // the reception line reports 0.22 s after a retune onto an active channel
         ATOM_XL.directAudio.capturePeriod = 1280; ATOM_XL.directAudio.capturePeriods = 4;   // what the stock HAL opens (vendor.mediatek.hardware.aguiextmodule@1.0-service: 32 kHz, 2 ch, 1280 x 4)
         ATOM_XL.directAudio.rate = 32000;
     }

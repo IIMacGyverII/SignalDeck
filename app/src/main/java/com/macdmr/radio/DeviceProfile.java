@@ -358,8 +358,8 @@ public final class DeviceProfile {
         ANYSECU_W6.gatewayLinesOff = new String[][] { { "/sys/kernel/relay_state/relay_state", "0" }, { "/sys/class/gpio/gpio223/value", "0" }, { "/sys/class/gpio/gpio179/value", "0" }, { "/sys/kernel/dmr_state/dmr_state", "0" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "1" } };
         // the relay path on the W6+ is ~16 dB quieter than the W6Plus DMR's for the same samples: at 0.03 its DTMF arrived at
         // RMS 50 (under the decoder's floor) and PSK31 lost words; it is linear up to 0.5 (no harmonics) and at 0.2 DTMF (16/16),
-        // PSK31, SSTV Robot 24 (clean, 118 lines), RTTY and FT8 all decoded on a W6Plus DMR (2026-10-29). Provisional until the
-        // HackRF measures its deviation.
+        // PSK31, SSTV Robot 24 (clean, 118 lines), RTTY and FT8 all decoded on a W6Plus DMR (2026-10-29). HackRF 2026-10-30
+        // (§3.7 item 9, media volume held at 10/25): an APRS packet at 0.2 deviates 2900 Hz p99 (0.3: 4086), on target.
         ANYSECU_W6.txAudioScale = 0.2f; ANYSECU_W6.gatewayVolume = 0.4f;
         // the stock app's receStart / receEnd (speaker path; the camcorder input carries the audio while these are set)
         ANYSECU_W6.rxLinesOn = new String[][] { { "/sys/kernel/dmr_state/dmr_state", "1" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "0" }, { "/sys/class/gpio/gpio183/value", "1" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "1" } };
@@ -417,8 +417,13 @@ public final class DeviceProfile {
         ANYSECU_W6_DMR.gatewayLinesOn = new String[][] { { "/sys/kernel/dmr_state/dmr_state", "0" }, { "/sys/kernel/relay_state/relay_state", "1" }, { "/sys/class/gpio/gpio223/value", "1" }, { "/sys/class/gpio/gpio222/value", "1" }, { "/sys/class/gpio/gpio179/value", "1" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "0" } };
         // HackRF 2026-10-29, 446.000 MHz: 1 kHz deviates ~1.09 Hz per sample unit, the module limits near 4.3 kHz, and the
         // path lifts 2.5 kHz by ~8 dB (pre-emphasis), cuts below 300 Hz (100-250 Hz at the floor) and above 3 kHz, so no M17
-        // over audio. An N0CALL APRS packet decoded at 0.04 (p99 3.8 kHz) and 0.03 (p99 2.85 kHz): 0.03 keeps AFSK off the limiter.
-        ANYSECU_W6_DMR.txAudioScale = 0.03f;
+        // over audio. That 0.03 was set at an unknown media volume; with the volume held at 10/25 (gatewayVolume) an APRS packet
+        // at 0.03 deviated only 879 Hz p99 (HackRF 2026-10-30, §3.7 item 9): 0.10 -> 2040, 0.12 -> 2408, 0.15 -> 2954 Hz, all decoded.
+        ANYSECU_W6_DMR.txAudioScale = 0.15f;
+        // §3.7 item 1 (HackRF carriers stepped 10 dB, 2026-10-30): one raw unit per dB, linear over at least 56 dB above the idle
+        // 42-43, like the Atom XL's module of the same DMR006 family; its offset kept (idle 0x22 = -103 dBm). Item 4: squelch
+        // levels 1-9 open at one point, 4-5 dB above the floor; 0 is monitor (no reception reported).
+        ANYSECU_W6_DMR.rssiStepDb = 1.0; ANYSECU_W6_DMR.rssiOffsetDb = -17;
         // a carrier with only its CTCSS arrives at RMS ~24 on this camcorder input (100.0 Hz from a W6+, 2026-10-30): the tone
         // stands ~300x above the other bins, but the default dead-air floor (RMS ~630) never let it count; 200 = RMS ~14, above
         // the idle input (RMS 7-10), the ratio tests still keep noise and voice out

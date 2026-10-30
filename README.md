@@ -91,7 +91,7 @@ The screenshots use demo data: made-up callsigns (unallocated `Q` prefixes, `DEM
 - **Region:** your country sets the APRS frequency, the channel lists offered (others are marked "not legal here"), weather radio, band edges, the station-ID interval and km or miles. The country data may be inaccurate: please report corrections with a source.
 - **Backups**, channel sharing (Android share sheet, CHIRP CSV) and boot persistence.
 - **Support tools:** Radio audio check, second radio test, device reports (**Run all checks**, also driven from adb; every report names the build that made it, official or a fork), a guided **transmit test session** for certifying a phone (`tx-report.json`), and a watchdog that restarts a radio module that stops taking commands.
-- **Module firmware page** (Device): shows the radio module's firmware, keeps a verified backup of the factory image taken from the stock app, and loads images from the project's signed catalogue, with every safety check shown before a load and the factory image restored when anything does not match. Experimental, and only for the listed phones.
+- **Module firmware page** (Device): shows the radio module's firmware, keeps a verified backup of the factory image taken from the stock app, and downloads and loads images from the project's signed catalogue, with every safety check shown before a load and the factory image restored when anything does not match. The first released image, **FW57** for the Armor 26 Ultra (beta.22 or newer), adds M17 voice and POCSAG transmit and the module's tone engine for FT8, RTTY and Morse. Experimental, and only for the listed phones.
 
 ## What the hardware cannot do
 
@@ -145,7 +145,7 @@ The device profile list in [`profiles/`](profiles/README.md) is signed separatel
 
 ## History
 
-SignalDeck began on 2026-10-17 inside [phonedmrapp](https://github.com/IIMacGyverII/phonedmrapp), the research project and **DMRModHooks** LSPosed module for the Ulefone Armor 26 Ultra, and moved here with its full history. Beta builds 1.0.0-beta.1 to beta.11 were published there, and later betas here (beta.21 on 2026-10-30); the changes of every build are in [CHANGELOG.md](CHANGELOG.md). The research behind the radio work (the module firmware, M17, POCSAG and the bench methods) is documented in phonedmrapp.
+SignalDeck began on 2026-10-17 inside [phonedmrapp](https://github.com/IIMacGyverII/phonedmrapp), the research project and **DMRModHooks** LSPosed module for the Ulefone Armor 26 Ultra, and moved here with its full history. Beta builds 1.0.0-beta.1 to beta.11 were published there, and later betas here (beta.22 on 2026-10-30); the changes of every build are in [CHANGELOG.md](CHANGELOG.md). The research behind the radio work (the module firmware, M17, POCSAG and the bench methods) is documented in phonedmrapp.
 
 ## License
 

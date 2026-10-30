@@ -141,6 +141,28 @@ every transmit test says exactly what was tested:
 
 Build from a clean, pushed commit when you can, so the maintainer can rebuild exactly your build.
 
+### 3.7 Timing and calibration (for Supported)
+Every radio module has its own timing and scales, and SignalDeck must not assume another phone's. These are measured on
+every phone before Supported, with a signal source whose level can be stepped (an SDR that transmits, such as a HackRF,
+or a signal generator) and the bench commands in the maintainer's build. The phone receives only, except where marked
+(TX). Each result either confirms the default or sets the phone's profile.
+
+| # | Measure | How | Feeds |
+|---|---|---|---|
+| 1 | **Signal reading scale** | A carrier in 10 dB steps across the reading's range; the raw reading at each step. Linear range, steps per dB, where it saturates; the idle level | `rssiStepDb`, `rssiOffsetDb` (dB shown in the S-meter, history, fox hunt, coverage, band scope), the reception thresholds |
+| 2 | **Settle after a retune** | The band scope over a carrier with the settle time stepped 0–1000 ms; the shortest that reads the carrier's true level and a clean floor next to it | band scope and scanner settle times |
+| 3 | **Reading time** | Time from a signal query to its answer | band scope step time |
+| 4 | **Squelch opening level** | Carriers stepped up from the floor at each squelch setting; where the radio reports a reception | the help's squelch text, Soft SQ defaults |
+| 5 | **Scan rate** | A scan list of empty channels plus one with a carrier: channels per second, time to stop and open the audio, hang after the carrier ends | scanner dwell and hang times |
+| 6 | **Receive audio path** | Tones from 100 Hz to 3.5 kHz at a fixed deviation; level and response; drop-outs over 15+ receptions | audio path settings, the help's limits |
+| 7 | **Sub-audible tones** | CTCSS tones (low, middle, high) and DCS: detected or not | tone detection limits in the help |
+| 8 | **Digital receive** | DMR caller ID and voice; M17 with the phone's equaliser or self-calibration (a fit kept only when a second station decodes as well); payload-exact frames where measurable | M17 equaliser table per phone model |
+| 9 | **(TX) Transmit levels** | FM deviation and frequency offset of a 1 kHz tone and of voice; DMR framing decoded from an SDR capture; time to key and unkey | TX scale, the help's offset note |
+| 10 | **(TX) Heat** | AP and battery temperature over five short keys and one long key | the heat guard |
+
+Record the numbers in the phone's compatibility notes and in the pull request that changes its profile; a default that
+was confirmed is recorded too ("settle 700 ms confirmed").
+
 ## 4. What to send
 
 - The **device report** (3.1) and, for each level, the results above: a table with each step, pass/fail, and a note.
@@ -179,6 +201,8 @@ after the Beta checks. Never add code that loads module firmware for a phone it 
 
 ## History
 
+- **v3 (2026-10-30):** timing and calibration measured on every phone before Supported (3.7), after the Atom XL
+  showed a module with another signal-reading scale than the Armor's.
 - **v2 (2026-10-29):** the transmit test session (3.5) and `tx-report.json` schema 1; build identity in every report
   (3.6); testing transmit in a fork's own build with `verified = true`; the Starting transmit tests and Transmit test
   results issue templates and the pull request checklist (section 4).

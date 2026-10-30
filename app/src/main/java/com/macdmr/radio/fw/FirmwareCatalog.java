@@ -134,7 +134,7 @@ public final class FirmwareCatalog {
      * {@code minAppVersionCode}: builds older than its introduction only know "stock" and "released", so they never see it
      * (FW57 needs SignalDeck beta.22's data-hold fix; with beta.21 and M17 receive on, its DMR keys are silent).
      */
-    static boolean offered(String status, int minAppVersionCode, int appVersionCode) {
+    public static boolean offered(String status, int minAppVersionCode, int appVersionCode) {
         if ("stock".equals(status) || "released".equals(status)) return true;
         return "released-min".equals(status) && minAppVersionCode > 0 && appVersionCode >= minAppVersionCode;
     }

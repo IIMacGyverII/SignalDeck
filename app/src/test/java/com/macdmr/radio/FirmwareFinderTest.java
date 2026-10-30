@@ -160,4 +160,15 @@ public class FirmwareFinderTest {
         assertTrue(f.line().contains("APK not found"));
         assertTrue(FirmwareFinder.noStockApk("").source.startsWith("stock app!"));
     }
+
+    @Test public void aReleasedMinImageIsNamedForWhatThisBuildMayDo() throws Exception {
+        String sha = "b".repeat(64);
+        String json = "{\"serial\":9,\"images\":[{\"tag\":\"DMR003.FW57.V022\",\"sha256\":\"" + sha + "\",\"model\":\"Armor 26 Ultra\",\"status\":\"released-min\",\"minAppVersionCode\":121}]}";
+        java.util.List<com.macdmr.radio.fw.FirmwareCatalog.Image> cat =
+                com.macdmr.radio.fw.FirmwareCatalog.parse(json.getBytes(java.nio.charset.StandardCharsets.UTF_8)).images;
+        org.junit.Assert.assertEquals("DMR003.FW57.V022, a released image for the Armor 26 Ultra", FirmwareFinder.known(sha, cat, 121));
+        String older = FirmwareFinder.known(sha, cat, 120);
+        org.junit.Assert.assertTrue(older, older.contains("needs a newer SignalDeck (version code 121 or newer)"));
+        org.junit.Assert.assertFalse(older, older.contains("kept for research"));
+    }
 }

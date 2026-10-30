@@ -129,6 +129,10 @@ public final class FirmwareFinder {
     }
 
     static String known(String sha, List<com.macdmr.radio.fw.FirmwareCatalog.Image> catalogue) {
+        return known(sha, catalogue, BuildConfig.VERSION_CODE);
+    }
+
+    static String known(String sha, List<com.macdmr.radio.fw.FirmwareCatalog.Image> catalogue, int appVersionCode) {
         if (sha == null || sha.length() != 64) return "";
         com.macdmr.radio.fw.ImageTable.Row r = com.macdmr.radio.fw.ImageTable.bySha(sha);
         if (r != null) return r.tag + (r.factory ? ", the factory image for the " + r.model : ", a SignalDeck bench image for the " + r.model);
@@ -137,6 +141,10 @@ public final class FirmwareFinder {
             String model = im.model == null || im.model.isEmpty() ? "another phone" : "the " + im.model;
             if (im.factory) return im.tag + ", the factory image for " + model;
             if ("released".equals(im.status)) return im.tag + ", a released image for " + model;
+            if ("released-min".equals(im.status))                              // released, but only for SignalDeck builds new enough (FirmwareCatalog.offered)
+                return com.macdmr.radio.fw.FirmwareCatalog.offered(im.status, im.minAppVersionCode, appVersionCode)
+                        ? im.tag + ", a released image for " + model
+                        : im.tag + ", a released image for " + model + " that needs a newer SignalDeck (version code " + im.minAppVersionCode + " or newer)";
             return im.tag + ", a stock copy for " + model + " kept for research (not offered for loading)";
         }
         return "";

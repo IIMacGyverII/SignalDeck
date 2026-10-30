@@ -95,7 +95,7 @@ public final class BandScopeScreen extends ModeScreen {
         BandScope s = svc.scope();
         if (s.running()) { new Thread(svc::scopeStop, "scope-stop").start(); return; }
         int[] r = range();
-        toast(svc.scopeStart(r[0], r[1], r[2], prefs().getInt("settle", BandScope.DEFAULT_SETTLE_MS)));
+        toast(svc.scopeStart(r[0], r[1], r[2], prefs().getInt("settle", svc.profile().scopeSettleMs)));
         refresh();
     }
     /** Use a new range: restart the sweep if one is running. */
@@ -149,10 +149,10 @@ public final class BandScopeScreen extends ModeScreen {
     }
     private static int parse(android.widget.EditText e) { try { return (int) Math.round(Double.parseDouble(e.getText().toString().trim().replace(',', '.')) * 1e6); } catch (Exception x) { return 0; } }
     private static int parseKhz(android.widget.EditText e) { try { return (int) Math.round(Double.parseDouble(e.getText().toString().trim().replace(',', '.')) * 1e3); } catch (Exception x) { return 0; } }
-    private static String describe(int from, int to, int step) {
+    private String describe(int from, int to, int step) {
         String e = BandScope.problem(from, to, step); if (e != null) return e;
         int n = BandScope.steps(from, to, step);
-        return n + " steps, a sweep takes about " + BandScope.duration((long) n * (BandScope.DEFAULT_SETTLE_MS + 300));
+        return n + " steps, a sweep takes about " + BandScope.duration((long) n * (svc.profile().scopeSettleMs + svc.profile().scopeReadMs));
     }
 
     private void listenHere() {

@@ -11,6 +11,25 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class DeviceProfileTest {
+
+    @Test public void otherPhonesKeepTheirTimingAndScaleExactly() {
+        DeviceProfile[] others = { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.ARMOR_20WT, DeviceProfile.XPLORE_1, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.UNKNOWN };
+        for (DeviceProfile p : others) {
+            String n = p.name;
+            assertEquals(n, 0.5, p.rssiStepDb, 0); assertEquals(n, 0, p.rssiOffsetDb, 0);
+            assertEquals(n, 700, p.scanSettleMs); assertEquals(n, 700, p.scopeSettleMs); assertEquals(n, 300, p.scopeReadMs);
+            assertEquals(n, p == DeviceProfile.XPLORE_1 ? 2500 : 1500, p.scanDwellMs);
+            assertEquals(n, Scanner.SETTLE_MS, p.scanSettleMs); assertEquals(n, BandScope.DEFAULT_SETTLE_MS, p.scopeSettleMs);
+        }
+    }
+
+    @Test public void theAtomXlUsesItsMeasuredTiming() {
+        DeviceProfile a = DeviceProfile.ATOM_XL;               // 2026-10-30: settles in ~50 ms, answers in 6-7 ms, the line reports 0.22 s after a retune
+        assertEquals(100, a.scopeSettleMs); assertEquals(20, a.scopeReadMs);
+        assertEquals(100, a.scanSettleMs); assertEquals(500, a.scanDwellMs);
+        assertEquals(1.0, a.rssiStepDb, 0); assertEquals(-17, a.rssiOffsetDb, 0);
+    }
+
     @Test public void armor20wtIsNotTakenForTheArmor26() {
         // Armor 20WT report (beta.18, 2026-10-24): same dmr009 node as the Armor 26 Ultra, detected as one before
         DeviceProfile p = DeviceProfile.detectBuiltIn("ulefone armor 20wt armor_20wt", true, false);

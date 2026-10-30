@@ -42,6 +42,14 @@ public final class DeviceProfile {
     public boolean globalSquelch;        // the module follows its global squelch (0x30) rather than the channel's sq byte: send it with every analog channel
     /** How long the scanner listens on each channel before moving on (the module's "receiving" report must arrive in time). */
     public long scanDwellMs = 1500;
+    /**
+     * Timing of the module after a retune, per phone (DEVICE_CERTIFICATION 3.7): how long the scanner waits before it
+     * trusts the reception report, how long the band scope waits before it reads the signal, and how long a reading
+     * takes. The defaults are the Armor's (2026-10-22: the reading is 15-20 dB low until 0.7 s after a retune, a reading
+     * takes 0.1-0.5 s). The Atom XL settles in about 50 ms and answers in 6-7 ms (2026-10-30).
+     */
+    public long scanSettleMs = 700;
+    public int scopeSettleMs = 700, scopeReadMs = 300;
     /** High-pass time constant of this phone's pager audio, seconds. 0 means no DC restoration. The Armor 26 Ultra's is from a 512 baud clip. */
     public double pocsagTauSec;
     /** Least time between two channel writes (0 = none); quicker channel changes collapse into the last one. */
@@ -369,7 +377,9 @@ public final class DeviceProfile {
         ATOM_XL.bandsHz = new long[] { 400_000_000L, 480_000_000L };          // the UHF module (DMR006.U4A); to be measured
         // the bridge's USB Audio Class card: S16_LE, 2 channels, 32 kHz both ways, no mixer controls (the HAL's pcm_open)
         ATOM_XL.directAudio = new DirectAudio(1, 0, 0, new String[0], new String[0], new String[0], new String[0]);
-        ATOM_XL.rssiStepDb = 1.0; ATOM_XL.rssiOffsetDb = -17;                  // one step per dB, idle 0x22 = -103 dBm as before
+        ATOM_XL.rssiStepDb = 1.0; ATOM_XL.rssiOffsetDb = -17;
+        ATOM_XL.scopeSettleMs = 100; ATOM_XL.scopeReadMs = 20;               // settles in ~50 ms, answers in 6-7 ms (2026-10-30, HackRF); 100 ms leaves margin
+        ATOM_XL.scanSettleMs = 100; ATOM_XL.scanDwellMs = 500;               // the reception line reports 0.22 s after a retune onto an active channel                  // one step per dB, idle 0x22 = -103 dBm as before
         ATOM_XL.directAudio.capturePeriod = 1280; ATOM_XL.directAudio.capturePeriods = 4;   // what the stock HAL opens (vendor.mediatek.hardware.aguiextmodule@1.0-service: 32 kHz, 2 ch, 1280 x 4)
         ATOM_XL.directAudio.rate = 32000;
     }
@@ -464,7 +474,7 @@ public final class DeviceProfile {
                 o.optString("pcmPort", null), o.optInt("pcmBaud", 0), o.optString("powerNode", null), o.optString("pttNode", null), o.optString("powerOnToken", "1"),
                 strings(o.optJSONArray("pttActions")), o.optString("stockApp", ""), strings(o.optJSONArray("sepolicy")), o.optString("serialLib", null),
                 o.optBoolean("supported", true), o.optBoolean("verified", false));
-        p.id = o.getString("id"); p.revision = o.getInt("revision"); p.globalSquelch = o.optBoolean("globalSquelch", false); p.scanDwellMs = o.optLong("scanDwellMs", 1500); p.minWriteGapMs = o.optLong("minWriteGapMs", 0);
+        p.id = o.getString("id"); p.revision = o.getInt("revision"); p.globalSquelch = o.optBoolean("globalSquelch", false); p.scanSettleMs = o.optLong("scanSettleMs", p.scanSettleMs); p.scopeSettleMs = o.optInt("scopeSettleMs", p.scopeSettleMs); p.scopeReadMs = o.optInt("scopeReadMs", p.scopeReadMs); p.scanDwellMs = o.optLong("scanDwellMs", 1500); p.minWriteGapMs = o.optLong("minWriteGapMs", 0);
         org.json.JSONArray ls = o.optJSONArray("lineSetup");
         if (ls != null) { p.lineSetup = new String[ls.length()][]; for (int i = 0; i < ls.length(); i++) p.lineSetup[i] = strings(ls.getJSONArray(i)); }
         p.protocol = o.optString("protocol", "mcu68"); p.rxDetectNode = o.optString("rxDetectNode", null);

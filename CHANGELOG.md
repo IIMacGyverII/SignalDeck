@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Atom XL: band scope and scanner at the radio's own speed
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Atom XL timing (owner, 2026-10-30; DEVICE_CERTIFICATION 3.7) | Measured on the Atom XL with a HackRF: its module reads a correct signal about 50 ms after a retune (the Armor needs 0.7 s), a reading answers in 6-7 ms (Armor 0.1-0.5 s), and the reception line reports 0.22 s after a retune onto an active channel. New per-profile timing (`scanSettleMs`, `scopeSettleMs`, `scopeReadMs`, beside the existing `scanDwellMs`): the Atom XL's band scope waits 100 ms per step and its scanner settles 100 ms and dwells 0.5 s on a quiet channel, so a band scope sweep takes about a ninth of the time. The band scope also converts its readings with the profile's scale (PR 141 had left it on the half-dB step: a carrier the S-meter showed at -54 dBm appeared at -78.5). Every other phone keeps exactly its values (a test). Help "How fast" updated | DeviceProfile, Scanner, BandScope, RadioService, BandScopeScreen, WebHost, HelpView, DeviceProfileTest, BandScopeTest | Host tests; device check after merge |
+
 ## 2026-10-30 — The M17 receive hold is sent only when it changes the module's state (DMR silent after M17)
 
 | Backlog | Change | Files | Test |

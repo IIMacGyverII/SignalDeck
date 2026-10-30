@@ -93,6 +93,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public boolean receiving() { return softSq.isEnabled() ? squelchOpen : receiving; }   // with Soft SQ on the module's squelch is open and it reports a reception all the time: the soft gate is the activity signal
         @Override public boolean softGated() { return softSq.isEnabled(); }
         @Override public long dwellMs() { return profile.scanDwellMs; }
+        @Override public long settleMs() { return profile.scanSettleMs; }
         @Override public ChannelStore.Channel priority() { int n = scanPriority(); return n > 0 ? store.byNumber(n) : null; }
         @Override public void status(boolean s, boolean h, ChannelStore.Channel on) {
             if (voiceOn()) {
@@ -4285,6 +4286,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         }
         @Override public void sweep(int from, int step, float[] dbm, int n) { ui.post(() -> { for (Listener l : listeners) l.onScope(from, step, dbm); }); }
         @Override public void state(String s) { ui.post(() -> { for (Listener l : listeners) l.onScopeState(s); }); }
+        @Override public double stepDb() { return profile.rssiStepDb; }
+        @Override public double offsetDb() { return profile.rssiOffsetDb; }
+        @Override public int readMs() { return profile.scopeReadMs; }
     });
     public BandScope scope() { return scope; }
     volatile int scopeSq = 9;                                                 // the squelch byte for sweep steps (bench: DIAG scope --ei sq)

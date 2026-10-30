@@ -81,13 +81,16 @@ public final class TxReport {
             "I watch the heat and stop if the phone gets hot" };
 
     /** The steps of section 3.3, in order; the DMR step only on phones with DMR. */
-    public static List<Step> plan(boolean dmr) {
+    public static List<Step> plan(boolean dmr) { return plan(dmr, false); }
+    /** {@code text}: a DMR text step after the group call, for a phone whose text body is not the Armor's (DeviceProfile.smsUtf8). */
+    public static List<Step> plan(boolean dmr, boolean text) {
         List<Step> s = new ArrayList<>();
         s.add(new Step("fm", "FM voice key (5 s)"));
         s.add(new Step("release", "Release check (three 2 s keys)"));
         s.add(new Step("watchdog", "Transmit limit check (one held key, the session's 28 s limit)"));
         s.add(new Step("measure", "Frequency and deviation"));
         if (dmr) s.add(new Step("dmr", "DMR group call (5 s)"));
+        if (dmr && text) s.add(new Step("text", "DMR text (one short message)"));
         s.add(new Step("heat", "Heat (five 3 s keys)"));
         return s;
     }
@@ -117,6 +120,16 @@ public final class TxReport {
         if (k == null || !k.keyed()) return NOT_RUN;
         if (!"watchdog".equals(k.releasedBy)) return "tester".equals(k.releasedBy) ? SKIPPED : FAIL;
         return k.durationMs >= 27_000 && k.durationMs <= 30_000 && k.sendStopMs >= 0 ? PASS : FAIL;
+    }
+
+    /**
+     * The text step: the module's answer (status 8 delivered, 9 failed, 0 none within the wait) and whether the other radio
+     * showed the text correctly. Pass needs both; a failure on either side fails it.
+     */
+    public static String textVerdict(int status, String shown) {
+        if (status == 9 || "no".equals(shown)) return FAIL;
+        if (status == 8 && "yes".equals(shown)) return PASS;
+        return RECORDED;
     }
 
     /** A key step with the tester's answer: pass when keyed cleanly and heard. */

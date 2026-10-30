@@ -126,7 +126,7 @@ public class TxReportTest {
         assertFalse(TxReport.gate(false, false, false, true, BuildIdentity.OFFICIAL).ok);
         assertTrue(DeviceProfile.ARMOR_20WT.txTestUnverified);
         assertFalse(DeviceProfile.ARMOR_20WT.verified);
-        for (DeviceProfile p : new DeviceProfile[] { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.XPLORE_1, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.ATOM_XL, DeviceProfile.UNKNOWN })
+        for (DeviceProfile p : new DeviceProfile[] { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.ATOM_XL, DeviceProfile.UNKNOWN })
             assertFalse(p.name, p.txTestUnverified);
         assertTrue(DeviceProfile.ARMOR_20WT.copy(true, false).txTestUnverified);
         assertTrue(TxTestSession.pttPath(DeviceProfile.ARMOR_20WT).contains("600 ms before the key"));

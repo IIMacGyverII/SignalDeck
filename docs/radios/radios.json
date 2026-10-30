@@ -229,13 +229,15 @@
       "features": [
         {"id": "smeter", "name": "Signal meter", "state": "yes", "note": "Signal readings answer"},
         {"id": "fm_rx", "name": "FM receive", "state": "yes", "note": "Voice clear in testers' reports"},
-        {"id": "fm_tx", "name": "FM transmit", "state": "untested", "note": "Blocked until the profile is verified"},
+        {"id": "fm_tx", "name": "FM transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"},
         {"id": "dmr_rx", "name": "DMR receive", "state": "untested", "note": null},
-        {"id": "dmr_tx", "name": "DMR transmit", "state": "untested", "note": "Blocked until the profile is verified"},
-        {"id": "firmware_loader", "name": "Module firmware loader", "state": "untested", "note": null}
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"},
+        {"id": "firmware_loader", "name": "Module firmware loader", "state": "no", "note": "Off: the stock app's updater carries no image, so this module's firmware has not been compared"}
       ],
       "quirks": [
-        {"title": "Profile in testing", "text": "Testers have receive, MON, CTCSS and channel import working. Transmit stays blocked until the profile is verified, and SignalDeck does not take over the radio by itself."},
+        {"title": "Profile in testing", "text": "Testers have receive, MON, CTCSS and channel import working. SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session."},
+        {"title": "Keyed by its PTT line", "text": "The stock app never sends the transmit command: it keys the radio by switching its PTT line, starts the microphone when the radio reports that it is transmitting, keeps it on a fifth of a second after the release, and takes no new key within 1.5 seconds of the last release. SignalDeck does the same; if the radio does not report transmitting within 2 seconds, no audio is sent."},
+        {"title": "DMR texts in the stock app's format", "text": "The stock app sends texts with a shorter header than the Armor and in UTF-8 rather than UTF-16. SignalDeck sends them the same way on this phone and reads received texts in either encoding. Not checked on the air yet."},
         {"title": "Channel changes need a pause", "text": "The stock app never writes channels less than 1 second apart; a burst of quick changes made the module refuse MON. SignalDeck keeps the same gap and only sends the newest channel."},
         {"title": "The module can stop taking commands", "text": "After an update the module was sometimes left on but not answering. SignalDeck checks at start-up and restarts the module when it does not answer."},
         {"title": "Slower reception reports", "text": "The radio reports a reception later than the Armor, so scanning waits 2.5 seconds per channel."},

@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Xplore 1: driven the way QuickChat drives the radio (keyed by its PTT line, texts in its format)
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Xplore 1 stock-app review (phonedmrapp docs/xplore1/stock-app-review.md) | QuickChat never sends 0x26: it keys with intercom_ptt_control 0 and releases with 1. New profile fields, set on the Xplore 1 only (rev 3); every other profile is unchanged and pinned (Xplore1ParityTest). **Keying:** the engine keys by the profile's transmit lines whenever it has them (txLinesOn/Off; before, only on phones with receive lines too), with no 0x26. **txAudioOnSendStart:** voice and SignalDeck's own sends (APRS, tones, SSTV …) start their audio at the module's SEND_START; if it doesn't come within 2 s, nothing is sent (history line). **txAudioTailMs 200:** the microphone runs past the release. **minKeyGapMs 1500:** QuickChat's 1.5 s rule. **bootMicInterrupt off:** QuickChat never sends 0x2A or 0x35 at boot. **politeAfterChannel 0:** 0x35 2, then 0x37 0, after each channel's acknowledgement (new 0x37 command). **smsUtf8:** texts go out as type + target + UTF-8 (no second ID); received texts are read as UTF-8 unless they look like UTF-16LE. **moduleLoader off:** QuickChat's updater ships no image, so this is an undiffed variant. **stockCommands** for the report. **txTestUnverified on:** the guided Transmit test session only, as on the 20WT. The session's PTT path names the line, the SEND_START rule and the tail; a new DMR text step runs on phones with smsUtf8 (status 8/9, and whether the other radio showed the text). Help and radio notes updated | DeviceProfile, ModuleEngine, RadioEngine, RadioService, TxReport, TxTestSession, HelpView, radios.json (+ generated docs), Xplore1ParityTest, DeviceProfileTest, TxReportTest | Host suite green. Not device-tested (no Xplore 1 here); the tester's report and Transmit test session confirm it |
+
 ## 2026-10-30 — Longest transmission: a limit changed during a key reaches the module after it
 
 | Backlog | Change | Files | Test |

@@ -100,7 +100,7 @@ public class DeviceProfileTest {
     }
 
     @Test public void otherPhonesKeepTheArmor26StockAppBehaviour() {
-        DeviceProfile[] others = { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.XPLORE_1, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.ATOM_XL, DeviceProfile.UNKNOWN };
+        DeviceProfile[] others = { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.ATOM_XL, DeviceProfile.UNKNOWN };
         for (DeviceProfile p : others) {
             String n = p.name;
             assertTrue(n, p.bootMicInterrupt);

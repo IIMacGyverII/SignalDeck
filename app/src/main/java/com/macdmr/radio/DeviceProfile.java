@@ -525,6 +525,8 @@ public final class DeviceProfile {
     /** Whether the module tunes {@code hz}. */
     public boolean tunable(long hz) { for (int i = 0; i + 1 < bandsHz.length; i += 2) if (hz >= bandsHz[i] && hz <= bandsHz[i + 1]) return true; return false; }
     /** Whether this phone's radio tunes {@code hz} (the active profile). */
+    /** The radio has the 2 m APRS frequencies (144.390 / 144.800 / 145.825 MHz); a UHF-only radio sends no automatic APRS acknowledgements (owner, 2026-10-30). */
+    public boolean hasTwoMetre() { return tunable(144_390_000L) || tunable(144_800_000L) || tunable(145_825_000L); }
     public static boolean inBands(long hz) { return detect().tunable(hz); }
     /** The nearest tunable frequency from {@code hz} going up ({@code dir} > 0) or down, or {@code hz} itself when it is tunable; -1 when there is none that way. */
     public long nextTunable(long hz, int dir) {

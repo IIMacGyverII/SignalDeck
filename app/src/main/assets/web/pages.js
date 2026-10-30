@@ -907,7 +907,7 @@ function renderAprsSettings(j) {
     + f('Lead-in length', '<select data-k="leadMs">' + opt(j.leadChoices.map(ms => [ms, ms ? (ms / 1000).toFixed(1) + ' s' : 'None']), s.leadMs) + '</select>')
     + '<div class="sect">RECEIVE AND DECODERS</div>'
     + f('Decode packets on analog channels', '<select data-k="passive">' + opt([[0, 'Off'], [1, 'Flagged channels'], [2, 'Every analog channel']], s.passive) + '</select>')
-    + '<div class="f" style="grid-column:1/-1;flex-direction:row;flex-wrap:wrap;gap:8px 18px">' + chk('autoAck', 'Acknowledge messages to me') + chk('digipeat', 'Fill-in digipeater') + chk('dtmf', 'DTMF decoder') + chk('wx', 'Weather alerts (SAME)') + chk('cw', 'Morse decoder') + chk('cwId', 'Morse ID after packets') + chk('telemetry', 'Telemetry beacon') + chk('weather', 'Weather beacon') + chk('txIgate', 'Transmit iGate') + '</div>'
+    + '<div class="f" style="grid-column:1/-1;flex-direction:row;flex-wrap:wrap;gap:8px 18px">' + (s.autoAckAllowed === false ? '<span class="muted">No auto-ack: this radio has no 2 m band</span>' : chk('autoAck', 'Acknowledge messages to me')) + chk('digipeat', 'Fill-in digipeater') + chk('dtmf', 'DTMF decoder') + chk('wx', 'Weather alerts (SAME)') + chk('cw', 'Morse decoder') + chk('cwId', 'Morse ID after packets') + chk('telemetry', 'Telemetry beacon') + chk('weather', 'Weather beacon') + chk('txIgate', 'Transmit iGate') + '</div>'
     + '<div class="sect">APRS-IS AND KISS</div>'
     + f('APRS-IS server', '<input data-k="isServer" value="' + esc(s.isServer) + '">')
     + f('APRS-IS port', '<input data-k="isPort" inputmode="numeric" value="' + s.isPort + '">')

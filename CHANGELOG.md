@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — APRS: no automatic acknowledgements on UHF-only radios
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Owner decision 2026-10-30 ("no aprs auto ack on uhf") | On a radio whose profile has no 2 m band (the ANYSECU W6+, the W6Plus DMR, the Atom XL), messages addressed to your callsign are never acknowledged automatically, whatever the stored Auto-ack setting is (kept for a phone with 2 m). The APRS page's chip reads "No auto-ack (UHF)" and does nothing when tapped; APRS settings and SignalDeck Web show a note instead of the switch, and the Web ignores an auto-ack write there. Help updated. | PacketEngine, RadioService, AprsScreen, PktDialog, WebHost, web/pages.js, HelpView | Host: `DeviceProfileTest.uhfOnlyRadiosHaveNoTwoMetre` (W6+, W6Plus DMR, Atom XL: no 2 m; the Armor 26 Ultra: 2 m); build. Not device-tested |
+
 ## 2026-10-30 — M17: the ANYSECU W6Plus DMR gets its own receive calibration
 
 | Backlog | Change | Files | Test |

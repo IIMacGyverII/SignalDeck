@@ -600,7 +600,8 @@ public final class PktDialog {
         cycle(body, "Length", PacketEngine.LEAD_NAMES, lead[0], v -> lead[0] = v);
         body.addView(hint("Sent before each packet while the radio's transmit audio settles (it reaches the air about 1 s after the carrier). Flags (the default) are the standard AX.25 TXDELAY every TNC sends; tone is a steady 1200 Hz; silence is dead air. Bench test, 252 packets: at 1.6 s all three decode alike, silence is the weakest when short. Shorter lengths are for testing with your digipeaters. SSTV and DTMF keep their own lead."));
         final boolean[] flags = { pe.autoAck(), pe.digipeat(), pe.dtmfEnabled(), pe.wxEnabled(), pe.cwEnabled(), pe.cwIdEnabled() };
-        toggle(body, "Auto-ack messages addressed to me (monitoring)", flags, 0);
+        if (pe.autoAckAllowed()) toggle(body, "Auto-ack messages addressed to me (monitoring)", flags, 0);
+        else body.addView(hint("Auto-ack is off on this radio: it has no 2 m band, so messages are not acknowledged automatically."));
         toggle(body, "Fill-in digipeater for WIDE1-1 (monitoring)", flags, 1);
         toggle(body, "DTMF decoder", flags, 2);
         toggle(body, "NOAA SAME weather alerts", flags, 3);
@@ -626,7 +627,7 @@ public final class PktDialog {
                         .putInt("isBeaconMin", Integer.parseInt(isMin.getText().toString().trim())).putString("isComment", isComment.getText().toString().trim())
                         .putInt("txLeadMs", PacketEngine.LEAD_CHOICES[lead[0]]).putInt("txLeadKind", kind[0]).putInt("txPower", power[0] == 1 ? 0 : 1).putInt("autoBeacon", auto[0]).putInt("beaconMin", Math.max(1, Integer.parseInt(bMin.getText().toString().trim())))
                         .putBoolean("telemetry", extra[0]).putBoolean("weather", extra[1]).putBoolean("txIgate", extra[2]).putString("groups", groups.getText().toString().trim().toUpperCase(Locale.US))
-                        .putBoolean("autoAck", flags[0]).putBoolean("digipeat", flags[1]).putBoolean("dtmf", flags[2]).putBoolean("wx", flags[3]).putBoolean("cw", flags[4]).putBoolean("cwId", flags[5]).apply();
+                        .putBoolean("autoAck", pe.autoAckAllowed() ? flags[0] : pe.prefs().getBoolean("autoAck", true)).putBoolean("digipeat", flags[1]).putBoolean("dtmf", flags[2]).putBoolean("wx", flags[3]).putBoolean("cw", flags[4]).putBoolean("cwId", flags[5]).apply();
                 com.macdmr.radio.Station.setRics(c, myRics.getText().toString());
                 pe.applySettings();
                 toast("Saved"); sub.dismiss();

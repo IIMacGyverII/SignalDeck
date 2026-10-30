@@ -188,4 +188,12 @@ public class DeviceProfileTest {
         assertTrue(VendorSerial.haveWrapper(armor20));
         assertFalse(VendorSerial.haveWrapper("      JNI com.wonder.serial.SerialPort.open()\n"));
     }
+
+    /** APRS auto-ack follows this: none on a radio without 2 m (owner, 2026-10-30). */
+    @org.junit.Test public void uhfOnlyRadiosHaveNoTwoMetre() {
+        org.junit.Assert.assertFalse(DeviceProfile.ANYSECU_W6.hasTwoMetre());
+        org.junit.Assert.assertFalse(DeviceProfile.ANYSECU_W6_DMR.hasTwoMetre());
+        org.junit.Assert.assertFalse(DeviceProfile.ATOM_XL.hasTwoMetre());
+        org.junit.Assert.assertTrue(DeviceProfile.ARMOR_26_ULTRA.hasTwoMetre());
+    }
 }

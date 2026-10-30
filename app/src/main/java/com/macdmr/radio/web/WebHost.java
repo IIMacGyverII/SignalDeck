@@ -1148,7 +1148,7 @@ public final class WebHost {
                         .put("callsignSet", pe.callsignSet()).put("ssid", pe.ssid()).put("comment", pe.comment()).put("path", pp.getString("path", "WIDE1-1,WIDE2-1"))
                         .put("symbol", pp.getString("symTable", "/") + pp.getString("symCode", "[")).put("autoBeacon", pe.autoBeacon()).put("beaconMin", pe.beaconMin())
                         .put("txPower", pe.dataTxPower()).put("leadKind", pe.packetLeadKind()).put("leadMs", pe.packetLeadMs()).put("passive", pe.passiveMode())
-                        .put("autoAck", pp.getBoolean("autoAck", true)).put("digipeat", pp.getBoolean("digipeat", false)).put("dtmf", pp.getBoolean("dtmf", true))
+                        .put("autoAck", pp.getBoolean("autoAck", true)).put("autoAckAllowed", pe.autoAckAllowed()).put("digipeat", pp.getBoolean("digipeat", false)).put("dtmf", pp.getBoolean("dtmf", true))
                         .put("wx", pp.getBoolean("wx", true)).put("cw", pp.getBoolean("cw", true)).put("cwId", pp.getBoolean("cwId", false))
                         .put("telemetry", pp.getBoolean("telemetry", false)).put("weather", pp.getBoolean("weather", false)).put("txIgate", pp.getBoolean("txIgate", false))
                         .put("groups", pp.getString("groups", "")).put("kissPort", pp.getInt("kissPort", 8001))
@@ -1186,7 +1186,7 @@ public final class WebHost {
                     if (b.has("leadKind")) ed.putInt("txLeadKind", Math.max(0, Math.min(com.macdmr.radio.PacketEngine.LEAD_KINDS.length - 1, b.getInt("leadKind"))));
                     if (b.has("leadMs")) { int ms = b.getInt("leadMs"); boolean okMs = false; for (int c : com.macdmr.radio.PacketEngine.LEAD_CHOICES) okMs |= c == ms; if (!okMs) return WebServer.Response.error(400, "Lead-in length must be one of the listed choices"); ed.putInt("txLeadMs", ms); }
                     if (b.has("passive")) ed.putInt("passive", Math.max(0, Math.min(2, b.getInt("passive"))));
-                    for (String k : new String[] { "autoAck", "digipeat", "dtmf", "wx", "cw", "cwId", "telemetry", "weather", "txIgate" }) if (b.has(k)) ed.putBoolean(k, b.getBoolean(k));
+                    for (String k : new String[] { (svc.packet() == null || svc.packet().autoAckAllowed()) ? "autoAck" : "-", "digipeat", "dtmf", "wx", "cw", "cwId", "telemetry", "weather", "txIgate" }) if (b.has(k)) ed.putBoolean(k, b.getBoolean(k));
                     if (b.has("kissPort")) { int v = b.getInt("kissPort"); if (v < 1024 || v > 65535) return WebServer.Response.error(400, "KISS port is 1024 to 65535"); ed.putInt("kissPort", v); }
                     if (b.has("isServer")) ed.putString("isServer", b.getString("isServer").trim());
                     if (b.has("isPort")) ed.putInt("isPort", b.getInt("isPort"));

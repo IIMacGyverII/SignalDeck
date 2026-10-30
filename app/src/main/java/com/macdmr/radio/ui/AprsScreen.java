@@ -51,7 +51,7 @@ public final class AprsScreen extends ModeScreen {
         // switches that matter while monitoring
         LinearLayout chips = new LinearLayout(c); chips.setGravity(Gravity.CENTER_VERTICAL); chips.setPadding(0, dp(8), 0, dp(4));
         ackChip = chip(chips); digiChip = chip(chips); beaconChip = chip(chips); isChip = chip(chips);
-        ackChip.setOnClickListener(v -> { pe.prefs().edit().putBoolean("autoAck", !pe.autoAck()).apply(); pe.applySettings(); refresh(); });
+        ackChip.setOnClickListener(v -> { if (!pe.autoAckAllowed()) return; pe.prefs().edit().putBoolean("autoAck", !pe.autoAck()).apply(); pe.applySettings(); refresh(); });
         digiChip.setOnClickListener(v -> { pe.prefs().edit().putBoolean("digipeat", !pe.digipeat()).apply(); pe.applySettings(); refresh(); });
         beaconChip.setOnClickListener(v -> { pe.prefs().edit().putInt("autoBeacon", (pe.autoBeacon() + 1) % 3).apply(); pe.applySettings(); refresh(); });
         isChip.setOnClickListener(v -> { if (pe.isEnabled()) pe.isStop(); else toast(pe.isStart()); refresh(); });
@@ -141,7 +141,7 @@ public final class AprsScreen extends ModeScreen {
         set(statLast, last == 0 ? "—" : ago(last).replace(" ago", ""));
 
         String[] beacon = { "Beacon off", "Beacon " + pe.beaconMin() + " min", "SmartBeacon" };
-        chipState(ackChip, "Auto-ack", pe.autoAck());
+        chipState(ackChip, pe.autoAckAllowed() ? "Auto-ack" : "No auto-ack (UHF)", pe.autoAck());
         chipState(digiChip, "Digipeater", pe.digipeat());
         chipState(beaconChip, beacon[Math.max(0, Math.min(2, pe.autoBeacon()))], pe.autoBeacon() != 0);
         chipState(isChip, pe.isEnabled() ? "APRS-IS: " + pe.isStatus() : "APRS-IS off", pe.isEnabled());

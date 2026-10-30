@@ -63,6 +63,8 @@ public final class PacketEngine {
         default int txCapMs() { return TxLimit.capMs(TxLimit.DEFAULT_S); }
         /** The transmit limit's name for a refusal ("2 min", "No limit"). */
         default String txLimitName() { return TxLimit.name(TxLimit.DEFAULT_S); }
+        /** False when the radio has no 2 m band (a UHF-only phone): no automatic acknowledgements there (owner, 2026-10-30). */
+        default boolean hasVhf() { return true; }
         /** True when the module's tone generator is there (bench firmware FW22 or later): Morse and RTTY go out through it. */
         default boolean tonePath() { return false; }
         /** Plays a pair list through the module's tone generator; the reason it cannot, or null when it is on its way. */
@@ -663,7 +665,9 @@ public final class PacketEngine {
     public String comment() { return prefs.getString("comment", "SignalDeck"); }
     public String[] path() { String p = prefs.getString("path", "WIDE1-1,WIDE2-1").trim(); return p.isEmpty() ? new String[0] : p.split("\\s*,\\s*"); }
     public int passiveMode() { return prefs.getInt("passive", 2); }       // 0 off, 1 flagged channels, 2 every analog channel
-    public boolean autoAck() { return prefs.getBoolean("autoAck", true); }
+    /** Auto-ack is off on a UHF-only radio whatever the setting says (owner, 2026-10-30); the setting is kept for a phone with 2 m. */
+    public boolean autoAckAllowed() { return host.hasVhf(); }
+    public boolean autoAck() { return autoAckAllowed() && prefs.getBoolean("autoAck", true); }
     public boolean digipeat() { return prefs.getBoolean("digipeat", false); }
     public int kissPort() { return prefs.getInt("kissPort", 8001); }
     public boolean dtmfEnabled() { return prefs.getBoolean("dtmf", true); }

@@ -574,6 +574,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     private final PacketEngine.Host packetHost = new PacketEngine.Host() {
         @Override public android.content.Context context() { return RadioService.this; }
         @Override public boolean analogRx() { ChannelStore.Channel c = current; return c != null && !c.isDigital(); }
+        @Override public boolean hasVhf() { return profile.hasTwoMetre(); }
         @Override public int rxFreqHz() { ChannelStore.Channel c = current; return c == null ? 0 : c.rxFreq; }
         @Override public int aprsHz() { return RadioService.this.aprsHz(); }
         @Override public int channelNumber() { ChannelStore.Channel c = current; return c == null ? 0 : c.number; }

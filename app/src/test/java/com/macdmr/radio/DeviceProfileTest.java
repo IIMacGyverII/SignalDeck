@@ -81,6 +81,55 @@ public class DeviceProfileTest {
             for (String[] l : ls) assertFalse("never the flyscale_misc attributes", l[0].contains("flyscale_misc"));
     }
 
+    @Test public void armor20wtDrivesTheRadioAsItsStockAppDoes() {
+        // stock-app review 2026-10-30 (phonedmrapp docs/armor20wt/stock-app-review.md, D3-D10)
+        DeviceProfile p = DeviceProfile.ARMOR_20WT;
+        assertEquals(2, p.revision);
+        assertFalse("still untested on hardware", p.verified);
+        assertFalse("its app never sends mic or interrupt at boot", p.bootMicInterrupt);
+        assertEquals(600, p.txAudioLeadMs);
+        assertEquals(2000, p.minKeyGapMs);
+        assertEquals(5, p.analogVolume);
+        assertEquals("channel_database_", p.stockAreaPrefix); assertEquals("Default", p.stockDefaultArea);
+        assertFalse("no updater and no image in its app: no loader on an undiffed variant", p.firmwareLoader());
+        assertFalse(p.symbolEngine());
+        assertArrayEquals(new int[] { 0x22, 0x23, 0x26, 0x27, 0x2C, 0x2D, 0x34, 0x36, 0x3B }, p.stockCommands);
+        DeviceProfile c = p.copy(true, false);                                 // an advisory's copy keeps them
+        assertFalse(c.bootMicInterrupt); assertEquals(600, c.txAudioLeadMs); assertEquals(2000, c.minKeyGapMs); assertEquals(5, c.analogVolume);
+        assertEquals("channel_database_", c.stockAreaPrefix); assertEquals("Default", c.stockDefaultArea); assertSame(p.stockCommands, c.stockCommands);
+    }
+
+    @Test public void otherPhonesKeepTheArmor26StockAppBehaviour() {
+        DeviceProfile[] others = { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.XPLORE_1, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.ATOM_XL, DeviceProfile.UNKNOWN };
+        for (DeviceProfile p : others) {
+            String n = p.name;
+            assertTrue(n, p.bootMicInterrupt);
+            assertEquals(n, 0, p.txAudioLeadMs); assertEquals(n, 0, p.minKeyGapMs);
+            assertEquals(n, 8, p.analogVolume);
+            assertEquals(n, "database_channel_area_", p.stockAreaPrefix); assertEquals(n, "default_uhf", p.stockDefaultArea);
+            assertNull(n, p.stockCommands);
+        }
+        assertEquals(1, DeviceProfile.ARMOR_26_ULTRA.revision);
+        assertTrue(DeviceProfile.ARMOR_26_ULTRA.firmwareLoader());
+    }
+
+    @Test public void stockAppFieldsComeFromTheProfileList() throws Exception {
+        org.json.JSONObject o = new org.json.JSONObject("{\"id\":\"x\",\"revision\":1,\"name\":\"X\",\"controlPort\":\"/dev/ttyS1\",\"baud\":57600,\"audio\":\"TINY_SERVICE\","
+                + "\"bootMicInterrupt\":false,\"txAudioLeadMs\":600,\"minKeyGapMs\":2000,\"analogVolume\":5,\"stockAreaPrefix\":\"channel_database_\",\"stockDefaultArea\":\"Default\",\"stockCommands\":[34,35,38]}");
+        DeviceProfile p = DeviceProfile.fromJson(o);
+        assertFalse(p.bootMicInterrupt); assertEquals(600, p.txAudioLeadMs); assertEquals(2000, p.minKeyGapMs); assertEquals(5, p.analogVolume);
+        assertEquals("channel_database_", p.stockAreaPrefix); assertEquals("Default", p.stockDefaultArea);
+        assertArrayEquals(new int[] { 0x22, 0x23, 0x26 }, p.stockCommands);
+        o.put("txAudioLeadMs", 99999).put("analogVolume", 0);                 // clamped
+        p = DeviceProfile.fromJson(o); assertEquals(2000, p.txAudioLeadMs); assertEquals(1, p.analogVolume);
+        o.put("stockAreaPrefix", "x; rm -rf /");                                 // ends up on a root command line
+        try { DeviceProfile.fromJson(o); fail("a prefix with shell characters must be refused"); } catch (org.json.JSONException expected) { }
+        o.remove("stockAreaPrefix"); o.remove("stockDefaultArea"); o.remove("bootMicInterrupt"); o.remove("txAudioLeadMs"); o.remove("minKeyGapMs"); o.remove("analogVolume"); o.remove("stockCommands");
+        p = DeviceProfile.fromJson(o);                                          // absent: the Armor 26 Ultra's behaviour
+        assertTrue(p.bootMicInterrupt); assertEquals(0, p.txAudioLeadMs); assertEquals(0, p.minKeyGapMs); assertEquals(8, p.analogVolume);
+        assertEquals("database_channel_area_", p.stockAreaPrefix); assertEquals("default_uhf", p.stockDefaultArea); assertNull(p.stockCommands);
+    }
+
     @Test public void moduleLoaderComesFromTheProfileList() throws Exception {
         org.json.JSONObject o = new org.json.JSONObject("{\"id\":\"x\",\"revision\":1,\"name\":\"X\",\"controlPort\":\"/dev/ttyS2\",\"baud\":57600,\"audio\":\"CAMCORDER\",\"moduleLoader\":false}");
         assertFalse(DeviceProfile.fromJson(o).firmwareLoader());

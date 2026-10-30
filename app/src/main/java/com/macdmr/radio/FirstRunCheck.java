@@ -58,6 +58,9 @@ public final class FirstRunCheck {
             String w = watchStockApp(c, watchPkg, p); watchText = w;
             DeviceReport.append("The stock app at work (" + watchPkg + ", 15 s, receive only)", w);
             sum.append("watched ").append(watchPkg).append(" start up for 15 s\n");
+            // a stock app that had not run since its data was cleared has no databases before the watch (Armor 20WT beta.18
+            // report): it creates them as it starts, so the structure is read again here
+            if (watchPkg.equals(dp.stockApp)) DeviceReport.append("Databases of " + watchPkg + " after the watch (structure only)", DeviceReport.dbStructure(c, watchPkg));
             File dir = DeviceReport.newestDir();
             if (lastTrace != null && dir != null) {                              // the whole sniff beside report.txt (radio IDs blanked)
                 try (java.io.FileOutputStream o = new java.io.FileOutputStream(new File(dir, "stock_serial.txt"))) { o.write(SerialTrace.redact(lastTrace).getBytes("UTF-8")); } catch (Throwable ignored) { }
@@ -107,6 +110,9 @@ public final class FirstRunCheck {
                    .append(stockAnswers).append(": the module works; SignalDeck's probe does not ask through the bridge yet\n");
             else if (!answered && stockAnswers != null)
                 sum.append("  but ").append(stockAnswers).append(": the module works; SignalDeck's probe did not reach the port it is on\n");
+            if (!answered && dp.supported && dp.serialLib != null && speedNotSet(r, dp.controlPort, dp.baud))
+                sum.append("  the probe could not set ").append(dp.controlPort).append(" to ").append(dp.baud)
+                   .append(" baud with stty, so its silence there proves nothing; the trial opens the port through the stock serial library\n");
         }
 
         if (trial && dp.supported && !svc.isReady()) {
@@ -326,6 +332,37 @@ public final class FirstRunCheck {
     }
 
     /** Take the radio for a few seconds (receive only), record what happened, give it back. */
+    /**
+     * The commands SignalDeck sent that the stock app is never seen to send ({@link DeviceProfile#stockCommands}), one line
+     * each with the module's answers: whether this module implements them is known only from these. "" when the profile
+     * lists no stock commands or SignalDeck sent nothing else.
+     */
+    static String unusedCommands(int[] stockCommands, java.util.Map<Integer, RadioEngine.CommandStats> stats) {
+        if (stockCommands == null || stats == null) return "";
+        java.util.Set<Integer> stock = new java.util.HashSet<>(); for (int x : stockCommands) stock.add(x);
+        StringBuilder b = new StringBuilder();
+        for (java.util.Map.Entry<Integer, RadioEngine.CommandStats> e : new java.util.TreeMap<>(stats).entrySet()) {
+            if (stock.contains(e.getKey())) continue;
+            RadioEngine.CommandStats s = e.getValue();
+            b.append(String.format(Locale.US, "  0x%02X  %d / %d / %d%s\n", e.getKey(), s.sent, s.answered, s.refused,
+                    s.answered == 0 ? "   <- no answer" : s.refused == s.answered ? "   <- always refused" : ""));
+        }
+        return b.toString();
+    }
+
+    /**
+     * Whether the radio probe tried {@code port} at {@code baud} and read another speed back ("  57600 baud (readback
+     * 9600), …"): toybox stty cannot change some UARTs (the Armor 20WT's ttyS1 read 9600 in its beta.18 report), so a
+     * silent module there was never asked at its speed.
+     */
+    static boolean speedNotSet(String probe, String port, int baud) {
+        if (probe == null || port == null) return false;
+        int k = probe.indexOf("--- " + port + " ---"); if (k < 0) return false;
+        int end = probe.indexOf("\n--- ", k + 1); String sec = probe.substring(k, end < 0 ? probe.length() : end);
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\b" + baud + " baud \\(readback (\\d+)\\)").matcher(sec);
+        return m.find() && !m.group(1).equals(String.valueOf(baud));
+    }
+
     private static String trialTakeOver(Context c, RadioService svc, Progress p) throws InterruptedException {
         StringBuilder r = new StringBuilder();
         p.step("Trial: taking over the radio (receive only)");
@@ -371,6 +408,11 @@ public final class FirstRunCheck {
                 r.append("first ").append(head.length).append(" bytes saved to rx_audio_first.bin; they start: ").append(hx.toString().trim()).append('\n');
             }
             if (!svc.profile().verified) svc.setMonitor(false);
+            r.append("module version: ").append(svc.moduleVersion().isEmpty() ? "(no answer to 0x34)" : svc.moduleVersion()).append('\n');
+            for (String l : svc.recentLog())                                 // how the port was opened and whether the module printed its banner
+                if (l.contains("UART ") && l.contains(" open") || l.contains("module booted") || l.contains("no boot banner")) r.append("  ").append(DeviceReport.mask(l)).append('\n');
+            String unused = unusedCommands(svc.profile().stockCommands, svc.engine().stats());
+            if (!unused.isEmpty()) r.append("commands the stock app does not use (sent / answered / refused):\n").append(unused);
         }
         p.step("Trial: handing the radio back");
         svc.shutDown(true);

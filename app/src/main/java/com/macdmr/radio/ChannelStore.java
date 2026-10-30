@@ -224,11 +224,13 @@ public final class ChannelStore extends SQLiteOpenHelper {
      * For an install imported before TG lists were read: map the stock rows to our channels by name and receive frequency
      * (numbers may have changed since) and import the module's lists and assignments without touching anything else.
      */
-    public int repairModuleTgLists(Context ctx, String stockPackage, String areaKey, StringBuilder err) {
-        SQLiteDatabase sdb = copyStock(ctx, stockPackage, "database_channel_area_" + areaKey + ".db", "stock_repair.db");
+    public int repairModuleTgLists(Context ctx, String stockPackage, String areaKey, StringBuilder err) { return repairModuleTgLists(ctx, stockPackage, "database_channel_area_", areaKey, err); }
+    /** {@code prefix}: the stock app's per-area file and table name before the area (DeviceProfile.stockAreaPrefix). */
+    public int repairModuleTgLists(Context ctx, String stockPackage, String prefix, String areaKey, StringBuilder err) {
+        SQLiteDatabase sdb = copyStock(ctx, stockPackage, prefix + areaKey + ".db", "stock_repair.db");
         if (sdb == null) { err.append("stock channels not readable"); return -1; }
         java.util.Map<Integer, Integer> map = new java.util.HashMap<>();
-        try (Cursor c = sdb.rawQuery("SELECT _id, channel_name, channel_rxFreq FROM database_channel_area_" + areaKey, null)) {
+        try (Cursor c = sdb.rawQuery("SELECT _id, channel_name, channel_rxFreq FROM " + prefix + areaKey, null)) {
             List<Channel> mine = all();
             while (c.moveToNext()) {
                 String name = c.getString(1); int rx = c.getInt(2);
@@ -732,13 +734,19 @@ public final class ChannelStore extends SQLiteOpenHelper {
     // ---- import from the stock app (root copy of its per-area database) ----------------------------
 
     /** @return number of channels imported, or -1 with the reason in {@code err}. */
-    public int importFromStock(Context ctx, String stockPackage, String areaKey, StringBuilder err) {
+    public int importFromStock(Context ctx, String stockPackage, String areaKey, StringBuilder err) { return importFromStock(ctx, stockPackage, "database_channel_area_", areaKey, err); }
+    /**
+     * {@code prefix}: the stock app's per-area file and table name before the area (DeviceProfile.stockAreaPrefix): the
+     * Armor 26 Ultra's app keeps database_channel_area_&lt;area&gt;, the Armor 20WT's channel_database_&lt;area&gt; (without the
+     * relay and interrupt columns, which take their defaults).
+     */
+    public int importFromStock(Context ctx, String stockPackage, String prefix, String areaKey, StringBuilder err) {
         try {
-            // stock files: databases/database_channel_area_<area>.db holding table database_channel_area_<area>
+            // stock files: databases/<prefix><area>.db holding table <prefix><area>
             File dst = new File(ctx.getCacheDir(), "stock_" + areaKey + ".db");
             String r = "";
             for (String base : new String[] { "/data/user/0/", "/data/data/" }) {        // su may see a different mount view
-                String src = base + stockPackage + "/databases/database_channel_area_" + areaKey + ".db";
+                String src = base + stockPackage + "/databases/" + prefix + areaKey + ".db";
                 r = RootSetup.run("cp " + src + " " + dst.getAbsolutePath() + " && chmod 644 " + dst.getAbsolutePath() + " && chown $(stat -c %u:%g " + ctx.getCacheDir().getAbsolutePath() + ") " + dst.getAbsolutePath());
                 if (dst.exists() && dst.length() > 0) break;
             }
@@ -751,7 +759,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
             java.util.Map<Integer, Integer> stockIdToNumber = new java.util.HashMap<>();   // module side-tables key on the stock row _id
             SQLiteDatabase db = getWritableDatabase();
             db.beginTransaction();
-            try (Cursor c = sdb.query("database_channel_area_" + areaKey, null, null, null, null, null, "_id")) {   // rows in display order
+            try (Cursor c = sdb.query(prefix + areaKey, null, null, null, null, null, "_id")) {   // rows in display order
                 db.delete("channels", null, null);
                 while (c.moveToNext()) {
                     Channel ch = new Channel();

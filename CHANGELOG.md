@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Armor 20WT: driven the way its stock app drives the radio; Run all checks collects what is still unknown
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Armor 20WT stock-app review (owner, 2026-10-30; phonedmrapp docs/armor20wt/stock-app-review.md) | The 20WT's stock app is an older build with the Armor 26's wire protocol and message layouts but a smaller command set. Profile revision 2 follows it: the boot handshake leaves out the mic/interrupt step it never sends; voice transmit opens the audio path 600 ms before the key command (a release before then sends nothing); a key less than 2 s after the last release waits for the rest; analog channel writes carry its volume byte 5; Import from the stock app reads its channel_database_<area>.db files (default area "Default"); the firmware loader is off (no update path or image in its app). New profile fields (bootMicInterrupt, txAudioLeadMs, minKeyGapMs, analogVolume, stockAreaPrefix, stockDefaultArea, stockCommands), also read from the signed profile list; every other phone keeps its values. Run all checks: the trial prints the module version, how the port was opened and the boot banner, and lists the commands SignalDeck sent that the stock app never sends with the module's answers; the stock app's databases are read again after its 15 s watch; the summary flags a probe that could not set the radio port's speed. Help and the 20WT radio notes updated. The profile stays unverified. | DeviceProfile, RadioEngine, RadioService, ChannelStore, FirstRunCheck, DeviceReport, HelpView, radios.json (+ generated docs) | Host tests (DeviceProfileTest: 20WT values, other profiles unchanged, profile-list parsing and clamping; FirstRunCheckTest). Not device-tested: no 20WT here. |
+
 ## 2026-10-30 — Atom XL: band scope and scanner at the radio's own speed
 
 | Backlog | Change | Files | Test |

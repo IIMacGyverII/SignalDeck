@@ -353,13 +353,14 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     /**
      * The OEM's cold-start handshake after the module boots (docs/deep-dive/03 §7a): version → channel →
      * interrupt (digital) / mic (analog) → TOT. Each step is acked; we just fire them in order with short gaps.
+     * Profiles whose stock app never sends interrupt or mic ({@link DeviceProfile#bootMicInterrupt} false) skip that step.
      */
     public void bootHandshake(Runnable setChannel, boolean digital) throws IOException {
         if (!waitBooted(10000)) ev.log("no boot banner within 10 s — sending the handshake anyway");
         pause(200);
         queryVersion(); pause(150);
         setChannel.run(); pause(250);
-        if (digital) setInterrupt(false); else setMic(4); pause(150);
+        if (profile.bootMicInterrupt) { if (digital) setInterrupt(false); else setMic(4); pause(150); }
         setTot(120); pause(150);   // 0 turns the module timer off; 120 is its own default and FW19's ceiling
         ev.log("boot handshake sent");
     }

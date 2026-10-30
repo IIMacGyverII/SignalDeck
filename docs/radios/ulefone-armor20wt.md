@@ -16,6 +16,8 @@ The Armor 26 Ultra's radio family on another serial port; the profile is written
 | Power | Not measured yet |
 | Connection | A serial port inside the phone at 57600 baud (a different port from the Armor 26 Ultra); audio through the phone's radio audio service. |
 
+SignalDeck does not load module firmware on this phone: its stock app has no update path and carries no module image.
+
 ## What works
 
 | Feature | State | Note |
@@ -34,6 +36,10 @@ This profile comes from an owner's device report and the phone's stock app. It h
 ### Looks like an Armor 26 Ultra
 
 The phone has the same radio control nodes as the Armor 26 Ultra but its module is on another port. SignalDeck recognises it by its model name.
+
+### Driven as its own app does
+
+Its stock walkie-talkie app is an older build than the Armor 26 Ultra's, with the same commands but fewer of them. SignalDeck follows it on this phone: a shorter start-up exchange with the module, the audio opened 0.6 s before the transmitter is keyed, no new key within 2 s of the last one, and its channel files for Import from the stock app. Whether the module answers the extra commands SignalDeck uses (signal strength, caller ID, monitor) is what Run all checks finds out.
 
 ### Bands not measured
 

@@ -370,7 +370,7 @@ public final class DeviceReport {
     }
 
     /** Tables, columns and row counts (never the rows) of the stock app's databases: what a channel importer needs. */
-    private static String dbStructure(Context c, String pkg) {
+    static String dbStructure(Context c, String pkg) {
         StringBuilder out = new StringBuilder();
         File dst = new File(c.getCacheDir(), "dbscan"); dst.mkdirs();
         // the folder may not exist (Armor 20WT, 2026-10-24: an error message was read as file names)

@@ -74,6 +74,10 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         variantText.setOnClickListener(v -> { com.macdmr.radio.FirmwareVariantCheck.Finding f = com.macdmr.radio.FirmwareVariantCheck.finding(getContext()); if (f != null) offerVariant(getContext(), f, this::refresh); });
         top.addView(tc, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         hero.addView(top);
+        TextView contributeTop = Neo.button(c, "Contribute", "heart", Neo.VIOLET);
+        LayoutParams ctl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); ctl.topMargin = (int) (12 * d);
+        hero.addView(contributeTop, ctl);
+        contributeTop.setOnClickListener(v -> contributeSheet());
         LinearLayout hb = new LinearLayout(c); hb.setBaselineAligned(false);
         takeOver = Neo.button(c, "Take over", "takeover", Neo.GREEN); handBack = Neo.button(c, "Hand back", "handback", Neo.AMBER);
         LayoutParams hl = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); hl.setMargins(0, (int) (12 * d), (int) (4 * d), 0);
@@ -219,7 +223,8 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         LinearLayout diag = Neo.tile(c, "diag", Neo.AMBER, "Diagnostics", "Live protocol log");
         LinearLayout widget = Neo.tile(c, "widget", Neo.VIOLET, "Home widget", "Channel, scan and Talk");
         LinearLayout sos = Neo.tile(c, "alert", Neo.RED, "Emergency", "Send your position");
-        java.util.List<LinearLayout> tl = new java.util.ArrayList<>(java.util.Arrays.asList(backup, restore, reimport, radioIdTile, report, about, upd, help, diag, widget, sos));
+        LinearLayout contribute = Neo.tile(c, "heart", Neo.VIOLET, "Contribute", "Donate, test, add a phone");
+        java.util.List<LinearLayout> tl = new java.util.ArrayList<>(java.util.Arrays.asList(backup, restore, reimport, radioIdTile, report, about, upd, help, diag, widget, sos, contribute));
         if (!com.macdmr.radio.DeviceProfile.detect().dmr()) tl.remove(radioIdTile);   // names for DMR IDs: nothing to look up without DMR
         if (tl.size() % 2 == 1) tl.add(null);
         LinearLayout[] tiles = tl.toArray(new LinearLayout[0]);
@@ -241,6 +246,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         diag.setOnClickListener(v -> { if (host != null) host.openDiagnostics(); });
         widget.setOnClickListener(v -> widgetSheet());
         sos.setOnClickListener(v -> EmergencyDialog.show(c, svc));
+        contribute.setOnClickListener(v -> contributeSheet());
 
         TextView foot = Neo.text(c, (com.macdmr.radio.DeviceProfile.detect().dmr()
                 ? "Backups are the five CSV files (Contacts, TG_Lists, Channels, Zones, DTMF) the DMRModHooks module and the OpenGD77 CPS fork use, in Download/DMR/DMR_Backups."
@@ -335,6 +341,48 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         legal.setLineSpacing(0, 1.12f); legal.setTextIsSelectable(true); legal.setPadding((int) (4 * d), 0, (int) (4 * d), (int) (6 * d));
         box.addView(legal);
         Neo.showSheet(c, box);
+    }
+
+    /** Where donations go: Ko-fi, and GitHub Sponsors (shown already; the page answers once GitHub approves the account). */
+    static final String DONATE_KOFI = "https://ko-fi.com/iimacgyverii";
+    static final String DONATE_SPONSORS = "https://github.com/sponsors/IIMacGyverII";   // owner 2026-10-30: in place before approval, so the link works the day GitHub approves it
+    static final String SITE = "https://signaldeckradio.com";
+    static final String REPO = "https://github.com/IIMacGyverII/SignalDeck";
+
+    /** Device → Contribute (top of the page and among the tools): the three ways to help the project, each with its link. */
+    private void contributeSheet() {
+        Context c = getContext();
+        LinearLayout box = Neo.sheetBody(c, "Contribute");
+        box.addView(Neo.sheetHint(c, "SignalDeck is free, and it stays free. There are three ways to help it grow."));
+        box.addView(Neo.sheetSection(c, "1  Donate"));
+        box.addView(para(c, "Developing and maintaining SignalDeck is expensive. Donations buy more phones to develop for and make compatible, and keep new features coming."));
+        box.addView(linkButton(c, "Donate on Ko-fi", "heart", Neo.VIOLET, DONATE_KOFI));
+        if (DONATE_SPONSORS != null) box.addView(linkButton(c, "GitHub Sponsors", "heart", Neo.VIOLET, DONATE_SPONSORS));
+        box.addView(Neo.sheetSection(c, "2  Take part in the development"));
+        box.addView(para(c, "Test for bugs, come up with feature ideas, and talk with other SignalDeck users. Report a bug or suggest a feature on GitHub, or join the community on the website."));
+        box.addView(linkButton(c, "signaldeckradio.com", "globe", Neo.CYAN, SITE));
+        box.addView(linkButton(c, "Report a bug or an idea", "report", Neo.CYAN, REPO + "/issues"));
+        box.addView(Neo.sheetSection(c, "3  Make your own phone compatible"));
+        box.addView(para(c, "Fork the project and make your phone work with it. When you think your phone is completely compatible, tell us: the work is reviewed and merged in, and everyone with that phone benefits. Help support this phone (under Device report) collects the facts a new phone needs."));
+        box.addView(linkButton(c, "SignalDeck on GitHub", "globe", Neo.GREEN, REPO));
+        Neo.showSheet(c, box);
+    }
+    private static TextView para(Context c, String s) {
+        float d = Theme.dp(c);
+        TextView t = Neo.text(c, s, Neo.TEXT, 14, Neo.uiMedium(c));
+        t.setLineSpacing(0, 1.12f); t.setPadding((int) (4 * d), 0, (int) (4 * d), (int) (8 * d));
+        return t;
+    }
+    private static TextView linkButton(Context c, String label, String icon, int accent, String url) {
+        float d = Theme.dp(c);
+        TextView b = Neo.button(c, label, icon, accent);
+        LayoutParams l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); l.bottomMargin = (int) (8 * d);
+        b.setLayoutParams(l);
+        b.setOnClickListener(v -> {
+            try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))); }
+            catch (Throwable t) { android.widget.Toast.makeText(c, "No browser to open " + url, android.widget.Toast.LENGTH_LONG).show(); }
+        });
+        return b;
     }
 
     /** Device → Home widget: the live widget as it will look, and a button that asks the launcher to add it. */

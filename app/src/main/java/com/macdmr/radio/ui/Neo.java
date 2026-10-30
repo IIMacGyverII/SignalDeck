@@ -258,6 +258,7 @@ public final class Neo {
         ICONS.put("widget", "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z");
         ICONS.put("search", "M11 4.5a6.5 6.5 0 1 0 0.01 0M16 16l4.5 4.5");
         ICONS.put("star", "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z");
+        ICONS.put("heart", "M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z");
         ICONS.put("menu", "M4 7h16M4 12h16M4 17h10");
         ICONS.put("left", "M15 5l-7 7 7 7");
         ICONS.put("right", "M9 5l7 7-7 7");

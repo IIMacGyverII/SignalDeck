@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Region help says the country data may be inaccurate and how to report corrections; GitHub Sponsors on the Contribute page
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| #95 / Contribute | Region help: "How accurate it is" (unconfirmed values, report with a source); Contribute shows GitHub Sponsors next to Ko-fi (owner: in place before GitHub approves the account) | ui/HelpView.java, ui/DeviceView.java | host suite; device look on the Armor |
+
 ## 2026-10-30 — Atom XL: the capture wait opens on its first re-check
 
 | Backlog | Change | Files | Test |
@@ -205,6 +211,11 @@
 | Backlog | Change | Files | Test |
 |---|---|---|---|
 | W6Plus DMR bring-up (owner, 2026-10-29) | A second W6 variant: the W6+'s body with a DMR module of the Atom XL's family (DMR006.U4A.V140) on /dev/ttyS2 at 57600, speaking the Armor's command set. New profile `anysecu-w6plus-dmr` (untested: Take over only, no transmit). It uses the Armor engine, the W6+'s camcorder audio played by SignalDeck at its own gain (4), and the W6+'s receive lines, which now follow the module's RECEIVE_START / RECEIVE_STOP on the Armor engine when a profile names them; PTT is the gpio188 line (the stock app never sends 0x26). New profile setting `moduleLoader` (false here: no firmware loader, no symbol engine; the module keeps the maker's image) and `camcorderGain`. Bands 400–480 MHz (VHF and anything below 400 never answered). Device → Re-import and the first-run question import the stock app's 128 channels (`channel_list_detial.db`, the module's bytes as hex) and the DMR ID from its slot in use. Help: an ANYSECU W6Plus DMR section. Findings in docs/w6dmr/FINDINGS.md. No new page or mode, so nothing to wire into Restricted mode. | DeviceProfile, RadioEngine, CamcorderAudio, RadioService, ChannelStore, HelpView, docs/help, docs/w6dmr/FINDINGS.md | Host suite. **Device (W6Plus DMR, 2026-10-29):** take-over, module version, signal readings, 0x23 band edges, 128 channels and the DMR ID imported with the slot in use written to the module (acked); HackRF on 446.000 MHz: the module's RECEIVE_START / RECEIVE_STOP drove the receive lines, the tone reached the camcorder input only during the reception, MON (0x2F) opened static. Not tested: DMR receive, transmit, side key, listening. |
+## 2026-10-29 — Contribute page on the Device page
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Owner request 2026-10-28 | Device → **Contribute** (a button at the top of the page and a tile among the tools) opens the ways to help: donate on Ko-fi (GitHub Sponsors joins it once approved), take part (signaldeckradio.com, GitHub issues), or fork the project and make your own phone compatible. New help section Device → Contribute; heart icon; `.github/FUNDING.yml` adds Ko-fi. | `ui/DeviceView.java`, `ui/Neo.java`, `ui/HelpView.java`, `docs/help/`, `.github/FUNDING.yml` | Host suite; device check owed |
 
 ## 2026-10-29 — Atom XL: a drop-out in the sound no longer turns into a run of them
 

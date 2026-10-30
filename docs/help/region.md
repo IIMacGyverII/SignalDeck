@@ -30,4 +30,8 @@ Change next to a value sets your own (for example a local APRS frequency); Reset
 
 Changing the region never transmits, never starts monitoring and never changes a channel you made. It only sets defaults: you remain responsible for your licence and for following your country's rules. SignalDeck Web shows the region on its Settings page and uses its APRS frequency for its buttons; the region is changed only on the phone.
 
+## How accurate it is
+
+The country values come from public band plans and national rules, and some are not yet confirmed: they may be wrong or out of date for your country. Check them against your own licence and band plan. If you find a wrong value, please report it on GitHub (Issues, title "Region data: \<country\>") with the correct value and a source, such as your national society's band plan or the regulator's page, so the next release can fix it for everyone.
+
 [All topics](README.md)

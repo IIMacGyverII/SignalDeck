@@ -50,6 +50,10 @@ What other radios see when you talk on DMR channels. Change sets it.
 
 The Mission Statement sheet (and its card in SignalDeck Web) also shows the version, the copyright, the license in plain words (free software under the GNU GPL v3 or later, no warranty; keep the author credit, mark modified versions, no rights to the SignalDeck name or icon), where the source code and the official signed builds are, and the open-source parts SignalDeck is built with.
 
+## Contribute
+
+The Contribute button at the top of the Device page, and the Contribute tile among the tools, open the ways to help SignalDeck: donate (Ko-fi, or GitHub Sponsors once GitHub has approved the account; the money buys phones to make compatible and keeps new features coming), take part (test for bugs, suggest features, talk with other users on signaldeckradio.com or GitHub), or fork the project and make your own phone compatible, then tell us so the work can be reviewed and merged for everyone. Each opens in your browser.
+
 ## Mission Statement
 
 The button above the tools (and in SignalDeck Web, at the top of Settings) shows why this project exists: “This project is a showcase of what an Android ham radio can do. It is built for innovation, and built on the innovation, discovery and hard work of those who came before me. I hope it inspires others to create, and to look for the next step.”

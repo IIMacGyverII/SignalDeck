@@ -147,6 +147,33 @@ public class M17Test {
     }
 
     /**
+     * ANYSECU W6Plus DMR (DMR006 module, camcorder input, audio inverted): a table fitted on one HackRF transmission with the
+     * short feedback decodes the other. The residual is noisier than the W6+'s (fit MSE ~0.14; the receiver's timing holds,
+     * the misses are scattered symbol errors), so about 80 of 100 frames come through exact (77-87 across feedback lengths
+     * and fit direction on the bench). M17_W6DMR_OUT writes the fitted table (the shipped assets/m17/eq_anysecu-w6plus-dmr.txt).
+     */
+    @Test public void decodesTheW6DmrAfterCalibration() throws Exception {
+        short[] audio = wav(M17Test.class.getResourceAsStream("/m17/m17_rx_w6dmr.wav"));
+        JSONArray parts = new JSONObject(new String(M17Test.class.getResourceAsStream("/m17/m17_rx_w6dmr.json").readAllBytes(), "UTF-8")).getJSONArray("parts");
+        float[] cal = M17Receiver.calibrate(audio, parts.getJSONObject(0).getInt("start8k"), symbols(parts.getJSONObject(0)), M17Receiver.LEARN_FEEDBACK);
+        System.out.printf("W6 DMR fit MSE %.3f%n", cal[M17Receiver.NCOEF]);
+        String out = System.getenv("M17_W6DMR_OUT");
+        if (out != null) { StringBuilder sb = new StringBuilder(); for (int i = 0; i < M17Receiver.NCOEF; i++) sb.append(cal[i]).append('\n'); java.nio.file.Files.write(java.nio.file.Paths.get(out), sb.toString().getBytes("UTF-8")); }
+        final List<byte[]> payloads = new ArrayList<>(); final List<String> events = new ArrayList<>();
+        M17Receiver rx = new M17Receiver(java.util.Arrays.copyOf(cal, M17Receiver.NCOEF), new M17Receiver.Listener() {
+            public void started(M17.Lsf l) { events.add("start " + l.src() + " " + l.crcOk); }
+            public void frame(M17.Stream s, float q) { payloads.add(s.payload); }
+            public void lsfFromLich(M17.Lsf l) { }
+            public void ended(int f, int g, String why) { }
+        });
+        rx.feed(audio, audio.length); rx.feed(new short[8000], 8000);
+        int exact = exactPayloads(payloads, parts.getJSONObject(1));
+        System.out.println("W6 DMR: exact payloads in the other transmission: " + exact + " of 100");
+        assertEquals(events.toString(), 2, events.stream().filter(e -> e.equals("start N0CALL true")).count());
+        assertTrue("exact " + exact, exact >= 72);
+    }
+
+    /**
      * The same W6+ transmissions recorded later in a clip (2026-10-30): the 40 ms preamble then spans two of the detector's
      * 160-sample windows instead of three, the end estimate is a hop early and the sync lay outside the old +-60 symbol search.
      * With the shipped table both transmissions must decode, as the first recording does.

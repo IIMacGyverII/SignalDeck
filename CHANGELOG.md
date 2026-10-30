@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — M17: the ANYSECU W6Plus DMR gets its own receive calibration
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| §3.7 item 8 on the W6 phones (2026-10-30) | The W6Plus DMR used the Armor's M17 equalizer, which does not match its receive path ("2 frames, 0 % clean" on a HackRF transmission). It now ships its own table, fitted on one HackRF transmission (the audio arrives inverted; the table absorbs it). The other transmission comes through with about 80 of 100 frames exact. Its residual is noisier than the W6+'s; the receiver's timing holds and the misses are scattered symbol errors, so self-calibration on received calls can still improve it. Help updated. | assets/m17/eq_anysecu-w6plus-dmr.txt, M17Test (+ test recording), HelpView | Host: `decodesTheW6DmrAfterCalibration` (fit MSE 0.142, 79/100 exact on the transmission not fitted; both calls start with a good link setup). Not yet checked live on the phone: needs a HackRF slot. |
+
 ## 2026-10-30 — M17: transmissions no longer missed when the preamble lands badly on the detector's windows
 
 | Backlog | Change | Files | Test |

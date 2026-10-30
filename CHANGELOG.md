@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Promiscuous DMR receive hidden until a module firmware proves it
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| FW57 acceptance (owner) | MON on a DMR channel no longer sends the promiscuous flag (0x40 op 15) on any bench image: on FW57 a real out-of-list TG 99 call was not admitted with the flag on, and the flag changes the next channel write's colour-code handling. PROMISCUOUS_FW is "none proven yet"; help says the feature is not available and MON behaves as on stock | RadioService.java, ui/HelpView.java, PromiscuousGateTest | host suite |
+
 ## 2026-10-30 — Module firmware catalogue: its own signing key from serial 6
 
 | Backlog | Change | Files | Test |

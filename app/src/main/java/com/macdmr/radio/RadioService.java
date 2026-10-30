@@ -1289,12 +1289,20 @@ public class RadioService extends Service implements RadioEngine.Events {
         }
     }
 
-    /** The first bench image whose receive handler admits every call while the flag is on (promiscuous receive, phonedmrapp docs/promiscuous-rx-patch-spec-2026-10-24.md). */
-    static final int PROMISCUOUS_FW = 26;
-    /** True when MON on this channel also means "every call": a digital channel and a module running FW26 or later. */
+    /**
+     * The first bench image proven on the air to admit every call while the flag is on (promiscuous receive, phonedmrapp
+     * docs/promiscuous-rx-patch-spec-2026-10-24.md). None yet: on FW57 (2026-10-30) a real out-of-list TG 99 call was not
+     * admitted with the flag acknowledged, and the flag also changes the colour-code handling of the next channel write.
+     * Owner decision: hidden until an image proves admission (FW58 work); then set this to that image's tag number.
+     */
+    static final int PROMISCUOUS_FW = Integer.MAX_VALUE;
+    /** True when MON on this channel also means "every call": a digital channel and a module running a proven image. */
     public boolean promiscuousCapable() {
         ChannelStore.Channel ch = current;
-        return ch != null && ch.isDigital() && Firmware.stubTag(moduleVersion) && Firmware.tagNumber(moduleVersion) >= PROMISCUOUS_FW;
+        return promiscuousCapable(ch != null && ch.isDigital(), moduleVersion);
+    }
+    static boolean promiscuousCapable(boolean digitalChannel, String moduleVersion) {
+        return digitalChannel && Firmware.stubTag(moduleVersion) && Firmware.tagNumber(moduleVersion) >= PROMISCUOUS_FW;
     }
     /** MON is on and the module is admitting every call (talkgroup, ID and colour code ignored), so the caller line carries CC and slot. */
     public boolean promiscuousOn() { return monitorOn && promiscuousCapable(); }

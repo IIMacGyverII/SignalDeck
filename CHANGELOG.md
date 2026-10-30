@@ -11,6 +11,11 @@
 | Backlog | Change | Files | Test |
 |---|---|---|---|
 | #95 / Contribute | Region help: "How accurate it is" (unconfirmed values, report with a source); Contribute shows GitHub Sponsors next to Ko-fi (owner: in place before GitHub approves the account) | ui/HelpView.java, ui/DeviceView.java | host suite; device look on the Armor |
+## 2026-10-30 — Atom XL: signal levels in real dB
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Atom XL signal reading (2026-10-30) | The Atom XL's module reads about one step per dB (HackRF in 10 dB steps: 0x3A, 0x44, 0x50, 0x5B, 0x65, 0x6C), but SignalDeck converted every module's reading at the Armor's half a dB per step, so on the Atom XL signal differences showed at half size (a 10 dB stronger station read 5 dB stronger). The conversion is now per profile (`rssiStepDb`, `rssiOffsetDb`; the Atom XL 1.0 and -17, so its idle level still reads -103 dBm), and the Atom XL's reception-watchdog thresholds are re-stated on the new scale so they sit on the same raw readings as before (start -87 / floor +12, end -97 / floor +4). The S-meter, history, fox hunt, coverage and band scope now show real dB differences on this phone; other phones are unchanged | DeviceProfile, RadioEngine, AgoldUsb, AgoldUsbTest | Host tests; device: HackRF steps |
 
 ## 2026-10-30 — Atom XL: the capture wait opens on its first re-check
 

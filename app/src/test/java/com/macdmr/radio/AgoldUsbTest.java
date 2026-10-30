@@ -118,16 +118,32 @@ public class AgoldUsbTest {
     }
 
     @Test public void theReceptionWatchdogFollowsTheIdleFloor() {
-        assertEquals("floor unknown: the fixed thresholds", -95, AgoldUsb.rssiStartDbm(Double.NaN), 0);
-        assertEquals(-100, AgoldUsb.rssiEndDbm(Double.NaN), 0);
-        assertEquals("a quiet channel (-102) keeps them", -95, AgoldUsb.rssiStartDbm(-102), 0);
-        assertEquals(-100, AgoldUsb.rssiEndDbm(-102), 0);
-        double f = Double.NaN;                                               // the bench channel with the charger in idled at -98 (2026-10-29)
-        for (int i = 0; i < 30; i++) f = AgoldUsb.nextFloor(f, -98);
-        assertEquals(-98, f, 0.01);
-        assertTrue("a reception can end again at -98: end above the floor", AgoldUsb.rssiEndDbm(f) > -98);
-        assertTrue("and the floor alone does not start one", AgoldUsb.rssiStartDbm(f) > -98);
-        assertEquals("a carrier is not idle: the floor stays", f, AgoldUsb.nextFloor(f, -74), 0);
+        assertEquals("floor unknown: the fixed thresholds", -87, AgoldUsb.rssiStartDbm(Double.NaN), 0);
+        assertEquals(-97, AgoldUsb.rssiEndDbm(Double.NaN), 0);
+        assertEquals("a quiet channel (-101) keeps them", -87, AgoldUsb.rssiStartDbm(-101), 0);
+        assertEquals(-97, AgoldUsb.rssiEndDbm(-101), 0);
+        double f = Double.NaN;                                               // the bench channel with the charger in idled 5 dB up (2026-10-29: -93 on this scale)
+        for (int i = 0; i < 30; i++) f = AgoldUsb.nextFloor(f, -93);
+        assertEquals(-93, f, 0.01);
+        assertTrue("a reception can end again at -93: end above the floor", AgoldUsb.rssiEndDbm(f) > -93);
+        assertTrue("and the floor alone does not start one", AgoldUsb.rssiStartDbm(f) > -93);
+        assertEquals("a carrier is not idle: the floor stays", f, AgoldUsb.nextFloor(f, -45), 0);
+    }
+
+    @Test public void theNewScaleKeepsTheWatchdogOnTheSameRawReadings() {
+        // the thresholds tuned on the bench in the half-dB scale (new = 2 x old + 103 for the same raw reading)
+        for (int floorRaw = 20; floorRaw <= 60; floorRaw++) {
+            double oldFloor = -120 + floorRaw / 2.0, newFloor = RadioEngine.rssiDbm(floorRaw, 1.0, -17);
+            double oldStart = Math.max(-95, oldFloor + 6), oldEnd = Math.max(-100, oldFloor + 2);
+            assertEquals(2 * oldStart + 103, AgoldUsb.rssiStartDbm(newFloor), 1e-9);
+            assertEquals(2 * oldEnd + 103, AgoldUsb.rssiEndDbm(newFloor), 1e-9);
+        }
+    }
+
+    @Test public void theSignalReadingFollowsTheProfilesStep() {
+        assertEquals("the Armor: half a dB per step", -88, RadioEngine.rssiDbm(64, 0.5, 0), 1e-9);
+        assertEquals("the Atom XL keeps its idle level", -103, RadioEngine.rssiDbm(0x22, DeviceProfile.ATOM_XL.rssiStepDb, DeviceProfile.ATOM_XL.rssiOffsetDb), 1e-9);
+        assertEquals("and a 10 dB stronger carrier reads 10 dB more", 10, RadioEngine.rssiDbm(0x44, 1.0, -17) - RadioEngine.rssiDbm(0x3A, 1.0, -17), 1e-9);
     }
 
     @Test public void aPowerUpWindowIsSettledByTheDriversFlag() {

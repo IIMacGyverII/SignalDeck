@@ -156,6 +156,8 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     private final StringBuilder banner = new StringBuilder();
     private volatile java.util.concurrent.CountDownLatch bootLatch = new java.util.concurrent.CountDownLatch(1);
 
+    /** A raw signal reading in dBm on a module with this step and offset ({@link DeviceProfile#rssiStepDb}). */
+    static double rssiDbm(int raw, double stepDb, double offsetDb) { return -120 + raw * stepDb + offsetDb; }
     public RadioEngine(DeviceProfile p, Events ev) {
         this.profile = p; this.ev = ev;
         FrameCodec codec = "agold".equals(p.protocol) ? new AgoldEnvelope() : FrameCodec.armor();
@@ -476,7 +478,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
                 break;
             }
             case CMD_RSSI:
-                if (f.rw == 0 && b.length >= 1) { int raw = b[0] & 0xFF; double dbm = raw > 0 ? -(120 - raw / 2.0) : -999; rssiReadings++; if (dbm > -20) { dbm = -999; rssiNoReading++; } ev.rssi(raw, dbm); }   // above -20 dBm is not a reading (the Xplore 1 reports raw 226, "-7")
+                if (f.rw == 0 && b.length >= 1) { int raw = b[0] & 0xFF; double dbm = raw > 0 ? rssiDbm(raw, profile.rssiStepDb, profile.rssiOffsetDb) : -999; rssiReadings++; if (dbm > -20) { dbm = -999; rssiNoReading++; } ev.rssi(raw, dbm); }   // above -20 dBm is not a reading (the Xplore 1 reports raw 226, "-7")
                 break;
             case CMD_VERSION:
                 if (b.length >= 4) ev.version(ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt(), new String(b).trim());

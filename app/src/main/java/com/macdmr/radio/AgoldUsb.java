@@ -137,12 +137,14 @@ final class AgoldUsb {
 
     /**
      * Signal-reading thresholds of the reception watchdog, given the channel's idle noise floor (NaN until it is known):
-     * a reception starts above the higher of -95 dBm and floor + 6 dB and ends below the higher of -100 dBm and
-     * floor + 2 dB. With a charger on the USB socket the bench channel idled at -98 dBm (2026-10-29, -101 to -103 without
-     * it), so a fixed -100 dBm end never came and a reception the watchdog had opened stayed open for good.
+     * a reception starts above the higher of -87 dBm and floor + 12 dB and ends below the higher of -97 dBm and
+     * floor + 4 dB. In the module's own steps these are the values tuned on the bench (2026-10-29: -95 / +6 and -100 / +2
+     * on the half-dB scale SignalDeck used for this module until 2026-10-30, when its reading was measured at one dB per
+     * step: new = 2 x old + 103). With a charger on the USB socket the bench channel idled 5 dB higher, so a fixed end
+     * never came and a reception the watchdog had opened stayed open for good.
      */
-    static double rssiStartDbm(double floor) { return Double.isNaN(floor) ? -95 : Math.max(-95, floor + 6); }
-    static double rssiEndDbm(double floor) { return Double.isNaN(floor) ? -100 : Math.max(-100, floor + 2); }
+    static double rssiStartDbm(double floor) { return Double.isNaN(floor) ? -87 : Math.max(-87, floor + 12); }
+    static double rssiEndDbm(double floor) { return Double.isNaN(floor) ? -97 : Math.max(-97, floor + 4); }
     /** The idle floor: a slow running mean of readings taken while nothing is received (a reading above the start threshold is not idle). */
     static double nextFloor(double floor, double dbm) {
         if (dbm > rssiStartDbm(floor)) return floor;

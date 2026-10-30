@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Module firmware: an at-your-own-risk disclaimer
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Owner request | The Module firmware page opens with "At your own risk": the released images are bench-tested, the page checks phone, module and file, and the factory image can always be loaded again, but there is no warranty and SignalDeck and its contributors are not responsible for a module that stops working or for what it transmits. The Load confirmation ends with "At your own risk: no warranty." Help (Radio firmware) says the same | ui/FirmwareScreen.java, ui/HelpView.java | host suite |
+
 ## 2026-10-30 — The M17 receive hold is sent only when it changes the module's state (DMR silent after M17)
 
 | Backlog | Change | Files | Test |

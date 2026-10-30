@@ -307,7 +307,7 @@ public final class DeviceProfile {
         XPLORE_1.smsUtf8 = true;
         XPLORE_1.moduleLoader = false;
         XPLORE_1.stockCommands = new int[] { 0x22, 0x23, 0x27, 0x28, 0x2C, 0x2D, 0x2F, 0x30, 0x34, 0x35, 0x37, 0x3B };
-        XPLORE_1.txTestUnverified = true;     // the guided Transmit test session only, as on the Armor 20WT (to confirm with the owner)
+        XPLORE_1.txTestUnverified = true;     // owner, 2026-10-30: the device report's transmit tests may key it (the guided session only)
         XPLORE_1.scanDwellMs = 2500;
         XPLORE_1.minWriteGapMs = 1000;        // QuickChat never writes channels less than 1 s apart; a burst of writes made the module refuse MON (2026-10-22)          // owner's tester 2026-10-22: the first scan stepped past an active channel; its receive report comes later than the Armor's
         XPLORE_1.globalSquelch = true;        // QuickChat sends 0x30 after each channel; the beta.3/5 trials showed the channel's sq 0 alone did not open it

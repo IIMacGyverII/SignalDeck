@@ -13,7 +13,7 @@ import org.junit.Test;
 public class DeviceProfileTest {
 
     @Test public void otherPhonesKeepTheirTimingAndScaleExactly() {
-        DeviceProfile[] others = { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.ARMOR_20WT, DeviceProfile.XPLORE_1, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.UNKNOWN };
+        DeviceProfile[] others = { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.ARMOR_20WT, DeviceProfile.XPLORE_1, DeviceProfile.ANYSECU_W6, DeviceProfile.UNKNOWN };
         for (DeviceProfile p : others) {
             String n = p.name;
             assertEquals(n, 0.5, p.rssiStepDb, 0); assertEquals(n, 0, p.rssiOffsetDb, 0);
@@ -72,7 +72,9 @@ public class DeviceProfileTest {
         for (String[] l : p.gatewayLinesOff) ampBack |= l[0].contains("ext_pa_en") && l[1].equals("1");
         assertTrue(ampBack);
         for (String[][] ls : new String[][][] { p.gatewayLinesOn, p.gatewayLinesOff }) for (String[] l : ls) assertFalse("never a flyscale_misc node", l[0].contains("flyscale_misc"));
-        assertEquals(0.03f, p.txAudioScale, 1e-6); assertEquals(0.03f, p.copy(true, true).txAudioScale, 1e-6);
+        assertEquals(0.15f, p.txAudioScale, 1e-6); assertEquals(0.15f, p.copy(true, true).txAudioScale, 1e-6);
+        assertEquals("one raw unit per dB, as its module family on the Atom XL", 1.0, p.rssiStepDb, 0); assertEquals(-17, p.rssiOffsetDb, 0);
+        assertEquals("timing defaults confirmed by §3.7 items 2 and 5", 700, p.scopeSettleMs); assertEquals(1500, p.scanDwellMs);
         assertEquals(0.4f, p.gatewayVolume, 1e-6); assertEquals(0.4f, p.copy(true, true).gatewayVolume, 1e-6);
         // the W6+ (same board) has the same relay; its stock app never used it, a tone and APRS through it decoded on a W6Plus DMR
         assertNotNull(DeviceProfile.ANYSECU_W6.gatewayLinesOn); assertEquals(0.2f, DeviceProfile.ANYSECU_W6.txAudioScale, 1e-6);

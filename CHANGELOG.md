@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — W6Plus DMR: signal readings in true dB, its own sounds at the right level; §3.7 calibration of both W6 phones
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| §3.7 timing and calibration (owner, 2026-10-30) | The W6Plus DMR used the Armor's reading scale (0.5 dB per raw unit), but its module reads one unit per dB, like the Atom XL's of the same family: the S-meter, history, fox hunt, coverage and band scope showed half the real change. It now has the Atom XL's scale. Its transmit level for SignalDeck's own sounds was set before the media volume was held at 10/25, which left APRS at 0.9 kHz deviation: now 0.15 (2.95 kHz). The W6+'s 0.2 is confirmed (2.90 kHz). | DeviceProfile, DeviceProfileTest | **HackRF, both W6 phones in the cage on battery, 434.000 MHz low power:** item 1 raw 99/88/77/67/58/47 for 0…−60 dB, idle 42–43 (1.0 per dB, linear ≥ 56 dB); item 9 APRS p99 879 Hz at 0.03, 2954 Hz at 0.15 (W6Plus DMR), 2900 Hz at 0.2 (W6+), all decoded; item 4 squelch levels 1–9 open at one point 4–5 dB above the floor, 0 = monitor; two-phone: item 2 settle 700 ms and item 5 scanner defaults confirmed, item 3 reading 8 ms, item 7 CTCSS 67.0/123.0/254.1 heard, DCS 023 squelch opens only on its code, the W6+'s CTCSS squelch rejects the neighbouring 103.5 Hz |
+
 ## 2026-10-30 — Xplore 1: driven the way QuickChat drives the radio (keyed by its PTT line, texts in its format)
 
 | Backlog | Change | Files | Test |

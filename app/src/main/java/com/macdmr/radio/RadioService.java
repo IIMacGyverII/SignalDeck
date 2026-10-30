@@ -4047,6 +4047,16 @@ public class RadioService extends Service implements RadioEngine.Events {
      */
     private volatile boolean holdActive;
 
+    /**
+     * Whether a hold is active after one op 6 variant 3 frame ({@code sr} null = no reply). A lost reply counts the worst
+     * way for the next request: after an apply, as held (if it ran, the next step must release first; if not, that
+     * release only writes back the last pre-hold mode); after a release, as still held, and a refresh stops there.
+     */
+    static boolean heldAfter(int action, Integer sr, boolean heldBefore) {
+        if (action == 1) return sr == null || sr == 0 || heldBefore;
+        return sr == null && heldBefore;
+    }
+
     /** The op 6 variant 3 actions to send (1 apply, 0 release), in order, for a request given whether a hold is active. */
     static int[] holdSteps(boolean apply, boolean held, boolean refresh) {
         if (!apply) return held ? new int[] { 0 } : new int[0];
@@ -4090,10 +4100,10 @@ public class RadioService extends Service implements RadioEngine.Events {
             for (int a : steps) {
                 Frame pic = sym40(new byte[] { 6, 3, (byte) a }, 1000);
                 log("data hold action=" + a + (pic == null ? " missing" : " sr=" + pic.sr));
-                if (a == 1) holdActive = pic != null && pic.sr == 0;
-                else if (pic != null) holdActive = false;                              // a missing reply leaves it marked, so a later release still goes out
+                holdActive = heldAfter(a, pic == null ? null : (int) pic.sr, holdActive);
                 M17Station s = m17;
-                if (s != null) s.setHeldPath(a == 1 && holdActive);
+                if (s != null) s.setHeldPath(a == 1 && pic != null && pic.sr == 0);
+                if (a == 0 && pic == null) { log("data hold: release not confirmed, apply not sent"); break; }   // an apply now could save 0x80 again
             }
         } catch (Throwable t) { log("data hold: " + t); }
     }

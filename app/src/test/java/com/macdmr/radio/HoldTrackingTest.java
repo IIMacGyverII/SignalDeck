@@ -22,6 +22,21 @@ public class HoldTrackingTest {
         assertArrayEquals("not held: a plain apply", new int[] { 1 }, RadioService.holdSteps(true, false, true));
     }
 
+    @Test public void aLostApplyReplyCountsAsHeld() {
+        org.junit.Assert.assertTrue("no reply to an apply: the next request must release first", RadioService.heldAfter(1, null, false));
+        org.junit.Assert.assertTrue(RadioService.heldAfter(1, 0, false));
+        org.junit.Assert.assertFalse("an apply the module refused leaves nothing held", RadioService.heldAfter(1, 1, false));
+        assertArrayEquals("so the next refresh releases first", new int[] { 0, 1 }, RadioService.holdSteps(true, RadioService.heldAfter(1, null, false), true));
+    }
+
+    @Test public void aLostReleaseReplyStopsTheRefresh() {
+        org.junit.Assert.assertTrue("no reply to a release: still held", RadioService.heldAfter(0, null, true));
+        org.junit.Assert.assertFalse(RadioService.heldAfter(0, 0, true));
+        // RadioService.sendDataHold0 breaks out of [0, 1] when the release reply is missing, so the apply is not sent;
+        // the next request then starts with a release again
+        assertArrayEquals(new int[] { 0, 1 }, RadioService.holdSteps(true, RadioService.heldAfter(0, null, true), true));
+    }
+
     @Test public void afterARestartTheFirstRequestIsAPlainApply() {
         // a module boot, power-cycle or firmware load clears the flag (RadioService.booted, powerCycleOrGiveUp0, loadFirmware)
         boolean heldAfterBoot = false;

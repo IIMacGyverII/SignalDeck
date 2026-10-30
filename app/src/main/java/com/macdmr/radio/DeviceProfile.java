@@ -59,6 +59,12 @@ public final class DeviceProfile {
     /** Whether the module reports signal strength (S-meter, band scope, fox hunt); the W6's answers no RSSI query. */
     public boolean rssi = true;
     /**
+     * The signal reading in dBm is -120 + raw x {@code rssiStepDb} + {@code rssiOffsetDb}. The Armor's module reads half a
+     * dB per step; the Atom XL's DMR006 about one (2026-10-30, HackRF in 10 dB steps: 0x3A, 0x44, 0x50, 0x5B, 0x65, 0x6C),
+     * with the offset keeping its idle reading where it showed before (raw 0x22 = -103 dBm).
+     */
+    public double rssiStepDb = 0.5, rssiOffsetDb = 0;
+    /**
      * Soft SQ sets the module's own squelch level instead of gating the audio in the app. The W6: its module drives the
      * speaker itself, its audio level follows the volume (no fixed noise threshold fits) and passes nothing above ~3.4 kHz
      * where the noise detector listens, nor the sub-audible tones; its module squelch (levels 1-8) works.
@@ -363,6 +369,7 @@ public final class DeviceProfile {
         ATOM_XL.bandsHz = new long[] { 400_000_000L, 480_000_000L };          // the UHF module (DMR006.U4A); to be measured
         // the bridge's USB Audio Class card: S16_LE, 2 channels, 32 kHz both ways, no mixer controls (the HAL's pcm_open)
         ATOM_XL.directAudio = new DirectAudio(1, 0, 0, new String[0], new String[0], new String[0], new String[0]);
+        ATOM_XL.rssiStepDb = 1.0; ATOM_XL.rssiOffsetDb = -17;                  // one step per dB, idle 0x22 = -103 dBm as before
         ATOM_XL.directAudio.capturePeriod = 1280; ATOM_XL.directAudio.capturePeriods = 4;   // what the stock HAL opens (vendor.mediatek.hardware.aguiextmodule@1.0-service: 32 kHz, 2 ch, 1280 x 4)
         ATOM_XL.directAudio.rate = 32000;
     }
@@ -468,7 +475,7 @@ public final class DeviceProfile {
             for (int i = 0; i < bands.length(); i++) p.bandsHz[i] = bands.getLong(i);
             for (int i = 0; i < bands.length(); i += 2) if (p.bandsHz[i] >= p.bandsHz[i + 1]) throw new org.json.JSONException("bandsHz: low below high");
         }
-        p.rssi = o.optBoolean("rssi", true); p.softSqInModule = o.optBoolean("softSqInModule", false); p.appPlayback = o.optBoolean("appPlayback", false); p.subaudible = o.optBoolean("subaudible", true); p.dataSquelch = Math.max(0, Math.min(8, o.optInt("dataSquelch", 0))); p.moduleLoader = o.optBoolean("moduleLoader", true); p.camcorderGain = Math.max(1, Math.min(32, o.optInt("camcorderGain", 12)));
+        p.rssi = o.optBoolean("rssi", true); p.rssiStepDb = o.optDouble("rssiStepDb", p.rssiStepDb); p.rssiOffsetDb = o.optDouble("rssiOffsetDb", p.rssiOffsetDb); p.softSqInModule = o.optBoolean("softSqInModule", false); p.appPlayback = o.optBoolean("appPlayback", false); p.subaudible = o.optBoolean("subaudible", true); p.dataSquelch = Math.max(0, Math.min(8, o.optInt("dataSquelch", 0))); p.moduleLoader = o.optBoolean("moduleLoader", true); p.camcorderGain = Math.max(1, Math.min(32, o.optInt("camcorderGain", 12)));
         org.json.JSONArray sst = o.optJSONArray("softSqThresholds");
         if (sst != null && sst.length() == 9) { p.softSqThresholds = new double[9]; for (int i = 0; i < 9; i++) p.softSqThresholds[i] = sst.optDouble(i, 0); p.softSqCloseCap = o.optDouble("softSqCloseCap", 0); } p.fixedModuleVolume = Math.max(1, Math.min(8, o.optInt("fixedModuleVolume", 4)));
         p.rxLinesOn = pairs(o.optJSONArray("rxLinesOn")); p.rxLinesOff = pairs(o.optJSONArray("rxLinesOff")); p.muteLines = pairs(o.optJSONArray("muteLines"));

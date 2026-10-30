@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — DMR keys keep their sync after M17 receive (bench firmware)
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| FW55 bisect (firmware agent) | The M17/data receive hold (0x40 op 6) is never applied on a DMR channel; selecting a DMR channel while it runs stops M17/page receive and releases the hold before the DMR write (its release writes the analog 0x58 value, so never after). The hold's WORK_MODE 0x80 took the sync off the first DMR key until a key/unkey rewrote it | RadioService.java, ui/HelpView.java, DataHoldTest | host suite; bench confirmation by Grok pending |
+
 ## 2026-10-30 — Contribute: SignalDeck says it is free and open source, and asks for a donation if you like it
 
 | Backlog | Change | Files | Test |

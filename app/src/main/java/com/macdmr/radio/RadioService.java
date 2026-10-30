@@ -1586,6 +1586,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             synchronized (tunes) { if (tunes.size() > 8) tunes.clear(); tunes.addLast(new Object[] { ch, fromStore }); }
             tgOverride.onApply(ch);                                          // a talkgroup picked on the intercom lasts until another channel is tuned
             if (ch.isDigital()) {
+                if (dataReceive) endDataHoldForDigital();                          // the hold's WORK_MODE 0x80 kills DMR sync: release it before this write, never after
                 int id = !fromStore && ch.mode > 0 ? ch.mode : localId();          // VFO may transmit under another DMR ID
                 int[] call = tgOverride.call(ch);
                 tunedAt = System.currentTimeMillis(); engine.setDigital(ch.rxFreq, ch.txFreq, id, tgOverride.groups(ch), call[0], call[1], ch.power, ch.cc, ch.inSlot, ch.outSlot, 8, 4);
@@ -4024,8 +4025,30 @@ public class RadioService extends Service implements RadioEngine.Events {
         worker.execute(() -> { if (g == dataHoldGen.get()) sendDataHold(want && dataReceive); });
     }
 
+    /** Whether the voice-filter hold may be applied now: never on a DMR channel (it stores WORK_MODE 0x80, which takes the
+     *  sync off a DMR key and its receive until the next key; FW55 bisect 2026-10-30, F55A/F55B). Releasing is always allowed. */
+    static boolean holdAllowed(boolean apply, boolean digitalChannel) { return !apply || !digitalChannel; }
+
+    /**
+     * Leaving a held analog/M17 receive for a DMR channel: M17 and page receive need an analog channel, so they stop, and the
+     * module's hold is released before the DMR channel is written. The release writes AT1846S 0x58 = 0x8405 (and, on FW44
+     * and later images, puts WORK_MODE back), which is wrong for DMR, so it must come first: the DMR write then sets 0x58 for
+     * itself. Pending re-applies are cancelled.
+     */
+    private void endDataHoldForDigital() {
+        dataHoldGen.incrementAndGet();
+        M17Station m = m17; if (m != null && m.running()) m.stop();
+        PagerStation pg = pager; if (pagerHold && pg != null) { pg.stop(); pagerHold = false; }
+        dataReceive = false;
+        sendDataHold(false);
+        log("data hold released before a DMR channel");
+        pushModes();
+    }
+
     private void sendDataHold(boolean apply) {
         try {
+            ChannelStore.Channel cur = current;
+            if (!holdAllowed(apply, cur != null && cur.isDigital())) { log("data hold: not on a DMR channel"); return; }
             if (!engine.isOpen()) { log("data hold: radio not open"); return; }
             if (moduleVersion.trim().isEmpty()) versionHandshake(1500);
             if (!Firmware.stubTag(moduleVersion)) { log("data hold: stock firmware, not sent"); M17Station s = m17; if (s != null) s.setHeldPath(false); return; }

@@ -108,7 +108,6 @@ public final class FirmwareCatalog {
         return new Doc(o.optInt("serial"), images, variants);
     }
 
-    /** @return null when the signature, the serial, or the body is not acceptable */
     /**
      * The firmware catalogue's own signing key (AndroidRadio_Firmware_Project catalog/public_key_firmware.b64, KEYS.md),
      * used from serial {@link #FIRMWARE_KEY_FROM_SERIAL} on. Earlier serials were signed with the profile-list key. Builds
@@ -117,6 +116,7 @@ public final class FirmwareCatalog {
     public static final String FIRMWARE_PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEm8EYMfAtrrQnIqRzAPjH2ZdZjKm9z8SnrVQep042zlGbaxPomUz8qw7ref7vBOBY/hB1UrBNyElaF6SqOydVcw==";
     public static final int FIRMWARE_KEY_FROM_SERIAL = 6;
 
+    /** @return null when the signature, the serial, or the body is not acceptable */
     public static Doc accept(byte[] json, String sig, int previousSerial) {
         return accept(json, sig, previousSerial, ProfileRegistry.PUBLIC_KEY, FIRMWARE_PUBLIC_KEY);
     }

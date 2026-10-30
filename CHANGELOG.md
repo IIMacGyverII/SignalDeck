@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Armor 20WT: the Transmit test session may key it; the trial measures squelch, level, settle time and band edges
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Armor 20WT device report (owner, 2026-10-30) | New profile field txTestUnverified (Armor 20WT on, every other profile off, also from the signed profile list): the guided Transmit test session may key the radio while the profile is unverified, so a 20WT owner can run the transmit tests for the report; the Talk key, the side key, packet modes and the web stay off (RadioService allows a key only while the session is keying). The session's report names the profile's 600 ms audio lead and 2 s key gap in the PTT path. Run all checks' trial on an untested phone (receive only) now also: opens the squelch with squelch 0 alone and with monitor and says which works (so an empty capture is read right); records the noise level at the profile's module volume and at 8 (rx_level_v<n>.wav); times the signal reading after five retunes; writes a receive channel at each band edge and 5 kHz outside it (136/174/400/480 MHz) and records the module's accept or refuse. Help, the Run all checks dialog and the 20WT radio notes updated. | DeviceProfile, RadioService, TxReport, TxTestSession, FirstRunCheck, DeviceView, HelpView, radios.json (+ generated docs) | Host tests (TxReportTest gate, FirstRunCheckTest verdicts, settle, edges). Not device-tested: no 20WT here. |
+
 ## 2026-10-30 — Armor 20WT: driven the way its stock app drives the radio; Run all checks collects what is still unknown
 
 | Backlog | Change | Files | Test |

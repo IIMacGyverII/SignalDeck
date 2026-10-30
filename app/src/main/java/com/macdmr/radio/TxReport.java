@@ -268,10 +268,12 @@ public final class TxReport {
      * maintainer's test build"; a fork sets {@code verified = true} in its own build to test, and the report flags it as
      * a fork), never while an advisory has switched transmit off.
      */
-    public static Gate gate(boolean verified, boolean txBlocked, boolean restrictedAllows, String buildKind) {
+    public static Gate gate(boolean verified, boolean txBlocked, boolean restrictedAllows, String buildKind) { return gate(verified, false, txBlocked, restrictedAllows, buildKind); }
+    /** {@code testUnverified}: the profile lets this session key while it is not verified yet (DeviceProfile.txTestUnverified). */
+    public static Gate gate(boolean verified, boolean testUnverified, boolean txBlocked, boolean restrictedAllows, String buildKind) {
         boolean fork = !BuildIdentity.OFFICIAL.equals(buildKind);
         if (!restrictedAllows) return new Gate(false, fork, "Restricted mode keeps transmitting off on this phone.");
-        if (!verified) return new Gate(false, fork, fork
+        if (!verified && !testUnverified) return new Gate(false, fork, fork
                 ? "This phone's profile has verified = false, so SignalDeck never transmits with it. To test transmit in your fork, set verified = true for this profile in your own build (keep it false in your pull request); the report then records that the flag came from your build."
                 : "Transmit is off on this phone until its profile is verified. The maintainer sends a test build for the transmit tests (docs/DEVICE_CERTIFICATION.md, section 3.3).");
         if (txBlocked) return new Gate(false, fork, "An advisory from the profile list switched transmit off for this phone (Device → Profile tells why; the owner can override it there).");

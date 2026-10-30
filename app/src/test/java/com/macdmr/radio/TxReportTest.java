@@ -117,6 +117,21 @@ public class TxReportTest {
         assertTrue(TxReport.gate(true, false, true, BuildIdentity.UNKNOWN).fork);          // not provably official: flagged
     }
 
+    @Test public void anUntestedProfileMayAllowTheSessionOnly() {
+        // the Armor 20WT (owner, 2026-10-30): the session may key it before it is verified; advisories and Restricted mode still win
+        TxReport.Gate g = TxReport.gate(false, true, false, true, BuildIdentity.OFFICIAL);
+        assertTrue(g.ok); assertNull(g.reason);
+        assertFalse(TxReport.gate(false, true, true, true, BuildIdentity.OFFICIAL).ok);
+        assertFalse(TxReport.gate(false, true, false, false, BuildIdentity.OFFICIAL).ok);
+        assertFalse(TxReport.gate(false, false, false, true, BuildIdentity.OFFICIAL).ok);
+        assertTrue(DeviceProfile.ARMOR_20WT.txTestUnverified);
+        assertFalse(DeviceProfile.ARMOR_20WT.verified);
+        for (DeviceProfile p : new DeviceProfile[] { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.XPLORE_1, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.ATOM_XL, DeviceProfile.UNKNOWN })
+            assertFalse(p.name, p.txTestUnverified);
+        assertTrue(DeviceProfile.ARMOR_20WT.copy(true, false).txTestUnverified);
+        assertTrue(TxTestSession.pttPath(DeviceProfile.ARMOR_20WT).contains("600 ms before the key"));
+    }
+
     @Test public void measuredValuesParse() {
         assertEquals(600.0, TxReport.parseHz("+600"), 0);
         assertEquals(-350.0, TxReport.parseHz("-350 Hz"), 0);

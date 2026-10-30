@@ -148,6 +148,12 @@ public final class DeviceProfile {
      * SignalDeck sent with the module's answers, since nothing shows that this module implements them.
      */
     public int[] stockCommands;
+    /**
+     * An untested profile whose owner may run the guided Transmit test session (Device report → Transmit test session) to
+     * collect what verifying it needs. Only that session keys the radio; the Talk key, the side key, packet modes and the
+     * web stay off until the profile is verified. The Armor 20WT (owner, 2026-10-30).
+     */
+    public boolean txTestUnverified;
 
     /**
      * The radio's audio as plain ALSA streams on the phone's sound card, for a ROM without the vendor audio service
@@ -269,6 +275,7 @@ public final class DeviceProfile {
         ARMOR_20WT.stockAreaPrefix = "channel_database_"; ARMOR_20WT.stockDefaultArea = "Default";
         ARMOR_20WT.moduleLoader = false;
         ARMOR_20WT.stockCommands = new int[] { 0x22, 0x23, 0x26, 0x27, 0x2C, 0x2D, 0x34, 0x36, 0x3B };
+        ARMOR_20WT.txTestUnverified = true;    // owner, 2026-10-30: the device report's transmit tests may key it
         XPLORE_1.id = "blackview-xplore1"; XPLORE_1.revision = 2;
         XPLORE_1.scanDwellMs = 2500;
         XPLORE_1.minWriteGapMs = 1000;        // QuickChat never writes channels less than 1 s apart; a burst of writes made the module refuse MON (2026-10-22)          // owner's tester 2026-10-22: the first scan stepped past an active channel; its receive report comes later than the Armor's
@@ -496,7 +503,7 @@ public final class DeviceProfile {
     DeviceProfile copy(boolean supported, boolean verified) {
         DeviceProfile p = new DeviceProfile(name, controlPort, baud, audio, pcmPort, pcmBaud, powerNode, pttNode, powerOnToken, pttActions, stockApp, sepolicy, serialLib, supported, verified);
         p.id = id; p.revision = revision; p.source = source; p.txBlocked = txBlocked; p.restrictedBy = restrictedBy; p.globalSquelch = globalSquelch; p.lineSetup = lineSetup; p.scanDwellMs = scanDwellMs; p.protocol = protocol; p.bandsHz = bandsHz.clone(); p.rssi = rssi; p.softSqInModule = softSqInModule; p.appPlayback = appPlayback; p.fixedModuleVolume = fixedModuleVolume; p.subaudible = subaudible; p.dataSquelch = dataSquelch; p.moduleLoader = moduleLoader; p.camcorderGain = camcorderGain; p.softSqThresholds = softSqThresholds; p.softSqCloseCap = softSqCloseCap; p.rxDetectNode = rxDetectNode; p.rxLinesOn = rxLinesOn; p.muteLines = muteLines; p.rxLinesOff = rxLinesOff; p.txLinesOn = txLinesOn; p.txLinesOff = txLinesOff; p.gatewayLinesOn = gatewayLinesOn; p.gatewayLinesOff = gatewayLinesOff; p.txAudioScale = txAudioScale; p.toneEnergyMin = toneEnergyMin; p.gatewayVolume = gatewayVolume; p.minWriteGapMs = minWriteGapMs; p.directAudio = directAudio;
-        p.bootMicInterrupt = bootMicInterrupt; p.txAudioLeadMs = txAudioLeadMs; p.minKeyGapMs = minKeyGapMs; p.analogVolume = analogVolume; p.stockAreaPrefix = stockAreaPrefix; p.stockDefaultArea = stockDefaultArea; p.stockCommands = stockCommands;
+        p.bootMicInterrupt = bootMicInterrupt; p.txAudioLeadMs = txAudioLeadMs; p.minKeyGapMs = minKeyGapMs; p.analogVolume = analogVolume; p.stockAreaPrefix = stockAreaPrefix; p.stockDefaultArea = stockDefaultArea; p.stockCommands = stockCommands; p.txTestUnverified = txTestUnverified;
         return p;
     }
 
@@ -528,7 +535,7 @@ public final class DeviceProfile {
         p.gatewayVolume = (float) Math.max(0.05, Math.min(1, o.optDouble("gatewayVolume", 0.4)));
         org.json.JSONObject da = o.optJSONObject("directAudio");
         if (da != null) p.directAudio = DirectAudio.fromJson(da);
-        p.bootMicInterrupt = o.optBoolean("bootMicInterrupt", true);
+        p.bootMicInterrupt = o.optBoolean("bootMicInterrupt", true); p.txTestUnverified = o.optBoolean("txTestUnverified", false);
         p.txAudioLeadMs = Math.max(0, Math.min(2000, o.optLong("txAudioLeadMs", 0))); p.minKeyGapMs = Math.max(0, Math.min(5000, o.optLong("minKeyGapMs", 0)));
         p.analogVolume = Math.max(1, Math.min(8, o.optInt("analogVolume", 8)));
         p.stockAreaPrefix = o.optString("stockAreaPrefix", p.stockAreaPrefix); p.stockDefaultArea = o.optString("stockDefaultArea", p.stockDefaultArea);

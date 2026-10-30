@@ -1942,8 +1942,13 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     // ---- PTT ----------------------------------------------------------------------------------------
 
+    /** Set by the Transmit test session around each of its keys (a profile with txTestUnverified may key then). */
+    public volatile boolean txTestKeying;
+    /** Whether this profile may transmit now: a verified one, or an untested one that allows the Transmit test session while it keys. */
+    private boolean profileMayTransmit() { return profile.verified || (profile.txTestUnverified && txTestKeying); }
+
     public boolean txInhibited() {
-        if (!profile.verified || ProfileRegistry.transmitBlocked()) return true;   // an untested profile never transmits; an advisory can switch it off (the Xplore 1 keys through a GPIO line)
+        if (!profileMayTransmit() || ProfileRegistry.transmitBlocked()) return true;   // an untested profile never transmits; an advisory can switch it off (the Xplore 1 keys through a GPIO line)
         ChannelStore.Channel ch = current;
         if (ch == null) return true;
         if (ch.isM17() && !m17CanSend()) return true;             // stock firmware: an M17 channel is receive-only
@@ -1987,7 +1992,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     final AudioBackend.TxFeed webFeed = webFeedNext; webFeedNext = null;
                     if (firmwareBusy) { log("PTT blocked: loading firmware"); history("warn", "Radio busy, loading firmware"); return; }
                     if (!isReady()) { log("PTT ignored: radio not ready"); return; }
-                    if (!profile.verified) { log("PTT blocked: untested profile"); history("warn", "⛔ Transmit is off on this phone until its profile has been tested"); return; }
+                    if (!profileMayTransmit()) { log("PTT blocked: untested profile"); history("warn", "⛔ Transmit is off on this phone until its profile has been tested"); return; }
                     if (txInhibited()) { log("PTT blocked: receive-only channel"); history("warn", "⛔ TX blocked on a receive-only channel"); return; }
                     if (pttDown) return;
                     pttDown = true; refreshControls();
@@ -4433,6 +4438,25 @@ public class RadioService extends Service implements RadioEngine.Events {
         history("pkt", "\u23F0 Scheduled: " + (e == null ? "operation" : e.actionName()) + " ended" + (moved && prev >= 0 ? ": back to channel " + prev : ""));
         Scheduler.arm(this);
     }
+
+    /**
+     * Run all checks' trial: write an analog receive channel at {@code hz} straight to the module, without the app's own
+     * band check, at low power and with nothing keyed. Whether the module took it shows in its answer to 0x23 (the
+     * command statistics): the module itself refuses frequencies it cannot tune (measured on the Armor 26 Ultra).
+     */
+    public void probeTune(final int hz) {
+        worker.execute(() -> {
+            try {
+                ChannelStore.Channel t = new ChannelStore.Channel(); t.type = 1; t.rxFreq = t.txFreq = hz; t.name = "probe";
+                synchronized (tunes) { tunes.addLast(new Object[] { t, false }); }   // its answer is matched like any channel write
+                tunedAt = System.currentTimeMillis(); engine.setAnalog(hz, hz, 1, 0, 0, 0, 0, 0, 0, profile.analogVolume, 2);
+            } catch (Exception e) { log("probe tune: " + e); }
+        });
+    }
+    /** Whether the module reports a reception (status 1 without its status 2 yet), whatever Soft SQ makes of it. */
+    public boolean moduleReceiving() { return receiving; }
+    /** The time of the last channel or VFO write to the module. */
+    public long lastTuneAt() { return tunedAt; }
 
     /** Bench (DiagReceiver): re-send the current analog channel/VFO with another module volume byte (normally 8). */
     public void diagAnalogVolume(final int vol) {

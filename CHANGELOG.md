@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Module firmware: a catalogue image can require a newer SignalDeck
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| FW57 release (owner) | Catalogue status "released-min" with minAppVersionCode: such an image is offered only to SignalDeck builds at or above that version code; older builds only know "stock" and "released" and never see it. FW57 is listed this way, because with beta.21 and M17 receive on its DMR keys are silent (the data-hold fix is in beta.22) | fw/FirmwareCatalog.java, FirmwareCatalogMinAppTest | host suite |
+
 ## 2026-10-30 — DMR keys keep their sync after M17 receive (bench firmware)
 
 | Backlog | Change | Files | Test |

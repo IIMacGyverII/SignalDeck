@@ -28,6 +28,8 @@ public final class FirmwareCatalog {
         public final String tag, sha256, summary, baseTag, model, stockPackage, stockVersion, url, status, device;
         public final int size;
         public final boolean factory, readBack;
+        /** Lowest SignalDeck versionCode that may load this image (catalogue status "released-min"); 0 = any. */
+        public int minAppVersionCode;
 
         Image(String tag, String sha256, int size, String summary, String baseTag, String model,
               String stockPackage, String stockVersion, String url, String status, String device,
@@ -83,6 +85,7 @@ public final class FirmwareCatalog {
                     row.optString("stockPackage"), row.optString("stockVersion"), row.optString("url"),
                     row.optString("status"), row.optString("device"),
                     row.optBoolean("factory"), row.optBoolean("readBack")));
+            images.get(images.size() - 1).minAppVersionCode = row.optInt("minAppVersionCode", 0);
         }
         List<Variant> variants = new ArrayList<>();
         JSONArray devices = o.optJSONArray("variants");
@@ -126,7 +129,17 @@ public final class FirmwareCatalog {
         } catch (Exception e) { return null; }
     }
 
-    /** Built-in rows, plus catalogue rows that are stock or released and not already listed. */
+    /**
+     * Whether a catalogue row may be offered to this app. "released-min" is a released image that needs at least
+     * {@code minAppVersionCode}: builds older than its introduction only know "stock" and "released", so they never see it
+     * (FW57 needs SignalDeck beta.22's data-hold fix; with beta.21 and M17 receive on, its DMR keys are silent).
+     */
+    static boolean offered(String status, int minAppVersionCode, int appVersionCode) {
+        if ("stock".equals(status) || "released".equals(status)) return true;
+        return "released-min".equals(status) && minAppVersionCode > 0 && appVersionCode >= minAppVersionCode;
+    }
+
+    /** Built-in rows, plus catalogue rows that are stock or released (and, for "released-min", new enough) and not already listed. */
     public static List<ImageTable.Row> rows(Context c) {
         List<ImageTable.Row> out = new ArrayList<>();
         java.util.Collections.addAll(out, ImageTable.rows());
@@ -134,7 +147,7 @@ public final class FirmwareCatalog {
         if (doc == null) return out;
         for (Image im : doc.images) {
             if (im.tag == null || im.sha256 == null || im.sha256.length() != 64) continue;
-            if (!"stock".equals(im.status) && !"released".equals(im.status)) continue;
+            if (!offered(im.status, im.minAppVersionCode, com.macdmr.radio.BuildConfig.VERSION_CODE)) continue;
             boolean have = false;
             for (ImageTable.Row r : out) if (r.sha256.equals(im.sha256)) have = true;
             if (have) continue;

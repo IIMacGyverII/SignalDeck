@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.web;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,7 +54,7 @@ public final class WebServer {
         static String decode(String s) { try { return java.net.URLDecoder.decode(s, "UTF-8"); } catch (Exception e) { return s; } }
     }
     public static final class Response {
-        public int status = 200; public String type = "application/json; charset=utf-8"; public byte[] body = new byte[0];
+        public int status = 200; public String type = "application/json; charset=utf-8"; public byte[] body = new byte[0];   // i18n: HTTP protocol
         public final Map<String, String> headers = new HashMap<>();
         public static Response json(int status, String json) { Response r = new Response(); r.status = status; r.body = json.getBytes(StandardCharsets.UTF_8); return r; }
         public static Response bytes(String type, byte[] b) { Response r = new Response(); r.type = type; r.body = b; return r; }
@@ -133,7 +136,7 @@ public final class WebServer {
     /** Push one event to every connected browser ({@code type} plus a JSON object). */
     public void publish(String type, String json) {
         if (streams.isEmpty()) return;
-        String frame = "event: " + type + "\ndata: " + json.replace("\n", "\ndata: ") + "\n\n";
+        String frame = "event: " + type + "\ndata: " + json.replace("\n", "\ndata: ") + "\n\n";   // i18n: HTTP protocol
         for (LinkedBlockingQueue<String> q : streams) { if (q.size() > 500) q.clear(); q.offer(frame); }
     }
 
@@ -147,15 +150,15 @@ public final class WebServer {
             for (int keep = 0; keep < 100; keep++) {
                 Request r = read(in); if (r == null) break;
                 r.remote = ra.getHostAddress(); r.secure = secure;
-                if ("GET".equals(r.method) && "/api/events".equals(r.path)) { if (authed(r)) { stream(c, out); return; } write(out, Response.error(401, "login required"), true); continue; }
+                if ("GET".equals(r.method) && "/api/events".equals(r.path)) { if (authed(r)) { stream(c, out); return; } write(out, Response.error(401, Txt.s(R.string.web_login_required)), true); continue; }
                 if ("GET".equals(r.method) && "websocket".equalsIgnoreCase(r.headers.get("upgrade"))) {
                     WebSocketHandler h = webSockets.get(r.path);
-                    if (h == null) { write(out, Response.error(404, "no such socket"), false); return; }
-                    if (!authed(r)) { write(out, Response.error(401, "login required"), false); return; }
-                    if (!sameOrigin(r)) { write(out, Response.error(403, "cross-site request refused"), false); return; }
+                    if (h == null) { write(out, Response.error(404, "no such socket"), false); return; }   // i18n: WebSocket handshake error, seen by no page
+                    if (!authed(r)) { write(out, Response.error(401, Txt.s(R.string.web_login_required)), false); return; }
+                    if (!sameOrigin(r)) { write(out, Response.error(403, Txt.s(R.string.web_cross_site)), false); return; }
                     webSocket(c, in, out, r, h); return;
                 }
-                if ("GET".equals(r.method) && "/api/audio".equals(r.path)) { if (authed(r)) { streamAudio(c, out); return; } write(out, Response.error(401, "login required"), true); continue; }
+                if ("GET".equals(r.method) && "/api/audio".equals(r.path)) { if (authed(r)) { streamAudio(c, out); return; } write(out, Response.error(401, Txt.s(R.string.web_login_required)), true); continue; }
                 Response resp = route(r);
                 boolean close = "close".equalsIgnoreCase(r.headers.get("connection"));
                 write(out, resp, !close);
@@ -178,15 +181,16 @@ public final class WebServer {
             if (r.path.equals("/api/login") && "POST".equals(r.method)) return login(r);
             if (r.path.equals("/api/logout")) { String t = token(r); if (t != null) { sessions.remove(hash(t)); saveSessions(true); } Response x = Response.json(200, "{\"ok\":true}"); x.headers.put("Set-Cookie", "sd_session=; Path=/; Max-Age=0; HttpOnly; SameSite=Strict"); return x; }
             if (r.path.startsWith("/api/")) {
-                if (!authed(r)) return Response.error(401, "login required");
+                if (!authed(r)) return Response.error(401, Txt.s(R.string.web_login_required));
                 Response x = api.handle(r);
-                return x != null ? x : Response.error(404, "no such API: " + r.path);
+                return x != null ? x : Response.error(404, Txt.s(R.string.web_no_such_api, r.path));
             }
             String p = r.path.equals("/") ? "index.html" : r.path.substring(1);
-            if (p.contains("..")) return Response.error(400, "bad path");
+            if (p.contains("..")) return Response.error(400, Txt.s(R.string.web_bad_path));
             byte[] b = assets.read(p);
+            if (b == null && p.startsWith("i18n/")) return Response.error(404, Txt.s(R.string.web_file_not_found));   // a language the pages do not have: a plain 404, no index.html
             if (b == null) { b = assets.read("index.html"); p = "index.html"; }       // the app routes itself
-            if (b == null) return Response.error(404, "not found");
+            if (b == null) return Response.error(404, Txt.s(R.string.web_file_not_found));
             if (p.equals("index.html"))      // scripts and styles are cached for 5 minutes: a new app version gets new URLs, so a browser never mixes old and new
                 b = new String(b, java.nio.charset.StandardCharsets.UTF_8).replaceAll("(src|href)=\"([A-Za-z0-9_-]+\\.(?:js|css))\"", "$1=\"$2?v=" + ASSET_STAMP + "\"").getBytes(java.nio.charset.StandardCharsets.UTF_8);
             Response x = Response.bytes(mime(p), b);
@@ -199,14 +203,14 @@ public final class WebServer {
         int[] f = failures.computeIfAbsent(r.remote, k -> new int[2]);
         int minute = (int) (System.currentTimeMillis() / 60000);
         if (f[1] != minute) { f[0] = 0; f[1] = minute; }
-        if (f[0] >= 5) return Response.error(429, "too many attempts: wait a minute");
+        if (f[0] >= 5) return Response.error(429, Txt.s(R.string.web_login_too_many));
         String given = jsonField(r.bodyText(), "pin");
-        if (given == null || !constantEquals(given.trim().toUpperCase(Locale.US), pin.toUpperCase(Locale.US))) { f[0]++; return Response.error(403, "wrong PIN"); }
+        if (given == null || !constantEquals(given.trim().toUpperCase(Locale.US), pin.toUpperCase(Locale.US))) { f[0]++; return Response.error(403, Txt.s(R.string.web_login_wrong_pin)); }
         byte[] b = new byte[24]; rnd.nextBytes(b);
         StringBuilder t = new StringBuilder(); for (byte x : b) t.append(String.format("%02x", x));
         sessions.put(hash(t.toString()), System.currentTimeMillis()); saveSessions(true);
         Response x = Response.json(200, "{\"ok\":true}");
-        x.headers.put("Set-Cookie", "sd_session=" + t + "; Path=/; Max-Age=" + (SESSION_IDLE_MS / 1000) + "; HttpOnly; SameSite=Strict");
+        x.headers.put("Set-Cookie", "sd_session=" + t + "; Path=/; Max-Age=" + (SESSION_IDLE_MS / 1000) + "; HttpOnly; SameSite=Strict");   // i18n: HTTP protocol
         return x;
     }
     boolean authed(Request r) {
@@ -231,7 +235,7 @@ public final class WebServer {
         streams.add(q);
         try {
             c.setSoTimeout(0);
-            out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-cache\r\nConnection: keep-alive\r\nX-Accel-Buffering: no\r\n\r\nretry: 3000\n\n").getBytes(StandardCharsets.UTF_8));
+            out.write(("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nCache-Control: no-cache\r\nConnection: keep-alive\r\nX-Accel-Buffering: no\r\n\r\nretry: 3000\n\n").getBytes(StandardCharsets.UTF_8));   // i18n: HTTP protocol
             out.flush();
             while (running) {
                 String f = q.poll(15, TimeUnit.SECONDS);
@@ -265,8 +269,8 @@ public final class WebServer {
         } catch (Exception e) { throw new IllegalStateException(e); }
     }
     private void webSocket(Socket c, InputStream in, OutputStream out, Request r, WebSocketHandler h) throws IOException {
-        String key = r.headers.get("sec-websocket-key"); if (key == null) { write(out, Response.error(400, "no key"), false); return; }
-        out.write(("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " + acceptKey(key) + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+        String key = r.headers.get("sec-websocket-key"); if (key == null) { write(out, Response.error(400, "no key"), false); return; }   // i18n: WebSocket handshake error, seen by no page
+        out.write(("HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " + acceptKey(key) + "\r\n\r\n").getBytes(StandardCharsets.UTF_8));   // i18n: HTTP protocol
         out.flush();
         c.setSoTimeout(0); c.setTcpNoDelay(true);
         final Object wlock = new Object();
@@ -314,7 +318,7 @@ public final class WebServer {
         audio.add(q);
         try {
             c.setSoTimeout(0); c.setTcpNoDelay(true);
-            out.write(("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nCache-Control: no-store\r\nX-Audio-Format: s16le;rate=8000;channels=1\r\nConnection: close\r\n\r\n").getBytes(StandardCharsets.UTF_8));
+            out.write(("HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nCache-Control: no-store\r\nX-Audio-Format: s16le;rate=8000;channels=1\r\nConnection: close\r\n\r\n").getBytes(StandardCharsets.UTF_8));   // i18n: HTTP protocol
             out.flush();
             while (running) {
                 byte[] b = q.poll(20, TimeUnit.SECONDS);
@@ -354,17 +358,17 @@ public final class WebServer {
     }
     private static void write(OutputStream out, Response r, boolean keep) throws IOException {
         StringBuilder h = new StringBuilder("HTTP/1.1 ").append(r.status).append(' ').append(reason(r.status)).append("\r\n");
-        h.append("Content-Type: ").append(r.type).append("\r\nContent-Length: ").append(r.body.length).append("\r\n");
-        h.append("X-Content-Type-Options: nosniff\r\nReferrer-Policy: no-referrer\r\n");
+        h.append("Content-Type: ").append(r.type).append("\r\nContent-Length: ").append(r.body.length).append("\r\n");   // i18n: HTTP protocol
+        h.append("X-Content-Type-Options: nosniff\r\nReferrer-Policy: no-referrer\r\n");   // i18n: HTTP protocol
         for (Map.Entry<String, String> e : r.headers.entrySet()) h.append(e.getKey()).append(": ").append(e.getValue()).append("\r\n");
-        h.append("Connection: ").append(keep ? "keep-alive" : "close").append("\r\n\r\n");
+        h.append("Connection: ").append(keep ? "keep-alive" : "close").append("\r\n\r\n");   // i18n: HTTP protocol
         out.write(h.toString().getBytes(StandardCharsets.UTF_8)); out.write(r.body); out.flush();
     }
-    private static String reason(int s) { switch (s) { case 200: return "OK"; case 400: return "Bad Request"; case 401: return "Unauthorized"; case 403: return "Forbidden"; case 404: return "Not Found"; case 429: return "Too Many Requests"; default: return s >= 500 ? "Server Error" : "OK"; } }
+    private static String reason(int s) { switch (s) { case 200: return "OK"; case 400: return "Bad Request"; case 401: return "Unauthorized"; case 403: return "Forbidden"; case 404: return "Not Found"; case 429: return "Too Many Requests"; default: return s >= 500 ? "Server Error" : "OK"; } }   // i18n: HTTP protocol
     static String mime(String p) {
         String e = p.substring(p.lastIndexOf('.') + 1).toLowerCase(Locale.US);
         switch (e) {
-            case "html": return "text/html; charset=utf-8"; case "css": return "text/css; charset=utf-8"; case "js": return "application/javascript; charset=utf-8";
+            case "html": return "text/html; charset=utf-8"; case "css": return "text/css; charset=utf-8"; case "js": return "application/javascript; charset=utf-8";   // i18n: HTTP protocol
             case "json": return "application/json"; case "png": return "image/png"; case "jpg": case "jpeg": return "image/jpeg"; case "svg": return "image/svg+xml";
             case "ttf": return "font/ttf"; case "woff2": return "font/woff2"; case "ico": return "image/x-icon"; case "wav": return "audio/wav";
             default: return "application/octet-stream";

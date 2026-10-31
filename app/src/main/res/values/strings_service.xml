@@ -237,6 +237,12 @@
     </plurals>
     <!-- History warning after an import, holding the note on receive tones. %1$s is that note (service_tone_note_*). Starts with an emoji; keep it. -->
     <string name="service_tone_note_history">🎵 %1$s</string>
+    <!-- History line: following the ISS pass after pass could not go on. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_sat_repeat_failed_history">🛰 %1$s</string>
+    <!-- History line: the parrot was started or stopped by a DTMF remote command. %1$s is what happened (the parrot's own status text). Starts with an emoji; keep it. -->
+    <string name="service_remote_parrot_history">📟 %1$s</string>
+    <!-- History line: a DTMF remote command could not send the Morse ID. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_remote_morse_failed_history">⛔ %1$s</string>
     <!-- Toast when importing the stock app's channels failed. %1$s is the reason. -->
     <string name="service_import_failed">Import failed: %1$s</string>
     <!-- Toast after importing the stock app's channels. %1$d is how many. English uses "channels" for one too. -->

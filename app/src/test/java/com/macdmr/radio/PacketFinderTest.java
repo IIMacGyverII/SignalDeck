@@ -83,4 +83,23 @@ public class PacketFinderTest {
         PacketFinder.Station s = m.get("N0BBS-1");
         assertEquals(PacketFinder.BBS, s.kind); assertEquals("N0BBS BBS", s.note); assertEquals(-80, s.bestDbm); assertEquals(145_030_000, s.hz); assertEquals(3, s.count); assertEquals(3000, s.last);
     }
+
+    @Test public void frequencyListTakesSemicolonsAndADecimalComma() {
+        // the German hint: semicolons, a comma as the decimal sign
+        assertEquals(Arrays.asList("144,910", "145,010"), PacketFinder.listItems("144,910; 145,010"));
+        assertEquals(Arrays.asList("144,910", "145,010"), PacketFinder.listItems("144,910;145,010"));
+        assertEquals(Arrays.asList("144,910", "145.010"), PacketFinder.listItems("144,910 145.010"));
+        // the English form from before keeps working: with a point, commas separate
+        assertEquals(Arrays.asList("144.390", "145.825"), PacketFinder.listItems("144.390, 145.825"));
+        assertEquals(Arrays.asList("144.390", "145.825"), PacketFinder.listItems("144.390,145.825"));
+        assertEquals(Arrays.asList("145", "146.52"), PacketFinder.listItems("145, 146.52"));     // myChannelsText's own form
+        assertEquals(Arrays.asList("144.39", "145.01"), PacketFinder.listItems("144.39;145.01"));  // as stored now
+        assertEquals(Arrays.asList(), PacketFinder.listItems("  ,; "));
+        // several commas and no point: unreadable either way, kept whole so the error names it as typed
+        assertEquals(Arrays.asList("144,910,145,010"), PacketFinder.listItems("144,910,145,010"));
+        double[] want = { 144.910, 145.010 }; List<String> got = PacketFinder.listItems("144,910; 145,010");
+        for (int i = 0; i < want.length; i++) assertEquals(want[i], com.macdmr.radio.i18n.Txt.parseDecimal(got.get(i)), 1e-9);
+        assertEquals("144.91", PacketFinder.storedMhz(144_910_000));
+        assertEquals("145", PacketFinder.storedMhz(145_000_000));
+    }
 }

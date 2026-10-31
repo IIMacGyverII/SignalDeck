@@ -33,6 +33,14 @@ public final class Msg {
     public static Msg of(int stringId, Object... args) { return new Msg(Txt.name(stringId), false, 0, clean(args)); }
     public static Msg plural(int pluralsId, int n, Object... args) { return new Msg(Txt.name(pluralsId), true, n, clean(args)); }
 
+    /**
+     * An argument that is a text a method returned in the app language (an error or status from {@code Txt.s}):
+     * the Msg that made it, so {@link #english()} is English all through and {@link #text()} follows the language.
+     * The text itself when it is not one of ours (English, a received text, an exception message). Use it only for
+     * such returned texts, never for something received or typed.
+     */
+    public static Object shown(String text) { Msg m = Txt.madeBy(text); return m != null ? m : text; }
+
     /** No control characters on screen (received callsigns and packet text can carry them; they also break screen readers). */
     private static Object[] clean(Object[] args) {
         Object[] out = args.clone();

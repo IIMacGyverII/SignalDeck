@@ -1282,12 +1282,8 @@
     <string name="intercom_netedit_days">Days</string>
     <!-- Section title of the start time in the net editor. One word, shown in caps. -->
     <string name="intercom_netedit_starts">Starts</string>
-    <!-- Net editor start time, 12-hour. %1$d hour, %2$02d minutes, %3$s AM or PM. One line, large. -->
-    <string name="intercom_netedit_time">%1$d:%2$02d %3$s \u0020· \u0020tap to change</string>
-    <!-- Morning marker after a 12-hour time. Very short. -->
-    <string name="intercom_netedit_am">AM</string>
-    <!-- Afternoon marker after a 12-hour time. Very short. -->
-    <string name="intercom_netedit_pm">PM</string>
+    <!-- Net editor start time, as the app language writes it ("7:30 PM", "19:30"). %1$s the time. One line, large. -->
+    <string name="intercom_netedit_time">%1$s \u0020· \u0020tap to change</string>
     <!-- Section title of the length field in the net editor. Short, shown in caps. -->
     <string name="intercom_netedit_length">Length in minutes</string>
     <!-- Section title of the notes field in the net editor. Short, shown in caps. -->

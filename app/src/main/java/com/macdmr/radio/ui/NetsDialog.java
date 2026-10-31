@@ -224,9 +224,9 @@ public final class NetsDialog {
         body.addView(days);
         body.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_netedit_starts)));
         final TextView time = Neo.label(c, "", Neo.CYAN_LIGHT, 18, true); time.setPadding((int) (4 * d), (int) (6 * d), 0, (int) (6 * d)); body.addView(time);
-        final Runnable showT = () -> { int h = m.minute / 60, mi = m.minute % 60; time.setText(Txt.s(R.string.intercom_netedit_time, h % 12 == 0 ? 12 : h % 12, mi, Txt.s(h < 12 ? R.string.intercom_netedit_am : R.string.intercom_netedit_pm))); };
+        final Runnable showT = () -> { time.setText(Txt.s(R.string.intercom_netedit_time, Txt.clock(m.minute))); };
         showT.run();
-        time.setOnClickListener(v -> new android.app.TimePickerDialog(c, (tp, h, mi) -> { m.minute = h * 60 + mi; showT.run(); }, m.minute / 60, m.minute % 60, android.text.format.DateFormat.is24HourFormat(c)).show());
+        time.setOnClickListener(v -> new android.app.TimePickerDialog(c, (tp, h, mi) -> { m.minute = h * 60 + mi; showT.run(); }, m.minute / 60, m.minute % 60, android.text.format.DateFormat.is24HourFormat(c) || !"en".equals(Txt.locale().getLanguage())).show());
         final android.widget.EditText len = field(c, body, Txt.s(R.string.intercom_netedit_length), String.valueOf(m.durationMin), "60");
         len.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         final android.widget.EditText notes = field(c, body, Txt.s(R.string.intercom_netedit_notes), m.notes, Txt.s(R.string.intercom_netedit_notes_hint));

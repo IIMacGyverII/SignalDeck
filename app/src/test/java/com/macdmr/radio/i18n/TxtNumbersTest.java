@@ -24,6 +24,16 @@ public class TxtNumbersTest {
             for (int p = 0; p <= 6; p++) assertEquals(String.format(Locale.US, "%." + p + "f", v), Txt.decimal(v, p));
     }
 
+    @Test public void clockIs12HourOnlyInEnglish() {
+        assertEquals("7:30 PM", Txt.clock(Locale.ENGLISH, 19 * 60 + 30));
+        assertEquals("12:05 AM", Txt.clock(Locale.US, 5));
+        assertEquals("12:00 PM", Txt.clock(Locale.US, 12 * 60));
+        assertEquals("7:30 PM", Txt.clock(19 * 60 + 30));                   // host: English
+        assertEquals("19:30", Txt.clock(Locale.GERMAN, 19 * 60 + 30));
+        assertEquals("07:05", Txt.clock(Locale.JAPAN, 7 * 60 + 5));
+        assertEquals("00:00", Txt.clock(Locale.forLanguageTag("pt-BR"), 0));
+    }
+
     @Test public void germanUsesTheComma() {
         assertEquals("467,6250", Txt.decimal(Locale.GERMAN, 467.625, 4));
         assertEquals("467,6250", Txt.decimal(Locale.forLanguageTag("de"), 467_625_000L / 1e6, 4));

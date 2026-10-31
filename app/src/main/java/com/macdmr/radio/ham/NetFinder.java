@@ -327,7 +327,7 @@ public final class NetFinder {
             R.string.channels_net_thu, R.string.channels_net_fri, R.string.channels_net_sat };
     /** "Mon, Wed, Fri 7:30 PM" / "Daily 8:00 AM". */
     public static String when(Manual m) {
-        int h = m.minute / 60, mi = m.minute % 60; String t = String.format(Locale.US, "%d:%02d %s", h % 12 == 0 ? 12 : h % 12, mi, h < 12 ? "AM" : "PM");
+        String t = Txt.clock(m.minute);
         if ((m.days & ALL_DAYS) == ALL_DAYS) return Txt.s(R.string.channels_net_when_daily, t);
         StringBuilder b = new StringBuilder();
         for (int d = Calendar.SUNDAY; d <= Calendar.SATURDAY; d++) if (m.on(d)) { if (b.length() > 0) b.append(Txt.s(R.string.channels_net_day_sep)); b.append(Txt.s(SHORT[d])); }
@@ -453,8 +453,7 @@ public final class NetFinder {
             R.string.channels_net_thursdays, R.string.channels_net_fridays, R.string.channels_net_saturdays };
     /** "Tuesdays 7:30 PM" / "Daily 8:00 AM". */
     public static String when(Slot s) {
-        int h = s.minute / 60, m = s.minute % 60;
-        String t = String.format(Locale.US, "%d:%02d %s", h % 12 == 0 ? 12 : h % 12, m, h < 12 ? "AM" : "PM");
+        String t = Txt.clock(s.minute);
         return s.dow == 0 ? Txt.s(R.string.channels_net_when_daily, t) : Txt.s(DAYS[s.dow], t);
     }
 

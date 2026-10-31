@@ -184,6 +184,14 @@ public final class Txt {
     /** One number in a {@code java.util.Formatter} spec of its own ("%4.1f"), with the app language's separator. */
     public static String decimalf(String spec, double v) { return number(locale(), spec, v); }
 
+    /** A time of day for the screen, {@code minute} after midnight: "7:30 PM" in English, "19:30" in every other language. */
+    public static String clock(int minute) { return clock(locale(), minute); }
+    static String clock(Locale l, int minute) {
+        int h = minute / 60, m = minute % 60;
+        if ("en".equals(l.getLanguage())) return String.format(Locale.US, "%d:%02d %s", h % 12 == 0 ? 12 : h % 12, m, h < 12 ? "AM" : "PM");
+        return String.format(Locale.US, "%02d:%02d", h, m);
+    }
+
     /** A number already written with a point ("12.5", from code that trims zeros), with the app language's separator. */
     public static String decimalText(String plain) { return decimalText(locale(), plain); }
     static String decimalText(Locale l, String plain) { char sep = separator(l); return plain == null || sep == '.' ? plain : plain.replace('.', sep); }

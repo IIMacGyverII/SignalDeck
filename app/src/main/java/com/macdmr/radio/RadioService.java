@@ -2915,6 +2915,16 @@ public class RadioService extends Service implements RadioEngine.Events {
         ui.post(() -> { for (Listener l : listeners) l.onHistory(line); });
     }
 
+    /** A history line kept as its message: stored in English (what is parsed and logged), shown in the app's language. */
+    public void history(String kind, com.macdmr.radio.i18n.Msg m) { history(current != null ? current.number : 0, kind, m); }
+
+    public void history(int chNum, String kind, com.macdmr.radio.i18n.Msg m) {
+        final int level = AgoldUsb.historyLevelFresh(agoldBridge(), rssiAt, rxBeganAt) ? rssi : -999;   // no stale level on the Atom XL
+        store.addHistory(chNum, kind, m, level, lastCaller);
+        String line = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US).format(new java.util.Date()) + " " + m.text() + (level != -999 ? " " + level + " dBm" : "");
+        ui.post(() -> { for (Listener l : listeners) l.onHistory(line); });
+    }
+
     // ---- RadioEngine.Events -------------------------------------------------------------------------
 
     /** Last 300 log lines for the Diagnostics page. Lines reach the pages only while that page is open: posting every

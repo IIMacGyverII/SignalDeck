@@ -1,4 +1,4 @@
-<!-- Generated from app/src/main/java/com/macdmr/radio/ui/HelpView.java by HelpExportTest. Do not edit by hand. -->
+<!-- Generated from app/src/main/assets/guide/en.json by HelpExportTest. Do not edit by hand. -->
 
 # Message forms
 

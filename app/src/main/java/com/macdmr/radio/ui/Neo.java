@@ -427,13 +427,19 @@ public final class Neo {
     }
 
     /** The body of a sheet: opaque card, icon tile and title (a leading emoji in the old titles is dropped). */
-    public static LinearLayout sheetBody(Context c, String title) {
+    public static LinearLayout sheetBody(Context c, String title) { return sheetBody(c, title, null); }
+
+    /**
+     * The same with its icon named. A translated title must name it: the icon is otherwise guessed from words in the
+     * English title ({@link #iconFor}), which a translation no longer has.
+     */
+    public static LinearLayout sheetBody(Context c, String title, String icon) {
         float d = Theme.dp(c);
         LinearLayout body = new LinearLayout(c); body.setOrientation(LinearLayout.VERTICAL);
         body.setBackground(sheet(c, alpha(CYAN, 0x66), 20)); body.setPadding((int) (18 * d), (int) (16 * d), (int) (18 * d), (int) (14 * d));
         String clean = title.replaceFirst("^[^\\p{L}\\p{N}]+", "").trim();
         LinearLayout head = new LinearLayout(c); head.setGravity(android.view.Gravity.CENTER_VERTICAL); head.setPadding(0, 0, 0, (int) (4 * d));
-        head.addView(iconTile(c, iconFor(clean), CYAN, 40), new LinearLayout.LayoutParams((int) (40 * d), (int) (40 * d)));
+        head.addView(iconTile(c, icon != null ? icon : iconFor(clean), CYAN, 40), new LinearLayout.LayoutParams((int) (40 * d), (int) (40 * d)));
         TextView t = text(c, clean, TEXT, 20, ui(c)); t.setPadding((int) (12 * d), 0, 0, 0);
         head.addView(t, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         body.addView(head);

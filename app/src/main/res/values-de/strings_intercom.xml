@@ -345,7 +345,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_toolong_title">Zu lang zum Senden</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_toolong_text">Die Firmware dieses Funkgeräts beendet jede Aussendung nach 30 Sekunden. Deshalb lehnt die App Audio ab, das länger als etwa 28,5 Sekunden ist (zum Beispiel eine lange Aufnahme oder eine SSTV-Betriebsart, die mehr Zeit braucht).</string>
+    <string name="intercom_lastheard_ex_toolong_text">Was gesendet werden sollte, war länger als die Sendezeitbegrenzung des Funkgeräts (Gerät → Längste Aussendung). Deshalb hat SignalDeck es abgelehnt, statt es mittendrin abzuschneiden (zum Beispiel eine lange Aufnahme oder eine SSTV-Betriebsart, die mehr Zeit braucht). Manche Sender haben ein eigenes, kürzeres Maximum; die Zeile sagt, an welche Grenze es gestoßen ist.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_busy_title">Kanal belegt</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->

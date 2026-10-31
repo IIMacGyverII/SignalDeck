@@ -362,7 +362,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_toolong_title">Too long to send</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_toolong_text">This radio\'s firmware ends every transmission after 30 seconds, so the app refuses audio longer than about 28.5 seconds (for example a long recording or an SSTV mode that needs more time).</string>
+    <string name="intercom_lastheard_ex_toolong_text">What was to be sent was longer than the radio\'s transmit limit (Device → Longest transmission), so SignalDeck refused it instead of cutting it off (for example a long recording or an SSTV mode that needs more time). Some senders have their own, shorter maximum; the line says which limit it met.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_busy_title">Channel busy</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->

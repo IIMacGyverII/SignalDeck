@@ -16,6 +16,8 @@ import java.io.IOException;
  * commands), so a DMR phone's code paths are the same as before this interface existed.
  */
 public interface ModuleEngine {
+    /** When a command that moves the module's speaker switch last went out (0 when this engine has no such switch). */
+    default long lastSpeakerCmdAt() { return 0; }
     /** "mcu68" for the DMR module's frames, "sa818" for AT-command modules. */
     default String protocol() { return "mcu68"; }
     /** True when the module does DMR (digital channels, texts, caller info, 0x40 commands). */

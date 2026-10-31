@@ -994,7 +994,7 @@
     <string name="packet_pfd_vfo_on">VFO em %1$s MHz (potência baixa)</string>
     <!-- ==== Packet finder settings dialog. -->
     <!-- Explanation above the frequency list. Two or three lines. -->
-    <string name="packet_pfd_set_freqs">Frequências em MHz, separadas por vírgula (vazio: as frequências de packet usuais de 2 m, 144,910–145,090). Adicione as frequências de packet de 70 cm da sua região, se souber.</string>
+    <string name="packet_pfd_set_freqs">Frequências em MHz, separadas por ponto e vírgula, com vírgula ou ponto decimal (ex.: 144,910; 145,010; vazio: as frequências de packet usuais de 2 m, 144,910–145,090). Adicione as frequências de packet de 70 cm da sua região, se souber.</string>
     <!-- Button that fills in the frequencies of your own analog channels. Short. -->
     <string name="packet_pfd_set_mine">Usar meus canais</string>
     <!-- Toast when none of your channels can be used. One line. -->

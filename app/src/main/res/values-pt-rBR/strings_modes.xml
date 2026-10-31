@@ -834,7 +834,7 @@
     <!-- Title of the Morse trainer sheet. One line. -->
     <string name="modes_morse_title">Treino de Morse</string>
     <!-- Explanation of the Koch method and Farnsworth spacing. A paragraph. -->
-    <string name="modes_morse_hint">O método Koch: comece com dois caracteres na velocidade final e acrescente um a cada lição copiada com 90 %. O espaçamento Farnsworth deixa intervalos maiores entre os caracteres enquanto você aprende; vá diminuindo conforme melhora. O som toca no celular, não vai para o ar.</string>
+    <string name="modes_morse_hint" formatted="false">O método Koch: comece com dois caracteres na velocidade final e acrescente um a cada lição copiada com 90 %. O espaçamento Farnsworth deixa intervalos maiores entre os caracteres enquanto você aprende; vá diminuindo conforme melhora. O som toca no celular, não vai para o ar.</string>
     <!-- Lesson line. %1$d lesson, %2$d lessons in all, %3$s its characters (spaced), %4$s the new character. One line beside two buttons. -->
     <string name="modes_morse_lesson">Lição %1$d de %2$d:\u0020 %3$s\u0020\u0020 (nova: %4$s)</string>
     <!-- Speed line. %1$d character speed, %2$d the spacing (Farnsworth) speed, both in words per minute. One line beside two buttons. -->
@@ -1902,7 +1902,7 @@
     <!-- Prediction note with no marks. One line. -->
     <string name="modes_fox_mark_to_start">Marque uma leitura para começar.</string>
     <!-- Prediction note: the map legend. One line. -->
-    <string name="modes_fox_shaded">Sombreado: onde a raposa provavelmente está; contorno forte 50 %, fraco 90 %.</string>
+    <string name="modes_fox_shaded" formatted="false">Sombreado: onde a raposa provavelmente está; contorno forte 50 %, fraco 90 %.</string>
     <!-- Prediction note: why a layer is not used. %1$s the reasons (lower case, joined with "; "). Ends with a space. Two lines. -->
     <string name="modes_fox_not_used">Ainda não usado: %1$s.\u0020</string>
     <!-- The same followed by the map legend. %1$s the reasons. Two lines. -->

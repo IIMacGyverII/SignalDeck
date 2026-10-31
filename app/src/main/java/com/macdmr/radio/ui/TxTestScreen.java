@@ -164,7 +164,7 @@ public final class TxTestScreen implements TxTestSession.Ui {
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Theme.dp(c, 48)); lp.topMargin = Theme.dp(c, 12);
             body.addView(ok, lp);
             TextView skip = Neo.button(c, "Leave empty", null, Neo.CYAN);
-            skip.setOnClickListener(v -> { d[0].dismiss(); l.countDown(); });
+            skip.setOnClickListener(v -> { out[0] = com.macdmr.radio.TxTestSession.leftEmpty(e.length); d[0].dismiss(); l.countDown(); });   // empty answers, not a stop
             LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Theme.dp(c, 48)); sp.topMargin = Theme.dp(c, 8);
             body.addView(skip, sp);
             d[0] = Neo.showSheet(c, body); d[0].setCancelable(false);

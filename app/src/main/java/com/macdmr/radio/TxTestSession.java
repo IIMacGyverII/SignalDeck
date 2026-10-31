@@ -161,8 +161,7 @@ public final class TxTestSession {
 
         String[] eq = ui.form("Your test equipment", "What checks your signal. Do not enter your callsign or DMR ID; SignalDeck removes them anyway.",
                 new String[] { "Measuring equipment (e.g. RTL-SDR v4, service monitor)", "Receiving radio (e.g. a handheld's make and model)" }, new String[] { "", "" }, new boolean[] { false, false });
-        if (eq == null) { finish(); return; }
-        r.equipment = eq[0].trim(); r.receiver = eq[1].trim();
+        if (!equipment(r, eq)) { finish(); return; }
 
         // 1 FM voice
         TxReport.Step s = r.step("fm");
@@ -347,6 +346,16 @@ public final class TxTestSession {
         if (callerId) { int b = ui.choose(s.title, "Did it show your caller ID (your DMR ID or name)?", "Yes", "No", "Not checked"); s.callerId = b == 0 ? "yes" : b == 1 ? "no" : "not checked"; }
         String[] n = ui.form(s.title, "Notes about what the receiving radio heard (optional).", new String[] { "Notes" }, new String[] { "" }, new boolean[] { false });
         if (n != null) s.notes = n[0].trim();
+    }
+
+    /** A form's "Leave empty": every field empty, so the session goes on (null is kept for a real cancel). */
+    public static String[] leftEmpty(int fields) { String[] r = new String[fields]; java.util.Arrays.fill(r, ""); return r; }
+
+    /** The equipment form's answer into the report; false only when the form was cancelled (the session stops). */
+    static boolean equipment(TxReport r, String[] eq) {
+        if (eq == null) return false;
+        r.equipment = eq[0].trim(); r.receiver = eq[1].trim();
+        return true;
     }
 
     private void finish() { report.finished = TxReport.utc(System.currentTimeMillis()); }

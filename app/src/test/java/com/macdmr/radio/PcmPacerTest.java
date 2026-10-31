@@ -59,6 +59,15 @@ public class PcmPacerTest {
         assertNotNull(p.poll(110 * MS));
     }
 
+    @Test public void leaveEmptyOnTheEquipmentFormDoesNotStopTheSession() {
+        TxReport r = new TxReport();
+        String[] empty = TxTestSession.leftEmpty(2);
+        assertArrayEquals(new String[] { "", "" }, empty);
+        assertTrue("Leave empty goes on", TxTestSession.equipment(r, empty));
+        assertEquals("", r.equipment); assertEquals("", r.receiver);
+        assertFalse("a real cancel still stops", TxTestSession.equipment(new TxReport(), null));
+    }
+
     @Test public void sessionOffersOnlyChannelsOfTheKindAStepNeeds() {
         java.util.List<ChannelStore.Channel> all = new java.util.ArrayList<>();
         for (int t : new int[] { ChannelStore.Channel.TYPE_DMR, 1, ChannelStore.Channel.TYPE_M17, ChannelStore.Channel.TYPE_DMR }) {

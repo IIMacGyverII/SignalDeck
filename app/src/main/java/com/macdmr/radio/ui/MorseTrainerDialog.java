@@ -61,7 +61,7 @@ public final class MorseTrainerDialog {
         final String[] sent = { "" };
         LinearLayout r1 = new LinearLayout(c); r1.setBaselineAligned(false);
         TextView play = Neo.button(c, Txt.s(R.string.modes_morse_play), "volume", Neo.GREEN), again = Neo.button(c, Txt.s(R.string.modes_morse_again), "update", Neo.CYAN);
-        for (TextView b : new TextView[] { play, again }) { LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (4 * d), (int) (3 * d), 0); r1.addView(b, lp); }
+        for (TextView b : new TextView[] { play, again }) { Neo.fit(b, true); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (4 * d), (int) (3 * d), 0); r1.addView(b, lp); }
         body.addView(r1);
         final EditText copy = new EditText(c); copy.setHint(Txt.s(R.string.modes_morse_copy_hint)); copy.setTextColor(Neo.TEXT); copy.setHintTextColor(Neo.DIM); copy.setTypeface(Neo.mono(c));
         copy.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);

@@ -101,7 +101,7 @@ public final class BandPlan {
     /** One line for a channel: "146.5200 MHz: 2 m national FM simplex calling". */
     public static String line(long hz) {
         Info i = of(hz);
-        return Txt.s(R.string.channels_bandplan_line, String.format(Locale.US, "%.4f", hz / 1e6), i == null ? Txt.s(R.string.channels_bandplan_outside) : i.text());
+        return Txt.s(R.string.channels_bandplan_line, Txt.freqMhz(hz, 4), i == null ? Txt.s(R.string.channels_bandplan_outside) : i.text());
 
     }
 

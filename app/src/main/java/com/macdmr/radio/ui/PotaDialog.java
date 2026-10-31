@@ -76,7 +76,7 @@ public final class PotaDialog {
                 int shown = 0;
                 for (Pota.Spot s : spots) {
                     if (++shown > 40) break;
-                    String sub = String.format(Locale.US, "%s %.4f MHz %s · %s %s", s.program, s.freqHz / 1e6, s.mode == null ? "" : s.mode, s.ref, s.name) + (s.where == null || s.where.isEmpty() ? "" : " (" + s.where + ")") + (s.time > 0 ? " · " + hm.format(new Date(s.time)) : "");   // i18n: spot data and units
+                    String sub = String.format(Locale.US, "%s %s MHz %s · %s %s", s.program, Txt.freqMhz(s.freqHz, 4), s.mode == null ? "" : s.mode, s.ref, s.name) + (s.where == null || s.where.isEmpty() ? "" : " (" + s.where + ")") + (s.time > 0 ? " · " + hm.format(new Date(s.time)) : "");   // i18n: spot data and units
                     LinearLayout t = Neo.tile(c, s.program.equals(Pota.SOTA) ? "signal" : "map", s.workable() ? Neo.GREEN : Neo.DIM, s.call, sub);
                     if (!s.workable()) t.setAlpha(0.6f);
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d);
@@ -89,7 +89,7 @@ public final class PotaDialog {
 
     private static void spotActions(Context c, RadioService svc, Pota.Spot s, AlertDialog sheet) {
         List<String> items = new ArrayList<>();
-        if (s.workable()) items.add(Txt.s(R.string.modes_pota_tune_to, String.format(Locale.US, "%.4f", s.freqHz / 1e6)));
+        if (s.workable()) items.add(Txt.s(R.string.modes_pota_tune_to, Txt.freqMhz(s.freqHz, 4)));
         items.add(Txt.s(R.string.modes_pota_log_hunting, s.call, s.ref));
         new AlertDialog.Builder(c).setTitle(s.call + " · " + s.ref).setItems(items.toArray(new String[0]), (dd, w) -> {
             if (s.workable() && w == 0) {
@@ -130,7 +130,7 @@ public final class PotaDialog {
                 st.setText(Txt.s(f.isEmpty() ? R.string.modes_pota_no_park : R.string.modes_pota_tap_park));
                 for (int i = 0; i < Math.min(25, f.size()); i++) {
                     Pota.Park p = f.get(i);
-                    LinearLayout t = Neo.tile(c, "map", Neo.GREEN, p.ref, p.name + String.format(Locale.US, " · %.1f km", p.km));   // i18n: park name and distance
+                    LinearLayout t = Neo.tile(c, "map", Neo.GREEN, p.ref, p.name + " · " + Txt.decimal(p.km, 1) + " km");   // i18n: park name and distance
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d);
                     near.addView(t, lp); t.setOnClickListener(v -> ref.setText(p.ref));
                 }
@@ -145,7 +145,7 @@ public final class PotaDialog {
         LinearLayout body = Neo.sheetBody(c, hunted != null ? Txt.s(R.string.modes_pota_log_call, hunted.call) : Txt.s(R.string.modes_pota_log_contact), "diag");
         ChannelStore.Channel cur = svc.current();
         final long freq = hunted != null ? hunted.freqHz : cur != null ? cur.rxFreq : 0;
-        List<String> facts = new ArrayList<>(); facts.add(String.format(Locale.US, "%.4f MHz FM", freq / 1e6));   // i18n: frequency and mode
+        List<String> facts = new ArrayList<>(); facts.add(Txt.freqMhz(freq, 4) + " MHz FM");   // i18n: frequency and mode
         if (a != null) facts.add(Txt.s(R.string.modes_pota_under_activation, a.ref));
         if (hunted != null) facts.add(Txt.s(R.string.modes_pota_their_ref, hunted.program, hunted.ref));
         body.addView(Neo.sheetHint(c, String.join(Txt.s(R.string.modes_middot_separator), facts)));

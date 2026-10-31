@@ -47,7 +47,7 @@ public final class NetDialog {
         body.addView(Neo.sheetHint(c, Txt.s(R.string.intercom_net_start_hint)));
         final EditText name = field(c, body, Txt.s(R.string.intercom_net_name_label), c.getSharedPreferences("nets", Context.MODE_PRIVATE).getString("last", Txt.s(R.string.intercom_net_name_default)));
         ChannelStore.Channel ch = svc.current();
-        body.addView(Neo.sheetHint(c, ch == null ? Txt.s(R.string.intercom_net_on_none) : Txt.s(R.string.intercom_net_on_channel, ch.name, String.format(Locale.US, "%.4f", ch.rxFreq / 1e6))));
+        body.addView(Neo.sheetHint(c, ch == null ? Txt.s(R.string.intercom_net_on_none) : Txt.s(R.string.intercom_net_on_channel, ch.name, Txt.freqMhz(ch.rxFreq, 4))));
         TextView start = Neo.button(c, Txt.s(R.string.intercom_net_start), "send", Neo.GREEN); body.addView(start, lp(d, 8));
         final AlertDialog[] self = new AlertDialog[1];
         start.setOnClickListener(v -> {
@@ -60,7 +60,7 @@ public final class NetDialog {
         });
         List<NetStore.Net> past = svc.nets().past(20);
         if (!past.isEmpty()) body.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_net_past)));
-        SimpleDateFormat f = new SimpleDateFormat("MMM d, HH:mm", Locale.US);
+        SimpleDateFormat f = Txt.dates("MMM d, HH:mm", "MMMdHHmm");
         for (NetStore.Net p : past) {
             int count = svc.nets().checkIns(p.id).size();
             LinearLayout r = card(c, Txt.p(R.plurals.intercom_net_past_title, count, p.name, count), Txt.s(R.string.intercom_net_past_sub, f.format(new Date(p.start)), (p.end - p.start) / 60000, p.channel));
@@ -90,7 +90,7 @@ public final class NetDialog {
         final LinearLayout list = new LinearLayout(c); list.setOrientation(LinearLayout.VERTICAL); body.addView(list);
         LinearLayout r = new LinearLayout(c); r.setBaselineAligned(false);
         TextView report = Neo.button(c, Txt.s(R.string.intercom_net_report), "report", Neo.CYAN), end = Neo.button(c, Txt.s(R.string.intercom_net_end), "stop", Neo.RED);
-        for (TextView b : new TextView[] { report, end }) { LinearLayout.LayoutParams l = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); l.setMargins((int) (3 * d), (int) (10 * d), (int) (3 * d), 0); r.addView(b, l); }
+        for (TextView b : new TextView[] { report, end }) { Neo.fit(b, true); LinearLayout.LayoutParams l = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); l.setMargins((int) (3 * d), (int) (10 * d), (int) (3 * d), 0); r.addView(b, l); }
         body.addView(r);
 
         final Runnable[] fill = new Runnable[1];
@@ -158,7 +158,7 @@ public final class NetDialog {
         body.addView(t);
         LinearLayout r = new LinearLayout(c); r.setBaselineAligned(false);
         TextView share = Neo.button(c, Txt.s(R.string.common_share), "send", Neo.CYAN), log = Neo.button(c, Txt.s(R.string.intercom_net_add_logbook), "report", Neo.GREEN);
-        for (TextView b : new TextView[] { share, log }) { LinearLayout.LayoutParams l = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); l.setMargins((int) (3 * d), (int) (10 * d), (int) (3 * d), 0); r.addView(b, l); }
+        for (TextView b : new TextView[] { share, log }) { Neo.fit(b, true); LinearLayout.LayoutParams l = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); l.setMargins((int) (3 * d), (int) (10 * d), (int) (3 * d), 0); r.addView(b, l); }
         body.addView(r);
         share.setOnClickListener(v -> { try { c.startActivity(android.content.Intent.createChooser(new android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_SUBJECT, n.name).putExtra(android.content.Intent.EXTRA_TEXT, text), Txt.s(R.string.intercom_net_share_chooser))); } catch (Throwable ignored) { } });
         log.setOnClickListener(v -> {

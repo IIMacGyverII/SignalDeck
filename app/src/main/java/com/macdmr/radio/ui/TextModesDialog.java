@@ -34,11 +34,11 @@ public final class TextModesDialog {
         final TextView[] modes = new TextView[2];
         for (int k = 0; k < 2; k++) {
             final int m = k + 1;
-            modes[k] = Neo.button(c, PacketEngine.TEXT_MODES[m], null, Neo.CYAN); modes[k].setTextSize(14);
+            modes[k] = Neo.button(c, PacketEngine.TEXT_MODES[m], null, Neo.CYAN); modes[k].setTextSize(14); Neo.fit(modes[k], true);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), 0);
             r1.addView(modes[k], lp);
         }
-        final TextView listen = Neo.button(c, "", null, Neo.GREEN); listen.setTextSize(14);
+        final TextView listen = Neo.button(c, "", null, Neo.GREEN); listen.setTextSize(14); Neo.fit(listen, true);
         LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); ll.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), 0);
         r1.addView(listen, ll);
         body.addView(r1);
@@ -49,7 +49,7 @@ public final class TextModesDialog {
         LinearLayout r2 = new LinearLayout(c); r2.setBaselineAligned(false);
         final EditText input = new EditText(c); input.setHint(Txt.s(R.string.modes_text_input_hint)); input.setTextColor(Neo.TEXT); input.setHintTextColor(Neo.DIM); input.setTypeface(Neo.mono(c));
         input.setImeOptions(EditorInfo.IME_ACTION_SEND); input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS); input.setSingleLine(true);
-        TextView send = Neo.button(c, Txt.s(R.string.common_send), null, Neo.AMBER), clear = Neo.button(c, Txt.s(R.string.common_clear), null, Neo.RED);
+        TextView send = Neo.button(c, Txt.s(R.string.common_send), null, Neo.AMBER), clear = Neo.button(c, Txt.s(R.string.common_clear), null, Neo.RED); Neo.fit(send, true); Neo.fit(clear, true);
         r2.addView(input, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         r2.addView(send, new LinearLayout.LayoutParams((int) (90 * d), LinearLayout.LayoutParams.MATCH_PARENT));
         r2.addView(clear, new LinearLayout.LayoutParams((int) (90 * d), LinearLayout.LayoutParams.MATCH_PARENT));

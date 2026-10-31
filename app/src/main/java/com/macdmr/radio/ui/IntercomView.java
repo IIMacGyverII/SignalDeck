@@ -616,7 +616,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         } else {
             readLabel[2].setText("SQ"); squelch.setText(String.valueOf(ch.sq)); power.setTextColor(Neo.TEXT);   // i18n: key legend (readout abbreviation)
             readLabel[3].setText(Txt.s(R.string.intercom_main_read_tone));
-            String tone = ch.rxType == 1 && com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode) > 0 ? String.format(java.util.Locale.US, "%.1f", com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode)) : ch.rxType == 2 || ch.rxType == 3 ? com.macdmr.radio.dsp.ToneTable.toneLabel(ch.rxType, ch.rxSubCode) : Txt.s(R.string.intercom_main_read_tone_none);
+            String tone = ch.rxType == 1 && com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode) > 0 ? Txt.decimal(com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode), 1) : ch.rxType == 2 || ch.rxType == 3 ? com.macdmr.radio.dsp.ToneTable.toneLabel(ch.rxType, ch.rxSubCode) : Txt.s(R.string.intercom_main_read_tone_none);
             power.setText(tone);
         }
     }

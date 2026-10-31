@@ -133,7 +133,7 @@ public final class Updater {
         android.widget.TextView ch = com.macdmr.radio.ui.Neo.label(c, Txt.s(R.string.device_update_changes, BuildConfig.VERSION_NAME, UpdatePaths.changes(p, 6000)), com.macdmr.radio.ui.Neo.TEXT_SOFT, 13, false);
         ch.setPadding(0, (int) (6 * d), 0, 0); ch.setTextIsSelectable(true);
         into.addView(ch);
-        android.widget.TextView go = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.device_update_to, p.newest.version, String.format(Locale.US, "%.1f", p.newest.apkSize / 1048576.0)), "update", beta ? com.macdmr.radio.ui.Neo.AMBER : com.macdmr.radio.ui.Neo.GREEN);
+        android.widget.TextView go = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.device_update_to, p.newest.version, Txt.decimal(p.newest.apkSize / 1048576.0, 1)), "update", beta ? com.macdmr.radio.ui.Neo.AMBER : com.macdmr.radio.ui.Neo.GREEN);
         android.widget.LinearLayout.LayoutParams l = new android.widget.LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT); l.topMargin = (int) (10 * d);
         into.addView(go, l);
         final Release rel = p.newest;
@@ -148,7 +148,7 @@ public final class Updater {
                 com.macdmr.radio.ui.Neo.TEXT_SOFT, 13, false);
         ch.setPadding(0, (int) (6 * d), 0, 0); ch.setTextIsSelectable(true);
         into.addView(ch);
-        android.widget.TextView go = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.device_update_back_button, rel.version, String.format(Locale.US, "%.1f", rel.apkSize / 1048576.0)), "restore", com.macdmr.radio.ui.Neo.GREEN);
+        android.widget.TextView go = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.device_update_back_button, rel.version, Txt.decimal(rel.apkSize / 1048576.0, 1)), "restore", com.macdmr.radio.ui.Neo.GREEN);
         android.widget.LinearLayout.LayoutParams l = new android.widget.LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT); l.topMargin = (int) (10 * d);
         into.addView(go, l);
         go.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_update_back_q, rel.version))
@@ -211,7 +211,7 @@ public final class Updater {
 
     private static void offer(final Context c, final Release rel) {
         String notes = rel.notes == null ? "" : rel.notes.trim(); if (notes.length() > 1500) notes = notes.substring(0, 1500) + "…";
-        String mb = String.format(Locale.US, "%.1f", rel.apkSize / 1e6);
+        String mb = Txt.decimal(rel.apkSize / 1e6, 1);
         new AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_update_offer_title, rel.version))
                 .setMessage(notes.isEmpty() ? Txt.s(R.string.device_update_offer, BuildConfig.VERSION_NAME, rel.apkName, mb) : Txt.s(R.string.device_update_offer_notes, BuildConfig.VERSION_NAME, notes, rel.apkName, mb))
                 .setNegativeButton(Txt.s(R.string.common_later), null).setPositiveButton(Txt.s(R.string.device_update_download), (d, w) -> download(c, rel)).show();

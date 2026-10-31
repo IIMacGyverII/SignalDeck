@@ -289,7 +289,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public String trackSat(final com.macdmr.radio.ham.Satellites.Sat sat, final com.macdmr.radio.ham.Sgp4 el, final com.macdmr.radio.ham.SatTrack.Pass pass) {
         final android.location.Location me = lastKnownLocation();
         if (me == null) return Txt.s(R.string.service_no_fix_location);
-        if (!profile.tunable(sat.downHz)) return Txt.s(R.string.service_sat_out_of_band, profile.bandsText(), sat.name, String.format(java.util.Locale.US, "%.3f", sat.downHz / 1e6));
+        if (!profile.tunable(sat.downHz)) return Txt.s(R.string.service_sat_out_of_band, profile.bandsText(), sat.name, Txt.freqMhz(sat.downHz, 3));
         stopSatTrack();
         final SatState st = new SatState(); st.name = sat.name; st.aos = pass.aos; st.los = pass.los; st.maxEl = pass.maxEl; st.waiting = true;
         final boolean listenOnly = sat.listenOnly() || !profile.tunable(sat.upHz);   // a 2 m uplink on a UHF-only radio (the W6): hear it, never key
@@ -410,7 +410,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (hz == 0) { if (foxHome != null) { foxHome = null; exitVfo(); } return null; }
         ChannelStore.Channel base = foxHome != null ? foxHome : current;
         if (base == null || base.isDigital()) return Txt.s(R.string.service_needs_analog);
-        if (!profile.tunable((long) base.rxFreq + hz)) return Txt.s(R.string.service_freq_outside, profile.bandsText(), String.format(Locale.US, "%.3f", (base.rxFreq + hz) / 1e6));   // the top of a band: the VFO would be refused
+        if (!profile.tunable((long) base.rxFreq + hz)) return Txt.s(R.string.service_freq_outside, profile.bandsText(), Txt.freqMhz((long) base.rxFreq + hz, 3));   // the top of a band: the VFO would be refused
         if (foxHome == null) foxHome = base;
         ChannelStore.Channel v = vfoCopy(base); v.rxFreq = base.rxFreq + hz; v.txFreq = base.txFreq; v.name = base.name + " +" + (hz / 1000) + " kHz";
         applyVfo(v, false);
@@ -663,7 +663,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (packet == null) return Txt.s(R.string.service_packet_not_ready);
         if (!packet.callsignSet()) return Txt.s(R.string.service_iss_need_callsign);
         { long f = com.macdmr.radio.ham.Satellites.issHz(this, "issAprs", com.macdmr.radio.ham.Satellites.ISS_APRS_HZ);   // a 2 m ISS APRS on a UHF-only radio: the VFO would be refused and the beacon go out on the channel
-          if (!profile.tunable(f - 10_000) || !profile.tunable(f + 10_000)) return Txt.s(R.string.service_iss_out_of_band, profile.bandsText(), String.format(Locale.US, "%.3f", f / 1e6)); }
+          if (!profile.tunable(f - 10_000) || !profile.tunable(f + 10_000)) return Txt.s(R.string.service_iss_out_of_band, profile.bandsText(), Txt.freqMhz(f, 3)); }
         final android.location.Location me = lastKnownLocation();
         if (me == null) return Txt.s(R.string.service_no_fix_yet);
         SatState st = satState;
@@ -701,14 +701,14 @@ public class RadioService extends Service implements RadioEngine.Events {
             try { Thread.sleep(12000); } catch (InterruptedException ignored) { }
             if (vfo != null && vfo.rxFreq == rxHz && satState == null) exitVfo();
         }, "iss-beacon").start();
-        return Txt.s(R.string.service_iss_beaconing_at, String.format(Locale.US, "%.0f", l.el), String.format(Locale.US, "%.4f", a.txFreq / 1e6));
+        return Txt.s(R.string.service_iss_beaconing_at, String.format(Locale.US, "%.0f", l.el), Txt.freqMhz(a.txFreq, 4));
     }
 
     /** The next ISS pass above 10\u00B0 as "Tue 15:42 (highest 48\u00B0)", or null. */
     public String nextIssPassText(com.macdmr.radio.ham.Sgp4 el, android.location.Location me) {
         java.util.List<com.macdmr.radio.ham.SatTrack.Pass> ps = com.macdmr.radio.ham.SatTrack.passes(el, System.currentTimeMillis(), 24, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0, 10);
         for (com.macdmr.radio.ham.SatTrack.Pass p : ps) if (p.aos > System.currentTimeMillis())
-            return Txt.s(R.string.service_iss_pass_when, new java.text.SimpleDateFormat("EEE HH:mm", Locale.US).format(new java.util.Date(p.aos)), String.format(Locale.US, "%.0f", p.maxEl));
+            return Txt.s(R.string.service_iss_pass_when, Txt.dates("EEE HH:mm", "EEEHHmm").format(new java.util.Date(p.aos)), String.format(Locale.US, "%.0f", p.maxEl));
         return null;
     }
 
@@ -830,7 +830,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** APRS monitoring on another frequency (the ISS digipeater on 145.825). */
     public String aprsMonitorAt(boolean on, int hz, String name) {
         if (packet == null) return Txt.s(R.string.service_packet_not_ready);
-        if (on && !profile.tunable(hz)) return Txt.s(R.string.service_aprs_out_of_band, profile.bandsText(), String.format(java.util.Locale.US, "%.3f", hz / 1e6));
+        if (on && !profile.tunable(hz)) return Txt.s(R.string.service_aprs_out_of_band, profile.bandsText(), Txt.freqMhz(hz, 3));
         if (on) {
             aprsMonitorHz = hz;
             ChannelStore.Channel a = new ChannelStore.Channel();
@@ -839,7 +839,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             packet.setMonitoring(true);
             applyVfo(a, false);
             pushModes();
-            return Txt.s(R.string.service_aprs_monitor_on, String.format(Locale.US, "%.3f", hz / 1e6));
+            return Txt.s(R.string.service_aprs_monitor_on, Txt.freqMhz(hz, 3));
         }
         packet.setMonitoring(false);
         if (vfo != null && vfo.rxFreq == aprsMonitorHz) exitVfo();
@@ -3618,7 +3618,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     // wheel microphone: 0 phone, 1 car through a talk call; stop on silence: 0 off, else the quiet gap in ms
     public static String[] wheelMicNames() { return new String[] { Txt.s(R.string.service_wheel_mic_phone), Txt.s(R.string.service_wheel_mic_car) }; }
     public static final int[] VOX_MS = { 0, 1500, 2500, 4000 };
-    public static String[] voxNames() { return new String[] { Txt.s(R.string.common_off), Txt.s(R.string.service_vox_seconds, "1.5"), Txt.s(R.string.service_vox_seconds, "2.5"), Txt.s(R.string.service_vox_seconds, "4") }; }
+    public static String[] voxNames() { return new String[] { Txt.s(R.string.common_off), Txt.s(R.string.service_vox_seconds, Txt.decimal(1.5, 1)), Txt.s(R.string.service_vox_seconds, Txt.decimal(2.5, 1)), Txt.s(R.string.service_vox_seconds, "4") }; }
     public int wheelMic() { return getSharedPreferences("radio", MODE_PRIVATE).getInt("wheelMic", 1); }
     public void setWheelMic(int m) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("wheelMic", m).apply(); }
     public int voxStop() { return getSharedPreferences("radio", MODE_PRIVATE).getInt("voxStop", 1); }   // default 1.5 s

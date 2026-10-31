@@ -82,7 +82,7 @@ public final class RadioIdStore extends SQLiteOpenHelper {
             while ((n = in.read(b)) > 0) {
                 out.write(b, 0, n); got += n;
                 int pct = total > 0 ? (int) (got * 100 / total) : -1;
-                if (pct != lastPct && p != null) { lastPct = pct; p.update(pct >= 0 ? Txt.s(R.string.channels_radioid_downloading_pct, pct) : Txt.s(R.string.channels_radioid_downloading_mb, String.format(Locale.US, "%.1f", got / 1e6))); }
+                if (pct != lastPct && p != null) { lastPct = pct; p.update(pct >= 0 ? Txt.s(R.string.channels_radioid_downloading_pct, pct) : Txt.s(R.string.channels_radioid_downloading_mb, Txt.decimal(got / 1e6, 1))); }
             }
         } finally { c.disconnect(); }
         int rows = importCsv(f, p);

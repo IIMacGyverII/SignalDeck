@@ -70,11 +70,11 @@ public final class PacketFinderDialog {
         float d = Theme.dp(c);
         list.removeAllViews();
         list.addView(Neo.sheetSection(c, st.isEmpty() ? Txt.s(R.string.packet_pfd_nothing) : Txt.s(R.string.packet_pfd_heard, st.size())));
-        SimpleDateFormat f = new SimpleDateFormat("EEE HH:mm", Locale.getDefault());
+        SimpleDateFormat f = Txt.dates("EEE HH:mm", "EEEHHmm", false);
         for (PacketFinder.Station s : st) {
             String icon = PacketFinder.GATEWAY.equals(s.kind) ? "mail" : PacketFinder.BBS.equals(s.kind) ? "messages" : PacketFinder.NODE.equals(s.kind) ? "zone" : "radio";
             int col = PacketFinder.GATEWAY.equals(s.kind) ? Neo.GREEN : PacketFinder.BBS.equals(s.kind) ? Neo.AMBER : PacketFinder.NODE.equals(s.kind) ? Neo.CYAN : Neo.MUTED;
-            String mhz = String.format(Locale.US, "%.3f", s.hz / 1e6), when = f.format(new Date(s.last));
+            String mhz = Txt.freqMhz(s.hz, 3), when = f.format(new Date(s.last));
             String line = (s.bestDbm > -200 ? Txt.s(R.string.packet_pfd_row_dbm, PacketFinder.kindName(s.kind), mhz, s.bestDbm, s.count, when) : Txt.s(R.string.packet_pfd_row, PacketFinder.kindName(s.kind), mhz, s.count, when))
                     + (s.note.isEmpty() ? "" : "\n" + s.note);
             LinearLayout t = Neo.tile(c, icon, col, s.call, line);
@@ -94,7 +94,7 @@ public final class PacketFinderDialog {
     private static void act(Context c, RadioService svc, PacketFinder.Station s, AlertDialog[] self) {
         if (svc.finder().running()) { Toast.makeText(c, Txt.s(R.string.packet_pfd_err_running), Toast.LENGTH_SHORT).show(); return; }
         final boolean gw = PacketFinder.GATEWAY.equals(s.kind);
-        String mhz = String.format(Locale.US, "%.3f", s.hz / 1e6);
+        String mhz = Txt.freqMhz(s.hz, 3);
         String[] items = gw
                 ? new String[] { Txt.s(R.string.packet_pfd_tune_winlink, mhz), Txt.s(R.string.packet_pfd_tune_terminal_short), Txt.s(R.string.packet_pfd_just_tune) }
                 : new String[] { Txt.s(R.string.packet_pfd_tune_terminal, mhz), Txt.s(R.string.packet_pfd_just_tune) };
@@ -105,7 +105,7 @@ public final class PacketFinderDialog {
             if (self[0] != null) self[0].dismiss();
             if (winlink) { svc.winlink().setGateway(s.call, ""); WinlinkDialog.show(c, svc); }
             else if (terminal) { c.getSharedPreferences("packet", Context.MODE_PRIVATE).edit().putString("termCall", s.call).putString("termVia", "").apply(); TerminalDialog.show(c, svc); }
-            Toast.makeText(c, Txt.s(R.string.packet_pfd_vfo_on, String.format(Locale.US, "%.3f", s.hz / 1e6)), Toast.LENGTH_SHORT).show();
+            Toast.makeText(c, Txt.s(R.string.packet_pfd_vfo_on, Txt.freqMhz(s.hz, 3)), Toast.LENGTH_SHORT).show();
         }).show();
     }
 

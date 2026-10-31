@@ -49,7 +49,7 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
     private TextView analogNote;
     private ChannelStore.Contact peer;
     private final List<ChannelStore.Message> msgs = new ArrayList<>();
-    private final SimpleDateFormat tf = new SimpleDateFormat("HH:mm", java.util.Locale.US), df = new SimpleDateFormat("MMM d  HH:mm", java.util.Locale.US);
+    private final SimpleDateFormat tf = new SimpleDateFormat("HH:mm", java.util.Locale.US), df = Txt.dates("MMM d  HH:mm", "MMMdHHmm");
 
     public MessagesView(Context c) {
         super(c);

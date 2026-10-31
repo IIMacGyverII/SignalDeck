@@ -70,14 +70,14 @@ public final class VfoDialog {
         body.addView(hint(Txt.s(R.string.intercom_vfo_offset_hint)));
         LinearLayout off = pillRow();
         pill(off, Txt.s(R.string.intercom_vfo_simplex), false, x -> offset(0));
-        if (svc.profile().tunable(146_000_000L)) { pill(off, "−0.600", false, x -> offset(-600_000)); pill(off, "+0.600", false, x -> offset(600_000)); }   // the 2 m repeater shift: only on a radio with the 136–174 MHz band
-        pill(off, "−5.000", false, x -> offset(-5_000_000)); pill(off, "+5.000", false, x -> offset(5_000_000)); body.addView(off);
+        if (svc.profile().tunable(146_000_000L)) { pill(off, Txt.decimalText("−0.600"), false, x -> offset(-600_000)); pill(off, Txt.decimalText("+0.600"), false, x -> offset(600_000)); }   // the 2 m repeater shift: only on a radio with the 136–174 MHz band
+        pill(off, Txt.decimalText("−5.000"), false, x -> offset(-5_000_000)); pill(off, Txt.decimalText("+5.000"), false, x -> offset(5_000_000)); body.addView(off);
         for (int i = 0; i < off.getChildCount(); i++) ((TextView) off.getChildAt(i)).setTextSize(12);
 
         // step
         body.addView(section(Txt.s(R.string.intercom_vfo_arrow_step)));
         LinearLayout stepRow = pillRow();
-        for (int i = 0; i < STEPS.length; i++) { final int k = i; stepPills.add(pill(stepRow, STEP_LABELS[i], step == STEPS[i], x -> { step = STEPS[k]; select(stepPills, k); })); }
+        for (int i = 0; i < STEPS.length; i++) { final int k = i; stepPills.add(pill(stepRow, Txt.decimalText(STEP_LABELS[i]), step == STEPS[i], x -> { step = STEPS[k]; select(stepPills, k); })); }
         body.addView(stepRow);
 
         // power
@@ -117,15 +117,15 @@ public final class VfoDialog {
     private void sections() { analog.setVisibility(v.type == 1 ? View.VISIBLE : View.GONE); digital.setVisibility(v.type == 0 ? View.VISIBLE : View.GONE); }
 
     private void offset(int hz) {
-        try { double r = Double.parseDouble(rx.getText().toString().trim()); tx.setText(String.format(Locale.US, "%.4f", r + hz / 1e6)); }
+        try { double r = Txt.parseDecimal(rx.getText().toString()); tx.setText(String.format(Locale.US, "%.4f", r + hz / 1e6)); }
         catch (Exception e) { Toast.makeText(c, Txt.s(R.string.intercom_vfo_need_rx_toast), Toast.LENGTH_SHORT).show(); }
     }
 
     /** Validate and copy the text fields into the VFO channel. */
     private boolean apply() {
         try {
-            v.rxFreq = (int) Math.round(Double.parseDouble(rx.getText().toString().trim()) * 1e6);
-            v.txFreq = (int) Math.round(Double.parseDouble(tx.getText().toString().trim()) * 1e6);
+            v.rxFreq = (int) Math.round(Txt.parseDecimal(rx.getText().toString()) * 1e6);
+            v.txFreq = (int) Math.round(Txt.parseDecimal(tx.getText().toString()) * 1e6);
             if (!com.macdmr.radio.ChannelStore.inBand(v.rxFreq) || !com.macdmr.radio.ChannelStore.inBand(v.txFreq)) throw new IllegalArgumentException(Txt.s(R.string.intercom_vfo_out_of_band_toast, com.macdmr.radio.DeviceProfile.detect().bandsText()));
             if (v.rxFreq < 300_000_000) v.band = 1;
             if (v.isDigital()) {
@@ -191,7 +191,7 @@ public final class VfoDialog {
         rx.addTextChangedListener(w); tx.addTextChangedListener(w); upd.run();
         return t;
     }
-    private static long mhz(EditText e) { try { return Math.round(Double.parseDouble(e.getText().toString().trim()) * 1e6); } catch (Throwable x) { return 0; } }
+    private static long mhz(EditText e) { try { return Math.round(Txt.parseDecimal(e.getText().toString()) * 1e6); } catch (Throwable x) { return 0; } }
 
     private TextView section(String s) { return Neo.sheetSection(c, s); }
 
@@ -212,7 +212,7 @@ public final class VfoDialog {
     private void style(TextView t, boolean on) { Neo.pillStyle(t, on, Neo.AMBER); }
     private void select(List<TextView> pills, int idx) { for (int i = 0; i < pills.size(); i++) style(pills.get(i), i == idx); }
 
-    private TextView button(LinearLayout row, String text, int[] accent) { TextView b = Neo.button(c, text, null, Neo.accentOf(accent)); b.setTextSize(14); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins(dp(3), dp(12), dp(3), dp(4)); row.setBaselineAligned(false); row.addView(b, lp); return b; }
+    private TextView button(LinearLayout row, String text, int[] accent) { TextView b = Neo.button(c, text, null, Neo.accentOf(accent)); b.setTextSize(14); Neo.fit(b, true); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins(dp(3), dp(12), dp(3), dp(4)); row.setBaselineAligned(false); row.addView(b, lp); return b; }
 
     private EditText freqField(LinearLayout target, String label, int hz) {
         return textField(target, label, hz > 0 ? String.format(Locale.US, "%.4f", hz / 1e6) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);

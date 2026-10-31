@@ -151,7 +151,7 @@ public final class ZonesDialog {
             tb.setOnClickListener(v -> {
                 int n = com.macdmr.radio.dsp.ToneConverter.ctcssCount();
                 String[] names = new String[n + 1]; names[0] = Txt.s(R.string.intercom_zones_tone_none);
-                for (int i = 0; i < n; i++) names[i + 1] = String.format(Locale.US, "%.1f Hz", com.macdmr.radio.dsp.ToneConverter.ctcssHz(i));
+                for (int i = 0; i < n; i++) names[i + 1] = Txt.decimal(com.macdmr.radio.dsp.ToneConverter.ctcssHz(i), 1) + " Hz";
                 new AlertDialog.Builder(c).setTitle(Txt.s(R.string.intercom_zones_repeater_tone)).setItems(names, (dd, w) -> { tone[0] = w - 1; tb.setText(w == 0 ? Txt.s(R.string.intercom_zones_tone_none_button) : Txt.s(R.string.intercom_zones_tone_button, names[w])); }).show();
             });
         }
@@ -232,7 +232,7 @@ public final class ZonesDialog {
         Set<Integer> in = new HashSet<>(); for (int n : z.numbers) in.add(n);
         for (int i = 0; i < all.size(); i++) {
             ChannelStore.Channel ch = all.get(i);
-            names[i] = String.format(Locale.US, "%d  %s  %.4f", ch.number, ch.name == null || ch.name.isEmpty() ? Txt.s(ch.isDigital() ? R.string.intercom_zones_unnamed_digital : R.string.intercom_zones_unnamed_analog) : ch.name, ch.rxFreq / 1e6);
+            names[i] = String.format(Locale.US, "%d  %s  %s", ch.number, ch.name == null || ch.name.isEmpty() ? Txt.s(ch.isDigital() ? R.string.intercom_zones_unnamed_digital : R.string.intercom_zones_unnamed_analog) : ch.name, Txt.freqMhz(ch.rxFreq, 4));
             on[i] = in.contains(ch.number);
         }
         new AlertDialog.Builder(c).setTitle(z.name).setMultiChoiceItems(names, on, (dd, w, checked) -> on[w] = checked)

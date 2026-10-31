@@ -49,15 +49,15 @@ final class PassCard extends LinearLayout {
         if (st.waiting || st.look == null) {
             long in = Math.max(0, st.aos - now) / 1000;
             String when = in >= 3600 ? Txt.s(R.string.modes_pass_in_hours, (int) (in / 3600), (int) (in % 3600 / 60)) : Txt.s(R.string.modes_pass_in_minutes, (int) (in / 60), (int) (in % 60));
-            t = Txt.s(R.string.modes_pass_next, new SimpleDateFormat("EEE HH:mm", Locale.US).format(new Date(st.aos)), when);
+            t = Txt.s(R.string.modes_pass_next, Txt.dates("EEE HH:mm", "EEEHHmm").format(new Date(st.aos)), when);
             dt = Txt.s(R.string.modes_pass_next_detail, String.format(Locale.US, "%.0f", st.maxEl), String.valueOf((st.los - st.aos + 30_000) / 60_000), follow);
         } else {
             long left = Math.max(0, st.los - now) / 1000;
             boolean up = st.look.el >= 0;
             t = up ? Txt.s(R.string.modes_pass_up, String.format(Locale.US, "%.0f", st.look.el), Maidenhead.compass(st.look.az)) : Txt.s(R.string.modes_pass_rising);
-            String rx = String.format(Locale.US, "%.4f", st.rxHz / 1e6), shift = String.format(Locale.US, "%+.1f", (st.rxHz - st.nominalHz) / 1000.0), clock = String.format(Locale.US, "%d:%02d", left / 60, left % 60), km = String.format(Locale.US, "%.0f", st.look.rangeKm);
+            String rx = Txt.freqMhz(st.rxHz, 4), shift = Txt.signed((st.rxHz - st.nominalHz) / 1000.0, 1), clock = String.format(Locale.US, "%d:%02d", left / 60, left % 60), km = String.format(Locale.US, "%.0f", st.look.rangeKm);
             dt = Txt.s(up ? R.string.modes_pass_listening_sets : R.string.modes_pass_listening_ends, rx, shift, clock, km)
-                    + (st.mode == Satellites.APRS && !st.listenOnly ? "\n" + Txt.s(R.string.modes_pass_talk, String.format(Locale.US, "%.4f", st.txHz / 1e6)) : "") + "\n" + follow;
+                    + (st.mode == Satellites.APRS && !st.listenOnly ? "\n" + Txt.s(R.string.modes_pass_talk, Txt.freqMhz(st.txHz, 4)) : "") + "\n" + follow;
         }
         ModeScreen.set(title, t); ModeScreen.set(detail, dt);
     }

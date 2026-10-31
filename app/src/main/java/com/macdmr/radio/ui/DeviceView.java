@@ -86,6 +86,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         contributeTop.setOnClickListener(v -> contributeSheet());
         LinearLayout hb = new LinearLayout(c); hb.setBaselineAligned(false);
         takeOver = Neo.button(c, Txt.s(R.string.device_link_take_over), "takeover", Neo.GREEN); handBack = Neo.button(c, Txt.s(R.string.device_link_hand_back), "handback", Neo.AMBER);
+        Neo.fit(takeOver, true); Neo.fit(handBack, true);                  // side by side: a long word (German) never breaks inside
         LayoutParams hl = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); hl.setMargins(0, (int) (12 * d), (int) (4 * d), 0);
         LayoutParams hr = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); hr.setMargins((int) (4 * d), (int) (12 * d), 0, 0);
         hb.addView(takeOver, hl); hb.addView(handBack, hr);

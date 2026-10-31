@@ -39,7 +39,7 @@ public final class ScheduleDialog {
         body.addView(Neo.sheetHint(c, Txt.s(com.macdmr.radio.DeviceProfile.inBands(com.macdmr.radio.PacketEngine.APRS_FREQ_HZ) ? R.string.intercom_schedule_hint : R.string.intercom_schedule_hint_no_aprs)));
         final AlertDialog[] self = { null };
         List<Scheduler.Entry> l = Scheduler.list(c);
-        SimpleDateFormat f = new SimpleDateFormat("EEE d MMM, HH:mm", Locale.getDefault());
+        SimpleDateFormat f = Txt.dates("EEE d MMM, HH:mm", "EEEdMMMHHmm", false);
         long now = System.currentTimeMillis();
         int running = Scheduler.runningEnd(c) > now ? Scheduler.runningId(c) : 0;
         if (l.isEmpty()) body.addView(Neo.sheetHint(c, Txt.s(R.string.intercom_schedule_empty)));
@@ -134,7 +134,7 @@ public final class ScheduleDialog {
         final android.widget.EditText label = field(c, body, Txt.s(R.string.intercom_schedule_name), e.label);
         LinearLayout btns = new LinearLayout(c);
         TextView save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN), del = Neo.button(c, Txt.s(isNew ? R.string.common_cancel : R.string.common_delete), isNew ? "close" : "stop", isNew ? Neo.MUTED : Neo.RED);
-        for (TextView b : new TextView[] { save, del }) { LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, (int) (48 * d), 1f); lp.setMargins((int) (4 * d), (int) (14 * d), (int) (4 * d), 0); btns.addView(b, lp); }
+        for (TextView b : new TextView[] { save, del }) { Neo.fit(b, true); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, (int) (48 * d), 1f); lp.setMargins((int) (4 * d), (int) (14 * d), (int) (4 * d), 0); btns.addView(b, lp); }
         body.addView(btns);
         final AlertDialog dlg = Neo.showSheet(c, body);
         save.setOnClickListener(v -> {
@@ -147,7 +147,7 @@ public final class ScheduleDialog {
             if (next < 0) { Toast.makeText(c, Txt.s(R.string.intercom_schedule_time_past_toast), Toast.LENGTH_LONG).show(); return; }
             Scheduler.put(c, e);
             dlg.dismiss();
-            Toast.makeText(c, Txt.s(R.string.intercom_schedule_next_toast, new SimpleDateFormat("EEE d MMM, HH:mm", Locale.getDefault()).format(new Date(next))), Toast.LENGTH_SHORT).show();
+            Toast.makeText(c, Txt.s(R.string.intercom_schedule_next_toast, Txt.dates("EEE d MMM, HH:mm", "EEEdMMMHHmm", false).format(new Date(next))), Toast.LENGTH_SHORT).show();
             show(c, svc);
         });
         del.setOnClickListener(v -> {

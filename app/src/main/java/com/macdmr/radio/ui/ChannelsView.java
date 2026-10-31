@@ -150,7 +150,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         String[] names = { Txt.s(R.string.channels_list_sel_star), Txt.s(R.string.channels_list_sel_zone), Txt.s(R.string.channels_list_sel_out), Txt.s(R.string.common_delete) }; int[] accents = { Neo.AMBER, Neo.CYAN, Neo.VIOLET, Neo.RED };
         for (int i = 0; i < 4; i++) {
             final int k = i;
-            TextView b = Neo.button(c, names[i], null, accents[i]); b.setTextSize(12.5f); b.setSingleLine(true); b.setPadding((int) (4 * d), (int) (6 * d), (int) (4 * d), (int) (6 * d));
+            TextView b = Neo.button(c, names[i], null, accents[i]); b.setTextSize(12.5f); b.setSingleLine(true); b.setPadding((int) (4 * d), (int) (6 * d), (int) (4 * d), (int) (6 * d)); Neo.fit(b, true);
             LayoutParams lp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), 0);
             acts.addView(b, lp);
             if (k == 2) selOut = b;
@@ -244,7 +244,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         adapter.notifyDataSetChanged();
     }
 
-    static String mhz(int hz) { return String.format(Locale.US, "%.4f", hz / 1e6); }
+    static String mhz(int hz) { return Txt.freqMhz(hz, 4); }   // on screen only (the readout, the list): the app language's decimal sign
 
     /** " · TS1" / " · TS2", or nothing on a radio whose module has no slot setting (the Armor 3WT). */
     static String slotText(ChannelStore.Channel ch) { return com.macdmr.radio.DeviceProfile.detect().timeSlots ? " · TS" + (ch.inSlot + 1) : ""; }
@@ -257,8 +257,8 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         int shift = ch.txFreq - ch.rxFreq;
         if (ch.rxFreq >= 162_400_000 && ch.rxFreq <= 162_550_000) parts.add(Txt.s(R.string.channels_list_badge_wx_rx_only));
         else if (ChannelStore.receiveOnly(ch)) parts.add(Txt.s(R.string.channels_list_badge_rx_only));
-        else if (Math.abs(shift) >= 100_000) parts.add((shift > 0 ? "+" : "−") + String.format(Locale.US, "%s MHz", trim(Math.abs(shift) / 1e6)));
-        if (ch.rxType == 1 && com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode) > 0) parts.add(String.format(Locale.US, "%.1f", com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode)));
+        else if (Math.abs(shift) >= 100_000) parts.add((shift > 0 ? "+" : "−") + String.format(Locale.US, "%s MHz", Txt.decimalText(trim(Math.abs(shift) / 1e6))));
+        if (ch.rxType == 1 && com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode) > 0) parts.add(Txt.decimal(com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode), 1));
         else if (ch.rxType == 2 || ch.rxType == 3) parts.add(com.macdmr.radio.dsp.ToneTable.toneLabel(ch.rxType, ch.rxSubCode));
         StringBuilder sb = new StringBuilder(); for (String p : parts) { if (sb.length() > 0) sb.append(" · "); sb.append(p); }
         return sb.toString();
@@ -291,7 +291,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         int[] accents = { Neo.GREEN, Neo.CYAN, Neo.AMBER, Neo.RED };
         for (int i = 0; i < 4; i++) {
             final int k = i;
-            TextView b = Neo.button(c, names[i], null, accents[i]); b.setTextSize(14);
+            TextView b = Neo.button(c, names[i], null, accents[i]); b.setTextSize(14); Neo.fit(b, true);
             LayoutParams lp = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (16 * d), (int) (3 * d), 0);
             btns.addView(b, lp);
             b.setOnClickListener(v -> {
@@ -433,7 +433,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
             int dd = now.get(java.util.Calendar.DAY_OF_YEAR) - t.get(java.util.Calendar.DAY_OF_YEAR);
             if (dd == 0) return hm; if (dd == 1) return Txt.s(R.string.channels_list_yesterday, hm);
         }
-        return new java.text.SimpleDateFormat("MMM d, HH:mm", Locale.US).format(new java.util.Date(ts));
+        return Txt.dates("MMM d, HH:mm", "MMMdHHmm").format(new java.util.Date(ts));
     }
 
     // RadioService.Listener

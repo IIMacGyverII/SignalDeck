@@ -57,11 +57,11 @@ public final class ChannelHistoryDialog {
         String heard = lastHeard > 0 ? Txt.s(R.string.intercom_chhistory_last_heard, ContactEditor.ago(lastHeard), lastWhat) : Txt.s(R.string.intercom_chhistory_none);
         String entries = total > rows.size() ? Txt.p(R.plurals.intercom_chhistory_entries_newest, total, total, rows.size()) : Txt.p(R.plurals.intercom_chhistory_entries, total, total);
         body.addView(Neo.sheetHint(c, total > 0 ? Txt.s(R.string.intercom_chhistory_summary, heard, entries, voice, texts, tones, ids, pkt, tx) : heard));
-        SimpleDateFormat f = new SimpleDateFormat("EEE MM-dd HH:mm:ss", Locale.US);
+        SimpleDateFormat f = Txt.dates("EEE MM-dd HH:mm:ss", "EEEMMddHHmmss"), dayF = Txt.dates("EEEE, MMM d", "EEEEMMMd");
         String day = "";
         for (Object[] r : rows) {
             long ts = (Long) r[0]; String kind = (String) r[1], text = (String) r[2], shown = (String) r[5]; int rssi = (Integer) r[3], dmrId = (Integer) r[4];   // text: the stored English (what is matched); shown: the line in the app's language
-            String dd = new SimpleDateFormat("EEEE, MMM d", Locale.US).format(new Date(ts));
+            String dd = dayF.format(new Date(ts));
             if (!dd.equals(day)) { day = dd; body.addView(Neo.sheetSection(c, dd)); }
             boolean alert = LastHeardDialog.isAlert(text) || kind.equals("warn") || kind.equals("alert") || kind.equals("busy");
             LinearLayout row = new LinearLayout(c); row.setOrientation(LinearLayout.VERTICAL);

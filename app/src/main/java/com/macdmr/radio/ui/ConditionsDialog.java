@@ -64,7 +64,7 @@ public final class ConditionsDialog {
 
     private static void fill(Context c, RadioService svc, LinearLayout cards, Conditions.Report r, android.location.Location me) {
         float d = Theme.dp(c);
-        SimpleDateFormat day = new SimpleDateFormat("EEE HH:mm", Locale.getDefault()), hh = new SimpleDateFormat("HH", Locale.getDefault()), date = new SimpleDateFormat("EEE d MMM", Locale.getDefault());
+        SimpleDateFormat day = Txt.dates("EEE HH:mm", "EEEHHmm", false), hh = new SimpleDateFormat("HH", Locale.getDefault()), date = Txt.dates("EEE d MMM", "EEEdMMM", false);
         // tropo
         LinearLayout t = card(c, cards, Txt.s(R.string.modes_cond_tropo_title), "signal", Neo.GREEN);
         if (r.tropo.isEmpty()) t.addView(small(c, me == null ? Txt.s(R.string.modes_cond_needs_fix) : Txt.s(R.string.modes_cond_tropo_failed)));
@@ -85,9 +85,9 @@ public final class ConditionsDialog {
         }
         // aurora
         LinearLayout a = card(c, cards, Txt.s(R.string.modes_cond_aurora_title), "weather", Neo.VIOLET);
-        a.addView(big(c, r.kpNow < 0 ? Txt.s(R.string.modes_cond_kp_unavailable) : Txt.s(R.string.modes_cond_kp_now, String.format(Locale.US, "%.1f", r.kpNow), Conditions.kpWords(r.kpNow)), r.kpNow >= 5 ? Neo.AMBER : Neo.TEXT));
+        a.addView(big(c, r.kpNow < 0 ? Txt.s(R.string.modes_cond_kp_unavailable) : Txt.s(R.string.modes_cond_kp_now, Txt.decimal(r.kpNow, 1), Conditions.kpWords(r.kpNow)), r.kpNow >= 5 ? Neo.AMBER : Neo.TEXT));
         List<String> al = new ArrayList<>();
-        if (r.kpMax >= 0) al.add(Txt.s(R.string.modes_cond_kp_forecast, String.format(Locale.US, "%.1f", r.kpMax), Conditions.kpWords(r.kpMax), day.format(new Date(r.kpMaxAt))));
+        if (r.kpMax >= 0) al.add(Txt.s(R.string.modes_cond_kp_forecast, Txt.decimal(r.kpMax, 1), Conditions.kpWords(r.kpMax), day.format(new Date(r.kpMaxAt))));
         if (r.aurora >= 0) al.add(Txt.s(R.string.modes_cond_aurora_chance, String.valueOf(r.aurora)));
         al.add(Txt.s(R.string.modes_cond_aurora_advice));
         a.addView(small(c, android.text.TextUtils.join("\n", al)));

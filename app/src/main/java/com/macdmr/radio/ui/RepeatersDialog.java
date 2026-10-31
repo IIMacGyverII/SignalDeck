@@ -105,7 +105,7 @@ public final class RepeatersDialog {
             LinearLayout rowv = shell();
             String kind = r.dmr && r.fm ? "DMR + FM" : r.dmr ? "DMR" + (r.cc >= 0 ? " CC" + r.cc : "") : "FM" + (hasTone(r.toneUp) ? " " + r.toneUp : "");   // i18n: mode names
             rowv.addView(Neo.label(c, nz(r.callsign) + "  ·  " + kind, r.dmr ? Theme.AMBER : Theme.CYAN, 15, true));
-            rowv.addView(Neo.label(c, String.format(Locale.US, "%.4f MHz %s%.1f  ·  %s %s%s", r.rxHz / 1e6, r.offsetHz() >= 0 ? "+" : "−", Math.abs(r.offsetHz()) / 1e6, GeoUtil.formatDistanceWithArrow(lat, lon, r.lat, r.lon), nz(r.city), r.approx ? " " + Txt.s(R.string.channels_rep_approx_short) : ""), 0xFFBFC8D0, 12, false));   // i18n: units and data
+            rowv.addView(Neo.label(c, String.format(Locale.US, "%s MHz %s%s  ·  %s %s%s", Txt.freqMhz(r.rxHz, 4), r.offsetHz() >= 0 ? "+" : "−", Txt.decimal(Math.abs(r.offsetHz()) / 1e6, 1), GeoUtil.formatDistanceWithArrow(lat, lon, r.lat, r.lon), nz(r.city), r.approx ? " " + Txt.s(R.string.channels_rep_approx_short) : ""), 0xFFBFC8D0, 12, false));   // i18n: units and data
             rowv.setClickable(true); rowv.setOnClickListener(x -> details(r, lat, lon));
             list.addView(rowv);
         }
@@ -113,7 +113,7 @@ public final class RepeatersDialog {
 
     private void details(final Repeater r, double lat, double lon) {
         LinearLayout body = page("📡  " + nz(r.callsign));
-        body.addView(Neo.label(c, String.format(Locale.US, "RX %.4f MHz  ·  TX %.4f MHz", r.rxHz / 1e6, r.txHz / 1e6), Theme.CYAN, 15, true));   // i18n: protocol words (RX, TX) and units
+        body.addView(Neo.label(c, String.format(Locale.US, "RX %s MHz  ·  TX %s MHz", Txt.freqMhz(r.rxHz, 4), Txt.freqMhz(r.txHz, 4)), Theme.CYAN, 15, true));   // i18n: protocol words (RX, TX) and units
         String sep = Txt.s(R.string.channels_codeplug_sep);
         String what = r.dmr ? "DMR" + (r.cc >= 0 ? sep + Txt.s(R.string.channels_rep_colour_code, r.cc) : "") + (r.network != null ? sep + r.network : "")
                 : "FM" + (hasTone(r.toneUp) ? sep + Txt.s(R.string.channels_rep_tx_tone, r.toneUp) : "") + (hasTone(r.toneDown) ? sep + Txt.s(R.string.channels_codeplug_rx_tone, r.toneDown) : "");
@@ -175,5 +175,5 @@ public final class RepeatersDialog {
     private LinearLayout shell() { LinearLayout r = new LinearLayout(c); r.setOrientation(LinearLayout.VERTICAL); r.setBackground(Neo.rowCard(c)); r.setPadding(dp(12), dp(8), dp(12), dp(8)); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = dp(6); r.setLayoutParams(lp); return r; }
     private TextView pill(LinearLayout row, String text, boolean on, View.OnClickListener l) { TextView t = Neo.label(c, text, 0xFFBFC8D0, 13, true); t.setGravity(Gravity.CENTER); t.setPadding(dp(6), dp(8), dp(6), dp(8)); t.setClickable(true); t.setOnClickListener(l); style(t, on); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); lp.setMargins(dp(2), 0, dp(2), 0); row.addView(t, lp); return t; }
     private void style(TextView t, boolean on) { Neo.pillStyle(t, on, Neo.GREEN); }
-    private TextView button(LinearLayout row, String text, int[] accent, View.OnClickListener l) { TextView b = Neo.button(c, text, null, Neo.accentOf(accent)); b.setTextSize(14); b.setOnClickListener(l); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins(dp(3), dp(4), dp(3), dp(2)); row.setBaselineAligned(false); row.addView(b, lp); return b; }
+    private TextView button(LinearLayout row, String text, int[] accent, View.OnClickListener l) { TextView b = Neo.button(c, text, null, Neo.accentOf(accent)); b.setTextSize(14); Neo.fit(b, true); b.setOnClickListener(l); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins(dp(3), dp(4), dp(3), dp(2)); row.setBaselineAligned(false); row.addView(b, lp); return b; }
 }

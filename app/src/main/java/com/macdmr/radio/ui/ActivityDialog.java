@@ -57,7 +57,7 @@ public final class ActivityDialog {
         body.addView(new Hours(c, s.byHour), new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) (120 * d)));
         body.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_activity_busiest)));
         if (s.channels.isEmpty()) body.addView(Neo.sheetHint(c, Txt.s(R.string.intercom_activity_nothing)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm", "MMddHHmm");
         int shown = 0;
         for (ActivityStats.Channel a : s.channels) {
             if (++shown > 25) break;

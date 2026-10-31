@@ -84,7 +84,7 @@ public final class M17Screen extends ModeScreen {
             set(now, Txt.s(R.string.modes_m17_receiving)); color(now, Neo.GREEN_LIGHT);
             set(who, (h.src.isEmpty() ? "…" : h.src) + "  →  " + (h.dst.isEmpty() ? "…" : h.dst));
             set(meta, h.encrypted ? Txt.s(R.string.modes_m17_encrypted) : h.data ? Txt.s(R.string.modes_m17_data) : h.meta != null ? "“" + h.meta + "”" : "");
-            set(stats, Txt.s(R.string.modes_m17_stats, String.format(Locale.US, "%.1f", (h.end - h.start) / 1000.0), h.frames, (int) Math.round(st.quality() * 100)));
+            set(stats, Txt.s(R.string.modes_m17_stats, Txt.decimal((h.end - h.start) / 1000.0, 1), h.frames, (int) Math.round(st.quality() * 100)));
         } else {
             set(now, Txt.s(R.string.modes_m17_listening)); color(now, Neo.VIOLET_LIGHT);
             set(who, ""); set(meta, ""); set(stats, "");
@@ -105,7 +105,7 @@ public final class M17Screen extends ModeScreen {
             SimpleDateFormat f = new SimpleDateFormat("HH:mm:ss", Locale.US);
             for (int i = hl.size() - 1; i >= 0 && i >= hl.size() - 30; i--) {
                 M17Station.Heard e = hl.get(i);
-                String line = String.format(Locale.US, "%s  %-9s → %-9s %4.1f s%s", f.format(new Date(e.start)), e.src.isEmpty() ? "?" : e.src, e.dst.isEmpty() ? "?" : e.dst, (e.end - e.start) / 1000.0,
+                String line = String.format(Locale.US, "%s  %-9s → %-9s %s s%s", f.format(new Date(e.start)), e.src.isEmpty() ? "?" : e.src, e.dst.isEmpty() ? "?" : e.dst, Txt.decimalf("%4.1f", (e.end - e.start) / 1000.0),
                     e.frames > 0 ? String.format(Locale.US, "  %d%%", 100 * e.good / e.frames) : "");
                 TextView t = Neo.text(c, line, e == h ? Neo.GREEN_LIGHT : Neo.TEXT, 13, Neo.mono(c)); t.setSingleLine(true); t.setPadding(0, dp(3), 0, dp(3));
                 final String src = e.src;

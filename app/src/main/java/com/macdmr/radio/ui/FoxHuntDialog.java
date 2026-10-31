@@ -51,7 +51,7 @@ public final class FoxHuntDialog {
         float d = Theme.dp(c);
         LinearLayout body = Neo.sheetBody(c, Txt.s(R.string.modes_fox_title), "radio");
         ChannelStore.Channel ch = svc.current();
-        body.addView(Neo.sheetHint(c, ch == null ? Txt.s(R.string.modes_fox_hint_no_channel) : Txt.s(R.string.modes_fox_hint, ch.name, String.format(Locale.US, "%.4f", ch.rxFreq / 1e6))));
+        body.addView(Neo.sheetHint(c, ch == null ? Txt.s(R.string.modes_fox_hint_no_channel) : Txt.s(R.string.modes_fox_hint, ch.name, Txt.freqMhz(ch.rxFreq, 4))));
 
         final TextView big = Neo.text(c, "--", Neo.CYAN, 56, Neo.display(c)); big.setGravity(Gravity.CENTER);
         body.addView(big);
@@ -165,7 +165,7 @@ public final class FoxHuntDialog {
             String own = cur == null ? null : com.macdmr.radio.dsp.ToneTable.toneLabel(cur.rxType, cur.rxSubCode);
             items.add(own == null || own.equals("—") ? Txt.s(R.string.modes_fox_tone_channel_none) : Txt.s(R.string.modes_fox_tone_channel, own)); tones.add(-1.0);
             double heard = svc.heardToneHz();
-            if (heard > 0) { items.add(Txt.s(R.string.modes_fox_tone_heard, String.format(Locale.US, "%.1f", heard))); tones.add(heard); }
+            if (heard > 0) { items.add(Txt.s(R.string.modes_fox_tone_heard, Txt.decimal(heard, 1))); tones.add(heard); }
             items.add(Txt.s(R.string.modes_fox_tone_pick)); tones.add(0.0);
             new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_fox_tone_title)).setItems(items.toArray(new String[0]), (x, w) -> {
                 double t = tones.get(w);
@@ -230,7 +230,7 @@ public final class FoxHuntDialog {
                 final FoxPredictor.Result res = r; final int miss = missing;
                 h.post(() -> {
                     if (g != gen[0]) return;                            // a newer mark or toggle arrived meanwhile
-                    if (miss > 0) { dlMb[0] = String.format(Locale.US, "%.1f", Math.max(0.1, miss * com.macdmr.radio.coverage.Terrain.TILE_BYTES / 1e6)); dlBtn.setText(Txt.s(R.string.modes_fox_download_terrain_size, dlMb[0])); dlBtn.setVisibility(View.VISIBLE); }
+                    if (miss > 0) { dlMb[0] = Txt.decimal(Math.max(0.1, miss * com.macdmr.radio.coverage.Terrain.TILE_BYTES / 1e6), 1); dlBtn.setText(Txt.s(R.string.modes_fox_download_terrain_size, dlMb[0])); dlBtn.setVisibility(View.VISIBLE); }
                     pred[0] = res; layer.set(res, ms); plot.setEstimate(res); mapView.invalidate();
                     predNote.setText(res == null ? Txt.s(R.string.modes_fox_mark_to_start) : res.note == null ? (res.hasMap() ? Txt.s(R.string.modes_fox_shaded) : "") : Txt.s(res.hasMap() ? R.string.modes_fox_not_used_shaded : R.string.modes_fox_not_used, res.note));
                     if (!ms.isEmpty()) {
@@ -340,7 +340,7 @@ public final class FoxHuntDialog {
                     String what = pr != null ? (pr.layers == 0 ? Txt.s(R.string.modes_fox_what_strongest) : pr.confidence() != null ? Txt.s(R.string.modes_fox_what_estimate_conf, pr.layerNames(), pr.confidenceText()) : Txt.s(R.string.modes_fox_what_estimate, pr.layerNames()))
                             : est.fromBearings ? Txt.p(R.plurals.modes_fox_what_bearings, est.used, est.used) : Txt.s(R.string.modes_fox_what_strongest);
                     if (res[0] < 10) sb.append("\n").append(Txt.s(R.string.modes_fox_here, what));   // closer than GPS can tell: a direction would be noise
-                    else sb.append(String.format(Locale.US, "\n%s: %s %s (%03.0f°)", what, com.macdmr.radio.region.Region.km() ? com.macdmr.radio.repeaters.GeoUtil.dist(res[0], true) : String.format(Locale.US, "%.2f mi", res[0] / 1609.344), compass(res[1]), (res[1] + 360) % 360));   // i18n: distance and bearing
+                    else sb.append(String.format(Locale.US, "\n%s: %s %s (%03.0f°)", what, com.macdmr.radio.region.Region.km() ? com.macdmr.radio.repeaters.GeoUtil.dist(res[0], true) : Txt.decimal(res[0] / 1609.344, 2) + " mi", compass(res[1]), (res[1] + 360) % 360));   // i18n: distance and bearing
                 } else if (svc.fox().marks().isEmpty()) sb.append("\n").append(Txt.s(R.string.modes_fox_no_marks));
                 info.setText(sb.toString());
                 plot.update(me, heading[0]);
@@ -562,8 +562,8 @@ public final class FoxHuntDialog {
             }
             p.setStyle(Paint.Style.FILL); p.setColor(Neo.DIM); p.setTextSize(11 * d); p.setTextAlign(Paint.Align.LEFT);
             double ring = maxM / (0.9 * 3.2);                 // metres between rings
-            cv.drawText(com.macdmr.radio.region.Region.km() ? (ring >= 1000 ? Txt.s(R.string.modes_fox_rings_km, String.format(Locale.US, "%.1f", ring / 1000)) : Txt.s(R.string.modes_fox_rings_m, String.format(Locale.US, "%.0f", ring)))
-                    : ring >= 1609 ? Txt.s(R.string.modes_fox_rings_mi, String.format(Locale.US, "%.1f", ring / 1609.344)) : Txt.s(R.string.modes_fox_rings_m, String.format(Locale.US, "%.0f", ring)), 10 * d, hgt - 10 * d, p);
+            cv.drawText(com.macdmr.radio.region.Region.km() ? (ring >= 1000 ? Txt.s(R.string.modes_fox_rings_km, Txt.decimal(ring / 1000, 1)) : Txt.s(R.string.modes_fox_rings_m, String.format(Locale.US, "%.0f", ring)))
+                    : ring >= 1609 ? Txt.s(R.string.modes_fox_rings_mi, Txt.decimal(ring / 1609.344, 1)) : Txt.s(R.string.modes_fox_rings_m, String.format(Locale.US, "%.0f", ring)), 10 * d, hgt - 10 * d, p);
             cv.drawText("N ↑", w - 34 * d, 18 * d, p);
         }
         private static double dist(double la, double lo, double la0, double lo0, double cos) { double x = Math.toRadians(lo - lo0) * 6371000 * cos, y = Math.toRadians(la - la0) * 6371000; return Math.sqrt(x * x + y * y); }

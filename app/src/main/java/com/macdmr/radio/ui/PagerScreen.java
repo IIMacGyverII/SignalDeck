@@ -104,7 +104,7 @@ public final class PagerScreen extends ModeScreen {
 
     private void send() {
         double mhz;
-        try { mhz = Double.parseDouble(freq.getText().toString().trim()); }
+        try { mhz = Txt.parseDecimal(freq.getText().toString()); }
         catch (NumberFormatException e) { status.setText(Txt.s(R.string.modes_pager_err_freq)); return; }
         int hz = (int) Math.round(mhz * 1e6);
         int[] rics;

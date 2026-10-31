@@ -55,8 +55,8 @@ public final class BandScopeScreen extends ModeScreen {
         String l = Txt.s(on ? R.string.common_stop : R.string.common_start); if (!l.contentEquals(startBtn.getText())) { startBtn.setText(l); Neo.fit(startBtn); }
         int nSteps = BandScope.steps(s.from(), s.to(), s.step());
         if (on) {
-            String f0 = String.format(Locale.US, "%.3f", s.from() / 1e6), f1 = String.format(Locale.US, "%.3f", s.to() / 1e6), about = s.sweepMs() > 0 ? "" : "≈", sweep = BandScope.duration(s.estimateMs());
-            setSubtitle(s.partialIndex() >= 0 ? Txt.s(R.string.modes_scope_running_step, f0, f1, nSteps, khz(s.step()), about, sweep, s.partialIndex() + 1) : Txt.s(R.string.modes_scope_running, f0, f1, nSteps, khz(s.step()), about, sweep));
+            String f0 = Txt.freqMhz(s.from(), 3), f1 = Txt.freqMhz(s.to(), 3), about = s.sweepMs() > 0 ? "" : "≈", sweep = BandScope.duration(s.estimateMs());
+            setSubtitle(s.partialIndex() >= 0 ? Txt.s(R.string.modes_scope_running_step, f0, f1, nSteps, khzShown(s.step()), about, sweep, s.partialIndex() + 1) : Txt.s(R.string.modes_scope_running, f0, f1, nSteps, khzShown(s.step()), about, sweep));
         }
         else setSubtitle(Txt.s(R.string.modes_scope_subtitle));
         showLive();
@@ -65,7 +65,7 @@ public final class BandScopeScreen extends ModeScreen {
             StringBuilder b = new StringBuilder();
             for (int[] p : firstPeaks(BandScope.peaks(last, s.from(), s.step(), 8), 5)) {
                 ChannelStore.Channel ch = channelAt(p[0]);
-                b.append(b.length() > 0 ? "\n" : "").append(String.format(Locale.US, "%.4f MHz  %d dBm", p[0] / 1e6, p[1])).append(ch == null ? "" : "  · " + ch.name);   // i18n: frequency and level, units only
+                b.append(b.length() > 0 ? "\n" : "").append(String.format(Locale.US, "%s MHz  %d dBm", Txt.freqMhz(p[0], 4), p[1])).append(ch == null ? "" : "  · " + ch.name);   // i18n: frequency and level, units only
             }
             set(peaks, b.length() == 0 ? Txt.s(R.string.modes_scope_no_peaks) : Txt.s(R.string.modes_scope_peaks, b.toString()));
         } else set(peaks, on ? Txt.s(R.string.modes_scope_first_sweep) : Txt.s(R.string.modes_scope_intro));
@@ -83,7 +83,7 @@ public final class BandScopeScreen extends ModeScreen {
     }
     private String rangeLabel() {
         if (!custom()) return BandScope.PRESETS[presetIdx].label();
-        int[] r = range(); return String.format(Locale.US, "%.3f–%.3f", r[0] / 1e6, r[1] / 1e6);
+        int[] r = range(); return Txt.freqMhz(r[0], 3) + "–" + Txt.freqMhz(r[1], 3);
     }
     private void buildButtons() {
         footer.removeAllViews();
@@ -117,7 +117,7 @@ public final class BandScopeScreen extends ModeScreen {
         int inBand = 0; for (BandScope.Preset p : BandScope.PRESETS) if (BandScope.fits(p)) inBand++;
         final boolean more = idx.size() < inBand;
         int k = idx.size(); String[] n = new String[k + (more ? 2 : 1)];
-        for (int j = 0; j < k; j++) { BandScope.Preset p = BandScope.PRESETS[idx.get(j)]; int st = BandScope.steps(p.from, p.to, p.step); n[j] = Txt.p(R.plurals.modes_scope_preset_item, st, p.label(), String.format(Locale.US, "%.3f", p.from / 1e6), String.format(Locale.US, "%.3f", p.to / 1e6), khz(p.step), st, BandScope.duration((long) st * (BandScope.DEFAULT_SETTLE_MS + 300))); }
+        for (int j = 0; j < k; j++) { BandScope.Preset p = BandScope.PRESETS[idx.get(j)]; int st = BandScope.steps(p.from, p.to, p.step); n[j] = Txt.p(R.plurals.modes_scope_preset_item, st, p.label(), Txt.freqMhz(p.from, 3), Txt.freqMhz(p.to, 3), khzShown(p.step), st, BandScope.duration((long) st * (BandScope.DEFAULT_SETTLE_MS + 300))); }
         n[k] = Txt.s(R.string.modes_scope_custom_item); if (more) n[k + 1] = Txt.s(R.string.modes_scope_show_all);
         new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_scope_which_band)).setItems(n, (dd, w) -> { if (w == k) customRange(); else if (w == k + 1) choosePreset(true); else picked(idx.get(w)); }).show();
     }
@@ -168,13 +168,15 @@ public final class BandScopeScreen extends ModeScreen {
             svc.scopeStop();
             post(() -> {
                 ChannelStore.Channel v = new ChannelStore.Channel(); v.type = 1; v.rxFreq = v.txFreq = hz; v.band = 1; v.power = 0; v.sq = 2; v.name = "";
-                svc.applyVfo(v); toast(Txt.s(R.string.modes_scope_listening, String.format(Locale.US, "%.4f", hz / 1e6))); close();
+                svc.applyVfo(v); toast(Txt.s(R.string.modes_scope_listening, Txt.freqMhz(hz, 4))); close();
             });
         }, "scope-listen").start();
     }
 
     @Override public void onScope(int from, int step, float[] dbm) { refresh(); }
     @Override protected long liveHz() { return svc.scope().currentHz(); }
+    /** {@link #khz} for the screen (the app language's decimal sign); the step field keeps the point. */
+    static String khzShown(int hz) { return Txt.decimalText(khz(hz)); }
     static String khz(int hz) { return hz % 1000 == 0 ? String.valueOf(hz / 1000) : String.format(Locale.US, "%.2f", hz / 1000.0).replaceAll("0+$", ""); }
     @Override public void onScopeState(String state) { refresh(); }
 
@@ -198,7 +200,7 @@ public final class BandScopeScreen extends ModeScreen {
             int i = Math.round(x / getWidth() * (n - 1)); selHz = s.from() + i * s.step(); selX = (float) i / (n - 1) * getWidth();
             float[] last = s.last(); float v = last != null && i < last.length ? last[i] : Float.NaN;
             ChannelStore.Channel ch = channelAt(selHz);
-            info.setText(String.format(Locale.US, "%.4f MHz  %s", selHz / 1e6, Float.isNaN(v) ? "" : Math.round(v) + " dBm") + (ch == null ? "" : "  · " + ch.name));   // i18n: frequency and level, units only
+            info.setText(String.format(Locale.US, "%s MHz  %s", Txt.freqMhz(selHz, 4), Float.isNaN(v) ? "" : Math.round(v) + " dBm") + (ch == null ? "" : "  · " + ch.name));   // i18n: frequency and level, units only
             invalidate(); return true;
         }
         float y(float dbm, float h) { float t = (Math.max(BOTTOM, Math.min(TOP, dbm)) - BOTTOM) / (TOP - BOTTOM); return h * (1 - t); }
@@ -216,7 +218,7 @@ public final class BandScopeScreen extends ModeScreen {
             for (float db = -120; db <= -40; db += 20) { float yy = y(db, gh); cv.drawLine(0, yy, w, yy, grid); cv.drawText((int) db + "", dp(2), yy - dp(2), text); }
             int n = BandScope.steps(s.from(), s.to(), s.step());
             if (n >= 2) {
-                for (int k = 0; k <= 4; k++) { float xx = w * k / 4f; cv.drawLine(xx, 0, xx, gh, grid); String l = String.format(Locale.US, "%.3f", (s.from() + (s.to() - s.from()) * k / 4.0) / 1e6); float tw = text.measureText(l); cv.drawText(l, Math.max(0, Math.min(w - tw, xx - tw / 2)), gh - dp(2), text); }
+                for (int k = 0; k <= 4; k++) { float xx = w * k / 4f; cv.drawLine(xx, 0, xx, gh, grid); String l = Txt.decimal((s.from() + (s.to() - s.from()) * k / 4.0) / 1e6, 3); float tw = text.measureText(l); cv.drawText(l, Math.max(0, Math.min(w - tw, xx - tw / 2)), gh - dp(2), text); }
                 float[] pk = s.peak(); if (pk != null) cv.drawPath(path(pk, w, gh), hold);
                 float[] last = s.last(), part = s.partial(); int pi = s.partialIndex();
                 if (last != null) { line.setAlpha(part != null && pi >= 0 ? 90 : 255); cv.drawPath(path(last, w, gh), line); }

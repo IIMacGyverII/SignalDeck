@@ -606,7 +606,7 @@
         { "id": "region", "head": "Region",
           "text": "{@device_title} → {@device_set_region}: the country whose defaults SignalDeck uses, such as the APRS frequency. See Region." },
         { "id": "language", "head": "Language",
-          "text": "{@device_title} → {@device_set_title} → {@device_language} sets the language of SignalDeck's screens, notifications, the car screens and this guide: the phone's language (the default, which follows the phone when you change it) or one SignalDeck ships. English is the only one so far; others are being translated. A text not yet translated shows in English. Logs, the device and transmit-test reports and anything sent on the air stay in English." },
+          "text": "{@device_title} → {@device_set_title} → {@device_language} sets the language of SignalDeck's screens, notifications, the car screens and this guide: the phone's language (the default, which follows the phone when you change it) or one SignalDeck ships. So far that is English and German; the German is a first draft that native-speaking hams are invited to improve, and more languages are being translated. A text not yet translated shows in English. Logs, the device and transmit-test reports and anything sent on the air stay in English." },
         { "id": "your-dmr-id", "head": "Your DMR ID",
           "text": "What other radios see when you talk on DMR channels. Change sets it." },
         { "id": "about-and-license", "head": "About and license",

@@ -44,7 +44,7 @@ Device → Region: the country whose defaults SignalDeck uses, such as the APRS 
 
 ## Language
 
-Device → Radio settings → Language sets the language of SignalDeck's screens, notifications, the car screens and this guide: the phone's language (the default, which follows the phone when you change it) or one SignalDeck ships. English is the only one so far; others are being translated. A text not yet translated shows in English. Logs, the device and transmit-test reports and anything sent on the air stay in English.
+Device → Radio settings → Language sets the language of SignalDeck's screens, notifications, the car screens and this guide: the phone's language (the default, which follows the phone when you change it) or one SignalDeck ships. So far that is English and German; the German is a first draft that native-speaking hams are invited to improve, and more languages are being translated. A text not yet translated shows in English. Logs, the device and transmit-test reports and anything sent on the air stay in English.
 
 ## Your DMR ID
 

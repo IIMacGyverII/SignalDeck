@@ -13,10 +13,10 @@
     <string name="channel_editor_h_m17">Who this channel calls. @ALL is everyone. A callsign calls that station. Pick from contacts uses a contact that has a callsign. Your own callsign, the one you transmit from, is the station callsign in APRS settings.</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
     <string name="channel_editor_h_can">Channel access number, 0 to 15. Radios only hear each other when this matches. 0 is the usual choice.</string>
-    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$d is the longest name the radio takes (characters). -->
-    <string name="channel_editor_h_tx">The frequency you transmit on, in MHz. On a simplex channel it is the same as the receive frequency; on a repeater channel it is the repeater\'s input (for example +5 MHz on UHF GMRS, or ±0.6 MHz on 2 m). Left empty, it is the receive frequency (simplex). This radio tunes %1$d.</string>
-    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$d is the longest name the radio takes (characters). -->
-    <string name="channel_editor_h_rx">The frequency you listen on, in MHz. On a repeater channel it is the repeater\'s output. This radio tunes %1$d; other frequencies (220 MHz, for example) cannot be saved.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$s is the longest name the radio takes (characters). -->
+    <string name="channel_editor_h_tx">The frequency you transmit on, in MHz. On a simplex channel it is the same as the receive frequency; on a repeater channel it is the repeater\'s input (for example +5 MHz on UHF GMRS, or ±0.6 MHz on 2 m). Left empty, it is the receive frequency (simplex). This radio tunes %1$s.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$s is the longest name the radio takes (characters). -->
+    <string name="channel_editor_h_rx">The frequency you listen on, in MHz. On a repeater channel it is the repeater\'s output. This radio tunes %1$s; other frequencies (220 MHz, for example) cannot be saved.</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
     <string name="channel_editor_h_pos">Optional position of the station or repeater this channel reaches. With it the intercom shows the place name and its distance and bearing from you. Use my position fills in the phone\'s last known location.</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->

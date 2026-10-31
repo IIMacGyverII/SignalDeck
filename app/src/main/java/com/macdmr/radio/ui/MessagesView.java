@@ -94,7 +94,7 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
         if (svc == null) return;
         convs.clear(); convs.addAll(svc.conversations()); convAdapter.notifyDataSetChanged();
         empty.setVisibility(convs.isEmpty() ? VISIBLE : GONE);
-        Neo.headerSubtitle(header).setText((convs.isEmpty() ? Txt.s(R.string.packet_msg_sub) : Txt.p(R.plurals.packet_msg_conversations, convs.size(), convs.size())).toUpperCase(java.util.Locale.US));
+        Neo.headerSubtitle(header).setText((convs.isEmpty() ? Txt.s(R.string.packet_msg_sub) : Txt.p(R.plurals.packet_msg_conversations, convs.size(), convs.size())).toUpperCase(Txt.locale()));
     }
 
     public boolean back() { if (threadPage != null) { content.removeView(threadPage); threadPage = null; peer = null; dataThread = null; if (svc != null) svc.watchingThread(""); reload(); return true; } return false; }

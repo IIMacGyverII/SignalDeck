@@ -79,8 +79,8 @@ public final class ActivityDialog {
             zone.setOnClickListener(v -> {
                 List<Integer> nums = new ArrayList<>();
                 for (ActivityStats.Channel a : s.channels) if (a.number > 0 && svc.store().byNumber(a.number) != null && nums.size() < 12) nums.add(a.number);
-                String zn = Txt.s(R.string.intercom_activity_busiest);
-                ChannelStore.Zone z = null; for (ChannelStore.Zone x : svc.store().zones()) if (x.name.equals(zn)) z = x;
+                String zn = Txt.s(R.string.intercom_activity_busiest), zenglish = Txt.en(R.string.intercom_activity_busiest);
+                ChannelStore.Zone z = null; for (ChannelStore.Zone x : svc.store().zones()) if (x.name.equals(zn) || x.name.equals(zenglish)) z = x;   // also the one made while the app was in English (a zone keeps the name it was made with)
                 if (z == null) { z = new ChannelStore.Zone(); z.name = zn; }
                 z.numbers = new int[nums.size()]; for (int i = 0; i < nums.size(); i++) z.numbers[i] = nums.get(i);
                 svc.store().saveZone(z); svc.setZone(z.id);

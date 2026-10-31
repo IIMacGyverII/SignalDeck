@@ -38,8 +38,6 @@ import java.util.Locale;
 public class ContactsView extends LinearLayout {
     public interface Host { void openThread(ChannelStore.Contact c); }
 
-    /** English type names, for ContactEditor until it reads {@link #type}; this page shows {@link #type}. */
-    static final String[] TYPES = { "Private", "Group", "All call" };   // i18n: kept for ContactEditor (not this group's file); use type(i)
     private static final int[] TYPE_NAMES = { R.string.intercom_contacts_type_private, R.string.intercom_contacts_type_group, R.string.intercom_contacts_type_all_call };
     /** A contact type's name in the app's language: 0 private, 1 group, 2 all call (out of range is clamped). */
     static String type(int type) { return Txt.s(TYPE_NAMES[Math.min(2, Math.max(0, type))]); }

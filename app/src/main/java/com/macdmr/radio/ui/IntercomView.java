@@ -551,7 +551,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
     private void pickCaptionModel() {
         if (svc == null) return;
         int cur = 1; for (int i = 0; i < com.macdmr.radio.VoskCaptions.MODELS.length; i++) if (com.macdmr.radio.VoskCaptions.MODELS[i].equals(svc.captionModel())) cur = i;
-        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.intercom_main_model_title)).setSingleChoiceItems(com.macdmr.radio.VoskCaptions.MODEL_LABELS, cur, null)
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.intercom_main_model_title)).setSingleChoiceItems(com.macdmr.radio.VoskCaptions.modelLabels(), cur, null)
                 .setPositiveButton(Txt.s(R.string.intercom_main_model_use), (d, w) -> {
                     int i = ((android.app.AlertDialog) d).getListView().getCheckedItemPosition();
                     if (i >= 0) { svc.setCaptionModel(com.macdmr.radio.VoskCaptions.MODELS[i]); android.widget.Toast.makeText(getContext(), Txt.s(R.string.intercom_main_model_switching), android.widget.Toast.LENGTH_LONG).show(); }

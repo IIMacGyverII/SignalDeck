@@ -36,10 +36,6 @@ public final class TxLimit {
     /** The choices offered, in order; Custom… follows them on the screen. */
     public static final int[] PRESETS_S = { 30, 60, 120, 180, 300, 600, NONE };
 
-    /** English only, for callers not yet moved to {@link #heatWarning()} (DeviceView, WebHost). */
-    public static final String HEAT_WARNING = "Long transmissions heat the phone. A 2-minute key at high power warmed the radio area about 11 °C on the bench. "   // i18n: kept for old callers; screens use heatWarning()
-            + "SignalDeck still stops any transmission if the phone gets too hot (radio area 70 °C, battery 48 °C).";   // i18n: kept for old callers; screens use heatWarning()
-
     /** The heat warning shown once when a long limit (or none) is picked, in the app's language. */
     public static String heatWarning() { return Txt.s(R.string.device_txlimit_heat_warning); }
 
@@ -58,7 +54,7 @@ public final class TxLimit {
     /** The module timer byte (0x3B): the limit plus the margin, at most 255; 0 (timer off) for no limit or a limit over 255 s, where SignalDeck's watchdog alone ends the key. */
     public static int moduleTot(int s) { s = valid(s); return s == NONE || s > MODULE_MAX_S ? 0 : Math.min(MODULE_MAX_S, s + MODULE_MARGIN_S); }
 
-    /** Whether picking this asks once with {@link #HEAT_WARNING}: no limit, or longer than 2 minutes. */
+    /** Whether picking this asks once with {@link #heatWarning()}: no limit, or longer than 2 minutes. */
     public static boolean needsWarning(int s) { s = valid(s); return s == NONE || s > WARN_ABOVE_S; }
 
     /** The custom field's text parsed: whole seconds of at least {@link #MIN_CUSTOM_S}, or -1 when it is not one. */

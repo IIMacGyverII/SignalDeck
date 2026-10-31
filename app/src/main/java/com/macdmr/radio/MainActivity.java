@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout tab = new LinearLayout(this); tab.setOrientation(LinearLayout.VERTICAL); tab.setGravity(Gravity.CENTER);
             tab.setPadding(0, Theme.dp(this, small ? 5 : 8), 0, Theme.dp(this, small ? 3 : 6)); tab.setContentDescription(tabNames[i]);
             android.widget.ImageView e = new android.widget.ImageView(this);
-            TextView t = com.macdmr.radio.ui.Neo.text(this, tabNames[i].toUpperCase(java.util.Locale.US), 0xFF71879D, small ? 10f : 11.5f, com.macdmr.radio.ui.Neo.ui(this)); t.setGravity(Gravity.CENTER); t.setLetterSpacing(0.08f); t.setSingleLine(true);
+            TextView t = com.macdmr.radio.ui.Neo.text(this, tabNames[i].toUpperCase(Txt.locale()), 0xFF71879D, small ? 10f : 11.5f, com.macdmr.radio.ui.Neo.ui(this)); t.setGravity(Gravity.CENTER); t.setLetterSpacing(0.08f); t.setSingleLine(true);
             LinearLayout.LayoutParams el = new LinearLayout.LayoutParams(Theme.dp(this, small ? 20 : 24), Theme.dp(this, small ? 20 : 24)); el.bottomMargin = Theme.dp(this, small ? 2 : 4);
             tab.addView(e, el); tab.addView(t);
             View ind = new View(this); LinearLayout.LayoutParams il = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Theme.dp(this, 3)); il.setMargins(Theme.dp(this, 14), Theme.dp(this, small ? 3 : 6), Theme.dp(this, 14), 0);
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
             ((com.macdmr.radio.ui.ChannelEditorView) editor).attach(svc);
             content.addView(editor, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
         });
-        show(0);
+        show(b != null ? Math.max(0, Math.min(4, b.getInt(STATE_TAB, 0))) : 0);   // recreated (a language change, a rotation): back on the tab it showed
         takeSharedLocation(getIntent()); takeOpenNets(getIntent()); takeCodeplug(getIntent());
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
@@ -481,6 +481,10 @@ public class MainActivity extends AppCompatActivity {
             finishAndRemoveTask();
         });
     }
+
+    /** The open tab, kept across the recreate a language change (Device → Language) or another configuration change causes. */
+    private static final String STATE_TAB = "tab";
+    @Override protected void onSaveInstanceState(Bundle out) { super.onSaveInstanceState(out); out.putInt(STATE_TAB, tab); }
 
     @Override protected void onDestroy() {
         super.onDestroy();

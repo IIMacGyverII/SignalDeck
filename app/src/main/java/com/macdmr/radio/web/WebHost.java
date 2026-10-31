@@ -417,7 +417,7 @@ public final class WebHost {
         JSONObject o = new JSONObject();
         if (p == null) return o;
         android.graphics.Bitmap b = p.sstvLast();
-        o.put("on", p.sstvRx()).put("status", p.sstvStatus()).put("picture", b != null).put("stamp", b == null ? "" : System.identityHashCode(b) + "_" + b.getGenerationId());
+        o.put("on", p.sstvRx()).put("status", p.sstvStatusText()).put("picture", b != null).put("stamp", b == null ? "" : System.identityHashCode(b) + "_" + b.getGenerationId());
         File[] fs = sstvDir().listFiles((d, n) -> n.endsWith(".png") || n.endsWith(".jpg"));   // changes when a picture is saved, combined or deleted
         long newest = 0; if (fs != null) for (File f : fs) newest = Math.max(newest, f.lastModified());
         o.put("gallery", (fs == null ? 0 : fs.length) + "_" + newest);
@@ -499,7 +499,7 @@ public final class WebHost {
         final int[] p = com.macdmr.radio.TxLimit.PRESETS_S;
         final int cur = svc.txLimitSetting(), at = com.macdmr.radio.TxLimit.presetIndex(cur);
         String[] names = new String[p.length + (at < 0 ? 1 : 0)], warn = new String[names.length];
-        for (int i = 0; i < p.length; i++) { names[i] = com.macdmr.radio.TxLimit.name(p[i]); if (p[i] == com.macdmr.radio.TxLimit.DEFAULT_S) names[i] = Txt.s(R.string.web_set_txlimit_default, names[i]); warn[i] = com.macdmr.radio.TxLimit.needsWarning(p[i]) ? com.macdmr.radio.TxLimit.HEAT_WARNING : null; }
+        for (int i = 0; i < p.length; i++) { names[i] = com.macdmr.radio.TxLimit.name(p[i]); if (p[i] == com.macdmr.radio.TxLimit.DEFAULT_S) names[i] = Txt.s(R.string.web_set_txlimit_default, names[i]); warn[i] = com.macdmr.radio.TxLimit.needsWarning(p[i]) ? com.macdmr.radio.TxLimit.heatWarning() : null; }
         if (at < 0) { names[p.length] = Txt.s(R.string.web_set_txlimit_custom, com.macdmr.radio.TxLimit.name(cur)); warn[p.length] = null; }
         return new Setting("txLimit", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_txlimit_label), Txt.s(R.string.web_set_txlimit_sub), "choice", names,
                 () -> at < 0 ? p.length : at, b -> {
@@ -518,7 +518,7 @@ public final class WebHost {
         l.add(new Setting("customPtt", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_customptt_label), Txt.s(R.string.web_set_customptt_sub), "bool", null, () -> com.macdmr.radio.CustomPttKey.enabled(svc), b -> { if (com.macdmr.radio.CustomPttKey.saved(svc) != null) { com.macdmr.radio.CustomPttKey.setEnabled(svc, b.getBoolean("value")); svc.customPttChanged(); } }));
         l.add(new Setting("scanSoftSq", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_scansoftsq_label), Txt.s(R.string.web_set_scansoftsq_sub), "bool", null, svc::scanSoftSq, b -> svc.setScanSoftSq(b.getBoolean("value"))));
         l.add(txLimitSetting());
-        l.add(new Setting("roger", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_roger_label), Txt.s(R.string.web_set_roger_sub), "choice", RadioService.ROGER_NAMES, svc::rogerStyle, b -> svc.setRogerStyle(Math.max(0, Math.min(RadioService.ROGER_NAMES.length - 1, b.getInt("value"))))));
+        l.add(new Setting("roger", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_roger_label), Txt.s(R.string.web_set_roger_sub), "choice", RadioService.rogerNames(), svc::rogerStyle, b -> svc.setRogerStyle(Math.max(0, Math.min(RadioService.rogerNames().length - 1, b.getInt("value"))))));
         l.add(new Setting("voice", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_voice_label), Txt.s(R.string.web_set_voice_sub), "bool", null, svc::voiceOn, b -> svc.setVoiceOn(b.getBoolean("value"))));
         l.add(new Setting("keywords", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_keywords_label), Txt.s(R.string.web_set_keywords_sub), "text", null, svc::keywords, b -> svc.setKeywords(b.getString("value"))));
         l.add(new Setting("logHeard", Txt.s(R.string.web_set_group_logbook), Txt.s(R.string.web_set_logheard_label), Txt.s(R.string.web_set_logheard_sub), "bool", null, svc::logHeard, b -> svc.setLogHeard(b.getBoolean("value"))));
@@ -528,9 +528,9 @@ public final class WebHost {
         l.add(new Setting("covInCar", Txt.s(R.string.web_set_group_coverage), Txt.s(R.string.web_set_covincar_label), Txt.s(R.string.web_set_covincar_sub), "bool", null, svc::coverageInCar, b -> svc.setCoverageInCar(b.getBoolean("value"))));
         l.add(new Setting("carMic", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_carmic_label), Txt.s(R.string.web_set_carmic_sub), "bool", null, svc::carMic, b -> svc.setCarMic(b.getBoolean("value"))));
         l.add(new Setting("wheelTalk", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_wheeltalk_label), Txt.s(R.string.web_set_wheeltalk_sub), "bool", null, svc::wheelTalk, b -> svc.setWheelTalk(b.getBoolean("value"))));
-        l.add(new Setting("nextTalk", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_nexttalk_label), Txt.s(R.string.web_set_nexttalk_sub), "choice", RadioService.NEXT_TALK_NAMES, svc::nextTalkMode, b -> svc.setNextTalkMode(Math.max(0, Math.min(RadioService.NEXT_TALK_NAMES.length - 1, b.getInt("value"))))));
-        l.add(new Setting("wheelMic", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_wheelmic_label), Txt.s(R.string.web_set_wheelmic_sub), "choice", RadioService.WHEEL_MIC_NAMES, svc::wheelMic, b -> svc.setWheelMic(Math.max(0, Math.min(1, b.getInt("value"))))));
-        l.add(new Setting("voxStop", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_voxstop_label), Txt.s(R.string.web_set_voxstop_sub), "choice", RadioService.VOX_NAMES, svc::voxStop, b -> svc.setVoxStop(Math.max(0, Math.min(RadioService.VOX_NAMES.length - 1, b.getInt("value"))))));
+        l.add(new Setting("nextTalk", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_nexttalk_label), Txt.s(R.string.web_set_nexttalk_sub), "choice", RadioService.nextTalkNames(), svc::nextTalkMode, b -> svc.setNextTalkMode(Math.max(0, Math.min(RadioService.nextTalkNames().length - 1, b.getInt("value"))))));
+        l.add(new Setting("wheelMic", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_wheelmic_label), Txt.s(R.string.web_set_wheelmic_sub), "choice", RadioService.wheelMicNames(), svc::wheelMic, b -> svc.setWheelMic(Math.max(0, Math.min(1, b.getInt("value"))))));
+        l.add(new Setting("voxStop", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_voxstop_label), Txt.s(R.string.web_set_voxstop_sub), "choice", RadioService.voxNames(), svc::voxStop, b -> svc.setVoxStop(Math.max(0, Math.min(RadioService.voxNames().length - 1, b.getInt("value"))))));
         l.add(new Setting("carScreen", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_carscreen_label), Txt.s(R.string.web_set_carscreen_sub), "bool", null, svc::carControlsScreen, b -> svc.setCarControlsScreen(b.getBoolean("value"))));
         return l;
     }
@@ -573,10 +573,10 @@ public final class WebHost {
                 return ok(on ? ("vosk".equals(svc.captionEngine()) ? Txt.s(R.string.web_captions_on_vosk) : Txt.s(R.string.web_captions_on)) : Txt.s(R.string.web_captions_off));
             }
             case "/api/captions/models": {                                      // engine, the on-device models (size, downloaded, in use), the recognizer's state
-                JSONArray a = new JSONArray(); String sel = svc.captionModel(), loaded = svc.captionLoadedModel();
+                JSONArray a = new JSONArray(); String sel = svc.captionModel(), loaded = svc.captionLoadedModel(); String[] labels = VoskCaptions.modelLabels();
                 for (int i = 0; i < VoskCaptions.MODELS.length; i++) {
                     String n = VoskCaptions.MODELS[i]; boolean present = VoskCaptions.modelPresent(svc, n);
-                    a.put(new JSONObject().put("name", n).put("label", VoskCaptions.MODEL_LABELS[i]).put("present", present).put("selected", n.equals(sel)).put("loaded", n.equals(loaded))
+                    a.put(new JSONObject().put("name", n).put("label", labels[i]).put("present", present).put("selected", n.equals(sel)).put("loaded", n.equals(loaded))
                             .put("bytes", present ? VoskCaptions.modelBytes(svc, n) : 0));
                 }
                 return ok(new JSONObject().put("engine", svc.captionEngine()).put("models", a).put("status", svc.captionStatus()).put("busy", svc.captionModelBusy())
@@ -1161,7 +1161,7 @@ public final class WebHost {
                         .put("groups", pp.getString("groups", "")).put("kissPort", pp.getInt("kissPort", 8001))
                         .put("isServer", pe.isServer()).put("isPort", pe.isPort()).put("isPasscodeSet", !"-1".equals(pp.getString("isPasscode", "-1")))
                         .put("isBeaconMin", pe.isBeaconMin()).put("isComment", pp.getString("isComment", pe.comment()));
-                JSONArray lk = new JSONArray(); for (String k : com.macdmr.radio.PacketEngine.LEAD_KINDS) lk.put(k);
+                JSONArray lk = new JSONArray(); for (String k : com.macdmr.radio.PacketEngine.leadKindNames()) lk.put(k);
                 JSONArray lc = new JSONArray(); for (int ms : com.macdmr.radio.PacketEngine.LEAD_CHOICES) lc.put(ms);
                 JSONArray dt = new JSONArray();
                 for (PacketStore.Dtmf d : pe.store().dtmfLog(50)) dt.put(new JSONObject().put("ts", d.ts).put("digits", d.digits).put("channel", d.channel).put("channelName", d.channelName));
@@ -1451,7 +1451,7 @@ public final class WebHost {
                         return null;
                     });
                 }
-                JSONArray modes = new JSONArray(); for (String m : com.macdmr.radio.PacketEngine.TEXT_MODES) modes.put(m);
+                JSONArray modes = new JSONArray(); for (String m : com.macdmr.radio.PacketEngine.textModeNames()) modes.put(m);
                 return ok(new JSONObject().put("mode", pe.textMode()).put("txMode", pe.textTxMode()).put("status", pe.textStatus()).put("text", pe.textReceived()).put("modes", modes).put("webTx", allowTx()));
             }
             case "/api/terminal": {                                             // AX.25 connected-mode terminal: GET transcript; POST {connect, via} | {send} | {disconnect} | {accept}

@@ -160,16 +160,16 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         addRow(set, Neo.switchRow(c, "ptt", Neo.RED, Txt.s(R.string.device_set_wheel), Txt.s(R.string.device_set_wheel_sub), wheelSw));
         wheelSw.setOnChange(on -> { if (svc != null) svc.setWheelTalk(on); });
         LinearLayout nextRow = Neo.switchRow(c, "ptt", Neo.RED, Txt.s(R.string.device_set_wheel_next), Txt.s(R.string.device_set_wheel_next_sub), null);
-        nextTalkValue = Neo.chip(c, com.macdmr.radio.RadioService.NEXT_TALK_NAMES[com.macdmr.radio.ham.WheelNext.DOUBLE], Neo.RED); nextRow.addView(nextTalkValue);
-        nextRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.nextTalkMode() + 1) % 3; svc.setNextTalkMode(m); nextTalkValue.setText(com.macdmr.radio.RadioService.NEXT_TALK_NAMES[m]); });
+        nextTalkValue = Neo.chip(c, com.macdmr.radio.RadioService.nextTalkNames()[com.macdmr.radio.ham.WheelNext.DOUBLE], Neo.RED); nextRow.addView(nextTalkValue);
+        nextRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.nextTalkMode() + 1) % 3; svc.setNextTalkMode(m); nextTalkValue.setText(com.macdmr.radio.RadioService.nextTalkNames()[m]); });
         addRow(set, nextRow);
         LinearLayout micRow = Neo.switchRow(c, "voice", Neo.RED, Txt.s(R.string.device_set_wheel_mic), Txt.s(R.string.device_set_wheel_mic_sub), null);
-        wheelMicValue = Neo.chip(c, com.macdmr.radio.RadioService.WHEEL_MIC_NAMES[1], Neo.RED); micRow.addView(wheelMicValue);
-        micRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.wheelMic() + 1) % 2; svc.setWheelMic(m); wheelMicValue.setText(com.macdmr.radio.RadioService.WHEEL_MIC_NAMES[m]); });
+        wheelMicValue = Neo.chip(c, com.macdmr.radio.RadioService.wheelMicNames()[1], Neo.RED); micRow.addView(wheelMicValue);
+        micRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.wheelMic() + 1) % 2; svc.setWheelMic(m); wheelMicValue.setText(com.macdmr.radio.RadioService.wheelMicNames()[m]); });
         addRow(set, micRow);
         LinearLayout voxRow = Neo.switchRow(c, "mon", Neo.RED, Txt.s(R.string.device_set_vox), Txt.s(R.string.device_set_vox_sub), null);
-        voxValue = Neo.chip(c, com.macdmr.radio.RadioService.VOX_NAMES[1], Neo.RED); voxRow.addView(voxValue);
-        voxRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.voxStop() + 1) % com.macdmr.radio.RadioService.VOX_NAMES.length; svc.setVoxStop(m); voxValue.setText(com.macdmr.radio.RadioService.VOX_NAMES[m]); });
+        voxValue = Neo.chip(c, com.macdmr.radio.RadioService.voxNames()[1], Neo.RED); voxRow.addView(voxValue);
+        voxRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.voxStop() + 1) % com.macdmr.radio.RadioService.voxNames().length; svc.setVoxStop(m); voxValue.setText(com.macdmr.radio.RadioService.voxNames()[m]); });
         addRow(set, voxRow);
         addRow(set, Neo.switchRow(c, "intercom", Neo.CYAN, Txt.s(R.string.device_set_car_screen), Txt.s(R.string.device_set_car_screen_sub), carScreenSw));
         carScreenSw.setOnChange(on -> { if (svc != null) svc.setCarControlsScreen(on); });
@@ -422,12 +422,12 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         col.addView(Neo.label(c, Txt.s(R.string.device_roger), Neo.TEXT, 16, true));
         TextView sub = Neo.label(c, Txt.s(R.string.device_roger_sub), Neo.MUTED, 13, false); sub.setPadding(0, Theme.dp(c, 2), 0, 0); col.addView(sub);
         row.addView(col, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        rogerValue = Neo.chip(c, com.macdmr.radio.RadioService.ROGER_NAMES[svc != null ? svc.rogerStyle() : 0], Neo.GREEN);
+        rogerValue = Neo.chip(c, com.macdmr.radio.RadioService.rogerNames()[svc != null ? svc.rogerStyle() : 0], Neo.GREEN);
         row.addView(rogerValue);
         row.setOnClickListener(v -> {
             if (svc == null) return;
-            int s = (svc.rogerStyle() + 1) % com.macdmr.radio.RadioService.ROGER_NAMES.length;
-            svc.setRogerStyle(s); rogerValue.setText(com.macdmr.radio.RadioService.ROGER_NAMES[s]);
+            int s = (svc.rogerStyle() + 1) % com.macdmr.radio.RadioService.rogerNames().length;
+            svc.setRogerStyle(s); rogerValue.setText(com.macdmr.radio.RadioService.rogerNames()[s]);
             com.macdmr.radio.RadioService.previewRoger(s);
         });
         return row;
@@ -1137,7 +1137,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         LayoutParams bl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); bl.setMargins(0, (int) (10 * d), 0, 0);
         box.addView(open, bl); box.addView(again, new LayoutParams(bl));
         final android.app.Dialog dlg = Neo.showSheet(c, box);
-        open.setOnClickListener(v -> { try { c.startActivity(com.macdmr.radio.car.AutoTrust.settingsIntent(c)); } catch (Throwable t) { android.widget.Toast.makeText(c, Txt.s(R.string.device_auto_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show(); } });
+        open.setOnClickListener(v -> { try { c.startActivity(com.macdmr.radio.car.AutoTrust.settingsIntent(c)); } catch (Throwable t) { android.widget.Toast.makeText(c, Txt.s(R.string.intercom_lastheard_open_auto_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show(); } });
         again.setOnClickListener(v -> { dlg.dismiss(); checkAutoTrust(); });
     }
 
@@ -1219,13 +1219,13 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         takeOver.setVisibility(unsupported ? GONE : VISIBLE); handBack.setVisibility(unsupported ? GONE : VISIBLE); reportNow.setVisibility(unsupported || !svc.profile().verified ? VISIBLE : GONE);
         takeOver.setAlpha(ready ? 0.55f : 1f); handBack.setAlpha(ready ? 1f : 0.55f);
         idText.setText(Txt.s(R.string.device_id_value, String.valueOf(svc.localId())));
-        if (rogerValue != null) rogerValue.setText(com.macdmr.radio.RadioService.ROGER_NAMES[svc.rogerStyle()]);
+        if (rogerValue != null) rogerValue.setText(com.macdmr.radio.RadioService.rogerNames()[svc.rogerStyle()]);
         if (txLimitValue != null) txLimitValue.setText(com.macdmr.radio.TxLimit.name(svc.txLimitSetting()));
         ownAtBoot.setChecked(svc.ownAtBoot()); voiceSw.setChecked(svc.voiceOn()); hwPttSw.setChecked(svc.hwPtt()); scanSqSw.setChecked(svc.scanSoftSq());
         volPttSw.setChecked(c.getSharedPreferences("radio", Context.MODE_PRIVATE).getBoolean("volPtt", false));
         refreshCustomPtt();
-        styleSw.setChecked(IntercomView.newLook(c)); animSw.setChecked(IntercomView.animatedPanel(c)); covSw.setChecked(svc.coverage().enabled()); roamSw.setChecked(svc.roaming()); carMicSw.setChecked(svc.carMic()); carCovSw.setChecked(svc.coverageInCar()); wheelSw.setChecked(svc.wheelTalk()); nextTalkValue.setText(com.macdmr.radio.RadioService.NEXT_TALK_NAMES[svc.nextTalkMode()]);
-        wheelMicValue.setText(com.macdmr.radio.RadioService.WHEEL_MIC_NAMES[Math.max(0, Math.min(1, svc.wheelMic()))]); voxValue.setText(com.macdmr.radio.RadioService.VOX_NAMES[Math.max(0, Math.min(3, svc.voxStop()))]); carScreenSw.setChecked(svc.carControlsScreen());
+        styleSw.setChecked(IntercomView.newLook(c)); animSw.setChecked(IntercomView.animatedPanel(c)); covSw.setChecked(svc.coverage().enabled()); roamSw.setChecked(svc.roaming()); carMicSw.setChecked(svc.carMic()); carCovSw.setChecked(svc.coverageInCar()); wheelSw.setChecked(svc.wheelTalk()); nextTalkValue.setText(com.macdmr.radio.RadioService.nextTalkNames()[svc.nextTalkMode()]);
+        wheelMicValue.setText(com.macdmr.radio.RadioService.wheelMicNames()[Math.max(0, Math.min(1, svc.wheelMic()))]); voxValue.setText(com.macdmr.radio.RadioService.voxNames()[Math.max(0, Math.min(3, svc.voxStop()))]); carScreenSw.setChecked(svc.carControlsScreen());
         ((TextView) radioIdTile.findViewWithTag("sub")).setText(svc.radioId().status());
         updateWeb();
     }

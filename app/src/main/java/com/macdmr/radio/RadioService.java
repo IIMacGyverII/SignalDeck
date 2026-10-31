@@ -125,6 +125,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         }
         @Override public String idCallsign() { ChannelStore.Channel ch = current; return ch != null && amateurBand(ch.txFreq) && packet != null && packet.callsignSet() ? packet.callsign() : null; }
         @Override public void event(String line) { history("pkt", line); }
+        @Override public void event(Msg m) { history("pkt", m); }
     });
     private volatile int parrotChannel = -1;
     private volatile long txStartedAt;
@@ -437,6 +438,8 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** A talkgroup's contact name, or "TG 91". */
     public String talkgroupName(int tg) { String n = store.contactName(tg, 1); return n != null && !n.isEmpty() ? n : Txt.s(R.string.service_tg_number, tg); }
+    /** {@link #talkgroupName} as a history argument: the contact name, or "TG n" as a message (English in the stored text). */
+    private Object talkgroupLabel(int tg) { String n = store.contactName(tg, 1); return n != null && !n.isEmpty() ? n : Msg.of(R.string.service_tg_number, tg); }
     /** Conversations with a name for everyone: contacts, then RadioID for radios, "TG n" for talkgroups. */
     public java.util.List<ChannelStore.Conversation> conversations() {
         java.util.List<ChannelStore.Conversation> l = store.conversations();
@@ -625,6 +628,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public void parrot(boolean on) { ui.post(() -> history("pkt", "\uD83D\uDCDF " + setParrot(on))); }
         @Override public void morseId() { if (packet != null) { String e = packet.sendCwId(); if (e != null) history("pkt", "\u26D4 " + e); } }
         @Override public void event(String line) { history("pkt", line); }
+        @Override public void event(Msg m) { history("pkt", m); }
     });
     /** Speak {@code text} on the channel 1.5 s after the caller unkeys; on amateur channels the Morse ID follows. */
     private void voiceTx(String text) {
@@ -2138,7 +2142,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     int vi = voxStop();
                     if ((fromWheel || fromCall) && vi > 0 && vi < VOX_MS.length && audio != null) {          // stop when the talking stops
                         final com.macdmr.radio.ham.VoxStop v = new com.macdmr.radio.ham.VoxStop(VOX_MS[vi], System.currentTimeMillis()); vox = v;
-                        audio.setTxLevel(pk -> { if (vox == v && v.level(pk, System.currentTimeMillis())) { vox = null; log("stopped: quiet for " + VOX_NAMES[vi]); ptt(false); } });
+                        audio.setTxLevel(pk -> { if (vox == v && v.level(pk, System.currentTimeMillis())) { vox = null; log("stopped: quiet for " + voxNames()[vi]); ptt(false); } });
                     } else if (audio != null) { vox = null; audio.setTxLevel(null); }
                     if (carMic) log("TX with the car microphone"); else if (fromWheel && inCar && carMic()) log("TX from the wheel: phone microphone (keeps the wheel's buttons working)");
                     if (profile.txAudioLeadMs > 0 && audio != null) {          // the Armor 20WT's stock app: audio path first, the key 600 ms later
@@ -3500,7 +3504,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         String who = callerName(fromId); if (who == null || who.isEmpty()) who = String.valueOf(fromId);
         String nm = t == 1 ? talkgroupName(peer) + (sender > 0 ? " \u00B7 " + who : "") : who;
         CarMessages.dmr(this, peer, t, nm, text);   // the phone and Android Auto (read aloud, voice reply to the thread)
-        history("sms", sender > 0 ? Msg.of(R.string.service_sms_from_on, who, talkgroupName(peer), text.length() > 40 ? text.substring(0, 40) + "…" : text) : Msg.of(R.string.service_sms_from, who, text.length() > 40 ? text.substring(0, 40) + "…" : text));
+        history("sms", sender > 0 ? Msg.of(R.string.service_sms_from_on, who, talkgroupLabel(peer), text.length() > 40 ? text.substring(0, 40) + "…" : text) : Msg.of(R.string.service_sms_from, who, text.length() > 40 ? text.substring(0, 40) + "…" : text));
         onFormText(nm == null || nm.isEmpty() ? String.valueOf(fromId) : nm, text, "DMR");
         final int threadPeer = peer, threadType = t;                         // the open thread (the talkgroup for a group text) refreshes
         ui.post(() -> { for (Listener l : listeners) l.onSms(threadPeer, threadType, text); });
@@ -3596,8 +3600,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         } catch (Throwable t) { log("car coverage: " + t); }
     }
     // ---- the wheel's Next as a talk key (hold, or double-press) ----
-    /** The choices' names in the language at start-up; {@link #nextTalkNames} reads them in the language now. */
-    public static final String[] NEXT_TALK_NAMES = nextTalkNames();
+    /** The choices' names in the app's language now (read again on each use, so a language change shows at once). */
     public static String[] nextTalkNames() { return new String[] { Txt.s(R.string.common_off), Txt.s(R.string.service_next_talk_hold), Txt.s(R.string.service_next_talk_double) }; }
     public int nextTalkMode() {
         android.content.SharedPreferences p = getSharedPreferences("radio", MODE_PRIVATE);
@@ -3613,10 +3616,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     private volatile boolean callPtt, talkCallPending;
 
     // wheel microphone: 0 phone, 1 car through a talk call; stop on silence: 0 off, else the quiet gap in ms
-    public static final String[] WHEEL_MIC_NAMES = wheelMicNames();
     public static String[] wheelMicNames() { return new String[] { Txt.s(R.string.service_wheel_mic_phone), Txt.s(R.string.service_wheel_mic_car) }; }
     public static final int[] VOX_MS = { 0, 1500, 2500, 4000 };
-    public static final String[] VOX_NAMES = voxNames();
     public static String[] voxNames() { return new String[] { Txt.s(R.string.common_off), Txt.s(R.string.service_vox_seconds, "1.5"), Txt.s(R.string.service_vox_seconds, "2.5"), Txt.s(R.string.service_vox_seconds, "4") }; }
     public int wheelMic() { return getSharedPreferences("radio", MODE_PRIVATE).getInt("wheelMic", 1); }
     public void setWheelMic(int m) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("wheelMic", m).apply(); }
@@ -3912,7 +3913,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public String carStatus() {
         String who = currentCaller();
         if (!who.isEmpty()) { int id = currentCallerId(); String t = currentTarget(); return who + (who.equals(Txt.s(R.string.service_caller_id, id)) ? "" : " \u00b7 " + id) + (t.isEmpty() ? "" : " \u00b7 " + t); }
-        return isReady() ? RadioWidget.status(this).replace("Mapping coverage \u00b7 ", "") : "Radio " + link;   // i18n: switched to RadioWidget.status(ctx, false) at integration
+        return isReady() ? RadioWidget.status(this, false) : Txt.s(R.string.service_radio_link, link);
     }
 
     // ---- coverage mapping ---------------------------------------------------------------------------
@@ -4013,9 +4014,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     // ---- roger beep ---------------------------------------------------------------------------------
-    public static final String[] ROGER_NAMES = rogerNames();
     public static String[] rogerNames() { return new String[] { Txt.s(R.string.common_off), Txt.s(R.string.service_roger_beep), Txt.s(R.string.service_roger_two_tone), Txt.s(R.string.service_roger_morse_k) }; }
-    public int rogerStyle() { int s = getSharedPreferences("radio", MODE_PRIVATE).getInt("roger", 0); return s >= 0 && s < ROGER_NAMES.length ? s : 0; }
+    public int rogerStyle() { int s = getSharedPreferences("radio", MODE_PRIVATE).getInt("roger", 0); return s >= 0 && s < rogerNames().length ? s : 0; }
     public void setRogerStyle(int s) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("roger", s).apply(); }
     /** The end-of-transmission tone at 8 kHz (null = off): 40 ms lead, soft 6 ms edges, about a third of full scale. */
     public static short[] rogerPcm(int style) {
@@ -4118,7 +4118,9 @@ public class RadioService extends Service implements RadioEngine.Events {
     public synchronized M17Station m17() {
         if (m17 == null) m17 = new M17Station(this, profile != null ? profile.id : "unknown", new M17Station.Host() {
             @Override public void event(String line) { history("pkt", line); }
+            @Override public void event(Msg m) { history("pkt", m); }
             @Override public void text(String line) { history("m17", line); }
+            @Override public void text(Msg m) { history("m17", m); }
             @Override public void sms(String src, String dst, String body, boolean sent) { fileM17(src, dst, body, sent); }
             @Override public void heard(String call) {
                 if (call == null || call.isEmpty() || call.startsWith("@") || call.startsWith("#")) return;
@@ -4402,6 +4404,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 @Override public String callsign() { return packet != null && packet.callsignSet() ? packet.callsign() : null; }
                 @Override public String grid() { return ft8Grid(); }
                 @Override public void event(String line) { history("pkt", line); }
+                @Override public void event(Msg m) { history("pkt", m); }
                 @Override public void heard(String call, String grid, int snr) {
                     logHeardStation(call, "FT8", "FT8 over FM, " + snr + " dB");
                     if (grid != null) try { logbook().enrich(call, null, grid, null); } catch (Throwable t) { log("logbook: " + t); }
@@ -4592,7 +4595,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         ChannelStore.Channel cur = current;
         int prevCh = cur != null && vfo == null ? cur.number : -1;
         boolean wasRec = recordOn, wasScan = scanning(), wasAprs = packet != null && packet.monitoring(), wasSstv = packet != null && packet.sstvRx();
-        String r = null;
+        Object r = null;   // a Msg where the result is SignalDeck's own, so the history text stays English; a String from the mode it started
         switch (e.action) {
             case Scheduler.LISTEN:
                 if (e.channel >= 0 && store.byNumber(e.channel) == null) { history("pkt", Msg.of(R.string.service_sched_skipped_missing, what, e.channel)); return; }
@@ -4600,24 +4603,24 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (wasScan) toggleScan();
                 if (e.channel >= 0) selectChannel(e.channel);
                 if (e.record && !wasRec) setRecord(true);
-                r = e.channel >= 0 ? Txt.s(e.record ? R.string.service_sched_r_channel_rec : R.string.service_sched_r_channel, e.channel) : Txt.s(e.record ? R.string.service_sched_r_this_rec : R.string.service_sched_r_this);
+                r = e.channel >= 0 ? Msg.of(e.record ? R.string.service_sched_r_channel_rec : R.string.service_sched_r_channel, e.channel) : Msg.of(e.record ? R.string.service_sched_r_this_rec : R.string.service_sched_r_this);
                 break;
-            case Scheduler.SCAN: r = wasScan ? Txt.s(R.string.service_sched_r_scanning) : toggleScan(); break;
-            case Scheduler.APRS: r = wasAprs ? Txt.s(R.string.service_sched_r_monitoring) : aprsMonitor(true); break;
+            case Scheduler.SCAN: r = wasScan ? Msg.of(R.string.service_sched_r_scanning) : toggleScan(); break;
+            case Scheduler.APRS: r = wasAprs ? Msg.of(R.string.service_sched_r_monitoring) : aprsMonitor(true); break;
             case Scheduler.SSTV:
-                if (wasSstv) { r = Txt.s(R.string.service_sched_r_receiving); break; }
+                if (wasSstv) { r = Msg.of(R.string.service_sched_r_receiving); break; }
                 if (e.channel >= 0 && store.byNumber(e.channel) == null) { history("pkt", Msg.of(R.string.service_sched_skipped_missing, what, e.channel)); return; }
                 if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { history("pkt", Msg.of(R.string.service_sched_skipped_band, what, e.channel, profile.bandsText())); return; }
-                if (e.channel >= 0) { selectChannel(e.channel); ui.postDelayed(() -> sstvMonitor(true, false), RETUNE_SETTLE_MS); r = Txt.s(R.string.service_sched_r_on_channel, e.channel); }
+                if (e.channel >= 0) { selectChannel(e.channel); ui.postDelayed(() -> sstvMonitor(true, false), RETUNE_SETTLE_MS); r = Msg.of(R.string.service_sched_r_on_channel, e.channel); }
                 else r = sstvMonitor(true, profile.tunable(PacketEngine.SSTV_FREQ_HZ));   // 144.500, or the channel the radio is on when it cannot tune 144.500 (the W6)
                 break;
-            case Scheduler.BEACON: r = packet == null ? Txt.s(R.string.service_sched_r_no_packet) : packet.sendBeacon(); if (r == null) r = Txt.s(R.string.service_sched_r_sent); break;
-            case Scheduler.FINDER: r = finder().start(e.minutes); if (r == null) r = Txt.s(R.string.service_sched_r_listening); break;
+            case Scheduler.BEACON: r = packet == null ? Msg.of(R.string.service_sched_r_no_packet) : packet.sendBeacon(); if (r == null) r = Msg.of(R.string.service_sched_r_sent); break;
+            case Scheduler.FINDER: r = finder().start(e.minutes); if (r == null) r = Msg.of(R.string.service_sched_r_listening); break;
             case Scheduler.WINLINK_NET: {
                 final com.macdmr.radio.winlink.Winlink w = winlink();
                 r = w.connectInternet();
                 if (r == null) {
-                    r = Txt.s(R.string.service_sched_r_cms);
+                    r = Msg.of(R.string.service_sched_r_cms);
                     final long until = System.currentTimeMillis() + 10 * 60_000L;
                     ui.postDelayed(new Runnable() { @Override public void run() {
                         if (w.busy() && System.currentTimeMillis() < until) { ui.postDelayed(this, 5_000); return; }
@@ -4629,9 +4632,9 @@ public class RadioService extends Service implements RadioEngine.Events {
             }
             case Scheduler.WINLINK: {
                 final com.macdmr.radio.winlink.Winlink w = winlink();
-                if (w.gateway().isEmpty()) { r = Txt.s(R.string.service_sched_r_no_gateway); break; }
-                if (w.busy()) { r = Txt.s(R.string.service_sched_r_winlink_busy); break; }
-                if (e.channel >= 0 && store.byNumber(e.channel) == null) { r = Txt.s(R.string.service_sched_r_missing, e.channel); break; }
+                if (w.gateway().isEmpty()) { r = Msg.of(R.string.service_sched_r_no_gateway); break; }
+                if (w.busy()) { r = Msg.of(R.string.service_sched_r_winlink_busy); break; }
+                if (e.channel >= 0 && store.byNumber(e.channel) == null) { r = Msg.of(R.string.service_sched_r_missing, e.channel); break; }
                 if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { r = outOfBandSkip(e.channel); break; }   // the select would be refused and the call go out on the channel the radio is on
                 final boolean move = e.channel >= 0 && e.channel != prevCh; final int back = prevCh;
                 if (wasScan) toggleScan();
@@ -4650,7 +4653,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         if (wasScan) ui.postDelayed(RadioService.this::toggleScan, RETUNE_SETTLE_MS);
                     } }, 5_000);
                 }, move ? RETUNE_SETTLE_MS : 0);
-                r = move ? Txt.s(R.string.service_sched_r_calling_on, w.gateway(), e.channel) : Txt.s(R.string.service_sched_r_calling, w.gateway());
+                r = move ? Msg.of(R.string.service_sched_r_calling_on, w.gateway(), e.channel) : Msg.of(R.string.service_sched_r_calling, w.gateway());
                 break;
             }
         }

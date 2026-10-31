@@ -47,8 +47,7 @@ public final class VoskCaptions {
     private static final String TAG = "VoskCaptions";   // i18n: log tag
     public static final long PAUSE_MS = 2500;
     public static final String[] MODELS = { "vosk-model-small-en-us-0.15", "vosk-model-en-us-0.22-lgraph", "vosk-model-en-us-0.22", "vosk-model-en-us-0.42-gigaspeech" };
-    /** The model names in the language at start-up; {@link #modelLabels} reads them in the language now. */
-    public static final String[] MODEL_LABELS = modelLabels();
+    /** The model names, in the app's language now. */
     public static String[] modelLabels() { return new String[] { Txt.s(R.string.service_vosk_small), Txt.s(R.string.service_vosk_better), Txt.s(R.string.service_vosk_best), Txt.s(R.string.service_vosk_max) }; }
     public static final String DEFAULT_MODEL = MODELS[1];
 

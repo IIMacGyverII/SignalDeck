@@ -260,6 +260,12 @@
     <string name="intercom_mode_ago_min">%1$d min ago</string>
     <!-- How long ago something happened, an hour or more: %1$d hours, %2$d minutes. Short. -->
     <string name="intercom_mode_ago_h_min">%1$d h %2$d min ago</string>
+    <!-- Time since something happened, without "ago", in a stat tile that is already labelled (APRS "Last packet"): under a minute, %1$d seconds. Very short. -->
+    <string name="intercom_mode_since_s">%1$d s</string>
+    <!-- The same, under an hour: %1$d minutes. Very short. -->
+    <string name="intercom_mode_since_min">%1$d min</string>
+    <!-- The same, an hour or more: %1$d hours, %2$d minutes. Very short. -->
+    <string name="intercom_mode_since_h_min">%1$d h %2$d min</string>
 
     <!-- A DMR radio ID shown where there is no name for it, e.g. "ID 3120001". ID is the DMR abbreviation. Very short. -->
     <string name="intercom_dmr_id">ID %1$d</string>
@@ -301,7 +307,7 @@
     <string name="intercom_lastheard_around">Around this time (±20 s)</string>
     <!-- Button on the details sheet of the Android Auto is hiding the radio alert: opens Android Auto's settings. Full-width button, one line. -->
     <string name="intercom_lastheard_open_auto">Open Android Auto settings</string>
-    <!-- Toast when Android Auto's settings could not be opened. %1$s is the system's error message. -->
+    <!-- Toast when Android Auto's settings could not be opened (Last heard and the Device page). %1$s is the system's error message. -->
     <string name="intercom_lastheard_open_auto_failed">Could not open Android Auto: %1$s</string>
     <!-- Button on an alert's details sheet that tunes the channel it happened on. %1$s is the channel name. Full-width button, one line. -->
     <string name="intercom_lastheard_tune">Tune %1$s</string>
@@ -435,6 +441,10 @@
     <string name="intercom_chhistory_kind_channel">channel</string>
 
     <!-- ===== Android Auto screens (car templates: rows are short) ===== -->
+    <!-- History line (Last heard) when Android Auto opens the Radio controls screen. Stored in English; Last heard explains lines starting "🚗 Android Auto opened". Keep the leading emoji. One line. -->
+    <string name="intercom_car_history_opened_controls">🚗 Android Auto opened Radio controls</string>
+    <!-- History line (Last heard) when Android Auto opens the media app. Stored in English, as above. Keep the leading emoji. One line. -->
+    <string name="intercom_car_history_opened_media">🚗 Android Auto opened the media app</string>
     <!-- Car screen row title and media app folder: the Last heard list. Short. -->
     <string name="intercom_car_last_heard">Last heard</string>
     <!-- Car screen row subtitle under Last heard, and the media app folder's subtitle. Car screen row: one short line. -->

@@ -142,7 +142,7 @@ public final class AprsScreen extends ModeScreen {
         set(statPackets, String.valueOf(packets));
         set(statStations, String.valueOf(pe.store().stationCount()));
         set(statMsgs, String.valueOf(forYou)); color(statMsgs, forYou > 0 ? Neo.AMBER : Neo.TEXT);
-        set(statLast, last == 0 ? "—" : ago(last).replace(" ago", ""));   // i18n: reads ModeScreen.ago()'s English
+        set(statLast, last == 0 ? "—" : since(last));
 
         String[] beacon = { Txt.s(R.string.packet_aprs_chip_beacon_off), Txt.s(R.string.packet_aprs_chip_beacon_min, pe.beaconMin()), Txt.s(R.string.packet_aprs_chip_smart) };
         chipState(ackChip, Txt.s(pe.autoAckAllowed() ? R.string.packet_aprs_chip_autoack : R.string.packet_aprs_chip_no_autoack), pe.autoAck());

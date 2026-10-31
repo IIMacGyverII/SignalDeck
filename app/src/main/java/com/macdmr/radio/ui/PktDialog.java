@@ -358,7 +358,7 @@ public final class PktDialog {
         toggle(body, Txt.s(R.string.packet_pkt_remote_answer), on, 0);
         final EditText pin = field(body, Txt.s(R.string.packet_pkt_remote_pin), pe.remotePin(), InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_VARIATION_PASSWORD);
         StringBuilder sb = new StringBuilder(Txt.s(R.string.packet_pkt_remote_intro)).append('\n');
-        for (int i = 1; i < com.macdmr.radio.ham.DtmfRemote.COMMANDS.length; i++) sb.append("\n").append(i).append("   ").append(com.macdmr.radio.ham.DtmfRemote.COMMANDS[i]);
+        for (int i = 1; i < com.macdmr.radio.ham.DtmfRemote.COMMANDS.length; i++) sb.append("\n").append(i).append("   ").append(com.macdmr.radio.ham.DtmfRemote.commandName(i));
         sb.append("\n\n").append(Txt.s(R.string.packet_pkt_remote_outro));
         body.addView(hint(sb.toString()));
         LinearLayout r = row();

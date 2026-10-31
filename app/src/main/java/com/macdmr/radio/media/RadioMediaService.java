@@ -37,7 +37,7 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
     @Override public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, Bundle rootHints) {
         android.util.Log.i("RadioMediaService", "root for " + clientPackageName);
         RadioService rs = RadioService.running;
-        if (rs != null && clientPackageName != null && clientPackageName.contains("gearhead")) { rs.carMediaBound(); rs.carEvent("🚗 Android Auto opened the media app"); }   // i18n: history line, stored in English (carEvent takes text only; Last heard matches it)
+        if (rs != null && clientPackageName != null && clientPackageName.contains("gearhead")) { rs.carMediaBound(); rs.carEvent(com.macdmr.radio.i18n.Msg.of(R.string.intercom_car_history_opened_media)); }
         Bundle extras = new Bundle();
         extras.putBoolean("android.media.browse.CONTENT_STYLE_SUPPORTED", true);
         extras.putBoolean("android.media.browse.SEARCH_SUPPORTED", true);

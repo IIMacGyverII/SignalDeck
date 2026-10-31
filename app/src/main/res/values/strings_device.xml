@@ -385,6 +385,10 @@
     <string name="device_report_issue">Open a GitHub issue with the facts filled in</string>
     <!-- Item in the Device report menu: explains the report. One line. -->
     <string name="device_report_what">What is in it?</string>
+    <!-- Toast when "Open a GitHub issue" finds no browser to open the page in. The report itself stays English. One line. -->
+    <string name="device_report_no_browser">No browser available</string>
+    <!-- Title of the Android share chooser for the device report zip (the report and its message stay English). One line. -->
+    <string name="device_report_share_title">Share the device report</string>
     <!-- Item in the Device report menu: the audio check. One line, may wrap. -->
     <string name="device_report_audio">Radio audio check (no sound, DMR or analog)</string>
     <!-- Item in the Device report menu: the test with a second radio. One line. -->
@@ -737,8 +741,6 @@
     <string name="device_auto_open">Open Android Auto settings</string>
     <!-- Button: check again whether Android Auto hides the app. Short. -->
     <string name="device_auto_again">Check again</string>
-    <!-- Toast when Android Auto's settings cannot be opened. %1$s is the error. -->
-    <string name="device_auto_failed">Could not open Android Auto: %1$s</string>
 
     <!-- ==== New firmware variant (submit to the catalogue) ==== -->
     <!-- Title of the dialog offering to submit an unknown firmware variant. One line. -->

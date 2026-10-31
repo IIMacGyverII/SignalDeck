@@ -161,7 +161,7 @@ public final class PacketEngine {
     private SAMEDecoder same;
     private volatile long lastDtmfDigitMs;
     // ---- SSTV ----
-    public interface SstvListener { void onSstv(String status, android.graphics.Bitmap live, int lines, int total, boolean complete); }
+    public interface SstvListener { void onSstv(Msg status, android.graphics.Bitmap live, int lines, int total, boolean complete); }
     private volatile boolean sstvRx;
     private SSTVReceiver sstv;
     private volatile SstvListener sstvListener;
@@ -175,12 +175,14 @@ public final class PacketEngine {
     public String sstvStatus() { return sstvStatus.english(); }
     /** The same in the app's language, for display. */
     public String sstvStatusText() { return sstvStatus.text(); }
+    /** The status itself, for a screen that tells the states apart by their string ({@link Msg#key}) and shows its text. */
+    public Msg sstvStatusMsg() { return sstvStatus; }
     public android.graphics.Bitmap sstvLast() { return sstvLast; }
     public void setSstvListener(SstvListener l) { sstvListener = l; }
-    /** The listener gets the English status (the SSTV screen reads it); {@link #sstvStatusText} has it for display. */
+    /** The listener gets the status as a message: its English (the SSTV screen reads it) and its text for display. */
     private void sstvPost(Msg m, android.graphics.Bitmap b, int lines, int total, boolean done) {
-        sstvStatus = m; if (b != null) sstvLast = b; String st = m.english();
-        SstvListener l = sstvListener; if (l != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> l.onSstv(st, b, lines, total, done));
+        sstvStatus = m; if (b != null) sstvLast = b;
+        SstvListener l = sstvListener; if (l != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> l.onSstv(m, b, lines, total, done));
     }
 
     // ---- continuous Robot 36 (MMSSTV-style: no VIS needed, partial pictures, coasts through fades) ----

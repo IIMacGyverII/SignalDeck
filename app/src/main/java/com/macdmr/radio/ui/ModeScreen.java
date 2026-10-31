@@ -136,6 +136,12 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
         long s = Math.max(0, (System.currentTimeMillis() - ts) / 1000);
         return s < 60 ? Txt.s(R.string.intercom_mode_ago_s, s) : s < 3600 ? Txt.s(R.string.intercom_mode_ago_min, s / 60) : Txt.s(R.string.intercom_mode_ago_h_min, s / 3600, s % 3600 / 60);
     }
+    /** The same time since {@code ts} without "ago" ("12 s", "3 min", "1 h 5 min"), for a stat tile that is already labelled. */
+    protected static String since(long ts) {
+        if (ts <= 0) return "—";
+        long s = Math.max(0, (System.currentTimeMillis() - ts) / 1000);
+        return s < 60 ? Txt.s(R.string.intercom_mode_since_s, s) : s < 3600 ? Txt.s(R.string.intercom_mode_since_min, s / 60) : Txt.s(R.string.intercom_mode_since_h_min, s / 3600, s % 3600 / 60);
+    }
     private static String elapsed(long since) {
         long s = Math.max(0, (System.currentTimeMillis() - since) / 1000);
         return s >= 3600 ? String.format(java.util.Locale.US, "%d:%02d:%02d", s / 3600, s % 3600 / 60, s % 60) : String.format(java.util.Locale.US, "%02d:%02d", s / 60, s % 60);

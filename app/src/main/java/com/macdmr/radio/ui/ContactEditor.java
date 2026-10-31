@@ -122,7 +122,7 @@ public final class ContactEditor {
         final TextView[] tb = new TextView[3];
         for (int i = 0; i < 3; i++) {
             final int k = i;
-            tb[i] = Neo.button(c, ContactsView.TYPES[i], null, ContactsView.typeColor(i)); tb[i].setTextSize(14);
+            tb[i] = Neo.button(c, ContactsView.type(i), null, ContactsView.typeColor(i)); tb[i].setTextSize(14);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins(i == 0 ? 0 : (int) (3 * d), (int) (10 * d), i == 2 ? 0 : (int) (3 * d), (int) (4 * d));
             types.addView(tb[i], lp);
             tb[i].setOnClickListener(v -> { t[0] = k; for (int j = 0; j < 3; j++) tb[j].setAlpha(j == k ? 1f : 0.45f); });
@@ -173,7 +173,7 @@ public final class ContactEditor {
         top.addView(ContactsView.avatar(c, ct.type, ct.name, 48), new LinearLayout.LayoutParams((int) (48 * d), (int) (48 * d)));
         LinearLayout col = new LinearLayout(c); col.setOrientation(LinearLayout.VERTICAL); col.setPadding((int) (12 * d), 0, 0, 0);
         LinearLayout l2 = new LinearLayout(c); l2.setGravity(Gravity.CENTER_VERTICAL);
-        if (ct.number > 0) { l2.addView(Neo.chip(c, ContactsView.TYPES[Math.min(2, Math.max(0, ct.type))], ContactsView.typeColor(ct.type))); TextView idv = Neo.text(c, String.valueOf(ct.number), Neo.TEXT_SOFT, 15, Neo.mono(c)); idv.setPadding((int) (8 * d), 0, (int) (8 * d), 0); l2.addView(idv); }
+        if (ct.number > 0) { l2.addView(Neo.chip(c, ContactsView.type(ct.type), ContactsView.typeColor(ct.type))); TextView idv = Neo.text(c, String.valueOf(ct.number), Neo.TEXT_SOFT, 15, Neo.mono(c)); idv.setPadding((int) (8 * d), 0, (int) (8 * d), 0); l2.addView(idv); }
         if (!ct.callsign.isEmpty()) l2.addView(Neo.chip(c, ct.callsign, Neo.GREEN));
         col.addView(l2);
         int[] rl = ct.ricList();

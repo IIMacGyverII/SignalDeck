@@ -88,6 +88,8 @@ public final class SpinBearing {
         if (track.size() >= 2 && r < SLOW_DPS) return Txt.s(R.string.modes_spin_keep_turning);
         return Txt.s(R.string.modes_spin_keep_going);
     }
+    /** Whether {@link #guide} says to slow down (the screen colours that one amber), told by the state, not the words. */
+    public boolean tooFast() { return !complete() && rate() > FAST_DPS; }
 
     public Result fit() { return fit(samples); }
 

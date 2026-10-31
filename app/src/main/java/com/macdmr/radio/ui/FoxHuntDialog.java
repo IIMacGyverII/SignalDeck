@@ -438,7 +438,7 @@ public final class FoxHuntDialog {
                 if (res[0] == null) {
                     ring.set(sp, null);
                     boolean wait = gate.fox().only && !gate.active(); String g = sp.guide();
-                    guide.setText(wait ? Txt.s(R.string.modes_fox_spin_waiting) : g); guide.setTextColor(wait ? Neo.MUTED : Txt.s(R.string.modes_spin_slower).equals(g) ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);
+                    guide.setText(wait ? Txt.s(R.string.modes_fox_spin_waiting) : g); guide.setTextColor(wait ? Neo.MUTED : sp.tooFast() ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);
                     String pct = String.format(Locale.US, "%.0f", sp.covered() * 100), turned = String.format(Locale.US, "%.0f", sp.turned());
                     detail.setText(Txt.p(wait ? R.plurals.modes_fox_spin_progress_wait : R.plurals.modes_fox_spin_progress, sp.samples(), pct, sp.samples(), turned));
                     if (sp.complete()) done.run();

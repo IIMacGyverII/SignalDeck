@@ -96,7 +96,7 @@ public class RadioControlScreen extends Screen {
         String caller = s.currentCaller();
         if (!caller.isEmpty()) {
             int id = s.currentCallerId(); String to = s.currentTarget();
-            Row.Builder talk = new Row.Builder().setTitle(caller.startsWith(Txt.s(R.string.intercom_dmr_id, id)) || caller.startsWith("ID ") ? Txt.s(R.string.intercom_car_talking, caller) : Txt.s(R.string.intercom_car_talking_id, caller, id));   // i18n: "ID " is what currentCaller() gives when there is no name
+            Row.Builder talk = new Row.Builder().setTitle(caller.equals(Txt.s(R.string.service_caller_id, id)) || caller.startsWith("ID ") ? Txt.s(R.string.intercom_car_talking, caller) : Txt.s(R.string.intercom_car_talking_id, caller, id));   // i18n: currentCaller() gives service_caller_id when there is no name; "ID " keeps names stored that way plain
             if (!to.isEmpty()) talk.addText(to);
             pane.addRow(talk.build());
         }

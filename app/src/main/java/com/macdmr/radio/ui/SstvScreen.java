@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Msg;
 import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.R;
 import android.content.Context;
@@ -105,7 +106,7 @@ public final class SstvScreen extends ModeScreen {
         button(r3, Txt.s(R.string.modes_sstv_decode_recording), "rec", Neo.CYAN, v -> RecordingsDialog.show(c, svc, com.macdmr.radio.RecordingDecodeJob.SSTV));
 
         if (pe.sstvLast() != null && !iss()) live.setImageBitmap(pe.sstvLast());      // an ISS session starts empty: the last picture came from elsewhere
-        status.setText(nice(pe.sstvStatus()));
+        status.setText(nice(pe.sstvStatusMsg()));
     }
 
     private boolean parked() { com.macdmr.radio.ChannelStore.Channel ch = svc.current(); return ch != null && ch.rxFreq == PacketEngine.SSTV_FREQ_HZ; }
@@ -116,16 +117,20 @@ public final class SstvScreen extends ModeScreen {
             if (bmp != null) live.setImageBitmap(bmp);
             status.setText(nice(st));
             if (total > 0) { progress.setProgress(Math.round(1000f * lines / total)); progressText.setText(Txt.s(R.string.modes_sstv_lines, lines, total)); }
-            else if (!st.startsWith("receiving")) { progress.setProgress(done ? 1000 : 0); progressText.setText(""); }   // i18n: PacketEngine status word, not shown
+            else if (!is(st, R.string.packet_sstv_receiving_line, R.string.packet_sstv_receiving_mode, R.string.packet_sstv_receiving_lines)) { progress.setProgress(done ? 1000 : 0); progressText.setText(""); }
             if (done) galleryStamp = -1;
         });
     }
     @Override protected void onDetachedFromWindow() { super.onDetachedFromWindow(); pe.setSstvListener(null); }
 
-    private static String nice(String s) {
-        if (s == null || s.isEmpty() || s.equals("idle")) return Txt.s(R.string.modes_sstv_waiting);
-        return s.substring(0, 1).toUpperCase(Locale.US) + s.substring(1);
+    /** The status for display: "Waiting…" when idle, else its text with a capital first letter. */
+    private static String nice(Msg m) {
+        if (m == null || is(m, R.string.packet_sstv_idle)) return Txt.s(R.string.modes_sstv_waiting);
+        String s = m.text(); if (s.isEmpty()) return Txt.s(R.string.modes_sstv_waiting);
+        return s.substring(0, 1).toUpperCase(Txt.locale()) + s.substring(1);
     }
+    /** Whether the status is one of these strings: the state is told by the string, not by its (translated) words. */
+    private static boolean is(Msg m, int... ids) { for (int id : ids) if (m.key().equals(Txt.name(id))) return true; return false; }
 
     private boolean iss() { return svc.satMode() == com.macdmr.radio.ham.Satellites.SSTV; }
     @Override protected long waitingHz() { com.macdmr.radio.RadioService.SatState st = svc.satState(); return st != null && st.mode == com.macdmr.radio.ham.Satellites.SSTV && st.waiting ? st.nominalHz : 0; }

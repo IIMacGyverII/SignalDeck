@@ -56,6 +56,6 @@ public final class ParrotScreen extends ModeScreen {
         set(now, Txt.s(parrot.playing() ? R.string.modes_parrot_replaying : parrot.recording() ? R.string.modes_parrot_recording : R.string.modes_parrot_waiting));
         color(now, parrot.playing() ? Neo.RED : parrot.recording() ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT);
         set(count, String.valueOf(parrot.played()));
-        set(last, parrot.lastHeardMs() <= 0 ? "—" : ago(parrot.lastHeardMs()).replace(" ago", ""));   // i18n: strips ModeScreen.ago's English suffix
+        set(last, parrot.lastHeardMs() <= 0 ? "—" : since(parrot.lastHeardMs()));
     }
 }

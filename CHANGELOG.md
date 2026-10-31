@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-31 — M17 receive works on the air: joins a transmission without its preamble
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| M17 receive on the W6+, W6Plus DMR and Atom XL (owner, 2026-10-30) | M17 receive decoded nothing live on these phones. The receiver locked on only from the 40 ms preamble at a transmission's start, and a phone's receive audio opens 45–370 ms after the carrier (the module's squelch; the Atom XL's capture), so on the air the preamble and the link setup were always gone. The HackRF test files had decoded only because they led with a long carrier. While idle, the receiver now also searches for the stream sync word that starts every frame: <ul><li>a gain-free linear prefilter, then a few gain factors (the preamble/stream ratio differs per phone);</li><li>it decodes the frame there and requires its LICH, and the next frame's sync a frame later;</li><li>the call is announced at its first confirmed frame, so nothing is listed for a false lock;</li><li>the callsign comes from the LICH;</li><li>a late call's gain is refined on each confirmed frame;</li><li>a call that ends or loses the signal is never re-joined on its own frames.</li></ul>It also joins a transmission already in progress, and re-joins after a fade. Help updated. | M17Receiver, M17Test (+3 short test recordings), HelpView | Host: the Armor's FW57 stream as each phone heard it (11 s clips) — W6+ 265/267, W6Plus DMR 231/268, Atom XL 239/271 frames confirmed, callsign from the LICH, was 0. The W6+ references with their starts muted decode both calls; a minute of noise starts no call; every earlier M17 test unchanged. Search cost on noise is about 1 % of real time on a PC. Not yet device-tested |
+
 ## 2026-10-29 — One-band radios never tune, offer or act on a channel outside their bands
 
 | Backlog | Change | Files | Test |

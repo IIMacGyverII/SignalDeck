@@ -38,12 +38,18 @@
         android:icon="@mipmap/ic_launcher"
         android:fullBackupContent="@xml/backup_rules"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:localeConfig="@xml/locales_config"
         android:theme="@style/AppTheme">
 
         <!-- Ulefone's radio audio class. On the stock ROM it is on the boot class path anyway; a custom ROM or GSI that
              gets it from a Magisk module ships it as a shared library, which only reaches an app that asks for it.
              Optional, so the app installs and runs on every phone (tester's report 2026-10-23, Armor 26 Ultra GSI). -->
         <uses-library android:name="android.os.PrizeTinyService" android:required="false" />
+
+        <!-- The app's own language (Device → Language): appcompat stores it and applies it on Android 10–12 too -->
+        <service android:name="androidx.appcompat.app.AppLocalesMetadataHolderService" android:enabled="false" android:exported="false">
+            <meta-data android:name="autoStoreLocales" android:value="true" />
+        </service>
 
         <!-- singleTask: the launcher icon, notifications, the widget and shares all bring the one open screen forward (onNewIntent)
              instead of stacking another copy, which also replayed the launch screen -->

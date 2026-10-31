@@ -36,6 +36,6 @@ Level asked for (Experimental / In progress / Beta / Supported):
 
 **Housekeeping**
 
-- [ ] In-app help (`ui/HelpView.java` TOPICS) describes anything that behaves differently on this phone; `docs/help` regenerated
+- [ ] In-app help (`app/src/main/assets/guide/en.json`) describes anything that behaves differently on this phone; `docs/help` regenerated
 - [ ] `CHANGELOG.md` row added
 - [ ] `./gradlew testReleaseUnitTest assembleRelease` passes

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Device page: settings rows, sheets and dialogs. See strings_common.xml for the conventions. -->
+<resources>
+    <!-- Device → Radio settings row and its dialog title: the language SignalDeck's screens use. One or two words. -->
+    <string name="device_language">Language</string>
+    <!-- First choice in the Language list: follow the phone. %1$s is the phone's language in its own name ("English", "Deutsch"). -->
+    <string name="device_language_phone">Phone\'s language (%1$s)</string>
+</resources>

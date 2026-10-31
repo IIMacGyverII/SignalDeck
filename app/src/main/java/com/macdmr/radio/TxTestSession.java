@@ -206,10 +206,9 @@ public final class TxTestSession {
         // 5 DMR group call
         s = r.step("dmr");
         if (s != null) {
+            int a = needChannel(s, true, "This step needs a DMR channel whose talkgroup the other DMR radio listens to (same colour code and time slot).");
+            if (stopped) { finish(); return; }
             ChannelStore.Channel ch = svc.current();
-            int a = ch != null && ch.isDigital() ? GO : ui.choose(s.title, "Choose a DMR channel on the Intercom page whose talkgroup the other DMR radio listens to (same colour code and time slot), then come back and tap Ready.", "Ready", "Skip this step", "Stop the session");
-            if (a == 2 || a < 0) { stopped = true; finish(); return; }
-            ch = svc.current();
             if (a == GO && (ch == null || !ch.isDigital())) { s.result = TxReport.SKIPPED; s.auto = "no DMR channel selected"; }
             else if (a == GO && ask(s, "Key 5 s", String.format(Locale.US, "SignalDeck makes a 5 second group call to talkgroup %d on time slot %d, colour code %d. The other DMR radio must hear it and show your caller ID.", ch.txContact, ch.outSlot + 1, ch.cc))) {
                 TxReport.Key k = key(s.title, 5000); s.keys.add(k);
@@ -222,10 +221,9 @@ public final class TxTestSession {
         // 5b DMR text (phones whose text body is QuickChat's, not the Armor's)
         s = r.step("text");
         if (s != null && !stopped) {
+            int a = needChannel(s, true, "This step needs a DMR channel whose call number the other DMR radio receives texts on (its own ID for a private text, or a talkgroup it listens to).");
+            if (stopped) { finish(); return; }
             ChannelStore.Channel ch = svc.current();
-            int a = ch != null && ch.isDigital() ? GO : ui.choose(s.title, "Choose a DMR channel whose call number the other DMR radio receives texts on (its own ID for a private text, or a talkgroup it listens to), then come back and tap Ready.", "Ready", "Skip this step", "Stop the session");
-            if (a == 2 || a < 0) { stopped = true; finish(); return; }
-            ch = svc.current();
             if (a == GO && (ch == null || !ch.isDigital())) { s.result = TxReport.SKIPPED; s.auto = "no DMR channel selected"; }
             else if (a == GO && ask(s, "Send the text", String.format(Locale.US, "SignalDeck sends the text \"%s\" to %s %d. The module reports whether it was delivered; then check the other radio.", TEXT, ch.contactType == 1 ? "talkgroup" : "radio", ch.txContact))) {
                 int st = text(ch);
@@ -284,14 +282,52 @@ public final class TxTestSession {
     /** An FM channel is needed: ask the tester to choose one, or skip. */
     private boolean fmChannel(TxReport.Step s) throws InterruptedException {
         if (stopped) return false;
-        while (true) {
-            ChannelStore.Channel ch = svc.current();
-            if (ch != null && !ch.isDigital() && !ch.isM17()) return true;
-            int a = ui.choose(s.title, "This step needs an FM (analog) channel: choose one on the Intercom page (a simplex frequency you may use, low power), then come back and tap Ready.", "Ready", "Skip this step", "Stop the session");
-            if (a == 1) { s.result = TxReport.SKIPPED; s.auto = "no FM channel selected"; return false; }
-            if (a != 0) { stopped = true; return false; }
-        }
+        return needChannel(s, false, "This step needs an FM (analog) channel: a simplex frequency you may use, at low power.") == GO;
     }
+
+    /**
+     * The current channel when it is of the kind the step needs ({@code dmr}: DMR, else FM); otherwise the tester picks one
+     * from the channel list right here (the session's sheets cover the Intercom page, so "choose it there" was a dead end,
+     * Xplore 1 tester 2026-10-31). GO with that channel tuned, SKIP (the step's result set), or -1 when stopped.
+     */
+    int needChannel(TxReport.Step s, boolean dmr, String why) throws InterruptedException {
+        while (!stopped) {
+            ChannelStore.Channel ch = svc.current();
+            if (ch != null && (dmr ? ch.isDigital() : !ch.isDigital() && !ch.isM17())) return GO;
+            java.util.List<ChannelStore.Channel> fit = channelsOfKind(svc.store().all(), dmr);
+            String none = dmr ? "no DMR channel selected" : "no FM channel selected";
+            if (fit.isEmpty()) {
+                int a = ui.choose(s.title, why + (dmr ? " Your channel list has no DMR channel." : " Your channel list has no FM channel."), "Skip this step", "Stop the session");
+                if (a == 0) { s.result = TxReport.SKIPPED; s.auto = none; return SKIP; }
+                stopped = true; return -1;
+            }
+            int a = ui.choose(s.title, why, "Choose a channel", "Skip this step", "Stop the session");
+            if (a == 1) { s.result = TxReport.SKIPPED; s.auto = none; return SKIP; }
+            if (a != 0) { stopped = true; return -1; }
+            String[] rows = new String[fit.size() + 1];
+            for (int i = 0; i < fit.size(); i++) rows[i] = channelRow(fit.get(i));
+            rows[fit.size()] = "Back";
+            int p = ui.choose(s.title, why, rows);
+            if (p < 0) { stopped = true; return -1; }
+            if (p >= fit.size()) continue;
+            ChannelStore.Channel want = fit.get(p);
+            svc.selectChannel(want.number);
+            long t0 = System.currentTimeMillis();
+            while (System.currentTimeMillis() - t0 < 5000) { ChannelStore.Channel c = svc.current(); if (c != null && c.number == want.number) break; Thread.sleep(100); }
+            long settle = RETUNE_SETTLE_MS - (System.currentTimeMillis() - t0);   // a key right after a channel change can be cut by it
+            if (settle > 0) Thread.sleep(settle);
+        }
+        return -1;
+    }
+    static final long RETUNE_SETTLE_MS = 3500;
+
+    /** The channels a step can use: DMR ones, or FM ones (not M17), in list order. */
+    static java.util.List<ChannelStore.Channel> channelsOfKind(java.util.List<ChannelStore.Channel> all, boolean dmr) {
+        java.util.List<ChannelStore.Channel> out = new java.util.ArrayList<>();
+        for (ChannelStore.Channel c : all) if (dmr ? c.isDigital() : !c.isDigital() && !c.isM17()) out.add(c);
+        return out;
+    }
+    static String channelRow(ChannelStore.Channel c) { return c.number + " · " + c.name + " · " + c.freqText(c.txFreq) + " MHz"; }
 
     /** The step's instruction with the current channel; false when skipped or stopped. */
     private boolean ask(TxReport.Step s, String go, String text) throws InterruptedException {

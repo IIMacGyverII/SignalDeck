@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-31 — Xplore 1: steady transmit audio; the Transmit test session picks its own channel
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Xplore 1 tester's transmit session (beta.25, 2026-10-31) | **Transmit works** (SEND_START ~80 ms after every key, SEND_STOP after every release, the 28 s limit), but the voice was choppy on the receiving radio. The tester's recording is chopped about every 64 ms, the rhythm of the microphone delivering its samples in bursts, which SignalDeck passed straight to the module. QuickChat sends one 160-byte block every 10 ms. The serial-port audio (UartPcmAudio, Xplore 1 only) now queues 80 ms and then sends exactly one block every 10 ms (new PcmPacer: refills after an underrun; a backlog over 250 ms drops its oldest blocks, so it doesn't send a burst to catch up); its stop line logs blocks, underruns and drops. **Transmit test session, every phone:** the steps that need an FM or DMR channel told the tester to choose one on the Intercom page, which the session's sheets cover, so the tester couldn't reach the DMR steps. They now offer **Choose a channel**, which lists the channels of that kind and tunes the chosen one (3.5 s settle before a key). Help updated | PcmPacer (new), UartPcmAudio, RadioService (stop line logged), TxTestSession, HelpView, docs/help, PcmPacerTest | Host suite green. Not device-tested; the tester's next session confirms it |
+
 ## 2026-10-31 — M17 receive works on the air: joins a transmission without its preamble
 
 | Backlog | Change | Files | Test |

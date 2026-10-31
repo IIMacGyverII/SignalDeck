@@ -363,7 +363,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_toolong_title">Demasiado largo para enviar</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_toolong_text">El firmware de este equipo corta cada transmisión a los 30 segundos, así que la app rechaza audio de más de unos 28,5 segundos (por ejemplo, una grabación larga o un modo SSTV que necesita más tiempo).</string>
+    <string name="intercom_lastheard_ex_toolong_text">Lo que se iba a enviar superaba el límite de transmisión del equipo (Dispositivo → Transmisión máxima), así que SignalDeck lo rechazó en vez de cortarlo a la mitad (por ejemplo, una grabación larga o un modo SSTV que necesita más tiempo). Algunos emisores tienen su propio máximo, más corto; la línea indica qué límite se alcanzó.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_busy_title">Canal ocupado</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->

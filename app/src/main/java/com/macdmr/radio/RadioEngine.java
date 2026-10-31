@@ -217,6 +217,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     @Override public void onBridge(int cmd, byte[] body) {
         ev.log(String.format(Locale.US, "bridge cmd=0x%02X body=%s", cmd, body == null ? "-" : java.util.Arrays.toString(body)));
         if (daemon() && cmd == 0x06) mcuStarted.countDown();
+        if (daemon() && cmd == 0x08 && body != null && body.length >= 1 && body[0] == 2) pttStopSeen = true;   // state report 02: PTT stop complete
         if (daemon() && cmd == 0x01 && body != null) { bridgeBuild = new String(body, java.nio.charset.StandardCharsets.US_ASCII).trim(); ev.log("bridge build " + bridgeBuild); }
         if (cmd == 0x08 && body != null && body.length >= 1 && body[0] == 3) ev.bridgeFault("bridge state report 03 (pcm error)");
     }
@@ -465,7 +466,11 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
 
     /** PTT: launch=1 keys the transmitter, 2 releases (enum 1/2 again — 0 is NAKed and the TX keeps running; firmware caps a keyed TX at 30 s). */
     public void ptt(boolean down) throws IOException {
-        if (daemon()) { port.control(down ? ExtModuleLink.CTL_PTT_ON : ExtModuleLink.CTL_PTT_OFF); return; }   // the daemon's PTT line; the module has no key command
+        if (daemon()) {                                     // the daemon's PTT line; the module has no key command
+            if (!down) { pttStopSeen = false; pttOffAt = System.currentTimeMillis(); }
+            port.control(down ? ExtModuleLink.CTL_PTT_ON : ExtModuleLink.CTL_PTT_OFF);
+            return;
+        }
         if (agold()) {                                     // the HAL's startPtt / stopPtt: the bridge's PTT line, active low; no 0x26
             SysfsGpio.write(AgoldUsb.HANDLE_PTT, down ? "0" : "1");
             RootSetup.run("setprop vendor.agui.extmodule.start " + (down ? 1 : 0));
@@ -491,8 +496,28 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      * relay 2 = normal, sq 0 = squelch open (soft squelch is done in software).
      * Enum bytes are 1 = on / 2 = off — the MCU answers sr=1 (fail) to a 0 in pwrSave/monitor (measured 2026-10-17).
      */
+    // ---- the Armor 3WT: no channel write until the bridge has finished the unkey ----
+    /** Its intercom app refuses a channel write after a release until the bridge's state report 02 or 2 s (mIsPTTStopComplete). */
+    static final long PTT_STOP_WAIT_MS = 2000;
+    private volatile boolean pttStopSeen = true;
+    private volatile long pttOffAt;
+    /** How long a channel write must still wait: 0 once the bridge reported the stop or the wait has run out. */
+    static long pttStopWait(boolean stopSeen, long offAt, long now) {
+        return stopSeen || offAt == 0 ? 0 : Math.max(0, offAt + PTT_STOP_WAIT_MS - now);
+    }
+    /** Only the Armor 3WT (its extmodule daemon) holds channel writes after an unkey; every other phone writes at once. */
+    static boolean holdsWritesAfterUnkey(DeviceProfile p) { return "agold-legacy".equals(p.protocol); }
+    private void awaitPttStop() {
+        if (!holdsWritesAfterUnkey(profile)) return;
+        long w = pttStopWait(pttStopSeen, pttOffAt, System.currentTimeMillis());
+        if (w <= 0) return;
+        ev.log("channel write held until the bridge finishes the unkey (" + w + " ms at most)");
+        while ((w = pttStopWait(pttStopSeen, pttOffAt, System.currentTimeMillis())) > 0) pause(Math.min(50, w));
+    }
+
     public void setAnalog(int rxHz, int txHz, int band, int power, int sq, int rxType, int rxSub, int txType, int txSub,
                           int volume, int monitor) throws IOException {
+        awaitPttStop();
         ByteBuffer b = ByteBuffer.allocate(19).order(ByteOrder.LITTLE_ENDIAN);
         b.putInt(rxHz).putInt(txHz).put((byte) band).put((byte) power).put((byte) sq).put((byte) rxType).put((byte) rxSub)
                 .put((byte) txType).put((byte) txSub).put((byte) 2 /* pwrSave: 1 on, 2 off (OEM default 2; 0 is NAKed) */)
@@ -507,6 +532,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      */
     public void setDigital(int rxHz, int txHz, int localId, int[] groups, int txContact, int contactType, int power, int cc,
                            int inSlot, int outSlot, int volume, int mic) throws IOException {
+        awaitPttStop();
         ByteBuffer b = ByteBuffer.allocate(163).order(ByteOrder.LITTLE_ENDIAN);
         b.putInt(rxHz).putInt(txHz).putInt(localId);
         int[] g = new int[32]; int n = 0;

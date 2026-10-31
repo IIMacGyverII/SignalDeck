@@ -73,6 +73,17 @@ public class Armor3wtProfileTest {
         try { DeviceProfile.fromJson(o); fail("a key code that is not a key name or four hex digits is refused"); } catch (org.json.JSONException expected) { }
     }
 
+    @Test public void channelWriteWaitsForTheUnkey() {
+        assertEquals("never keyed", 0, RadioEngine.pttStopWait(true, 0, 5000));
+        assertEquals("just released", 2000, RadioEngine.pttStopWait(false, 1000, 1000));
+        assertEquals(500, RadioEngine.pttStopWait(false, 1000, 2500));
+        assertEquals("the 2 s ran out", 0, RadioEngine.pttStopWait(false, 1000, 3500));
+        assertEquals("the bridge reported the stop", 0, RadioEngine.pttStopWait(true, 1000, 1100));
+        assertTrue(RadioEngine.holdsWritesAfterUnkey(DeviceProfile.ARMOR_3WT));
+        for (DeviceProfile p : new DeviceProfile[] { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.ARMOR_20WT, DeviceProfile.XPLORE_1, DeviceProfile.ATOM_XL, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.UNKNOWN })
+            assertFalse(p.name + " writes channels at once", RadioEngine.holdsWritesAfterUnkey(p));
+    }
+
     @Test public void daemonPortsFromProcNetTcp() {
         String tcp = String.join("\n",
                 "  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode",

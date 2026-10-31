@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Ulefone Armor 3WT: no channel write until the radio has finished the unkey
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Armor 3WT review §7 (its intercom app's `mIsPTTStopComplete`) | On the Armor 3WT a channel write (a channel change, a VFO retune, a scanner step) that comes right after a transmission now waits until the radio bridge reports that it has finished the unkey (state report 02), or 2 s at most, as its intercom app does; a write sent sooner could be refused or lost. Every other phone is unchanged. | `RadioEngine` | `Armor3wtProfileTest`; whole host suite. **Not device-tested.** |
+
 ## 2026-10-30 — Ulefone Armor 3WT: an untested profile that drives the radio through its own radio service
 
 | Backlog | Change | Files | Test |

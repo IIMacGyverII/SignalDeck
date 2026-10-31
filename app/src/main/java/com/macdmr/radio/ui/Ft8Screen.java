@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -72,13 +74,13 @@ public final class Ft8Screen extends ModeScreen {
         content.addView(col, ll);
 
         LinearLayout r1 = buttonRow();
-        button(r1, "Call CQ", "send", Neo.GREEN, v -> { toast(st.callCq()); refresh(); });
-        haltBtn = button(r1, "Halt TX", "stop", Neo.RED, v -> { st.haltTx(); refresh(); });
-        button(r1, "Send text", "txt", Neo.CYAN, v -> sendText());
+        button(r1, Txt.s(R.string.modes_ft8_call_cq), "send", Neo.GREEN, v -> { toast(st.callCq()); refresh(); });
+        haltBtn = button(r1, Txt.s(R.string.modes_ft8_halt), "stop", Neo.RED, v -> { st.haltTx(); refresh(); });
+        button(r1, Txt.s(R.string.modes_ft8_send_text), "txt", Neo.CYAN, v -> sendText());
         LinearLayout r2 = buttonRow();
         periodBtn = button(r2, "", "scan", Neo.AMBER, v -> { st.setTxParity(1 - st.txParity()); refresh(); });
-        button(r2, "Settings", "menu", Neo.CYAN, v -> settings());
-        button(r2, "Stop FT8", "power", Neo.RED, v -> { svc.setFt8(false); close(); });
+        button(r2, Txt.s(R.string.modes_ft8_settings), "menu", Neo.CYAN, v -> settings());
+        button(r2, Txt.s(R.string.modes_ft8_stop), "power", Neo.RED, v -> { svc.setFt8(false); close(); });
         refresh();
     }
 
@@ -89,12 +91,12 @@ public final class Ft8Screen extends ModeScreen {
 
     @Override protected void refresh() {
         com.macdmr.radio.ChannelStore.Channel ch = svc.current();
-        setSubtitle("FT8 over FM on " + (ch != null ? "Ch " + ch.number + " · " + ch.name : "this channel"));
+        setSubtitle(ch != null ? Txt.s(R.string.modes_ft8_on_channel, String.valueOf(ch.number), ch.name) : Txt.s(R.string.modes_ft8_on_this));
         String next = st.nextMessage();
-        set(qso, st.txEnabled() && next != null ? "TX " + (st.txParity() == 0 ? "1st" : "2nd") + " ▸ " + next : st.partner() != null ? "QSO with " + st.partner() : "Not transmitting");
+        set(qso, st.txEnabled() && next != null ? Txt.s(st.txParity() == 0 ? R.string.modes_ft8_tx_first : R.string.modes_ft8_tx_second, next) : st.partner() != null ? Txt.s(R.string.modes_ft8_qso_with, st.partner()) : Txt.s(R.string.modes_ft8_not_tx));
         color(qso, st.txEnabled() ? Neo.AMBER_LIGHT : Neo.DIM);
-        set(status, st.status() + "  ·  transmit at " + Math.round(st.txHz()) + " Hz" + (svc.ft8Grid().isEmpty() ? "" : "  ·  grid " + svc.ft8Grid()));
-        set(periodBtn, st.txParity() == 0 ? "TX 1st (:00 :30)" : "TX 2nd (:15 :45)");
+        set(status, svc.ft8Grid().isEmpty() ? Txt.s(R.string.modes_ft8_status_line, st.status(), String.valueOf(Math.round(st.txHz()))) : Txt.s(R.string.modes_ft8_status_line_grid, st.status(), String.valueOf(Math.round(st.txHz())), svc.ft8Grid()));
+        set(periodBtn, Txt.s(st.txParity() == 0 ? R.string.modes_ft8_period_first : R.string.modes_ft8_period_second));
         haltBtn.setAlpha(st.txEnabled() ? 1f : 0.45f);
         List<Ft8Station.Heard> h = st.heard(); List<String> sent = st.sent();
         if (h.size() != shown || sent.size() != sentShown) { shown = h.size(); sentShown = sent.size(); rebuild(h, sent); }
@@ -105,10 +107,7 @@ public final class Ft8Screen extends ModeScreen {
     private void rebuild(List<Ft8Station.Heard> h, List<String> sent) {
         list.removeAllViews();
         if (h.isEmpty() && sent.isEmpty()) {
-            list.addView(Neo.sheetHint(c, "Listening. Every 15 s the last slot is decoded and listed here, newest at the top. Tap a CQ to answer it; "
-                + "the app then runs the exchange (grid, report, R-report, RR73, 73) by itself and logs the contact.\n\n"
-                + "FT8 over FM talks to stations sending FT8 audio on this FM channel: another SignalDeck, or WSJT-X through an FM radio. "
-                + "It cannot hear SSB FT8 (144.174 / 432.174 MHz), and FM lets only the strongest station of each slot through.")); return;
+            list.addView(Neo.sheetHint(c, Txt.s(R.string.modes_ft8_empty_hint))); return;
         }
         int si = sent.size() - 1;
         long lastSlot = Long.MIN_VALUE;
@@ -118,13 +117,13 @@ public final class Ft8Screen extends ModeScreen {
             TextView row = Neo.text(c, String.format(Locale.US, "%s %+3d %+4.1f %4.0f  %s", e.time(), e.d.snrDb, e.d.dtS, e.d.freqHz, e.d.text), e.toMe ? Neo.AMBER_LIGHT : e.cq ? Neo.GREEN_LIGHT : Neo.TEXT, 13.5f, Neo.mono(c));
             row.setSingleLine(true); row.setPadding(dp(8), dp(7), dp(8), dp(7));
             row.setBackground(e.toMe ? Neo.tint(c, Neo.AMBER, 8, 1) : e.cq ? Neo.tint(c, Neo.GREEN, 8, 0) : null);
-            row.setOnClickListener(v -> { String err = st.reply(e); toast(err != null ? err : "Calling " + e.from + " in the " + (st.txParity() == 0 ? "1st" : "2nd") + " period"); refresh(); });
+            row.setOnClickListener(v -> { String err = st.reply(e); toast(err != null ? err : Txt.s(st.txParity() == 0 ? R.string.modes_ft8_calling_first : R.string.modes_ft8_calling_second, e.from)); refresh(); });
             LayoutParams rl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); rl.topMargin = dp(2);
             list.addView(row, rl);
             if (list.getChildCount() > 120) break;
         }
         if (!sent.isEmpty()) {
-            list.addView(Neo.sheetSection(c, "Sent"));
+            list.addView(Neo.sheetSection(c, Txt.s(R.string.modes_ft8_sent)));
             for (int i = sent.size() - 1; i >= 0 && i >= sent.size() - 20; i--) {
                 TextView row = Neo.text(c, sent.get(i), 0xFFFF9AA6, 13f, Neo.mono(c)); row.setSingleLine(true); row.setPadding(dp(8), dp(4), dp(8), dp(4));
                 list.addView(row);
@@ -133,15 +132,15 @@ public final class Ft8Screen extends ModeScreen {
     }
 
     private void sendText() {
-        LinearLayout b = Neo.sheetBody(c, "Send an FT8 message");
-        b.addView(Neo.sheetHint(c, "Any standard message (for example \"CQ " + safeCall() + "\") or up to 13 characters of free text: A-Z, 0-9, space and + - . / ?. It goes out once, in your period."));
-        final EditText in = new EditText(c); in.setTextColor(Neo.TEXT); in.setHintTextColor(Neo.DIM); in.setTypeface(Neo.mono(c)); in.setHint("TNX 73 GL");
+        LinearLayout b = Neo.sheetBody(c, Txt.s(R.string.modes_ft8_send_title), "radio");
+        b.addView(Neo.sheetHint(c, Txt.s(R.string.modes_ft8_send_hint, safeCall())));
+        final EditText in = new EditText(c); in.setTextColor(Neo.TEXT); in.setHintTextColor(Neo.DIM); in.setTypeface(Neo.mono(c)); in.setHint("TNX 73 GL");   // i18n: example FT8 message, sent on air as typed
         in.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS); in.setSingleLine(true);
         b.addView(in);
         final android.app.AlertDialog[] dlg = new android.app.AlertDialog[1];
         LinearLayout r = new LinearLayout(c);
-        TextView send = Neo.button(c, "Send", "send", Neo.AMBER);
-        send.setOnClickListener(v -> { String e = st.sendText(in.getText().toString()); toast(e != null ? e : "Queued for your next period"); if (e == null) dlg[0].dismiss(); refresh(); });
+        TextView send = Neo.button(c, Txt.s(R.string.common_send), "send", Neo.AMBER);
+        send.setOnClickListener(v -> { String e = st.sendText(in.getText().toString()); toast(e != null ? e : Txt.s(R.string.modes_ft8_queued)); if (e == null) dlg[0].dismiss(); refresh(); });
         r.addView(send, new LinearLayout.LayoutParams(0, dp(48), 1f));
         b.addView(r);
         dlg[0] = Neo.showSheet(c, b);
@@ -150,22 +149,22 @@ public final class Ft8Screen extends ModeScreen {
     private String safeCall() { String s = svc.packet() != null ? svc.packet().callsign() : ""; return s.isEmpty() ? "YOURCALL" : s; }
 
     private void settings() {
-        LinearLayout b = Neo.sheetBody(c, "FT8 settings");
-        b.addView(Neo.sheetSection(c, "Grid sent with CQ and replies"));
-        b.addView(Neo.sheetHint(c, "FT8 sends a 4-character Maidenhead grid (about 100 x 200 km). Leave it empty to use the phone's location, type one to fix it, or type - to send no grid. Now: " + (svc.ft8Grid().isEmpty() ? "none" : svc.ft8Grid()) + "."));
+        LinearLayout b = Neo.sheetBody(c, Txt.s(R.string.modes_ft8_settings_title), "device");
+        b.addView(Neo.sheetSection(c, Txt.s(R.string.modes_ft8_grid_section)));
+        b.addView(Neo.sheetHint(c, Txt.s(R.string.modes_ft8_grid_hint, svc.ft8Grid().isEmpty() ? Txt.s(R.string.modes_ft8_grid_none) : svc.ft8Grid())));
         final EditText g = new EditText(c); g.setTextColor(Neo.TEXT); g.setTypeface(Neo.mono(c)); g.setText(svc.ft8GridSetting()); g.setSingleLine(true);
-        g.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS); g.setHint("from location");
+        g.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS); g.setHint(Txt.s(R.string.modes_ft8_grid_input_hint));
         b.addView(g);
-        b.addView(Neo.sheetSection(c, "Transmit frequency"));
-        b.addView(Neo.sheetHint(c, "The audio frequency of your signal (" + Math.round(st.txHz()) + " Hz). Tap the waterfall to move it. On FM it matters little: the receiver hears one station at a time."));
-        b.addView(Neo.sheetSection(c, "Clock"));
+        b.addView(Neo.sheetSection(c, Txt.s(R.string.modes_ft8_txfreq_section)));
+        b.addView(Neo.sheetHint(c, Txt.s(R.string.modes_ft8_txfreq_hint, String.valueOf(Math.round(st.txHz())))));
+        b.addView(Neo.sheetSection(c, Txt.s(R.string.modes_ft8_clock_section)));
         b.addView(Neo.sheetHint(c, clockHint()));
         LinearLayout r = new LinearLayout(c);
-        TextView save = Neo.button(c, "Save", "check", Neo.GREEN), clear = Neo.button(c, "Clear list", "close", Neo.RED);
+        TextView save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN), clear = Neo.button(c, Txt.s(R.string.modes_ft8_clear_list), "close", Neo.RED);
         final android.app.AlertDialog[] dlg = new android.app.AlertDialog[1];
         save.setOnClickListener(v -> {
             String s = g.getText().toString().trim().toUpperCase(Locale.US);
-            if (!s.isEmpty() && !s.equals("-") && !s.matches("[A-R]{2}[0-9]{2}([A-X]{2})?")) { toast("A grid is two letters A-R and two digits, like FN42"); return; }
+            if (!s.isEmpty() && !s.equals("-") && !s.matches("[A-R]{2}[0-9]{2}([A-X]{2})?")) { toast(Txt.s(R.string.modes_ft8_grid_invalid)); return; }
             svc.setFt8Grid(s); dlg[0].dismiss(); refresh();
         });
         clear.setOnClickListener(v -> { st.clear(); dlg[0].dismiss(); });
@@ -177,10 +176,10 @@ public final class Ft8Screen extends ModeScreen {
     /** FT8 needs the clock within about a second: the decodes' DT shows how far off the phone (or the other station) is. */
     private String clockHint() {
         List<Ft8Station.Heard> h = st.heard();
-        if (h.isEmpty()) return "FT8 needs your clock within about a second of the other station's. The phone sets its clock from the network; after the first decodes, their DT column shows the difference.";
+        if (h.isEmpty()) return Txt.s(R.string.modes_ft8_clock_hint);
         double s = 0; int n = 0; for (int i = Math.max(0, h.size() - 20); i < h.size(); i++) { s += h.get(i).d.dtS; n++; }
         double dt = s / n;
-        return String.format(Locale.US, "Recent decodes average DT %+.1f s. ", dt) + (Math.abs(dt) < 0.8 ? "That is fine." : "That is a lot: check the phone's automatic time setting (or the other station's clock).");
+        return Txt.s(Math.abs(dt) < 0.8 ? R.string.modes_ft8_clock_fine : R.string.modes_ft8_clock_off, String.format(Locale.US, "%+.1f", dt));
     }
 
     // ---- views ----
@@ -199,7 +198,8 @@ public final class Ft8Screen extends ModeScreen {
             cv.drawRoundRect(0, 0, (float) (w * s / 15.0), h, r, r, p);
             p.setColor(Neo.alpha(Neo.TEXT, 0x50)); float sig = (float) (w * (0.5 + 12.64) / 15.0); cv.drawRect(sig, dp(4), sig + dp(1), h - dp(4), p);
             t.setColor(Neo.TEXT);
-            String label = String.format(Locale.US, "%s period  %4.1f s", parity == 0 ? "1st" : "2nd", s) + (ours ? "  · TX" : "");
+            String secs = String.format(Locale.US, "%4.1f", s);
+            String label = Txt.s(parity == 0 ? (ours ? R.string.modes_ft8_clock_first_tx : R.string.modes_ft8_clock_first) : (ours ? R.string.modes_ft8_clock_second_tx : R.string.modes_ft8_clock_second), secs);
             cv.drawText(label, dp(10), h / 2 + t.getTextSize() / 3, t);
         }
     }
@@ -210,7 +210,7 @@ public final class Ft8Screen extends ModeScreen {
         double marker = 1500; private float floor = -80;
         Waterfall(Context c) {
             super(c); m.setColor(Neo.RED); m.setStrokeWidth(dp(2)); lbl.setColor(Neo.DIM); lbl.setTextSize(dp(10)); lbl.setTypeface(Neo.mono(c));
-            setContentDescription("Waterfall; tap to choose the transmit frequency");
+            setContentDescription(Txt.s(R.string.modes_ft8_waterfall_description));
         }
         int columns() { return Math.max(64, Math.min(400, getWidth() / 2)); }
         void addLine(float[] db) {

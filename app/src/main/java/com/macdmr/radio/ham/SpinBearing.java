@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +34,7 @@ public final class SpinBearing {
         public double[] curve;                                    // dBm every 360/STEPS degrees from north, null when too few readings
         public String describe() {
             if (!ok) return retry;
-            return String.format(java.util.Locale.US, "%03.0f° ±%.0f° from the %s, %.0f dB deep", bearing, sigma, fromNull ? "null behind you" : "peak", depth);
+            return Txt.s(fromNull ? R.string.modes_spin_result_null : R.string.modes_spin_result_peak, String.format(java.util.Locale.US, "%03.0f", bearing), String.format(java.util.Locale.US, "%.0f", sigma), String.format(java.util.Locale.US, "%.0f", depth));
         }
     }
 
@@ -81,10 +83,10 @@ public final class SpinBearing {
     /** What to tell the hunter now. */
     public String guide() {
         double r = rate();
-        if (complete()) return "Full circle: done";
-        if (r > FAST_DPS) return "Slower";
-        if (track.size() >= 2 && r < SLOW_DPS) return "Keep turning";
-        return "Keep going";
+        if (complete()) return Txt.s(R.string.modes_spin_done);
+        if (r > FAST_DPS) return Txt.s(R.string.modes_spin_slower);
+        if (track.size() >= 2 && r < SLOW_DPS) return Txt.s(R.string.modes_spin_keep_turning);
+        return Txt.s(R.string.modes_spin_keep_going);
     }
 
     public Result fit() { return fit(samples); }
@@ -92,11 +94,11 @@ public final class SpinBearing {
     /** Fit a sweep given as {t, heading, dBm} rows. */
     public static Result fit(List<double[]> rows) {
         Result r = new Result(); r.samples = rows.size();
-        if (rows.size() < MIN_SAMPLES) { r.retry = "Too few readings: turn more slowly, all the way round"; return r; }
+        if (rows.size() < MIN_SAMPLES) { r.retry = Txt.s(R.string.modes_spin_few); return r; }
         double[] hs = new double[rows.size()]; for (int i = 0; i < hs.length; i++) hs[i] = rows.get(i)[1];
         Arrays.sort(hs);
         double gap = 360 - hs[hs.length - 1] + hs[0]; for (int i = 1; i < hs.length; i++) gap = Math.max(gap, hs[i] - hs[i - 1]);
-        if (gap > MAX_GAP_DEG) { r.retry = String.format(java.util.Locale.US, "Not a full circle (a %.0f° gap): turn all the way round", gap); return r; }
+        if (gap > MAX_GAP_DEG) { r.retry = Txt.s(R.string.modes_spin_gap, String.format(java.util.Locale.US, "%.0f", gap)); return r; }
         double[] cv = new double[STEPS]; double k = 1 / (2 * SMOOTH_DEG * SMOOTH_DEG);
         for (int i = 0; i < STEPS; i++) {
             double a = i * 360.0 / STEPS, sw = 0, s = 0;
@@ -111,7 +113,7 @@ public final class SpinBearing {
         r.peakAt = refine(cv, pi); r.nullAt = refine(cv, ni);
         double[] sorted = cv.clone(); Arrays.sort(sorted); double median = sorted[STEPS / 2];
         double prom = r.peakDb - median, deep = median - r.nullDb;
-        if (r.depth < MIN_DEPTH_DB || r.depth < 3 * r.noise) { r.retry = String.format(java.util.Locale.US, "Too little difference (%.0f dB): hold the phone flat against your chest, step into the open and turn again", r.depth); return r; }
+        if (r.depth < MIN_DEPTH_DB || r.depth < 3 * r.noise) { r.retry = Txt.s(R.string.modes_spin_flat, String.format(java.util.Locale.US, "%.0f", r.depth)); return r; }
         r.fromNull = deep > prom;
         r.bearing = r.fromNull ? (r.nullAt + 180) % 360 : r.peakAt;
         double width = width(cv, r.fromNull ? ni : pi, r.fromNull ? r.nullDb + r.depth / 2 : r.peakDb - r.depth / 2, !r.fromNull);

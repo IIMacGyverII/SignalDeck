@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -34,7 +36,7 @@ public final class MediaDialogs {
 
     public static void recordings(final Context c, final RadioService svc) {
         float d = Theme.dp(c);
-        final LinearLayout body = page(c, "🎧  Recordings");
+        final LinearLayout body = page(c, Txt.s(R.string.modes_media_recordings_title), "rec");
         List<File> files = new ArrayList<>();
         java.util.HashSet<String> seen = new java.util.HashSet<>();
         File[] chans = audioRoot().listFiles();
@@ -44,7 +46,7 @@ public final class MediaDialogs {
             while (cur != null && cur.moveToNext()) { String p = cur.getString(0); if (p != null && p.endsWith(".wav") && seen.add(p)) files.add(new File(p)); }
         } catch (Throwable ignored) { }
         files.sort((a, b) -> Long.compare(b.lastModified(), a.lastModified()));
-        body.addView(hint(c, files.isEmpty() ? "No recordings yet. Turn REC on; every reception on the channel is saved under Download/DMR/Audio/<channel>/." : "Tap to play or stop, long-press to delete. Files live in Download/DMR/Audio/<channel>/."));
+        body.addView(hint(c, files.isEmpty() ? Txt.s(R.string.modes_media_recordings_none) : Txt.s(R.string.modes_media_recordings_hint)));
         SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
         int n = 0;
         for (final File file : files) {
@@ -55,7 +57,7 @@ public final class MediaDialogs {
             row.addView(Neo.label(c, f.format(new Date(file.lastModified())) + String.format(Locale.US, "  ·  %.0f s  ·  %.0f kB", Math.max(0, file.length() - 44) / 16000.0, file.length() / 1024.0), 0xFFBFC8D0, 12, false));
             row.setClickable(true); row.setLongClickable(true);
             row.setOnClickListener(v -> toggle(c, file, t));
-            row.setOnLongClickListener(v -> { new AlertDialog.Builder(c).setTitle("Delete recording?").setMessage(file.getName()).setPositiveButton("Delete", (dd, w) -> { stop(); if (file.delete()) { body.removeView(row); Toast.makeText(c, "Deleted", Toast.LENGTH_SHORT).show(); } }).setNegativeButton("Cancel", null).show(); return true; });
+            row.setOnLongClickListener(v -> { new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_media_delete_confirm)).setMessage(file.getName()).setPositiveButton(Txt.s(R.string.common_delete), (dd, w) -> { stop(); if (file.delete()) { body.removeView(row); Toast.makeText(c, Txt.s(R.string.modes_media_deleted), Toast.LENGTH_SHORT).show(); } }).setNegativeButton(Txt.s(R.string.common_cancel), null).show(); return true; });
             body.addView(row);
         }
         AlertDialog a = dialog(c, body);
@@ -69,7 +71,7 @@ public final class MediaDialogs {
             player = new MediaPlayer(); player.setDataSource(file.getAbsolutePath()); player.prepare(); player.start(); playing = t;
             t.setText("■ " + t.getText().toString().substring(2)); t.setTextColor(Theme.GREEN);
             player.setOnCompletionListener(mp -> stop());
-        } catch (Throwable e) { Toast.makeText(c, "Cannot play: " + e.getMessage(), Toast.LENGTH_LONG).show(); stop(); }
+        } catch (Throwable e) { Toast.makeText(c, Txt.s(R.string.modes_media_cannot_play, String.valueOf(e.getMessage())), Toast.LENGTH_LONG).show(); stop(); }
     }
     private static void stop() {
         try { if (player != null) { player.stop(); player.release(); } } catch (Throwable ignored) { }
@@ -78,22 +80,22 @@ public final class MediaDialogs {
     }
 
     public static void captions(final Context c, final RadioService svc) {
-        final LinearLayout body = page(c, "📝  Captions heard");
+        final LinearLayout body = page(c, Txt.s(R.string.modes_media_captions_title), "txt");
         List<Object[]> rows = svc.store().captions(300);
-        body.addView(hint(c, rows.isEmpty() ? "No captions yet. Turn TXT on; every finished sentence is kept here with its channel and time." : "Every finished caption sentence, newest first."));
+        body.addView(hint(c, rows.isEmpty() ? Txt.s(R.string.modes_media_captions_none) : Txt.s(R.string.modes_media_captions_hint)));
         SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
         for (Object[] r : rows) {
             ChannelStore.Channel ch = svc.store().byNumber((Integer) r[1]);
             LinearLayout row = shell(c);
             row.addView(Neo.label(c, ((String) r[2]).replace("📝 ", ""), Theme.WHITE, 14, false));
-            row.addView(Neo.label(c, f.format(new Date((Long) r[0])) + "  ·  " + (ch != null ? ch.name : "channel " + r[1]), 0xFF8A98A6, 11, false));
+            row.addView(Neo.label(c, f.format(new Date((Long) r[0])) + "  ·  " + (ch != null ? ch.name : Txt.s(R.string.modes_media_channel, String.valueOf(r[1]))), 0xFF8A98A6, 11, false));
             body.addView(row);
         }
         dialog(c, body);
     }
 
     // ---- widgets ----
-    private static LinearLayout page(Context c, String title) { return Neo.sheetBody(c, title); }
+    private static LinearLayout page(Context c, String title, String icon) { return Neo.sheetBody(c, title, icon); }
     private static AlertDialog dialog(Context c, LinearLayout body) { return Neo.showSheet(c, body); }
     private static TextView hint(Context c, String s) { return Neo.sheetHint(c, s); }
     private static LinearLayout shell(Context c) { float d = Theme.dp(c); LinearLayout r = new LinearLayout(c); r.setOrientation(LinearLayout.VERTICAL); r.setBackground(Neo.rowCard(c)); r.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d)); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d); r.setLayoutParams(lp); return r; }

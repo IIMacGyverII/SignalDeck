@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Handler;
@@ -33,11 +35,11 @@ public final class PotaDialog {
 
     public static void show(Context c, RadioService svc) {
         float d = Theme.dp(c);
-        LinearLayout body = Neo.sheetBody(c, "POTA / SOTA");
-        body.addView(Neo.sheetHint(c, "Parks on the Air and Summits on the Air: hams operate from parks and summits, others work them. Activate from a park or summit and log your contacts here, or find activators on the air and work them."));
+        LinearLayout body = Neo.sheetBody(c, "POTA / SOTA");   // i18n: program names
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_pota_hint)));
         final AlertDialog[] self = { null };
         // ---- your activation ----
-        body.addView(Neo.sheetSection(c, "Your activation"));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_pota_your_activation)));
         Pota.Activation a = Pota.active(c);
         if (a != null) {
             String day = Pota.utcDay(System.currentTimeMillis());
@@ -45,22 +47,22 @@ public final class PotaDialog {
             LinearLayout card = new LinearLayout(c); card.setOrientation(LinearLayout.VERTICAL); card.setBackground(Neo.tint(c, Neo.GREEN, 12, 1)); card.setPadding((int) (14 * d), (int) (10 * d), (int) (14 * d), (int) (12 * d));
             card.addView(Neo.text(c, a.program + " " + a.ref, Neo.GREEN_LIGHT, 20, Neo.display(c)));
             if (!a.name.isEmpty()) card.addView(Neo.text(c, a.name, Neo.TEXT, 15, Neo.uiMedium(c)));
-            card.addView(Neo.text(c, "Since " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(a.since)) + " · today (UTC) " + today + " of " + need + " contacts" + (today >= need ? ": it counts" : ""), today >= need ? Neo.GREEN : Neo.MUTED, 14, Neo.uiMedium(c)));
+            card.addView(Neo.text(c, Txt.s(today >= need ? R.string.modes_pota_since_counts : R.string.modes_pota_since, new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(a.since)), today, need), today >= need ? Neo.GREEN : Neo.MUTED, 14, Neo.uiMedium(c)));
             body.addView(card);
             LinearLayout r = row(c, body);
-            btn(c, r, "Log a contact", "plus", Neo.GREEN, v -> { if (self[0] != null) self[0].dismiss(); log(c, svc, null); });
-            btn(c, r, "Export ADIF", "send", Neo.CYAN, v -> export(c, svc, a));
+            btn(c, r, Txt.s(R.string.modes_pota_log_contact), "plus", Neo.GREEN, v -> { if (self[0] != null) self[0].dismiss(); log(c, svc, null); });
+            btn(c, r, Txt.s(R.string.modes_log_export), "send", Neo.CYAN, v -> export(c, svc, a));
             LinearLayout r2 = row(c, body);
-            btn(c, r2, "End the activation", "stop", Neo.RED, v -> new AlertDialog.Builder(c).setTitle("End " + a.ref + "?").setMessage("Its contacts stay in the logbook (and can still be exported).").setPositiveButton("End", (dd, w) -> { Pota.end(c); if (self[0] != null) self[0].dismiss(); show(c, svc); }).setNegativeButton("Cancel", null).show());
+            btn(c, r2, Txt.s(R.string.modes_pota_end_activation), "stop", Neo.RED, v -> new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_pota_end_confirm, a.ref)).setMessage(Txt.s(R.string.modes_pota_end_message)).setPositiveButton(Txt.s(R.string.modes_pota_end), (dd, w) -> { Pota.end(c); if (self[0] != null) self[0].dismiss(); show(c, svc); }).setNegativeButton(Txt.s(R.string.common_cancel), null).show());
         } else {
-            body.addView(Neo.sheetHint(c, "Start one when you are set up in a park or on a summit: your contacts are then logged under its reference and counted (POTA: 10 in a UTC day, SOTA: 4)."));
+            body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_pota_start_hint)));
             LinearLayout r = row(c, body);
-            btn(c, r, "Activate a park…", "map", Neo.GREEN, v -> { if (self[0] != null) self[0].dismiss(); chooseRef(c, svc, Pota.POTA); });
-            btn(c, r, "Activate a summit…", "signal", Neo.AMBER, v -> { if (self[0] != null) self[0].dismiss(); chooseRef(c, svc, Pota.SOTA); });
+            btn(c, r, Txt.s(R.string.modes_pota_activate_park_button), "map", Neo.GREEN, v -> { if (self[0] != null) self[0].dismiss(); chooseRef(c, svc, Pota.POTA); });
+            btn(c, r, Txt.s(R.string.modes_pota_activate_summit_button), "signal", Neo.AMBER, v -> { if (self[0] != null) self[0].dismiss(); chooseRef(c, svc, Pota.SOTA); });
         }
         // ---- activators on the air ----
-        body.addView(Neo.sheetSection(c, "On the air now"));
-        final TextView status = Neo.label(c, "Loading the POTA and SOTA spots…", Neo.MUTED, 14, false); body.addView(status);
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_pota_on_air)));
+        final TextView status = Neo.label(c, Txt.s(R.string.modes_pota_loading), Neo.MUTED, 14, false); body.addView(status);
         final LinearLayout list = new LinearLayout(c); list.setOrientation(LinearLayout.VERTICAL); body.addView(list);
         self[0] = Neo.showSheet(c, body);
         final Handler h = new Handler(Looper.getMainLooper());
@@ -68,12 +70,13 @@ public final class PotaDialog {
             List<String> problems = new ArrayList<>(); List<Pota.Spot> spots = Pota.spots(problems);
             h.post(() -> {
                 int workable = 0; for (Pota.Spot s : spots) if (s.workable()) workable++;
-                status.setText((workable == 0 ? "Nobody is on FM on 2 m or 70 cm right now" + (spots.isEmpty() ? "." : " (" + spots.size() + " activators on HF and other modes, listed below).") : workable + " on FM on 2 m / 70 cm: tap one to tune or log it.") + (problems.isEmpty() ? "" : "  " + android.text.TextUtils.join(", ", problems)));
+                String line = workable == 0 ? (spots.isEmpty() ? Txt.s(R.string.modes_pota_nobody) : Txt.p(R.plurals.modes_pota_nobody_others, spots.size(), spots.size())) : Txt.s(R.string.modes_pota_workable, workable);
+                status.setText(problems.isEmpty() ? line : line + "  " + android.text.TextUtils.join(Txt.s(R.string.modes_list_separator), problems));
                 SimpleDateFormat hm = new SimpleDateFormat("HH:mm", Locale.getDefault());
                 int shown = 0;
                 for (Pota.Spot s : spots) {
                     if (++shown > 40) break;
-                    String sub = String.format(Locale.US, "%s %.4f MHz %s · %s %s", s.program, s.freqHz / 1e6, s.mode == null ? "" : s.mode, s.ref, s.name) + (s.where == null || s.where.isEmpty() ? "" : " (" + s.where + ")") + (s.time > 0 ? " · " + hm.format(new Date(s.time)) : "");
+                    String sub = String.format(Locale.US, "%s %.4f MHz %s · %s %s", s.program, s.freqHz / 1e6, s.mode == null ? "" : s.mode, s.ref, s.name) + (s.where == null || s.where.isEmpty() ? "" : " (" + s.where + ")") + (s.time > 0 ? " · " + hm.format(new Date(s.time)) : "");   // i18n: spot data and units
                     LinearLayout t = Neo.tile(c, s.program.equals(Pota.SOTA) ? "signal" : "map", s.workable() ? Neo.GREEN : Neo.DIM, s.call, sub);
                     if (!s.workable()) t.setAlpha(0.6f);
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d);
@@ -86,48 +89,48 @@ public final class PotaDialog {
 
     private static void spotActions(Context c, RadioService svc, Pota.Spot s, AlertDialog sheet) {
         List<String> items = new ArrayList<>();
-        if (s.workable()) items.add(String.format(Locale.US, "Tune to %.4f MHz (VFO)", s.freqHz / 1e6));
-        items.add("Log " + s.call + " (hunting " + s.ref + ")");
+        if (s.workable()) items.add(Txt.s(R.string.modes_pota_tune_to, String.format(Locale.US, "%.4f", s.freqHz / 1e6)));
+        items.add(Txt.s(R.string.modes_pota_log_hunting, s.call, s.ref));
         new AlertDialog.Builder(c).setTitle(s.call + " · " + s.ref).setItems(items.toArray(new String[0]), (dd, w) -> {
             if (s.workable() && w == 0) {
                 ChannelStore.Channel v = new ChannelStore.Channel(); v.type = 1; v.rxFreq = v.txFreq = (int) s.freqHz; v.band = 1; v.power = 1; v.sq = 2; v.name = s.call + " " + s.ref;
-                svc.applyVfo(v); Toast.makeText(c, "Tuned to " + s.call, Toast.LENGTH_SHORT).show();
+                svc.applyVfo(v); Toast.makeText(c, Txt.s(R.string.modes_pota_tuned, s.call), Toast.LENGTH_SHORT).show();
             } else { if (sheet != null) sheet.dismiss(); log(c, svc, s); }
         }).show();
     }
 
     private static void chooseRef(Context c, RadioService svc, String program) {
         float d = Theme.dp(c);
-        LinearLayout body = Neo.sheetBody(c, Pota.POTA.equals(program) ? "Activate a park" : "Activate a summit");
-        final EditText ref = field(c, body, Pota.POTA.equals(program) ? "Park reference (US-1234, GB-0001…)" : "Summit reference (W0C/FR-001, G/SE-001…)", "");
+        LinearLayout body = Neo.sheetBody(c, Txt.s(Pota.POTA.equals(program) ? R.string.modes_pota_activate_park : R.string.modes_pota_activate_summit), "radio");
+        final EditText ref = field(c, body, Txt.s(Pota.POTA.equals(program) ? R.string.modes_pota_park_ref : R.string.modes_pota_summit_ref), "");
         ref.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        TextView go = Neo.button(c, "Start the activation", "check", Neo.GREEN); body.addView(go);
+        TextView go = Neo.button(c, Txt.s(R.string.modes_pota_start), "check", Neo.GREEN); body.addView(go);
         final LinearLayout near = new LinearLayout(c); near.setOrientation(LinearLayout.VERTICAL);
         final AlertDialog dlg = Neo.showSheet(c, body);
         go.setOnClickListener(v -> {
             final String r = ref.getText().toString().trim().toUpperCase(Locale.US);
-            if (!program.equals(Pota.programOf(r))) { Toast.makeText(c, "That does not look like a " + program + " reference", Toast.LENGTH_SHORT).show(); return; }
+            if (!program.equals(Pota.programOf(r))) { Toast.makeText(c, Txt.s(R.string.modes_pota_bad_ref, program), Toast.LENGTH_SHORT).show(); return; }
             go.setEnabled(false);
             new Thread(() -> { String name = Pota.lookup(r); new Handler(Looper.getMainLooper()).post(() -> {
                 go.setEnabled(true);
-                if (name == null) { new AlertDialog.Builder(c).setTitle(r + " was not found").setMessage(program + " does not know it (or could not be reached). Start anyway?").setPositiveButton("Start", (dd, w) -> { Pota.start(c, r, ""); dlg.dismiss(); show(c, svc); }).setNegativeButton("Cancel", null).show(); return; }
-                Pota.start(c, r, name); dlg.dismiss(); Toast.makeText(c, "Activating " + r + ": " + name, Toast.LENGTH_SHORT).show(); show(c, svc);
+                if (name == null) { new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_pota_not_found, r)).setMessage(Txt.s(R.string.modes_pota_not_found_message, program)).setPositiveButton(Txt.s(R.string.common_start), (dd, w) -> { Pota.start(c, r, ""); dlg.dismiss(); show(c, svc); }).setNegativeButton(Txt.s(R.string.common_cancel), null).show(); return; }
+                Pota.start(c, r, name); dlg.dismiss(); Toast.makeText(c, Txt.s(R.string.modes_pota_activating, r, name), Toast.LENGTH_SHORT).show(); show(c, svc);
             }); }, "pota-lookup").start();
         });
         if (!Pota.POTA.equals(program)) return;
-        body.addView(Neo.sheetSection(c, "Parks near you"));
-        final TextView st = Neo.label(c, "Looking…", Neo.MUTED, 14, false); body.addView(st); body.addView(near);
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_pota_parks_near)));
+        final TextView st = Neo.label(c, Txt.s(R.string.modes_pota_looking), Neo.MUTED, 14, false); body.addView(st); body.addView(near);
         final android.location.Location me = svc.lastKnownLocation();
-        if (me == null) { st.setText("Needs a position fix."); return; }
+        if (me == null) { st.setText(Txt.s(R.string.modes_pota_needs_fix)); return; }
         new Thread(() -> {
             List<Pota.Park> ps; try { ps = Pota.parksNear(me.getLatitude(), me.getLongitude()); } catch (Throwable t) { ps = null; }
             final List<Pota.Park> f = ps;
             new Handler(Looper.getMainLooper()).post(() -> {
-                if (f == null) { st.setText("POTA could not be reached."); return; }
-                st.setText(f.isEmpty() ? "No park within 60 km." : "Tap one to fill in its reference:");
+                if (f == null) { st.setText(Txt.s(R.string.modes_pota_unreachable_parks)); return; }
+                st.setText(Txt.s(f.isEmpty() ? R.string.modes_pota_no_park : R.string.modes_pota_tap_park));
                 for (int i = 0; i < Math.min(25, f.size()); i++) {
                     Pota.Park p = f.get(i);
-                    LinearLayout t = Neo.tile(c, "map", Neo.GREEN, p.ref, p.name + String.format(Locale.US, " · %.1f km", p.km));
+                    LinearLayout t = Neo.tile(c, "map", Neo.GREEN, p.ref, p.name + String.format(Locale.US, " · %.1f km", p.km));   // i18n: park name and distance
                     LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d);
                     near.addView(t, lp); t.setOnClickListener(v -> ref.setText(p.ref));
                 }
@@ -139,35 +142,38 @@ public final class PotaDialog {
     private static void log(Context c, RadioService svc, Pota.Spot hunted) {
         float d = Theme.dp(c);
         final Pota.Activation a = Pota.active(c);
-        LinearLayout body = Neo.sheetBody(c, hunted != null ? "Log " + hunted.call : "Log a contact");
+        LinearLayout body = Neo.sheetBody(c, hunted != null ? Txt.s(R.string.modes_pota_log_call, hunted.call) : Txt.s(R.string.modes_pota_log_contact), "diag");
         ChannelStore.Channel cur = svc.current();
         final long freq = hunted != null ? hunted.freqHz : cur != null ? cur.rxFreq : 0;
-        body.addView(Neo.sheetHint(c, String.format(Locale.US, "%.4f MHz FM", freq / 1e6) + (a != null ? " · under your activation " + a.ref : "") + (hunted != null ? " · their " + hunted.program + " " + hunted.ref : "")));
-        final EditText call = field(c, body, "Callsign", hunted != null ? hunted.call : "");
+        List<String> facts = new ArrayList<>(); facts.add(String.format(Locale.US, "%.4f MHz FM", freq / 1e6));   // i18n: frequency and mode
+        if (a != null) facts.add(Txt.s(R.string.modes_pota_under_activation, a.ref));
+        if (hunted != null) facts.add(Txt.s(R.string.modes_pota_their_ref, hunted.program, hunted.ref));
+        body.addView(Neo.sheetHint(c, String.join(Txt.s(R.string.modes_middot_separator), facts)));
+        final EditText call = field(c, body, Txt.s(R.string.modes_log_f_call), hunted != null ? hunted.call : "");
         call.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        final EditText sent = field(c, body, "Report sent", "59"), rcvd = field(c, body, "Report received", "59");
-        final EditText theirRef = field(c, body, "Their park or summit (park-to-park, optional)", hunted != null ? hunted.ref : "");
+        final EditText sent = field(c, body, Txt.s(R.string.modes_pota_f_sent), "59"), rcvd = field(c, body, Txt.s(R.string.modes_log_f_rcvd), "59");
+        final EditText theirRef = field(c, body, Txt.s(R.string.modes_pota_f_their_ref), hunted != null ? hunted.ref : "");
         theirRef.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        final EditText notes = field(c, body, "Notes (optional)", "");
-        TextView save = Neo.button(c, "Save", "check", Neo.GREEN);
+        final EditText notes = field(c, body, Txt.s(R.string.modes_pota_f_notes), "");
+        TextView save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN);
         LinearLayout.LayoutParams sl = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) (50 * d)); sl.topMargin = (int) (12 * d);
         body.addView(save, sl);
         final AlertDialog dlg = Neo.showSheet(c, body);
         save.setOnClickListener(v -> {
             String cs = call.getText().toString().trim().toUpperCase(Locale.US);
-            if (Logbook.baseCall(cs) == null) { Toast.makeText(c, "Enter a callsign", Toast.LENGTH_SHORT).show(); return; }
+            if (Logbook.baseCall(cs) == null) { Toast.makeText(c, Txt.s(R.string.modes_pota_enter_call), Toast.LENGTH_SHORT).show(); return; }
             Runnable doSave = () -> {
                 Logbook.Entry e = new Logbook.Entry(); e.ts = System.currentTimeMillis(); e.call = cs; e.freqHz = freq; e.mode = "FM"; e.qso = true;
-                e.rstSent = sent.getText().toString().trim(); e.rstRcvd = rcvd.getText().toString().trim(); e.notes = notes.getText().toString().trim(); e.source = a != null ? a.program + " activation" : "POTA/SOTA hunting";
+                e.rstSent = sent.getText().toString().trim(); e.rstRcvd = rcvd.getText().toString().trim(); e.notes = notes.getText().toString().trim(); e.source = a != null ? a.program + " activation" : "POTA/SOTA hunting";   // i18n: stored in the logbook source column
                 String tr = theirRef.getText().toString().trim().toUpperCase(Locale.US); if (Pota.programOf(tr) != null) { e.sig = Pota.programOf(tr); e.sigInfo = tr; }
                 if (a != null) { e.mySig = a.program; e.mySigInfo = a.ref; }
                 svc.logbook().save(e); dlg.dismiss();
                 int n = a == null ? 0 : svc.logbook().activation(a.ref, Pota.utcDay(e.ts)).size();
-                Toast.makeText(c, cs + " logged" + (a != null ? " (" + n + " of " + Pota.needed(a.program) + " today)" : ""), Toast.LENGTH_SHORT).show();
+                Toast.makeText(c, a != null ? Txt.s(R.string.modes_pota_logged_count, cs, n, Pota.needed(a.program)) : Txt.s(R.string.modes_pota_logged, cs), Toast.LENGTH_SHORT).show();
                 show(c, svc);
             };
             if (a != null && svc.logbook().isDupe(cs, freq, System.currentTimeMillis(), a.ref))
-                new AlertDialog.Builder(c).setTitle(cs + " is already in the log").setMessage("Worked on this band today under " + a.ref + ". Log it again anyway?").setPositiveButton("Log again", (dd, w) -> doSave.run()).setNegativeButton("Cancel", null).show();
+                new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_pota_dupe, cs)).setMessage(Txt.s(R.string.modes_pota_dupe_message, a.ref)).setPositiveButton(Txt.s(R.string.modes_pota_log_again), (dd, w) -> doSave.run()).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
             else doSave.run();
         });
     }
@@ -178,14 +184,14 @@ public final class PotaDialog {
             String me = svc.packet() == null ? "" : svc.packet().callsign();
             String day = Pota.utcDay(System.currentTimeMillis());
             List<Logbook.Entry> es = svc.logbook().activation(a.ref, null);
-            if (es.isEmpty()) { Toast.makeText(c, "No contacts under " + a.ref + " yet", Toast.LENGTH_SHORT).show(); return; }
+            if (es.isEmpty()) { Toast.makeText(c, Txt.s(R.string.modes_pota_no_contacts, a.ref), Toast.LENGTH_SHORT).show(); return; }
             String adif = Logbook.adif(es, com.macdmr.radio.BuildConfig.VERSION_NAME, me);
             java.io.File dir = new java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS), "DMR/Logbook"); dir.mkdirs();
-            java.io.File out = new java.io.File(dir, (me.isEmpty() ? "MYCALL" : me) + "@" + a.ref.replace('/', '_') + "-" + day + ".adi");
+            java.io.File out = new java.io.File(dir, (me.isEmpty() ? "MYCALL" : me) + "@" + a.ref.replace('/', '_') + "-" + day + ".adi");   // i18n: file name
             try (java.io.Writer w = new java.io.OutputStreamWriter(new java.io.FileOutputStream(out), java.nio.charset.StandardCharsets.UTF_8)) { w.write(adif); }
-            Toast.makeText(c, "Saved Download/DMR/Logbook/" + out.getName() + (me.isEmpty() ? " (set your callsign in APRS settings for the station field)" : ""), Toast.LENGTH_LONG).show();
-            c.startActivity(android.content.Intent.createChooser(new android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_SUBJECT, out.getName()).putExtra(android.content.Intent.EXTRA_TEXT, adif), "Send the log"));
-        } catch (Throwable t) { Toast.makeText(c, "Export failed: " + t.getMessage(), Toast.LENGTH_LONG).show(); }
+            Toast.makeText(c, me.isEmpty() ? Txt.s(R.string.modes_pota_exported_no_call, out.getName()) : Txt.s(R.string.modes_log_exported, out.getName()), Toast.LENGTH_LONG).show();
+            c.startActivity(android.content.Intent.createChooser(new android.content.Intent(android.content.Intent.ACTION_SEND).setType("text/plain").putExtra(android.content.Intent.EXTRA_SUBJECT, out.getName()).putExtra(android.content.Intent.EXTRA_TEXT, adif), Txt.s(R.string.modes_pota_send_log)));
+        } catch (Throwable t) { Toast.makeText(c, Txt.s(R.string.modes_log_export_failed, String.valueOf(t.getMessage())), Toast.LENGTH_LONG).show(); }
     }
 
     private static LinearLayout row(Context c, LinearLayout body) { LinearLayout r = new LinearLayout(c); body.addView(r); return r; }

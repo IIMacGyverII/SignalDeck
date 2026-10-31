@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -39,47 +41,47 @@ public final class MorseTrainerDialog {
         float d = Theme.dp(c);
         final SharedPreferences p = c.getSharedPreferences("trainer", Context.MODE_PRIVATE);
         final int[] lesson = { p.getInt("lesson", 1) }, wpm = { p.getInt("wpm", 20) }, fw = { p.getInt("fw", 10) };
-        LinearLayout body = Neo.sheetBody(c, "Morse trainer");
-        body.addView(Neo.sheetHint(c, "The Koch method: start with two characters at full speed and add one each time you copy a lesson with 90 %. Farnsworth spacing leaves longer gaps between characters while you learn; close it up as you improve. Sound plays on the phone, not on the air."));
+        LinearLayout body = Neo.sheetBody(c, Txt.s(R.string.modes_morse_title), "radio");
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_morse_hint)));
         final TextView lessonT = Neo.text(c, "", Neo.TEXT, 16, Neo.ui(c)), speedT = Neo.text(c, "", Neo.TEXT, 15, Neo.ui(c));
         final Runnable[] save = new Runnable[1];
         save[0] = () -> {
             p.edit().putInt("lesson", lesson[0]).putInt("wpm", wpm[0]).putInt("fw", fw[0]).apply();
             String cs = MorseTrainer.chars(lesson[0]);
-            lessonT.setText("Lesson " + lesson[0] + " of " + MorseTrainer.LESSONS + ":  " + cs.replace("", " ").trim() + "   (new: " + cs.charAt(cs.length() - 1) + ")");
-            speedT.setText(String.format(Locale.US, "Characters %d WPM  ·  spacing %d WPM", wpm[0], fw[0]));
+            lessonT.setText(Txt.s(R.string.modes_morse_lesson, lesson[0], MorseTrainer.LESSONS, cs.replace("", " ").trim(), String.valueOf(cs.charAt(cs.length() - 1))));
+            speedT.setText(Txt.s(R.string.modes_morse_speed, wpm[0], fw[0]));
         };
         body.addView(stepper(c, lessonT, () -> { lesson[0] = Math.max(1, lesson[0] - 1); save[0].run(); }, () -> { lesson[0] = Math.min(MorseTrainer.LESSONS, lesson[0] + 1); save[0].run(); }));
         body.addView(stepper(c, speedT, () -> { wpm[0] = Math.max(5, wpm[0] - 1); fw[0] = Math.min(fw[0], wpm[0]); save[0].run(); }, () -> { wpm[0] = Math.min(35, wpm[0] + 1); save[0].run(); }));
-        final TextView fwT = Neo.text(c, "Spacing", Neo.MUTED, 14, Neo.uiMedium(c));
+        final TextView fwT = Neo.text(c, Txt.s(R.string.modes_morse_spacing), Neo.MUTED, 14, Neo.uiMedium(c));
         body.addView(stepper(c, fwT, () -> { fw[0] = Math.max(5, fw[0] - 1); save[0].run(); }, () -> { fw[0] = Math.min(wpm[0], fw[0] + 1); save[0].run(); }));
         save[0].run();
 
-        body.addView(Neo.sheetSection(c, "Copy practice"));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_morse_copy)));
         final String[] sent = { "" };
         LinearLayout r1 = new LinearLayout(c); r1.setBaselineAligned(false);
-        TextView play = Neo.button(c, "Play 5 groups", "volume", Neo.GREEN), again = Neo.button(c, "Again", "update", Neo.CYAN);
+        TextView play = Neo.button(c, Txt.s(R.string.modes_morse_play), "volume", Neo.GREEN), again = Neo.button(c, Txt.s(R.string.modes_morse_again), "update", Neo.CYAN);
         for (TextView b : new TextView[] { play, again }) { LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (4 * d), (int) (3 * d), 0); r1.addView(b, lp); }
         body.addView(r1);
-        final EditText copy = new EditText(c); copy.setHint("Type what you heard"); copy.setTextColor(Neo.TEXT); copy.setHintTextColor(Neo.DIM); copy.setTypeface(Neo.mono(c));
+        final EditText copy = new EditText(c); copy.setHint(Txt.s(R.string.modes_morse_copy_hint)); copy.setTextColor(Neo.TEXT); copy.setHintTextColor(Neo.DIM); copy.setTypeface(Neo.mono(c));
         copy.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         body.addView(copy);
         final TextView result = Neo.label(c, "", 0xFFCFE8D8, 13.5f, false); result.setTypeface(Neo.mono(c)); body.addView(result);
-        TextView check = Neo.button(c, "Check", "check", Neo.AMBER); body.addView(check);
+        TextView check = Neo.button(c, Txt.s(R.string.modes_morse_check), "check", Neo.AMBER); body.addView(check);
         play.setOnClickListener(v -> { sent[0] = MorseTrainer.groups(lesson[0], 5, new Random()); copy.setText(""); result.setText(""); playPcm(MorseTrainer.pcm(sent[0], wpm[0], fw[0], 650)); });
         again.setOnClickListener(v -> { if (!sent[0].isEmpty()) playPcm(MorseTrainer.pcm(sent[0], wpm[0], fw[0], 650)); });
         check.setOnClickListener(v -> {
             if (sent[0].isEmpty()) return;
             double sc = MorseTrainer.score(sent[0], copy.getText().toString());
             boolean pass = sc >= 0.9;
-            result.setText(String.format(Locale.US, "%.0f %%  %s\nsent:  %s\nyou:   %s", sc * 100, pass ? (lesson[0] < MorseTrainer.LESSONS ? "✔ next lesson unlocked" : "✔ all characters done") : "keep going at this lesson", sent[0], copy.getText().toString().toUpperCase(Locale.US)));
+            result.setText(Txt.s(R.string.modes_morse_result, String.format(Locale.US, "%.0f", sc * 100), Txt.s(pass ? (lesson[0] < MorseTrainer.LESSONS ? R.string.modes_morse_next_lesson : R.string.modes_morse_all_done) : R.string.modes_morse_keep_going), sent[0], copy.getText().toString().toUpperCase(Locale.US)));
             result.setTextColor(pass ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT);
             if (pass && lesson[0] < MorseTrainer.LESSONS) { lesson[0]++; save[0].run(); }
         });
 
-        body.addView(Neo.sheetSection(c, "Sending practice"));
-        body.addView(Neo.sheetHint(c, "Hold the key for dahs, tap for dits; after a pause of a second and a half the decoder shows what you sent and your speed."));
-        final TextView key = Neo.button(c, "KEY", null, Neo.CYAN); key.setTextSize(22); key.setMinHeight((int) (110 * d));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_morse_sending)));
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_morse_sending_hint)));
+        final TextView key = Neo.button(c, Txt.s(R.string.modes_morse_key), null, Neo.CYAN); key.setTextSize(22); key.setMinHeight((int) (110 * d));
         body.addView(key);
         final TextView sentOut = Neo.label(c, "", Neo.CYAN, 16, true); sentOut.setTypeface(Neo.mono(c)); body.addView(sentOut);
         final Handler h = new Handler(Looper.getMainLooper());
@@ -94,7 +96,7 @@ public final class MorseTrainerDialog {
             final String[] got = { "" }; final int[] speed = { 0 };
             CwDecoder dec = new CwDecoder((text, hz, w) -> { got[0] = text; speed[0] = w; }, false);
             dec.process(pcm); dec.process(new short[16000]);
-            sentOut.setText(got[0].isEmpty() ? "(not readable yet: keep dits short and dahs three times as long)" : got[0] + String.format(Locale.US, "   ≈ %d WPM", speed[0]));
+            sentOut.setText(got[0].isEmpty() ? Txt.s(R.string.modes_morse_unreadable) : Txt.s(R.string.modes_morse_decoded, got[0], speed[0]));
             presses.clear();
         };
         key.setOnTouchListener((v, e) -> {

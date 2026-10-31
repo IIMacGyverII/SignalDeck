@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -30,7 +32,7 @@ public final class VoiceKeyer {
     private File dir() { File d = new File(ctx.getFilesDir(), "keyer"); d.mkdirs(); return d; }
     private File file(int slot) { return new File(dir(), "slot" + slot + ".pcm"); }
 
-    public String name(int slot) { return ctx.getSharedPreferences("keyer", Context.MODE_PRIVATE).getString("name" + slot, new String[] { "CQ", "Net preamble", "My ID" }[slot]); }
+    public String name(int slot) { return ctx.getSharedPreferences("keyer", Context.MODE_PRIVATE).getString("name" + slot, Txt.s(new int[] { R.string.modes_keyer_slot_cq, R.string.modes_keyer_slot_net, R.string.modes_keyer_slot_id }[slot])); }
     public void setName(int slot, String n) { ctx.getSharedPreferences("keyer", Context.MODE_PRIVATE).edit().putString("name" + slot, n).apply(); }
     public boolean addId(int slot) { return ctx.getSharedPreferences("keyer", Context.MODE_PRIVATE).getBoolean("id" + slot, slot == 0); }
     public void setAddId(int slot, boolean on) { ctx.getSharedPreferences("keyer", Context.MODE_PRIVATE).edit().putBoolean("id" + slot, on).apply(); }
@@ -53,12 +55,12 @@ public final class VoiceKeyer {
 
     /** Start recording into {@code slot} from the microphone; stops by itself at {@link #MAX_MS}. Error or null. */
     public synchronized String start(int slot, Runnable stopped) {
-        if (rec != null) return "Already recording";
+        if (rec != null) return Txt.s(R.string.modes_keyer_err_recording);
         int min = AudioRecord.getMinBufferSize(SR, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
         final AudioRecord r;
         try { r = new AudioRecord(MediaRecorder.AudioSource.MIC, SR, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, Math.max(min, 8192)); }
-        catch (SecurityException e) { return "The microphone permission is needed"; }
-        if (r.getState() != AudioRecord.STATE_INITIALIZED) { r.release(); return "The microphone is busy"; }
+        catch (SecurityException e) { return Txt.s(R.string.modes_keyer_err_permission); }
+        if (r.getState() != AudioRecord.STATE_INITIALIZED) { r.release(); return Txt.s(R.string.modes_keyer_err_busy); }
         rec = r; recSlot = slot;
         recThread = new Thread(() -> {
             short[] all = new short[SR * MAX_MS / 1000]; int n = 0; short[] buf = new short[1024];

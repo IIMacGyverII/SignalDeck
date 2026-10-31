@@ -91,11 +91,11 @@ public final class Logbook extends SQLiteOpenHelper {
         return out;
     }
     public synchronized void delete(long id) { getWritableDatabase().delete("log", "_id=?", new String[] { String.valueOf(id) }); }
-    public synchronized int count(boolean qsoOnly) { try (Cursor c = getReadableDatabase().rawQuery("SELECT COUNT(*) FROM log" + (qsoOnly ? " WHERE qso=1" : ""), null)) { return c.moveToFirst() ? c.getInt(0) : 0; } }
+    public synchronized int count(boolean qsoOnly) { try (Cursor c = getReadableDatabase().rawQuery("SELECT COUNT(*) FROM log" + (qsoOnly ? " WHERE qso=1" : ""), null)) { return c.moveToFirst() ? c.getInt(0) : 0; } }   // i18n: SQL
 
     public synchronized List<Entry> list(int limit, boolean qsoOnly) {
         List<Entry> out = new ArrayList<>();
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT _id, ts, call, freq, mode, rstSent, rstRcvd, name, notes, qso, source, grid, qth, sig, sigInfo, mySig, mySigInfo FROM log" + (qsoOnly ? " WHERE qso=1" : "") + " ORDER BY ts DESC LIMIT " + limit, null)) {
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT _id, ts, call, freq, mode, rstSent, rstRcvd, name, notes, qso, source, grid, qth, sig, sigInfo, mySig, mySigInfo FROM log" + (qsoOnly ? " WHERE qso=1" : "") + " ORDER BY ts DESC LIMIT " + limit, null)) {   // i18n: SQL
             while (c.moveToNext()) {
                 Entry e = new Entry(); e.id = c.getLong(0); e.ts = c.getLong(1); e.call = c.getString(2); e.freqHz = c.getLong(3); e.mode = c.getString(4); e.rstSent = c.getString(5); e.rstRcvd = c.getString(6);
                 e.name = c.getString(7); e.notes = c.getString(8); e.qso = c.getInt(9) == 1; e.source = c.getString(10); e.grid = c.getString(11) == null ? "" : c.getString(11); e.qth = c.getString(12) == null ? "" : c.getString(12); out.add(e);
@@ -143,8 +143,8 @@ public final class Logbook extends SQLiteOpenHelper {
     public static String adif(List<Entry> entries, String version) { return adif(entries, version, null); }
     /** ADIF with STATION_CALLSIGN / OPERATOR (POTA's uploads want them). */
     public static String adif(List<Entry> entries, String version, String station) {
-        StringBuilder sb = new StringBuilder("SignalDeck logbook export\n");
-        field(sb, "ADIF_VER", "3.1.4"); field(sb, "PROGRAMID", "SignalDeck"); field(sb, "PROGRAMVERSION", version);
+        StringBuilder sb = new StringBuilder("SignalDeck logbook export\n");   // i18n: ADIF file format
+        field(sb, "ADIF_VER", "3.1.4"); field(sb, "PROGRAMID", "SignalDeck"); field(sb, "PROGRAMVERSION", version);   // i18n: ADIF file format
         sb.append("<EOH>\n");
         SimpleDateFormat d = new SimpleDateFormat("yyyyMMdd", Locale.US), t = new SimpleDateFormat("HHmmss", Locale.US);
         d.setTimeZone(TimeZone.getTimeZone("UTC")); t.setTimeZone(TimeZone.getTimeZone("UTC"));

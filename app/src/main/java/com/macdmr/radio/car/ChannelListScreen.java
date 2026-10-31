@@ -18,6 +18,8 @@ import androidx.car.app.model.Template;
 import androidx.core.graphics.drawable.IconCompat;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.RadioService;
 import com.macdmr.radio.media.CarArt;
 
@@ -36,13 +38,13 @@ public class ChannelListScreen extends Screen {
     static final String FAV = com.macdmr.radio.ui.ChannelsView.FAV_ZONE;
 
     /** The zone list. */
-    public ChannelListScreen(@NonNull CarContext c) { this(c, -1, false, "Channels"); }
+    public ChannelListScreen(@NonNull CarContext c) { this(c, -1, false, Txt.s(R.string.intercom_car_channels)); }
 
     private ChannelListScreen(@NonNull CarContext c, long zoneId, boolean all, String title) { super(c); this.zoneId = zoneId; this.all = all; this.title = title; }
 
     @NonNull @Override public Template onGetTemplate() {
         try { return build(); }
-        catch (Throwable t) { return new ListTemplate.Builder().setSingleList(new ItemList.Builder().addItem(new Row.Builder().setTitle("Unavailable").addText(String.valueOf(t.getMessage())).build()).build()).setTitle(title).setHeaderAction(Action.BACK).build(); }
+        catch (Throwable t) { return new ListTemplate.Builder().setSingleList(new ItemList.Builder().addItem(new Row.Builder().setTitle(Txt.s(R.string.intercom_car_unavailable)).addText(String.valueOf(t.getMessage())).build()).build()).setTitle(title).setHeaderAction(Action.BACK).build(); }
     }
 
     private Template build() {
@@ -51,34 +53,34 @@ public class ChannelListScreen extends Screen {
         int max = 100;
         try { max = getCarContext().getCarService(androidx.car.app.constraints.ConstraintManager.class).getContentLimit(androidx.car.app.constraints.ConstraintManager.CONTENT_LIMIT_TYPE_LIST); } catch (Throwable ignored) { }
         if (s == null) {
-            list.addItem(new Row.Builder().setTitle("The radio is off").addText("Open SignalDeck on the phone").build());
+            list.addItem(new Row.Builder().setTitle(Txt.s(R.string.intercom_car_radio_off)).addText(Txt.s(R.string.intercom_car_open_phone)).build());
         } else if (zoneId < 0 && !all) {
             List<ChannelStore.Zone> zones = new ArrayList<>(s.store().zones());
             ChannelStore.Zone fav = null;
             for (ChannelStore.Zone z : zones) if (FAV.equals(z.name)) fav = z;
             if (fav != null) zones.remove(fav);
-            list.addItem(new Row.Builder().setTitle("Last heard").addText("Who and what was received, newest first")
-                    .setImage(icon(CarArt.zoneTilePublic(getCarContext(), "last heard"))).setBrowsable(true)
+            list.addItem(new Row.Builder().setTitle(Txt.s(R.string.intercom_car_last_heard)).addText(Txt.s(R.string.intercom_car_last_heard_sub))
+                    .setImage(icon(CarArt.zoneTilePublic(getCarContext(), "last heard"))).setBrowsable(true)   // i18n: icon key (CarArt.zoneTile)
                     .setOnClickListener(() -> getScreenManager().push(new LastHeardScreen(getCarContext()))).build());
             // Favourites first, always: until channels are starred it says how
             if (fav != null && fav.numbers.length > 0) {
                 final ChannelStore.Zone f = fav;
-                list.addItem(new Row.Builder().setTitle(FAV).addText(f.numbers.length + (f.numbers.length == 1 ? " channel" : " channels"))
+                list.addItem(new Row.Builder().setTitle(FAV).addText(Txt.p(R.plurals.intercom_car_zone_count, f.numbers.length, f.numbers.length))
                         .setImage(icon(CarArt.zoneTilePublic(getCarContext(), FAV))).setBrowsable(true)
                         .setOnClickListener(() -> getScreenManager().push(new ChannelListScreen(getCarContext(), f.id, false, FAV))).build());
             } else {
-                list.addItem(new Row.Builder().setTitle(FAV).addText("Star channels on the phone (Channels page) to list them here")
+                list.addItem(new Row.Builder().setTitle(FAV).addText(Txt.s(R.string.intercom_car_star_hint))
                         .setImage(icon(CarArt.zoneTilePublic(getCarContext(), FAV))).build());
             }
             int n = 2;
             for (final ChannelStore.Zone z : zones) {
                 if (n++ >= max - 1) break;
-                list.addItem(new Row.Builder().setTitle(z.name).addText(z.numbers.length + (z.numbers.length == 1 ? " channel" : " channels"))
+                list.addItem(new Row.Builder().setTitle(z.name).addText(Txt.p(R.plurals.intercom_car_zone_count, z.numbers.length, z.numbers.length))
                         .setImage(icon(CarArt.zoneTilePublic(getCarContext(), z.name))).setBrowsable(true)
                         .setOnClickListener(() -> getScreenManager().push(new ChannelListScreen(getCarContext(), z.id, false, z.name))).build());
             }
-            list.addItem(new Row.Builder().setTitle("All channels").addText(s.store().all().size() + " channels").setImage(icon(CarArt.zoneTilePublic(getCarContext(), "all"))).setBrowsable(true)
-                    .setOnClickListener(() -> getScreenManager().push(new ChannelListScreen(getCarContext(), -1, true, "All channels"))).build());
+            list.addItem(new Row.Builder().setTitle(Txt.s(R.string.intercom_car_all_channels)).addText(Txt.p(R.plurals.intercom_car_all_count, s.store().all().size(), s.store().all().size())).setImage(icon(CarArt.zoneTilePublic(getCarContext(), "all"))).setBrowsable(true)
+                    .setOnClickListener(() -> getScreenManager().push(new ChannelListScreen(getCarContext(), -1, true, Txt.s(R.string.intercom_car_all_channels)))).build());
         } else {
             List<ChannelStore.Channel> chans = new ArrayList<>();
             if (all) chans.addAll(s.store().all());
@@ -88,17 +90,17 @@ public class ChannelListScreen extends Screen {
             if (chans.size() > max && cur != null) for (int i = 0; i < chans.size(); i++) if (chans.get(i).number == cur.number) start = Math.max(0, Math.min(i - max / 2, chans.size() - max));   // long list: centred on the current channel
             for (int i = start; i < chans.size() && i < start + max; i++) {
                 final ChannelStore.Channel c = chans.get(i);
-                String sub = String.format(Locale.US, "%s MHz · %s%s", c.freqText(c.rxFreq), c.isDigital() ? "DMR" : "FM", cur != null && cur.number == c.number ? " · tuned" : "");
+                String sub = Txt.s(cur != null && cur.number == c.number ? R.string.intercom_car_channel_sub_tuned : R.string.intercom_car_channel_sub, c.freqText(c.rxFreq), c.isDigital() ? "DMR" : "FM");
                 list.addItem(new Row.Builder().setTitle(c.name).addText(sub).setImage(icon(CarArt.channelTilePublic(getCarContext(), c)))
                         .setOnClickListener(() -> { RadioService r = RadioService.running; if (r != null) r.selectChannel(c.number); getScreenManager().popToRoot(); }).build());
             }
-            if (chans.isEmpty()) list.setNoItemsMessage("No channels in this zone");
+            if (chans.isEmpty()) list.setNoItemsMessage(Txt.s(R.string.intercom_car_zone_empty));
         }
         ListTemplate.Builder t = new ListTemplate.Builder().setSingleList(list.build()).setTitle(title).setHeaderAction(Action.BACK);
         if (s != null && (zoneId >= 0 || all)) {                    // a channel list: scan exactly these channels
             final boolean scanning = s.isScanning();
             t.setActionStrip(new androidx.car.app.model.ActionStrip.Builder().addAction(new Action.Builder()
-                    .setTitle(scanning ? "Stop scan" : "Scan")
+                    .setTitle(Txt.s(scanning ? R.string.intercom_car_stop_scan : R.string.intercom_car_scan))
                     .setOnClickListener(() -> {
                         RadioService r = RadioService.running; if (r == null) return;
                         if (r.isScanning()) r.toggleScan();

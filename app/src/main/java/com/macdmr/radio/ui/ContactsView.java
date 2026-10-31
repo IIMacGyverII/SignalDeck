@@ -22,7 +22,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
+import com.macdmr.radio.i18n.Txt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +38,11 @@ import java.util.Locale;
 public class ContactsView extends LinearLayout {
     public interface Host { void openThread(ChannelStore.Contact c); }
 
-    static final String[] TYPES = { "Private", "Group", "All call" };
+    /** English type names, for ContactEditor until it reads {@link #type}; this page shows {@link #type}. */
+    static final String[] TYPES = { "Private", "Group", "All call" };   // i18n: kept for ContactEditor (not this group's file); use type(i)
+    private static final int[] TYPE_NAMES = { R.string.intercom_contacts_type_private, R.string.intercom_contacts_type_group, R.string.intercom_contacts_type_all_call };
+    /** A contact type's name in the app's language: 0 private, 1 group, 2 all call (out of range is clamped). */
+    static String type(int type) { return Txt.s(TYPE_NAMES[Math.min(2, Math.max(0, type))]); }
     private final ListView list;
     private final Adapter adapter = new Adapter();
     private final EditText search;
@@ -51,8 +57,8 @@ public class ContactsView extends LinearLayout {
         super(c);
         setOrientation(VERTICAL);   // background: the window's
         float d = Theme.dp(c);
-        header = Neo.header(c, "Contacts", "");
-        ImageView add = Neo.iconButton(c, "plus", Neo.GREEN, "Add contact");
+        header = Neo.header(c, Txt.s(R.string.intercom_contacts_title), "");
+        ImageView add = Neo.iconButton(c, "plus", Neo.GREEN, Txt.s(R.string.intercom_contacts_add));
         add.setOnClickListener(v -> edit(null));
         Neo.addAction(header, add);
         addView(header);
@@ -61,7 +67,7 @@ public class ContactsView extends LinearLayout {
         sf.setBackground(Neo.card(c, Neo.alpha(Neo.CYAN, 0x33), 12)); sf.setPadding((int) (14 * d), 0, (int) (10 * d), 0);
         ImageView si = new ImageView(c); si.setImageDrawable(new Neo.IconDrawable("search", Neo.MUTED));
         sf.addView(si, new LayoutParams((int) (18 * d), (int) (18 * d)));
-        search = new EditText(c); search.setHint("Name, callsign, DMR ID or RIC"); search.setSingleLine(true); search.setTextSize(16); search.setTypeface(Neo.uiSemi(c));
+        search = new EditText(c); search.setHint(Txt.s(R.string.intercom_contacts_search_hint)); search.setSingleLine(true); search.setTextSize(16); search.setTypeface(Neo.uiSemi(c));
         search.setTextColor(Neo.TEXT); search.setHintTextColor(Neo.DIM); search.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         search.setBackground(null); search.setPadding((int) (10 * d), 0, 0, 0);
         search.addTextChangedListener(new TextWatcher() {
@@ -74,7 +80,7 @@ public class ContactsView extends LinearLayout {
 
         HorizontalScrollView hs = new HorizontalScrollView(c); hs.setHorizontalScrollBarEnabled(false);
         LinearLayout cr = new LinearLayout(c); cr.setPadding((int) (16 * d), (int) (10 * d), (int) (16 * d), (int) (8 * d));
-        String[] names = { "ALL", "PRIVATE", "TALKGROUPS" };
+        String[] names = { Txt.s(R.string.intercom_contacts_filter_all), Txt.s(R.string.intercom_contacts_filter_private), Txt.s(R.string.intercom_contacts_filter_talkgroups) };
         for (int i = 0; i < 3; i++) {
             final int k = i;
             TextView t = Neo.text(c, names[i], Neo.TEXT, 14, Neo.ui(c)); t.setLetterSpacing(0.07f); t.setGravity(Gravity.CENTER);
@@ -111,7 +117,7 @@ public class ContactsView extends LinearLayout {
         all.clear(); all.addAll(svc.store().contacts());
         fillCallsigns();
         int groups = 0; for (ChannelStore.Contact ct : all) if (ct.type != 0) groups++;
-        Neo.headerSubtitle(header).setText(((all.size() - groups) + " private · " + groups + (groups == 1 ? " talkgroup" : " talkgroups")).toUpperCase(Locale.US));
+        Neo.headerSubtitle(header).setText(Txt.p(R.plurals.intercom_contacts_counts, groups, all.size() - groups, groups).toUpperCase(Locale.US));
         filter();
     }
 
@@ -149,7 +155,7 @@ public class ContactsView extends LinearLayout {
     /** Round-cornered avatar: initial for a private ID, TG for a talkgroup, ALL for all-call. */
     static TextView avatar(Context c, int type, String name, float sizeDp) {
         int col = typeColor(type);
-        String label = type == 1 ? "TG" : type == 2 ? "ALL" : (name == null || name.trim().isEmpty() ? "#" : name.trim().substring(0, 1).toUpperCase(Locale.US));
+        String label = type == 1 ? Txt.s(R.string.intercom_contacts_avatar_tg) : type == 2 ? Txt.s(R.string.intercom_contacts_avatar_all) :(name == null || name.trim().isEmpty() ? "#" : name.trim().substring(0, 1).toUpperCase(Locale.US));
         TextView t = Neo.text(c, label, col, type == 0 ? sizeDp * 0.42f : sizeDp * 0.3f, type == 0 ? Neo.display(c) : Neo.ui(c)); t.setGravity(Gravity.CENTER);
         android.graphics.drawable.GradientDrawable g = new android.graphics.drawable.GradientDrawable(); g.setCornerRadius(Theme.dp(c, sizeDp * 0.3f));
         g.setColor(Neo.alpha(col, 0x1C)); g.setStroke(Theme.dp(c, 1), Neo.alpha(col, 0x77)); t.setBackground(g);
@@ -183,7 +189,7 @@ public class ContactsView extends LinearLayout {
                 col.addView(l3);
                 row.addView(col, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
                 ImageView msg = new ImageView(c); msg.setTag("msg"); msg.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                int sp = (int) (12 * d); msg.setPadding(sp, sp, sp, sp); msg.setClickable(true); msg.setContentDescription("Message");
+                int sp = (int) (12 * d); msg.setPadding(sp, sp, sp, sp); msg.setClickable(true); msg.setContentDescription(Txt.s(R.string.intercom_contacts_message));
                 msg.setImageDrawable(new Neo.IconDrawable("messages", Neo.GREEN));
                 row.addView(msg, new LayoutParams((int) (44 * d), (int) (44 * d)));
                 outer.addView(row, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
@@ -196,12 +202,12 @@ public class ContactsView extends LinearLayout {
             av.addView(avatar(c, ct.type, ct.name, 46), new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
             ((TextView) row.findViewWithTag("name")).setText(ct.name);
             LinearLayout l2 = row.findViewWithTag("l2"); l2.removeAllViews();
-            l2.addView(Neo.chip(c, TYPES[Math.min(2, Math.max(0, ct.type))], typeColor(ct.type)));
-            TextView idv = Neo.text(c, ct.number > 0 ? String.valueOf(ct.number) : "no DMR ID", ct.number > 0 ? Neo.TEXT_SOFT : Neo.DIM, 15, Neo.mono(c)); idv.setPadding((int) (8 * d), 0, (int) (8 * d), 0); l2.addView(idv);
+            l2.addView(Neo.chip(c, type(ct.type), typeColor(ct.type)));
+            TextView idv = Neo.text(c, ct.number > 0 ? String.valueOf(ct.number) : Txt.s(R.string.intercom_contacts_no_id), ct.number > 0 ? Neo.TEXT_SOFT : Neo.DIM, 15, Neo.mono(c)); idv.setPadding((int) (8 * d), 0, (int) (8 * d), 0); l2.addView(idv);
             LinearLayout l3 = row.findViewWithTag("l3"); l3.removeAllViews();
             if (!ct.callsign.isEmpty()) l3.addView(Neo.chip(c, ct.callsign, Neo.GREEN));
-            if (!ct.rics.isEmpty()) { TextView pg = Neo.chip(c, "PAGER", Neo.AMBER); LayoutParams pl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); pl.leftMargin = ct.callsign.isEmpty() ? 0 : (int) (6 * d); l3.addView(pg, pl); }
-            if (ct.lastTs > 0) { TextView lh = Neo.text(c, "heard " + ChannelsView.heardWhen(ct.lastTs), Neo.DIM, 12, Neo.uiMedium(c)); lh.setPadding(l3.getChildCount() > 0 ? (int) (8 * d) : 0, 0, 0, 0); lh.setSingleLine(true); l3.addView(lh); }   // the same form as the channel cards (owner, 2026-10-25)
+            if (!ct.rics.isEmpty()) { TextView pg = Neo.chip(c, Txt.s(R.string.intercom_contacts_pager), Neo.AMBER); LayoutParams pl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); pl.leftMargin = ct.callsign.isEmpty() ? 0 : (int) (6 * d); l3.addView(pg, pl); }
+            if (ct.lastTs > 0) { TextView lh = Neo.text(c, Txt.s(R.string.intercom_contacts_heard, ChannelsView.heardWhen(ct.lastTs)), Neo.DIM, 12, Neo.uiMedium(c)); lh.setPadding(l3.getChildCount() > 0 ? (int) (8 * d) : 0, 0, 0, 0); lh.setSingleLine(true); l3.addView(lh); }   // the same form as the channel cards (owner, 2026-10-25)
             l3.setVisibility(l3.getChildCount() > 0 ? VISIBLE : GONE);
             row.findViewWithTag("msg").setVisibility(ct.number > 0 ? VISIBLE : INVISIBLE);
             row.findViewWithTag("msg").setOnClickListener(x -> { if (host != null && ct.number > 0) host.openThread(ct); });

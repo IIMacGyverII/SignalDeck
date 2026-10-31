@@ -25,7 +25,7 @@ public class RadioCarAppService extends CarAppService {
         return new Session() {
             @NonNull @Override public Screen onCreateScreen(@NonNull Intent intent) {
                 com.macdmr.radio.RadioService rs = com.macdmr.radio.RadioService.running;
-                if (rs != null) rs.carEvent("🚗 Android Auto opened Radio controls");
+                if (rs != null) rs.carEvent("🚗 Android Auto opened Radio controls");   // i18n: history line, stored in English (carEvent takes text only; Last heard matches it)
                 return new RadioControlScreen(getCarContext());
             }
         };

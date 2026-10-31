@@ -3000,8 +3000,22 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** The transmit test session's view of the module's status replies (Device report → Transmit test session); null otherwise. */
     public volatile java.util.function.BiConsumer<Integer, String> statusTap;
 
+    /**
+     * With the promiscuous flag on (0x40 op 15), the module's start/stop gate reports EVERY call it passes, the listed ones
+     * included, as 10 / 11 (MIX_DIGITAL_RX_START / _STOP) instead of 1 / 2 (firmware reading 2026-10-31; first seen on FW26,
+     * 2026-10-28). On a digital channel that is a reception like 1 / 2: the receive gate, the history and the caller query all
+     * follow it. With the flag off the module never posts 10 / 11.
+     */
+    /** With the flag on, every call is posted as 10 / 11 (F62E bench, in-list TG 9 included); a raw 1 / 2 then only comes from the module's speaker switch (0x37F4). */
+    static boolean promiscuousEdge(int code, boolean promiscuousOn, boolean digital) { return promiscuousOn && digital && (code == 1 || code == 2); }
+
+    static int rxStatusFor(int code, boolean digital) { return digital && (code == 10 || code == 11) ? code - 9 : code; }
+
     @Override public void status(int code, String name) {
         java.util.function.BiConsumer<Integer, String> tap = statusTap; if (tap != null) try { tap.accept(code, name); } catch (Throwable ignored) { }
+        boolean digital = current != null && current.isDigital();
+        if (promiscuousEdge(code, promiscuousOn(), digital)) { log("speaker edge " + code + " with the promiscuous flag on: not a reception"); return; }   // i18n: log line
+        code = rxStatusFor(code, digital);
         if ((code == 1 || code == 2) && audio instanceof ExtModuleAudio) ((ExtModuleAudio) audio).reception(code == 1);   // the 3WT: extmodule streams receive audio only between these
         switch (code) {
             case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); if (!captureRunning()) bridgeCapture(true); } break; }   // a capture closed for silence reopens   // already open: an edge after a signal-started reception
@@ -3467,9 +3481,17 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (groups != null) for (int g : groups) if (g > 0 && g == target) return true;
         return false;
     }
+    /**
+     * The colour code and slot the promiscuous firmware appends to 0x2B: kept only when the colour code is the channel's own.
+     * FW62 bench (2026-10-31): for a call outside the list the appended bytes read 0E 00 / 0D 00 against a CC 1 sender
+     * (a register the module does not latch for those calls), so a mismatch is not shown as a received colour code.
+     */
+    static boolean trustedCc(int cc, int channelCc) { return cc >= 0 && cc == channelCc; }
+
     @Override public void callerInfo(int type, int caller, int target, int cc, int slot) {
         if (caller <= 0) return;
         ChannelStore.Channel ac = current;
+        if (cc >= 0 && !(ac != null && trustedCc(cc, ac.cc))) { cc = -1; slot = -1; }
         if (ac != null && ac.isDigital()) {
             boolean a = dmrAdmits(type, target, tgOverride.groups(ac), localId(), ac.mode);
             if (profile.dmrAppAdmission && a != dmrAdmitted) log("DMR caller info " + (a ? "admits" : "does not admit") + " type " + type + " target " + target);

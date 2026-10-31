@@ -486,7 +486,7 @@
     <!-- Refusal (toast) of the repeater key-up test on a simplex channel or one without a location. One line. -->
     <string name="service_keyup_needs_repeater">Elige un canal de repetidor FM que tenga ubicación</string>
     <!-- Refusal (toast) of the repeater key-up test before the callsign is set. PKT → APRS settings is where it is set. Two lines. -->
-    <string name="service_keyup_needs_callsign">Primero configura tu indicativo (PKT → Ajustes APRS): la prueba lo envía como tu identificación</string>
+    <string name="service_keyup_needs_callsign">Primero configura tu indicativo (PKT → Ajustes de APRS): la prueba lo envía como tu identificación</string>
     <!-- Text of the ongoing radio notification before the radio is up. Short. -->
     <string name="service_notif_idle">Radio inactiva</string>
     <!-- Choice of the roger beep setting: a short beep at the end of each transmission. One word (chip). -->
@@ -528,7 +528,7 @@
     <!-- Notification title when a message form arrives. %1$s is the form's kind ("ICS-213"), %2$s the sender. One line. -->
     <string name="service_form_notify_title">%1$s de %2$s</string>
     <!-- Notification text when a message form without a subject arrives: where to read it. Short. -->
-    <string name="service_form_open">Abre PKT → Formularios</string>
+    <string name="service_form_open">Abre PKT → Formularios de mensaje</string>
     <!-- Refusal (toast) when a packet feature is used while the packet engine is not running. Short. -->
     <string name="service_packet_not_running">El motor de packet no está en marcha</string>
     <!-- Refusal (toast) when a form is sent by APRS without a callsign. Short. -->
@@ -598,7 +598,7 @@
     <!-- History line with the result of a scheduled Winlink check. %1$s is the result. Starts with an emoji; keep it. -->
     <string name="service_sched_winlink">⏰ Consulta programada de Winlink: %1$s</string>
     <!-- Result of a scheduled Winlink check by radio before a gateway was ever used. "Winlink → Connect: radio" is the button path. One line. -->
-    <string name="service_sched_r_no_gateway">omitido: aún no hay gateway (conecta una vez con Winlink → Conectar: radio)</string>
+    <string name="service_sched_r_no_gateway">omitido: aún no hay pasarela (conecta una vez con Winlink → Conectar: radio)</string>
     <!-- Result of a scheduled Winlink check while a session runs. Short. -->
     <string name="service_sched_r_winlink_busy">omitido: ya hay una sesión de Winlink en curso</string>
     <!-- Result of a scheduled Winlink check whose channel was deleted. %1$d is the channel number. Short. -->
@@ -636,11 +636,11 @@
     <!-- Scheduled operation: send an APRS position beacon. One line. -->
     <string name="service_sched_beacon">Enviar una baliza APRS</string>
     <!-- Scheduled operation: check Winlink e-mail through a radio gateway. One line. -->
-    <string name="service_sched_winlink_radio">Consultar correo Winlink (gateway de radio)</string>
+    <string name="service_sched_winlink_radio">Consultar correo Winlink (pasarela por radio)</string>
     <!-- Scheduled operation: check Winlink e-mail over the internet. One line. -->
     <string name="service_sched_winlink_net">Consultar correo Winlink (internet)</string>
     <!-- Scheduled operation: the packet finder (listen for packet stations). BBSs, nodes and gateways are kinds of packet station. One line. -->
-    <string name="service_sched_finder">Buscador de packet (escucha BBS, nodos y gateways)</string>
+    <string name="service_sched_finder">Buscador de packet (escucha BBS, nodos y pasarelas)</string>
     <!-- SAFETY: refusal (toast) when APRS monitoring is scheduled on a radio that cannot tune the APRS frequency. %1$s is the radio's bands, %2$s the APRS frequency in MHz. -->
     <string name="service_sched_no_aprs">Este equipo sintoniza %1$s, no %2$s MHz: sin escucha APRS</string>
     <!-- SAFETY: refusal (toast) when a schedule's channel is outside the radio's bands. %1$s is the channel name, %2$s the radio's bands. -->

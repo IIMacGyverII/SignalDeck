@@ -108,7 +108,7 @@
     <!-- Settings row title: which microphone a wheel transmission uses. One line. -->
     <string name="device_set_wheel_mic">Micrófono para el volante</string>
     <!-- Subtitle of "Steering-wheel microphone". May wrap to three lines. -->
-    <string name="device_set_wheel_mic_sub">Vehículo (como una llamada): el micrófono del vehículo; se detiene con colgar del volante o Finalizar. Teléfono: el micrófono del teléfono; se detiene con el volante. Toca para cambiar</string>
+    <string name="device_set_wheel_mic_sub">Vehículo (llamada): el micrófono del vehículo; se detiene con colgar del volante o Finalizar. Teléfono: el micrófono del teléfono; se detiene con el volante. Toca para cambiar</string>
     <!-- Settings row title: unkey a wheel transmission after silence. One line. -->
     <string name="device_set_vox">Parar cuando dejo de hablar</string>
     <!-- Subtitle of "Stop when I stop talking". May wrap. -->
@@ -384,7 +384,7 @@
     <!-- Item in the Device report menu: the root radio probe. One line. -->
     <string name="device_report_probe">Sondeo de radio (root)</string>
     <!-- Item in the Device report menu. One line, may wrap. -->
-    <string name="device_report_issue">Abrir un issue en GitHub con los datos rellenados</string>
+    <string name="device_report_issue">Abrir un issue en GitHub con los datos completados</string>
     <!-- Item in the Device report menu: explains the report. One line. -->
     <string name="device_report_what">¿Qué contiene?</string>
     <!-- Toast when "Open a GitHub issue" finds no browser to open the page in. The report itself stays English. One line. -->
@@ -750,7 +750,7 @@
     <!-- Title of the dialog offering to submit an unknown firmware variant. One line. -->
     <string name="device_variant">Nueva variante de firmware</string>
     <!-- First paragraphs of the firmware variant dialog (ends with two line breaks). %1$s is why the firmware is new (from the check). "Submit" is GitHub's button. -->
-    <string name="device_variant_msg">El firmware de radio de este teléfono aún no está en el catálogo de firmware de SignalDeck: %1$s.\n\nSi lo envías, el proyecto de firmware puede catalogarlo, así SignalDeck lo reconoce y el trabajo de firmware podrá cubrirlo más adelante. GitHub se abre en tu navegador con el modelo del teléfono, la versión del módulo, la versión de la app del fabricante y la huella del archivo de firmware ya rellenados. Revísalos y presiona Submit allí (requiere una cuenta de GitHub). No se envía nada si no lo envías tú, y nada de ello te identifica.\n\n</string>
+    <string name="device_variant_msg">El firmware de radio de este teléfono aún no está en el catálogo de firmware de SignalDeck: %1$s.\n\nSi lo envías, el proyecto de firmware puede catalogarlo, así SignalDeck lo reconoce y el trabajo de firmware podrá cubrirlo más adelante. GitHub se abre en tu navegador con el modelo del teléfono, la versión del módulo, la versión de la app del fabricante y la huella del archivo de firmware ya completados. Revísalos y presiona Submit allí (requiere una cuenta de GitHub). No se envía nada si no lo envías tú, y nada de ello te identifica.\n\n</string>
     <!-- Paragraph of the firmware variant dialog when the firmware file is new too (ends with two line breaks). -->
     <string name="device_variant_attach">El propio archivo de firmware también es nuevo: SignalDeck lo copia a Download/DMR/FoundFirmware en este teléfono, y el issue indica dónde está. Adjuntarlo es decisión tuya: un adjunto en el issue es público, cualquiera puede descargarlo, y el archivo pertenece al fabricante del teléfono.\n\n</string>
     <!-- Paragraph of the firmware variant dialog when the file is known (ends with two line breaks). -->
@@ -1250,7 +1250,7 @@
     <!-- Module firmware pre-flight, name of the check that the phone's own radio app is paused (SignalDeck has taken over the radio). Short. -->
     <string name="device_fw_check_stock">App del fabricante en pausa</string>
     <!-- SAFETY: Module firmware pre-flight, detail when the stock radio app still runs: take over first ("Take over" is the Device page's button). One line. -->
-    <string name="device_fw_check_stock_on">Primero toma el control de la radio</string>
+    <string name="device_fw_check_stock_on">Primero toma el control del módulo de radio</string>
     <!-- Module firmware pre-flight, detail when the stock app is paused. One word. -->
     <string name="device_fw_check_stock_ok">En pausa</string>
     <!-- Module firmware pre-flight, name of the battery check (over 60 %, or over 40 % while charging). One word. -->

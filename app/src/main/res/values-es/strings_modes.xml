@@ -138,7 +138,7 @@
     <!-- Satellite list line: nobody reported on this satellite to AMSAT recently. One line. -->
     <string name="modes_fmsat_status_none">AMSAT: sin reportes en los últimos 4 días</string>
     <!-- Part of the AMSAT status line: how many people heard the satellite. %1$d a count. "×" means times. Very short. -->
-    <string name="modes_fmsat_status_heard">oído %1$d×</string>
+    <string name="modes_fmsat_status_heard">escuchado %1$d×</string>
     <!-- Part of the AMSAT status line: reports of telemetry only (no voice). %1$d a count. Very short. -->
     <string name="modes_fmsat_status_telemetry">solo telemetría %1$d×</string>
     <!-- Part of the AMSAT status line: reports that it was not heard. %1$d a count. Very short. -->
@@ -228,9 +228,9 @@
     <!-- Title of the Message forms sheet. One line. -->
     <string name="modes_forms_title">Formularios de mensaje</string>
     <!-- Explanation on the Message forms sheet (radio without DMR). A few lines. -->
-    <string name="modes_forms_hint">El mensaje general ICS-213 y el radiograma ARRL, para ruedas de emergencia y de tráfico: rellena uno y léelo en el aire, o envíalo como mensajes APRS a otro SignalDeck, que vuelve a montar las partes en el formulario.</string>
+    <string name="modes_forms_hint">El mensaje general ICS-213 y el radiograma ARRL, para ruedas de emergencia y de tráfico: completa uno y léelo en el aire, o envíalo como mensajes APRS a otro SignalDeck, que vuelve a montar las partes en el formulario.</string>
     <!-- The same on a radio with DMR texts. A few lines. -->
-    <string name="modes_forms_hint_dmr">El mensaje general ICS-213 y el radiograma ARRL, para ruedas de emergencia y de tráfico: rellena uno y léelo en el aire, o envíalo como mensajes APRS o textos DMR a otro SignalDeck, que vuelve a montar las partes en el formulario.</string>
+    <string name="modes_forms_hint_dmr">El mensaje general ICS-213 y el radiograma ARRL, para ruedas de emergencia y de tráfico: completa uno y léelo en el aire, o envíalo como mensajes APRS o textos DMR a otro SignalDeck, que vuelve a montar las partes en el formulario.</string>
     <!-- Button: start a new ICS-213 form. Short (half-width button). -->
     <string name="modes_forms_new_ics">Nuevo ICS-213</string>
     <!-- Button: start a new radiogram. Short (half-width button). -->
@@ -268,7 +268,7 @@
     <!-- Hint under the large form text. Two lines. -->
     <string name="modes_forms_read_hint">Lee despacio, campo por campo; deletrea con el alfabeto fonético las palabras poco comunes y da los números cifra a cifra.</string>
     <!-- Hint in the radiogram editor: the check field is computed. One line. -->
-    <string name="modes_forms_check_hint">El control se rellena con el número de palabras del texto al enviar.</string>
+    <string name="modes_forms_check_hint">El control se completa con el número de palabras del texto al enviar.</string>
     <!-- Button and dialog title: send the form as APRS messages. Half-width button. -->
     <string name="modes_forms_send_aprs">Enviar por APRS</string>
     <!-- Button: send the form as DMR texts. Half-width button. -->
@@ -426,7 +426,7 @@
     <!-- FT8 error: a typed message is too long or has characters FT8 cannot carry. Toast, two lines. -->
     <string name="modes_ft8_err_no_fit">Ese mensaje no cabe en FT8 (13 caracteres de A-Z 0-9 + - . / ? como texto libre)</string>
     <!-- FT8 error: no callsign is set (it is set in the APRS settings). Toast. -->
-    <string name="modes_ft8_err_callsign">Primero configura tu indicativo (ajustes APRS)</string>
+    <string name="modes_ft8_err_callsign">Primero configura tu indicativo (ajustes de APRS)</string>
     <!-- FT8 error: the callsign cannot be encoded in FT8. Toast. -->
     <string name="modes_ft8_err_call_unsendable">Tu indicativo no se puede enviar en FT8</string>
     <!-- History line: the callsign is non-standard, so CQ goes out without the grid. WSJT-X is a program's name. Two lines. -->
@@ -650,7 +650,7 @@
     <!-- Label under the time since the last reception (capitals, small, half-width tile). One or two words. -->
     <string name="modes_parrot_stat_last">ÚLTIMA</string>
     <!-- Parrot explanation. %1$s the longest recording in seconds, %2$s the minutes between Morse IDs. A paragraph. -->
-    <string name="modes_parrot_hint">Todo lo que el equipo oye en este canal (hasta %1$s s) se graba y se devuelve un segundo después de que la otra estación suelte el PTT, para que compruebe cómo sale a través de ti. Con un indicativo configurado, añade tu indicativo en Morse a una repetición como mucho cada %2$s minutos. El límite de transmisión de 30 segundos del equipo acota cada repetición.</string>
+    <string name="modes_parrot_hint">Todo lo que el equipo oye en este canal (hasta %1$s s) se graba y se devuelve un segundo después de que la otra estación suelte el PTT, para que verifique cómo sale a través de ti. Con un indicativo configurado, añade tu indicativo en Morse a una repetición como mucho cada %2$s minutos. El límite de transmisión de 30 segundos del equipo acota cada repetición.</string>
     <!-- Button: turn the parrot off and close. Short. -->
     <string name="modes_parrot_stop">Detener el loro</string>
     <!-- Subtitle. %1$s the channel number, %2$s its name. One line. -->
@@ -746,7 +746,7 @@
     <!-- Hint under the frequency. Two lines. -->
     <string name="modes_pager_freq_hint">El mensaje sale en esta frecuencia, con potencia baja. Si no es el canal en el que estás, el equipo sintoniza primero allí y espera a que se estabilice.</string>
     <!-- Hint when no own pager address (RIC) is set. Two lines. -->
-    <string name="modes_pager_rics_none">Tus RIC de pager se configuran en PKT → Ajustes APRS. Los mensajes a esos RIC son tuyos.</string>
+    <string name="modes_pager_rics_none">Tus RIC de pager se configuran en PKT → Ajustes de APRS. Los mensajes a esos RIC son tuyos.</string>
     <!-- Hint listing the user's own pager addresses. %1$s the RICs. One line. -->
     <string name="modes_pager_rics">Tus RIC: %1$s</string>
     <!-- Section heading above the recipients field. Short. -->
@@ -850,7 +850,7 @@
     <!-- Hint in the field where the user types what was heard. Short. -->
     <string name="modes_morse_copy_hint">Escribe lo que oíste</string>
     <!-- Button: score what was typed. Full width. -->
-    <string name="modes_morse_check">Comprobar</string>
+    <string name="modes_morse_check">Verificar</string>
     <!-- Copy result, monospaced: "sent:" and "you:" are padded so the two lines line up; keep them the same width. %1$s the score in percent, %2$s the verdict, %3$s what was sent, %4$s what was typed. Three lines. -->
     <string name="modes_morse_result">%1$s %%\u0020 %2$s\nenviado:\u0020 %3$s\ntú:\u0020\u0020\u0020\u0020\u0020\u0020 %4$s</string>
     <!-- Verdict: 90 % or more, the next lesson opens. Short. -->
@@ -860,7 +860,7 @@
     <!-- Verdict: under 90 %. Short. -->
     <string name="modes_morse_keep_going">sigue con esta lección</string>
     <!-- Section heading (capitals): keying practice. Short. -->
-    <string name="modes_morse_sending">Práctica de transmisión</string>
+    <string name="modes_morse_sending">Práctica de manipulación</string>
     <!-- Hint for the key. Two lines. -->
     <string name="modes_morse_sending_hint">Mantén el manipulador para las rayas y tócalo para los puntos; tras una pausa de un segundo y medio, el decodificador muestra lo que enviaste y tu velocidad.</string>
     <!-- The big Morse key button (capitals). One short word. -->
@@ -894,7 +894,7 @@
     <!-- Section heading (capitals): the identification timer. Short. -->
     <string name="modes_keyer_id_section">Identificación</string>
     <!-- Explanation of the ten-minute ID timer; "I just identified" is the button below. A paragraph. -->
-    <string name="modes_keyer_id_hint">Las normas de radioaficionado piden tu indicativo cada diez minutos mientras hablas y al terminar. El temporizador arranca con tu primera transmisión en un canal de radioaficionado después de la última identificación; cuando se agota, el teléfono vibra y te lo recuerda al pulsar el PTT. Una identificación en Morse (PKT, las memorias de voz o después de hablar) lo reinicia; o toca Ya me identifiqué después de decir tu indicativo.</string>
+    <string name="modes_keyer_id_hint">Las normas de radioaficionado piden tu indicativo cada diez minutos mientras hablas y al terminar. El temporizador arranca con tu primera transmisión en un canal de radioaficionado después de la última identificación; cuando se agota, el teléfono vibra y te lo recuerda al presionar el PTT. Una identificación en Morse (PKT, las memorias de voz o después de hablar) lo reinicia; o toca Ya me identifiqué después de decir tu indicativo.</string>
     <!-- Button: reset the ID timer after saying the callsign. Full width. -->
     <string name="modes_keyer_identified">Ya me identifiqué</string>
     <!-- Slot state while recording. Lower case, very short. -->
@@ -953,7 +953,7 @@
     <!-- Empty heard list. VFO is the free-tuning mode. Two lines. -->
     <string name="modes_m17_nothing">Aún nada. Sintoniza la frecuencia M17 (el canal o el VFO). Una transmisión se detecta por su sincronismo y se reproduce por el altavoz del teléfono.</string>
     <!-- Notes paragraph, first sentence when this radio can send M17. @ALL is the M17 broadcast address. -->
-    <string name="modes_m17_note_send">Mantén para hablar envía tu voz en M17 a todos (@ALL), hasta el límite de transmisión (Dispositivo → Transmisión máxima). Tras la última palabra sigue una cola corta para que el final no se corte. Tu indicativo es el de los ajustes APRS.</string>
+    <string name="modes_m17_note_send">Mantén para hablar envía tu voz en M17 a todos (@ALL), hasta el límite de transmisión (Dispositivo → Transmisión máxima). Tras la última palabra sigue una cola corta para que el final no se corte. Tu indicativo es el de los ajustes de APRS.</string>
     <!-- Notes paragraph, first sentence on a firmware without the symbol engine. -->
     <string name="modes_m17_note_firmware">Solo recepción con este firmware: para transmitir en M17 hace falta el firmware del módulo con el motor de símbolos.</string>
     <!-- Notes paragraph, first sentence on a radio that cannot send M17. -->
@@ -1231,7 +1231,7 @@
     <!-- The same before any orbit was downloaded. A paragraph. -->
     <string name="modes_satd_hint_no_orbits">Pases sobre ti en las próximas 24 horas. Sigue un pase y el equipo lo acompaña: un minuto antes de que salga, el VFO toma las frecuencias del satélite, corregidas por Doppler cada par de segundos (nunca mientras hablas), y vuelve a tu canal cuando se pone. Una antena vertical oye mejor los pases altos. Órbitas no descargadas.</string>
     <!-- Button: stop following a pass. Full width. -->
-    <string name="modes_satd_stop_tracking">Dejar de seguir</string>
+    <string name="modes_satd_stop_tracking">Detener seguimiento</string>
     <!-- Toast after Stop tracking. Short. -->
     <string name="modes_satd_tracking_stopped">Seguimiento detenido</string>
     <!-- Hint: the phone has no location. One line. -->
@@ -1284,15 +1284,15 @@
     <string name="modes_log_title">Log</string>
     <!-- Top line with the user's grid. %1$s the grid ("FN42ab"), %2$d grid squares worked. One line. -->
     <plurals name="modes_log_grids_here">
-        <item quantity="one">Estás en %1$s\u0020 ·\u0020 %2$d cuadrícula trabajada</item>
-        <item quantity="many">Estás en %1$s\u0020 ·\u0020 %2$d cuadrículas trabajadas</item>
-        <item quantity="other">Estás en %1$s\u0020 ·\u0020 %2$d cuadrículas trabajadas</item>
+        <item quantity="one">Estás en %1$s\u0020 ·\u0020 %2$d localizador trabajado</item>
+        <item quantity="many">Estás en %1$s\u0020 ·\u0020 %2$d localizadores trabajados</item>
+        <item quantity="other">Estás en %1$s\u0020 ·\u0020 %2$d localizadores trabajados</item>
     </plurals>
     <!-- Top line without a position. %1$d grid squares worked. One line. -->
     <plurals name="modes_log_grids">
-        <item quantity="one">%1$d cuadrícula trabajada</item>
-        <item quantity="many">%1$d cuadrículas trabajadas</item>
-        <item quantity="other">%1$d cuadrículas trabajadas</item>
+        <item quantity="one">%1$d localizador trabajado</item>
+        <item quantity="many">%1$d localizadores trabajados</item>
+        <item quantity="other">%1$d localizadores trabajados</item>
     </plurals>
     <!-- Part of modes_log_hint: the contacts logged. %1$d a count. -->
     <plurals name="modes_log_contacts">
@@ -1329,7 +1329,7 @@
     <!-- Empty list. One line. -->
     <string name="modes_log_nothing">Aún no hay nada anotado.</string>
     <!-- Chip on an entry that was heard, not worked. Lower case, one short word. -->
-    <string name="modes_log_chip_heard">oída</string>
+    <string name="modes_log_chip_heard">escuchada</string>
     <!-- Entry line part: the signal report sent. %1$s the report ("59"). Very short. -->
     <string name="modes_log_rst_sent">env. %1$s</string>
     <!-- Entry line part: the signal report received. %1$s the report. Very short. -->
@@ -1624,7 +1624,7 @@
     <!-- Toast: nothing to export. %1$s the reference. One line. -->
     <string name="modes_pota_no_contacts">Aún no hay QSO en %1$s</string>
     <!-- Toast after export without a callsign set. %1$s the file name; keep the path. Two lines. -->
-    <string name="modes_pota_exported_no_call">Guardado en Download/DMR/Logbook/%1$s (configura tu indicativo en los ajustes APRS para el campo de estación)</string>
+    <string name="modes_pota_exported_no_call">Guardado en Download/DMR/Logbook/%1$s (configura tu indicativo en los ajustes de APRS para el campo de estación)</string>
     <!-- Title of Android's share chooser for the activation log. One line. -->
     <string name="modes_pota_send_log">Enviar el log</string>
 

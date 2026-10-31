@@ -307,7 +307,7 @@
     <!-- Section heading on an alert's details sheet: the history lines within 20 seconds of it. Shown in caps. One line. -->
     <string name="intercom_lastheard_around">En torno a ese momento (±20 s)</string>
     <!-- Button on the details sheet of the Android Auto is hiding the radio alert: opens Android Auto's settings. Full-width button, one line. -->
-    <string name="intercom_lastheard_open_auto">Abrir los ajustes de Android Auto</string>
+    <string name="intercom_lastheard_open_auto">Abrir ajustes de Android Auto</string>
     <!-- Toast when Android Auto's settings could not be opened (Last heard and the Device page). %1$s is the system's error message. -->
     <string name="intercom_lastheard_open_auto_failed">No se pudo abrir Android Auto: %1$s</string>
     <!-- Button on an alert's details sheet that tunes the channel it happened on. %1$s is the channel name. Full-width button, one line. -->
@@ -331,7 +331,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_sound_title">El vehículo reprodujo otra cosa</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_sound_text">Otra fuente empezó a sonar en el vehículo (música, una app de audio, la radio del propio vehículo o una llamada), así que Android Auto le dio los altavoces y el sonido de la radio se pausó. Mientras tanto la radio sigue recibiendo, grabando y decodificando. Pulsa reproducir en la tarjeta de la radio o en su pantalla multimedia para recuperar los altavoces. Justo antes de una desconexión esta línea es normal: Android Auto retira el sonido al cerrarse.</string>
+    <string name="intercom_lastheard_ex_sound_text">Otra fuente empezó a sonar en el vehículo (música, una app de audio, la radio del propio vehículo o una llamada), así que Android Auto le dio los altavoces y el sonido de la radio se pausó. Mientras tanto la radio sigue recibiendo, grabando y decodificando. Presiona reproducir en la tarjeta de la radio o en su pantalla multimedia para recuperar los altavoces. Justo antes de una desconexión esta línea es normal: Android Auto retira el sonido al cerrarse.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_connected_title">Android Auto conectado</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -357,9 +357,9 @@
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
     <string name="intercom_lastheard_ex_coverage_text">El registro de cobertura guarda la señal y tus aperturas del repetidor con GPS para los mapas de cobertura (Mapa → Cobertura). Con Dispositivo → Registrar cobertura en el vehículo activado, empieza cuando Android Auto se conecta y se detiene cuando se desconecta.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
-    <string name="intercom_lastheard_ex_rxonly_title">Canal de solo recepción</string>
+    <string name="intercom_lastheard_ex_rxonly_title">Canal solo de recepción</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_rxonly_text">Los canales meteorológicos NOAA (de 162,400 a 162,550 MHz), los canales de VHF marina (de 156,000 a 157,450 MHz) y los canales ferroviarios AAR (de 159,810 a 161,565 MHz) son de solo recepción. El equipo no transmite en ellos, se pulse el botón que se pulse.</string>
+    <string name="intercom_lastheard_ex_rxonly_text">Los canales meteorológicos NOAA (de 162,400 a 162,550 MHz), los canales de VHF marina (de 156,000 a 157,450 MHz) y los canales ferroviarios AAR (de 159,810 a 161,565 MHz) son de solo recepción. El equipo no transmite en ellos, se presione el botón que se presione.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_toolong_title">Demasiado largo para enviar</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -429,7 +429,7 @@
     <!-- Kind of a history line: something you transmitted. Lower case, one word. -->
     <string name="intercom_chhistory_kind_transmitted">transmitido</string>
     <!-- Kind of a history line: a repeater sending its callsign in Morse. Lower case, two words. -->
-    <string name="intercom_chhistory_kind_repeater_id">identificación de repetidor</string>
+    <string name="intercom_chhistory_kind_repeater_id">identificación del repetidor</string>
     <!-- Kind of a history line: Morse code heard. One word. -->
     <string name="intercom_chhistory_kind_morse">Morse</string>
     <!-- Kind of a history line: packet radio traffic (APRS…). Lower case, one word. -->
@@ -523,7 +523,7 @@
 
     <!-- ===== Car's now-playing picture (drawn on a 512 px square: short, shown in caps) ===== -->
     <!-- Top line of the car's now-playing picture: the zone. %1$s is the zone name. Upper-cased on screen, short. -->
-    <string name="intercom_carart_zone">ZONA · %1$s</string>
+    <string name="intercom_carart_zone">ZONE · %1$s</string>
     <!-- State badge on the car's now-playing picture. All caps, at most about 12 characters. -->
     <string name="intercom_carart_radio_off">APAGADA</string>
     <!-- State badge on the car's now-playing picture: transmitting. All caps, at most about 12 characters. -->
@@ -557,7 +557,7 @@
     <!-- Toast when a widget button is pressed while the radio is not on. -->
     <string name="intercom_widget_not_on">Primero abre la app de radio: la radio no está encendida</string>
     <!-- Toast when the widget's Talk is pressed on a receive-only channel. -->
-    <string name="intercom_widget_rx_only">Este canal es de solo recepción</string>
+    <string name="intercom_widget_rx_only">Este canal es solo de recepción</string>
     <!-- Widget status when the radio service is not running. One short line. -->
     <string name="intercom_widget_off">Radio apagada · toca para abrir</string>
     <!-- Part of the widget and notification status line: the frequency. %1$s is the frequency in MHz. Parts are joined with intercom_widget_sep. -->
@@ -1163,7 +1163,7 @@
     <!-- Switch row title on the Nets sheet: alert when a net opens. Short. -->
     <string name="intercom_nets_live">Avisarme cuando empiece una rueda</string>
     <!-- Switch row subtitle under "Tell me when a net starts". Up to two lines. -->
-    <string name="intercom_nets_live_sub">Una rueda de NetLogger que abre en tus canales o en repetidores cercanos (se comprueba cada 5 minutos)</string>
+    <string name="intercom_nets_live_sub">Una rueda de NetLogger que abre en tus canales o en repetidores cercanos (se verifica cada 5 minutos)</string>
     <!-- Status line while the Nets sheet loads. One line. -->
     <string name="intercom_nets_looking">Buscando ruedas…</string>
     <!-- Button on the Nets sheet that reloads the lists. Short (half-width button). -->

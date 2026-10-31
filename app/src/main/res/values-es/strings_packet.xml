@@ -66,7 +66,7 @@
     <!-- Toast: no callsign is set. PKT → Settings is where to set it. -->
     <string name="packet_err_callsign_settings">Primero configura tu indicativo (PKT → Ajustes)</string>
     <!-- Toast: no callsign is set. PKT → APRS settings is where to set it. -->
-    <string name="packet_err_callsign_aprs">Primero configura tu indicativo (PKT → Ajustes APRS)</string>
+    <string name="packet_err_callsign_aprs">Primero configura tu indicativo (PKT → Ajustes de APRS)</string>
     <!-- Toast: no callsign is set (APRS-IS). -->
     <string name="packet_err_callsign">Primero configura tu indicativo</string>
     <!-- Toast: packet cannot be sent on a DMR channel. -->
@@ -919,7 +919,7 @@
     <!-- Toast when the packet finder cannot start. One or two lines. -->
     <string name="packet_finder_err_no_freqs">Ninguna de las frecuencias de packet está al alcance de este equipo (%1$s): agrega alguna en Ajustes</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
-    <string name="packet_finder_err_tx">No mientras transmites</string>
+    <string name="packet_finder_err_tx">No mientras se transmite</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
     <string name="packet_finder_err_sat">Se está siguiendo un pase de satélite</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
@@ -969,7 +969,7 @@
     <!-- Line under the status: %1$d frequencies, %2$d minutes each, for %3$d hours. -->
     <string name="packet_pfd_sub_idle">%1$d frecuencias, %2$d min en cada una, durante %3$d h (Ajustes)</string>
     <!-- Section heading when the finder has found nothing. One line, capitals. -->
-    <string name="packet_pfd_nothing">Aún no se ha oído nada</string>
+    <string name="packet_pfd_nothing">Aún no se ha escuchado nada</string>
     <!-- Section heading over the stations found. %1$d how many. One line, capitals. -->
     <string name="packet_pfd_heard">Escuchadas (%1$d)</string>
     <!-- Details of a station found: %1$s its kind, %2$s the frequency in MHz, %3$d times heard, %4$s when last heard (day and time). -->
@@ -1022,7 +1022,7 @@
     <!-- Button on the PKT sheet while the M17 receiver runs. Short (two buttons share a row). -->
     <string name="packet_pkt_m17_listening">M17 (escuchando)</string>
     <!-- Button on the PKT sheet that starts the M17 receiver. Short (two buttons share a row). -->
-    <string name="packet_pkt_m17_receive">Recibir M17</string>
+    <string name="packet_pkt_m17_receive">Recepción M17</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
     <string name="packet_pkt_m17_hint">Recibir M17: escucha estaciones de voz digital M17 en este canal o en el VFO, con el indicativo y el mensaje de quien llama (solo recepción: este equipo no puede transmitir en M17).</string>
     <!-- Button on the PKT sheet that stops APRS monitoring. Short (two buttons share a row). -->
@@ -1210,7 +1210,7 @@
     <!-- Button on the PKT sheet that opens the message forms; %1$d forms saved (ICS-213 is a form name). Short (two buttons share a row). -->
     <string name="packet_pkt_forms">ICS-213 y radiogramas (%1$d)</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
-    <string name="packet_pkt_forms_hint">Rellena un ICS-213 o un radiograma, léelo en el aire o envíalo por APRS o texto DMR; los formularios que te envían se recomponen aquí.</string>
+    <string name="packet_pkt_forms_hint">Completa un ICS-213 o un radiograma, léelo en el aire o envíalo por APRS o texto DMR; los formularios que te envían se recomponen aquí.</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
     <string name="packet_pkt_nets_section">Ruedas</string>
     <!-- Button on the PKT sheet that lists nets nearby. Short (two buttons share a row). -->
@@ -1268,7 +1268,7 @@
     <!-- Toast after the pager receiver stops. One line. -->
     <string name="packet_pkt_pager_off">Recepción de pager desactivada</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
-    <string name="packet_pkt_pager_hint">Envía un mensaje alfanumérico de pager a uno o varios RIC en una sola transmisión. Tus RIC de pager están en los ajustes APRS. Con el firmware de fábrica del teléfono, la página indica que necesita el motor de símbolos.</string>
+    <string name="packet_pkt_pager_hint">Envía un mensaje alfanumérico de pager a uno o varios RIC en una sola transmisión. Tus RIC de pager están en los ajustes de APRS. Con el firmware de fábrica del teléfono, la página indica que necesita el motor de símbolos.</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
     <string name="packet_pkt_sstv_section">Imágenes SSTV</string>
     <!-- Button on the PKT sheet that stops the SSTV receiver. Short (two buttons share a row). -->

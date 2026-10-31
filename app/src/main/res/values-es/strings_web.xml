@@ -186,7 +186,7 @@
     <!-- Reply after sending an APRS position beacon. -->
     <string name="web_aprs_beacon_sent">Baliza enviada</string>
     <!-- Error: no SSTV picture has been received yet. -->
-    <string name="web_sstv_no_picture">Aún no hay ninguna imagen</string>
+    <string name="web_sstv_no_picture">Aún no hay imagen</string>
     <!-- Error: the recording to decode is gone. -->
     <string name="web_decode_not_found">No se encontró la grabación</string>
     <!-- Reply after starting to decode a recording. %1$s: the file name. -->
@@ -264,7 +264,7 @@
     <!-- Reply after starting a Winlink connection. -->
     <string name="web_wl_connecting">Conectando</string>
     <!-- Reply after starting a Winlink radio connection. %1$s: the frequency, e.g. "145.0500". -->
-    <string name="web_wl_tuning">Sintonizando %1$s MHz; conexión en unos segundos</string>
+    <string name="web_wl_tuning">Sintonizando %1$s MHz, conexión en unos segundos</string>
     <!-- Error: a Maidenhead grid square. The examples stay as they are. -->
     <string name="web_wl_grid">Localizador como JO01 o JO01ab</string>
     <!-- Error: the Winlink attachment is gone. -->
@@ -362,7 +362,7 @@
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_wheelmic_label">Micrófono para el volante</string>
     <!-- Setting description under its name. -->
-    <string name="web_set_wheelmic_sub">Vehículo (como una llamada) o el micrófono del teléfono</string>
+    <string name="web_set_wheelmic_sub">Vehículo (llamada) o el micrófono del teléfono</string>
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_voxstop_label">Parar cuando dejo de hablar</string>
     <!-- Setting description under its name. -->
@@ -386,7 +386,7 @@
     <!-- Error in the APRS settings. KISS is a protocol name. -->
     <string name="web_aprs_kiss_port">El puerto KISS va de 1024 a 65535</string>
     <!-- Reply after saving the APRS settings. -->
-    <string name="web_aprs_saved">Ajustes APRS guardados</string>
+    <string name="web_aprs_saved">Ajustes de APRS guardados</string>
     <!-- Reply after turning the APRS-IS internet link on. APRS-IS is a service name. -->
     <string name="web_tool_is_start">Iniciando APRS-IS</string>
     <!-- Reply after turning the APRS-IS internet link off. -->

@@ -843,7 +843,7 @@
       "maker": "Ulefone",
       "variant": null,
       "status": "exp",
-      "summary": "The Atom XL's USB radio bridge with an older DMR module, driven through the phone's own radio daemon; the profile is written from its intercom app and one report and not yet tested.",
+      "summary": "The Atom XL's USB radio bridge with an older DMR module, driven through the phone's radio daemon; written from a report, not yet tested.",
       "radio": {
         "module": "Older Agold DMR module (version ver0.5.4_470M_TONE in one report; chip not known)",
         "modes": [

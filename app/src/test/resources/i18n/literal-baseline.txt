@@ -1,3 +1,2 @@
 # English literals left in the code, per file (I18nLiteralGuardTest). Only ever goes down.
-8 com/macdmr/radio/ham/M17Receiver.java
-# total 8
+# total 0

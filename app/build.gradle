@@ -48,8 +48,8 @@ android {
         applicationId "com.macdmr.radio"
         minSdk 29
         targetSdk 34
-        versionCode 122
-        versionName "1.0.0-beta.23"
+        versionCode 123
+        versionName "1.0.0-beta.24"
         buildConfigField 'String', 'GIT_COMMIT', javaString(gitCommit)
         buildConfigField 'String', 'GIT_COMMIT_FULL', javaString(gitCommitFull)
         buildConfigField 'String', 'GIT_BRANCH', javaString(gitBranch)

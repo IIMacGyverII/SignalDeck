@@ -52,17 +52,17 @@
     <!-- SAFETY: refusal (toast) when a frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
     <string name="service_freq_outside">Dieses Funkgerät deckt %1$s ab: %2$s MHz liegt außerhalb</string>
     <!-- History line when the parrot (simplex repeater) is switched off. %1$d is how many transmissions it repeated. Starts with an emoji; keep it. -->
-    <string name="service_parrot_off_history">🦜 Papagei aus (%1$d wiederholt)</string>
+    <string name="service_parrot_off_history">🦜 Parrot aus (%1$d wiederholt)</string>
     <!-- Toast when the parrot (simplex repeater) is switched off. Short. -->
-    <string name="service_parrot_off">Papagei aus</string>
+    <string name="service_parrot_off">Parrot aus</string>
     <!-- SAFETY: transmit refusal (toast) when the parrot is switched on on a digital channel. One line. -->
-    <string name="service_parrot_needs_fm">Der Papagei braucht einen analogen FM-Kanal</string>
+    <string name="service_parrot_needs_fm">Das Parrot-Relais braucht einen analogen FM-Kanal</string>
     <!-- Refusal (toast) when the parrot is switched on with the squelch open. Soft SQ is SignalDeck's software squelch. Two lines. -->
-    <string name="service_parrot_needs_squelch">Erst die Rauschsperre des Kanals hochdrehen (oder Soft SQ ein): Bei Rauschsperre 0 würde der Papagei Rauschen wiederholen</string>
+    <string name="service_parrot_needs_squelch">Erst die Rauschsperre des Kanals hochdrehen (oder Soft SQ ein): Bei SQL-Stufe 0 würde das Parrot-Relais Rauschen wiederholen</string>
     <!-- History line when the parrot (simplex repeater) is switched on. %1$s is the channel name. Starts with an emoji; keep it. -->
-    <string name="service_parrot_on_history">🦜 Papagei ein: wiederholt, was auf %1$s zu hören ist</string>
+    <string name="service_parrot_on_history">🦜 Parrot ein: wiederholt, was auf %1$s zu hören ist</string>
     <!-- Toast when the parrot (simplex repeater) is switched on. %1$s is the channel name. One or two lines. -->
-    <string name="service_parrot_on">Papagei auf %1$s: Aussendungen werden eine Sekunde nach ihrem Ende wiederholt</string>
+    <string name="service_parrot_on">Parrot auf %1$s: Aussendungen werden eine Sekunde nach ihrem Ende wiederholt</string>
     <!-- A DMR talkgroup without a name, as a number (history, Last heard, notifications). %1$d is the talkgroup number. TG is the usual abbreviation for talkgroup. -->
     <string name="service_tg_number">TG %1$d</string>
     <!-- History line when a caption keyword alert fires. %1$s is the keyword. Starts with an emoji; keep it. -->
@@ -80,7 +80,7 @@
     <!-- Toast when SSTV picture receive is switched off. Short. -->
     <string name="service_sstv_off">SSTV-Empfang aus</string>
     <!-- History line when a beacon asked by DTMF remote control could not be sent. %1$s is the reason. Starts with an emoji; keep it. -->
-    <string name="service_remote_beacon_failed">⛔ Ferngesteuerte Bake nicht gesendet: %1$s</string>
+    <string name="service_remote_beacon_failed">⛔ Ferngesteuertes Beacon nicht gesendet: %1$s</string>
     <!-- History line after a spoken reply to a DTMF remote-control request was transmitted. %1$s is what was said (English speech). Starts with an emoji; keep it. -->
     <string name="service_remote_reply_sent">🗣 Antwort auf Fernsteuerung gesendet: %1$s</string>
     <!-- Refusal (toast) when an ISS beacon is asked before the callsign is set. PKT → Settings is where it is set. One line. -->
@@ -92,9 +92,9 @@
     <!-- Refusal (toast) when an ISS beacon is asked while the ISS is not in view. Short. -->
     <string name="service_iss_below_horizon">Die ISS ist unter dem Horizont</string>
     <!-- History line when an APRS beacon through the ISS could not be sent. %1$s is the reason. Starts with an emoji; keep it. -->
-    <string name="service_iss_beacon_failed">⛔ ISS-Bake nicht gesendet: %1$s</string>
+    <string name="service_iss_beacon_failed">⛔ ISS-Beacon nicht gesendet: %1$s</string>
     <!-- Toast when an APRS beacon through the ISS digipeater is being sent. ARISS is the programme's name. One line. -->
-    <string name="service_iss_beaconing">Bake über die ISS (ARISS)</string>
+    <string name="service_iss_beaconing">Beacon über die ISS (ARISS)</string>
     <!-- Refusal (toast) when the ISS is not in view now. Short. -->
     <string name="service_iss_not_in_view">Die ISS ist nicht in Sicht</string>
     <!-- Refusal (toast) when the ISS is not in view now. %1$s is the next pass ("Tue 14:05 (highest 42°)"). One line. -->
@@ -102,13 +102,13 @@
     <!-- SAFETY: refusal (toast) when the ISS APRS downlink or uplink (Doppler-corrected) is outside the radio's bands. %1$s is the radio's bands. -->
     <string name="service_iss_link_out_of_band">Dieses Funkgerät deckt %1$s ab: ISS-APRS-Downlink oder -Uplink liegt außerhalb</string>
     <!-- SAFETY: history line when the ISS beacon was not sent because the radio refused the frequency. Starts with an emoji; keep it. -->
-    <string name="service_iss_beacon_not_tuned">⛔ ISS-Bake nicht gesendet: Das Funkgerät hat die ISS-APRS-Frequenz nicht eingestellt</string>
+    <string name="service_iss_beacon_not_tuned">⛔ ISS-Beacon nicht gesendet: Das Funkgerät hat die ISS-APRS-Frequenz nicht eingestellt</string>
     <!-- Toast when an APRS beacon is sent through the ISS. %1$s is the ISS's elevation in degrees, %2$s the uplink frequency in MHz. ARISS is the programme's name. -->
-    <string name="service_iss_beaconing_at">ISS bei %1$s°: Bake auf %2$s MHz (Doppler-korrigiert) über ARISS</string>
+    <string name="service_iss_beaconing_at">ISS bei %1$s°: Beacon auf %2$s MHz (Doppler-korrigiert) über ARISS</string>
     <!-- The next ISS pass, inside other messages. %1$s is the day and time ("Tue 14:05"), %2$s the highest elevation in degrees. Short. -->
     <string name="service_iss_pass_when">%1$s (max. %2$s°)</string>
     <!-- Refusal (toast) when the ISS orbit has not been downloaded yet. "Satellite passes" is the name of a screen. One line. -->
-    <string name="service_iss_no_orbit">Noch keine ISS-Bahndaten: Öffne einmal „Satellitenüberflüge“, um sie herunterzuladen</string>
+    <string name="service_iss_no_orbit">Noch keine ISS-Orbitdaten: Öffne einmal „Satellitenüberflüge“, um sie herunterzuladen</string>
     <!-- Message when no ISS pass high enough comes within a day. One line. -->
     <string name="service_iss_no_pass">Kein ISS-Überflug über 10° in den nächsten 24 Stunden</string>
     <!-- History line when ISS tracking resumes after the app restarted. %1$s is the mode (SSTV or APRS). Starts with an emoji; keep it. -->
@@ -138,11 +138,11 @@
     <!-- History warning on Agold phones whose App block setting would stop SignalDeck with the screen off. %1$s lists the blocking switches that are on. Settings → App block → SignalDeck is the path in the phone's own settings. Starts with an emoji; keep it. -->
     <string name="service_agold_app_block">⚠ Agold App block stoppt SignalDeck bei ausgeschaltetem Bildschirm (%1$s ein): Schalte sie aus unter Einstellungen → App block → SignalDeck</string>
     <!-- History warning after Hand back when the radio's USB bridge did not answer. Starts with an emoji; keep it. -->
-    <string name="service_bridge_no_answer_handback">⚠ Die USB-Brücke des Funkgeräts hat nicht geantwortet: Starte das Telefon neu, bevor du die Hersteller-App öffnest</string>
+    <string name="service_bridge_no_answer_handback">⚠ Die USB-Brücke des Funkgeräts hat nicht geantwortet: Starte das Telefon neu, bevor du die Original-App öffnest</string>
     <!-- History warning after Hand back when the phone holds radio firmware files the stock app would load. %1$s is the folder. Starts with an emoji; keep it. -->
-    <string name="service_stock_firmware_files">⚠ %1$s enthält Firmware-Dateien fürs Funkmodul: Die Hersteller-App lädt sie beim Start ins Modul. Entferne sie, außer du willst genau das.</string>
+    <string name="service_stock_firmware_files">⚠ %1$s enthält Firmware-Dateien fürs Funkmodul: Die Original-App lädt sie beim Start ins Modul. Entferne sie, außer du willst genau das.</string>
     <!-- History line: the parrot stopped because the user changed channel. Starts with an emoji; keep it. -->
-    <string name="service_parrot_stopped_channel">🦜 Papagei gestoppt: Kanal gewechselt</string>
+    <string name="service_parrot_stopped_channel">🦜 Parrot gestoppt: Kanal gewechselt</string>
     <!-- History line (Last heard box) when a CTCSS tone is detected on a channel without one. %1$s is the tone in Hz ("100.0"). Tapping the box applies it. Starts with an emoji; keep it. -->
     <string name="service_tone_heard">🎵 CTCSS %1$s Hz gehört – tippe auf dieses Feld, um ihn zu übernehmen</string>
     <!-- Toast when the heard tone is to be applied but none is pending. Short. -->
@@ -154,7 +154,7 @@
     <!-- Toast when a packet mode (APRS, SSTV, ISS beacon) is asked before the packet engine has started. Very short. -->
     <string name="service_packet_not_ready">nicht bereit</string>
     <!-- History warning when the radio module did not take the "promiscuous" flag (hear every DMR call). MON is the monitor button. Starts with an emoji; keep it. -->
-    <string name="service_mon_flag_refused">⚠ Das Modul hat das „Alle hören“-Flag nicht übernommen (MON ist nur der eigene Monitor des Funkgeräts)</string>
+    <string name="service_mon_flag_refused">⚠ Das Modul hat das „Alles hören“-Flag nicht übernommen (MON ist nur der eigene Monitor des Funkgeräts)</string>
     <!-- History warning when the radio did not answer the MON (monitor) switch. Starts with an emoji; keep it. -->
     <string name="service_mon_no_answer">⚠ Das Funkgerät hat auf MON nicht geantwortet: In ein paar Sekunden erneut schalten</string>
     <!-- Live caption line while Google Cloud transcribes what was heard. Starts with an emoji; keep it. Short. -->
@@ -260,13 +260,13 @@
         <item quantity="other">%1$d Kanäle importiert (%2$s). %3$s</item>
     </plurals>
     <!-- Note after importing the stock app's channels when every analog channel opens only for a receive tone. %1$d is how many. "RX tone type" and "None" are the names of a field and its choice in the channel editor. -->
-    <string name="service_tone_note_all">Alle %1$d importierten Analogkanäle öffnen nur bei einem Empfangston, wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
+    <string name="service_tone_note_all">Alle %1$d importierten Analogkanäle öffnen nur bei einem Empfangston, wie in der Original-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
     <!-- As service_tone_note_all, when all use the same tone. %1$d is how many, %2$s the tone ("CTCSS 62.5"). -->
-    <string name="service_tone_note_all_kind">Alle %1$d importierten Analogkanäle öffnen nur bei einem Empfangston (%2$s), wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
+    <string name="service_tone_note_all_kind">Alle %1$d importierten Analogkanäle öffnen nur bei einem Empfangston (%2$s), wie in der Original-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
     <!-- Note after importing the stock app's channels when some analog channels open only for a receive tone. %1$d is how many do, %2$d how many analog channels there are. -->
-    <string name="service_tone_note_some">%1$d von %2$d importierten Analogkanälen öffnen nur bei einem Empfangston, wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
+    <string name="service_tone_note_some">%1$d von %2$d importierten Analogkanälen öffnen nur bei einem Empfangston, wie in der Original-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
     <!-- As service_tone_note_some, when they all use the same tone. %1$d is how many do, %2$d how many analog channels there are, %3$s the tone ("CTCSS 62.5"). -->
-    <string name="service_tone_note_some_kind">%1$d von %2$d importierten Analogkanälen öffnen nur bei einem Empfangston (%3$s), wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
+    <string name="service_tone_note_some_kind">%1$d von %2$d importierten Analogkanälen öffnen nur bei einem Empfangston (%3$s), wie in der Original-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
     <!-- Toast after the user chose not to import the stock app's channels. Short. -->
     <string name="service_import_declined">Start ohne Kanäle</string>
     <!-- SAFETY: history warning when PTT is pressed on an M17 channel and the module firmware cannot send M17. "Symbol engine" is the firmware feature. Starts with an emoji; keep it. -->
@@ -367,7 +367,7 @@
     <!-- History warning when the radio's reception line is stuck, so receptions are found from the signal strength. Starts with an emoji; keep it. -->
     <string name="service_rx_line_stuck">⚠ Das Empfangssignal des Funkgeräts hängt: SignalDeck erkennt Rufe an der Signalstärke (etwas später). Ein Neustart des Telefons behebt das</string>
     <!-- History warning when the radio's USB bridge did not come back after a restart. Take over is the button that starts SignalDeck's control of the radio. Starts with an emoji; keep it. -->
-    <string name="service_bridge_lost">⚠ Die USB-Brücke des Funkgeräts ist nach einem Neustart nicht zurückgekommen: Das Funkgerät ist aus und wieder bei der Hersteller-App. Übernimm es erneut oder starte das Telefon neu, wenn das öfter passiert</string>
+    <string name="service_bridge_lost">⚠ Die USB-Brücke des Funkgeräts ist nach einem Neustart nicht zurückgekommen: Das Funkgerät ist aus und wieder bei der Original-App. Übernimm es erneut oder starte das Telefon neu, wenn das öfter passiert</string>
     <!-- History warning when the radio module did not answer at start-up and was restarted successfully. Starts with an emoji; keep it. -->
     <string name="service_module_restarted_startup">⚠ Das Funkmodul hat beim Start nicht geantwortet und wurde neu gestartet: Es funktioniert jetzt</string>
     <!-- History warning when the radio module does not answer commands. MON is the monitor button. Starts with an emoji; keep it. -->
@@ -419,7 +419,7 @@
     <!-- Notification text and Android Auto status while the radio is not up. %1$s is the radio's state, an English code ("booting", "no root", "error: …"). -->
     <string name="service_radio_link">Funkgerät: %1$s</string>
     <!-- History line when coverage logging starts by itself for a drive. Starts with an emoji; keep it. -->
-    <string name="service_cov_car_on">📶 Reichweiten-Protokoll läuft, solange Android Auto verbunden ist</string>
+    <string name="service_cov_car_on">📶 Abdeckungs-Log läuft, solange Android Auto verbunden ist</string>
     <!-- Choice of the steering-wheel Next talk setting: hold Next to talk. One word (chip). -->
     <string name="service_next_talk_hold">Halten</string>
     <!-- Choice of the steering-wheel Next talk setting: press Next twice to talk. One or two words (chip). -->
@@ -469,7 +469,7 @@
     <!-- Refusal (toast) when the radio is off. Short. -->
     <string name="service_radio_not_on">Das Funkgerät ist nicht eingeschaltet</string>
     <!-- Refusal (toast) of the repeater key-up test while coverage logging is off. One or two lines. -->
-    <string name="service_keyup_needs_coverage">Schalte zuerst das Reichweiten-Protokoll ein: Das Ergebnis wird mit deinem Standort gespeichert</string>
+    <string name="service_keyup_needs_coverage">Schalte zuerst das Abdeckungs-Log ein: Das Ergebnis wird mit deinem Standort gespeichert</string>
     <!-- Refusal (toast) of the repeater key-up test on DMR. 9990 is BrandMeister's echo (parrot) number. Two lines. -->
     <string name="service_keyup_dmr">Auf DMR nimm stattdessen den Parrot: Ein Einzelruf an 9990 bei BrandMeister spielt deinen Durchgang zurück</string>
     <!-- Refusal (toast) of the repeater key-up test on a simplex channel or one without a location. One line. -->
@@ -623,7 +623,7 @@
     <!-- Scheduled operation: SSTV picture receive. One line. -->
     <string name="service_sched_sstv">SSTV-Empfang</string>
     <!-- Scheduled operation: send an APRS position beacon. One line. -->
-    <string name="service_sched_beacon">APRS-Bake senden</string>
+    <string name="service_sched_beacon">APRS-Beacon senden</string>
     <!-- Scheduled operation: check Winlink e-mail through a radio gateway. One line. -->
     <string name="service_sched_winlink_radio">Winlink-Mail abrufen (Funk-Gateway)</string>
     <!-- Scheduled operation: check Winlink e-mail over the internet. One line. -->

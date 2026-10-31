@@ -101,7 +101,7 @@
     <!-- Satellite card footnote. One or two lines. -->
     <string name="modes_cond_sat_footer">Überflüge über 20° in den nächsten 12 Stunden; PKT → Satellitenüberflüge verfolgt sie mit Doppler-Korrektur.</string>
     <!-- Footnote of the conditions sheet. %1$s the time the data was fetched (HH:mm). Two lines. -->
-    <string name="modes_cond_sources">Quellen: NOAA SWPC (Kp, OVATION-Aurora), Open-Meteo (Tropo), Bahndaten von AMSAT/SatNOGS. Stand %1$s; nach 20 Minuten aktualisiert.</string>
+    <string name="modes_cond_sources">Quellen: NOAA SWPC (Kp, OVATION-Aurora), Open-Meteo (Tropo), Orbitdaten von AMSAT/SatNOGS. Stand %1$s; nach 20 Minuten aktualisiert.</string>
 
     <!-- ===== DTMF remote control (PKT → DTMF remote, history lines) ===== -->
     <!-- DTMF remote command 1: the phone speaks its position on the channel. Short, in a list "1   Position by voice". -->
@@ -109,11 +109,11 @@
     <!-- DTMF remote command 2: the phone speaks battery, channel and signal. Short. -->
     <string name="modes_dtmf_cmd_status">Status per Sprache</string>
     <!-- DTMF remote command 3: send an APRS position beacon. Short. -->
-    <string name="modes_dtmf_cmd_beacon">APRS-Positionsbake</string>
+    <string name="modes_dtmf_cmd_beacon">APRS-Positions-Beacon</string>
     <!-- DTMF remote command 4: turn the parrot (repeat what it hears) on. Short. -->
-    <string name="modes_dtmf_cmd_parrot_on">Papagei ein</string>
+    <string name="modes_dtmf_cmd_parrot_on">Parrot ein</string>
     <!-- DTMF remote command 5: turn the parrot off. Short. -->
-    <string name="modes_dtmf_cmd_parrot_off">Papagei aus</string>
+    <string name="modes_dtmf_cmd_parrot_off">Parrot aus</string>
     <!-- DTMF remote command 6: send the Morse ID. Short. -->
     <string name="modes_dtmf_cmd_morse_id">Morse-Kennung</string>
     <!-- History line: three wrong PINs, the remote is locked. One line. -->
@@ -172,15 +172,15 @@
     <!-- Voice keyer error: another app holds the microphone. One line (toast). -->
     <string name="modes_keyer_err_busy">Das Mikrofon ist belegt</string>
     <!-- History line: the parrot recorded a call but could not transmit it. %1$d the recording's length in seconds. One line. -->
-    <string name="modes_parrot_event_failed">🦜 Papagei konnte die %1$d-s-Aufnahme nicht senden</string>
+    <string name="modes_parrot_event_failed">🦜 Parrot konnte die %1$d-s-Aufnahme nicht senden</string>
     <!-- History line: the parrot played a call back. %1$d its length in seconds. One line. -->
-    <string name="modes_parrot_event_repeated">🦜 Papagei hat %1$d s wiederholt</string>
+    <string name="modes_parrot_event_repeated">🦜 Parrot hat %1$d s wiederholt</string>
     <!-- History line: the parrot played a call back, shortened to the radio's 26 s limit. %1$d its length in seconds. One line. -->
-    <string name="modes_parrot_event_repeated_cut">🦜 Papagei hat %1$d s wiederholt (bei 26 s abgeschnitten, der Grenze des Funkgeräts)</string>
+    <string name="modes_parrot_event_repeated_cut">🦜 Parrot hat %1$d s wiederholt (bei 26 s abgeschnitten, der Grenze des Funkgeräts)</string>
     <!-- History line: the parrot played a call back followed by the Morse ID ("ID"). %1$d its length in seconds. One line. -->
-    <string name="modes_parrot_event_repeated_id">🦜 Papagei hat %1$d s wiederholt + ID</string>
+    <string name="modes_parrot_event_repeated_id">🦜 Parrot hat %1$d s wiederholt + ID</string>
     <!-- History line: the parrot played a shortened call back followed by the Morse ID. %1$d its length in seconds. One line. -->
-    <string name="modes_parrot_event_repeated_cut_id">🦜 Papagei hat %1$d s wiederholt (bei 26 s abgeschnitten, der Grenze des Funkgeräts) + ID</string>
+    <string name="modes_parrot_event_repeated_cut_id">🦜 Parrot hat %1$d s wiederholt (bei 26 s abgeschnitten, der Grenze des Funkgeräts) + ID</string>
 
     <!-- ===== Message forms (PKT → Message forms): ICS-213 and ARRL Radiogram =====
          Field labels are shown in the form editor; in the read-only view the part in brackets is dropped, so keep
@@ -377,7 +377,7 @@
 
     <!-- ===== Satellites ===== -->
     <!-- About the ISS APRS digipeater, on the satellite list. One or two lines. -->
-    <string name="modes_sat_about_iss_aprs">Packet-Digipeater: Der Überflug wird auf der APRS-Seite mitgehört; PKT → Bake über die ISS sendet deine Position darüber</string>
+    <string name="modes_sat_about_iss_aprs">Packet-Digipeater: Der Überflug wird auf der APRS-Seite mitgehört; PKT → Beacon über die ISS sendet deine Position darüber</string>
     <!-- About the ISS SSTV events. Robot 36 is an SSTV mode. One or two lines. -->
     <string name="modes_sat_about_iss_sstv">Bild-Events (Robot 36): Die Bilder werden auf der SSTV-Seite dekodiert. Nur bei angekündigten Events</string>
     <!-- About the ISS cross-band repeater. One or two lines. -->
@@ -389,7 +389,7 @@
     <!-- About the PO-101 satellite (Diwata-2 is its other name). One or two lines. -->
     <string name="modes_sat_about_po101">FM-Relais nach Zeitplan (Diwata-2); auf 70 cm mit 141,3 Hz sprechen</string>
     <!-- Error: the orbit download failed from both sources. One line. -->
-    <string name="modes_sat_download_failed">Satellitenbahndaten konnten nicht geladen werden (AMSAT und CelesTrak nicht erreichbar)</string>
+    <string name="modes_sat_download_failed">Satelliten-Orbitdaten konnten nicht geladen werden (AMSAT und CelesTrak nicht erreichbar)</string>
     <!-- Error: the orbits could not be written. %1$s the technical reason. One line. -->
     <string name="modes_sat_save_failed">Speichern fehlgeschlagen: %1$s</string>
 
@@ -629,15 +629,15 @@
 
     <!-- ===== Parrot (simplex repeater) screen ===== -->
     <!-- Title of the parrot screen: it repeats what it hears. One or two words. -->
-    <string name="modes_parrot_title">Papagei</string>
+    <string name="modes_parrot_title">Parrot</string>
     <!-- Label under the count of replays (capitals, small, half-width tile). One or two words. -->
     <string name="modes_parrot_stat_repeated">WIEDERHOLT</string>
     <!-- Label under the time since the last reception (capitals, small, half-width tile). One or two words. -->
     <string name="modes_parrot_stat_last">ZULETZT GEHÖRT</string>
     <!-- Parrot explanation. %1$s the longest recording in seconds, %2$s the minutes between Morse IDs. A paragraph. -->
-    <string name="modes_parrot_hint">Alles, was das Funkgerät auf diesem Kanal hört (bis %1$s s), wird aufgenommen und eine Sekunde nach dem Ende der Gegenstation zurückgesendet, damit sie prüfen kann, wie sie über dich klingt. Ist ein Rufzeichen eingestellt, hängt der Papagei höchstens alle %2$s Minuten dein Rufzeichen in Morse an eine Wiedergabe an. Die Sendezeitbegrenzung des Funkgeräts von 30 Sekunden begrenzt jede Wiedergabe.</string>
+    <string name="modes_parrot_hint">Alles, was das Funkgerät auf diesem Kanal hört (bis %1$s s), wird aufgenommen und eine Sekunde nach dem Ende der Gegenstation zurückgesendet, damit sie prüfen kann, wie sie über dich klingt. Ist ein Rufzeichen eingestellt, hängt das Parrot-Relais höchstens alle %2$s Minuten dein Rufzeichen in Morse an eine Wiedergabe an. Die Sendezeitbegrenzung des Funkgeräts von 30 Sekunden begrenzt jede Wiedergabe.</string>
     <!-- Button: turn the parrot off and close. Short. -->
-    <string name="modes_parrot_stop">Papagei stoppen</string>
+    <string name="modes_parrot_stop">Parrot stoppen</string>
     <!-- Subtitle. %1$s the channel number, %2$s its name. One line. -->
     <string name="modes_parrot_on_channel">Wiederholt auf Kanal %1$s · %2$s</string>
     <!-- Subtitle when no channel is known. One line. -->
@@ -1162,7 +1162,7 @@
 
     <!-- ===== Satellite passes sheet (PKT → Satellite passes) ===== -->
     <!-- Toast while the orbits download. One line. -->
-    <string name="modes_satd_downloading">Satellitenbahndaten werden geladen…</string>
+    <string name="modes_satd_downloading">Satelliten-Orbitdaten werden geladen…</string>
     <!-- Title of the ISS frequencies sheet, and the button that opens it. Short. -->
     <string name="modes_satd_iss_title">ISS-Frequenzen</string>
     <!-- ISS frequencies explanation; ARISS is the ISS amateur radio programme. Three lines. -->
@@ -1200,9 +1200,9 @@
     <!-- Title of the satellite passes sheet. One line. -->
     <string name="modes_satd_title">Satellitenüberflüge</string>
     <!-- Explanation on the passes sheet. %1$s the age of the orbits in hours. A paragraph. -->
-    <string name="modes_satd_hint">Überflüge über deinem Standort in den nächsten 24 Stunden. Verfolge einen Überflug, und das Funkgerät folgt ihm: Eine Minute vor dem Aufgang übernimmt der VFO die Frequenzen des Satelliten, alle paar Sekunden auf Doppler korrigiert (nie während du sprichst), und kehrt nach dem Untergang zu deinem Kanal zurück. Eine vertikale Antenne hört die höheren Überflüge am besten. Bahndaten von vor %1$s h.</string>
+    <string name="modes_satd_hint">Überflüge über deinem Standort in den nächsten 24 Stunden. Verfolge einen Überflug, und das Funkgerät folgt ihm: Eine Minute vor dem Aufgang übernimmt der VFO die Frequenzen des Satelliten, alle paar Sekunden auf Doppler korrigiert (nie während du sprichst), und kehrt nach dem Untergang zu deinem Kanal zurück. Eine vertikale Antenne hört die höheren Überflüge am besten. Orbitdaten von vor %1$s h.</string>
     <!-- The same before any orbit was downloaded. A paragraph. -->
-    <string name="modes_satd_hint_no_orbits">Überflüge über deinem Standort in den nächsten 24 Stunden. Verfolge einen Überflug, und das Funkgerät folgt ihm: Eine Minute vor dem Aufgang übernimmt der VFO die Frequenzen des Satelliten, alle paar Sekunden auf Doppler korrigiert (nie während du sprichst), und kehrt nach dem Untergang zu deinem Kanal zurück. Eine vertikale Antenne hört die höheren Überflüge am besten. Bahndaten nicht geladen.</string>
+    <string name="modes_satd_hint_no_orbits">Überflüge über deinem Standort in den nächsten 24 Stunden. Verfolge einen Überflug, und das Funkgerät folgt ihm: Eine Minute vor dem Aufgang übernimmt der VFO die Frequenzen des Satelliten, alle paar Sekunden auf Doppler korrigiert (nie während du sprichst), und kehrt nach dem Untergang zu deinem Kanal zurück. Eine vertikale Antenne hört die höheren Überflüge am besten. Orbitdaten nicht geladen.</string>
     <!-- Button: stop following a pass. Full width. -->
     <string name="modes_satd_stop_tracking">Verfolgung stoppen</string>
     <!-- Toast after Stop tracking. Short. -->
@@ -1223,7 +1223,7 @@
     <!-- Satellite frequencies with a tone. %1$s downlink, %2$s uplink MHz, %3$s the CTCSS tone in Hz, %4$s the description. Two lines. -->
     <string name="modes_satd_listen_talk_tone">Hören %1$s, sprechen %2$s MHz mit %3$s Hz. %4$s</string>
     <!-- Hint: no orbit for this satellite. One line. -->
-    <string name="modes_satd_no_orbit">Keine Bahndaten dafür im Download.</string>
+    <string name="modes_satd_no_orbit">Keine Orbitdaten dafür im Download.</string>
     <!-- Pass row, the satellite is up now. %1$s highest elevation in degrees, %2$d the pass length in minutes. One line. -->
     <string name="modes_satd_pass_up">Jetzt sichtbar\u0020 ·\u0020 max. %1$s°\u0020 ·\u0020 %2$d min</string>
     <!-- Pass row. %1$s weekday and time it rises, %2$s highest elevation in degrees, %3$d minutes. One line. -->
@@ -1241,9 +1241,9 @@
     <!-- Switch description; keep the path. Two lines. -->
     <string name="modes_satd_record_hint">Der ganze Überflug als WAV in Download/DMR/Audio/&lt;Satellit&gt; (etwa 1 MB pro Minute), damit ein verpasstes Bild oder Paket nachträglich dekodiert werden kann</string>
     <!-- Button: download the orbits and the FM satellite list. Full width. -->
-    <string name="modes_satd_update">Bahndaten aktualisieren</string>
+    <string name="modes_satd_update">Orbitdaten aktualisieren</string>
     <!-- Toast after updating the orbits. Short. -->
-    <string name="modes_satd_updated">Bahndaten aktualisiert</string>
+    <string name="modes_satd_updated">Orbitdaten aktualisiert</string>
     <!-- Live line before the pass. %1$s the satellite, %2$s when it rises (HH:mm). One line. -->
     <string name="modes_satd_live_waiting">Verfolge %1$s: warte auf den Überflug um %2$s</string>
     <!-- Live line during a pass, satellite coming closer. %1$s satellite, %2$s azimuth degrees, %3$s compass, %4$s elevation degrees, %5$s listen MHz, %6$s talk MHz. Two lines. -->
@@ -1329,7 +1329,7 @@
     <!-- Button text while looking up. Short. -->
     <string name="modes_log_looking_up">Wird nachgeschlagen…</string>
     <!-- Toast: the lookup found nothing; HamDB is a service name. One line. -->
-    <string name="modes_log_not_found">Nicht gefunden (HamDB führt Zulassungen aus den USA, Kanada und einigen anderen Ländern)</string>
+    <string name="modes_log_not_found">Nicht gefunden (HamDB führt Lizenzen aus den USA, Kanada und einigen anderen Ländern)</string>
     <!-- Toast after a lookup. %1$s the name found, %2$s the licence class ("Extra"). One line. -->
     <string name="modes_log_found_class">%1$s, Klasse %2$s</string>
     <!-- Field label: notes. Short. -->
@@ -1779,7 +1779,7 @@
     <!-- The same button with the size. %1$s megabytes ("2.4"). Half width. -->
     <string name="modes_fox_download_terrain_size">Gelände laden (etwa %1$s MB)</string>
     <!-- Download dialog message. %1$s megabytes. "Terrain" is the layer pill. Three lines. -->
-    <string name="modes_fox_download_message">Geländehöhen für dieses Gebiet (etwa %1$s MB), einmal heruntergeladen und auf dem Telefon behalten für spätere Jagden und die Reichweitenkarten, sodass die Ebene Gelände danach offline funktioniert.</string>
+    <string name="modes_fox_download_message">Geländehöhen für dieses Gebiet (etwa %1$s MB), einmal heruntergeladen und auf dem Telefon behalten für spätere Jagden und die Abdeckungskarten, sodass die Ebene Gelände danach offline funktioniert.</string>
     <!-- Dialog button: download. One word. -->
     <string name="modes_fox_download">Herunterladen</string>
     <!-- Chip on the map that switches to the plot. One word. -->
@@ -1841,9 +1841,9 @@
     <!-- Dialog title: the CTCSS tone list. One line. -->
     <string name="modes_fox_ctcss_title">CTCSS-Ton</string>
     <!-- On a radio without signal readings. Two lines. -->
-    <string name="modes_fox_no_rssi">Dieses Funkgerät meldet keine Signalstärke und kann daher keinen Fuchs jagen. Es kann aber selbst einer sein: Die Bake unten ist das, wonach die Jäger suchen.</string>
+    <string name="modes_fox_no_rssi">Dieses Funkgerät meldet keine Signalstärke und kann daher keinen Fuchs jagen. Es kann aber selbst einer sein: Der Fuchssender unten ist das, wonach die Jäger suchen.</string>
     <!-- Section heading (capitals): be the hidden transmitter. Short. -->
-    <string name="modes_fox_be_fox">Selbst Fuchs sein</string>
+    <string name="modes_fox_be_fox">Sei der Fuchs</string>
     <!-- Button: stop the fox beacon. Full width. -->
     <string name="modes_fox_beacon_stop">Fuchssender stoppen</string>
     <!-- Button: start the fox beacon. Full width. -->

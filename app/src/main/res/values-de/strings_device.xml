@@ -18,7 +18,7 @@
     <!-- SAFETY: title of the dialog before taking over a phone whose profile has never run on it. One line. -->
     <string name="device_link_untested_title">Ungetestetes Profil</string>
     <!-- SAFETY: take-over warning for an untested profile. %1$s is the phone model, %2$s the stock app's package name. "Hand back", "Device report", "Generate device report" and "Radio probe (root)" are button names on the Device page. -->
-    <string name="device_link_untested_msg">SignalDeck hat ein Profil für %1$s, erstellt aus der Hersteller-App und den Berichten eines Besitzers, aber es lief noch nie auf diesem Telefon. Beim Übernehmen wird %2$s angehalten, und die seriellen Schnittstellen des Funkmoduls werden geöffnet. Schlägt das fehl, wird die Hersteller-App wieder eingeschaltet; auch „Zurückgeben“ oder ein Neustart gibt sie zurück.\n\nFühre zuerst Gerätebericht → Gerätebericht erstellen und Funkmodul-Abfrage (root) aus und teile beides: Erst damit wird daraus ein getestetes Profil.</string>
+    <string name="device_link_untested_msg">SignalDeck hat ein Profil für %1$s, erstellt aus der Original-App und den Berichten eines Besitzers, aber es lief noch nie auf diesem Telefon. Beim Übernehmen wird %2$s angehalten, und die seriellen Schnittstellen des Funkmoduls werden geöffnet. Schlägt das fehl, wird die Original-App wieder eingeschaltet; auch „Zurückgeben“ oder ein Neustart gibt sie zurück.\n\nFühre zuerst Gerätebericht → Gerätebericht erstellen und Funkmodul-Abfrage (root) aus und teile beides: Erst damit wird daraus ein getestetes Profil.</string>
     <!-- Button on the link card and title of the exit sheet: stop SignalDeck properly. Short. -->
     <string name="device_exit">SignalDeck beenden</string>
     <!-- Button on the link card: install the Magisk boot module so SignalDeck keeps root access to the radio after a reboot. One line. -->
@@ -30,7 +30,7 @@
     <!-- Button on the link card (unsupported or untested phone) and title of its menu: the guided steps that help make this phone supported. One line. -->
     <string name="device_support">Hilf mit, dieses Telefon zu unterstützen</string>
     <!-- SAFETY: note under the link card buttons: what taking over and handing back do to the stock app. A paragraph. -->
-    <string name="device_link_note">Benötigt Root (Magisk). Solange diese App das Funkmodul belegt, ist die Walkie-Talkie-App des Herstellers angehalten und ihr Symbol ausgeblendet; „Zurückgeben“ stellt sie wieder her. Das Magisk-Modul erhält die SELinux-Regeln über Neustarts hinweg, sodass das Funkmodul direkt ab dem Start übernommen werden kann.</string>
+    <string name="device_link_note">Benötigt Root (Magisk). Solange diese App das Funkmodul belegt, ist die originale Walkie-Talkie-App angehalten und ihr Symbol ausgeblendet; „Zurückgeben“ stellt sie wieder her. Das Magisk-Modul erhält die SELinux-Regeln über Neustarts hinweg, sodass das Funkmodul direkt ab dem Start übernommen werden kann.</string>
     <!-- ==== Device page: Radio settings card ==== -->
     <!-- Heading of the Radio settings card (shown in capitals). Short. -->
     <string name="device_set_title">Funkeinstellungen</string>
@@ -39,7 +39,7 @@
     <!-- Settings switch title. One line. -->
     <string name="device_set_own_boot">Funkmodul beim Start übernehmen</string>
     <!-- Subtitle of "Own the radio at boot". One line, may wrap. -->
-    <string name="device_set_own_boot_sub">Sonst wird nach einem Neustart die Hersteller-App wiederhergestellt</string>
+    <string name="device_set_own_boot_sub">Sonst wird nach einem Neustart die Original-App wiederhergestellt</string>
     <!-- Settings switch title: the phone's side push-to-talk key transmits. One line. -->
     <string name="device_set_side_ptt">Seitliche PTT-Taste</string>
     <!-- Subtitle of "Side PTT key". May wrap. -->
@@ -47,7 +47,7 @@
     <!-- Settings switch title: the volume-up key transmits. One line. -->
     <string name="device_set_vol_ptt">Lauter-Taste sendet</string>
     <!-- Subtitle of "Volume-up transmits". One line. -->
-    <string name="device_set_vol_ptt_sub">Solange die Funkseite offen ist</string>
+    <string name="device_set_vol_ptt_sub">Solange die Intercom-Seite offen ist</string>
     <!-- Settings switch title: a learned button transmits. One line. -->
     <string name="device_set_custom_ptt">Eigene PTT-Taste</string>
     <!-- Subtitle of "Custom PTT key" when no key is learned yet. May wrap. -->
@@ -61,19 +61,19 @@
     <!-- Subtitle of "Voice announcements". May wrap. -->
     <string name="device_set_voice_sub">Kanalwechsel, Anrufernamen, Stichwort-Alarme</string>
     <!-- Settings switch title: the new intercom page design. One line. -->
-    <string name="device_set_new_look">Neue Funk-Ansicht</string>
+    <string name="device_set_new_look">Neue Intercom-Ansicht</string>
     <!-- Subtitle of "New intercom look". One line. -->
-    <string name="device_set_new_look_sub">Aus: die klassische Funkseite</string>
+    <string name="device_set_new_look_sub">Aus: die klassische Intercom-Seite</string>
     <!-- Settings switch title: the animated panel on an idle channel. One line. -->
     <string name="device_set_anim">Animation bei Stille</string>
     <!-- Subtitle of "Animated panel when quiet". May wrap. -->
     <string name="device_set_anim_sub">Fallende Linien auf einem ruhigen Kanal (kostet etwas Akku)</string>
     <!-- Settings switch title: record signal reports for the coverage map. One line. -->
-    <string name="device_set_coverage">Reichweiten-Protokoll</string>
+    <string name="device_set_coverage">Abdeckungs-Log</string>
     <!-- Subtitle of "Coverage logging" on a radio that reports signal strength. May wrap. -->
-    <string name="device_set_coverage_sub_rssi">Zeichnet Signal und Auftastungen mit GPS für die Reichweitenkarten auf (Karte → Reichweite)</string>
+    <string name="device_set_coverage_sub_rssi">Zeichnet Signal und Auftastungen mit GPS für die Abdeckungskarten auf (Karte → Abdeckung)</string>
     <!-- Subtitle of "Coverage logging" on a radio with no signal readings. May wrap. -->
-    <string name="device_set_coverage_sub_no_rssi">Zeichnet deine Auftastungen mit GPS für die Reichweitenkarte auf (Karte → Reichweite); dieses Funkgerät liefert keine Signalwerte, daher wird nichts als gehört protokolliert</string>
+    <string name="device_set_coverage_sub_no_rssi">Zeichnet deine Auftastungen mit GPS für die Abdeckungskarte auf (Karte → Abdeckung); dieses Funkgerät liefert keine Signalwerte, daher wird nichts als gehört protokolliert</string>
     <!-- Settings switch title: DMR repeater roaming. One line. -->
     <string name="device_set_roaming">DMR-Roaming</string>
     <!-- Subtitle of "DMR roaming". May wrap. -->
@@ -91,9 +91,9 @@
     <!-- Subtitle of the Android Auto warning row. May wrap. -->
     <string name="device_set_auto_hidden_sub">„Unbekannte Quellen“ ist aus, daher zeigt das Auto SignalDeck nicht an. Tippen für die Lösung</string>
     <!-- Settings switch title: coverage logging while in the car. One line. -->
-    <string name="device_set_car_cov">Reichweite im Auto protokollieren</string>
+    <string name="device_set_car_cov">Abdeckung im Auto loggen</string>
     <!-- Subtitle of "Log coverage in the car". One line. -->
-    <string name="device_set_car_cov_sub">Reichweiten-Protokoll, solange Android Auto verbunden ist</string>
+    <string name="device_set_car_cov_sub">Abdeckungs-Log, solange Android Auto verbunden ist</string>
     <!-- Settings switch title: the steering wheel's play/pause key transmits. One line. -->
     <string name="device_set_wheel">Play/Pause am Lenkrad sendet</string>
     <!-- Subtitle of "Steering-wheel play/pause talks". May wrap. -->
@@ -115,9 +115,9 @@
     <!-- Subtitle of "Full-screen Radio controls in the car". May wrap. -->
     <string name="device_set_car_screen_sub">Aus: eine Medien-App (läuft in jedem Auto). Ein: stattdessen ein großer Sprechbildschirm; nach dem Ändern das Auto neu verbinden</string>
     <!-- Toast when coverage logging is switched on. -->
-    <string name="device_set_coverage_on">Reichweiten-Protokoll ist an</string>
+    <string name="device_set_coverage_on">Abdeckungs-Log ist an</string>
     <!-- Toast when coverage logging is switched off. -->
-    <string name="device_set_coverage_off">Reichweiten-Protokoll ist aus</string>
+    <string name="device_set_coverage_off">Abdeckungs-Log ist aus</string>
     <!-- Settings row title: a short tone when the talk key is released. One line. -->
     <string name="device_roger">Roger-Beep</string>
     <!-- Subtitle of "Roger beep". May wrap. -->
@@ -209,7 +209,7 @@
     <!-- Tool tile title: import the channels again from the stock app. Short (half-width tile). -->
     <string name="device_tool_reimport">Neu importieren</string>
     <!-- Subtitle of the Re-import tile. Short (half-width tile). -->
-    <string name="device_tool_reimport_sub">Kanäle aus der Hersteller-App</string>
+    <string name="device_tool_reimport_sub">Kanäle aus der Original-App</string>
     <!-- Tool tile title and dialog title: the radioid.net list of DMR ID names. Short (half-width tile). -->
     <string name="device_radioid">RadioID-Liste</string>
     <!-- Tool tile title and title of its menu and dialogs: the device report. Short (half-width tile). -->
@@ -333,17 +333,17 @@
     <!-- Message of the restore confirmation. -->
     <string name="device_restore_msg">Ersetzt alle Kanäle, Kontakte und Zonen in dieser App durch die Sicherung (auch OpenGD77-CPS-Exporte funktionieren). Verlauf, Nachrichten und Einstellungen bleiben erhalten.</string>
     <!-- Title of the re-import confirmation on a phone whose stock app has one channel list. One line. -->
-    <string name="device_reimport_title">Kanäle der Hersteller-App neu importieren?</string>
+    <string name="device_reimport_title">Kanäle der Original-App neu importieren?</string>
     <!-- Message of the re-import confirmation (one channel list). -->
-    <string name="device_reimport_msg">Ersetzt alle Kanäle in SignalDeck durch die in der Funk-App des Herstellers gespeicherten.</string>
+    <string name="device_reimport_msg">Ersetzt alle Kanäle in SignalDeck durch die in der Original-App gespeicherten.</string>
     <!-- Title of the list of the stock app's areas to import. One line. -->
-    <string name="device_reimport_which">Welchen Bereich der Hersteller-App importieren?</string>
+    <string name="device_reimport_which">Welchen Bereich der Original-App importieren?</string>
     <!-- Title of the re-import confirmation. %1$s is the stock area's name. One line. -->
     <string name="device_reimport_confirm">%1$s neu importieren?</string>
     <!-- Message of the re-import confirmation when only channels are imported. -->
-    <string name="device_reimport_msg_channels">Ersetzt alle Kanäle in SignalDeck durch die Kanäle dieses Bereichs aus der Hersteller-App.</string>
+    <string name="device_reimport_msg_channels">Ersetzt alle Kanäle in SignalDeck durch die Kanäle dieses Bereichs aus der Original-App.</string>
     <!-- Message of the re-import confirmation when channels, contacts, history and messages are imported. -->
-    <string name="device_reimport_msg_all">Ersetzt alle Kanäle, Kontakte, den Verlauf und die Nachrichten in dieser App durch die aktuellen Daten dieses Bereichs aus der Hersteller-App.</string>
+    <string name="device_reimport_msg_all">Ersetzt alle Kanäle, Kontakte, den Verlauf und die Nachrichten in dieser App durch die aktuellen Daten dieses Bereichs aus der Original-App.</string>
     <!-- Message of the RadioID list dialog. %1$s is the list's status (how many IDs, when downloaded). -->
     <string name="device_radioid_msg">Namen zu DMR-IDs, die auf der Frequenz gehört werden, von radioid.net heruntergeladen und auf dem Telefon gespeichert.\n\nAktuell: %1$s</string>
     <!-- Button in the RadioID list dialog. Short. -->
@@ -385,7 +385,7 @@
     <!-- SAFETY: item in the Device report menu: the transmit test session, which keys the radio. One line. -->
     <string name="device_report_txtest">Sendetest-Sitzung (sendet)</string>
     <!-- Message explaining what the device report gathers. A paragraph. -->
-    <string name="device_report_what_msg">Für ein Telefon ohne Profil oder zur Fehlersuche an einem: Sammelt die Angaben, die ein Profil braucht (serielle Schnittstellen, Knoten des Funkmoduls, die Walkie-Talkie-App des Herstellers und ihre APK, Hersteller-Bibliotheken, Framework-JARs, Dienste; mit Root auch SELinux-Labels und die Broadcasts der PTT-Taste), speichert sie unter Download/DMR/DeviceReport und bietet an, die ZIP-Datei in einem GitHub-Issue zu teilen. Am Telefon wird nichts verändert.</string>
+    <string name="device_report_what_msg">Für ein Telefon ohne Profil oder zur Fehlersuche an einem: Sammelt die Angaben, die ein Profil braucht (serielle Schnittstellen, Knoten des Funkmoduls, die originale Walkie-Talkie-App und ihre APK, Hersteller-Bibliotheken, Framework-JARs, Dienste; mit Root auch SELinux-Labels und die Broadcasts der PTT-Taste), speichert sie unter Download/DMR/DeviceReport und bietet an, die ZIP-Datei in einem GitHub-Issue zu teilen. Am Telefon wird nichts verändert.</string>
     <!-- Row 1 of the Help support this phone list: title line, then a line break and the details. Two spaces after the number. May be prefixed with a tick. -->
     <string name="device_support_step1">1  Alle Prüfungen ausführen\nEtwa zwei Minuten, hört nur zu; braucht Magisk-Root</string>
     <!-- Row 2 of the Help support this phone list: title line, line break, details. Two spaces after the number. May be prefixed with a tick or a lock. -->
@@ -406,13 +406,13 @@
     <string name="device_support_what_msg">Jeder Schritt verrät uns etwas darüber, wie das Funkmodul dieses Telefons arbeitet. Schick nach jedem Schritt die Ergebnisse (Schritt 3): Daraus schreiben oder korrigieren wir das Profil dieses Telefons, und du bekommst eine neue Version über Gerät → Updates. Die Schritte hören nur zu: Es wird nichts gesendet.</string>
     <!-- ==== Exit SignalDeck sheet ==== -->
     <!-- SAFETY: first hint on the Exit sheet: closing the app keeps the radio running; Exit stops it properly. A paragraph. -->
-    <string name="device_exit_hint">Wenn du die App schließt oder wegwischst, läuft das Funkgerät im Hintergrund weiter (so empfängt es auch bei ausgeschaltetem Bildschirm). „SignalDeck beenden“ stoppt es richtig: Jede laufende Aussendung und alles, was läuft (Suchlauf, APRS, FT8, M17, Satellitenverfolgung, der Papagei), wird beendet, der Ton gestoppt und die serielle Schnittstelle des Funkmoduls geschlossen.</string>
+    <string name="device_exit_hint">Wenn du die App schließt oder wegwischst, läuft das Funkgerät im Hintergrund weiter (so empfängt es auch bei ausgeschaltetem Bildschirm). „SignalDeck beenden“ stoppt es richtig: Jede laufende Aussendung und alles, was läuft (Suchlauf, APRS, FT8, M17, Satellitenverfolgung, das Parrot-Relais), wird beendet, der Ton gestoppt und die serielle Schnittstelle des Funkmoduls geschlossen.</string>
     <!-- Button on the Exit sheet: switch the radio module off and exit. One line, full width. -->
     <string name="device_exit_off">Funkmodul ausschalten und beenden</string>
     <!-- SAFETY: hint under "Turn the radio off and exit". -->
     <string name="device_exit_off_hint">Schaltet die Stromversorgung des Funkmoduls ab: Es empfängt nicht mehr und verbraucht keinen Akku. Beim Öffnen von SignalDeck schaltet es sich wieder ein (einige Sekunden).</string>
     <!-- Button on the Exit sheet: give the radio back to the stock app and exit. One line, full width. -->
-    <string name="device_exit_handback">An die Hersteller-App zurückgeben und beenden</string>
+    <string name="device_exit_handback">An die Original-App zurückgeben und beenden</string>
     <!-- SAFETY: hand-back hint on the Exit sheet. -->
     <string name="device_exit_handback_hint">Schaltet die Funk-App des Telefons wieder ein und überlässt ihr das Funkmodul. Geplante Aktionen starten SignalDeck trotzdem zu ihrer Zeit.</string>
     <!-- SAFETY: hand-back hint on the Exit sheet when SignalDeck owns the radio at boot. "Keep access after reboot" is a button name. -->
@@ -505,7 +505,7 @@
     <!-- Title of the radio audio check dialogs. One line. -->
     <string name="device_audio">Funkaudio-Prüfung</string>
     <!-- Instructions before the radio audio check. Several paragraphs; "Start" is the button name, MON the monitor key. -->
-    <string name="device_audio_intro">Für „kein Ton vom Funkgerät“, bei DMR oder analog. SignalDeck prüft im System des Telefons, ob der Audiodienst des Herstellers da ist (bei Custom-ROMs fehlt er unter Umständen), hört dann auf dem aktuellen Kanal mit und zeichnet auf, was das Funkmodul meldet, ob Ton vom Funk-Audiodienst des Telefons ankam und wie laut, und wie das Telefon ihn abspielt.\n\nAnalogkanal (am einfachsten: ein NOAA-Wetterkanal, dort sendet immer eine Station): zuerst 10 Sekunden mit offen gehaltener Rauschsperre (MON), dann muss Empfängerrauschen ankommen, auch wenn niemand sendet; danach eine Minute mit normaler Rauschsperre.\nDMR-Kanal: eine Minute; lass währenddessen jemanden auf der Sprechgruppe sprechen.\n\n1. Wähle auf der Funkseite den Kanal.\n2. Tippe auf „Starten“.\n\nEs wird nichts gesendet. Der Ton wird nur gemessen, nie gespeichert, und Anrufer-IDs werden im Bericht gekürzt. Am Ende kannst du den Bericht teilen.</string>
+    <string name="device_audio_intro">Für „kein Ton vom Funkgerät“, bei DMR oder analog. SignalDeck prüft im System des Telefons, ob der Audiodienst des Herstellers da ist (bei Custom-ROMs fehlt er unter Umständen), hört dann auf dem aktuellen Kanal mit und zeichnet auf, was das Funkmodul meldet, ob Ton vom Funk-Audiodienst des Telefons ankam und wie laut, und wie das Telefon ihn abspielt.\n\nAnalogkanal (am einfachsten: ein NOAA-Wetterkanal, dort sendet immer eine Station): zuerst 10 Sekunden mit offen gehaltener Rauschsperre (MON), dann muss Empfängerrauschen ankommen, auch wenn niemand sendet; danach eine Minute mit normaler Rauschsperre.\nDMR-Kanal: eine Minute; lass währenddessen jemanden auf der Sprechgruppe sprechen.\n\n1. Wähle auf der Intercom-Seite den Kanal.\n2. Tippe auf „Starten“.\n\nEs wird nichts gesendet. Der Ton wird nur gemessen, nie gespeichert, und Anrufer-IDs werden im Bericht gekürzt. Am Ende kannst du den Bericht teilen.</string>
     <!-- Added to the audio check instructions when SignalDeck does not own the radio (starts with two line breaks). "Take over" is the button name. -->
     <string name="device_audio_need_radio">\n\nSignalDeck hat das Funkmodul noch nicht: Zuerst „Übernehmen“ (die Systemprüfungen laufen trotzdem).</string>
     <!-- Result of the audio check. %1$s is the verdict (English, from the report). -->
@@ -518,7 +518,7 @@
     <!-- Title of the second radio test dialogs. One line. -->
     <string name="device_second">Test mit zweitem Funkgerät</string>
     <!-- SAFETY: instructions for the second radio test, with the licence note. %1$s is the phone's tuning range ("400–480 MHz"). Keep the frequencies and service names as they are. -->
-    <string name="device_second_intro">Du brauchst irgendein anderes FM-Funkgerät (ein billiges Handfunkgerät reicht) und etwa fünf Minuten.\n\n1. Wähle auf der Funkseite einen analogen (FM-)Kanal, den niemand nutzt, auf einer Frequenz, auf der das andere Funkgerät senden kann: VHF und UHF gehen beide (dieses Telefon deckt %1$s ab). Anmeldefreie Beispiele: PMR446 Kanal 1, 446,00625 MHz (Europa); FRS Kanal 1, 462,5625 MHz (USA); oder eine Amateurfunk-Simplexfrequenz, wenn du eine Amateurfunkzulassung hast.\n2. Stell das andere Funkgerät auf dieselbe Frequenz, ohne Ton, niedrige Leistung, ein paar Meter von diesem Telefon entfernt.\n3. Tippe auf „Starten“ und mach, was jeder Schritt verlangt: SignalDeck misst alles selbst.\n\nDieses Telefon hört nur zu: Es sendet nichts. Der Tonsquelch-Teil nutzt eine vorübergehende Kopie des Kanals; dein Kanal wird nicht verändert.</string>
+    <string name="device_second_intro">Du brauchst irgendein anderes FM-Funkgerät (ein billiges Handfunkgerät reicht) und etwa fünf Minuten.\n\n1. Wähle auf der Intercom-Seite einen analogen (FM-)Kanal, den niemand nutzt, auf einer Frequenz, auf der das andere Funkgerät senden kann: VHF und UHF gehen beide (dieses Telefon deckt %1$s ab). Anmeldefreie Beispiele: PMR446 Kanal 1, 446,00625 MHz (Europa); FRS Kanal 1, 462,5625 MHz (USA); oder eine Amateurfunk-Simplexfrequenz, wenn du eine Amateurfunklizenz hast.\n2. Stell das andere Funkgerät auf dieselbe Frequenz, ohne Ton, niedrige Leistung, ein paar Meter von diesem Telefon entfernt.\n3. Tippe auf „Starten“ und mach, was jeder Schritt verlangt: SignalDeck misst alles selbst.\n\nDieses Telefon hört nur zu: Es sendet nichts. Der Tonsquelch-Teil nutzt eine vorübergehende Kopie des Kanals; dein Kanal wird nicht verändert.</string>
     <!-- Button in a second radio test step: the owner is ready. Short. -->
     <string name="device_second_ready">Bereit</string>
     <!-- Button in a second radio test step. Short. -->
@@ -531,7 +531,7 @@
     <!-- Title of the listen check instructions. One line. -->
     <string name="device_listen">Hörprüfung</string>
     <!-- Instructions for the listen check. Numbered steps; "Start" is the button name. -->
-    <string name="device_listen_intro">1. Wähle auf der Funkseite einen Kanal, auf dem du gerade Stationen hörst (ein belebtes Relais, ein Wetterkanal, ein Freund, der mit einem anderen Funkgerät ruft).\n2. Komm hierher zurück und tippe auf „Starten“.\n3. Teil 1, 10 Sekunden: SignalDeck hält die Rauschsperre offen (MON), der Lautsprecher sollte also etwas wiedergeben – Rauschen oder die Station, wenn sie gerade spricht; danach fragt es, was du gehört hast. (Entfällt auf einem DMR-Kanal, der kein Rauschen hat.)\n4. Teil 2, 50 Sekunden mit normaler Rauschsperre: Sie öffnet von selbst, wenn die Station spricht. SignalDeck zeichnet Signalstärke und Ton auf; danach sagst du, ob du die Station deutlich gehört hast.\n\nDreh vorher die Medienlautstärke auf.</string>
+    <string name="device_listen_intro">1. Wähle auf der Intercom-Seite einen Kanal, auf dem du gerade Stationen hörst (ein belebtes Relais, ein Wetterkanal, ein Freund, der mit einem anderen Funkgerät ruft).\n2. Komm hierher zurück und tippe auf „Starten“.\n3. Teil 1, 10 Sekunden: SignalDeck hält die Rauschsperre offen (MON), der Lautsprecher sollte also etwas wiedergeben – Rauschen oder die Station, wenn sie gerade spricht; danach fragt es, was du gehört hast. (Entfällt auf einem DMR-Kanal, der kein Rauschen hat.)\n4. Teil 2, 50 Sekunden mit normaler Rauschsperre: Sie öffnet von selbst, wenn die Station spricht. SignalDeck zeichnet Signalstärke und Ton auf; danach sagst du, ob du die Station deutlich gehört hast.\n\nDreh vorher die Medienlautstärke auf.</string>
     <!-- Title of the listen check, part 1. One line. -->
     <string name="device_listen_part1">Hörprüfung · Teil 1 von 2: Rauschen</string>
     <!-- Progress of the listen check, part 1. %1$s is the live status (English, from the check). -->
@@ -584,14 +584,14 @@
     <!-- Intercom layout choice: the compact layout for short screens. One word. -->
     <string name="device_layout_compact">Kompakt</string>
     <!-- Settings row title and dialog title: the intercom page layout. One line. -->
-    <string name="device_layout">Funk-Layout</string>
+    <string name="device_layout">Intercom-Layout</string>
     <!-- ==== Run all checks (the first-run checks) ==== -->
     <!-- First paragraph of the checks dialog at first launch, on a phone with an untested profile. Ends with two line breaks. -->
     <string name="device_checks_intro_known">SignalDeck hat für dieses Telefon ein Profil, das darauf noch nicht getestet wurde. Ein Durchlauf der Prüfungen zeigt uns, was wir brauchen, damit es funktioniert. Das dauert etwa zwei Minuten.\n\n</string>
     <!-- First paragraph of the checks dialog at first launch, on a phone with no profile. Ends with two line breaks. -->
     <string name="device_checks_intro_unknown">SignalDeck kennt dieses Telefon noch nicht. Ein Durchlauf der Prüfungen zeigt uns, was wir brauchen, damit es funktioniert. Das dauert etwa zwei Minuten.\n\n</string>
     <!-- The checks dialog: what happens, as bullet lines (each ends with a line break). -->
-    <string name="device_checks_steps">Was passiert:\n• ein Gerätebericht (Telefon, Schnittstellen, Funkmodul, die Walkie-Talkie-App des Herstellers; liest nur)\n• 10 s, um die seitliche PTT-Taste ein paarmal zu drücken\n• mit Root wird die Walkie-Talkie-App des Herstellers geschlossen, dann 15 s lang geöffnet, damit wir sehen, wie sie das Funkmodul startet und was sie ihm schickt (dabei nicht PTT drücken), und wieder geschlossen\n</string>
+    <string name="device_checks_steps">Was passiert:\n• ein Gerätebericht (Telefon, Schnittstellen, Funkmodul, die originale Walkie-Talkie-App; liest nur)\n• 10 s, um die seitliche PTT-Taste ein paarmal zu drücken\n• mit Root wird die originale Walkie-Talkie-App geschlossen, dann 15 s lang geöffnet, damit wir sehen, wie sie das Funkmodul startet und was sie ihm schickt (dabei nicht PTT drücken), und wieder geschlossen\n</string>
     <!-- Bullet line in the checks dialog: the radio probe. SA818 AT is a protocol name. Ends with a line break. -->
     <string name="device_checks_probe">• mit Magisk-Root die Funkmodul-Abfrage (fragt das Modul auf den seriellen Schnittstellen, die die Walkie-Talkie-App nutzt, wer es ist: die DMR-Versionsabfrage und der SA818-AT-Handshake; schaltet das Modul ein, wenn es nicht antwortet)\n</string>
     <!-- Bullet line in the checks dialog on a phone with no profile: the radio probe. Ends with a line break. -->
@@ -617,7 +617,7 @@
     <!-- Progress while SignalDeck looks for the stock walkie-talkie app. -->
     <string name="device_checks_finding_app">Suche die Walkie-Talkie-App…</string>
     <!-- Row in the app list: the profile's stock app. %1$s is the app's name, %2$s its package, %3$s the phone model. Two lines. -->
-    <string name="device_checks_app_stock">%1$s\n%2$s · die Hersteller-App für %3$s</string>
+    <string name="device_checks_app_stock">%1$s\n%2$s · die Original-App für %3$s</string>
     <!-- Row in the app list: choose any app. Two lines. -->
     <string name="device_checks_app_other">Andere App wählen…\nFalls die Walkie-Talkie-App nicht aufgeführt ist</string>
     <!-- Row in the app list: open no app. One line. -->
@@ -646,7 +646,7 @@
     <!-- Title of the dialog before sharing the device report. One line. -->
     <string name="device_share_title">Gerätebericht teilen</string>
     <!-- What the device report holds, before sharing it. Two paragraphs. File names (stock_serial.txt, rx_audio_raw.bin) stay. -->
-    <string name="device_share_msg">Der Bericht enthält Telefonmodell und Build-Angaben, Namen der seriellen Schnittstellen und der Funkmodul-Knoten, Paketangaben der Walkie-Talkie-App, Namen von Bibliotheks- und Framework-Dateien, laufende Funkprozesse und (mit Root) SELinux-Labels sowie kurze funkbezogene Log-Auszüge, bei denen Nachrichtentext entfernt und lange Zahlen maskiert sind. Nach „Alle Prüfungen ausführen“ enthält er außerdem das eigene Log von SignalDeck (Paket-, Positions-, Nachrichten- und Anruferzeilen entfernt; Rufzeichen und IDs maskiert), die Bytes, die die Hersteller-App beim Start mit dem Funkmodul ausgetauscht hat (stock_serial.txt: Befehle, Kanalfrequenzen und die Antworten des Moduls; Funk-IDs geleert) und, nach dem Probelauf, eine 5 Sekunden lange Rohkopie dessen, was das Funkmodul empfangen hat (rx_audio_raw.bin: was auch immer auf dem Kanal war). Keine Konten, Kontakte, Nachrichten, Standorte oder Kennungen wie die IMEI.\n\nDie kopierte Walkie-Talkie-APK des Herstellers ist dessen Software: Leg sie bei, wenn du sie ohne Bedenken veröffentlichen kannst, oder teile ohne sie (wir können privat danach fragen).</string>
+    <string name="device_share_msg">Der Bericht enthält Telefonmodell und Build-Angaben, Namen der seriellen Schnittstellen und der Funkmodul-Knoten, Paketangaben der Walkie-Talkie-App, Namen von Bibliotheks- und Framework-Dateien, laufende Funkprozesse und (mit Root) SELinux-Labels sowie kurze funkbezogene Log-Auszüge, bei denen Nachrichtentext entfernt und lange Zahlen maskiert sind. Nach „Alle Prüfungen ausführen“ enthält er außerdem das eigene Log von SignalDeck (Paket-, Positions-, Nachrichten- und Anruferzeilen entfernt; Rufzeichen und IDs maskiert), die Bytes, die die Original-App beim Start mit dem Funkmodul ausgetauscht hat (stock_serial.txt: Befehle, Kanalfrequenzen und die Antworten des Moduls; Funk-IDs geleert) und, nach dem Probelauf, eine 5 Sekunden lange Rohkopie dessen, was das Funkmodul empfangen hat (rx_audio_raw.bin: was auch immer auf dem Kanal war). Keine Konten, Kontakte, Nachrichten, Standorte oder Kennungen wie die IMEI.\n\nDie kopierte Walkie-Talkie-APK des Herstellers ist dessen Software: Leg sie bei, wenn du sie ohne Bedenken veröffentlichen kannst, oder teile ohne sie (wir können privat danach fragen).</string>
     <!-- Button: share the report with the stock APK. Short. -->
     <string name="device_share_all">Alles teilen</string>
     <!-- Button: share the report without the stock APK. Short. -->
@@ -671,7 +671,7 @@
     <!-- Title of the radio firmware files dialogs. One line. -->
     <string name="device_fwfiles">Firmware-Dateien des Funkmoduls</string>
     <!-- What the radio firmware files search does, before it runs. A paragraph. -->
-    <string name="device_fwfiles_intro">Benötigt Magisk-Root. Sucht in den Ordnern, in denen Funk-Telefone die Images ihres Funkchips ablegen, und in der Walkie-Talkie-App des Herstellers, und listet auf, was es findet: Name, Größe, einen Fingerabdruck (SHA-256) und die darin eingetragene Modulversion. Eigene Dateien von SignalDeck (serielle Mitschnitte, Aufnahmen, Berichte) bleiben außen vor; in /sdcard/DMR zählt nur ein Modul-Image. Eine Datei, die SignalDeck oder sein Firmware-Katalog schon hat, wird als bereits bekannt markiert, damit niemand eine Kopie davon braucht. Die Liste kommt in den Gerätebericht. Es wird nichts kopiert, außer du hakst Dateien an, und dann nur nach Download/DMR/FoundFirmware auf diesem Telefon; nichts wird irgendwohin geschickt. Diese Dateien gehören dem Telefonhersteller: Teile sie nur privat und nur, wenn der Maintainer von SignalDeck darum bittet.</string>
+    <string name="device_fwfiles_intro">Benötigt Magisk-Root. Sucht in den Ordnern, in denen Funk-Telefone die Images ihres Funkchips ablegen, und in der originalen Walkie-Talkie-App, und listet auf, was es findet: Name, Größe, einen Fingerabdruck (SHA-256) und die darin eingetragene Modulversion. Eigene Dateien von SignalDeck (serielle Mitschnitte, Aufnahmen, Berichte) bleiben außen vor; in /sdcard/DMR zählt nur ein Modul-Image. Eine Datei, die SignalDeck oder sein Firmware-Katalog schon hat, wird als bereits bekannt markiert, damit niemand eine Kopie davon braucht. Die Liste kommt in den Gerätebericht. Es wird nichts kopiert, außer du hakst Dateien an, und dann nur nach Download/DMR/FoundFirmware auf diesem Telefon; nichts wird irgendwohin geschickt. Diese Dateien gehören dem Telefonhersteller: Teile sie nur privat und nur, wenn der Maintainer von SignalDeck darum bittet.</string>
     <!-- Button: start the firmware file search. Short. -->
     <string name="device_fwfiles_look">Suchen</string>
     <!-- Result when no readable firmware file was found. -->
@@ -700,7 +700,7 @@
     <!-- Title of the radio probe dialogs. One line. -->
     <string name="device_probe">Funkmodul-Abfrage</string>
     <!-- What the radio probe does, before it runs; ends with a question about the power pulse. -->
-    <string name="device_probe_msg">Benötigt Magisk-Root. Liest die SELinux-Labels der seriellen Schnittstellen, leitet daraus die Regeln für diese Sitzung ab und wendet sie an, schickt auf jeder Schnittstelle bei mehreren Geschwindigkeiten die Versionsabfrage des Moduls, liest den Strom-Knoten und horcht nach einem PCM-Datenstrom. Die Walkie-Talkie-App des Herstellers sollte geschlossen sein. Den Strom-Knoten auch kurz pulsen?</string>
+    <string name="device_probe_msg">Benötigt Magisk-Root. Liest die SELinux-Labels der seriellen Schnittstellen, leitet daraus die Regeln für diese Sitzung ab und wendet sie an, schickt auf jeder Schnittstelle bei mehreren Geschwindigkeiten die Versionsabfrage des Moduls, liest den Strom-Knoten und horcht nach einem PCM-Datenstrom. Die originale Walkie-Talkie-App sollte geschlossen sein. Den Strom-Knoten auch kurz pulsen?</string>
     <!-- Button: run the probe. Short. -->
     <string name="device_probe_run">Abfragen</string>
     <!-- Button: run the probe and pulse the module's power. Short. -->
@@ -720,7 +720,7 @@
     <!-- Title of the dialog offering to submit an unknown firmware variant. One line. -->
     <string name="device_variant">Neue Firmware-Variante</string>
     <!-- First paragraphs of the firmware variant dialog (ends with two line breaks). %1$s is why the firmware is new (from the check). "Submit" is GitHub's button. -->
-    <string name="device_variant_msg">Die Funk-Firmware dieses Telefons steht noch nicht im Firmware-Katalog von SignalDeck: %1$s.\n\nWenn du sie einreichst, kann das Firmware-Projekt sie katalogisieren, damit SignalDeck sie erkennt und spätere Firmware-Arbeit sie abdecken kann. GitHub öffnet sich im Browser, mit Telefonmodell, Modulversion, Version der Hersteller-App und dem Fingerabdruck der Firmware-Datei bereits ausgefüllt. Prüf die Angaben und drück dort auf „Submit“ (dafür brauchst du ein GitHub-Konto). Ohne Einreichen wird nichts verschickt, und nichts darin verrät, wer du bist.\n\n</string>
+    <string name="device_variant_msg">Die Funk-Firmware dieses Telefons steht noch nicht im Firmware-Katalog von SignalDeck: %1$s.\n\nWenn du sie einreichst, kann das Firmware-Projekt sie katalogisieren, damit SignalDeck sie erkennt und spätere Firmware-Arbeit sie abdecken kann. GitHub öffnet sich im Browser, mit Telefonmodell, Modulversion, Version der Original-App und dem Fingerabdruck der Firmware-Datei bereits ausgefüllt. Prüf die Angaben und drück dort auf „Submit“ (dafür brauchst du ein GitHub-Konto). Ohne Einreichen wird nichts verschickt, und nichts darin verrät, wer du bist.\n\n</string>
     <!-- Paragraph of the firmware variant dialog when the firmware file is new too (ends with two line breaks). -->
     <string name="device_variant_attach">Auch die Firmware-Datei selbst ist neu: SignalDeck kopiert sie auf diesem Telefon nach Download/DMR/FoundFirmware, und im Issue steht, wo sie liegt. Ob du sie anhängst, entscheidest du: Ein Anhang im Issue ist öffentlich, jeder kann ihn herunterladen, und die Datei gehört dem Telefonhersteller.\n\n</string>
     <!-- Paragraph of the firmware variant dialog when the file is known (ends with two line breaks). -->
@@ -782,7 +782,7 @@
     <!-- Link state on the link card: root was not granted. One line. -->
     <string name="device_status_no_root">Root nicht gewährt (Magisk → Superuser)</string>
     <!-- Link state on the link card: the stock app has the radio. One line. -->
-    <string name="device_status_stopped">Die Hersteller-App hat das Funkmodul</string>
+    <string name="device_status_stopped">Die Original-App hat das Funkmodul</string>
     <!-- Link state on the link card: no profile for this phone. One line. -->
     <string name="device_status_unsupported">Noch kein Profil für dieses Telefon</string>
     <!-- Link state on the link card while it starts. %1$s is the current step (English, from the service). -->
@@ -885,13 +885,13 @@
     <!-- Progress line of the Listen check. %1$d seconds done, %2$d seconds in all, %3$d seconds with a signal. One line. -->
     <string name="device_firstrun_listening">Hören: %1$d von %2$d s, %3$d s lang etwas gehört</string>
     <!-- SAFETY: progress line while the stock walkie-talkie app runs for 15 s; the owner must not transmit. One or two lines. -->
-    <string name="device_firstrun_watch_open">Die Walkie-Talkie-App des Herstellers ist 15 s lang offen – drücke bitte nicht PTT</string>
+    <string name="device_firstrun_watch_open">Die originale Walkie-Talkie-App ist 15 s lang offen – drücke bitte nicht PTT</string>
     <!-- SAFETY: the same, on phones whose radio uses the USB port (USB to a computer is off). Two lines. -->
-    <string name="device_firstrun_watch_open_bridged">Die Walkie-Talkie-App des Herstellers ist 15 s lang offen – drücke bitte nicht PTT (USB zum Computer ist währenddessen aus)</string>
+    <string name="device_firstrun_watch_open_bridged">Die originale Walkie-Talkie-App ist 15 s lang offen – drücke bitte nicht PTT (USB zum Computer ist währenddessen aus)</string>
     <!-- Progress line of the trial take-over (receive only): squelch check with squelch level 0. One line. -->
-    <string name="device_firstrun_trial_squelch_alone">Probelauf: Rauschsperren-Test, Rauschsperre 0 allein</string>
+    <string name="device_firstrun_trial_squelch_alone">Probelauf: Rauschsperren-Test, SQL-Stufe 0 allein</string>
     <!-- Progress line of the trial: squelch check with squelch 0 and the monitor (MON) on. One line. -->
-    <string name="device_firstrun_trial_squelch_monitor">Probelauf: Rauschsperren-Test, Rauschsperre 0 und Monitor</string>
+    <string name="device_firstrun_trial_squelch_monitor">Probelauf: Rauschsperren-Test, SQL-Stufe 0 und Monitor</string>
     <!-- Progress line of the trial: receive level at a module volume step. %1$d is the step (1–8). One line. -->
     <string name="device_firstrun_trial_level">Probelauf: Empfangspegel bei Lautstärke %1$d</string>
     <!-- Progress line of the trial: timing the signal reading after a retune. %1$d is the run (1 to 5). One line. -->
@@ -962,7 +962,7 @@
     <!-- Finding (warning) for a volume key. Two sentences. -->
     <string name="device_ptt_check_volume">Außerhalb von SignalDeck ändert das Telefon beim Gedrückthalten weiterhin die Lautstärke. SignalDeck stellt die Lautstärke beim Loslassen wieder zurück.</string>
     <!-- Finding (warning): "Volume-up transmits" is the name of an Intercom setting, switched off by this key. Two sentences. -->
-    <string name="device_ptt_check_vol_ptt">„Lauter-Taste sendet“ nutzt auf der Funkseite dieselbe Taste. Es wird ausgeschaltet, da diese Taste es ersetzt.</string>
+    <string name="device_ptt_check_vol_ptt">„Lauter-Taste sendet“ nutzt auf der Intercom-Seite dieselbe Taste. Es wird ausgeschaltet, da diese Taste es ersetzt.</string>
     <!-- Finding (warning) for a media button. One sentence. -->
     <string name="device_ptt_check_media">Eine Medientaste: Sie startet oder pausiert weiterhin Musik, und langes Halten kann den Sprachassistenten starten.</string>
     <!-- Finding (warning): "Steering-wheel play/pause talks" is the name of a car setting. Two sentences. -->
@@ -985,7 +985,7 @@
     <string name="device_ptt_learn_failed">Anlernen fehlgeschlagen: %1$s</string>
     <!-- ===== Main screen (tabs, bars, sheets, toasts) ===== -->
     <!-- Bottom tab: the radio's main page. Shown in capitals, ≤ 9 characters (five tabs share a phone's width). -->
-    <string name="device_main_tab_intercom">Funk</string>
+    <string name="device_main_tab_intercom">Intercom</string>
     <!-- Bottom tab: the channel list. Capitals, ≤ 9 characters. -->
     <string name="device_main_tab_channels">Kanäle</string>
     <!-- Bottom tab: the contact list. Capitals, ≤ 9 characters. -->
@@ -997,11 +997,11 @@
     <!-- Placeholder page for a tab not built yet. %1$s is the tab name. -->
     <string name="device_main_coming_next">%1$s\n\nkommt als Nächstes</string>
     <!-- Title of the one-time sheet announcing the coverage maps feature. One line. -->
-    <string name="device_main_coverage_title">Reichweitenkarten</string>
+    <string name="device_main_coverage_title">Abdeckungskarten</string>
     <!-- Small label in capitals on the coverage maps sheet. Two words. -->
     <string name="device_main_coverage_new">Neue Funktion</string>
     <!-- Text of the coverage maps sheet. A few lines. -->
-    <string name="device_main_coverage_hint">Sieh, wo dich jedes deiner Relais erreicht und wo du es auftasten kannst. Schalte das Reichweiten-Protokoll ein, und die App misst beim Fahren oder Gehen mit und zeichnet es auf der Karte ein. Export nach Google Earth jederzeit möglich.</string>
+    <string name="device_main_coverage_hint">Sieh, wo dich jedes deiner Relais erreicht und wo du es auftasten kannst. Schalte das Abdeckungs-Log ein, und die App misst beim Fahren oder Gehen mit und zeichnet es auf der Karte ein. Export nach Google Earth jederzeit möglich.</string>
     <!-- Button on the coverage maps sheet that opens the map. Short (button, about 60 % of the width). -->
     <string name="device_main_coverage_open">Karte öffnen</string>
     <!-- Toast when shared channels contained nothing to import. Short. -->
@@ -1019,7 +1019,7 @@
     <!-- APRS monitoring in the mode picker. APRS is a mode name. Short. -->
     <string name="device_main_mode_aprs_monitoring">APRS-Mithören</string>
     <!-- The parrot (repeats what it hears) in the mode picker. Short. -->
-    <string name="device_main_mode_parrot">Papagei</string>
+    <string name="device_main_mode_parrot">Parrot</string>
     <!-- M17 receive in the mode picker. M17 is a mode name. Short. -->
     <string name="device_main_mode_m17_rx">M17-Empfang</string>
     <!-- Green bar over the Intercom while the band scope runs. One line (single line, cut off if long). -->
@@ -1035,7 +1035,7 @@
     <!-- Mode bar: APRS monitoring. %1$s is the frequency (MHz). Keep the emoji and the spacing. One line. -->
     <string name="device_main_bar_aprs">📡  APRS-Mithören  ·  %1$s</string>
     <!-- Mode bar: the parrot is on. Keep the emoji and the two spaces. One line. -->
-    <string name="device_main_bar_parrot">🦜  Papagei</string>
+    <string name="device_main_bar_parrot">🦜  Parrot</string>
     <!-- Mode bar: M17 receive, nothing heard. Keep the emoji and spacing. One line. -->
     <string name="device_main_bar_m17_listening">📻  M17  ·  hört</string>
     <!-- Mode bar: M17, a station is being received (no callsign yet). One line. -->
@@ -1065,7 +1065,7 @@
     <!-- Toast: no app on the phone can pick a file or folder. Short. -->
     <string name="device_main_no_file_picker">Keine Dateiauswahl verfügbar</string>
     <!-- SAFETY: toast after Exit when the radio went back to the phone's own walkie-talkie app. One line. -->
-    <string name="device_main_exit_handed_back">Funkmodul an die Hersteller-App zurückgegeben</string>
+    <string name="device_main_exit_handed_back">Funkmodul an die Original-App zurückgegeben</string>
     <!-- Toast after Exit when the radio was switched off. One or two lines. -->
     <string name="device_main_exit_switched_off">Funkmodul ausgeschaltet. Öffne SignalDeck, um es wieder einzuschalten</string>
     <!-- ==== Device → Module firmware page (ui/FirmwareScreen) ==== -->
@@ -1164,7 +1164,7 @@
     <!-- Module firmware page, Factory backup section when the backup is verified. %1$s is where it came from ("stock app" or "saved copy"); the second line is the file path (keep it: %2$s is the version string, %3$s the start of its hash). Two lines. -->
     <string name="device_fw_backup_verified">Geprüft · %1$s\nDownload/DMR/Firmware/factory-%2$s-%3$s.bin</string>
     <!-- SAFETY: Module firmware page, Factory backup section: no verified backup, the stock app's copy could not be read. One or two lines. -->
-    <string name="device_fw_backup_unread">Noch nicht geprüft. Die Kopie der Hersteller-App konnte nicht gelesen werden.</string>
+    <string name="device_fw_backup_unread">Noch nicht geprüft. Die Kopie der Original-App konnte nicht gelesen werden.</string>
     <!-- SAFETY: Module firmware page, Factory backup section: no verified backup, the stock app's copy is not the known factory image. One or two lines. -->
     <string name="device_fw_backup_mismatch">Noch nicht geprüft. Die Werks-Kopie passt nicht zur bekannten Werks-Firmware.</string>
     <!-- Module firmware page, Chosen image section, the line after the image's name and description: %1$s is its size in bytes (already formatted), %2$s its hash; the file is on the phone. One line (it wraps). -->
@@ -1203,7 +1203,7 @@
     <!-- Module firmware pre-flight, detail when the radio is idle. One word. -->
     <string name="device_fw_check_idle_ok">Frei</string>
     <!-- Module firmware pre-flight, name of the check that the phone's own radio app is paused (SignalDeck has taken over the radio). Short. -->
-    <string name="device_fw_check_stock">Hersteller-App angehalten</string>
+    <string name="device_fw_check_stock">Original-App angehalten</string>
     <!-- SAFETY: Module firmware pre-flight, detail when the stock radio app still runs: take over first ("Take over" is the Device page's button). One line. -->
     <string name="device_fw_check_stock_on">Übernimm zuerst das Funkmodul</string>
     <!-- Module firmware pre-flight, detail when the stock app is paused. One word. -->
@@ -1256,26 +1256,26 @@
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the module is silent, and recovery loads only the factory image. One line. -->
     <string name="device_fw_recovery_factory_only">Das Modul hat nicht geantwortet. Die Wiederherstellung lädt nur die Werks-Firmware</string>
     <!-- SAFETY: Module firmware pre-flight, why recovery cannot start: no verified factory backup; the stock app's copy is needed. One or two lines. -->
-    <string name="device_fw_backup_needed_recovery">Die Werks-Sicherung fehlt oder passt nicht. Stell vor der Wiederherstellung die Kopie aus der Hersteller-App bereit</string>
+    <string name="device_fw_backup_needed_recovery">Die Werks-Sicherung fehlt oder passt nicht. Stell vor der Wiederherstellung die Kopie aus der Original-App bereit</string>
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the stock radio app is uninstalled and there is no verified factory copy. One or two lines. -->
-    <string name="device_fw_stock_gone">Die Hersteller-App ist nicht mehr da, und auf diesem Telefon gibt es keine geprüfte Werks-Kopie</string>
+    <string name="device_fw_stock_gone">Die Original-App ist nicht mehr da, und auf diesem Telefon gibt es keine geprüfte Werks-Kopie</string>
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the module runs a firmware this build does not know. %1$s is its version string. One line. -->
     <string name="device_fw_variant_tag">Firmware-Variante noch nicht unterstützt (%1$s)</string>
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: it was built for another phone model. One line. -->
     <string name="device_fw_wrong_model">Dieses Image wurde nicht für dieses Telefonmodell erstellt</string>
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the phone's stock radio app is not the one the image belongs to. One or two lines. -->
-    <string name="device_fw_wrong_stock_app">Die Funk-App des Herstellers auf diesem Telefon ist nicht die, zu der dieses Image gehört</string>
+    <string name="device_fw_wrong_stock_app">Die Original-App auf diesem Telefon ist nicht die, zu der dieses Image gehört</string>
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the stock app's firmware file is not the known factory image and there is no verified backup. One or two lines. -->
-    <string name="device_fw_stock_mismatch">Die Firmware der Hersteller-App passt nicht zur bekannten Werks-Firmware, und es gibt keine geprüfte Sicherung</string>
+    <string name="device_fw_stock_mismatch">Die Firmware der Original-App passt nicht zur bekannten Werks-Firmware, und es gibt keine geprüfte Sicherung</string>
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded yet: the factory backup must be on the phone first. One line. -->
     <string name="device_fw_backup_first">Lege vor jedem anderen Image zuerst die Werks-Sicherung auf dieses Telefon</string>
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: it was not built from this phone's factory firmware. One line. -->
     <string name="device_fw_wrong_base">Dieses Image wurde nicht aus der Werks-Firmware dieses Telefons erstellt</string>
     <!-- Module firmware pre-flight, warning (amber) on the "This phone" check: the stock app's version differs from the recorded one (%1$s found, %2$s expected), but its firmware file matches. One or two lines. -->
-    <string name="device_fw_stock_version_note">Hersteller-App ist %1$s, nicht %2$s. Die Firmware-Datei passt, daher kann das Laden weitergehen</string>
+    <string name="device_fw_stock_version_note">Original-App ist %1$s, nicht %2$s. Die Firmware-Datei passt, daher kann das Laden weitergehen</string>
     <!-- ==== Module firmware: where the factory backup came from (fw/FirmwareVault) ==== -->
     <!-- Module firmware page, where the verified factory backup came from: read out of the stock radio app (after "Verified · "). A few words, lower case. -->
-    <string name="device_fw_source_stock">Hersteller-App</string>
+    <string name="device_fw_source_stock">Original-App</string>
     <!-- Module firmware page, where the verified factory backup came from: the copy SignalDeck saved earlier (after "Verified · "). A few words, lower case. -->
     <string name="device_fw_source_saved">gespeicherte Kopie</string>
     <!-- SAFETY: Module firmware page, description of an unlisted firmware file (not from the catalogue). %1$s is the version string read from the file. Two lines. -->
@@ -1333,7 +1333,7 @@
     <!-- SAFETY: Diagnostics page, pill button that takes over the radio (powers the module up for SignalDeck). One of four buttons in a row: very short. -->
     <string name="device_diag_bring_up">Funk starten</string>
     <!-- SAFETY: Diagnostics page, pill button that hands the radio back to the phone's own radio app. One of four buttons in a row: short. -->
-    <string name="device_diag_release">Freigeben (Hersteller-App an)</string>
+    <string name="device_diag_release">Freigeben (Original-App an)</string>
     <!-- Diagnostics page, pill button that asks the radio module for its firmware version (into the log). One of three in a row: short. -->
     <string name="device_diag_version">Modulversion</string>
     <!-- Diagnostics page, pill button that switches the radio module off and on. One of three in a row: short. -->
@@ -1450,7 +1450,7 @@
     <string name="device_fw_finder_looking">Suche in %1$s</string>
     <!-- ==== Device → Profile: the signed profile list and its advisories (ProfileRegistry). Advisory titles and reasons are data from the list. ==== -->
     <!-- SAFETY: What an advisory from the signed profile list does on this phone: the phone's profile is not used, the stock radio app keeps the radio. Starts with a capital; shown as a sentence, and also lower-cased inside "This advisory says: …". One line. -->
-    <string name="device_profile_restrict_profile">SignalDeck verwendet das Profil dieses Telefons nicht (die Hersteller-App behält das Funkmodul)</string>
+    <string name="device_profile_restrict_profile">SignalDeck verwendet das Profil dieses Telefons nicht (die Original-App behält das Funkmodul)</string>
     <!-- SAFETY: What an advisory does on this phone: SignalDeck no longer takes over the radio by itself and does not transmit. Shown as a sentence, and also lower-cased inside "This advisory says: …". One line. -->
     <string name="device_profile_restrict_takeover">SignalDeck übernimmt das Funkmodul nicht mehr von selbst (und sendet nicht)</string>
     <!-- SAFETY: What an advisory does on this phone: transmitting is switched off. Lower case at the start (it is used inside sentences too). Short. -->

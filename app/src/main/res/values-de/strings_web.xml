@@ -184,7 +184,7 @@
     <!-- Reply after queueing an APRS message. %1$s: the callsign. -->
     <string name="web_aprs_message_queued">Nachricht an %1$s in der Warteschlange</string>
     <!-- Reply after sending an APRS position beacon. -->
-    <string name="web_aprs_beacon_sent">Bake gesendet</string>
+    <string name="web_aprs_beacon_sent">Beacon gesendet</string>
     <!-- Error: no SSTV picture has been received yet. -->
     <string name="web_sstv_no_picture">Noch kein Bild</string>
     <!-- Error: the recording to decode is gone. -->
@@ -212,11 +212,11 @@
     <!-- Reply after starting ISS tracking. %1$s: "aprs" or "sstv". -->
     <string name="web_iss_tracking">Verfolge die ISS (%1$s)</string>
     <!-- Reply after the orbit download. -->
-    <string name="web_sat_updated">Bahndaten und FM-Satellitenliste aktualisiert</string>
+    <string name="web_sat_updated">Orbitdaten und FM-Satellitenliste aktualisiert</string>
     <!-- Shown on a satellite's card: the orbit download has no orbit for it. -->
-    <string name="web_sat_no_orbit_it">Im Download keine Bahndaten dafür</string>
+    <string name="web_sat_no_orbit_it">Im Download keine Orbitdaten dafür</string>
     <!-- Error: no orbit for a satellite. %1$s: the satellite's name. -->
-    <string name="web_sat_no_orbit">Keine Bahndaten für %1$s</string>
+    <string name="web_sat_no_orbit">Keine Orbitdaten für %1$s</string>
     <!-- Reply after starting to track a satellite pass. %1$s: the satellite's name. -->
     <string name="web_sat_tracking">Verfolge %1$s</string>
     <!-- Error: the pass to track is already over. -->
@@ -288,7 +288,7 @@
     <!-- Group heading on the web Settings page (shown in capitals). Short. -->
     <string name="web_set_group_logbook">Logbuch</string>
     <!-- Group heading on the web Settings page (shown in capitals). Short. -->
-    <string name="web_set_group_coverage">Reichweite</string>
+    <string name="web_set_group_coverage">Abdeckung</string>
     <!-- Group heading on the web Settings page (shown in capitals). Short. -->
     <string name="web_set_group_car">Auto</string>
     <!-- Setting name on the web Settings page. One line. -->
@@ -306,7 +306,7 @@
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_volptt_label">Lauter-Taste sendet</string>
     <!-- Setting description under its name. -->
-    <string name="web_set_volptt_sub">Solange am Telefon die Seite Funk offen ist</string>
+    <string name="web_set_volptt_sub">Solange am Telefon die Intercom-Seite offen ist</string>
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_customptt_label">Eigene PTT-Taste</string>
     <!-- Setting description under its name. "Device → Custom PTT key" names the phone's setting. -->
@@ -340,13 +340,13 @@
     <!-- Setting description under its name. Two lines. -->
     <string name="web_set_roaming_sub">Wechselt unterwegs auf das nächstgelegene Relais dieser Zone mit derselben Sprechgruppe (braucht Relaiskanäle mit Standort)</string>
     <!-- Setting name on the web Settings page. One line. -->
-    <string name="web_set_coverage_label">Reichweiten-Protokoll</string>
+    <string name="web_set_coverage_label">Abdeckungs-Log</string>
     <!-- Setting description under its name. -->
-    <string name="web_set_coverage_sub">Zeichnet Signal und Auftastungen mit GPS für die Reichweitenkarten auf</string>
+    <string name="web_set_coverage_sub">Zeichnet Signal und Auftastungen mit GPS für die Abdeckungskarten auf</string>
     <!-- Setting name on the web Settings page. One line. -->
-    <string name="web_set_covincar_label">Reichweite im Auto protokollieren</string>
+    <string name="web_set_covincar_label">Abdeckung im Auto loggen</string>
     <!-- Setting description under its name. Android Auto is a product name. -->
-    <string name="web_set_covincar_sub">Reichweiten-Protokoll, solange Android Auto verbunden ist</string>
+    <string name="web_set_covincar_sub">Abdeckungs-Log, solange Android Auto verbunden ist</string>
     <!-- Setting name on the web Settings page. One line. Android Auto is a product name. -->
     <string name="web_set_carmic_label">Automikrofon in Android Auto</string>
     <!-- Setting description under its name. -->
@@ -374,7 +374,7 @@
     <!-- Reply after Take over on the web Settings page. -->
     <string name="web_radio_takeover">Funkgerät wird übernommen</string>
     <!-- Reply after Hand back on the web Settings page. -->
-    <string name="web_radio_handback">Funkgerät wird an die Hersteller-App zurückgegeben</string>
+    <string name="web_radio_handback">Funkgerät wird an die Original-App zurückgegeben</string>
     <!-- Error: the packet engine has not started yet. -->
     <string name="web_pkt_not_ready">Packet-Engine nicht bereit</string>
     <!-- Error in the APRS settings: the callsign's format. -->
@@ -474,7 +474,7 @@
     <!-- Error in the contact form. SSID is the usual ham word. -->
     <string name="web_contact_call_format">Rufzeichen: Buchstaben und Ziffern, optional mit -SSID</string>
     <!-- Error in the contact form: the home location. -->
-    <string name="web_contact_home">Heimatstandort: ein Locator oder Breite, Länge</string>
+    <string name="web_contact_home">Home: ein Locator oder Breite, Länge</string>
     <!-- Error in the contact form. -->
     <string name="web_contact_id_range">Die DMR-ID muss zwischen 1 und 16777215 liegen</string>
     <!-- Error in the contact form. RIC is a pager address. -->

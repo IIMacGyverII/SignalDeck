@@ -18,9 +18,9 @@
     <!-- Licence line of a listen-only channel list (weather, marine, railroad). One line. -->
     <string name="channels_preset_licence_rx_only">Nur Empfang</string>
     <!-- Licence line of an amateur channel list. One line. -->
-    <string name="channels_preset_licence_amateur">Amateurfunkzulassung nötig</string>
+    <string name="channels_preset_licence_amateur">Amateurfunklizenz nötig</string>
     <!-- Licence line of the satellite list: listening is free. One line. -->
-    <string name="channels_preset_licence_amateur_tx">Zum Senden ist eine Amateurfunkzulassung nötig</string>
+    <string name="channels_preset_licence_amateur_tx">Zum Senden ist eine Amateurfunklizenz nötig</string>
     <!-- Description of the FRS channel list (US Family Radio Service). Paragraph. -->
     <string name="channels_preset_frs_about">Family Radio Service (USA): die 22 Kanäle der Walkie-Talkies aus dem Supermarktregal. Schmalband, geringe Leistung.</string>
     <!-- Description of the GMRS channel list. Paragraph. -->
@@ -34,7 +34,7 @@
     <!-- Description of the Marine VHF channel list. Paragraph. -->
     <string name="channels_preset_marine_about">Seefunkkanäle (UKW) zum Mithören von Booten, Häfen und Küstenwache: 16 ist Not- und Anrufkanal, 9 Anrufkanal unter Sportbooten, 13 Brücke zu Brücke, 22A die US-Küstenwache. Nur Empfang: Dieses Funkgerät ist kein Seefunkgerät.</string>
     <!-- Description of the DMR simplex channel list. Paragraph. -->
-    <string name="channels_preset_dmr_about">DMR-Simplex im Amateurfunk: die Kanäle, die die meisten DMR-Funkgeräte haben, alle mit Colorcode 1, Zeitschlitz 1, Sprechgruppe 99.</string>
+    <string name="channels_preset_dmr_about">DMR-Simplex im Amateurfunk: die Kanäle, die die meisten DMR-Funkgeräte haben, alle mit Colorcode 1, Zeitkanal 1, Sprechgruppe 99.</string>
     <!-- Description of the US business channel list; "dot" and "star" are the colour names of these frequencies. Paragraph. -->
     <string name="channels_preset_biz_about">Business-Itinerant-Kanäle (USA): die „Dot“- und „Star“-Frequenzen, auf die Miet- und Ladenfunkgeräte voreingestellt sind, genutzt bei Veranstaltungen, in Geschäften, auf Höfen und Baustellen. Mithören ist frei. Auf VHF arbeitet dieses Funkgerät nur breitbandig, und das lassen diese Kanäle zum Senden nicht mehr zu: Sprich auf den UHF-Kanälen.</string>
     <!-- Licence line of the business list. One line. -->
@@ -315,7 +315,7 @@
     <!-- Title of the Region sheet. One or two words. -->
     <string name="channels_region_title">Region</string>
     <!-- Intro paragraph of the Region sheet. -->
-    <string name="channels_region_intro">Die Region legt die Standardwerte von SignalDeck fest: die APRS-Frequenz, die Anruf- und SSTV-Frequenzen, welche lizenzfreien Funkdienste zuerst angeboten werden, ob es Wetterfunk gibt, die Grenzen der Amateurfunkbänder für die Morsekennung und die Kennungs-Erinnerung sowie Kilometer oder Meilen. Sie sendet nie, startet keine Betriebsart und ändert keinen deiner Kanäle. Für deine Zulassung und die Vorschriften deines Landes bleibst du selbst verantwortlich.</string>
+    <string name="channels_region_intro">Die Region legt die Standardwerte von SignalDeck fest: die APRS-Frequenz, die Anruf- und SSTV-Frequenzen, welche lizenzfreien Funkdienste zuerst angeboten werden, ob es Wetterfunk gibt, die Grenzen der Amateurfunkbänder für die Morsekennung und die Kennungs-Erinnerung sowie Kilometer oder Meilen. Sie sendet nie, startet keine Betriebsart und ändert keinen deiner Kanäle. Für deine Lizenz und die Vorschriften deines Landes bleibst du selbst verantwortlich.</string>
     <!-- Under the region name: %1$s how it was chosen ("from your SIM"), %2$s the country the mobile network reports. One line. -->
     <string name="channels_region_how_roam">%1$s (das Netz meldet %2$s)</string>
     <!-- Under the region name, for a country with no entry of its own: %1$s how it was chosen, %2$d the IARU region number (1 to 3). One or two lines. -->
@@ -376,7 +376,7 @@
     <!-- Hint of the Station-ID editor: %1$s is the region's value ("Every 10 min"). Two lines. -->
     <string name="channels_region_edit_minutes">Minuten zwischen zwei Kennungen (1 bis 60): Erinnerung und Morsekennung richten sich danach. Wert der Region: %1$s.</string>
     <!-- Hint of the APRS frequency editor; Reset is the chip on the Region sheet. Two lines. -->
-    <string name="channels_region_edit_aprs">In MHz. APRS-Mithören, Baken, Telemetrie und das iGate nutzen sie. Der Wert deiner Region ist nur einen Tipp entfernt (Zurücksetzen).</string>
+    <string name="channels_region_edit_aprs">In MHz. APRS-Mithören, Beacons, Telemetrie und das iGate nutzen sie. Der Wert deiner Region ist nur einen Tipp entfernt (Zurücksetzen).</string>
     <!-- Hint of a calling or SSTV frequency editor; Reset is the chip on the Region sheet. One or two lines. -->
     <string name="channels_region_edit_mhz">In MHz, 0 für keine. Der Wert deiner Region ist nur einen Tipp entfernt (Zurücksetzen).</string>
     <!-- Toast when the station-ID minutes are out of range. Short. -->
@@ -408,7 +408,7 @@
     <!-- Warning when a DMR repeater lists no talkgroups (toast). One line. -->
     <string name="channels_rep_warn_no_tgs">für dieses Relais sind keine Sprechgruppen bekannt</string>
     <!-- Warning in the programming preview: %1$d the time slot (1 or 2), %2$d how many talkgroups it has, %3$d how many fit. One line. -->
-    <string name="channels_rep_warn_truncated">Zeitschlitz %1$d hat %2$d Sprechgruppen; nur die ersten %3$d werden programmiert</string>
+    <string name="channels_rep_warn_truncated">Zeitkanal %1$d hat %2$d Sprechgruppen; nur die ersten %3$d werden programmiert</string>
     <!-- Repeater sheet status: the BrandMeister list could not be loaded. Keep the trailing space (the next status follows). Short. -->
     <string name="channels_rep_unavailable_bm">BrandMeister nicht erreichbar.</string>
     <!-- Repeater sheet status: the hearham list could not be loaded. Keep the trailing space. Short. -->
@@ -522,15 +522,15 @@
 
     <!-- ===== Channel store: importing the stock app's channels ===== -->
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). The stock app's channel database could not be read. Short. -->
-    <string name="channels_store_stock_unreadable">Kanäle der Hersteller-App nicht lesbar</string>
+    <string name="channels_store_stock_unreadable">Kanäle der Original-App nicht lesbar</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$s is a technical folder listing for the bug report. Short. -->
-    <string name="channels_store_stock_unreadable_ls">Kanäle der Hersteller-App nicht lesbar: %1$s</string>
+    <string name="channels_store_stock_unreadable_ls">Kanäle der Original-App nicht lesbar: %1$s</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). QuickChat is the stock app's name; %1$s is a technical folder listing. Short. -->
     <string name="channels_store_quickchat_unreadable">QuickChat-Kanäle nicht lesbar: %1$s</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). QuickChat is the stock app's name. Keep the "; " at the end (another note may follow). -->
     <string name="channels_store_quickchat_no_contacts">keine QuickChat-Kontaktdatenbank;</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$s is a technical folder listing. Short. -->
-    <string name="channels_store_agold_unreadable">die Kanäle der Hersteller-App sind nicht lesbar: %1$s</string>
+    <string name="channels_store_agold_unreadable">die Kanäle der Original-App sind nicht lesbar: %1$s</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). The chosen stock area (%1$d is its number) holds no channels. Short. -->
     <string name="channels_store_area_empty">Bereich %1$d enthält keine Kanäle</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$d channels left out, %2$s the bands this radio tunes ("400–470 MHz"). One line. -->
@@ -664,7 +664,7 @@
     <!-- Dialog title on first start: import the stock app's channels? Short. -->
     <string name="channels_list_import_title">Deine Kanäle importieren?</string>
     <!-- Dialog message on first start. Device → Re-import names a button. Paragraph. -->
-    <string name="channels_list_import_message">SignalDeck hat noch keine Kanäle. Die Kanäle aus der Funk-App des Herstellers importieren?\n\nMit „Leer starten“ legst du stattdessen eigene an. Importieren kannst du später jederzeit mit Gerät → Neu importieren.</string>
+    <string name="channels_list_import_message">SignalDeck hat noch keine Kanäle. Die Kanäle aus der Original-App importieren?\n\nMit „Leer starten“ legst du stattdessen eigene an. Importieren kannst du später jederzeit mit Gerät → Neu importieren.</string>
     <!-- Dialog button: do not import, start with no channels. Short. -->
     <string name="channels_list_import_start_empty">Leer starten</string>
     <!-- Toast when the channel list changed (e.g. from SignalDeck Web) while channels were ticked. One line. -->
@@ -717,7 +717,7 @@
     <!-- Repeater details while its talkgroups load. Short. -->
     <string name="channels_rep_loading_tgs">Sprechgruppen werden geladen…</string>
     <!-- Repeater details: BrandMeister lists no talkgroups. Two lines. -->
-    <string name="channels_rep_no_tgs">Für dieses Relais gibt es keine Sprechgruppenliste. Ein Hörkanal pro Zeitschlitz wird trotzdem angelegt, sobald eine Sprechgruppe bekannt ist; TGs kannst du im Kanaleditor von Hand hinzufügen.</string>
+    <string name="channels_rep_no_tgs">Für dieses Relais gibt es keine Sprechgruppenliste. Ein Hörkanal pro Zeitkanal wird trotzdem angelegt, sobald eine Sprechgruppe bekannt ist; TGs kannst du im Kanaleditor von Hand hinzufügen.</string>
     <!-- Section heading (capitals) above the repeater's talkgroups. One line. -->
     <string name="channels_rep_tgs_section">Sprechgruppen (markiere die, für die du einen Sprechkanal willst)</string>
     <!-- Button on the repeater details sheet. Short. -->
@@ -890,13 +890,13 @@
     <!-- Label above a field in the contact editor. One line. RIC is a pager address. -->
     <string name="channels_contact_f_rics">Pager-RICs (eine oder mehrere, z. B. 1234567; 1234568)</string>
     <!-- Label above a field in the contact editor. One line. -->
-    <string name="channels_contact_f_home">Heimatstandort (Locator oder Breite, Länge)</string>
+    <string name="channels_contact_f_home">Home-Standort (Locator oder Breite, Länge)</string>
     <!-- Label above a field in the contact editor. One line. QTH is the ham word for a home station's place. -->
     <string name="channels_contact_f_home_label">Bezeichnung des Standorts (Ort, QTH)</string>
     <!-- Hint in the contact editor: %1$s the last position, %2$s how long ago. Two lines. -->
-    <string name="channels_contact_last_hint">Zuletzt gehört bei %1$s %2$s: von der App eingetragen, getrennt vom Heimatstandort.</string>
+    <string name="channels_contact_last_hint">Zuletzt gehört bei %1$s %2$s: von der App eingetragen, getrennt vom Home-Standort.</string>
     <!-- The same with %3$s, how it was heard (APRS, M17…). Two lines. -->
-    <string name="channels_contact_last_hint_by">Zuletzt gehört bei %1$s %2$s über %3$s: von der App eingetragen, getrennt vom Heimatstandort.</string>
+    <string name="channels_contact_last_hint_by">Zuletzt gehört bei %1$s %2$s über %3$s: von der App eingetragen, getrennt vom Home-Standort.</string>
     <!-- Label above a field in the contact editor. One line. -->
     <string name="channels_contact_f_notes">Notizen</string>
     <!-- Title of the contact editor for a new contact. Short. -->
@@ -912,13 +912,13 @@
     <!-- Why a contact was not saved. One line. -->
     <string name="channels_contact_err_empty">Ein Kontakt braucht eine DMR-ID, ein Rufzeichen oder eine Pager-RIC</string>
     <!-- Why a contact was not saved; EM12ab is an example grid square. One line. -->
-    <string name="channels_contact_err_home">Heimatstandort: ein Locator (EM12ab) oder Breite, Länge</string>
+    <string name="channels_contact_err_home">Home: ein Locator (EM12ab) oder Breite, Länge</string>
     <!-- Toast when a contact cannot be saved; %1$s is the reason. One line. -->
     <string name="channels_contact_not_saved">Nicht gespeichert: %1$s</string>
     <!-- On a contact's sheet: %1$s its pager RICs. Short. -->
     <string name="channels_contact_pager">Pager %1$s</string>
     <!-- Label of a line on the contact's sheet: their home location. Short. -->
-    <string name="channels_contact_home">Zuhause</string>
+    <string name="channels_contact_home">Home</string>
     <!-- Label of a line on the contact's sheet: where and when they were last heard. Short. -->
     <string name="channels_contact_last_heard">Zuletzt gehört</string>
     <!-- On the contact's sheet: %1$s how long ago, %2$s how they were heard (APRS, M17…). Short. -->

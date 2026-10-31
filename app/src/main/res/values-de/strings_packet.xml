@@ -195,9 +195,9 @@
     <!-- History line: an APRS emergency status report went out (no GPS fix). -->
     <string name="packet_emergency_sent_status">🆘 Notfallstatus (ohne GPS-Position) gesendet</string>
     <!-- History line: a position beacon went out. -->
-    <string name="packet_beacon_sent">📡 Bake gesendet</string>
+    <string name="packet_beacon_sent">📡 Beacon gesendet</string>
     <!-- History line: a position beacon went out through a path. %1$s the path (WIDE1-1,WIDE2-1 or ARISS). -->
-    <string name="packet_beacon_sent_via">📡 Bake gesendet über %1$s</string>
+    <string name="packet_beacon_sent_via">📡 Beacon gesendet über %1$s</string>
     <!-- ==== DTMF. -->
     <!-- Shown instead of the digits when a DTMF remote-control command (with its PIN) was heard. Short, lower case. -->
     <string name="packet_dtmf_remote_command">Fernsteuerbefehl</string>
@@ -404,7 +404,7 @@
     <string name="packet_kiss_err_running">läuft bereits auf Port %1$d</string>
     <!-- ==== Coverage map (repeater coverage logging and the terrain prediction). -->
     <!-- History line: coverage logging cannot start without the location permission. -->
-    <string name="packet_cov_event_no_permission">📶 Das Reichweiten-Protokoll braucht die Standortberechtigung</string>
+    <string name="packet_cov_event_no_permission">📶 Das Abdeckungs-Log braucht die Standortberechtigung</string>
     <!-- History line: the repeater answered your transmission here. %1$s the channel name, %2$d the repeater's signal in dBm, %3$s in S units (S7). -->
     <string name="packet_cov_event_keyed">📶 %1$s von hier aufgetastet (Nachlauf %2$d dBm, %3$s)</string>
     <!-- History line: the repeater did not answer your transmission here. %1$s the channel name. -->
@@ -446,7 +446,7 @@
     <!-- Button at the bottom of the APRS screen that opens the APRS message sheet. Short (three share a row). -->
     <string name="packet_aprs_message">Nachricht</string>
     <!-- Button at the bottom of the APRS screen that sends a position beacon. Short (three share a row). -->
-    <string name="packet_aprs_beacon">Bake</string>
+    <string name="packet_aprs_beacon">Beacon</string>
     <!-- Button at the bottom of the APRS screen that opens the map. Short (three share a row). -->
     <string name="packet_aprs_map">Karte</string>
     <!-- ==== Subtitle of the APRS screen: parts joined with " · ". -->
@@ -464,9 +464,9 @@
     <string name="packet_aprs_sub_no_call">Rufzeichen in den Einstellungen eintragen</string>
     <!-- ==== Switch chips on the APRS screen (tap to turn on or off). One short line each. -->
     <!-- Chip: automatic beacons off. -->
-    <string name="packet_aprs_chip_beacon_off">Bake aus</string>
+    <string name="packet_aprs_chip_beacon_off">Beacon aus</string>
     <!-- Chip: a beacon every %1$d minutes. -->
-    <string name="packet_aprs_chip_beacon_min">Bake %1$d min</string>
+    <string name="packet_aprs_chip_beacon_min">Beacon %1$d min</string>
     <!-- Chip: SmartBeaconing (a feature name, usually kept). -->
     <string name="packet_aprs_chip_smart">SmartBeacon</string>
     <!-- Chip: acknowledge messages automatically. -->
@@ -510,9 +510,9 @@
     <!-- APRS screen card: what the packet was (a position report). Lower case, short. -->
     <string name="packet_aprs_kind_pos">Position</string>
     <!-- APRS screen card: what the packet was (your beacon). Lower case, short. -->
-    <string name="packet_aprs_kind_beacon">deine Bake</string>
+    <string name="packet_aprs_kind_beacon">dein Beacon</string>
     <!-- APRS screen card: what the packet was (your beacon over APRS-IS). Lower case, short. -->
-    <string name="packet_aprs_kind_is_beacon">Internet-Bake</string>
+    <string name="packet_aprs_kind_is_beacon">Internet-Beacon</string>
     <!-- APRS screen card: what the packet was (a packet you repeated). Lower case, short. -->
     <string name="packet_aprs_kind_digi">von dir digipeatet</string>
     <!-- APRS screen card: what the packet was (a status report). Lower case, short. -->
@@ -531,7 +531,7 @@
     <!-- Screen reader label of the map's close button. -->
     <string name="packet_map_cd_close">Karte schließen</string>
     <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
-    <string name="packet_map_pill_coverage">Reichweite</string>
+    <string name="packet_map_pill_coverage">Abdeckung</string>
     <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
     <string name="packet_map_pill_repeaters">Relais</string>
     <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
@@ -699,27 +699,27 @@
     <string name="packet_map_cell_no_reply_body">Das Relais hat auf deine Aussendungen von hier nicht geantwortet, obwohl es dir anderswo antwortet. Versuche es mit hoher Leistung oder von einer besseren Stelle.</string>
     <!-- ==== Coverage maps sheet (and its first-time introduction). -->
     <!-- Title of the coverage maps sheet. One line. -->
-    <string name="packet_cov_title">Reichweitenkarten</string>
+    <string name="packet_cov_title">Abdeckungskarten</string>
     <!-- Badge on the coverage introduction: a new feature. Capitals, one word. -->
     <string name="packet_cov_new">NEU</string>
     <!-- Explanation on the coverage introduction. A few lines. -->
-    <string name="packet_cov_intro_1">Finde heraus, wo deine Relais wirklich funktionieren. Mit eingeschaltetem Protokoll merkt sich die App, wie stark jedes Relais überall dort ist, wo du es hörst, und ob es antwortet, wenn du sendest. Sei einfach wie gewohnt zu Fuß oder mit dem Auto unterwegs; die Karte füllt sich von selbst.</string>
+    <string name="packet_cov_intro_1">Finde heraus, wo deine Relais wirklich funktionieren. Mit eingeschaltetem Abdeckungs-Log merkt sich die App, wie stark jedes Relais überall dort ist, wo du es hörst, und ob es antwortet, wenn du sendest. Sei einfach wie gewohnt zu Fuß oder mit dem Auto unterwegs; die Karte füllt sich von selbst.</string>
     <!-- Explanation on the coverage introduction (Heard and Key-ups are the layer names). A few lines. -->
     <string name="packet_cov_intro_2">Zwei Ebenen: Gehört zeigt das Signal des Relais bei dir, farbig von schwach (blau) bis stark (rot). Auftasten zeigt, wo deine eigenen Aussendungen das Relais geöffnet haben (grün) oder keine Antwort bekamen (rot) – meist die kürzere Reichweite.</string>
     <!-- Explanation on the coverage introduction (Nearby repeaters is a page name). A few lines. -->
     <string name="packet_cov_intro_3">Das funktioniert auf Kanälen mit Standort; Kanäle aus „Relais in der Nähe“ haben schon einen. Es wird nichts verschickt: Alles bleibt auf dem Telefon und lässt sich exportieren.</string>
     <!-- Button on the coverage introduction. Short. -->
-    <string name="packet_cov_turn_on">Reichweiten-Protokoll einschalten</string>
+    <string name="packet_cov_turn_on">Abdeckungs-Log einschalten</string>
     <!-- Toast after coverage logging is turned on. One line. -->
-    <string name="packet_cov_on">Reichweiten-Protokoll ist an</string>
+    <string name="packet_cov_on">Abdeckungs-Log ist an</string>
     <!-- Toast after coverage logging is turned off. One line. -->
-    <string name="packet_cov_off">Reichweiten-Protokoll ist aus</string>
+    <string name="packet_cov_off">Abdeckungs-Log ist aus</string>
     <!-- Explanation on the coverage maps sheet. A few lines. -->
     <string name="packet_cov_hint">Gehört: das Signal des Relais an jedem Ort, an dem du es gehört hast. Auftasten: Orte, an denen deine Aussendung das Relais geöffnet hat (grün) oder keine Antwort bekam (rot).</string>
     <!-- Explanation on the coverage maps sheet, on a radio without signal readings. A few lines. -->
     <string name="packet_cov_hint_no_rssi">Gehört: das Signal des Relais an jedem Ort, an dem du es gehört hast. Auftasten: Orte, an denen deine Aussendung das Relais geöffnet hat (grün) oder keine Antwort bekam (rot). Dieses Funkgerät liefert keine Signalwerte, deshalb zeichnet es nur Auftastversuche auf; die Ebene Gehört bleibt leer.</string>
     <!-- Switch on the coverage sheet. Short. -->
-    <string name="packet_cov_log">Reichweite protokollieren</string>
+    <string name="packet_cov_log">Abdeckung loggen</string>
     <!-- Under the Log coverage switch: %1$d signal readings and %2$d transmissions stored. -->
     <string name="packet_cov_log_sub">%1$d Messwerte, %2$d Aussendungen gespeichert</string>
     <!-- Button on the coverage sheet that transmits a short test. Short. -->
@@ -749,7 +749,7 @@
     <!-- Section heading on the coverage sheet. One line, capitals. -->
     <string name="packet_cov_pred_section">Geländevorhersage</string>
     <!-- Explanation on the coverage sheet. A few lines. -->
-    <string name="packet_cov_pred_pick">Wähle oben ein Relais (oder tippe auf der Karte auf ein Relais oder einen Kanal → Reichweite), um seine Reichweite aus dem Gelände vorherzusagen, noch bevor du etwas gemessen hast.</string>
+    <string name="packet_cov_pred_pick">Wähle oben ein Relais (oder tippe auf der Karte auf ein Relais oder einen Kanal → Abdeckung), um seine Reichweite aus dem Gelände vorherzusagen, noch bevor du etwas gemessen hast.</string>
     <!-- Switch on the coverage sheet. Short. -->
     <string name="packet_cov_pred_show">Vorhersage zeigen</string>
     <!-- Under that switch: %1$s the repeater. -->
@@ -781,9 +781,9 @@
     <!-- Toast after the coverage export: %1$s the folder name. Keep the path and file names. -->
     <string name="packet_cov_exported">Gespeichert unter Download/DMR/Coverage/%1$s: zwei CSV-Dateien und coverage.kml für Google Earth</string>
     <!-- Title of the dialog that deletes all coverage data. One line. -->
-    <string name="packet_cov_clear_all">Alle Reichweitendaten löschen?</string>
+    <string name="packet_cov_clear_all">Alle Abdeckungsdaten löschen?</string>
     <!-- Title of the dialog that deletes one repeater's coverage data: %1$s its name. One line. -->
-    <string name="packet_cov_clear_one">Reichweitendaten für %1$s löschen?</string>
+    <string name="packet_cov_clear_one">Abdeckungsdaten für %1$s löschen?</string>
     <!-- Text of the clear dialog. -->
     <string name="packet_cov_clear_msg">Die gespeicherten Messwerte und Auftastversuche werden vom Telefon gelöscht. Exportiere vorher, wenn du eine Kopie behalten willst.</string>
     <!-- Last choice pill (and dialog button) that takes any number. Very short. -->
@@ -794,11 +794,11 @@
     <string name="packet_cov_set_err">Zwischen %1$d und %2$d</string>
     <!-- ==== Map help sheet (the Help pill). -->
     <!-- Explanation on the map help sheet. A few lines. -->
-    <string name="packet_map_help_1">Grüne Punkte sind APRS-Stationen, die das Funkgerät gehört hat, an ihrer zuletzt gemeldeten Position (der Filter APRS blendet sie ein oder aus). Cyanfarbene Rauten sind FM-Relais, violette Rauten DMR-Relais im Umkreis von „Relais in der Nähe“. Gelbe Stecknadeln sind deine Kanäle mit Standort (im Kanaleditor festlegen). Der blaue Punkt bist du.</string>
+    <string name="packet_map_help_1">Grüne Punkte sind APRS-Stationen, die das Funkgerät gehört hat, an ihrer zuletzt gemeldeten Position (der Filter APRS blendet sie ein oder aus). Cyanfarbene Rauten sind FM-Relais, violette Rauten DMR-Relais im Umkreis von „Relais in der Nähe“. Orangefarbene Stecknadeln sind deine Kanäle mit Standort (im Kanaleditor festlegen). Der blaue Punkt bist du.</string>
     <!-- Explanation on the map help sheet. A few lines. -->
     <string name="packet_map_help_2">Zum Verschieben ziehen, zum Zoomen mit zwei Fingern spreizen oder doppelt tippen, für Details auf eine Markierung tippen. Die Filter oben blenden jede Art ein oder aus; die Schaltflächen rechts zoomen, springen zu deinem Standort zurück und zeigen alles auf dem Bildschirm.</string>
     <!-- Explanation on the map help sheet. A few lines. -->
-    <string name="packet_map_help_3">Reichweite: Der violette Filter zeigt, wo du jedes Relais gehört hast (Gehört) und wo deine Aussendungen es geöffnet haben (Auftasten). Dort schaltest du das Protokoll ein; Hilfe → Reichweitenkarten erklärt alles.</string>
+    <string name="packet_map_help_3">Abdeckung: Der violette Filter zeigt, wo du jedes Relais gehört hast (Gehört) und wo deine Aussendungen es geöffnet haben (Auftasten). Dort schaltest du das Abdeckungs-Log ein; Hilfe → Abdeckungskarten erklärt alles.</string>
     <!-- Explanation on the map help sheet. A few lines. -->
     <string name="packet_map_help_4">Die Kartenkacheln kommen von OpenStreetMap und bleiben 30 Tage auf dem Telefon gespeichert, so dass Orte, die du dir angesehen hast, auch ohne Verbindung angezeigt werden.</string>
 
@@ -899,7 +899,7 @@
     <!-- Kind of station found: a station identifying itself. Short. -->
     <string name="packet_finder_kind_id">Stationskennung</string>
     <!-- Kind of station found: a beacon. Short. -->
-    <string name="packet_finder_kind_beacon">Bake</string>
+    <string name="packet_finder_kind_beacon">Beacon</string>
     <!-- Kind of station found: any other packet station. Short. -->
     <string name="packet_finder_kind_station">Packet-Station</string>
     <!-- Packet finder status: it has not run yet. One line. -->
@@ -1033,9 +1033,9 @@
     <!-- Button on the PKT sheet that opens the APRS message sheet. Short (two buttons share a row). -->
     <string name="packet_pkt_send_message">Nachricht senden</string>
     <!-- Button on the PKT sheet that sends one APRS position report. Short (two buttons share a row). -->
-    <string name="packet_pkt_position_beacon">Positionsbake</string>
+    <string name="packet_pkt_position_beacon">Positions-Beacon</string>
     <!-- Toast after a position beacon is queued for sending. One line. -->
-    <string name="packet_pkt_beacon_queued">Bake eingereiht</string>
+    <string name="packet_pkt_beacon_queued">Beacon eingereiht</string>
     <!-- Button on the PKT sheet that opens the APRS object sheet. Short (two buttons share a row). -->
     <string name="packet_pkt_object">Objekt …</string>
     <!-- Button on the PKT sheet that opens the APRS bulletin sheet. Short (two buttons share a row). -->
@@ -1065,7 +1065,7 @@
     <!-- Toast after ISS APRS stops. One line. -->
     <string name="packet_pkt_iss_aprs_stopped">ISS-APRS gestoppt</string>
     <!-- Button on the PKT sheet that sends a position report through the space station. Short (two buttons share a row). -->
-    <string name="packet_pkt_iss_beacon">Bake über die ISS</string>
+    <string name="packet_pkt_iss_beacon">Beacon über die ISS</string>
     <!-- Automatic beacons line: they are off. Lower case (inside the sentence). -->
     <string name="packet_pkt_auto_off">aus</string>
     <!-- Automatic beacons line: timed beacons. %1$d minutes. Lower case. -->
@@ -1077,9 +1077,9 @@
     <!-- Automatic beacons line, added to the list. Lower case. -->
     <string name="packet_pkt_auto_weather">Wetter alle 30 min</string>
     <!-- Hint on the PKT sheet. %1$s what goes out automatically ("every 15 min, telemetry every 30 min"), %2$s the APRS frequency. -->
-    <string name="packet_pkt_auto_here">Automatische Baken: %1$s (nur auf %2$s, einstellbar in den Einstellungen).</string>
+    <string name="packet_pkt_auto_here">Automatische Beacons: %1$s (nur auf %2$s, einstellbar in den Einstellungen).</string>
     <!-- Hint on the PKT sheet when the radio cannot tune the APRS frequency. %1$s what goes out automatically, %2$s the APRS frequency. -->
-    <string name="packet_pkt_auto_away">Automatische Baken: %1$s (sie gehen auf %2$s raus, das dieses Funkgerät nicht einstellen kann).</string>
+    <string name="packet_pkt_auto_away">Automatische Beacons: %1$s (sie gehen auf %2$s raus, das dieses Funkgerät nicht einstellen kann).</string>
     <!-- Sentence after the automatic beacons line when the two-way iGate is on. %1$d messages so far (English keeps the plural form even for 1). -->
     <plurals name="packet_pkt_igate_on">
         <item quantity="one">Zwei-Wege-iGate an: %1$d Internet-Nachricht auf Funk weitergeleitet.</item>
@@ -1120,11 +1120,11 @@
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
     <string name="packet_pkt_passive_away_digi">Passives Dekodieren läuft auf %1$s. Dieses Funkgerät kann %2$s MHz nicht einstellen, deshalb gibt es kein Mithören: APRS wird auf deinen eigenen Kanälen dekodiert und WIDE1-1 digipeatet. Dein Kanal kommt zurück, wenn du stoppst.</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
-    <string name="packet_pkt_parrot_section">Simplex-Relais (Papagei)</string>
+    <string name="packet_pkt_parrot_section">Simplex-Relais (Parrot)</string>
     <!-- Button on the PKT sheet that stops the simplex repeater. Short (two buttons share a row). -->
-    <string name="packet_pkt_parrot_stop">Papagei stoppen</string>
+    <string name="packet_pkt_parrot_stop">Parrot stoppen</string>
     <!-- Button on the PKT sheet that starts the simplex repeater. Short (two buttons share a row). -->
-    <string name="packet_pkt_parrot_start">Papagei auf diesem Kanal</string>
+    <string name="packet_pkt_parrot_start">Parrot auf diesem Kanal</string>
     <!-- Start of the parrot hint while it runs. %1$d transmissions repeated so far. -->
     <string name="packet_pkt_parrot_on">🦜 An, bisher %1$d wiederholt.</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
@@ -1191,11 +1191,11 @@
     <!-- Button on the PKT sheet that opens the fox hunt. Short (two buttons share a row). -->
     <string name="packet_pkt_fox">Fuchsjagd</string>
     <!-- Start of the fox hunt hint while the fox beacon transmits. -->
-    <string name="packet_pkt_fox_on">🦊 Die Fuchssender ist an.</string>
+    <string name="packet_pkt_fox_on">🦊 Der Fuchssender ist an.</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
     <string name="packet_pkt_fox_hint">Finde einen versteckten Sender: Signalstärke live, Kompasspeilungen und eine Schätzung, wo der Fuchs ist. Oder sei selbst der Fuchs.</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
-    <string name="packet_pkt_fox_hint_tx">Sei der Fuchs: eine Bake, die andere suchen. Dieses Funkgerät meldet keine Signalstärke und kann deshalb selbst keinen Fuchs jagen.</string>
+    <string name="packet_pkt_fox_hint_tx">Sei der Fuchs: ein Beacon, das andere suchen. Dieses Funkgerät meldet keine Signalstärke und kann deshalb selbst keinen Fuchs jagen.</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
     <string name="packet_pkt_forms_section">Nachrichtenformulare</string>
     <!-- Button on the PKT sheet that opens the message forms; %1$d forms saved (ICS-213 is a form name). Short (two buttons share a row). -->
@@ -1494,7 +1494,7 @@
     <!-- Title of the APRS log. One line. -->
     <string name="packet_pkt_log_title">APRS-Log</string>
     <!-- The APRS log is empty. -->
-    <string name="packet_pkt_log_empty">Nachrichten, Bestätigungen, Baken, Digipeats und Statusmeldungen erscheinen hier, die neuesten zuerst.</string>
+    <string name="packet_pkt_log_empty">Nachrichten, Bestätigungen, Beacons, Digipeats und Statusmeldungen erscheinen hier, die neuesten zuerst.</string>
     <!-- APRS log row for a message to you: %1$s the sender and addressee ("💬 N0ABC → N0XYZ-7"). Note the two spaces. -->
     <string name="packet_pkt_log_for_you">%1$s  (für dich)</string>
     <!-- ==== DTMF heard list. -->
@@ -1523,7 +1523,7 @@
     <!-- Label above a text field on the APRS settings (the codes /[, />, /- stay). One line. -->
     <string name="packet_set_symbol">Symbol (Tabelle + Code, z. B. /[ Person, /> Auto, /- Haus)</string>
     <!-- Label above a text field on the APRS settings. One line. -->
-    <string name="packet_set_comment">Bakenkommentar</string>
+    <string name="packet_set_comment">Beacon-Kommentar</string>
     <!-- Label above a text field on the APRS settings. One line. -->
     <string name="packet_set_path">Digipeater-Pfad</string>
     <!-- Label above a text field on the APRS settings. One line. -->
@@ -1537,15 +1537,15 @@
     <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
     <string name="packet_set_is_passcode">Passcode (-1 = nur Empfang; wird nie angezeigt oder protokolliert)</string>
     <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
-    <string name="packet_set_is_beacon_min">Internet-Bake alle N Minuten (0 = aus)</string>
+    <string name="packet_set_is_beacon_min">Internet-Beacon alle N Minuten (0 = aus)</string>
     <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
-    <string name="packet_set_is_comment">Kommentar der Internet-Bake</string>
+    <string name="packet_set_is_comment">Kommentar des Internet-Beacons</string>
     <!-- Section heading in the APRS settings. %1$s the APRS frequency. One line, shown in capitals. -->
-    <string name="packet_set_auto_section">Automatische Baken (nur auf %1$s)</string>
+    <string name="packet_set_auto_section">Automatische Beacons (nur auf %1$s)</string>
     <!-- Choice pill for automatic beacons: timed. Short. -->
     <string name="packet_set_auto_every">Alle N Minuten</string>
     <!-- Label of the automatic beacon choice. Short. -->
-    <string name="packet_set_beacon">Bake</string>
+    <string name="packet_set_beacon">Beacon</string>
     <!-- Label above a text field on the APRS settings. One line. -->
     <string name="packet_set_beacon_min">Alle N Minuten (Modus „Alle N Minuten“)</string>
     <!-- Switch in the APRS settings. One or two lines. -->
@@ -1573,7 +1573,7 @@
     <!-- Choice pill: low power. Short. -->
     <string name="packet_set_power_low">Niedrig</string>
     <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
-    <string name="packet_set_power_hint">Gilt auf den Frequenzen, die die App selbst einstellt: APRS-Mithören auf %1$s (automatische Baken, Auto-Acks, Digipeats), ISS-APRS und seine Bake sowie SSTV auf 144,500. Nachrichten und Baken, die von einem deiner Kanäle aus gesendet werden, nutzen die Leistung dieses Kanals.</string>
+    <string name="packet_set_power_hint">Gilt auf den Frequenzen, die die App selbst einstellt: APRS-Mithören auf %1$s (automatische Beacons, Auto-Acks, Digipeats), ISS-APRS und sein Beacon sowie SSTV auf 144,500. Nachrichten und Beacons, die von einem deiner Kanäle aus gesendet werden, nutzen die Leistung dieses Kanals.</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
     <string name="packet_set_lead_section">Packet-Vorlauf (Test)</string>
     <!-- Label of the lead-in kind choice (tone, flags, silence). Short. -->

@@ -124,11 +124,11 @@
     <!-- Toast after a long-press on the VFO key turned VFO mode off. "VFO" stays as on the key. Short. -->
     <string name="intercom_main_vfo_off_toast">VFO aus</string>
     <!-- Title of the dialog that offers the new intercom look (long-press on the classic title). One line. -->
-    <string name="intercom_main_look_try_new">Neue Funk-Ansicht ausprobieren?</string>
+    <string name="intercom_main_look_try_new">Neue Intercom-Ansicht ausprobieren?</string>
     <!-- Title of the dialog that offers the classic intercom look (intercom menu). One line. -->
-    <string name="intercom_main_look_back_classic">Zurück zur klassischen Funk-Ansicht?</string>
+    <string name="intercom_main_look_back_classic">Zurück zur klassischen Intercom-Ansicht?</string>
     <!-- Message of the intercom look dialog: names the Device setting that does the same. -->
-    <string name="intercom_main_look_message">Das geht auch unter Gerät → Funkeinstellungen → Neue Funk-Ansicht.</string>
+    <string name="intercom_main_look_message">Das geht auch unter Gerät → Funkeinstellungen → Neue Intercom-Ansicht.</string>
     <!-- Button of the intercom look dialog: switch to the new look. Short (dialog button). -->
     <string name="intercom_main_look_new">Neue Ansicht</string>
     <!-- Button of the intercom look dialog: switch to the classic look. Short (dialog button). -->
@@ -142,13 +142,13 @@
     <!-- Intercom menu item: opens the nets sheet. One line. -->
     <string name="intercom_main_menu_nets">Funkrunden in der Nähe</string>
     <!-- Intercom menu item: opens the map and coverage sheet. One line. -->
-    <string name="intercom_main_menu_map">Karte &amp; Reichweite</string>
+    <string name="intercom_main_menu_map">Karte &amp; Abdeckung</string>
     <!-- Intercom menu item: opens the fox hunt (direction finding) sheet. One line. -->
     <string name="intercom_main_menu_fox">Fuchsjagd</string>
     <!-- Intercom menu item: opens the emergency sheet. One line. -->
     <string name="intercom_main_menu_emergency">Notfall</string>
     <!-- Intercom menu item: switch back to the classic intercom page. One line. -->
-    <string name="intercom_main_menu_classic">Klassische Funk-Ansicht</string>
+    <string name="intercom_main_menu_classic">Klassische Intercom-Ansicht</string>
     <!-- Screen-reader label of the left arrow beside the channel number. -->
     <string name="intercom_main_prev_channel">Vorheriger Kanal</string>
     <!-- Screen-reader label of the right arrow beside the channel number. -->
@@ -216,7 +216,7 @@
     <string name="intercom_splash_tagline">Erweiterte Funksteuerung</string>
     <!-- ===== Full-screen mode pages (ui/ModeScreen.java: APRS monitoring, SSTV receive, parrot) ===== -->
     <!-- Screen-reader label of the back arrow on a mode page: leaves the page, the mode keeps running. -->
-    <string name="intercom_mode_back">Zurück zum Funk (läuft weiter)</string>
+    <string name="intercom_mode_back">Zurück zu Intercom (läuft weiter)</string>
     <!-- Screen-reader label of the mode icon in a mode page's header, which opens the packet tools sheet. -->
     <string name="intercom_mode_all_packet_tools">Alle Packet-Werkzeuge</string>
     <!-- State line of a mode page (all caps): the radio is listening. Short. -->
@@ -273,7 +273,7 @@
     <!-- Section heading on the Last heard sheet: warnings and refusals of the last week. Shown in caps. One line. -->
     <string name="intercom_lastheard_section_alerts">Warnungen (letzte 7 Tage)</string>
     <!-- Section heading on the Last heard sheet: Android Auto and coverage-logging events. Shown in caps. One line. -->
-    <string name="intercom_lastheard_section_events">Auto und Reichweite</string>
+    <string name="intercom_lastheard_section_events">Auto und Abdeckung</string>
     <!-- Shown on the Last heard sheet when nothing has been heard. One line. -->
     <string name="intercom_lastheard_empty">Noch nichts gehört.</string>
     <!-- Second line of an alert or event row on Last heard. %1$s is the date and time, %2$s the channel name. One line. -->
@@ -329,15 +329,15 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_noreply_title">Keine Antwort vom Relais</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_noreply_text">Nachdem du auf diesem Relaiskanal gesendet hast, hat die App auf die Antwort des Relais gewartet (sein Signal, das nach dem Loslassen zurückkommt), aber keine gehört. Die Reichweitenkarte markiert diese Stelle als „Relais nicht erreicht“. Entweder hat das Relais dich nicht gehört, oder du konntest es nicht hören.</string>
+    <string name="intercom_lastheard_ex_noreply_text">Nachdem du auf diesem Relaiskanal gesendet hast, hat die App auf die Antwort des Relais gewartet (sein Signal, das nach dem Loslassen zurückkommt), aber keine gehört. Die Abdeckungskarte markiert diese Stelle als „Relais nicht erreicht“. Entweder hat das Relais dich nicht gehört, oder du konntest es nicht hören.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_keyed_title">Das Relais hat geantwortet</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_keyed_text">Nachdem du gesendet hast, kam das Signal des Relais zurück: Von dieser Stelle aus erreichst du es. Der Pegel ist der Nachlauf des Relais, wie er hier ankommt, und die Reichweitenkarte zeichnet ihn auf.</string>
+    <string name="intercom_lastheard_ex_keyed_text">Nachdem du gesendet hast, kam das Signal des Relais zurück: Von dieser Stelle aus erreichst du es. Der Pegel ist der Nachlauf des Relais, wie er hier ankommt, und die Abdeckungskarte zeichnet ihn auf.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
-    <string name="intercom_lastheard_ex_coverage_title">Reichweiten-Protokoll</string>
+    <string name="intercom_lastheard_ex_coverage_title">Abdeckungs-Log</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_coverage_text">Das Reichweiten-Protokoll zeichnet das Signal und dein Auftasten mit GPS für die Reichweitenkarten auf (Karte → Reichweite). Ist Gerät → Reichweite im Auto protokollieren eingeschaltet, startet es, wenn sich Android Auto verbindet, und stoppt bei der Trennung.</string>
+    <string name="intercom_lastheard_ex_coverage_text">Das Abdeckungs-Log zeichnet das Signal und dein Auftasten mit GPS für die Abdeckungskarten auf (Karte → Abdeckung). Ist Gerät → Abdeckung im Auto loggen eingeschaltet, startet es, wenn sich Android Auto verbindet, und stoppt bei der Trennung.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_rxonly_title">Kanal nur für Empfang</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -349,7 +349,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_busy_title">Kanal belegt</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_busy_text">Das Funkgerät hat das Senden abgelehnt, weil der Kanal belegt war: Eine andere Station war darauf, oder bei DMR war der Zeitschlitz des Relais belegt. Warte, bis er frei ist, und versuch es dann noch einmal.</string>
+    <string name="intercom_lastheard_ex_busy_text">Das Funkgerät hat das Senden abgelehnt, weil der Kanal belegt war: Eine andere Station war darauf, oder bei DMR war der Zeitkanal des Relais belegt. Warte, bis er frei ist, und versuch es dann noch einmal.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_repeaterid_title">Relaiskennung</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -361,7 +361,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_keyword_title">Stichwort gehört</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_keyword_text">Die Live-Untertitel haben eines deiner Stichwörter in empfangener Sprache erkannt. Die Stichwörter legst du auf der Funkseite fest: lange auf TXT drücken → Stichwort-Alarme.</string>
+    <string name="intercom_lastheard_ex_keyword_text">Die Live-Untertitel haben eines deiner Stichwörter in empfangener Sprache erkannt. Die Stichwörter legst du auf der Intercom-Seite fest: lange auf TXT drücken → Stichwort-Alarme.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_notsent_title">Nicht gesendet</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -418,7 +418,7 @@
     <!-- Kind of a history line: an Android Auto event. Lower case, one word. -->
     <string name="intercom_chhistory_kind_car">Auto</string>
     <!-- Kind of a history line: a coverage-logging event. Lower case, one word. -->
-    <string name="intercom_chhistory_kind_coverage">Reichweite</string>
+    <string name="intercom_chhistory_kind_coverage">Abdeckung</string>
     <!-- Kind of a history line: a channel change. Lower case, one word. -->
     <string name="intercom_chhistory_kind_channel">Kanal</string>
     <!-- ===== Android Auto screens (car templates: rows are short) ===== -->
@@ -538,7 +538,7 @@
     <!-- Separator between the parts of the widget and notification status line (a middle dot with a space each side). -->
     <string name="intercom_widget_sep"> ·</string>
     <!-- Part of the status line while coverage is being logged. Short. -->
-    <string name="intercom_widget_mapping">Reichweite wird erfasst</string>
+    <string name="intercom_widget_mapping">Abdeckung wird erfasst</string>
     <!-- Part of the status line while transmitting. All caps on purpose, short. -->
     <string name="intercom_widget_transmitting">SENDEN</string>
     <!-- Part of the status line while a signal is received. One word. -->
@@ -603,7 +603,7 @@
     <string name="intercom_autotrust_notloaded_short">Kabel abziehen und wieder einstecken</string>
     <!-- ==== VFO sheet (intercom VFO key) ==== -->
     <!-- Hint at the top of the VFO sheet. A few lines. -->
-    <string name="intercom_vfo_hint">Jede Frequenz einstellen, ohne einen Kanal zu speichern. Solange VFO an ist, ändern die Pfeile auf der Funkseite die Frequenz schrittweise; drücke lange auf VFO, um zu deinem Kanal zurückzukehren.</string>
+    <string name="intercom_vfo_hint">Jede Frequenz einstellen, ohne einen Kanal zu speichern. Solange VFO an ist, ändern die Pfeile auf der Intercom-Seite die Frequenz schrittweise; drücke lange auf VFO, um zu deinem Kanal zurückzukehren.</string>
     <!-- VFO sheet: mode pill for analog FM. Short pill (half the width). -->
     <string name="intercom_vfo_mode_fm">FM analog</string>
     <!-- VFO sheet: mode pill for DMR. Short pill (half the width). -->
@@ -641,7 +641,7 @@
     <!-- VFO sheet: DMR colour code row label. Short. -->
     <string name="intercom_vfo_colour_code">Colorcode</string>
     <!-- VFO sheet: section title above the DMR time slot pills. Short, shown in caps. -->
-    <string name="intercom_vfo_time_slot">Zeitschlitz</string>
+    <string name="intercom_vfo_time_slot">Zeitkanal</string>
     <!-- VFO sheet: DMR time slot pill; %1$d is 1 or 2. Short pill. -->
     <string name="intercom_vfo_slot">TS %1$d</string>
     <!-- VFO sheet: DMR call type row label. Short. -->
@@ -708,7 +708,7 @@
     <!-- Content description (screen reader) of a zone row's ⋮ button; %1$s is the zone name. -->
     <string name="intercom_zones_options_cd">Zonenoptionen für %1$s</string>
     <!-- Hint at the top of the Add a zone sheet. Mentions the licence line shown under each list. A few lines. -->
-    <string name="intercom_zones_add_hint">Eine Standardliste legt ihre Kanäle an und dazu eine Zone, die sie enthält. Kanäle, die du schon auf derselben Frequenz hast, werden wiederverwendet statt doppelt angelegt. Beachte die Zeile zur Zulassung: Hören ist immer erlaubt, Senden nicht auf jeder Liste.</string>
+    <string name="intercom_zones_add_hint">Eine Standardliste legt ihre Kanäle an und dazu eine Zone, die sie enthält. Kanäle, die du schon auf derselben Frequenz hast, werden wiederverwendet statt doppelt angelegt. Beachte die Zeile zur Lizenz: Hören ist immer erlaubt, Senden nicht auf jeder Liste.</string>
     <!-- Add a zone sheet: section title above the "your own channels" card. Short, shown in caps. -->
     <string name="intercom_zones_your_own">Eigene</string>
     <!-- Add a zone sheet: card title for a zone made from your own channels. One line. -->
@@ -858,9 +858,9 @@
     <!-- Title of the Scheduled operations sheet. One line. -->
     <string name="intercom_schedule_title">Geplante Aktionen</string>
     <!-- Hint at the top of the Scheduled operations sheet. A few lines. -->
-    <string name="intercom_schedule_hint">Starte etwas zu einer festen Zeit, einmalig oder jede Woche: einen Kanal abhören (und aufnehmen), die Zone absuchen, APRS mithören, SSTV empfangen oder eine APRS-Bake senden. Ist die Zeit um, macht das Funkgerät mit dem weiter, was es vorher getan hat. Das läuft auch bei ausgeschaltetem Bildschirm; ein verfolgter Satellitenüberflug hat immer Vorrang.</string>
+    <string name="intercom_schedule_hint">Starte etwas zu einer festen Zeit, einmalig oder jede Woche: einen Kanal abhören (und aufnehmen), die Zone absuchen, APRS mithören, SSTV empfangen oder ein APRS-Beacon senden. Ist die Zeit um, macht das Funkgerät mit dem weiter, was es vorher getan hat. Das läuft auch bei ausgeschaltetem Bildschirm; ein verfolgter Satellitenüberflug hat immer Vorrang.</string>
     <!-- The same hint on a radio that cannot tune the APRS frequency (no "APRS monitoring" in the list). A few lines. -->
-    <string name="intercom_schedule_hint_no_aprs">Starte etwas zu einer festen Zeit, einmalig oder jede Woche: einen Kanal abhören (und aufnehmen), die Zone absuchen, SSTV empfangen oder eine APRS-Bake senden. Ist die Zeit um, macht das Funkgerät mit dem weiter, was es vorher getan hat. Das läuft auch bei ausgeschaltetem Bildschirm; ein verfolgter Satellitenüberflug hat immer Vorrang.</string>
+    <string name="intercom_schedule_hint_no_aprs">Starte etwas zu einer festen Zeit, einmalig oder jede Woche: einen Kanal abhören (und aufnehmen), die Zone absuchen, SSTV empfangen oder ein APRS-Beacon senden. Ist die Zeit um, macht das Funkgerät mit dem weiter, was es vorher getan hat. Das läuft auch bei ausgeschaltetem Bildschirm; ein verfolgter Satellitenüberflug hat immer Vorrang.</string>
     <!-- Shown when there are no schedules. One line. -->
     <string name="intercom_schedule_empty">Noch nichts geplant.</string>
     <!-- Schedule row subtitle while it runs; %1$s is when it repeats (e.g. "Mon Wed 07:00 for 60 min"), %2$s the end time (HH:mm). One line. -->
@@ -910,7 +910,7 @@
     <!-- Schedule editor: section title above the start time. Short, shown in caps. -->
     <string name="intercom_schedule_starts">Beginn</string>
     <!-- Schedule editor: section title above the length field. One line, shown in caps. -->
-    <string name="intercom_schedule_minutes">Wie viele Minuten (nicht bei Bake oder Postabruf)</string>
+    <string name="intercom_schedule_minutes">Wie viele Minuten (nicht bei Beacon oder Postabruf)</string>
     <!-- Schedule editor: section title above the name field. Short, shown in caps. -->
     <string name="intercom_schedule_name">Name (optional)</string>
     <!-- Toast when the chosen time is in the past. One or two lines. -->
@@ -1188,13 +1188,13 @@
     <string name="intercom_nets_elsewhere_section">Anderswo auf Sendung</string>
     <!-- Tap-to-expand line under "Elsewhere on the air". %1$d number of nets. The English uses "nets" for every count. -->
     <plurals name="intercom_nets_elsewhere_show">
-        <item quantity="one">%1$d weitere Runde auf 2 m, 70 cm und DMR-Sprechgruppen zeigen (nicht in deiner Nähe; eine DMR-Sprechgruppe erreichst du trotzdem, wenn du sie zur Empfangsliste eines DMR-Kanals hinzufügst)</item>
-        <item quantity="other">%1$d weitere Runden auf 2 m, 70 cm und DMR-Sprechgruppen zeigen (nicht in deiner Nähe; eine DMR-Sprechgruppe erreichst du trotzdem, wenn du sie zur Empfangsliste eines DMR-Kanals hinzufügst)</item>
+        <item quantity="one">%1$d weitere Runde auf 2 m, 70 cm und DMR-Sprechgruppen zeigen (nicht in deiner Nähe; eine DMR-Sprechgruppe erreichst du trotzdem, wenn du sie zu den RX-Gruppen eines DMR-Kanals hinzufügst)</item>
+        <item quantity="other">%1$d weitere Runden auf 2 m, 70 cm und DMR-Sprechgruppen zeigen (nicht in deiner Nähe; eine DMR-Sprechgruppe erreichst du trotzdem, wenn du sie zu den RX-Gruppen eines DMR-Kanals hinzufügst)</item>
     </plurals>
     <!-- The same line once expanded (tap to collapse). -->
     <plurals name="intercom_nets_elsewhere_hide">
-        <item quantity="one">%1$d weitere Runde auf 2 m, 70 cm und DMR-Sprechgruppen ausblenden (nicht in deiner Nähe; eine DMR-Sprechgruppe erreichst du trotzdem, wenn du sie zur Empfangsliste eines DMR-Kanals hinzufügst)</item>
-        <item quantity="other">%1$d weitere Runden auf 2 m, 70 cm und DMR-Sprechgruppen ausblenden (nicht in deiner Nähe; eine DMR-Sprechgruppe erreichst du trotzdem, wenn du sie zur Empfangsliste eines DMR-Kanals hinzufügst)</item>
+        <item quantity="one">%1$d weitere Runde auf 2 m, 70 cm und DMR-Sprechgruppen ausblenden (nicht in deiner Nähe; eine DMR-Sprechgruppe erreichst du trotzdem, wenn du sie zu den RX-Gruppen eines DMR-Kanals hinzufügst)</item>
+        <item quantity="other">%1$d weitere Runden auf 2 m, 70 cm und DMR-Sprechgruppen ausblenden (nicht in deiner Nähe; eine DMR-Sprechgruppe erreichst du trotzdem, wenn du sie zu den RX-Gruppen eines DMR-Kanals hinzufügst)</item>
     </plurals>
     <!-- Choice in the dialog for a net matched by frequency: it is near me. One line. -->
     <string name="intercom_nets_near_yes">Sie ist in meiner Nähe</string>

@@ -34,7 +34,7 @@ import java.util.Map;
 public final class BrandMeisterSource {
 
     public static final String DEVICE_LIST_URL =
-        "https://api.brandmeister.network/v2/device?repeater=true";
+        "https://api.brandmeister.network/v2/device?repeater=true";   // i18n: URL
     public static final String TALKGROUP_MAP_URL =
         "https://api.brandmeister.network/v2/talkgroup";
     /** Per-device static talkgroups: append the device id. */

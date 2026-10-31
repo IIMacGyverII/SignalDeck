@@ -7,6 +7,8 @@
 package com.macdmr.radio.car;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.RadioService;
 
 import java.text.SimpleDateFormat;
@@ -29,15 +31,15 @@ public final class LastHeard {
         SimpleDateFormat f = new SimpleDateFormat("HH:mm", Locale.US);
         String prevKey = null, pTitle = null, pSub = null; int pCh = 0, count = 0; boolean pKnown = false;
         for (Object[] r : s.store().lastHeard(max * 3)) {
-            long ts = (Long) r[0]; int chNum = (Integer) r[1]; String kind = (String) r[2]; String text = (String) r[3]; int id = (Integer) r[4];
+            long ts = (Long) r[0]; int chNum = (Integer) r[1]; String kind = (String) r[2]; String text = (String) r[3]; int id = (Integer) r[4]; String shown = (String) r[5];   // text: the stored English (parsed); shown: in the app's language
             ChannelStore.Channel ch = s.store().byNumber(chNum);
-            String title;
-            if ("dmr".equals(kind) && id > 0) { String n = s.callerName(id); title = n.isEmpty() ? "ID " + id : n + " · " + id; }
-            else title = clean(text);
-            if (title.isEmpty()) title = "Received";
-            String sub = f.format(new Date(ts)) + (ch != null ? " · Ch " + ch.number + " " + ch.name : "");
+            String title, same;                                     // same: what merges repeats (from the stored English, as before)
+            if ("dmr".equals(kind) && id > 0) { String n = s.callerName(id); title = n.isEmpty() ? Txt.s(R.string.intercom_dmr_id, id) : n + " · " + id; same = title; }
+            else { title = clean(shown); same = clean(text); }
+            if (title.isEmpty()) title = Txt.s(R.string.intercom_car_received);
+            String sub = ch != null ? Txt.s(R.string.intercom_car_heard_sub, f.format(new Date(ts)), ch.number, ch.name) : f.format(new Date(ts));
             if ("dmr".equals(kind)) { int tg = text == null ? -1 : text.indexOf("TG "); if (tg >= 0) { int end = text.indexOf(' ', tg + 3); sub += " · " + text.substring(tg, end > 0 ? end : text.length()); } }
-            String key = title + "|" + chNum;
+            String key = same + "|" + chNum;
             if (key.equals(prevKey)) { count++; continue; }   // back-to-back transmissions from the same station: one line
             if (pTitle != null) { out.add(new Item(pTitle + (count > 1 ? "  (" + count + "×)" : ""), pSub, pCh, pKnown)); if (out.size() >= max) return out; }
             prevKey = key; pTitle = title; pSub = sub; pCh = chNum; pKnown = ch != null; count = 1;

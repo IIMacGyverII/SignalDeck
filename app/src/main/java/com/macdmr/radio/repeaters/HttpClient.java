@@ -27,7 +27,7 @@ public final class HttpClient {
 
     /** One real contact address goes here before the first production fetch (chapter 16 §9.2). */
     public static final String USER_AGENT =
-        "SignalDeck/" + com.macdmr.radio.BuildConfig.VERSION_NAME + " (+https://github.com/IIMacGyverII/SignalDeck)";
+        "SignalDeck/" + com.macdmr.radio.BuildConfig.VERSION_NAME + " (+https://github.com/IIMacGyverII/SignalDeck)";   // i18n: HTTP user agent
 
     private static final int CONNECT_TIMEOUT_MS = 15000;
     private static final int READ_TIMEOUT_MS = 30000;

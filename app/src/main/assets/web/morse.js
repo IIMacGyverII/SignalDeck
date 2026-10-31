@@ -19,13 +19,13 @@ async function loadTrainer() {
 const lessonChars = l => MT.koch.substring(0, Math.max(2, Math.min(MT.koch.length, l + 1)));
 function renderTrainer() {
   const opts = (a, b, cur) => { let h = ''; for (let i = a; i <= b; i++) h += '<option value="' + i + '"' + (i === cur ? ' selected' : '') + '>' + i + '</option>'; return h; };
-  $('mtBody').innerHTML = '<div class="row wrap"><label class="f">Lesson<select id="mtLesson">' + opts(1, MT.lessons, MT.lesson) + '</select></label>'
-    + '<label class="f">Character speed (WPM)<select id="mtWpm">' + opts(5, 40, MT.wpm) + '</select></label>'
-    + '<label class="f">Effective speed (Farnsworth)<select id="mtFw">' + opts(5, 40, MT.fw) + '</select></label></div>'
-    + '<p class="muted">Characters in this lesson: <b class="mono" style="color:var(--cyan);letter-spacing:.2em">' + esc(lessonChars(MT.lesson)) + '</b> (newest: <b class="mono">' + esc(lessonChars(MT.lesson).slice(-1)) + '</b>)</p>'
-    + '<div class="row wrap"><button class="btn primary" id="mtPlay">Play a lesson (10 groups)</button><button class="btn" id="mtAgain" disabled>Play again</button><button class="btn" id="mtStop">Stop</button></div>'
-    + '<textarea id="mtCopy" class="mtcopy mono" placeholder="Type what you hear, groups of five separated by spaces" spellcheck="false" autocapitalize="characters"></textarea>'
-    + '<div class="row wrap"><button class="btn primary" id="mtCheck" disabled>Check</button><span id="mtResult" class="muted"></span></div>';
+  $('mtBody').innerHTML = '<div class="row wrap"><label class="f">' + t('exam_mt_lesson') + '<select id="mtLesson">' + opts(1, MT.lessons, MT.lesson) + '</select></label>'
+    + '<label class="f">' + t('exam_mt_wpm') + '<select id="mtWpm">' + opts(5, 40, MT.wpm) + '</select></label>'
+    + '<label class="f">' + t('exam_mt_farnsworth') + '<select id="mtFw">' + opts(5, 40, MT.fw) + '</select></label></div>'
+    + '<p class="muted">' + t('exam_mt_chars', { chars: '<b class="mono" style="color:var(--cyan);letter-spacing:.2em">' + esc(lessonChars(MT.lesson)) + '</b>', newest: '<b class="mono">' + esc(lessonChars(MT.lesson).slice(-1)) + '</b>' }) + '</p>'
+    + '<div class="row wrap"><button class="btn primary" id="mtPlay">' + t('exam_mt_play') + '</button><button class="btn" id="mtAgain" disabled>' + t('exam_mt_again') + '</button><button class="btn" id="mtStop">' + t('common_stop') + '</button></div>'
+    + '<textarea id="mtCopy" class="mtcopy mono" placeholder="' + t('exam_mt_copy_hint') + '" spellcheck="false" autocapitalize="characters"></textarea>'
+    + '<div class="row wrap"><button class="btn primary" id="mtCheck" disabled>' + t('exam_mt_check') + '</button><span id="mtResult" class="muted"></span></div>';
   const save = () => { MT.lesson = +$('mtLesson').value; MT.wpm = +$('mtWpm').value; MT.fw = +$('mtFw').value; act('trainer', { lesson: MT.lesson, wpm: MT.wpm, fw: MT.fw }); renderTrainer(); };
   $('mtLesson').onchange = save; $('mtWpm').onchange = save; $('mtFw').onchange = save;
   $('mtPlay').onclick = () => { MT.sent = groups(MT.lesson, 10); $('mtCopy').value = ''; $('mtResult').textContent = ''; morsePlay(MT.sent); $('mtAgain').disabled = false; $('mtCheck').disabled = false; $('mtCopy').focus(); };
@@ -75,8 +75,8 @@ function score(sent, copied) {
 }
 async function check() {
   const s = score(MT.sent, $('mtCopy').value), pct = Math.round(s * 100);
-  let msg = pct + ' % right. Sent: ' + MT.sent;
-  if (s >= 0.9 && MT.lesson < MT.lessons) { MT.lesson++; await act('trainer', { lesson: MT.lesson }); msg = pct + ' % — on to lesson ' + MT.lesson + ' (adds ' + lessonChars(MT.lesson).slice(-1) + '). Sent: ' + MT.sent; }
-  else if (s < 0.9) msg += '  ·  90 % moves you on.';
+  let msg = t('exam_mt_result', { pct, sent: MT.sent });
+  if (s >= 0.9 && MT.lesson < MT.lessons) { MT.lesson++; await act('trainer', { lesson: MT.lesson }); msg = t('exam_mt_next', { pct, lesson: MT.lesson, adds: lessonChars(MT.lesson).slice(-1), sent: MT.sent }); }
+  else if (s < 0.9) msg = t('exam_mt_result_more', { pct, sent: MT.sent });
   const keep = MT.sent; renderTrainer(); MT.sent = keep; $('mtResult').textContent = msg; $('mtResult').style.color = s >= 0.9 ? 'var(--green)' : 'var(--amber)'; $('mtAgain').disabled = false;
 }

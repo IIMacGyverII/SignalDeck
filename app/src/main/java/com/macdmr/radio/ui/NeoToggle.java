@@ -18,7 +18,7 @@ public class NeoToggle extends NeonToggle {
     public NeoToggle(Context c, String iconName, String label, int accent) {
         super(c, "", label, Theme.SOFTSQ);
         this.accent = accent;
-        setText(label); setLines(1); setTextSize(12); setTypeface(Neo.ui(c)); setLetterSpacing(0.1f);
+        setText(label); setLines(1); setTextSize(12); setTypeface(Neo.ui(c)); Neo.tracking(this, 0.1f);
         setGravity(Gravity.CENTER);
         icon = new Neo.IconDrawable(iconName, accent); int sz = Theme.dp(c, 21); icon.setBounds(0, 0, sz, sz);
         setCompoundDrawables(null, icon, null, null); setCompoundDrawablePadding(Theme.dp(c, 3));

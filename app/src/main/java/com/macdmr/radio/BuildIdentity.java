@@ -20,6 +20,7 @@ import java.util.Locale;
  * APK with {@code apksigner verify --print-certs}); no key material is in the app. A fork that copies the constant still
  * cannot sign with the key, so its builds report "fork". Also which profile it ran with and whether transmit was
  * switched on for it in a way the official profile list does not show.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class BuildIdentity {
     private BuildIdentity() { }

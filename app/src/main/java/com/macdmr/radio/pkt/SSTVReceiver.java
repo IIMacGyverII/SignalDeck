@@ -10,6 +10,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
+
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
@@ -132,8 +135,8 @@ public class SSTVReceiver {
                     long abortThresholdMs = (long) (currentMode.fullLineDurationMs * 3.5);
                     if (streamingMs > abortThresholdMs) {
                         android.util.Log.d("sstv", TAG + ": ⚠ No lines in "
-                                + streamingMs + "ms (threshold "
-                                + abortThresholdMs + "ms) — aborting false detection");
+                                + streamingMs + "ms (threshold "   // i18n: log
+                                + abortThresholdMs + "ms) — aborting false detection");   // i18n: log
                         stopTimeoutChecker();
                         reset();
                         return;
@@ -151,8 +154,8 @@ public class SSTVReceiver {
                     long thresholdMs = (long) (currentMode.fullLineDurationMs * 3);
                     if (msSinceLastSync > thresholdMs) {
                         android.util.Log.d("sstv", TAG + ": ⏱ Sync-loss timeout: " + msSinceLastSync
-                                + "ms since last valid sync (threshold " + thresholdMs + "ms, "
-                                + currentMode.name + " " + (int) currentMode.fullLineDurationMs + "ms/line)");
+                                + "ms since last valid sync (threshold " + thresholdMs + "ms, "   // i18n: log
+                                + currentMode.name + " " + (int) currentMode.fullLineDurationMs + "ms/line)");   // i18n: log
                         stopTimeoutChecker();
                         handleTransmissionComplete();
                         return;
@@ -307,7 +310,7 @@ public class SSTVReceiver {
                             : 0;
                     android.util.Log.d("sstv", TAG + ": Streaming " + currentMode.name + " — "
                             + progress + "% (" + (streamDecoder != null ? streamDecoder.getProcessedLines() : 0)
-                            + "/" + (streamDecoder != null ? streamDecoder.getTotalLines() : '?') + " lines)");
+                            + "/" + (streamDecoder != null ? streamDecoder.getTotalLines() : '?') + " lines)");   // i18n: log
                 }
             }
         } catch (Exception e) {
@@ -383,7 +386,7 @@ public class SSTVReceiver {
             startIdx = allSamples.length - maxBacklog;
         }
         android.util.Log.d("sstv", TAG + ": Streaming init — feeding backlog "
-                + startIdx + "→" + allSamples.length + " samples (" + currentMode.name + ")");
+                + startIdx + "→" + allSamples.length + " samples (" + currentMode.name + ")");   // i18n: log
         int chunkSize = 1024;
         for (int off = startIdx; off < allSamples.length; off += chunkSize) {
             int len = Math.min(chunkSize, allSamples.length - off);
@@ -469,15 +472,15 @@ public class SSTVReceiver {
                             SSTVIQDemodulator.SyncPulseWidth.FIVE_MS);
                     if (nineCount >= 1) {
                         android.util.Log.d("sstv", TAG + ": VIS gave PD mode (" + visMode.name
-                                + ") but " + nineCount + " nine_ms sync(s) found — rejecting");
+                                + ") but " + nineCount + " nine_ms sync(s) found — rejecting");   // i18n: log
                         detectedMode = SSTVMode.MODE_UNKNOWN;
                     } else if (fiveCount >= 1) {
                         android.util.Log.d("sstv", TAG + ": VIS gave PD mode (" + visMode.name
-                                + ") but " + fiveCount + " five_ms sync(s) found — rejecting");
+                                + ") but " + fiveCount + " five_ms sync(s) found — rejecting");   // i18n: log
                         detectedMode = SSTVMode.MODE_UNKNOWN;
                     } else {
                         android.util.Log.d("sstv", TAG + ": VIS " + visMode.name + " accepted ("
-                                + (samples.length * 1000 / sampleRate) + "ms buffered)");
+                                + (samples.length * 1000 / sampleRate) + "ms buffered)");   // i18n: log
                     }
                 }
 
@@ -506,19 +509,19 @@ public class SSTVReceiver {
                         }
                     }
                     android.util.Log.d("sstv", TAG + ": FIVE_MS guard: " + fiveCntF
-                            + " syncs in " + (scanLenF * 1000 / sampleRate) + "ms post-VIS");
+                            + " syncs in " + (scanLenF * 1000 / sampleRate) + "ms post-VIS");   // i18n: log
                     SSTVMode.Mode syncMode5 = runDetectorOnFamily(fivePosF, fiveCntF,
                             SSTVIQDemodulator.SyncPulseWidth.FIVE_MS);
                     if (syncMode5 != null && syncMode5.visCode != detectedMode) {
                         android.util.Log.d("sstv", TAG + ": FIVE_MS VIS/sync contradiction: VIS="
-                                + visMode.name + " sync=" + syncMode5.name + " → trusting sync");
+                                + visMode.name + " sync=" + syncMode5.name + " → trusting sync");   // i18n: log
                         detectedMode = syncMode5.visCode;
                     } else if (syncMode5 != null) {
                         android.util.Log.d("sstv", TAG + ": FIVE_MS VIS confirmed by sync: " + visMode.name);
                     } else {
                         // Inconclusive — trust VIS code now, don't delay image start.
                         android.util.Log.d("sstv", TAG + ": FIVE_MS sync inconclusive ("
-                                + (postVisLenF * 1000 / sampleRate) + "ms) — accepting VIS: " + visMode.name);
+                                + (postVisLenF * 1000 / sampleRate) + "ms) — accepting VIS: " + visMode.name);   // i18n: log
                     }
                 }
 
@@ -546,19 +549,19 @@ public class SSTVReceiver {
                         }
                     }
                     android.util.Log.d("sstv", TAG + ": NINE_MS guard: " + nineCntN
-                            + " syncs in " + (scanLenN * 1000 / sampleRate) + "ms post-VIS");
+                            + " syncs in " + (scanLenN * 1000 / sampleRate) + "ms post-VIS");   // i18n: log
                     SSTVMode.Mode syncModeN = runDetectorOnFamily(ninePosN, nineCntN,
                             SSTVIQDemodulator.SyncPulseWidth.NINE_MS);
                     if (syncModeN != null && syncModeN.visCode != detectedMode) {
                         android.util.Log.d("sstv", TAG + ": NINE_MS VIS/sync contradiction: VIS="
-                                + visMode.name + " sync=" + syncModeN.name + " → trusting sync");
+                                + visMode.name + " sync=" + syncModeN.name + " → trusting sync");   // i18n: log
                         detectedMode = syncModeN.visCode;
                     } else if (syncModeN != null) {
                         android.util.Log.d("sstv", TAG + ": NINE_MS VIS confirmed by sync: " + visMode.name);
                     } else {
                         // Inconclusive — trust VIS code now, don't delay image start.
                         android.util.Log.d("sstv", TAG + ": NINE_MS sync inconclusive ("
-                                + (postVisLenN * 1000 / sampleRate) + "ms) — accepting VIS: " + visMode.name);
+                                + (postVisLenN * 1000 / sampleRate) + "ms) — accepting VIS: " + visMode.name);   // i18n: log
                     }
                 }
 
@@ -584,7 +587,7 @@ public class SSTVReceiver {
             double audioRms = probeLen > 0 ? Math.sqrt((double) energySum / probeLen) : 0;
             if (audioRms < 300.0) {
                 android.util.Log.d("sstv", TAG + ": Auto-detect skipped (RMS=" + (int) audioRms
-                        + " < 300, likely noise/static)");
+                        + " < 300, likely noise/static)");   // i18n: log
             } else {
                 int autoLen;
                 synchronized (bufferLock) {
@@ -602,7 +605,7 @@ public class SSTVReceiver {
                             + retryCount + "): " + autoMode.name);
                 } else {
                     android.util.Log.d("sstv", TAG + ": Auto-detection inconclusive (attempt "
-                            + retryCount + "), will retry.");
+                            + retryCount + "), will retry.");   // i18n: log
                 }
             }
         }
@@ -611,9 +614,9 @@ public class SSTVReceiver {
             currentMode = SSTVMode.getModeByVIS(detectedMode);
             if (currentMode != null) {
                 android.util.Log.d("sstv", TAG + ": ✓ VIS DETECTED: " + currentMode.name
-                               + " (VIS: 0x" + Integer.toHexString(detectedMode) + ")");
+                               + " (VIS: 0x" + Integer.toHexString(detectedMode) + ")");   // i18n: log
                 android.util.Log.d("sstv", TAG + ": Mode info: " + currentMode.width + "x" + currentMode.height
-                               + ", " + currentMode.durationMs + "ms, "
+                               + ", " + currentMode.durationMs + "ms, "   // i18n: log
                                + (currentMode.isRGB ? "RGB" : "YUV"));
             } else {
                 android.util.Log.d("sstv", TAG + ": ⚠ VIS detected but mode not supported: 0x"
@@ -985,7 +988,7 @@ public class SSTVReceiver {
 
         int elapsedMs = (int) (System.currentTimeMillis() - startTime);
         android.util.Log.d("sstv", TAG + ": Transmission complete - " + currentMode.name
-                + " received in " + elapsedMs + "ms (expected: " + currentMode.durationMs + "ms)");
+                + " received in " + elapsedMs + "ms (expected: " + currentMode.durationMs + "ms)");   // i18n: log
 
         try {
             // Prefer the streaming decoder result (already decoded progressively)
@@ -993,7 +996,7 @@ public class SSTVReceiver {
                 streamDecoder.finalizeStreaming();
                 decodedImage = streamDecoder.getCurrentBitmap();
                 android.util.Log.d("sstv", TAG + ": Using streaming result: "
-                        + streamDecoder.getProcessedLines() + " lines decoded");
+                        + streamDecoder.getProcessedLines() + " lines decoded");   // i18n: log
             } else {
                 // Fallback: batch decode from accumulated audio buffer
                 android.util.Log.d("sstv", TAG + ": No streaming result — falling back to batch decode");
@@ -1110,8 +1113,8 @@ public class SSTVReceiver {
                 && candidate.visCode != currentMode.visCode) {
             android.util.Log.d("sstv", TAG + ": ⚡ Mid-stream mode change: " + currentMode.name
                     + " → " + candidate.name
-                    + " (avg skip spacing " + (int) avgMs + "ms, "
-                    + consecutiveSkips + " consecutive skips)");
+                    + " (avg skip spacing " + (int) avgMs + "ms, "   // i18n: log
+                    + consecutiveSkips + " consecutive skips)");   // i18n: log
             handleModeChange(candidate);
         }
     }
@@ -1171,13 +1174,13 @@ public class SSTVReceiver {
      */
     public String getStatus() {
         if (!visDetected) {
-            return "Waiting for VIS code...";
+            return Txt.s(R.string.packet_sstv_rx_waiting_vis);
         } else if (currentMode != null) {
             int elapsedMs = (int) (System.currentTimeMillis() - startTime);
             int progress = (elapsedMs * 100) / currentMode.durationMs;
-            return "Receiving " + currentMode.name + " (" + Math.min(progress, 100) + "%)";
+            return Txt.s(R.string.packet_sstv_rx_receiving, currentMode.name, Math.min(progress, 100));
         } else {
-            return "Unknown mode";
+            return Txt.s(R.string.packet_sstv_rx_unknown_mode);
         }
     }
     

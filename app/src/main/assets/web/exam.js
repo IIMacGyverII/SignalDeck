@@ -15,11 +15,10 @@ async function loadExam() {
   try { EX.els = (await api('exam')).elements; examHome(); } catch (e) { }
 }
 function examHome() {
-  $('examBody').innerHTML = '<div class="passgrid">' + EX.els.map((e, i) => '<div class="satbox"><h4>' + esc(e.name) + '</h4><div class="about">' + e.questions + ' questions, pass at ' + e.pass
-    + (e.best >= 0 ? ' · best ' + e.best + '/' + e.questions : '') + ' · ' + e.missed.length + ' missed to review</div>'
-    + '<div class="row wrap"><button class="btn primary" data-ex="exam" data-i="' + i + '">Practice exam</button><button class="btn" data-ex="study" data-i="' + i + '">Study a subelement</button>'
-    + '<button class="btn" data-ex="missed" data-i="' + i + '"' + (e.missed.length ? '' : ' disabled') + '>Review missed</button></div></div>').join('') + '</div>'
-    + '<p class="muted small">Questions are the NCVEC pools (public domain). Missed questions and best scores are shared with the phone\'s Exam practice.</p>';
+  $('examBody').innerHTML = '<div class="passgrid">' + EX.els.map((e, i) => '<div class="satbox"><h4>' + esc(e.name) + '</h4><div class="about">' + (e.best >= 0 ? t.plural('exam_about_best', e.missed.length, { questions: e.questions, pass: e.pass, best: e.best }) : t.plural('exam_about', e.missed.length, { questions: e.questions, pass: e.pass })) + '</div>'
+    + '<div class="row wrap"><button class="btn primary" data-ex="exam" data-i="' + i + '">' + t('exam_practice') + '</button><button class="btn" data-ex="study" data-i="' + i + '">' + t('exam_study') + '</button>'
+    + '<button class="btn" data-ex="missed" data-i="' + i + '"' + (e.missed.length ? '' : ' disabled') + '>' + t('exam_review_missed') + '</button></div></div>').join('') + '</div>'
+    + '<p class="muted small">' + t('exam_pools_note') + '</p>';
 }
 async function pool(e) {
   if (EX.poolKey === e.key) return EX.pool;
@@ -34,8 +33,8 @@ async function examStart(mode, i) {
     const m = new Set(e.missed); EX.qs = shuffle(p.filter(q => m.has(q.id))); EX.exam = false;
   } else {
     const subs = {}; for (const q of p) subs[subOf(q.id)] = (subs[subOf(q.id)] || 0) + 1;
-    $('examBody').innerHTML = '<h3 class="label">' + esc(e.name) + ': choose a subelement</h3><div class="quick" style="margin-top:12px">'
-      + Object.entries(subs).map(([s, n]) => '<button type="button" data-sub="' + s + '">' + s + ' · ' + n + ' questions</button>').join('') + '</div><button class="btn" data-ex="home">Back</button>';
+    $('examBody').innerHTML = '<h3 class="label">' + t('exam_choose_sub', { name: esc(e.name) }) + '</h3><div class="quick" style="margin-top:12px">'
+      + Object.entries(subs).map(([s, n]) => '<button type="button" data-sub="' + s + '">' + t.plural('exam_sub_count', n, { sub: s }) + '</button>').join('') + '</div><button class="btn" data-ex="home">' + t('common_back') + '</button>';
     return;
   }
   EX.i = 0; EX.wrong = []; examQuestion();
@@ -44,10 +43,10 @@ function examStudy(sub) { EX.qs = shuffle(EX.pool.filter(q => subOf(q.id) === su
 function examQuestion() {
   if (EX.i >= EX.qs.length) return examResults();
   const q = EX.qs[EX.i]; EX.answered = false;
-  $('examBody').innerHTML = '<div class="row between"><span class="label">' + (EX.exam ? 'PRACTICE EXAM' : 'STUDY') + ' · ' + (EX.i + 1) + ' / ' + EX.qs.length + '</span><span class="chip dim">' + q.id + '</span></div>'
-    + '<p class="exq">' + esc(q.question) + '</p>' + (q.figure ? '<img class="exfig" src="/exam/' + encodeURIComponent(q.figure) + '" alt="Figure ' + esc(q.figure) + '">' : '')
+  $('examBody').innerHTML = '<div class="row between"><span class="label">' + (EX.exam ? t('exam_practice_heading') : t('exam_study_heading')) + ' · ' + (EX.i + 1) + ' / ' + EX.qs.length + '</span><span class="chip dim">' + q.id + '</span></div>'
+    + '<p class="exq">' + esc(q.question) + '</p>' + (q.figure ? '<img class="exfig" src="/exam/' + encodeURIComponent(q.figure) + '" alt="' + t('exam_figure_alt', { figure: esc(q.figure) }) + '">' : '')
     + '<div class="exans">' + q.answers.map((a, k) => '<button type="button" class="exa" data-k="' + k + '"><b>' + 'ABCD'[k] + '.</b> ' + esc(a) + '</button>').join('') + '</div>'
-    + '<div class="row" id="exNext"></div><div class="row" style="margin-top:14px"><button class="btn small-btn" data-ex="stop">Stop</button></div>';
+    + '<div class="row" id="exNext"></div><div class="row" style="margin-top:14px"><button class="btn small-btn" data-ex="stop">' + t('common_stop') + '</button></div>';
 }
 async function examAnswer(k) {
   if (EX.answered) return; EX.answered = true;
@@ -57,16 +56,16 @@ async function examAnswer(k) {
   if (EX.exam) { EX.i++; examQuestion(); return; }
   const bs = document.querySelectorAll('.exa');
   bs[q.correct].classList.add('right'); if (!right) bs[k].classList.add('wrong');
-  $('exNext').innerHTML = '<button class="btn ' + (right ? 'primary' : '') + '" data-ex="next">' + (right ? 'Right · next' : 'The answer is ' + 'ABCD'[q.correct] + ' · next') + '</button>';
+  $('exNext').innerHTML = '<button class="btn ' + (right ? 'primary' : '') + '" data-ex="next">' + (right ? t('exam_right_next') : t('exam_answer_next', { letter: 'ABCD'[q.correct] })) + '</button>';
 }
 async function examResults() {
   const n = EX.exam ? EX.qs.length : EX.i, right = n - EX.wrong.length, e = EX.el;
   const full = EX.exam && n === e.questions, pass = full && right >= e.pass;
   if (full) await act('exam/result', { element: e.key, right }).catch(() => {});
   $('examBody').innerHTML = '<div class="center"><div class="digits" style="font-size:56px;color:' + (full ? (pass ? 'var(--green)' : 'var(--amber)') : 'var(--cyan)') + '">' + right + ' / ' + n + '</div>'
-    + '<p class="muted">' + (full ? (pass ? 'Pass: ' + e.pass + ' were needed.' : 'Not yet: ' + e.pass + ' are needed. Review the misses below, then try again.') : (n ? Math.round(right * 100 / n) + ' % right. Misses are kept for Review missed.' : '')) + '</p></div>'
-    + (EX.wrong.length ? '<div class="group">MISSED</div>' + EX.wrong.map(([q, k]) => '<div class="item"><div class="main"><b>' + q.id + '</b> ' + esc(q.question) + '<div class="sub">You: ' + 'ABCD'[k] + '. ' + esc(q.answers[k]) + '</div><div class="sub" style="color:var(--green)">Answer: ' + 'ABCD'[q.correct] + '. ' + esc(q.answers[q.correct]) + '</div></div></div>').join('') : '')
-    + '<div class="row" style="margin-top:14px"><button class="btn primary" data-ex="home">Done</button></div>';
+    + '<p class="muted">' + (full ? (pass ? t('exam_passed', { pass: e.pass }) : t('exam_not_yet', { pass: e.pass })) : (n ? t('exam_percent', { pct: Math.round(right * 100 / n) }) : '')) + '</p></div>'
+    + (EX.wrong.length ? '<div class="group">' + t('exam_missed_heading') + '</div>' + EX.wrong.map(([q, k]) => '<div class="item"><div class="main"><b>' + q.id + '</b> ' + esc(q.question) + '<div class="sub">' + t('exam_you', { letter: 'ABCD'[k], answer: esc(q.answers[k]) }) + '</div><div class="sub" style="color:var(--green)">' + t('exam_answer', { letter: 'ABCD'[q.correct], answer: esc(q.answers[q.correct]) }) + '</div></div></div>').join('') : '')
+    + '<div class="row" style="margin-top:14px"><button class="btn primary" data-ex="home">' + t('common_done') + '</button></div>';
   EX.els = (await api('exam')).elements;
 }
 $('examBody').addEventListener('click', e => {

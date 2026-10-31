@@ -57,7 +57,7 @@ public final class Theme {
         TextView t = new TextView(c);
         t.setText(text); t.setTextColor(color); t.setTextSize(sp);
         if (bold) t.setTypeface(Typeface.DEFAULT_BOLD);
-        return t;
+        return Neo.lang(t);
     }
 
     public static TextView pillButton(Context c, String text) {

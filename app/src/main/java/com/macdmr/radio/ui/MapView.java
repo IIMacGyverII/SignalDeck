@@ -65,8 +65,8 @@ public class MapView extends View {
     public void setOnCell(OnCell l) { onCell = l; }
     public int layer() { return layer; }
 
-    private static final String TILE_URL = "https://tile.openstreetmap.org/%d/%d/%d.png";
-    private static final String UA = "SignalDeck/1.0 (Android; com.macdmr.radio)";
+    private static final String TILE_URL = "https://tile.openstreetmap.org/%d/%d/%d.png";   // i18n: URL
+    private static final String UA = "SignalDeck/1.0 (Android; com.macdmr.radio)";   // i18n: HTTP user agent
     private static final long TILE_MAX_AGE = 30L * 24 * 3600 * 1000;
 
     private double cx = lonToX(-98.35), cy = latToY(39.5), zoom = 4;      // centre in normalised Web Mercator (0..1)
@@ -119,7 +119,7 @@ public class MapView extends View {
                 return true;
             }
         });
-        setContentDescription("Map");
+        setContentDescription(com.macdmr.radio.i18n.Txt.s(com.macdmr.radio.R.string.packet_map_cd));
     }
 
     // ---- public API -------------------------------------------------------------------------------------
@@ -210,7 +210,7 @@ public class MapView extends View {
             ring.setColor(0xFFFFFFFF); dot.setColor(0xFF4DA3FF);
             cv.drawCircle(x, y, 7 * d, dot); cv.drawCircle(x, y, 7 * d, ring);
         }
-        String a = "© OpenStreetMap contributors";
+        String a = "© OpenStreetMap contributors";   // i18n: map attribution (OpenStreetMap's wording)
         float aw = attr.measureText(a);
         cv.drawRoundRect(w - aw - 14 * d, h - 20 * d, w - 4 * d, h - 4 * d, 4 * d, 4 * d, textBg);
         cv.drawText(a, w - aw - 9 * d, h - 8.5f * d, attr);

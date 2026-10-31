@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The channel editor: its fields, their help texts (the i icons) and its messages. See strings_common.xml for the conventions. -->
+<resources>
+
+    <!-- ===== Field help: the text of each field's i button in the channel editor (also shown by SignalDeck Web) ===== -->
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_notes">Alles, was du dir zu diesem Kanal merken willst: wer ihn nutzt, Betreiber oder Verein des Relais, Vernetzung, Betriebszeiten, wie man sich in die Runde meldet. Beim Teilen kann die Notiz mitgehen (Kanäle teilen → Kanalnotizen).</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$d is the longest name the radio takes (characters). -->
+    <string name="channel_editor_h_name">Erscheint auf der Intercom-Seite, in der Kanalliste und in Sprachansagen. Bis zu %1$d Zeichen; der Zähler unter dem Feld zeigt, wie viele noch frei sind. Das Funkgerät selbst bekommt den Namen nie. Codeplug-Programme wie OpenGD77 CPS speichern kürzere Namen (16 Zeichen), in einem dort geöffneten Backup kann ein langer Name also abgeschnitten sein.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_type">Digitale Kanäle (DMR) übertragen Sprache und Text als Daten und brauchen einen Colorcode, einen Zeitkanal und ein Rufziel. Analoge Kanäle sind klassisches FM. M17-Kanäle sind breite FM-Kanäle, über die M17 läuft: mit einem Ziel-Rufzeichen (oder alle) und einer Kanalzugangsnummer. Beim Umschalten erscheinen die jeweils passenden Einstellungen.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_m17">Wen dieser Kanal ruft. @ALL ruft alle, ein Rufzeichen genau diese Station. „Aus Kontakten wählen“ nimmt einen Kontakt mit Rufzeichen. Dein eigenes Rufzeichen, mit dem du sendest, ist das Stationsrufzeichen in den APRS-Einstellungen.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_can">Kanalzugangsnummer, 0 bis 15. Funkgeräte hören sich nur, wenn sie übereinstimmt. Üblich ist 0.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$s is the longest name the radio takes (characters). -->
+    <string name="channel_editor_h_tx">Die Frequenz, auf der du sendest, in MHz. Auf einem Simplex-Kanal ist sie gleich der Empfangsfrequenz, auf einem Relaiskanal ist es die Eingabe des Relais (zum Beispiel +5 MHz bei GMRS auf UHF oder ±0,6 MHz auf 2 m). Bleibt das Feld leer, gilt die Empfangsfrequenz (Simplex). Dieses Funkgerät deckt %1$s ab.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$s is the longest name the radio takes (characters). -->
+    <string name="channel_editor_h_rx">Die Frequenz, auf der du hörst, in MHz. Auf einem Relaiskanal ist es die Ausgabe des Relais. Dieses Funkgerät deckt %1$s ab; andere Frequenzen (etwa 220 MHz) lassen sich nicht speichern.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_pos">Optionale Position der Station oder des Relais, das dieser Kanal erreicht. Damit zeigt die Intercom-Seite den Ortsnamen sowie Entfernung und Richtung von dir aus. „Meine Position“ übernimmt den letzten bekannten Standort des Telefons.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_rxonly">Nur Empfang: Dieser Kanal sendet nie. Sprechen, die Seitentaste, der Sprachspeicher, Beacons, Antworten und jede andere Aussendung werden abgelehnt, solange du auf diesem Kanal bist (für einen Hörposten, einen Kanal, für den du keine Lizenz hast, eine Frequenz, die ruhig bleiben soll). Kanäle für NOAA-Wetterfunk, Seefunk und Bahnfunk sind immer nur Empfang, egal was hier steht.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_power">Sendeleistung. Hoch reicht weiter und braucht mehr Akku; Niedrig genügt für Funkgeräte in der Nähe. Manche Funkdienste begrenzen die Leistung (zum Beispiel FRS).</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_band">Kanalbandbreite: Breit (25 kHz) oder Schmal (12,5 kHz). Nimm, was die anderen Funkgeräte oder das Relais nutzen. Auf VHF (unter 300 MHz) steht dieses Funkgerät immer auf Breit: Mit Schmal ist sein Empfänger dort taub.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_relay">Die Relais-Trennung des Funkgeräts. Normal (empfohlen): Das Funkgerät bleibt mit dem Relais verbunden und sendet normal. Trennen: Das Funkgerät wartet auf eine Bestätigung des Relais und sendet womöglich gar nicht; nur verwenden, wenn dein Netz das verlangt.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_cc">Das DMR-Gegenstück zum Subton, 0 bis 15. Dein Funkgerät und das Relais (oder auf einem Simplex-Kanal die anderen Funkgeräte) müssen denselben Colorcode nutzen, sonst hört ihr euch nicht.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_mode">Direkt: von Funkgerät zu Funkgerät (Simplex). Doppelslot: über ein DMR-Relais, das zwei Zeitkanäle gleichzeitig überträgt. Für Relaiskanäle Doppelslot verwenden.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_noslot">Zeitkanal: wählt das Funkmodul dieses Telefons selbst. Seine Kanaleinstellung kennt keinen Zeitkanal, deshalb kann SignalDeck hier nicht TS1 oder TS2 wählen, und Relaiskanäle (Doppelslot) funktionieren womöglich nicht. Sicher ist DMR-Simplex mit anderen Funkgeräten.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_slot">Ein DMR-Relais überträgt zwei getrennte Gespräche, Zeitkanal 1 und 2. Nimm den Zeitkanal, auf dem deine Sprechgruppe liegt (das steht in der Relaisliste). Auf einem Simplex-Kanal müssen alle Funkgeräte denselben Zeitkanal nutzen, meist TS1.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_ctype">Wen du rufst: Einzel (eine DMR-ID), Gruppe (eine Sprechgruppe) oder Alle (jedes Funkgerät). Auf diesem Funkgerät meldet ein Kanal auf Alle die Anrufer als ID 16777215 und gibt empfangenen Ton nicht aus; für normalen Sprechgruppenverkehr also Gruppe nehmen.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_callfrom">Gib die Rufnummer selbst ein oder wähle sie aus deinen Kontakten: Gruppenkontakte (Sprechgruppen) für einen Gruppenruf, Einzelkontakte (DMR-IDs) für einen Einzelruf. In beiden Fällen speichert der Kanal die Nummer; Sprechgruppen legst du auf der Seite Kontakte mit dem Typ Gruppe an. Auf der Intercom-Seite wählt ein langer Druck auf RUF vorübergehend eine andere Sprechgruppe, ohne den Kanal zu ändern.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_callpick">Der Kontakt, den dieser Kanal ruft. Tippe, um einen anderen zu wählen; die Liste richtet sich nach dem Kontakttyp oben.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_call">Die DMR-ID (Einzelruf) oder Sprechgruppennummer (Gruppenruf), an die du sendest. Bei einem Gruppenruf wird sie beim Speichern in die RX-Gruppen aufgenommen, weil das Funkgerät nur Gruppenrufe durchlässt, deren Sprechgruppe dort steht.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_groups">Sprechgruppen, die du auf diesem Kanal hören willst, durch Kommas getrennt, bis zu 32. Das Funkgerät lässt einen Gruppenruf nur durch, wenn seine Sprechgruppe in dieser Liste steht. Einzelrufe an deine eigene DMR-ID kommen immer durch, und MON auf der Intercom-Seite lässt jeden Ruf durch, den das Funkgerät dekodieren kann. „TG-Listen“ darunter fügt eine gespeicherte Liste ein (die Listen des Moduls kommen aus der Original-App) oder speichert diese Liste unter einem Namen.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_enc">Die eigene DMR-Verschleierung des Funkgeräts mit einem 8-stelligen Schlüssel. Nur Funkgeräte mit demselben Verfahren und demselben Schlüssel hören dich; die meisten anderen DMR-Geräte nicht. Verschlüsselung ist auf Amateurfunkfrequenzen nicht erlaubt.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_key">Genau 8 Zeichen, auf allen Funkgeräten der Gruppe gleich. Wird nur verwendet, wenn Verschlüsselung auf Aktiviert steht.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_int">DMR-Sendeunterbrechung. EIN erlaubt auf Funkgeräten, die das unterstützen, einen laufenden Ruf zu unterbrechen (etwa durch das gerufene Funkgerät); wird das abgelehnt, meldet das Funkgerät, dass das gerufene Gerät keine Unterbrechung zulässt. AUS ist die Werkseinstellung.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_sq">Die eigene Rauschsperre des Funkgeräts; sie gilt, wenn Soft SQ für diesen Kanal aus ist. 0 hält sie ganz offen: Du hörst Rauschen, und das Funkgerät meldet ständig Empfang. 1 bis 9 schließen sie; auf diesem Funkgerät wirken alle Stufen wie eine einzige Schwelle, etwa −90 dBm.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_softsq">Soft SQ hält die Rauschsperre des Funkgeräts offen und lässt die App entscheiden, was du hörst: den CTCSS-Ton des Kanals, wenn er einen hat, sonst eine Rauschsperre, die Sprache von Rauschen unterscheidet. Sie erfasst schwächere Stationen als die Rauschsperre des Funkgeräts. Auch die Taste SOFT SQ auf der Intercom-Seite schaltet sie.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_softsq_lvl">Wie streng Soft SQ ist, von 1 (großzügig: öffnet auch bei schwächeren, verrauschten Signalen) bis 9 (streng: nur saubere Signale). Entspricht dem Schieberegler auf der Intercom-Seite.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_maps">„Karten öffnen“ zeigt diese Position (oder deine) in deiner Karten-App. Such dort den Ort und nimm Teilen → SignalDeck, oder kopiere Koordinaten oder Link und tippe hier auf „Einfügen“. „Einfügen“ liest Koordinaten, geo:-Links sowie Google-, Apple- oder OpenStreetMap-Links aus der Zwischenablage und folgt dabei auch kurzen Teilen-Links.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_txt">Ein Subton, der mit deiner Aussendung mitgesendet wird: CTCSS (ein tiefer Ton, 62,5 bis 254,1 Hz) oder DCS (ein digitaler Code). Relais und Funkgeräte, die Töne auswerten, öffnen nur beim richtigen; der Eintrag eines Relais in der Relaisliste nennt seinen Zugangston.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_txc">Die zu sendende CTCSS-Frequenz oder der DCS-Code. Zum Auswählen aus der Liste tippen.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_rxt">Nur Signale mit diesem Ton öffnen die Rauschsperre, andere Nutzer auf der Frequenz bleiben also stumm. Mit Soft SQ prüft die App den CTCSS-Ton selbst; DCS prüft das Funkgerät.</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_rxc">Die CTCSS-Frequenz oder der DCS-Code, auf den das Funkgerät achtet. Zum Auswählen aus der Liste tippen.</string>
+
+    <!-- ===== Channel editor: header, sections, labels and choices ===== -->
+    <!-- Title of the channel editor for a new channel. Short. -->
+    <string name="channel_editor_title_new">Neuer Kanal</string>
+    <!-- Title of the channel editor. Short. -->
+    <string name="channel_editor_title_edit">Kanal bearbeiten</string>
+    <!-- Subtitle of the channel editor for a new channel (shown in capitals). Short. -->
+    <string name="channel_editor_subtitle_new">Ausfüllen und speichern</string>
+    <!-- Subtitle of the channel editor (capitals): %1$d is the channel number. Short. -->
+    <string name="channel_editor_subtitle_number">Kanal %1$d</string>
+    <!-- Content description of the back arrow of the channel editor. Short. -->
+    <string name="channel_editor_cd_back">Zurück ohne Speichern</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_channel">Kanal</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_radio">Funk</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. FM channels. -->
+    <string name="channel_editor_sec_analog">Analog</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_location">Standort</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_notes">Notizen</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_nets">Funkrunden hier</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_history">Verlauf</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_name">Kanalname</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_type">Kanaltyp</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. A DMR channel. -->
+    <string name="channel_editor_o_digital">Digital</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. An FM channel. -->
+    <string name="channel_editor_o_analog">Analog</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_rx">Empfangsfrequenz (MHz)</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_tx">Sendefrequenz (MHz)</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Transmit power. -->
+    <string name="channel_editor_l_power">Leistung</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_low_power">Niedrig</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_high_power">Hoch</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Whether the channel may transmit. -->
+    <string name="channel_editor_l_transmit">Senden</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. The channel may transmit. -->
+    <string name="channel_editor_o_allowed">Erlaubt</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. The channel never transmits. -->
+    <string name="channel_editor_o_rx_only">Nur Empfang</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The radio module's relay setting. -->
+    <string name="channel_editor_l_relay">Relais (Repeater)</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Relay setting. -->
+    <string name="channel_editor_o_disconnect">Trennen</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Relay setting (recommended). -->
+    <string name="channel_editor_o_normal">Normal</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The DMR colour code. -->
+    <string name="channel_editor_l_cc">Colorcode</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. DMR direct or through a repeater. -->
+    <string name="channel_editor_l_mode">Betriebsart</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Radio to radio. -->
+    <string name="channel_editor_o_direct">Direkt</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Through a DMR repeater (two time slots). -->
+    <string name="channel_editor_o_double_slot">Doppelslot</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_slot">Zeitkanal</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Who a DMR call goes to. -->
+    <string name="channel_editor_l_ctype">Kontakttyp</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. A private call (one DMR ID). -->
+    <string name="channel_editor_o_private">Einzel</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. A group call (a talkgroup). -->
+    <string name="channel_editor_o_group">Gruppe</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. An all call. -->
+    <string name="channel_editor_o_all">Alle</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Where the call number comes from. -->
+    <string name="channel_editor_l_callfrom">Quelle der Rufnummer</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_typed">Eingabe</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Pick it from the contacts. -->
+    <string name="channel_editor_o_contacts">Kontakte</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_call">Rufnummer (DMR-ID / Sprechgruppe)</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The contact the channel calls. -->
+    <string name="channel_editor_l_callpick">Kontakt</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_groups">RX-Gruppen (TGs, durch Komma getrennt, max. 32)</string>
+    <!-- Button under the RX group list: named talkgroup lists. Short. -->
+    <string name="channel_editor_tg_lists_button">TG-Listen…</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. DMR privacy scrambling. -->
+    <string name="channel_editor_l_enc">Verschlüsselung</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_disabled">Deaktiviert</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_enabled">Aktiviert</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_key">Schlüssel (8 Zeichen)</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. DMR transmit interrupt. -->
+    <string name="channel_editor_l_int">Sendeunterbrechung</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Capitals. -->
+    <string name="channel_editor_o_int_off">AUS</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Capitals. -->
+    <string name="channel_editor_o_int_on">EIN</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Channel width. -->
+    <string name="channel_editor_l_band">Bandbreite</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. 12.5 kHz. -->
+    <string name="channel_editor_o_narrow">Schmal</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. 25 kHz. -->
+    <string name="channel_editor_o_wide">Breit</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Soft SQ is the app's own squelch (a feature name). -->
+    <string name="channel_editor_l_softsq">Soft SQ</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_softsq_level">Soft-SQ-Stufe</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The radio's own squelch. -->
+    <string name="channel_editor_l_sq">SQL-Stufe</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The kind of tone sent: none, CTCSS or DCS. -->
+    <string name="channel_editor_l_tx_tone_type">Sendeton-Art</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Also the title of the tone list. -->
+    <string name="channel_editor_l_tx_tone">Sendeton</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The kind of tone that opens the squelch. -->
+    <string name="channel_editor_l_rx_tone_type">Empfangston-Art</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Also the title of the tone list. -->
+    <string name="channel_editor_l_rx_tone">Empfangston</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. No tone. -->
+    <string name="channel_editor_tone_none">Kein</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. DCS with inverted polarity; DCS stays. -->
+    <string name="channel_editor_tone_dcs_inverted">DCS invertiert</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. @ALL is an M17 word: keep it. -->
+    <string name="channel_editor_l_m17dest">Ziel (@ALL oder Rufzeichen)</string>
+    <!-- Button under the M17 destination. Short. -->
+    <string name="channel_editor_pick_contacts">Aus Kontakten wählen…</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The M17 channel access number. -->
+    <string name="channel_editor_l_can">Kanalzugangsnummer</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_lat">Breitengrad (optional)</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_lon">Längengrad (optional)</string>
+    <!-- Button under the location fields (three share a row). Very short. -->
+    <string name="channel_editor_my_position">Meine Position</string>
+    <!-- Button under the location fields (three share a row). Very short. -->
+    <string name="channel_editor_open_maps">Karten öffnen</string>
+    <!-- Button under the location fields (three share a row). Very short. -->
+    <string name="channel_editor_paste">Einfügen</string>
+    <!-- Toast when My position has no position yet. Short. -->
+    <string name="channel_editor_no_fix">Noch keine Position</string>
+    <!-- Hint under the location buttons; Open Maps, Share → SignalDeck and Paste name buttons. Two lines. -->
+    <string name="channel_editor_location_how">Ort in der Karten-App wählen: „Karten öffnen“, Ort suchen, dann Teilen → SignalDeck. Oder Koordinaten bzw. Link kopieren und auf „Einfügen“ tippen.</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_notes">Notizen (optional)</string>
+
+    <!-- ===== Channel editor: history, nets, location and talkgroup lists ===== -->
+    <!-- History section of a channel not yet saved. One or two lines. -->
+    <string name="channel_editor_history_new">Sobald der Kanal gespeichert ist, steht hier alles, was auf ihm gehört und gesendet wurde.</string>
+    <!-- History section when SignalDeck does not drive the radio yet. One line. -->
+    <string name="channel_editor_history_no_service">Übernimm das Funkmodul, um den Verlauf zu sehen.</string>
+    <!-- History section when it cannot be read; %1$s is the error. One line. -->
+    <string name="channel_editor_history_failed">Verlauf nicht verfügbar: %1$s</string>
+    <!-- Nets section of a channel not yet saved. One line. -->
+    <string name="channel_editor_nets_new">Speichere zuerst den Kanal, dann trägst du die Funkrunden darauf ein.</string>
+    <!-- A net on this channel: %1$s its schedule ("Tue 7:30 PM"), %2$d its length in minutes. One line. -->
+    <string name="channel_editor_net_line">%1$s · %2$d min · zum Bearbeiten tippen</string>
+    <!-- The same with the net's notes (%3$s). One line. -->
+    <string name="channel_editor_net_line_notes">%1$s · %2$d min · %3$s · zum Bearbeiten tippen</string>
+    <!-- Button in the Nets section. Short. -->
+    <string name="channel_editor_add_net">Funkrunde hinzufügen</string>
+    <!-- Hint in the Nets section; Nets near you and Intercom name a sheet and a page. Two lines. -->
+    <string name="channel_editor_nets_how">Eine Funkrunde oder ein Treffen auf diesem Kanal. Sie erscheint unter „Funkrunden in der Nähe“ (Intercom-Menü), auf Wunsch mit einer Erinnerung 10 Minuten vorher.</string>
+    <!-- Toast after a place was shared or pasted into the editor. One line. -->
+    <string name="channel_editor_location_filled">Standort eingetragen: Zum Behalten auf Speichern tippen</string>
+    <!-- Label of the pin in the maps app for a channel with no name. One word. -->
+    <string name="channel_editor_maps_label">Kanal</string>
+    <!-- Toast when the maps app opens. One line. -->
+    <string name="channel_editor_maps_how">Ort suchen, dann Teilen → SignalDeck (oder kopieren und auf „Einfügen“ tippen)</string>
+    <!-- Toast when no maps app is installed. Short. -->
+    <string name="channel_editor_no_maps">Keine Karten-App installiert</string>
+    <!-- Toast when Paste finds nothing. One or two lines. -->
+    <string name="channel_editor_clipboard_empty">Die Zwischenablage ist leer: Kopiere zuerst Koordinaten oder Link eines Orts in deiner Karten-App</string>
+    <!-- Toast when the pasted text holds no coordinates. One line. -->
+    <string name="channel_editor_clipboard_no_coords">Keine Koordinaten im kopierten Text gefunden</string>
+    <!-- Last item of the Talkgroup lists menu. One line. -->
+    <string name="channel_editor_tg_save_item">Diese RX-Gruppen als neue Liste speichern…</string>
+    <!-- Title of the Talkgroup lists menu. Short. -->
+    <string name="channel_editor_tg_lists_title">Sprechgruppenlisten</string>
+    <!-- Toast after adding a talkgroup list to the RX list: %1$d talkgroups added. One line. -->
+    <plurals name="channel_editor_tg_added">
+        <item quantity="one">%1$d Sprechgruppe hinzugefügt: Zum Behalten auf Speichern tippen</item>
+        <item quantity="other">%1$d Sprechgruppen hinzugefügt: Zum Behalten auf Speichern tippen</item>
+    </plurals>
+    <!-- The same when the RX list is now full (32). One line. -->
+    <plurals name="channel_editor_tg_added_full">
+        <item quantity="one">%1$d Sprechgruppe hinzugefügt (das Funkgerät fasst 32): Zum Behalten auf Speichern tippen</item>
+        <item quantity="other">%1$d Sprechgruppen hinzugefügt (das Funkgerät fasst 32): Zum Behalten auf Speichern tippen</item>
+    </plurals>
+    <!-- Hint of the name field for a new talkgroup list. Short. -->
+    <string name="channel_editor_tg_list_name">Name der Liste</string>
+    <!-- Dialog title: save the RX list under a name. Short. -->
+    <string name="channel_editor_tg_save_title">Sprechgruppenliste speichern</string>
+    <!-- Toast after saving a talkgroup list; %1$s is its name. Short. -->
+    <string name="channel_editor_tg_saved">„%1$s“ gespeichert</string>
+    <!-- Contact row when the typed number is not a contact; %1$d is the number. Short. -->
+    <string name="channel_editor_call_not_contact">%1$d (kein Kontakt)</string>
+    <!-- Contact row before a contact is chosen. Very short. -->
+    <string name="channel_editor_choose">Wählen…</string>
+    <!-- Dialog title when there are no private contacts to pick. Short. -->
+    <string name="channel_editor_no_private">Keine Einzelkontakte</string>
+    <!-- Dialog title when there are no group contacts to pick. Short. -->
+    <string name="channel_editor_no_group">Keine Gruppenkontakte</string>
+    <!-- Dialog message; Private, Call number from and Typed number name a contact type, a field and a choice. Two lines. -->
+    <string name="channel_editor_no_private_msg">Lege sie auf der Seite Kontakte an (Typ Einzel) oder stelle „Quelle der Rufnummer“ wieder auf „Eingabe“.</string>
+    <!-- Dialog message; Group, Call number from and Typed number name a contact type, a field and a choice. Two lines. -->
+    <string name="channel_editor_no_group_msg">Lege sie auf der Seite Kontakte an (Typ Gruppe) oder stelle „Quelle der Rufnummer“ wieder auf „Eingabe“.</string>
+    <!-- Title of the list of private contacts to call. Short. -->
+    <string name="channel_editor_private_contacts">Einzelkontakte</string>
+    <!-- Title of the list of group contacts to call. Short. -->
+    <string name="channel_editor_group_contacts">Gruppenkontakte (Sprechgruppen)</string>
+    <!-- Title of the list of M17 destinations. Short. -->
+    <string name="channel_editor_m17_dest_title">M17-Ziel</string>
+    <!-- Toast when a tone is picked before its type. One line. -->
+    <string name="channel_editor_tone_type_first">Wähle zuerst oben bei der Tonart CTCSS oder DCS</string>
+    <!-- Content description of a field's i button; %1$s is the field's label. Short. -->
+    <string name="channel_editor_cd_about">Über %1$s</string>
+    <!-- Button that closes a field's help card. Short. -->
+    <string name="channel_editor_got_it">Verstanden</string>
+
+    <!-- ===== Channel editor: checks on Save ===== -->
+    <!-- Save check: a field is empty; %1$s names it ("the receive frequency (MHz)"). One line. -->
+    <string name="channel_editor_err_enter">Gib %1$s ein</string>
+    <!-- Save check: %1$s is what was typed, %2$s names the field. One line. -->
+    <string name="channel_editor_err_not_number">„%1$s“ ist keine Zahl: Prüfe %2$s</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_rx">die Empfangsfrequenz (MHz)</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_tx">die Sendefrequenz (MHz)</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_lat">den Breitengrad</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_lon">den Längengrad</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_call">die Rufnummer</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_group">jeden Eintrag der RX-Gruppen</string>
+    <!-- Save check: %1$s is the bands this radio tunes ("400-480 MHz"). One line. -->
+    <string name="channel_editor_err_band">Frequenzen müssen innerhalb von %1$s liegen</string>
+    <!-- Save check on the location fields. One line. -->
+    <string name="channel_editor_err_both">Gib Breiten- und Längengrad ein oder lass beide leer</string>
+    <!-- Save check on the location fields. One line. -->
+    <string name="channel_editor_err_latlon">Der Breitengrad muss innerhalb von ±90 liegen, der Längengrad innerhalb von ±180</string>
+    <!-- Save check on the RX group list. One line. -->
+    <string name="channel_editor_err_groups">RX-Gruppen: höchstens 32 Sprechgruppen (die Rufnummer mitgezählt)</string>
+    <!-- Save check on the encrypt key. One line. -->
+    <string name="channel_editor_err_key">Der Schlüssel muss genau 8 Zeichen lang sein</string>
+    <!-- Title of the dialog that shows a Save check. Short. -->
+    <string name="channel_editor_check_title">Kanal prüfen</string>
+</resources>

@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.winlink;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -57,9 +59,9 @@ public final class Winlink {
 
     private final Context ctx; private final Radio radio; private final WinlinkStore store; private final SharedPreferences prefs;
     private final StringBuilder log = new StringBuilder();
-    private volatile String state = "Not connected"; private volatile boolean busy; private volatile String progress = "";
+    private volatile String state = Txt.s(R.string.modes_winlink_state_idle); private volatile boolean busy; private volatile String progress = "";
     private volatile Listener listener; private volatile Socket socket; private volatile boolean viaRadio, cancelled;
-    private volatile long lastSession; private volatile String lastResult = "";
+    private volatile long lastSession; private volatile String lastResult = "";   // English: it also goes in the history text
 
     public Winlink(Context ctx, Radio radio) {
         this.ctx = ctx.getApplicationContext(); this.radio = radio;
@@ -118,28 +120,28 @@ public final class Winlink {
             private final java.io.ByteArrayOutputStream rx = new java.io.ByteArrayOutputStream(); private int rxBin;
             @Override public int read(long timeoutMs) throws IOException {
                 int c;
-                try { c = w.read(timeoutMs); } catch (IOException e) { flushRx(); note("~ read: " + e.getMessage()); throw e; }
+                try { c = w.read(timeoutMs); } catch (IOException e) { flushRx(); note("~ read: " + e.getMessage()); throw e; }   // i18n: session log (diagnostic)
                 if (inBinary && !diagContents()) { rxBin++; return c; }
-                if (rxBin > 0) { note("~ RX " + rxBin + " bytes of message data (contents not logged)"); rxBin = 0; }
+                if (rxBin > 0) { note("~ RX " + rxBin + " bytes of message data (contents not logged)"); rxBin = 0; }   // i18n: session log (diagnostic)
                 rx.write(c); if (c == '\r' || rx.size() >= 64) flushRx();
                 return c;
             }
             @Override public void write(byte[] b) throws IOException {
                 flushRx();
-                if (inBinary && !diagContents()) note("~ TX " + b.length + " bytes of message data (contents not logged)");
-                else note("~ TX " + b.length + " B: " + dump(b));
+                if (inBinary && !diagContents()) note("~ TX " + b.length + " bytes of message data (contents not logged)");   // i18n: session log (diagnostic)
+                else note("~ TX " + b.length + " B: " + dump(b));   // i18n: session log (diagnostic)
                 w.write(b);
             }
             private void flushRx() {
-                if (rxBin > 0) { note("~ RX " + rxBin + " bytes of message data (contents not logged)"); rxBin = 0; }
-                if (rx.size() > 0) { byte[] b = rx.toByteArray(); rx.reset(); note("~ RX " + b.length + " B: " + dump(b)); }
+                if (rxBin > 0) { note("~ RX " + rxBin + " bytes of message data (contents not logged)"); rxBin = 0; }   // i18n: session log (diagnostic)
+                if (rx.size() > 0) { byte[] b = rx.toByteArray(); rx.reset(); note("~ RX " + b.length + " B: " + dump(b)); }   // i18n: session log (diagnostic)
             }
         };
     }
     /** "hex | text" with the secure-login answer hidden. */
     static String dump(byte[] b) {
         String text = new String(b, StandardCharsets.ISO_8859_1);
-        if (text.contains(";PR:")) return "(the login answer, hidden)";
+        if (text.contains(";PR:")) return "(the login answer, hidden)";   // i18n: session log (diagnostic)
         StringBuilder h = new StringBuilder(), t = new StringBuilder();
         for (int i = 0; i < b.length && i < 256; i++) { h.append(String.format(Locale.US, "%02X", b[i] & 0xFF)).append(i % 4 == 3 ? " " : ""); int c = b[i] & 0xFF; t.append(c >= 32 && c < 127 ? (char) c : c == 13 ? '\u21B5' : '.'); }
         return h.toString().trim() + " | " + t + (b.length > 256 ? " \u2026" : "");
@@ -152,8 +154,12 @@ public final class Winlink {
         RmsList.Result r = RmsList.parse(csv);
         prefs.edit().putString("gateways", RmsList.toJson(r.usable)).putLong("gatewaysAt", System.currentTimeMillis()).apply();
         changed();
-        return r.usable.size() + " packet gateway" + (r.usable.size() == 1 ? "" : "s") + " this radio can use (1200 baud, 136\u2013174 or 400\u2013480 MHz), of " + r.rows + " in the file"
-                + (r.hf > 0 ? "; " + r.hf + " HF" : "") + (r.otherBaud > 0 ? "; " + r.otherBaud + " other speeds or modes" : "") + (r.outOfRange > 0 ? "; " + r.outOfRange + " on other bands" : "");
+        List<String> parts = new ArrayList<>();
+        parts.add(Txt.p(R.plurals.modes_winlink_import_usable, r.usable.size(), r.usable.size(), r.rows));
+        if (r.hf > 0) parts.add(Txt.s(R.string.modes_winlink_import_hf, r.hf));
+        if (r.otherBaud > 0) parts.add(Txt.p(R.plurals.modes_winlink_import_other_baud, r.otherBaud, r.otherBaud));
+        if (r.outOfRange > 0) parts.add(Txt.p(R.plurals.modes_winlink_import_other_bands, r.outOfRange, r.outOfRange));
+        return String.join(Txt.s(R.string.modes_clause_separator), parts);
     }
     /** The imported gateways, nearest first when the position is known. */
     public java.util.List<RmsList.Gateway> gateways() {
@@ -169,14 +175,14 @@ public final class Winlink {
     /** Put a new message in the outbox; returns an error text or null. */
     public String compose(String to, String cc, String subject, String text) {
         String call = radio.callsign();
-        if (call.isEmpty()) return "Set your callsign first (PKT → Settings)";
-        B2Message m = B2Message.create(call, subject.trim().isEmpty() ? "No subject" : subject.trim(), text);
+        if (call.isEmpty()) return Txt.s(R.string.modes_winlink_err_callsign);
+        B2Message m = B2Message.create(call, subject.trim().isEmpty() ? "No subject" : subject.trim(), text);   // i18n: Winlink message header
         for (String a : split(to)) m.to.add(B2Message.address(a));
         for (String a : split(cc)) m.cc.add(B2Message.address(a));
-        if (m.to.isEmpty()) return "Add at least one recipient (a callsign or an e-mail address)";
-        if (m.subject.length() > 128) return "The subject is too long (128 characters at most)";
-        if (m.body.length == 0) return "Write something first";
-        try { store.save(WinlinkStore.OUTBOX, m); } catch (IOException e) { return "Could not save: " + e.getMessage(); }
+        if (m.to.isEmpty()) return Txt.s(R.string.modes_winlink_err_no_to);
+        if (m.subject.length() > 128) return Txt.s(R.string.modes_winlink_err_subject);
+        if (m.body.length == 0) return Txt.s(R.string.modes_winlink_err_empty);
+        try { store.save(WinlinkStore.OUTBOX, m); } catch (IOException e) { return Txt.s(R.string.modes_sat_save_failed, String.valueOf(e.getMessage())); }
         changed();
         return null;
     }
@@ -191,13 +197,13 @@ public final class Winlink {
     /** Exchange mail with the CMS over the internet. Returns an error text or null (started). */
     public String connectInternet() {
         String call = radio.callsign();
-        if (call.isEmpty()) return "Set your callsign first (PKT → Settings)";
-        if (busy) return "A Winlink session is already running";
+        if (call.isEmpty()) return Txt.s(R.string.modes_winlink_err_callsign);
+        if (busy) return Txt.s(R.string.modes_winlink_err_busy);
         start("internet", () -> {
             Socket s = new Socket(); socket = s;
-            setState("Connecting to the Winlink CMS…");
+            setState(Txt.s(R.string.modes_winlink_state_connecting_cms));
             int bp = benchPort;
-            if (bp > 0) note("* bench: test CMS at 127.0.0.1:" + bp);
+            if (bp > 0) note("* bench: test CMS at 127.0.0.1:" + bp);   // i18n: session log (diagnostic)
             s.connect(bp > 0 ? new InetSocketAddress("127.0.0.1", bp) : new InetSocketAddress(CMS_HOST, CMS_PORT), 20_000); s.setSoTimeout(1_000);
             final InputStream in = s.getInputStream(); final OutputStream out = s.getOutputStream();
             B2fClient.Wire w = socketWire(in, out);
@@ -208,7 +214,7 @@ public final class Winlink {
                 if (l.startsWith("callsign")) w.write((call + "\r").getBytes(StandardCharsets.US_ASCII));
                 else if (l.startsWith("password")) { w.write((CMS_TELNET_PASSWORD + "\r").getBytes(StandardCharsets.US_ASCII)); break; }
             }
-            setState("Connected to the CMS: exchanging mail");
+            setState(Txt.s(R.string.modes_winlink_state_cms));
             exchange(w, CMS_TARGET, 60_000);
         });
         return null;
@@ -217,16 +223,16 @@ public final class Winlink {
     /** Exchange mail with a packet gateway (RMS) on the current channel. Returns an error text or null (started). */
     public String connectRadio(String gateway, String via) {
         String call = radio.callsign();
-        if (call.isEmpty()) return "Set your callsign first (PKT → Settings)";
-        if (busy) return "A Winlink session is already running";
+        if (call.isEmpty()) return Txt.s(R.string.modes_winlink_err_callsign);
+        if (busy) return Txt.s(R.string.modes_winlink_err_busy);
         String g = gateway == null ? "" : gateway.trim().toUpperCase(Locale.US);
-        if (!g.matches("[A-Z0-9]{3,6}(-[0-9]{1,2})?")) return "Gateway callsign like N0ABC-10";
+        if (!g.matches("[A-Z0-9]{3,6}(-[0-9]{1,2})?")) return Txt.s(R.string.modes_winlink_err_gateway);
         setGateway(g, via == null ? "" : via);
         start("radio", () -> {
             viaRadio = true;
-            setState("Calling " + g + "…");
+            setState(Txt.s(R.string.modes_winlink_state_calling, g));
             B2fClient.Wire w = radio.open(g, via, this::setState);
-            setState("Connected to " + g + ": exchanging mail");
+            setState(Txt.s(R.string.modes_winlink_state_gateway, g));
             exchange(w, g.replaceAll("-.*", ""), 240_000);
         });
         return null;
@@ -245,19 +251,20 @@ public final class Winlink {
         busy = true; cancelled = false; viaRadio = false; progress = "";
         synchronized (this) { log.setLength(0); }
         t0 = System.currentTimeMillis(); diagNow = diagEnabled(); lastWasDiag = diagNow; inBinary = false;
-        note("* " + how + " session started " + B2Message.formatDate(System.currentTimeMillis()) + " UTC");
+        note("* " + how + " session started " + B2Message.formatDate(System.currentTimeMillis()) + " UTC");   // i18n: session log (diagnostic)
         if (diagNow) {
             String ver = ""; try { ver = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionName; } catch (Exception ignored) { }
-            note("* detailed diagnostic log on: SignalDeck " + ver + ", " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + ", Android " + android.os.Build.VERSION.RELEASE
-                    + (radio.describe().isEmpty() ? "" : ", " + radio.describe()) + "; password never logged" + (diagContents() ? "; message data included" : "; message data left out"));
+            note("* detailed diagnostic log on: SignalDeck " + ver + ", " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + ", Android " + android.os.Build.VERSION.RELEASE   // i18n: session log (diagnostic)
+                    + (radio.describe().isEmpty() ? "" : ", " + radio.describe()) + "; password never logged" + (diagContents() ? "; message data included" : "; message data left out"));   // i18n: session log (diagnostic)
             if ("radio".equals(how)) radio.frameLog(line -> note("# " + line));
         }
         new Thread(() -> {
-            String result;
-            try { job.run(); result = lastResult; }
+            String result, shown;                                              // English (log, history) and in the app's language (the screen)
+            try { job.run(); result = lastResult; shown = lastShown; }
             catch (Throwable t) {
-                String why = t instanceof SocketTimeoutException ? "no answer in time" : t.getMessage() == null ? t.toString() : t.getMessage();
-                result = cancelled ? "Stopped" : "Failed: " + why;
+                boolean timeout = t instanceof SocketTimeoutException; String why = t.getMessage() == null ? t.toString() : t.getMessage();
+                result = cancelled ? Txt.en(R.string.modes_winlink_stopped) : Txt.en(R.string.modes_winlink_failed, timeout ? Txt.en(R.string.modes_winlink_timeout) : why);
+                shown = cancelled ? Txt.s(R.string.modes_winlink_stopped) : Txt.s(R.string.modes_winlink_failed, timeout ? Txt.s(R.string.modes_winlink_timeout) : why);
                 note("* " + result);
             } finally {
                 Socket s = socket; socket = null; if (s != null) try { s.close(); } catch (IOException ignored) { }
@@ -266,8 +273,8 @@ public final class Winlink {
                 busy = false; progress = "";
             }
             lastResult = result; lastSession = System.currentTimeMillis();
-            if (diagNow) note("* " + result + " (" + (lastSession - t0) / 1000 + " s). Please share this log (Session log \u2192 Share log), whether it worked or not.");
-            setState(result);
+            if (diagNow) note("* " + result + " (" + (lastSession - t0) / 1000 + " s). Please share this log (Session log \u2192 Share log), whether it worked or not.");   // i18n: session log (diagnostic)
+            setState(shown);
         }, "winlink").start();
     }
 
@@ -283,7 +290,7 @@ public final class Winlink {
             }
             @Override public void sent(String mid) { store.markSent(mid); changed(); }
             @Override public void log(String line) { note(line); }
-            @Override public void progress(String what, int done, int total) { progress = what + " \u00B7 " + done + " of " + total + " bytes"; changed(); }
+            @Override public void progress(String what, int done, int total) { progress = Txt.s(R.string.modes_winlink_progress, what, done, total); changed(); }
             @Override public void binary(boolean on) { inBinary = on; }
         };
         String version = "1.0";
@@ -291,9 +298,11 @@ public final class Winlink {
         if (diagNow) w = diagWire(w);
         B2fClient c = new B2fClient(w, box, radio.callsign(), target, grid(), version, prefs.getString("password", ""), timeoutMs);
         c.run();
-        lastResult = "Done: " + c.sent() + " sent, " + c.received() + " received";
-        if (got[0] > 0) radio.notifyUser("Winlink", got[0] == 1 ? "1 new message" : got[0] + " new messages");
+        lastResult = Txt.en(R.string.modes_winlink_done, c.sent(), c.received()); lastShown = Txt.s(R.string.modes_winlink_done, c.sent(), c.received());
+        if (got[0] > 0) radio.notifyUser("Winlink", Txt.p(R.plurals.modes_winlink_new_mail, got[0], got[0]));   // i18n: service name
     }
+
+    private volatile String lastShown = "";
 
     private B2fClient.Wire socketWire(InputStream in, OutputStream out) {
         return new B2fClient.Wire() {

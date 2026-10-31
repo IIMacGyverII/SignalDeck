@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
  * report.json beside report.txt (W6 plan item 9): the same facts as data, so two reports can be compared on a host
  * (scripts/report_diff.py). Built from the finished report text only, like the draft profile; it carries nothing the
  * text does not (the text is already redacted), and the phone fields are the ones in the summary's first line.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 final class ReportJson {
     private ReportJson() { }

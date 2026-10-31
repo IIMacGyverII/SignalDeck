@@ -8,6 +8,8 @@ package com.macdmr.radio;
 
 import android.util.Base64;
 
+import com.macdmr.radio.i18n.Txt;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -36,7 +38,7 @@ import java.nio.ByteOrder;
 public final class TranscriptionClient {
 
     private static final String TAG = "DMRModHooks";
-    private static final String ENDPOINT = "https://speech.googleapis.com/v1/speech:recognize?key=";
+    private static final String ENDPOINT = "https://speech.googleapis.com/v1/speech:recognize?key=";   // i18n: URL
 
     private TranscriptionClient() { }
 
@@ -51,7 +53,7 @@ public final class TranscriptionClient {
      */
     public static String transcribe(byte[] pcmBytes, int sampleRate, String apiKey) {
         if (isPlaceholderKey(apiKey)) {
-            return "[API key not configured - Press TXT to configure]";
+            return Txt.s(R.string.service_stt_no_key);
         }
         HttpURLConnection conn = null;
         try {
@@ -97,10 +99,10 @@ public final class TranscriptionClient {
             return "";
         } catch (IOException e) {
             android.util.Log.d("stt", TAG + ": transcription network error: " + e);
-            return "[Network error: " + e.getMessage() + "]";
+            return Txt.s(R.string.service_stt_network, String.valueOf(e.getMessage()));
         } catch (Throwable t) {
             android.util.Log.d("stt", TAG + ": transcription error: " + t);
-            return "[Error: " + t.getMessage() + "]";
+            return Txt.s(R.string.service_stt_error, String.valueOf(t.getMessage()));
         } finally {
             if (conn != null) try { conn.disconnect(); } catch (Throwable ignore) { }
         }
@@ -128,16 +130,16 @@ public final class TranscriptionClient {
         } catch (Throwable ignore) { }
 
         if ("BILLING_DISABLED".equals(reason))
-            return "[Transcription: enable billing on your Google Cloud project]";
+            return Txt.s(R.string.service_stt_billing);
         if ("SERVICE_DISABLED".equals(reason) || (message != null && message.contains("has not been used")))
-            return "[Transcription: enable the Cloud Speech-to-Text API in Google Cloud]";
+            return Txt.s(R.string.service_stt_api_off);
         if (reason.startsWith("API_KEY"))   // API_KEY_INVALID, API_KEY_SERVICE_BLOCKED, API_KEY_HTTP_REFERRER_BLOCKED...
-            return "[Transcription: API key invalid or not allowed for Speech-to-Text]";
+            return Txt.s(R.string.service_stt_bad_key);
         if (code == 429 || "RESOURCE_EXHAUSTED".equals(status))
-            return "[Transcription: Google quota exceeded - try later]";
+            return Txt.s(R.string.service_stt_quota);
         if (code == 400)
-            return "[Transcription: bad request (" + (message.isEmpty() ? "400" : shorten(message)) + ")]";
-        return "[Transcription API error " + code + (status.isEmpty() ? "" : " " + status) + "]";
+            return Txt.s(R.string.service_stt_bad_request, message.isEmpty() ? "400" : shorten(message));
+        return status.isEmpty() ? Txt.s(R.string.service_stt_api_error, code) : Txt.s(R.string.service_stt_api_error_status, code, status);
     }
 
     private static String shorten(String s) {

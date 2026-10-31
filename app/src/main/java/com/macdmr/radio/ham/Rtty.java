@@ -20,7 +20,7 @@ public final class Rtty {
     private static final double SPB = SR / BAUD;                   // samples per bit, 176
 
     // ITA2: index = 5-bit code (LSB first on air), letters and figures
-    private static final String LTRS = "\0E\nA SIU\rDRJNFCKTZLWHYPQOBG\u000EMXV\u000F";
+    private static final String LTRS = "\0E\nA SIU\rDRJNFCKTZLWHYPQOBG\u000EMXV\u000F";   // i18n: Baudot code table
     private static final String FIGS = "\u0000" + "3\n- \u000787\r$4',!:(5\")2#6019?&\u000E./;\u000F";
     private static final int LTRS_CODE = 31, FIGS_CODE = 27;
 

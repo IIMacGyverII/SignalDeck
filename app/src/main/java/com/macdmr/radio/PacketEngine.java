@@ -76,6 +76,8 @@ public final class PacketEngine {
         /** The same as a message, so it can be shown in the app's language; by default its English text. */
         default void event(Msg m) { event(m.english()); }
         void notifyUser(String title, String text, boolean alert);
+        /** An APRS message for this station from {@code from} (APRS-IS when {@code internet}). The service shows it as a conversation; by default an ordinary notification. */
+        default void notifyMessage(String from, String text, boolean internet) { notifyUser(Txt.s(internet ? R.string.packet_is_notify_message : R.string.packet_aprs_notify_message, from), text, false); }
         int rssiDbm();                           // last signal reading, -999 = none
         /** Keep GPS updates coming to {@link #onLocation} (SmartBeaconing) or stop them. */
         void wantLocation(boolean on);
@@ -799,7 +801,7 @@ public final class PacketEngine {
             String from = p.sourceCallsign + (p.sourceSSID != 0 ? "-" + p.sourceSSID : "");
             store.log(p.isAck ? "ack" : p.isRej ? "rej" : "msg", from + " (IS)", p.messageTo, p.messageText, p.messageId, true);
             if (p.isAck || p.isRej) return;
-            host.notifyUser(Txt.s(R.string.packet_is_notify_message, from), p.messageText, false);
+            host.notifyMessage(from, p.messageText, true);
             host.event("\uD83C\uDF10 " + from + ": " + p.messageText);
             AprsIsClient c = is;
             if (p.messageId != null && c != null && c.isVerified()) c.send(c.getLogin() + ">APDR16,TCPIP*:" + Ax25.messageInfo(from, "ack" + p.messageId, 0));
@@ -991,7 +993,7 @@ public final class PacketEngine {
         if (group != null && !p.isAck && !p.isRej) { store.log("msg", from, p.messageTo, p.messageText, p.messageId, true); host.notifyUser(Txt.s(R.string.packet_aprs_notify_group, group, from), p.messageText, false); return; }
         store.log(p.isAck ? "ack" : p.isRej ? "rej" : "msg", from, p.messageTo, p.messageText, p.messageId, mine);
         if (mine && !p.isAck && !p.isRej && p.messageId != null) maybeAutoAck(from, p.messageId);
-        if ((mine || bulletin) && !p.isAck && !p.isRej) host.notifyUser(Txt.s(mine ? R.string.packet_aprs_notify_message : R.string.packet_aprs_notify_bulletin, from), p.messageText, false);
+        if ((mine || bulletin) && !p.isAck && !p.isRej) { if (mine) host.notifyMessage(from, p.messageText, false); else host.notifyUser(Txt.s(R.string.packet_aprs_notify_bulletin, from), p.messageText, false); }
         if (mine && !p.isAck && !p.isRej) { RadioService r = RadioService.running; if (r != null) r.onFormText(from, p.messageText, "APRS"); }   // ICS-213 / radiogram parts
     }
 

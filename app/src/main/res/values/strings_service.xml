@@ -799,4 +799,24 @@
     <string name="service_stt_api_error_status">[Transcription API error %1$d %2$s]</string>
     <!-- Error inside "model error: …" when the speech model download failed. %1$d is the HTTP status code. -->
     <string name="service_vosk_http">HTTP %1$d downloading the model</string>
+    <!-- SAFETY: History line (Last heard → Alerts): a long transmission was held back by the heat guard. %1$s the reason (heat guard text: too hot, cooling down…). Keep the ⏳ first. -->
+    <string name="service_tx_held">⏳ %1$s</string>
+    <!-- SAFETY: Emergency sheet result: nothing was sent because the radio is not running. -->
+    <string name="service_sos_radio_off">Not sent: the radio is not on</string>
+    <!-- SAFETY: Emergency sheet result: nothing was sent because this channel is receive-only (weather, marine, railroad). -->
+    <string name="service_sos_receive_only">Not sent: this channel is receive-only</string>
+    <!-- SAFETY: Emergency sheet result on a DMR channel: pick the contact or talkgroup that gets the emergency text first. -->
+    <string name="service_sos_choose_recipient">Not sent: choose who receives the emergency text</string>
+    <!-- SAFETY: Emergency sheet result: the DMR emergency text went out. %1$s who it went to (name or number). -->
+    <string name="service_sos_text_sent">Emergency text sent to %1$s</string>
+    <!-- SAFETY: As service_sos_text_sent, when the phone had no GPS position to include. -->
+    <string name="service_sos_text_sent_no_fix">Emergency text sent to %1$s (no position fix)</string>
+    <!-- SAFETY: Emergency sheet result on an FM channel: APRS (packet radio) is not running, so nothing was sent. -->
+    <string name="service_sos_no_packet">Not sent: packet radio is not available</string>
+    <!-- SAFETY: Emergency sheet result: not sent; %1$s the reason the packet engine gave. -->
+    <string name="service_sos_not_sent">Not sent: %1$s</string>
+    <!-- SAFETY: Emergency sheet result: an APRS emergency position report went out on channel %1$s (its name). -->
+    <string name="service_sos_aprs_position_sent">Emergency APRS position sent on %1$s</string>
+    <!-- SAFETY: As service_sos_aprs_position_sent, but only a status (the phone had no GPS position). -->
+    <string name="service_sos_aprs_status_sent">Emergency APRS status (no position fix) sent on %1$s</string>
 </resources>

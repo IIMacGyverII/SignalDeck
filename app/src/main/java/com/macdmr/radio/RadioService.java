@@ -110,7 +110,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     private final java.util.concurrent.ExecutorService worker = java.util.concurrent.Executors.newSingleThreadExecutor(r -> new Thread(r, "radio-worker"));
     private volatile boolean pttDown;
     /** Ends a voice key at the transmit limit (Device → Longest transmission, {@link TxLimit}); not posted for No limit. */
-    private final Runnable txWatchdog = () -> { if (pttDown) { String n = TxLimit.name(txLimitS()); log("TX watchdog: releasing PTT after " + n); history("tx", Msg.of(R.string.service_tx_limit_ended, n)); ptt(false); } };
+    private final Runnable txWatchdog = () -> { if (pttDown) { Msg n = TxLimit.nameMsg(txLimitS()); log("TX watchdog: releasing PTT after " + n.english()); history("tx", Msg.of(R.string.service_tx_limit_ended, n)); ptt(false); } };
     /** The heat watch of the voice key in progress, and a count of voice keys so a late watch never ends the next key. */
     private volatile Thread voiceHeat;
     private volatile long voiceKeys;
@@ -596,6 +596,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public void sentTo(String call, String source, String detail) { ChannelStore.Contact pc = store.contactByCallsign(call); if (pc != null) store.contactSent(pc.id, System.currentTimeMillis(), source, detail); }
         @Override public void event(String line) { history("pkt", line); }
         @Override public void notifyUser(String title, String text, boolean alert) { RadioService.this.notifyUser(title, text, alert); }
+        @Override public void notifyMessage(String from, String text, boolean internet) { RadioService.this.notifyMessage(from, text, internet); }
+        @Override public void event(Msg m) { history("pkt", m); }
         @Override public int rssiDbm() { return rssi; }
         @Override public void wantLocation(boolean on) { ui.post(() -> aprsLocation(on)); }
         @Override public void logHeard(String call, String mode, String note) { RadioService.this.logHeardStation(call, mode, note); }
@@ -756,11 +758,11 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (pttDown) { log("TX " + label + " skipped: PTT busy"); return; }
                 int ms = pcm.length / 8;
                 int limit = TxLimit.capMs(txLimitS()), cap = Math.min(maxMs, limit);
-                if (ms > cap) { log("TX " + label + " refused: " + ms + " ms over " + cap); history("warn", cap == limit ? Msg.of(R.string.service_tx_too_long_limit, label, Math.round(ms / 1000.0), TxLimit.name(txLimitS())) : Msg.of(R.string.service_tx_too_long_sender, label, Math.round(ms / 1000.0), cap / 1000)); return; }
+                if (ms > cap) { log("TX " + label + " refused: " + ms + " ms over " + cap); history("warn", cap == limit ? Msg.of(R.string.service_tx_too_long_limit, label, Math.round(ms / 1000.0), TxLimit.nameMsg(txLimitS())) : Msg.of(R.string.service_tx_too_long_sender, label, Math.round(ms / 1000.0), cap / 1000)); return; }
                 Thread heatWatch = null;
                 if (ms > ThermalGuard.LONG_MS) {
-                    String wait = thermal.gate(ms, ThermalGuard.batteryC(this));
-                    if (wait != null) { log("TX " + label + " held: " + wait); history("warn", "\u23F3 " + wait); return; }
+                    Msg wait = thermal.gateMsg(ms, ThermalGuard.batteryC(this));
+                    if (wait != null) { log("TX " + label + " held: " + wait.english()); history("warn", Msg.of(R.string.service_tx_held, wait)); return; }
                     thermal.beforeLong();
                     heatWatch = heatWatchdog(label);
                 }
@@ -794,10 +796,11 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     private int notifyId = 100;
+    /** An APRS message for this station (over the air, or APRS-IS when {@code internet}): a conversation, so Android Auto reads it aloud and offers a reply. */
+    public void notifyMessage(String from, String text, boolean internet) { CarMessages.aprs(this, from, text, internet); }
+
     public void notifyUser(String title, String text, boolean alert) {
-        // messages and weather alerts as conversations, so Android Auto reads them aloud (and offers a reply)
-        if (title != null && title.startsWith("APRS-IS message from ")) { CarMessages.aprs(this, title.substring("APRS-IS message from ".length()), text, true); return; }   // i18n: matches the title the packet engine builds
-        if (title != null && title.startsWith("APRS message from ")) { CarMessages.aprs(this, title.substring("APRS message from ".length()), text, false); return; }   // i18n: matches the title the packet engine builds
+        // weather alerts as conversations, so Android Auto reads them aloud (APRS messages come through notifyMessage)
         if (alert && title != null && title.startsWith("\u26C8")) { CarMessages.alert(this, title.replaceFirst("^\\S+\\s*", ""), text); return; }
         try {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -2782,10 +2785,10 @@ public class RadioService extends Service implements RadioEngine.Events {
                 while (!Thread.currentThread().isInterrupted()) {
                     Thread.sleep(5000);
                     double z = thermal.readC(), b = ThermalGuard.batteryC(RadioService.this);
-                    String stop = ThermalGuard.stopNow(z, b, pz, pb);
+                    Msg stopM = ThermalGuard.stopNowMsg(z, b, pz, pb); String stop = stopM == null ? null : stopM.english();
                     if (stop != null) {
                         log("heat stop during " + label + ": " + stop);
-                        history("warn", Msg.of(R.string.service_heat_stop, label, stop));
+                        history("warn", Msg.of(R.string.service_heat_stop, label, stopM));
                         stopKey.run();
                         return;
                     }
@@ -2811,7 +2814,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         Thread t = new Thread(() -> {
             long t0 = System.currentTimeMillis();
             double z0 = thermal.readC(), b0 = ThermalGuard.batteryC(RadioService.this);
-            String held = thermal.gate(ThermalGuard.LONG_MS + 1, b0);          // what a long key starting now would be told
+            Msg heldM = thermal.gateMsg(ThermalGuard.LONG_MS + 1, b0); String held = heldM == null ? null : heldM.english();          // what a long key starting now would be told
             double pz = Double.NaN, pb = Double.NaN; int n = 0; boolean longKey = false;
             try {
                 while (alive.alive()) {
@@ -2819,15 +2822,15 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (!alive.alive()) return;
                     if (!longKey && System.currentTimeMillis() - t0 > ThermalGuard.LONG_MS) {
                         longKey = true;
-                        if (held != null) { log("heat: " + label + " ended at 30 s: " + held); history("warn", Msg.of(R.string.service_heat_cap, label, held)); stopKey.run(); return; }
+                        if (held != null) { log("heat: " + label + " ended at 30 s: " + held); history("warn", Msg.of(R.string.service_heat_cap, label, heldM)); stopKey.run(); return; }
                         thermal.beforeLong(z0);                                    // the cool-down after this key is measured from where it started
                     }
                     if (++n % 5 != 0) continue;                                   // read every 5 s
                     double z = thermal.readC(), b = ThermalGuard.batteryC(RadioService.this);
-                    String stop = longKey ? ThermalGuard.stopNow(z, b, pz, pb) : null;
+                    Msg stopM = longKey ? ThermalGuard.stopNowMsg(z, b, pz, pb) : null; String stop = stopM == null ? null : stopM.english();
                     if (stop != null && alive.alive()) {
                         log("heat stop during " + label + ": " + stop);
-                        history("warn", Msg.of(R.string.service_heat_stop, label, stop));
+                        history("warn", Msg.of(R.string.service_heat_stop, label, stopM));
                         stopKey.run();
                         return;
                     }
@@ -3927,6 +3930,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             }
             @Override public void pollRssi() { RadioService.this.pollRssiMeasure(); }
             @Override public void event(String line) { history("cov", line); }
+            @Override public void event(Msg m) { history("cov", m); }
         });
         return coverage;
     }
@@ -4062,13 +4066,16 @@ public class RadioService extends Service implements RadioEngine.Events {
         } catch (Throwable t) { log("media volume: " + t); }
     }
 
-    public String emergency(String text, int toNumber, int toType, String toName) {
+    /** What an emergency send did: {@code sent} decides the dialog's colour and button, {@code text} is shown. */
+    public static final class Sos { public final boolean sent; public final String text; Sos(boolean sent, String text) { this.sent = sent; this.text = text; } }
+
+    public Sos emergency(String text, int toNumber, int toType, String toName) {
         ChannelStore.Channel ch = current;
-        if (!isReady() || ch == null) return "Not sent: the radio is not on";   // i18n: EmergencyDialog matches it (to become a status code)
-        if (txInhibited()) return "Not sent: this channel is receive-only";   // i18n: EmergencyDialog matches it (to become a status code)
+        if (!isReady() || ch == null) return new Sos(false, Txt.s(R.string.service_sos_radio_off));
+        if (txInhibited()) return new Sos(false, Txt.s(R.string.service_sos_receive_only));
         String m = text == null || text.trim().isEmpty() ? "Need help" : text.trim();   // i18n: sent on air
         if (ch.isDigital()) {
-            if (toNumber <= 0) return "Not sent: choose who receives the emergency text";   // i18n: EmergencyDialog matches it (to become a status code)
+            if (toNumber <= 0) return new Sos(false, Txt.s(R.string.service_sos_choose_recipient));
             android.location.Location l = lastKnownLocation();
             String pos = l == null ? "position unknown" : String.format(Locale.US, "%.5f,%.5f", l.getLatitude(), l.getLongitude()) + (l.hasAccuracy() ? " +-" + Math.round(l.getAccuracy()) + "m" : "");   // i18n: sent on air
             String body = "EMERGENCY " + m + " @ " + pos;   // i18n: sent on air
@@ -4077,12 +4084,12 @@ public class RadioService extends Service implements RadioEngine.Events {
             sendSms(to, body);
             String who = to.name.isEmpty() ? String.valueOf(toNumber) : to.name;
             history("tx", Msg.of(R.string.service_sos_history, who, body));
-            return "Emergency text sent to " + who + (l == null ? " (no position fix)" : "");   // i18n: EmergencyDialog matches it (to become a status code)
+            return new Sos(true, Txt.s(l == null ? R.string.service_sos_text_sent_no_fix : R.string.service_sos_text_sent, who));
         }
-        if (packet == null) return "Not sent: packet radio is not available";   // i18n: EmergencyDialog matches it (to become a status code)
+        if (packet == null) return new Sos(false, Txt.s(R.string.service_sos_no_packet));
         String e = packet.sendEmergency(m);
-        if (e != null) return "Not sent: " + e;   // i18n: EmergencyDialog matches it (to become a status code)
-        return "Emergency APRS " + (lastKnownLocation() != null ? "position" : "status (no position fix)") + " sent on " + ch.name;   // i18n: EmergencyDialog matches it (to become a status code)
+        if (e != null) return new Sos(false, Txt.s(R.string.service_sos_not_sent, e));
+        return new Sos(true, Txt.s(lastKnownLocation() != null ? R.string.service_sos_aprs_position_sent : R.string.service_sos_aprs_status_sent, ch.name));
     }
     public boolean pttHeld() { return pttDown; }
     public boolean isScanning() { return scanner != null && scanner.isScanning(); }

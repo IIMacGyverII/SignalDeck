@@ -91,9 +91,9 @@ public final class EmergencyDialog {
                 if (left > 0) { send.setText(Txt.s(R.string.intercom_emergency_keep_holding, (int) (left / 1000 + 1))); h.postDelayed(this, 100); return; }
                 downAt[0] = 0;
                 p.edit().putString("text", msg.getText().toString()).apply();
-                String r = svc.emergency(msg.getText().toString(), p.getInt("to", 0), p.getInt("toType", 0), p.getString("toName", ""));
-                send.setText(Txt.s(r.startsWith("Emergency") ? R.string.intercom_emergency_send_again : R.string.intercom_emergency_hold_to_send));
-                result.setText(r); result.setTextColor(r.startsWith("Emergency") ? Neo.GREEN : Neo.AMBER);
+                com.macdmr.radio.RadioService.Sos r = svc.emergency(msg.getText().toString(), p.getInt("to", 0), p.getInt("toType", 0), p.getString("toName", ""));
+                send.setText(Txt.s(r.sent ? R.string.intercom_emergency_send_again : R.string.intercom_emergency_hold_to_send));
+                result.setText(r.text); result.setTextColor(r.sent ? Neo.GREEN : Neo.AMBER);
             }
         };
         send.setOnTouchListener((v, e) -> {

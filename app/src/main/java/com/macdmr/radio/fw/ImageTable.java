@@ -4,6 +4,9 @@
  */
 package com.macdmr.radio.fw;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -38,9 +41,9 @@ public final class ImageTable {
             "DMR003.UV4T.V022",
             "90e361fda1082cdd010f8f2127eab97786f2a078f2f7590821c26867526c8c10",
             378620,
-            "The firmware this phone shipped with. Loading it puts the module back the way it was. The image stays until another one is loaded, including across a reboot.",
+            "The firmware this phone shipped with. Loading it puts the module back the way it was. The image stays until another one is loaded, including across a reboot.",   // i18n: English copy of the row; shown through summary(Row)
             "DMR003.UV4T.V022",
-            "Armor 26 Ultra",
+            "Armor 26 Ultra",   // i18n: phone model name
             "com.pri.prizeinterphone",
             "V1.0",
             true, false);
@@ -49,7 +52,7 @@ public final class ImageTable {
             "DMR003.FW22.V022",
             "38f900a0df169c0101f9e6183fe8ec8d2e9cdca74169f034f5571b04aa988d6a",
             378620,
-            "Bench image. A tone still plays when nothing else is queued, and the module can read its own flash. The radio's own transmit limit on this image is 120 seconds. It stays until another image is loaded, including across a reboot. It does not change bands or power.",
+            "Bench image. A tone still plays when nothing else is queued, and the module can read its own flash. The radio's own transmit limit on this image is 120 seconds. It stays until another image is loaded, including across a reboot. It does not change bands or power.",   // i18n: English copy of the row; shown through summary(Row)
             FACTORY.tag,
             FACTORY.model,
             FACTORY.stockPackage,
@@ -57,6 +60,13 @@ public final class ImageTable {
             false, true);
 
     private static final Row[] ROWS = { FACTORY, FW22 };
+
+    /** A row's description in the app's language: the built-in rows from resources, catalogue and unlisted rows as they came. */
+    public static String summary(Row r) {
+        if (r == FACTORY) return Txt.s(R.string.device_fw_factory_summary);
+        if (r == FW22) return Txt.s(R.string.device_fw_fw22_summary);
+        return r.summary;
+    }
 
     private ImageTable() { }
 
@@ -117,32 +127,32 @@ public final class ImageTable {
      */
     public static String refuse(Row image, String moduleTag, String assetSha, String assetTag,
                                 String model, String pkg, String pkgVersion, boolean backupVerified, boolean stockPresent, List<Row> known) {
-        if (image == null) return "That file is not a known module image";
-        if (!FACTORY.sha256.equals(image.sha256) && bySha(image.sha256, known) == null) return "That file is not a known module image";
+        if (image == null) return Txt.s(R.string.device_fw_not_known_image);
+        if (!FACTORY.sha256.equals(image.sha256) && bySha(image.sha256, known) == null) return Txt.s(R.string.device_fw_not_known_image);
         boolean silent = moduleTag == null || moduleTag.trim().isEmpty();
         if (silent) {
-            if (!image.factory) return "The module did not answer. Recovery loads the factory image only";
+            if (!image.factory) return Txt.s(R.string.device_fw_recovery_factory_only);
             if (!backupVerified) return stockPresent
-                    ? "The factory backup is missing or does not match. Connect the stock app's copy before recovery"
-                    : "The stock app is gone and there is no verified factory copy on this phone";
+                    ? Txt.s(R.string.device_fw_backup_needed_recovery)
+                    : Txt.s(R.string.device_fw_stock_gone);
             return null;
         }
         String tag = moduleTag.trim();
         Row running = byTag(tag, known);
         if (running == null) {
-            if (!(image.factory && backupVerified)) return "Firmware variant not yet supported (" + tag + ")";
+            if (!(image.factory && backupVerified)) return Txt.s(R.string.device_fw_variant_tag, tag);
         } else if (!FACTORY.tag.equals(running.baseTag) && !FACTORY.tag.equals(running.tag)) {
-            return "Firmware variant not yet supported (" + tag + ")";
+            return Txt.s(R.string.device_fw_variant_tag, tag);
         }
-        if (!modelMatches(model)) return "This phone model is not the one that image was built for";
-        if (pkg == null || !FACTORY.stockPackage.equals(pkg)) return "The stock radio app on this phone is not the one this image belongs to";
+        if (!modelMatches(model)) return Txt.s(R.string.device_fw_wrong_model);
+        if (pkg == null || !FACTORY.stockPackage.equals(pkg)) return Txt.s(R.string.device_fw_wrong_stock_app);
         boolean assetOk = FACTORY.sha256.equals(assetSha) && FACTORY.tag.equals(assetTag);
         if (!assetOk && !backupVerified)
             return stockPresent
-                    ? "The stock app's firmware does not match the known factory image, and there is no verified backup"
-                    : "The stock app is gone and there is no verified factory copy on this phone";
-        if (!image.factory && !backupVerified) return "Load the factory backup onto this phone before any other image";
-        if (!image.factory && !FACTORY.tag.equals(image.baseTag)) return "That image was not built from this phone's factory firmware";
+                    ? Txt.s(R.string.device_fw_stock_mismatch)
+                    : Txt.s(R.string.device_fw_stock_gone);
+        if (!image.factory && !backupVerified) return Txt.s(R.string.device_fw_backup_first);
+        if (!image.factory && !FACTORY.tag.equals(image.baseTag)) return Txt.s(R.string.device_fw_wrong_base);
         return null;
     }
 
@@ -154,14 +164,14 @@ public final class ImageTable {
         return unlistedPolicy(moduleTag, backupVerified, model, pkg, Arrays.asList(ROWS));
     }
     public static String unlistedPolicy(String moduleTag, boolean backupVerified, String model, String pkg, List<Row> known) {
-        if (!backupVerified) return "Load the factory backup onto this phone before any other image";
-        if (moduleTag == null || moduleTag.trim().isEmpty()) return "The module did not answer. Recovery loads the factory image only";
+        if (!backupVerified) return Txt.s(R.string.device_fw_backup_first);
+        if (moduleTag == null || moduleTag.trim().isEmpty()) return Txt.s(R.string.device_fw_recovery_factory_only);
         String tag = moduleTag.trim();
         Row running = byTag(tag, known);
-        if (running == null) return "Firmware variant not yet supported (" + tag + ")";
-        if (!FACTORY.tag.equals(running.baseTag) && !FACTORY.tag.equals(running.tag)) return "Firmware variant not yet supported (" + tag + ")";
-        if (!modelMatches(model)) return "This phone model is not the one that image was built for";
-        if (pkg == null || !FACTORY.stockPackage.equals(pkg)) return "The stock radio app on this phone is not the one this image belongs to";
+        if (running == null) return Txt.s(R.string.device_fw_variant_tag, tag);
+        if (!FACTORY.tag.equals(running.baseTag) && !FACTORY.tag.equals(running.tag)) return Txt.s(R.string.device_fw_variant_tag, tag);
+        if (!modelMatches(model)) return Txt.s(R.string.device_fw_wrong_model);
+        if (pkg == null || !FACTORY.stockPackage.equals(pkg)) return Txt.s(R.string.device_fw_wrong_stock_app);
         return null;
     }
 
@@ -172,6 +182,6 @@ public final class ImageTable {
     public static String versionWarning(String assetSha, String pkgVersion) {
         if (!FACTORY.sha256.equals(assetSha)) return null;
         if (pkgVersion == null || FACTORY.stockVersion.equals(pkgVersion)) return null;
-        return "Stock app is " + pkgVersion + ", not " + FACTORY.stockVersion + ". The firmware file matches, so the load can continue";
+        return Txt.s(R.string.device_fw_stock_version_note, pkgVersion, FACTORY.stockVersion);
     }
 }

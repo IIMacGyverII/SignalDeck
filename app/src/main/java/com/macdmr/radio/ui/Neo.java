@@ -148,6 +148,49 @@ public final class Neo {
         return t;
     }
 
+    /**
+     * {@link #fit(TextView)} for a row of buttons that share the width (weights), changing nothing while the label fits:
+     * a one-word label stays on one line and a longer one wraps between words onto at most two lines. Only when a word
+     * would break inside (a long German word), or the label is taller than a fixed-height button, the icon goes first, and if the word still does not fit the text shrinks,
+     * down to 10 sp. So a row whose labels fit (English) keeps its icons, size and line breaks. Follows label changes.
+     */
+    public static TextView fit(final TextView t, boolean keepIcon) {
+        if (!keepIcon) return fit(t);
+        final float base = t.getTextSize();
+        final int minPx = Math.round(10 * t.getResources().getDisplayMetrics().scaledDensity);
+        final boolean[] shrinking = { false };
+        t.setSingleLine(false);                                            // a single-line view scrolls sideways and never shrinks
+        t.setMaxLines(fitLines(t.getText()));
+        t.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);
+        final Runnable check = () -> {
+            int lines = fitLines(t.getText());
+            if (t.getMaxLines() != lines) { t.setMaxLines(lines); return; }   // a new label: measure again after the layout
+            int room = t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight();
+            if (room <= 0 || shrinking[0]) return;
+            Paint p = new Paint(t.getPaint()); p.setTextSize(base);
+            boolean tooWide = false;
+            for (String w : String.valueOf(t.getText()).trim().split(" +")) if (p.measureText(w) > room) { tooWide = true; break; }
+            android.text.Layout lay = t.getLayout();
+            boolean tooLong = lay != null && (lay.getLineCount() > lines || lay.getHeight() > t.getHeight() - t.getTotalPaddingTop() - t.getTotalPaddingBottom());   // more lines than words allow, or taller than a fixed-height button
+            if (!tooWide && !tooLong) return;
+            if (t.getCompoundDrawables()[0] != null) { t.setCompoundDrawables(null, null, null, null); return; }   // the word needs the icon's room
+            if ((int) base <= minPx) return;
+            shrinking[0] = true;                                           // the last resort: from here the size follows the room
+            t.setAutoSizeTextTypeUniformWithConfiguration(minPx, (int) base, 1, android.util.TypedValue.COMPLEX_UNIT_PX);
+        };
+        t.addOnLayoutChangeListener((v, l, tp, r, b, ol, ot, or, ob) -> t.post(check));
+        t.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int n) { }
+            @Override public void onTextChanged(CharSequence s, int a, int b, int n) { }
+            @Override public void afterTextChanged(android.text.Editable s) { t.post(check); }
+        });
+        return t;
+    }
+    private static int fitLines(CharSequence text) {
+        String s = text == null ? "" : text.toString().trim();
+        return Math.min(2, s.isEmpty() ? 1 : s.split(" +").length);
+    }
+
     /** Square icon button (header actions). */
     public static ImageView iconButton(Context c, String icon, int accent, String description) {
         ImageView v = new ImageView(c); v.setImageDrawable(new IconDrawable(icon, accent)); v.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -186,13 +229,37 @@ public final class Neo {
         GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[] { 0xF20A1420, 0x99060B12 });
         bar.setBackground(new android.graphics.drawable.LayerDrawable(new Drawable[] { bg, bottomLine() }));
         LinearLayout col = new LinearLayout(c); col.setOrientation(LinearLayout.VERTICAL);
-        TextView t = title(c, title); t.setTag("title"); col.addView(t);
+        TextView t = title(c, title); t.setTag("title"); col.addView(t); shrinkToFit(t, 11);   // a long title (German) shrinks before "…"
         TextView s = caps(c, subtitle == null ? "" : subtitle); s.setTag("subtitle"); s.setPadding(0, Theme.dp(c, 5), 0, 0); s.setMaxLines(2); s.setEllipsize(android.text.TextUtils.TruncateAt.END);   // two lines when a page splits it (see fitSubtitle)
         col.addView(s);
         bar.addView(col, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         LinearLayout actions = new LinearLayout(c); actions.setTag("actions"); actions.setGravity(Gravity.CENTER_VERTICAL);
         bar.addView(actions);
         return bar;
+    }
+    /**
+     * A one-line title shrinks to fit (down to {@code minSp}) before it is cut off with "…" (a long German title next
+     * to the header's buttons). A title that fits keeps its size, also one the page set itself (the intercom's).
+     */
+    static void shrinkToFit(final TextView t, final float minSp) {
+        final float[] want = { t.getTextSize() }, mine = { -1 };
+        final Runnable fit = () -> {
+            float cur = t.getTextSize();
+            if (cur != mine[0]) want[0] = cur;                             // a size the page set: the most this title may have
+            int room = t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight();
+            if (room <= 0) return;
+            float min = minSp * t.getResources().getDisplayMetrics().scaledDensity, size = want[0];
+            String s = String.valueOf(t.getText());
+            Paint p = new Paint(t.getPaint()); p.setTextSize(size);
+            while (size > min && p.measureText(s) > room) { size = Math.max(min, size - 1); p.setTextSize(size); }
+            if (size != cur) { mine[0] = size; t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, size); }
+        };
+        t.addOnLayoutChangeListener((v, l, tp, r, b, ol, ot, or, ob) -> t.post(fit));
+        t.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int n) { }
+            @Override public void onTextChanged(CharSequence s, int a, int b, int n) { }
+            @Override public void afterTextChanged(android.text.Editable s) { t.post(fit); }
+        });
     }
     public static TextView headerTitle(LinearLayout bar) { return (TextView) bar.findViewWithTag("title"); }
     public static TextView headerSubtitle(LinearLayout bar) { return (TextView) bar.findViewWithTag("subtitle"); }
@@ -236,62 +303,62 @@ public final class Neo {
     // ---- icons: 24-unit line paths (stroke 1.8, round caps), the set shown on the design canvas ----
     public static final Map<String, String> ICONS = new HashMap<>();
     static {
-        ICONS.put("intercom", "M9 6a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0zM5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7");
-        ICONS.put("channels", "M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1");
-        ICONS.put("contacts", "M12 4a4 4 0 1 0 0.01 0M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6");
-        ICONS.put("messages", "M4 5h16v11H9l-5 4z");
-        ICONS.put("mail", "M3 6h18v12H3zM3.5 6.5l8.5 6.5 8.5-6.5");
-        ICONS.put("inbox", "M4 13l2.5-8h11L20 13v6H4zM4 13h4.5l1.5 2.5h4l1.5-2.5H20");
-        ICONS.put("device", "M4 8h16v13H4zM8 3l8 5M7 13h3M7 16h3M15 12a2.5 2.5 0 1 0 0.01 0");
-        ICONS.put("scan", "M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4");
-        ICONS.put("stop", "M7 7h10v10H7z");
-        ICONS.put("ft8", "M3 18h3v-4h3v5h3v-9h3v4h3V6h3");                 // stepped tones: 8-FSK
-        ICONS.put("zone", "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5");
-        ICONS.put("softsq", "M3 12h3l2-5 3 10 3-7 2 2h5");
-        ICONS.put("txt", "M4 6h16M4 11h11M4 16h14M4 21h7");
-        ICONS.put("vfo", "M12 6.5a5.5 5.5 0 1 0 0.01 0M12 6.5v4M12 2v1.5M3.5 5.5l1 1M20.5 5.5l-1 1M2 12h1.5M20.5 12H22");
-        ICONS.put("rec", "M12 7a5 5 0 1 0 0.01 0");
-        ICONS.put("mon", "M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12zM12 9.5a2.5 2.5 0 1 0 0.01 0");
-        ICONS.put("pkt", "M12 10v11M8 21h8M8.5 6.5a5 5 0 0 1 7 0M5.5 3.5a9 9 0 0 1 13 0");
-        ICONS.put("repeaters", "M5 14a7 7 0 0 0 9.9 0L5 4.1a7 7 0 0 0 0 9.9zM10 9l3-3M14 4a6 6 0 0 1 6 6M14 7.5a2.5 2.5 0 0 1 2.5 2.5M8 18l-2 3h8l-2-3");
-        ICONS.put("plus", "M12 5v14M5 12h14");
-        ICONS.put("widget", "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z");
-        ICONS.put("search", "M11 4.5a6.5 6.5 0 1 0 0.01 0M16 16l4.5 4.5");
-        ICONS.put("star", "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z");
-        ICONS.put("heart", "M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z");
-        ICONS.put("menu", "M4 7h16M4 12h16M4 17h10");
-        ICONS.put("left", "M15 5l-7 7 7 7");
-        ICONS.put("right", "M9 5l7 7-7 7");
-        ICONS.put("module", "M6 6h12v12H6zM9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4M10 12h4");
-        ICONS.put("handback", "M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3");
-        ICONS.put("takeover", "M15 10l5 5-5 5M20 15H10a6 6 0 0 1 0-12h3");
-        ICONS.put("shield", "M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6zM8.5 12l2.5 2.5 4.5-5");
-        ICONS.put("power", "M12 3v8M6.3 7a8 8 0 1 0 11.4 0");
-        ICONS.put("ptt", "M9 6a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0zM5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21");
-        ICONS.put("volume", "M4 9v6h4l5 4V5L8 9zM17 9a4 4 0 0 1 0 6M19.5 6.5a7.5 7.5 0 0 1 0 11");
-        ICONS.put("voice", "M4 9v6h4l5 4V5L8 9zM17 9a4 4 0 0 1 0 6");
-        ICONS.put("backup", "M12 4v11M7 10l5 5 5-5M5 20h14");
-        ICONS.put("restore", "M12 20V9M7 14l5-5 5 5M5 4h14");
-        ICONS.put("import", "M4 4h7v7H4zM13 13h7v7h-7zM14 7h4a2 2 0 0 1 2 2v2M10 17H6a2 2 0 0 1-2-2v-2");
-        ICONS.put("globe", "M12 3a9 9 0 1 0 0.01 0M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18");
-        ICONS.put("report", "M9 3h6l1 3h3v15H5V6h3zM9 12h6M9 16h4");
-        ICONS.put("update", "M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5");
-        ICONS.put("spin", "M12 4a8 8 0 1 1-7.4 5M4.6 4.5v4.5h4.5M12 10.5a1.5 1.5 0 1 0 0.01 0");
-        ICONS.put("help", "M12 3a9 9 0 1 0 0.01 0M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01");
-        ICONS.put("diag", "M3 12h4l3-8 4 16 3-8h4");
-        ICONS.put("id", "M3 6h18v12H3zM7 10h4M7 14h6M16 10a1.5 1.5 0 1 0 0.01 0");
-        ICONS.put("check", "M5 12.5l4.5 4.5L19 7.5");
-        ICONS.put("info", "M12 3a9 9 0 1 0 0.01 0M12 11v5.5M12 7.8h.01");
-        ICONS.put("close", "M6 6l12 12M18 6L6 18");
-        ICONS.put("map", "M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14");
-        ICONS.put("locate", "M12 8a4 4 0 1 0 0.01 0M12 2v3M12 19v3M2 12h3M19 12h3");
-        ICONS.put("minus", "M5 12h14");
-        ICONS.put("signal", "M4 20v-3M9 20v-7M14 20V9M19 20V4");
-        ICONS.put("expand", "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5");
-        ICONS.put("alert", "M12 3.5L2.5 20h19zM12 10v4.5M12 17.5h.01");
-        ICONS.put("bolt", "M13 3L5 13.5h6L10 21l8-10.5h-6z");
-        ICONS.put("send", "M4 12l16-8-5.5 16-3.2-6.8zM11.3 13.2L20 4");
-        ICONS.put("radio", "M5 9h14v12H5zM9 4l8 5M8 14h3M8 17h3M15 15a2 2 0 1 0 0.01 0");
+        ICONS.put("intercom", "M9 6a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0zM5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7");   // i18n: icon name
+        ICONS.put("channels", "M9 6h11M9 12h11M9 18h11M4 6h1M4 12h1M4 18h1");   // i18n: icon name
+        ICONS.put("contacts", "M12 4a4 4 0 1 0 0.01 0M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6");   // i18n: icon name
+        ICONS.put("messages", "M4 5h16v11H9l-5 4z");   // i18n: icon name
+        ICONS.put("mail", "M3 6h18v12H3zM3.5 6.5l8.5 6.5 8.5-6.5");   // i18n: icon name
+        ICONS.put("inbox", "M4 13l2.5-8h11L20 13v6H4zM4 13h4.5l1.5 2.5h4l1.5-2.5H20");   // i18n: icon name
+        ICONS.put("device", "M4 8h16v13H4zM8 3l8 5M7 13h3M7 16h3M15 12a2.5 2.5 0 1 0 0.01 0");   // i18n: icon name
+        ICONS.put("scan", "M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3M18 3v4h-4M6 21v-4h4");   // i18n: icon name
+        ICONS.put("stop", "M7 7h10v10H7z");   // i18n: icon name
+        ICONS.put("ft8", "M3 18h3v-4h3v5h3v-9h3v4h3V6h3");                 // stepped tones: 8-FSK        ICONS.put("ft8", "M3 18h3v-4h3v5h3v-9h3v4h3V6h3");                 // stepped tones: 8-FSK
+        ICONS.put("zone", "M12 3l9 5-9 5-9-5zM3 13l9 5 9-5");   // i18n: icon name
+        ICONS.put("softsq", "M3 12h3l2-5 3 10 3-7 2 2h5");   // i18n: icon name
+        ICONS.put("txt", "M4 6h16M4 11h11M4 16h14M4 21h7");   // i18n: icon name
+        ICONS.put("vfo", "M12 6.5a5.5 5.5 0 1 0 0.01 0M12 6.5v4M12 2v1.5M3.5 5.5l1 1M20.5 5.5l-1 1M2 12h1.5M20.5 12H22");   // i18n: icon name
+        ICONS.put("rec", "M12 7a5 5 0 1 0 0.01 0");   // i18n: icon name
+        ICONS.put("mon", "M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12zM12 9.5a2.5 2.5 0 1 0 0.01 0");   // i18n: icon name
+        ICONS.put("pkt", "M12 10v11M8 21h8M8.5 6.5a5 5 0 0 1 7 0M5.5 3.5a9 9 0 0 1 13 0");   // i18n: icon name
+        ICONS.put("repeaters", "M5 14a7 7 0 0 0 9.9 0L5 4.1a7 7 0 0 0 0 9.9zM10 9l3-3M14 4a6 6 0 0 1 6 6M14 7.5a2.5 2.5 0 0 1 2.5 2.5M8 18l-2 3h8l-2-3");   // i18n: icon name
+        ICONS.put("plus", "M12 5v14M5 12h14");   // i18n: icon name
+        ICONS.put("widget", "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z");   // i18n: icon name
+        ICONS.put("search", "M11 4.5a6.5 6.5 0 1 0 0.01 0M16 16l4.5 4.5");   // i18n: icon name
+        ICONS.put("star", "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z");   // i18n: icon name
+        ICONS.put("heart", "M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z");   // i18n: icon name
+        ICONS.put("menu", "M4 7h16M4 12h16M4 17h10");   // i18n: icon name
+        ICONS.put("left", "M15 5l-7 7 7 7");   // i18n: icon name
+        ICONS.put("right", "M9 5l7 7-7 7");   // i18n: icon name
+        ICONS.put("module", "M6 6h12v12H6zM9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4M10 12h4");   // i18n: icon name
+        ICONS.put("handback", "M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3");   // i18n: icon name
+        ICONS.put("takeover", "M15 10l5 5-5 5M20 15H10a6 6 0 0 1 0-12h3");   // i18n: icon name
+        ICONS.put("shield", "M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6zM8.5 12l2.5 2.5 4.5-5");   // i18n: icon name
+        ICONS.put("power", "M12 3v8M6.3 7a8 8 0 1 0 11.4 0");   // i18n: icon name
+        ICONS.put("ptt", "M9 6a3 3 0 0 1 6 0v5a3 3 0 0 1-6 0zM5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21");   // i18n: icon name
+        ICONS.put("volume", "M4 9v6h4l5 4V5L8 9zM17 9a4 4 0 0 1 0 6M19.5 6.5a7.5 7.5 0 0 1 0 11");   // i18n: icon name
+        ICONS.put("voice", "M4 9v6h4l5 4V5L8 9zM17 9a4 4 0 0 1 0 6");   // i18n: icon name
+        ICONS.put("backup", "M12 4v11M7 10l5 5 5-5M5 20h14");   // i18n: icon name
+        ICONS.put("restore", "M12 20V9M7 14l5-5 5 5M5 4h14");   // i18n: icon name
+        ICONS.put("import", "M4 4h7v7H4zM13 13h7v7h-7zM14 7h4a2 2 0 0 1 2 2v2M10 17H6a2 2 0 0 1-2-2v-2");   // i18n: icon name
+        ICONS.put("globe", "M12 3a9 9 0 1 0 0.01 0M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18");   // i18n: icon name
+        ICONS.put("report", "M9 3h6l1 3h3v15H5V6h3zM9 12h6M9 16h4");   // i18n: icon name
+        ICONS.put("update", "M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5");   // i18n: icon name
+        ICONS.put("spin", "M12 4a8 8 0 1 1-7.4 5M4.6 4.5v4.5h4.5M12 10.5a1.5 1.5 0 1 0 0.01 0");   // i18n: icon name
+        ICONS.put("help", "M12 3a9 9 0 1 0 0.01 0M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01");   // i18n: icon name
+        ICONS.put("diag", "M3 12h4l3-8 4 16 3-8h4");   // i18n: icon name
+        ICONS.put("id", "M3 6h18v12H3zM7 10h4M7 14h6M16 10a1.5 1.5 0 1 0 0.01 0");   // i18n: icon name
+        ICONS.put("check", "M5 12.5l4.5 4.5L19 7.5");   // i18n: icon name
+        ICONS.put("info", "M12 3a9 9 0 1 0 0.01 0M12 11v5.5M12 7.8h.01");   // i18n: icon name
+        ICONS.put("close", "M6 6l12 12M18 6L6 18");   // i18n: icon name
+        ICONS.put("map", "M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14");   // i18n: icon name
+        ICONS.put("locate", "M12 8a4 4 0 1 0 0.01 0M12 2v3M12 19v3M2 12h3M19 12h3");   // i18n: icon name
+        ICONS.put("minus", "M5 12h14");   // i18n: icon name
+        ICONS.put("signal", "M4 20v-3M9 20v-7M14 20V9M19 20V4");   // i18n: icon name
+        ICONS.put("expand", "M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5");   // i18n: icon name
+        ICONS.put("alert", "M12 3.5L2.5 20h19zM12 10v4.5M12 17.5h.01");   // i18n: icon name
+        ICONS.put("bolt", "M13 3L5 13.5h6L10 21l8-10.5h-6z");   // i18n: icon name
+        ICONS.put("send", "M4 12l16-8-5.5 16-3.2-6.8zM11.3 13.2L20 4");   // i18n: icon name
+        ICONS.put("radio", "M5 9h14v12H5zM9 4l8 5M8 14h3M8 17h3M15 15a2 2 0 1 0 0.01 0");   // i18n: icon name
     }
 
     /** A line icon from {@link #ICONS} (or raw path data), stroked in one colour, scaled to its bounds. */
@@ -339,7 +406,7 @@ public final class Neo {
         private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         public NeonSwitch(Context c) { super(c); setClickable(true); setFocusable(true); setOnClickListener(v -> { setChecked(!on); if (cb != null) cb.changed(on); }); }
         public void setAccent(int a) { accent = a; invalidate(); }
-        public void setChecked(boolean v) { on = v; setContentDescription(on ? "On" : "Off"); invalidate(); }
+        public void setChecked(boolean v) { on = v; setContentDescription(on ? com.macdmr.radio.i18n.Txt.s(com.macdmr.radio.R.string.common_on) : com.macdmr.radio.i18n.Txt.s(com.macdmr.radio.R.string.common_off)); invalidate(); }
         public boolean isChecked() { return on; }
         public void setOnChange(OnChange c) { cb = c; }
         @Override protected void onMeasure(int w, int h) { setMeasuredDimension(Theme.dp(getContext(), 52), Theme.dp(getContext(), 32)); }
@@ -418,11 +485,11 @@ public final class Neo {
 
     private static String iconFor(String title) {
         String t = title.toLowerCase(java.util.Locale.US);
-        if (t.contains("ptt")) return "ptt"; if (t.equals("nets")) return "contacts"; if (t.contains("packet")) return "pkt"; if (t.contains("vfo")) return "vfo"; if (t.contains("repeater")) return "repeaters";
-        if (t.contains("record")) return "rec"; if (t.contains("caption") || t.contains("transcript")) return "txt"; if (t.contains("last heard")) return "intercom";
-        if (t.contains("station")) return "globe"; if (t.contains("dtmf")) return "channels"; if (t.contains("weather") || t.contains("same")) return "alert";
-        if (t.contains("coverage")) return "signal"; if (t.contains("emergency")) return "alert"; if (t.contains("widget")) return "widget";
-        if (t.contains("setting")) return "device"; if (t.contains("sstv") || t.contains("picture")) return "report"; if (t.contains("log")) return "diag";
+        if (t.contains("ptt")) return "ptt"; if (t.equals("nets")) return "contacts"; if (t.contains("packet")) return "pkt"; if (t.contains("vfo")) return "vfo"; if (t.contains("repeater")) return "repeaters";   // i18n: iconFor matches English title words
+        if (t.contains("record")) return "rec"; if (t.contains("caption") || t.contains("transcript")) return "txt"; if (t.contains("last heard")) return "intercom";   // i18n: iconFor matches English title words
+        if (t.contains("station")) return "globe"; if (t.contains("dtmf")) return "channels"; if (t.contains("weather") || t.contains("same")) return "alert";   // i18n: iconFor matches English title words
+        if (t.contains("coverage")) return "signal"; if (t.contains("emergency")) return "alert"; if (t.contains("widget")) return "widget";   // i18n: iconFor matches English title words
+        if (t.contains("setting")) return "device"; if (t.contains("sstv") || t.contains("picture")) return "report"; if (t.contains("log")) return "diag";   // i18n: iconFor matches English title words
         return "radio";
     }
 

@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -38,13 +39,13 @@ public final class SstvCombine {
 
     /** Load the pictures and line them up automatically; null with the reason in {@code err[0]}. */
     public static Plan plan(List<File> files, String[] err) {
-        if (files.size() < 2) { err[0] = "Select at least two receptions of the same picture"; return null; }
+        if (files.size() < 2) { err[0] = Txt.s(R.string.modes_sstv_combine_two); return null; }
         List<int[]> px = new ArrayList<>(); int w = -1, h = -1;
         for (File f : files) {
             Bitmap b = BitmapFactory.decodeFile(f.getAbsolutePath());
-            if (b == null) { err[0] = "Could not read " + f.getName(); return null; }
+            if (b == null) { err[0] = Txt.s(R.string.modes_sstv_combine_unreadable, f.getName()); return null; }
             if (w < 0) { w = b.getWidth(); h = b.getHeight(); }
-            else if (b.getWidth() != w || b.getHeight() != h) { b.recycle(); err[0] = "The pictures are different sizes (different SSTV modes): they cannot be combined"; return null; }
+            else if (b.getWidth() != w || b.getHeight() != h) { b.recycle(); err[0] = Txt.s(R.string.modes_sstv_combine_sizes); return null; }
             int[] a = new int[w * h]; b.getPixels(a, 0, w, 0, 0, w, h); b.recycle(); px.add(a);
         }
         Plan p = new Plan(files, px, w, h);
@@ -55,13 +56,13 @@ public final class SstvCombine {
 
     /** Save the plan's combination beside the pictures. */
     public static Result save(Plan p) {
-        if (p.used() < 2) return new Result(null, "Only one picture is in: nothing to combine");
+        if (p.used() < 2) return new Result(null, Txt.s(R.string.modes_sstv_combine_one));
         Bitmap out = Bitmap.createBitmap(p.render(), p.w, p.h, Bitmap.Config.ARGB_8888);
         File f = new File(p.files.get(0).getParentFile(), "SSTV_combined_" + new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new java.util.Date()) + "_" + p.used() + "x.png");
         try (FileOutputStream o = new FileOutputStream(f)) { out.compress(Bitmap.CompressFormat.PNG, 100, o); }
-        catch (Exception e) { return new Result(null, "Could not save: " + e.getMessage()); }
+        catch (Exception e) { return new Result(null, Txt.s(R.string.modes_sat_save_failed, String.valueOf(e.getMessage()))); }
         finally { out.recycle(); }
-        return new Result(f, "Combined " + p.used() + " pictures → " + f.getName());
+        return new Result(f, Txt.p(R.plurals.modes_sstv_combine_done, p.used(), p.used(), f.getName()));
     }
 
     /** PNG bytes of the combination as it stands (the web preview). */

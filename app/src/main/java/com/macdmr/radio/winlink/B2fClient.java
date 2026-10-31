@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.winlink;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -101,10 +103,10 @@ public final class B2fClient {
         if (!flags.contains("B2")) throw new IOException("the gateway does not offer B2F (" + sid + ")");
         if (challenge != null && password.isEmpty()) throw new IOException("the gateway asks for your Winlink password (secure login): set it in Winlink settings");
         StringBuilder hs = new StringBuilder();
-        hs.append(";FW: ").append(myCall).append('\r');
-        hs.append('[').append("SignalDeck-").append(version).append('-').append(SID_FLAGS).append("]\r");
-        if (challenge != null) hs.append(";PR: ").append(secureLoginResponse(challenge, password)).append('\r');
-        hs.append("; ").append(target).append(" DE ").append(myCall).append(locator.isEmpty() ? "" : " (" + locator + ")").append('\r');
+        hs.append(";FW: ").append(myCall).append('\r');   // i18n: B2F protocol
+        hs.append('[').append("SignalDeck-").append(version).append('-').append(SID_FLAGS).append("]\r");   // i18n: B2F protocol
+        if (challenge != null) hs.append(";PR: ").append(secureLoginResponse(challenge, password)).append('\r');   // i18n: B2F protocol
+        hs.append("; ").append(target).append(" DE ").append(myCall).append(locator.isEmpty() ? "" : " (" + locator + ")").append('\r');   // i18n: B2F protocol
         for (String l : hs.toString().split("\r")) box.log("> " + (l.startsWith(";PR:") ? ";PR: ********" : l));
         write(hs.toString());
         boolean done = false;
@@ -129,7 +131,7 @@ public final class B2fClient {
         for (B2Message m : all) {
             if (props.size() >= MAX_PROPOSALS) break;
             Out o = new Out(); o.m = m; byte[] plain = m.toBytes(); o.size = plain.length; o.data = Lzhuf.compressB2(plain);
-            String line = "FC EM " + m.mid + " " + o.size + " " + o.data.length + " 0";
+            String line = "FC EM " + m.mid + " " + o.size + " " + o.data.length + " 0";   // i18n: B2F protocol
             for (char c : line.toCharArray()) sum += c; sum += '\r';
             sb.append(line).append('\r'); box.log("> " + line);
             props.add(o);
@@ -148,10 +150,10 @@ public final class B2fClient {
         for (int k = 0; k < reply.length(); k++) {
             if (i >= props.size()) throw new IOException("more answers than proposals: " + reply);
             char c = reply.charAt(k); Out o = props.get(i++);
-            if ("Yy+".indexOf(c) >= 0) o.answer = '+';
-            else if ("NnRr-".indexOf(c) >= 0) o.answer = '-';
-            else if ("LlHh=".indexOf(c) >= 0) o.answer = '=';
-            else if ("Aa!".indexOf(c) >= 0) {                                 // resume at an offset: we start over instead
+            if ("Yy+".indexOf(c) >= 0) o.answer = '+';   // i18n: B2F protocol
+            else if ("NnRr-".indexOf(c) >= 0) o.answer = '-';   // i18n: B2F protocol
+            else if ("LlHh=".indexOf(c) >= 0) o.answer = '=';   // i18n: B2F protocol
+            else if ("Aa!".indexOf(c) >= 0) {                                 // resume at an offset: we start over instead   // i18n: B2F protocol
                 while (k + 1 < reply.length() && Character.isDigit(reply.charAt(k + 1))) k++;
                 o.answer = '+';
             } else throw new IOException("bad answer character '" + c + "' in " + reply);
@@ -165,7 +167,7 @@ public final class B2fClient {
     }
 
     private void writeCompressed(Out o) throws IOException {
-        String title = ascii(o.m.subject.isEmpty() ? "No title" : o.m.subject); if (title.length() > 80) title = title.substring(0, 80);
+        String title = ascii(o.m.subject.isEmpty() ? "No title" : o.m.subject); if (title.length() > 80) title = title.substring(0, 80);   // i18n: B2F protocol (proposal title)
         ByteArrayOutputStream b = new ByteArrayOutputStream();
         byte[] t = title.getBytes(StandardCharsets.US_ASCII);
         b.write(1); b.write(t.length + 1 + 2); b.write(t, 0, t.length); b.write(0); b.write('0'); b.write(0);
@@ -182,7 +184,7 @@ public final class B2fClient {
         try {
         for (int p = 0; p < all.length; p += 512) {                           // in pieces, so progress can be shown
             int n = Math.min(512, all.length - p); byte[] part = new byte[n]; System.arraycopy(all, p, part, 0, n);
-            wire.write(part); box.progress("sending " + o.m.mid, Math.min(p + n, all.length), all.length);
+            wire.write(part); box.progress(Txt.s(R.string.modes_winlink_sending, o.m.mid), Math.min(p + n, all.length), all.length);
         }
         } finally { box.binary(false); }
     }
@@ -217,7 +219,7 @@ public final class B2fClient {
                     if (theirs != ((-sum) & 0xFF)) throw new IOException("proposal checksum error");
                     if (props.isEmpty()) { remoteNoMsgs = true; return false; }
                     remoteNoMsgs = false;
-                    StringBuilder a = new StringBuilder("FS ");
+                    StringBuilder a = new StringBuilder("FS ");   // i18n: B2F protocol
                     for (In in : props) a.append(in.answer);
                     box.log("> " + a); write(a + "\r");
                     for (In in : props) if (in.answer == '+') readCompressed(in);
@@ -247,7 +249,7 @@ public final class B2fClient {
             if (k == 2) {
                 int n = wire.read(timeoutMs); if (n == 0) n = 256;
                 for (int i = 0; i < n; i++) { int b = wire.read(timeoutMs); data.write(b); sum += b; }
-                box.progress("receiving " + in.mid, data.size(), in.csize);
+                box.progress(Txt.s(R.string.modes_winlink_receiving, in.mid), data.size(), in.csize);
             } else if (k == 4) {
                 sum += wire.read(timeoutMs);
                 if ((sum & 0xFF) != 0) throw new IOException("message checksum error");
@@ -265,7 +267,7 @@ public final class B2fClient {
     private void remoteError(String line) throws IOException {
         if (line.startsWith("***")) {
             String why = line.replaceFirst("^\\*+\\s*", "");
-            throw new IOException(why.isEmpty() ? "the gateway ended the session" : why);
+            throw new IOException(why.isEmpty() ? "the gateway ended the session" : why);   // i18n: exception text
         }
     }
 

@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -39,12 +41,12 @@ public final class ExamDialog {
         try (InputStream in = c.getAssets().open(e.asset)) {
             java.io.ByteArrayOutputStream o = new java.io.ByteArrayOutputStream(); byte[] b = new byte[16384]; int n; while ((n = in.read(b)) > 0) o.write(b, 0, n);
             return ExamPool.parse(new String(o.toByteArray(), StandardCharsets.UTF_8));
-        } catch (Throwable t) { Toast.makeText(c, "Could not read the question pool: " + t.getMessage(), Toast.LENGTH_LONG).show(); return null; }
+        } catch (Throwable t) { Toast.makeText(c, Txt.s(R.string.modes_exam_err_pool, String.valueOf(t.getMessage())), Toast.LENGTH_LONG).show(); return null; }
     }
 
     /** One sheet for the whole session: each screen replaces its content. */
     private void page(String title) {
-        LinearLayout b = Neo.sheetBody(c, title);
+        LinearLayout b = Neo.sheetBody(c, title, "radio");
         if (dlg == null) {
             scroll = new ScrollView(c); scroll.setVerticalScrollBarEnabled(false); scroll.addView(b);
             dlg = new AlertDialog.Builder(c).setView(scroll).create(); dlg.show();
@@ -55,11 +57,15 @@ public final class ExamDialog {
     private Set<String> missed(ExamPool.Element e) { return new HashSet<>(prefs.getStringSet("missed_" + e.key, new HashSet<>())); }
 
     private void home() {
-        page("Exam practice");
-        body.addView(Neo.sheetHint(c, "Practice for the US amateur licence exams with the official question pools. A practice exam draws one question from each group, as the real exam does; you need 26 of 35 right (37 of 50 for Extra). The pools are public domain (NCVEC); machine-readable edition by Russ Olsen."));
+        page(Txt.s(R.string.modes_exam_title));
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_exam_hint)));
         for (ExamPool.Element e : ExamPool.ELEMENTS) {
             int best = prefs.getInt("best_" + e.key, -1);
-            LinearLayout r = card(e.name, e.questions + " questions, pass at " + e.pass + (best >= 0 ? "  ·  best " + best + "/" + e.questions : "") + "  ·  " + missed(e).size() + " missed to review");
+            List<String> facts = new ArrayList<>();
+            facts.add(Txt.p(R.plurals.modes_exam_questions_pass, e.questions, e.questions, e.pass));
+            if (best >= 0) facts.add(Txt.s(R.string.modes_exam_best, best, e.questions));
+            facts.add(Txt.p(R.plurals.modes_exam_missed_review, missed(e).size(), missed(e).size()));
+            LinearLayout r = card(e.name, String.join(Txt.s(R.string.modes_dot_separator), facts));
             r.setOnClickListener(v -> element(e));
             body.addView(r);
         }
@@ -68,30 +74,30 @@ public final class ExamDialog {
     private void element(ExamPool.Element e) {
         ExamPool p = load(e); if (p == null) return;
         page(e.name.replaceFirst(" \\(.*", ""));
-        body.addView(Neo.sheetHint(c, p.all.size() + " questions in the pool."));
-        TextView exam = Neo.button(c, "Practice exam (" + e.questions + " questions)", "check", Neo.GREEN); body.addView(exam, lp(6));
+        body.addView(Neo.sheetHint(c, Txt.p(R.plurals.modes_exam_pool_size, p.all.size(), p.all.size())));
+        TextView exam = Neo.button(c, Txt.p(R.plurals.modes_exam_practice, e.questions, e.questions), "check", Neo.GREEN); body.addView(exam, lp(6));
         exam.setOnClickListener(v -> quiz(e, p.exam(new Random()), true, 0, new ArrayList<>()));
         final Set<String> miss = missed(e);
-        TextView again = Neo.button(c, "Missed questions (" + miss.size() + ")", "update", Neo.AMBER); body.addView(again, lp(6));
+        TextView again = Neo.button(c, Txt.s(R.string.modes_exam_missed_button, miss.size()), "update", Neo.AMBER); body.addView(again, lp(6));
         again.setOnClickListener(v -> {
             List<ExamPool.Question> l = new ArrayList<>(); for (ExamPool.Question q : p.all) if (miss.contains(q.id)) l.add(q);
-            if (l.isEmpty()) { Toast.makeText(c, "Nothing missed yet", Toast.LENGTH_SHORT).show(); return; }
+            if (l.isEmpty()) { Toast.makeText(c, Txt.s(R.string.modes_exam_nothing_missed), Toast.LENGTH_SHORT).show(); return; }
             java.util.Collections.shuffle(l); quiz(e, l, false, 0, new ArrayList<>());
         });
-        body.addView(Neo.sheetSection(c, "Study a subelement"));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_exam_study_section)));
         for (java.util.Map.Entry<String, Integer> s : p.subelements().entrySet()) {
-            LinearLayout r = card(s.getKey(), s.getValue() + " questions, with the answer shown after each");
+            LinearLayout r = card(s.getKey(), Txt.p(R.plurals.modes_exam_study_card, s.getValue(), s.getValue()));
             r.setOnClickListener(v -> quiz(e, p.subelement(s.getKey(), true, new Random()), false, 0, new ArrayList<>()));
             body.addView(r);
         }
-        TextView back = Neo.button(c, "Back", null, Neo.CYAN); body.addView(back, lp(10)); back.setOnClickListener(v -> home());
+        TextView back = Neo.button(c, Txt.s(R.string.common_back), null, Neo.CYAN); body.addView(back, lp(10)); back.setOnClickListener(v -> home());
     }
 
     /** Question {@code i} of {@code qs}; {@code exam}: no feedback until the end. {@code wrong} collects the misses. */
     private void quiz(ExamPool.Element e, List<ExamPool.Question> qs, boolean exam, int i, List<Object[]> wrong) {
         if (i >= qs.size()) { results(e, qs, exam, wrong); return; }
         ExamPool.Question q = qs.get(i);
-        page((exam ? "Exam " : "Study ") + (i + 1) + " of " + qs.size());
+        page(Txt.s(exam ? R.string.modes_exam_question_exam : R.string.modes_exam_question_study, i + 1, qs.size()));
         body.addView(Neo.label(c, q.id, Theme.CYAN, 13, true));
         TextView t = Neo.text(c, q.text, Neo.TEXT, 17, Neo.uiMedium(c)); t.setLineSpacing(0, 1.12f); t.setPadding(0, (int) (6 * d), 0, (int) (8 * d)); body.addView(t);
         if (!q.figure.isEmpty()) {
@@ -115,31 +121,31 @@ public final class ExamDialog {
                 if (exam) { quiz(e, qs, true, i + 1, wrong); return; }
                 bs[q.correct].setBackground(Neo.outline(c, Neo.GREEN, 0x44, 12, 2)); bs[q.correct].setTextColor(Neo.GREEN_LIGHT);
                 if (!right) { bs[pick].setBackground(Neo.outline(c, Neo.RED, 0x33, 12, 2)); bs[pick].setTextColor(Neo.RED); }
-                TextView next = Neo.button(c, right ? "Right — next" : "The answer is " + (char) ('A' + q.correct) + " — next", null, right ? Neo.GREEN : Neo.AMBER);
+                TextView next = Neo.button(c, right ? Txt.s(R.string.modes_exam_right_next) : Txt.s(R.string.modes_exam_answer_next, String.valueOf((char) ('A' + q.correct))), null, right ? Neo.GREEN : Neo.AMBER);
                 body.addView(next, lp(12)); next.setOnClickListener(x -> quiz(e, qs, false, i + 1, wrong));
             });
         }
-        TextView stop = Neo.button(c, "Stop", null, Neo.MUTED); body.addView(stop, lp(16)); stop.setOnClickListener(v -> results(e, qs.subList(0, i), exam, wrong));
+        TextView stop = Neo.button(c, Txt.s(R.string.common_stop), null, Neo.MUTED); body.addView(stop, lp(16)); stop.setOnClickListener(v -> results(e, qs.subList(0, i), exam, wrong));
     }
 
     private void results(ExamPool.Element e, List<ExamPool.Question> qs, boolean exam, List<Object[]> wrong) {
         int right = qs.size() - wrong.size();
-        page(exam ? "Exam result" : "Study result");
+        page(Txt.s(exam ? R.string.modes_exam_result_exam : R.string.modes_exam_result_study));
         boolean full = exam && qs.size() == e.questions;
         boolean pass = full && right >= e.pass;
         TextView big = Neo.text(c, right + " / " + qs.size(), full ? (pass ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT) : Neo.CYAN_LIGHT, 40, Neo.display(c)); big.setGravity(android.view.Gravity.CENTER); body.addView(big);
-        body.addView(Neo.sheetHint(c, full ? (pass ? "Pass: " + e.pass + " were needed." : "Not yet: " + e.pass + " are needed. Review the misses below, then try again.") : String.format(Locale.US, "%.0f %% right. Misses are kept under Missed questions until you answer them right.", qs.isEmpty() ? 0 : 100.0 * right / qs.size())));
+        body.addView(Neo.sheetHint(c, full ? (pass ? Txt.p(R.plurals.modes_exam_passed, e.pass, e.pass) : Txt.p(R.plurals.modes_exam_not_yet, e.pass, e.pass)) : Txt.s(R.string.modes_exam_percent, String.format(Locale.US, "%.0f", qs.isEmpty() ? 0 : 100.0 * right / qs.size()))));
         if (full && right > prefs.getInt("best_" + e.key, -1)) prefs.edit().putInt("best_" + e.key, right).apply();
-        if (!wrong.isEmpty()) body.addView(Neo.sheetSection(c, "Missed"));
+        if (!wrong.isEmpty()) body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_exam_missed_section)));
         for (Object[] w : wrong) {
             ExamPool.Question q = (ExamPool.Question) w[0]; int pick = (Integer) w[1];
             LinearLayout r = new LinearLayout(c); r.setOrientation(LinearLayout.VERTICAL); r.setBackground(Neo.rowCard(c)); r.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d));
             r.addView(Neo.label(c, q.id + "  " + q.text, Neo.TEXT, 13.5f, false));
-            r.addView(Neo.label(c, "Answer " + (char) ('A' + q.correct) + ": " + q.answers[q.correct], Neo.GREEN_LIGHT, 13, false));
-            r.addView(Neo.label(c, "You chose " + (char) ('A' + pick) + ": " + q.answers[pick], 0xFFE08A80, 12.5f, false));
+            r.addView(Neo.label(c, Txt.s(R.string.modes_exam_answer, String.valueOf((char) ('A' + q.correct)), q.answers[q.correct]), Neo.GREEN_LIGHT, 13, false));
+            r.addView(Neo.label(c, Txt.s(R.string.modes_exam_you_chose, String.valueOf((char) ('A' + pick)), q.answers[pick]), 0xFFE08A80, 12.5f, false));
             body.addView(r, lp(6));
         }
-        TextView again = Neo.button(c, "Back to " + e.name.replaceFirst(" \\(.*", ""), null, Neo.CYAN); body.addView(again, lp(12)); again.setOnClickListener(v -> element(e));
+        TextView again = Neo.button(c, Txt.s(R.string.modes_exam_back_to, e.name.replaceFirst(" \\(.*", "")), null, Neo.CYAN); body.addView(again, lp(12)); again.setOnClickListener(v -> element(e));
     }
 
     private LinearLayout card(String title, String sub) {

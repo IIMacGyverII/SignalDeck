@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -61,20 +64,20 @@ public final class SstvScreen extends ModeScreen {
         body.addView(progress, new LayoutParams(LayoutParams.MATCH_PARENT, dp(8)));
         progressText = Neo.text(c, "", Neo.DIM, 12, Neo.mono(c)); progressText.setPadding(0, dp(4), 0, 0);
         body.addView(progressText);
-        body.addView(Neo.sheetHint(c, "Two decoders (the button below switches): Any mode recognises Robot, Martin, Scottie and PD pictures from their VIS header at the start. Robot 36 continuous (always used for the ISS) needs no header: it locks on the line syncs, so a picture picked up halfway is drawn and placed at the bottom, fades are coasted through, and the screen shows the static until a picture comes in. Every picture, and every partial one of 16 lines or more, is saved to Download/DMR/SSTV."));
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_sstv_hint)));
 
-        galleryTitle = Neo.caps(c, "RECEIVED"); galleryTitle.setPadding(0, dp(14), 0, dp(6));
+        galleryTitle = Neo.caps(c, Txt.s(R.string.modes_sstv_received)); galleryTitle.setPadding(0, dp(14), 0, dp(6));
         body.addView(galleryTitle);
         selBar = new LinearLayout(c); selBar.setOrientation(VERTICAL); selBar.setVisibility(GONE); selBar.setPadding(0, 0, 0, dp(8));   // the count, then the actions sharing the width
         selCount = Neo.text(c, "", Neo.CYAN_LIGHT, 15, Neo.uiMedium(c)); selCount.setPadding(0, 0, 0, dp(6)); selBar.addView(selCount);
-        TextView sShare = Neo.button(c, "Share", null, Neo.CYAN), sDel = Neo.button(c, "Delete", null, Neo.RED), sDone = Neo.button(c, "Done", null, Neo.MUTED);
-        TextView sComb = Neo.button(c, "Combine", null, Neo.GREEN);
+        TextView sShare = Neo.button(c, Txt.s(R.string.common_share), null, Neo.CYAN), sDel = Neo.button(c, Txt.s(R.string.common_delete), null, Neo.RED), sDone = Neo.button(c, Txt.s(R.string.common_done), null, Neo.MUTED);
+        TextView sComb = Neo.button(c, Txt.s(R.string.modes_sstv_combine), null, Neo.GREEN);
         sComb.setOnClickListener(v -> combine(selectedFiles()));
         LinearLayout selRow = new LinearLayout(c); selBar.addView(selRow, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         TextView[] acts = { sComb, sShare, sDel, sDone };
-        for (int k = 0; k < acts.length; k++) { TextView t = acts[k]; t.setTextSize(14); t.setPadding(dp(4), 0, dp(4), 0); LayoutParams l = new LayoutParams(0, dp(42), 1f); if (k > 0) l.leftMargin = dp(6); selRow.addView(t, l); }
-        sShare.setOnClickListener(v -> { java.util.List<File> fs = selectedFiles(); if (fs.isEmpty()) toast("Tap pictures to select them"); else share(fs); });
-        sDel.setOnClickListener(v -> { java.util.List<File> fs = selectedFiles(); if (fs.isEmpty()) toast("Tap pictures to select them"); else delete(fs, null); });
+        for (int k = 0; k < acts.length; k++) { TextView t = acts[k]; t.setTextSize(14); t.setPadding(dp(4), 0, dp(4), 0); Neo.fit(t, true); LayoutParams l = new LayoutParams(0, dp(42), 1f); if (k > 0) l.leftMargin = dp(6); selRow.addView(t, l); }
+        sShare.setOnClickListener(v -> { java.util.List<File> fs = selectedFiles(); if (fs.isEmpty()) toast(Txt.s(R.string.modes_sstv_tap_to_select)); else share(fs); });
+        sDel.setOnClickListener(v -> { java.util.List<File> fs = selectedFiles(); if (fs.isEmpty()) toast(Txt.s(R.string.modes_sstv_tap_to_select)); else delete(fs, null); });
         sDone.setOnClickListener(v -> endSelect());
         HorizontalScrollView hs = new HorizontalScrollView(c); hs.setHorizontalScrollBarEnabled(false);
         gallery = new LinearLayout(c); hs.addView(gallery);
@@ -83,27 +86,27 @@ public final class SstvScreen extends ModeScreen {
         content.addView(sv);
 
         LinearLayout r1 = buttonRow();
-        sendBtn = button(r1, "Send picture", "send", Neo.AMBER, v -> PktDialog.sheet(c, svc, "sstvSend"));
+        sendBtn = button(r1, Txt.s(R.string.modes_sstv_send), "send", Neo.AMBER, v -> PktDialog.sheet(c, svc, "sstvSend"));
         switchBtn = button(r1, "", "radio", Neo.CYAN, v -> {
             boolean parked = parked();
             svc.sstvMonitor(false, false); toast(svc.sstvMonitor(true, !parked));
         });
         LinearLayout r2 = buttonRow();
         decoderBtn = button(r2, "", "scan", Neo.VIOLET, v -> {
-            if (iss()) { toast("ISS events are Robot 36: the continuous decoder is always used"); return; }
+            if (iss()) { toast(Txt.s(R.string.modes_sstv_iss_robot)); return; }
             pe.setSstvContinuousMode(!pe.sstvContinuousMode());
-            toast(pe.sstvContinuousMode() ? "Robot 36 continuous: no header needed, partial pictures kept" : "Any mode: starts on the VIS header");
+            toast(Txt.s(pe.sstvContinuousMode() ? R.string.modes_sstv_mode_continuous_toast : R.string.modes_sstv_mode_any_toast));
             refresh();
         });
-        button(r2, "Stop receiving", "stop", Neo.RED, v -> {
-            if (iss()) { svc.endSatTracking(); toast("ISS SSTV stopped"); close(); return; }
+        button(r2, Txt.s(R.string.modes_sstv_stop), "stop", Neo.RED, v -> {
+            if (iss()) { svc.endSatTracking(); toast(Txt.s(R.string.modes_sstv_iss_stopped)); close(); return; }
             toast(svc.sstvMonitor(false, false)); close();
         });
         LinearLayout r3 = buttonRow();
-        button(r3, "Decode a recording", "rec", Neo.CYAN, v -> RecordingsDialog.show(c, svc, com.macdmr.radio.RecordingDecodeJob.SSTV));
+        button(r3, Txt.s(R.string.modes_sstv_decode_recording), "rec", Neo.CYAN, v -> RecordingsDialog.show(c, svc, com.macdmr.radio.RecordingDecodeJob.SSTV));
 
         if (pe.sstvLast() != null && !iss()) live.setImageBitmap(pe.sstvLast());      // an ISS session starts empty: the last picture came from elsewhere
-        status.setText(nice(pe.sstvStatus()));
+        status.setText(nice(pe.sstvStatusMsg()));
     }
 
     private boolean parked() { com.macdmr.radio.ChannelStore.Channel ch = svc.current(); return ch != null && ch.rxFreq == PacketEngine.SSTV_FREQ_HZ; }
@@ -113,17 +116,21 @@ public final class SstvScreen extends ModeScreen {
         pe.setSstvListener((st, bmp, lines, total, done) -> {
             if (bmp != null) live.setImageBitmap(bmp);
             status.setText(nice(st));
-            if (total > 0) { progress.setProgress(Math.round(1000f * lines / total)); progressText.setText(lines + " of " + total + " lines"); }
-            else if (!st.startsWith("receiving")) { progress.setProgress(done ? 1000 : 0); progressText.setText(""); }
+            if (total > 0) { progress.setProgress(Math.round(1000f * lines / total)); progressText.setText(Txt.s(R.string.modes_sstv_lines, lines, total)); }
+            else if (!is(st, R.string.packet_sstv_receiving_line, R.string.packet_sstv_receiving_mode, R.string.packet_sstv_receiving_lines)) { progress.setProgress(done ? 1000 : 0); progressText.setText(""); }
             if (done) galleryStamp = -1;
         });
     }
     @Override protected void onDetachedFromWindow() { super.onDetachedFromWindow(); pe.setSstvListener(null); }
 
-    private static String nice(String s) {
-        if (s == null || s.isEmpty() || s.equals("idle")) return "Waiting";
-        return s.substring(0, 1).toUpperCase(Locale.US) + s.substring(1);
+    /** The status for display: "Waiting…" when idle, else its text with a capital first letter. */
+    private static String nice(Msg m) {
+        if (m == null || is(m, R.string.packet_sstv_idle)) return Txt.s(R.string.modes_sstv_waiting);
+        String s = m.text(); if (s.isEmpty()) return Txt.s(R.string.modes_sstv_waiting);
+        return s.substring(0, 1).toUpperCase(Txt.locale()) + s.substring(1);
     }
+    /** Whether the status is one of these strings: the state is told by the string, not by its (translated) words. */
+    private static boolean is(Msg m, int... ids) { for (int id : ids) if (m.key().equals(Txt.name(id))) return true; return false; }
 
     private boolean iss() { return svc.satMode() == com.macdmr.radio.ham.Satellites.SSTV; }
     @Override protected long waitingHz() { com.macdmr.radio.RadioService.SatState st = svc.satState(); return st != null && st.mode == com.macdmr.radio.ham.Satellites.SSTV && st.waiting ? st.nominalHz : 0; }
@@ -132,19 +139,19 @@ public final class SstvScreen extends ModeScreen {
 
     @Override protected void refresh() {
         passCard.update(svc);
-        String dec = pe.sstvUsingContinuous() || iss() ? "Robot 36 continuous" : "Any mode (header)";
+        String dec = Txt.s(pe.sstvUsingContinuous() || iss() ? R.string.modes_sstv_dec_continuous : R.string.modes_sstv_dec_any);
         if (!dec.contentEquals(decoderBtn.getText())) { decoderBtn.setText(dec); Neo.fit(decoderBtn); }
-        if (waitingHz() > 0) { set(status, "The decoder starts with the pass"); set(progressText, ""); }
+        if (waitingHz() > 0) { set(status, Txt.s(R.string.modes_sstv_starts_with_pass)); set(progressText, ""); }
         if (iss()) {
-            setSubtitle("ISS SSTV " + String.format(Locale.US, "%.3f", svc.satState().nominalHz / 1e6) + " \u00B7 Doppler-tracked");
+            setSubtitle(Txt.s(R.string.modes_sstv_iss_subtitle, Txt.freqMhz(svc.satState().nominalHz, 3)));
             if (switchBtn.getVisibility() != GONE) { switchBtn.setVisibility(GONE); sendBtn.setVisibility(GONE); }    // an ISS downlink: receive only
         } else {
-            setSubtitle(parked() ? "Receiving on 144.500 MHz" : "Receiving on this channel");
+            setSubtitle(Txt.s(parked() ? R.string.modes_sstv_on_144 : R.string.modes_sstv_on_channel));
             boolean can144 = svc.profile().tunable(PacketEngine.SSTV_FREQ_HZ) || parked();   // the W6 tunes UHF only: no 144.500
             int sv = can144 ? VISIBLE : GONE;
             if (switchBtn.getVisibility() != sv) switchBtn.setVisibility(sv);
             if (sendBtn.getVisibility() != VISIBLE) sendBtn.setVisibility(VISIBLE);
-            String sw = parked() ? "Use this channel" : "Go to 144.500";
+            String sw = Txt.s(parked() ? R.string.modes_sstv_use_channel : R.string.modes_sstv_go_144);
             if (!sw.contentEquals(switchBtn.getText())) { switchBtn.setText(sw); Neo.fit(switchBtn); }
         }
         File dir = new File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS), "DMR/SSTV");
@@ -153,9 +160,9 @@ public final class SstvScreen extends ModeScreen {
         if (stamp == galleryStamp) return;
         galleryStamp = stamp;
         gallery.removeAllViews(); thumbs.clear();
-        if (fs == null || fs.length == 0) { galleryTitle.setText("RECEIVED  ·  none yet"); endSelect(); return; }
+        if (fs == null || fs.length == 0) { galleryTitle.setText(Txt.s(R.string.modes_sstv_received_none)); endSelect(); return; }
         Arrays.sort(fs, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
-        galleryTitle.setText("RECEIVED  ·  " + fs.length);
+        galleryTitle.setText(Txt.s(R.string.modes_sstv_received_count, fs.length));
         for (int i = 0; i < Math.min(24, fs.length); i++) {
             final File f = fs[i];
             BitmapFactory.Options o = new BitmapFactory.Options(); o.inSampleSize = 4;
@@ -179,19 +186,19 @@ public final class SstvScreen extends ModeScreen {
         // its real height up front: the sheet's window is sized when it opens, and a wrap-content picture measured short there (cut the sheet off)
         int pw = getResources().getDisplayMetrics().widthPixels - dp(56), ph = bm != null && bm.getWidth() > 0 ? pw * bm.getHeight() / bm.getWidth() : LayoutParams.WRAP_CONTENT;
         body.addView(iv, new LayoutParams(LayoutParams.MATCH_PARENT, ph));
-        body.addView(Neo.sheetHint(c, "Received " + new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new java.util.Date(f.lastModified())) + " · Download/DMR/SSTV"));
-        TextView share = Neo.button(c, "Share", "send", Neo.CYAN);
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_sstv_received_at, new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new java.util.Date(f.lastModified())))));
+        TextView share = Neo.button(c, Txt.s(R.string.common_share), "send", Neo.CYAN);
         share.setOnClickListener(v -> {
             try {
                 File dir = new File(c.getCacheDir(), "share"); dir.mkdirs();       // the provider shares the cache's share/ folder only
                 File copy = new File(dir, f.getName());
                 try (java.io.InputStream in = new java.io.FileInputStream(f); java.io.OutputStream out = new java.io.FileOutputStream(copy)) { byte[] b = new byte[65536]; int n; while ((n = in.read(b)) > 0) out.write(b, 0, n); }
                 android.net.Uri u = androidx.core.content.FileProvider.getUriForFile(c, c.getPackageName() + ".files", copy);
-                c.startActivity(android.content.Intent.createChooser(new android.content.Intent(android.content.Intent.ACTION_SEND).setType("image/*").putExtra(android.content.Intent.EXTRA_STREAM, u).addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION), "Share picture"));
-            } catch (Throwable t) { toast("Could not share: " + t.getMessage()); }
+                c.startActivity(android.content.Intent.createChooser(new android.content.Intent(android.content.Intent.ACTION_SEND).setType("image/*").putExtra(android.content.Intent.EXTRA_STREAM, u).addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION), Txt.s(R.string.modes_sstv_share_picture)));
+            } catch (Throwable t) { toast(Txt.s(R.string.modes_sstv_share_failed, String.valueOf(t.getMessage()))); }
         });
         body.addView(share, new LayoutParams(LayoutParams.MATCH_PARENT, dp(48)));
-        TextView del = Neo.button(c, "Delete", "stop", Neo.RED);
+        TextView del = Neo.button(c, Txt.s(R.string.common_delete), "stop", Neo.RED);
         LayoutParams dl = new LayoutParams(LayoutParams.MATCH_PARENT, dp(48)); dl.topMargin = dp(8);
         body.addView(del, dl);
         final android.app.AlertDialog[] sheet = { null };
@@ -205,7 +212,7 @@ public final class SstvScreen extends ModeScreen {
         if (selected == null) return;
         if (!selected.remove(f.getName())) selected.add(f.getName());
         for (java.util.Map.Entry<String, ImageView> e : thumbs.entrySet()) mark(e.getValue(), selected.contains(e.getKey()));
-        selCount.setText(selected.size() == 1 ? "1 selected" : selected.size() + " selected");
+        selCount.setText(Txt.p(R.plurals.modes_sstv_selected, selected.size(), selected.size()));
     }
     /**
      * Several receptions of the same picture (the ISS repeats its slides) into one cleaner picture, saved beside them.
@@ -213,8 +220,8 @@ public final class SstvScreen extends ModeScreen {
      * one out, with a preview after every change, then Save.
      */
     private void combine(final java.util.List<File> fs) {
-        if (fs.size() < 2) { toast("Select two or more receptions of the same picture"); return; }
-        toast("Lining up " + fs.size() + " pictures\u2026");
+        if (fs.size() < 2) { toast(Txt.s(R.string.modes_sstv_select_two)); return; }
+        toast(Txt.p(R.plurals.modes_sstv_lining_up, fs.size(), fs.size()));
         new Thread(() -> {
             final String[] err = { null };
             final com.macdmr.radio.SstvCombine.Plan pl = com.macdmr.radio.SstvCombine.plan(fs, err);
@@ -222,14 +229,14 @@ public final class SstvScreen extends ModeScreen {
         }, "sstv-combine").start();
     }
     private void combineSheet(final com.macdmr.radio.SstvCombine.Plan pl) {
-        LinearLayout body = Neo.sheetBody(c, "\uD83D\uDCFA  Combine " + pl.files.size() + " pictures");
+        LinearLayout body = Neo.sheetBody(c, Txt.p(R.plurals.modes_sstv_combine_title, pl.files.size(), pl.files.size()), "report");
         final ImageView iv = new ImageView(c); iv.setAdjustViewBounds(true);
         int pw = getResources().getDisplayMetrics().widthPixels - dp(56);                 // real height up front (see view())
         body.addView(iv, new LayoutParams(LayoutParams.MATCH_PARENT, pw * pl.h / Math.max(1, pl.w)));
         final TextView note = Neo.sheetHint(c, ""); body.addView(note);
         final int[] cur = { pl.ref == 0 ? 1 : 0 }; final boolean[] manual = { false };
         final TextView pick = Neo.button(c, "", null, Neo.CYAN), use = Neo.button(c, "", null, Neo.MUTED);
-        pick.setTextSize(13);
+        pick.setTextSize(13); Neo.fit(use, true);
         LinearLayout r1 = new LinearLayout(c); r1.setOrientation(HORIZONTAL);
         r1.addView(pick, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)); LayoutParams ul = new LayoutParams(dp(104), LayoutParams.MATCH_PARENT); ul.leftMargin = dp(6); r1.addView(use, ul);
         LayoutParams r1l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); r1l.topMargin = dp(6); body.addView(r1, r1l);
@@ -238,7 +245,7 @@ public final class SstvScreen extends ModeScreen {
         final int[][] step = { { -1, 0 }, { 1, 0 }, { 0, 1 }, { 0, -1 } };      // rows, and the sideways shift (positive moves the picture left)
         for (int k = 0; k < 4; k++) { LayoutParams l = new LayoutParams(0, dp(46), 1f); if (k > 0) l.leftMargin = dp(6); r2.addView(arrows[k], l); }
         LayoutParams r2l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); r2l.topMargin = dp(6); body.addView(r2, r2l);
-        final TextView auto = Neo.button(c, "Automatic", null, Neo.MUTED), save = Neo.button(c, "Save", "check", Neo.GREEN);
+        final TextView auto = Neo.button(c, Txt.s(R.string.modes_sstv_automatic), null, Neo.MUTED), save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN); Neo.fit(auto, true); Neo.fit(save, true);
         LinearLayout r3 = new LinearLayout(c); r3.setOrientation(HORIZONTAL);
         r3.addView(auto, new LayoutParams(0, dp(48), 1f)); LayoutParams sl = new LayoutParams(0, dp(48), 1f); sl.leftMargin = dp(6); r3.addView(save, sl);
         LayoutParams r3l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); r3l.topMargin = dp(8); body.addView(r3, r3l);
@@ -247,13 +254,17 @@ public final class SstvScreen extends ModeScreen {
         show[0] = () -> {
             int i = cur[0]; boolean isRef = i == pl.ref;
             String n = pl.files.get(i).getName().replace("SSTV_", "").replace(".png", "");
-            String where = isRef ? "reference" : !pl.use[i] ? "left out" : (pl.dy[i] < 0 ? "up " + -pl.dy[i] : "down " + pl.dy[i]) + " lines, " + (pl.dx[i] > 0 ? "left " + pl.dx[i] : "right " + -pl.dx[i]) + " px";
-            pick.setText("Picture " + (i + 1) + " of " + pl.files.size() + " \u25B8\n" + n + " \u00B7 " + where);
-            use.setText(isRef ? "Reference" : pl.use[i] ? "In" : "Left out"); use.setEnabled(!isRef); use.setAlpha(isRef ? 0.5f : 1f);
+            String where = isRef ? Txt.s(R.string.modes_sstv_where_ref) : !pl.use[i] ? Txt.s(R.string.modes_sstv_where_out)
+                : Txt.s(pl.dy[i] < 0 ? (pl.dx[i] > 0 ? R.string.modes_sstv_where_up_left : R.string.modes_sstv_where_up_right) : (pl.dx[i] > 0 ? R.string.modes_sstv_where_down_left : R.string.modes_sstv_where_down_right), Math.abs(pl.dy[i]), Math.abs(pl.dx[i]));
+            pick.setText(Txt.s(R.string.modes_sstv_pick, i + 1, pl.files.size(), n, where));
+            use.setText(Txt.s(isRef ? R.string.modes_sstv_use_ref : pl.use[i] ? R.string.modes_sstv_use_in : R.string.modes_sstv_use_out)); use.setEnabled(!isRef); use.setAlpha(isRef ? 0.5f : 1f);
             for (TextView a : arrows) { a.setEnabled(!isRef && pl.use[i]); a.setAlpha(!isRef && pl.use[i] ? 1f : 0.4f); }
             String uns = pl.unsure();
-            note.setText((pl.used() < 2 ? "Only one picture is in. " : "") + (manual[0] ? "Placed by hand. " : uns.isEmpty() ? "Lined up automatically. " : "Not sure of the line-up of picture " + uns + ": check it and move it with the arrows. ")
-                    + "Partial pictures are drawn at the bottom, so a piece may belong higher up. Tap the picture name to choose which one the arrows move; long-press an arrow for 8 steps.");
+            java.util.List<String> sentences = new java.util.ArrayList<>();
+            if (pl.used() < 2) sentences.add(Txt.s(R.string.modes_sstv_note_one));
+            sentences.add(manual[0] ? Txt.s(R.string.modes_sstv_note_manual) : uns.isEmpty() ? Txt.s(R.string.modes_sstv_note_auto) : Txt.s(R.string.modes_sstv_note_unsure, uns));
+            sentences.add(Txt.s(R.string.modes_sstv_note_partial));
+            note.setText(String.join(Txt.s(R.string.modes_sentence_separator), sentences));
             save.setEnabled(pl.used() >= 2); save.setAlpha(pl.used() >= 2 ? 1f : 0.4f);
             android.graphics.Bitmap bm = android.graphics.Bitmap.createBitmap(pl.render(), pl.w, pl.h, android.graphics.Bitmap.Config.ARGB_8888);
             iv.setImageBitmap(android.graphics.Bitmap.createScaledBitmap(bm, pl.w * 2, pl.h * 2, false)); bm.recycle();
@@ -297,20 +308,20 @@ public final class SstvScreen extends ModeScreen {
             android.content.Intent i = us.size() == 1
                     ? new android.content.Intent(android.content.Intent.ACTION_SEND).setType("image/*").putExtra(android.content.Intent.EXTRA_STREAM, us.get(0))
                     : new android.content.Intent(android.content.Intent.ACTION_SEND_MULTIPLE).setType("image/*").putParcelableArrayListExtra(android.content.Intent.EXTRA_STREAM, us);
-            i.putExtra(android.content.Intent.EXTRA_TEXT, (us.size() == 1 ? "An SSTV picture" : us.size() + " SSTV pictures") + " received with SignalDeck").addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            c.startActivity(android.content.Intent.createChooser(i, us.size() == 1 ? "Share the picture" : "Share " + us.size() + " pictures"));
-        } catch (Throwable t) { toast("Could not share: " + t.getMessage()); }
+            i.putExtra(android.content.Intent.EXTRA_TEXT, us.size() == 1 ? Txt.s(R.string.modes_sstv_share_text_one) : Txt.p(R.plurals.modes_sstv_share_text, us.size(), us.size())).addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            c.startActivity(android.content.Intent.createChooser(i, us.size() == 1 ? Txt.s(R.string.modes_sstv_share_title_one) : Txt.p(R.plurals.modes_sstv_share_title, us.size(), us.size())));
+        } catch (Throwable t) { toast(Txt.s(R.string.modes_sstv_share_failed, String.valueOf(t.getMessage()))); }
     }
     /** Delete after a confirmation; {@code after} runs once they are gone (closes the viewer). */
     private void delete(java.util.List<File> fs, Runnable after) {
-        String what = fs.size() == 1 ? "this picture" : "these " + fs.size() + " pictures";
-        new android.app.AlertDialog.Builder(c).setTitle("Delete " + what + "?").setMessage("They are removed from Download/DMR/SSTV on this phone. This cannot be undone.")
-                .setPositiveButton("Delete", (d, w) -> {
+        String title = fs.size() == 1 ? Txt.s(R.string.modes_sstv_delete_one) : Txt.p(R.plurals.modes_sstv_delete_many, fs.size(), fs.size());
+        new android.app.AlertDialog.Builder(c).setTitle(title).setMessage(Txt.s(R.string.modes_sstv_delete_message))
+                .setPositiveButton(Txt.s(R.string.common_delete), (d, w) -> {
                     int gone = 0; for (File f : fs) if (f.delete()) gone++;
-                    toast(gone == 1 ? "1 picture deleted" : gone + " pictures deleted");
+                    toast(Txt.p(R.plurals.modes_sstv_deleted, gone, gone));
                     endSelect(); galleryStamp = -1; refresh();
                     if (after != null) after.run();
                 })
-                .setNegativeButton("Cancel", null).show();
+                .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 }

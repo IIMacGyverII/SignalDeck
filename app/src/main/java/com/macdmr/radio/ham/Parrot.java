@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 /**
  * Simplex repeater ("parrot"): records each transmission heard on the channel and, a second after it ends, sends it
  * back on the same channel. A station hears how it sounds, and two stations out of each other's range can relay
@@ -20,6 +23,8 @@ public final class Parrot {
         boolean transmit(short[] pcm, String label, Runnable done);
         String idCallsign();            // null or empty: no identification
         void event(String line);
+        /** The same line kept as a message, so the history can show it in the app's language; by default its English. */
+        default void event(Msg m) { event(m.english()); }
     }
 
     public static final int MAX_MS = 26_000, MIN_MS = 700, HANG_MS = 700, REPLY_DELAY_MS = 1000;
@@ -75,10 +80,10 @@ public final class Parrot {
         playing = true;
         new Thread(() -> {
             try { Thread.sleep(REPLY_DELAY_MS); } catch (InterruptedException ignored) { }
-            boolean ok = host.transmit(out, "parrot " + secs + " s", () -> { synchronized (Parrot.this) { playing = false; played++; } });
-            if (!ok) { synchronized (Parrot.this) { playing = false; } host.event("🦜 Parrot could not transmit the " + secs + " s recording"); return; }
+            boolean ok = host.transmit(out, "parrot " + secs + " s", () -> { synchronized (Parrot.this) { playing = false; played++; } });   // i18n: TX label (logs and stored history text)
+            if (!ok) { synchronized (Parrot.this) { playing = false; } host.event(Msg.of(R.string.modes_parrot_event_failed, secs)); return; }
             if (sentId) lastIdMs = System.currentTimeMillis();
-            host.event("🦜 Parrot repeated " + secs + " s" + (cut ? " (cut at 26 s, the radio's limit)" : "") + (sentId ? " + ID" : ""));
+            host.event(Msg.of(cut ? (sentId ? R.string.modes_parrot_event_repeated_cut_id : R.string.modes_parrot_event_repeated_cut) : (sentId ? R.string.modes_parrot_event_repeated_id : R.string.modes_parrot_event_repeated), secs));
         }, "parrot").start();
     }
 

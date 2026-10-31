@@ -5,6 +5,7 @@
  * (keep this notice and the author credit, mark modified versions, no rights to the SignalDeck name or icon).
  */
 package com.macdmr.radio.pkt;
+// i18n: stays English (decoder diagnostics: logs only)
 
 
 

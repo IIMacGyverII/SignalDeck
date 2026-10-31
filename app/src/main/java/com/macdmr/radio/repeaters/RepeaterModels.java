@@ -41,7 +41,7 @@ public final class RepeaterModels {
         }
 
         @Override public String toString() {
-            return "TG " + id + (slot > 0 ? " TS" + slot : "") + (name != null ? " " + name : "");
+            return "TG " + id + (slot > 0 ? " TS" + slot : "") + (name != null ? " " + name : "");   // i18n: debug toString
         }
     }
 
@@ -83,8 +83,8 @@ public final class RepeaterModels {
 
         @Override public String toString() {
             return (callsign != null ? callsign : "?")
-                 + " " + rxMhzString() + (dmr ? " DMR CC" + cc : " FM")
-                 + (hasCoords ? String.format(Locale.US, " (%.4f,%.4f)", lat, lon) : " (no coords)");
+                 + " " + rxMhzString() + (dmr ? " DMR CC" + cc : " FM")   // i18n: debug toString
+                 + (hasCoords ? String.format(Locale.US, " (%.4f,%.4f)", lat, lon) : " (no coords)");   // i18n: debug toString
         }
     }
 

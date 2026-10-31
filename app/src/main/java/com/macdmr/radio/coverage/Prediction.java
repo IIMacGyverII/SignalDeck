@@ -8,6 +8,9 @@ package com.macdmr.radio.coverage;
 
 import android.content.Context;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -23,13 +26,13 @@ public final class Prediction {
         public double rxOffset, txLimit; public int rxN, txN, txKeyed; public boolean txFromRx;
         public double antennaUsed, radiusUsedM, erpWatts; public boolean antennaFitted, erpKnown;
         public String summary(boolean rxLayer) {
-            String ant = antennaFitted ? String.format(Locale.US, ", antenna %.0f m (fitted)", antennaUsed) : "";
-            if (rxLayer) return rxN == 0 ? (erpKnown ? String.format(Locale.US, "Uncalibrated: %.0f W, antenna %.0f m; Heard readings will refine it", erpWatts, antennaUsed)
-                    : "Uncalibrated: assumes a 50 W repeater; Heard readings will correct it")
-                    : String.format(Locale.US, "Calibrated with %d measured squares (%+.0f dB%s)", rxN, rxOffset, ant);
-            if (txFromRx) return String.format(Locale.US, "Estimated from %d Heard squares (%+.0f dB); your key-ups will refine it", rxN, rxOffset);
-            return txN == 0 ? "Uncalibrated: assumes a 4 W handheld; your key-ups will correct it"
-                    : String.format(Locale.US, "Calibrated with %d key-ups (%d keyed): reach limit %.0f dB", txN, txKeyed, txLimit);
+            String ant = String.format(Locale.US, "%.0f", antennaUsed), off = String.format(Locale.US, "%+.0f", rxOffset);
+            if (rxLayer) return rxN == 0 ? (erpKnown ? Txt.s(R.string.packet_cov_pred_rx_uncal_erp, String.format(Locale.US, "%.0f", erpWatts), ant)
+                    : Txt.s(R.string.packet_cov_pred_rx_uncal))
+                    : antennaFitted ? Txt.s(R.string.packet_cov_pred_rx_cal_fitted, rxN, off, ant) : Txt.s(R.string.packet_cov_pred_rx_cal, rxN, off);
+            if (txFromRx) return Txt.s(R.string.packet_cov_pred_tx_from_rx, rxN, off);
+            return txN == 0 ? Txt.s(R.string.packet_cov_pred_tx_uncal)
+                    : Txt.s(R.string.packet_cov_pred_tx_cal, txN, txKeyed, String.format(Locale.US, "%.0f", txLimit));
         }
     }
 
@@ -81,7 +84,7 @@ public final class Prediction {
         res.rxN = m.size();
         // the antenna height: measured at a spread of distances, the data can tell it (it shapes the coverage); otherwise the default or your choice
         if (antennaAgl <= 0 && m.size() >= 3 && farMax - nearMin >= 3000) {
-            if (pr != null && !pr.update("Fitting the antenna height to " + m.size() + " measured squares")) return null;
+            if (pr != null && !pr.update(Txt.s(R.string.packet_cov_pred_fitting, m.size()))) return null;
             double[] fit = Predictor.fitAntenna(t, p, m.size() > 300 ? m.subList(0, 300) : m);
             p.antennaAgl = fit[0]; res.antennaFitted = true;
         }

@@ -28,6 +28,8 @@ import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.RadioService;
 import com.macdmr.radio.coverage.CoverageMath;
 import com.macdmr.radio.media.CarArt;
@@ -74,8 +76,8 @@ public class RadioControlScreen extends Screen {
         try { return build(); }
         catch (Throwable t) {
             android.util.Log.w("RadioControlScreen", "template: " + t);
-            return new PaneTemplate.Builder(new Pane.Builder().addRow(new Row.Builder().setTitle("Radio controls are unavailable").addText(String.valueOf(t.getMessage())).build()).build())
-                    .setHeaderAction(Action.APP_ICON).setTitle("Radio controls").build();
+            return new PaneTemplate.Builder(new Pane.Builder().addRow(new Row.Builder().setTitle(Txt.s(R.string.intercom_car_controls_unavailable)).addText(String.valueOf(t.getMessage())).build()).build())
+                    .setHeaderAction(Action.APP_ICON).setTitle(Txt.s(R.string.intercom_car_controls)).build();
         }
     }
 
@@ -84,17 +86,17 @@ public class RadioControlScreen extends Screen {
         CarContext c = getCarContext();
         Pane.Builder pane = new Pane.Builder();
         if (s == null) {
-            pane.addRow(new Row.Builder().setTitle("The radio is off").addText("Open SignalDeck on the phone to start it").build());
-            return new PaneTemplate.Builder(pane.build()).setHeaderAction(Action.APP_ICON).setTitle("Radio controls").build();
+            pane.addRow(new Row.Builder().setTitle(Txt.s(R.string.intercom_car_radio_off)).addText(Txt.s(R.string.intercom_car_open_phone_start)).build());
+            return new PaneTemplate.Builder(pane.build()).setHeaderAction(Action.APP_ICON).setTitle(Txt.s(R.string.intercom_car_controls)).build();
         }
         ChannelStore.Channel ch = s.current();
-        String status = s.firmwareLoading() ? "Radio busy, loading firmware" : s.isReady() ? com.macdmr.radio.RadioWidget.status(s).replace("Mapping coverage · ", "") : "Radio " + s.link();
+        String status = s.firmwareLoading() ? Txt.s(R.string.intercom_car_firmware_loading) : s.isReady() ? com.macdmr.radio.RadioWidget.status(s, false) : Txt.s(R.string.intercom_car_radio_link, s.link());
         if (s.hearing() && s.lastRssi() != -999) status += " · " + CoverageMath.sUnits(s.lastRssi());
-        pane.addRow(new Row.Builder().setTitle(ch == null ? "No channel" : "Ch " + ch.number + " · " + ch.name).addText(status).build());
+        pane.addRow(new Row.Builder().setTitle(ch == null ? Txt.s(R.string.intercom_car_no_channel) : Txt.s(R.string.intercom_car_channel_title, ch.number, ch.name)).addText(status).build());
         String caller = s.currentCaller();
         if (!caller.isEmpty()) {
             int id = s.currentCallerId(); String to = s.currentTarget();
-            Row.Builder talk = new Row.Builder().setTitle("Talking: " + caller + (caller.startsWith("ID ") ? "" : " · " + id));
+            Row.Builder talk = new Row.Builder().setTitle(caller.equals(Txt.s(R.string.service_caller_id, id)) || caller.startsWith("ID ") ? Txt.s(R.string.intercom_car_talking, caller) : Txt.s(R.string.intercom_car_talking_id, caller, id));   // i18n: currentCaller() gives service_caller_id when there is no name; "ID " keeps names stored that way plain
             if (!to.isEmpty()) talk.addText(to);
             pane.addRow(talk.build());
         }
@@ -108,14 +110,14 @@ public class RadioControlScreen extends Screen {
 
         boolean tx = s.pttHeld();
         pane.addAction(new Action.Builder()
-                .setTitle(s.firmwareLoading() ? "LOADING FIRMWARE" : tx ? "STOP TALKING" : "TALK")
+                .setTitle(Txt.s(s.firmwareLoading() ? R.string.intercom_car_btn_loading : tx ? R.string.intercom_car_btn_stop_talking : R.string.intercom_car_btn_talk))
                 .setIcon(icon(c, "ptt", 0xFFFFFFFF))
                 .setBackgroundColor(CarColor.createCustom(tx ? Neo.RED : 0xFF1FAE5C, tx ? Neo.RED : 0xFF1FAE5C))
                 .setFlags(Action.FLAG_PRIMARY)
                 .setOnClickListener(() -> { RadioService r = svc(); if (r == null) return; if (r.firmwareLoading()) return; if (r.pttHeld()) r.ptt(false); else r.ptt(true); ui.postDelayed(this::invalidate, 300); })
                 .build());
         pane.addAction(new Action.Builder()
-                .setTitle("Channels")
+                .setTitle(Txt.s(R.string.intercom_car_channels))
                 .setIcon(icon(c, "channels", 0xFFFFFFFF))
                 .setOnClickListener(() -> getScreenManager().push(new ChannelListScreen(getCarContext())))
                 .build());
@@ -125,7 +127,7 @@ public class RadioControlScreen extends Screen {
                 .addAction(new Action.Builder().setIcon(icon(c, "left", 0xFFFFFFFF)).setOnClickListener(() -> { RadioService r = svc(); if (r != null) r.stepChannel(-1); }).build())
                 .addAction(new Action.Builder().setIcon(icon(c, "right", 0xFFFFFFFF)).setOnClickListener(() -> { RadioService r = svc(); if (r != null) r.stepChannel(1); }).build())
                 .build();
-        return new PaneTemplate.Builder(pane.build()).setHeaderAction(Action.APP_ICON).setTitle("Radio controls").setActionStrip(strip).build();
+        return new PaneTemplate.Builder(pane.build()).setHeaderAction(Action.APP_ICON).setTitle(Txt.s(R.string.intercom_car_controls)).setActionStrip(strip).build();
     }
 
     /** One of the app's own glyphs as a car icon. */

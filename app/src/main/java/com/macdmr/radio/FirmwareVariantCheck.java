@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 public final class FirmwareVariantCheck {
     private FirmwareVariantCheck() { }
 
-    public static final String ISSUES = "https://github.com/IIMacGyverII/AndroidRadio_Firmware_Project/issues/new";
+    public static final String ISSUES = "https://github.com/IIMacGyverII/AndroidRadio_Firmware_Project/issues/new";   // i18n: URL
     private static final String PREFS = "radio";
     /** SignalDeck's own bench and release tags (DMR003.FW27.V022, DMR003.R4a0.V022): never a phone's stock firmware. */
     private static final Pattern OWN_TAG = Pattern.compile("^DMR\\d{3}\\.(FW\\d+|R\\d[0-9A-Za-z]*)\\.V\\d+$");
@@ -59,9 +59,9 @@ public final class FirmwareVariantCheck {
         if (f.stockTag.isEmpty() || OWN_TAG.matcher(f.stockTag).matches()) return null;
         boolean tag = k.tags.contains(f.stockTag), sha = f.assetSha.isEmpty() || k.shas.contains(f.assetSha);
         if (tag && sha) return null;
-        if (!tag && !sha) return "the module version " + f.stockTag + " and the stock app's firmware file are not in the firmware catalogue";
-        if (!tag) return "the module version " + f.stockTag + " is not in the firmware catalogue";
-        return "the stock app's firmware file (sha256 " + f.assetSha + ") is not in the firmware catalogue";
+        if (!tag && !sha) return "the module version " + f.stockTag + " and the stock app's firmware file are not in the firmware catalogue";   // i18n: issue text for the firmware project (English, sent to GitHub)
+        if (!tag) return "the module version " + f.stockTag + " is not in the firmware catalogue";   // i18n: issue text for the firmware project (English, sent to GitHub)
+        return "the stock app's firmware file (sha256 " + f.assetSha + ") is not in the firmware catalogue";   // i18n: issue text for the firmware project (English, sent to GitHub)
     }
 
     /** Tags and hashes from a verified catalogue body, plus SignalDeck's built-in images. */
@@ -94,16 +94,16 @@ public final class FirmwareVariantCheck {
     /** The issue form, filled in (field ids of .github/ISSUE_TEMPLATE/firmware-variant.yml). Only the phone model, versions and hash. */
     public static String issueUrl(Facts f, String why, String appVersion) {
         String stockApp = f.stockPkg.isEmpty() ? "" : f.stockPkg + (f.stockPkgVersion.isEmpty() ? "" : " " + f.stockPkgVersion);
-        String msg = "SignalDeck " + appVersion + ": " + why + ".";
-        return ISSUES + "?template=firmware-variant.yml"
-                + "&title=" + enc("[variant] " + (f.stockTag.isEmpty() ? "unknown version" : f.stockTag) + " on " + f.model)
+        String msg = "SignalDeck " + appVersion + ": " + why + ".";   // i18n: issue text for the firmware project (English, sent to GitHub)
+        return ISSUES + "?template=firmware-variant.yml"   // i18n: issue text for the firmware project (English, sent to GitHub)
+                + "&title=" + enc("[variant] " + (f.stockTag.isEmpty() ? "unknown version" : f.stockTag) + " on " + f.model)   // i18n: issue text for the firmware project (English, sent to GitHub)
                 + "&model=" + enc(f.model) + "&version=" + enc(f.stockTag) + "&stockapp=" + enc(stockApp)
                 + "&hash=" + enc(f.assetSha) + "&message=" + enc(msg);
     }
     /** The issue's attachment box, filled in with where the copied file is (the user attaches it, or not). */
     public static String withFileNote(String url, String folder, String name) {
-        return url + "&report=" + enc("The stock firmware file " + name + " was copied on the phone to Download/DMR/FoundFirmware/" + folder
-                + "/. Attach it here only if you choose to: an attachment on this issue is public, and the file belongs to the phone maker.");
+        return url + "&report=" + enc("The stock firmware file " + name + " was copied on the phone to Download/DMR/FoundFirmware/" + folder   // i18n: issue text for the firmware project (English, sent to GitHub)
+                + "/. Attach it here only if you choose to: an attachment on this issue is public, and the file belongs to the phone maker.");   // i18n: issue text for the firmware project (English, sent to GitHub)
     }
 
     /** The single assets/DMR*.bin in an APK (the stock app's firmware file), or null when there is none or more than one. */
@@ -138,9 +138,9 @@ public final class FirmwareVariantCheck {
         if (!dir.mkdirs() && !dir.isDirectory()) throw new Exception("cannot create " + dir);
         String safe = FirmwareFinder.safe(name);
         java.nio.file.Files.write(new File(dir, safe).toPath(), image);
-        String src = "Stock firmware file copied by SignalDeck for the firmware project's \"Firmware variant seen\" issue.\n"
-                + safe + "  <-  " + source + "  " + image.length + " bytes  sha256 " + expectSha.toLowerCase(Locale.US) + "\n"
-                + "It belongs to the phone maker. Attaching it to the issue is your choice; an attachment there is public.\n";
+        String src = "Stock firmware file copied by SignalDeck for the firmware project's \"Firmware variant seen\" issue.\n"   // i18n: SOURCES.txt file text (English)
+                + safe + "  <-  " + source + "  " + image.length + " bytes  sha256 " + expectSha.toLowerCase(Locale.US) + "\n"   // i18n: SOURCES.txt file text (English)
+                + "It belongs to the phone maker. Attaching it to the issue is your choice; an attachment there is public.\n";   // i18n: SOURCES.txt file text (English)
         java.nio.file.Files.write(new File(dir, "SOURCES.txt").toPath(), src.getBytes(StandardCharsets.UTF_8));
         return safe;
     }
@@ -157,7 +157,7 @@ public final class FirmwareVariantCheck {
                 File a = new File(apk);
                 byte[] img = assetFrom(a); String name = img == null ? null : assetName(a);
                 if (img == null && RootSetup.haveRoot()) {
-                    RootSetup.run("cat '" + apk + "' > '" + tmp.getAbsolutePath() + "' && chmod 644 '" + tmp.getAbsolutePath() + "'");
+                    RootSetup.run("cat '" + apk + "' > '" + tmp.getAbsolutePath() + "' && chmod 644 '" + tmp.getAbsolutePath() + "'");   // i18n: shell command
                     img = assetFrom(tmp); name = img == null ? null : assetName(tmp);
                 }
                 if (img == null) continue;

@@ -15,7 +15,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
+import com.macdmr.radio.i18n.Txt;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -26,17 +28,17 @@ import java.util.Locale;
 
 /** Last heard: who and which channel had activity, newest first, with names from contacts and the RadioID list. Tap to switch. */
 public final class LastHeardDialog {
-    private static final class Row { int channel, dmrId, count; long ts; String kind, text; }
+    private static final class Row { int channel, dmrId, count; long ts; String kind, text, shown; }   // text: the stored English (what explain() matches); shown: the line in the app's language
 
     public static void show(Context c, RadioService svc) {
         float d = Theme.dp(c);
-        LinearLayout body = Neo.sheetBody(c, "Last heard");
-        TextView hint = Neo.label(c, "Newest first across every channel: alerts and car events, then who called, text and APRS traffic, what was recorded. Tap an alert or event for what it means; tap a caller for the contact; tap a heard line to switch to that channel.", 0xFF8A98A6, 12, false);
+        LinearLayout body = Neo.sheetBody(c, Txt.s(R.string.intercom_lastheard_title), "intercom");
+        TextView hint = Neo.label(c, Txt.s(R.string.intercom_lastheard_hint), 0xFF8A98A6, 12, false);
         hint.setPadding(0, (int) (4 * d), 0, (int) (8 * d)); body.addView(hint);
         LinearLayout tools = new LinearLayout(c); tools.setGravity(Gravity.CENTER);
         tools.setBaselineAligned(false);
-        for (String[] t : new String[][] { { "Recordings", "rec" }, { "Captions", "txt" }, { "Activity", "signal" } }) {
-            TextView b = Neo.button(c, t[0], t[1], t[1].equals("rec") ? Neo.RED : t[1].equals("txt") ? Neo.VIOLET : Neo.CYAN); b.setTextSize(14);
+        for (String[] t : new String[][] { { Txt.s(R.string.intercom_lastheard_recordings), "rec" }, { Txt.s(R.string.intercom_lastheard_captions), "txt" }, { Txt.s(R.string.intercom_lastheard_activity), "signal" } }) {
+            TextView b = Neo.button(c, t[0], t[1], t[1].equals("rec") ? Neo.RED : t[1].equals("txt") ? Neo.VIOLET : Neo.CYAN); b.setTextSize(14); Neo.fit(b, true);   // three in a row: never a break inside a word
             final String which = t[1];
             b.setOnClickListener(v -> { if (which.equals("rec")) MediaDialogs.recordings(c, svc); else if (which.equals("txt")) MediaDialogs.captions(c, svc); else ActivityDialog.show(c, svc); });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), (int) (10 * d)); tools.addView(b, lp);
@@ -46,29 +48,29 @@ public final class LastHeardDialog {
         final AlertDialog[] sheet = new AlertDialog[1];
         eventSections(c, svc, body, sheet);
 
-        body.addView(Neo.sheetSection(c, "Heard"));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_lastheard_section_heard)));
         LinkedHashMap<String, Row> rows = new LinkedHashMap<>();
         for (Object[] h : svc.store().lastHeard(400)) {
-            Row r = new Row(); r.ts = (Long) h[0]; r.channel = (Integer) h[1]; r.kind = (String) h[2]; r.text = (String) h[3]; r.dmrId = (Integer) h[4];
+            Row r = new Row(); r.ts = (Long) h[0]; r.channel = (Integer) h[1]; r.kind = (String) h[2]; r.text = (String) h[3]; r.dmrId = (Integer) h[4]; r.shown = (String) h[5];
             if (isAlert(r.text)) continue;   // a refusal is not something heard: it is listed under Alerts
             String key = r.channel + ":" + (r.kind.equals("dmr") || r.kind.equals("sms") ? r.dmrId : r.kind);
             Row e = rows.get(key);
             if (e == null) { r.count = 1; rows.put(key, r); } else e.count++;
         }
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
-        if (rows.isEmpty()) body.addView(Neo.label(c, "Nothing heard yet.", 0xFFBFC8D0, 14, false));
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm:ss", "MMddHHmmss");
+        if (rows.isEmpty()) body.addView(Neo.label(c, Txt.s(R.string.intercom_lastheard_empty), 0xFFBFC8D0, 14, false));
         List<Row> list = new ArrayList<>(rows.values());
         for (Row r : list) {
             ChannelStore.Channel ch = svc.store().byNumber(r.channel);
-            String chName = ch != null ? ch.name : (r.channel == 0 ? "VFO" : "channel " + r.channel);
+            String chName = ch != null ? ch.name : (r.channel == 0 ? "VFO" : Txt.s(R.string.intercom_channel_n, r.channel));
             String who = r.dmrId > 0 ? svc.callerName(r.dmrId) : "";
-            String title = (r.dmrId > 0 ? (who.isEmpty() ? "ID " + r.dmrId : who + "  ·  " + r.dmrId) : r.text.length() > 48 ? r.text.substring(0, 48) + "…" : r.text);
+            String title = (r.dmrId > 0 ? (who.isEmpty() ? Txt.s(R.string.intercom_dmr_id, r.dmrId) : who + "  ·  " + r.dmrId) : r.shown.length() > 48 ? r.shown.substring(0, 48) + "…" : r.shown);
             LinearLayout rowv = new LinearLayout(c); rowv.setOrientation(LinearLayout.VERTICAL);
             rowv.setBackground(Neo.rowCard(c)); rowv.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d);
             TextView tl = Neo.label(c, title, r.dmrId > 0 ? Theme.AMBER : Theme.CYAN, 15, true); rowv.addView(tl);
             if (r.dmrId > 0) { final int did = r.dmrId; tl.setClickable(true); tl.setOnClickListener(v -> ContactEditor.open(c, svc, ContactEditor.Identity.dmr(did), null)); }
-            rowv.addView(Neo.label(c, f.format(new Date(r.ts)) + "  ·  " + chName + (r.count > 1 ? "  ·  " + r.count + "×" : "") + (r.dmrId > 0 && !r.text.isEmpty() ? "\n" + r.text : ""), 0xFFBFC8D0, 12, false));
+            rowv.addView(Neo.label(c, f.format(new Date(r.ts)) + "  ·  " + chName + (r.count > 1 ? "  ·  " + r.count + "×" : "") + (r.dmrId > 0 && !r.shown.isEmpty() ? "\n" + r.shown : ""), 0xFFBFC8D0, 12, false));
             final int chNum = r.channel;
             rowv.setClickable(true);
             body.addView(rowv, lp);
@@ -91,16 +93,16 @@ public final class LastHeardDialog {
         List<Row> alerts = new ArrayList<>(), events = new ArrayList<>();
         Row prevA = null, prevE = null;
         for (Object[] h : ev) {
-            Row r = new Row(); r.ts = (Long) h[0]; r.channel = (Integer) h[1]; r.kind = (String) h[2]; r.text = (String) h[3]; r.count = 1;
+            Row r = new Row(); r.ts = (Long) h[0]; r.channel = (Integer) h[1]; r.kind = (String) h[2]; r.text = (String) h[3]; r.shown = (String) h[5]; r.count = 1;
             boolean alert = isAlert(r.text) || "busy".equals(r.kind) || "alert".equals(r.kind) || "warn".equals(r.kind);
             Row prev = alert ? prevA : prevE;
             if (prev != null && prev.text.equals(r.text) && prev.channel == r.channel) { prev.count++; continue; }   // a run of the same line: one row, n×
             if (alert) { if (alerts.size() < 10) alerts.add(r); prevA = r; } else { if (events.size() < 15) events.add(r); prevE = r; }
         }
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
-        if (!alerts.isEmpty()) body.addView(Neo.sheetSection(c, "Alerts (last 7 days)"));
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm:ss", "MMddHHmmss");
+        if (!alerts.isEmpty()) body.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_lastheard_section_alerts)));
         for (Row r : alerts) body.addView(eventRow(c, svc, r, f, true, sheet), rowLp(d));
-        if (!events.isEmpty()) body.addView(Neo.sheetSection(c, "Car and coverage"));
+        if (!events.isEmpty()) body.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_lastheard_section_events)));
         for (Row r : events) body.addView(eventRow(c, svc, r, f, false, sheet), rowLp(d));
     }
 
@@ -108,14 +110,15 @@ public final class LastHeardDialog {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d); return lp;
     }
 
-    private static String chName(RadioService svc, int n) { ChannelStore.Channel ch = svc.store().byNumber(n); return ch != null ? ch.name : (n == 0 ? "VFO" : "channel " + n); }
+    private static String chName(RadioService svc, int n) { ChannelStore.Channel ch = svc.store().byNumber(n); return ch != null ? ch.name : (n == 0 ? "VFO" : Txt.s(R.string.intercom_channel_n, n)); }
 
     private static LinearLayout eventRow(Context c, RadioService svc, Row r, SimpleDateFormat f, boolean alert, AlertDialog[] sheet) {
         float d = Theme.dp(c);
         LinearLayout v = new LinearLayout(c); v.setOrientation(LinearLayout.VERTICAL);
         v.setBackground(alert ? Neo.tint(c, Neo.AMBER, 12, 1) : Neo.rowCard(c)); v.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d));
-        v.addView(Neo.label(c, r.text, alert ? Theme.AMBER : Theme.CYAN, 14, true));
-        v.addView(Neo.label(c, f.format(new Date(r.ts)) + "  ·  " + chName(svc, r.channel) + (r.count > 1 ? "  ·  " + r.count + "×" : "") + "  ·  tap for details", 0xFFBFC8D0, 12, false));
+        v.addView(Neo.label(c, r.shown, alert ? Theme.AMBER : Theme.CYAN, 14, true));
+        String when = f.format(new Date(r.ts));
+        v.addView(Neo.label(c, r.count > 1 ? Txt.s(R.string.intercom_lastheard_event_sub_n, when, chName(svc, r.channel), r.count) : Txt.s(R.string.intercom_lastheard_event_sub, when, chName(svc, r.channel)), 0xFFBFC8D0, 12, false));
         v.setClickable(true);
         v.setOnClickListener(x -> details(c, svc, r, sheet));
         return v;
@@ -125,70 +128,72 @@ public final class LastHeardDialog {
     private static void details(Context c, RadioService svc, Row r, AlertDialog[] sheet) {
         float d = Theme.dp(c);
         String[] ex = explain(r.text);
-        LinearLayout box = Neo.sheetBody(c, ex[0]);
-        box.addView(Neo.label(c, r.text, isAlert(r.text) ? Theme.AMBER : Theme.CYAN, 14.5f, true));
+        LinearLayout box = Neo.sheetBody(c, ex[0], ex[2]);
+        box.addView(Neo.label(c, r.shown, isAlert(r.text) ? Theme.AMBER : Theme.CYAN, 14.5f, true));
         ChannelStore.Channel ch = svc.store().byNumber(r.channel);
-        String when = new SimpleDateFormat("EEE MMM d, HH:mm:ss", Locale.US).format(new Date(r.ts)) + (r.count > 1 ? " (latest of " + r.count + " in a row)" : "");
-        String where = ch == null ? chName(svc, r.channel) : ch.name + "  ·  TX " + String.format(Locale.US, "%.4f", ch.txFreq / 1e6) + " / RX " + String.format(Locale.US, "%.4f", ch.rxFreq / 1e6) + " MHz  ·  " + (ch.isDigital() ? "DMR" : "FM") + ", " + (ch.power == 1 ? "high" : "low") + " power";
+        String at = Txt.dates("EEE MMM d, HH:mm:ss", "EEEMMMdHHmmss").format(new Date(r.ts));
+        String when = r.count > 1 ? Txt.s(R.string.intercom_lastheard_when_n, at, r.count) : at;
+        String where = ch == null ? chName(svc, r.channel) : Txt.s(ch.power == 1 ? R.string.intercom_lastheard_where_high : R.string.intercom_lastheard_where_low, ch.name,
+                Txt.freqMhz(ch.txFreq, 4), Txt.freqMhz(ch.rxFreq, 4), ch.isDigital() ? "DMR" : "FM");
         box.addView(Neo.sheetHint(c, when + "\n" + where));
         if (!ex[1].isEmpty()) { TextView t = Neo.label(c, ex[1], 0xFFD6DEE6, 13.5f, false); t.setLineSpacing(0, 1.12f); t.setPadding(0, (int) (6 * d), 0, (int) (4 * d)); box.addView(t); }
         List<Object[]> near = svc.store().around(r.ts, 20_000);
         if (near.size() > 1) {
-            box.addView(Neo.sheetSection(c, "Around this time (±20 s)"));
+            box.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_lastheard_around)));
             SimpleDateFormat hf = new SimpleDateFormat("HH:mm:ss", Locale.US);
             StringBuilder sb = new StringBuilder();
-            for (Object[] h : near) { long ts = (Long) h[0]; sb.append(ts == r.ts ? "▶ " : "   ").append(hf.format(new Date(ts))).append("  ").append((String) h[3]).append('\n'); }
+            for (Object[] h : near) { long ts = (Long) h[0]; sb.append(ts == r.ts ? "▶ " : "   ").append(hf.format(new Date(ts))).append("  ").append((String) h[4]).append('\n'); }
             TextView t = Neo.label(c, sb.substring(0, sb.length() - 1), 0xFFBFC8D0, 12, false); t.setTypeface(Neo.mono(c)); box.addView(t);
         }
         LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); bl.setMargins(0, (int) (10 * d), 0, 0);
         final AlertDialog[] self = new AlertDialog[1];
         if (r.text.contains("hiding SignalDeck")) {
-            TextView open = Neo.button(c, "Open Android Auto settings", "intercom", Neo.AMBER); box.addView(open, bl);
-            open.setOnClickListener(x -> { try { c.startActivity(com.macdmr.radio.car.AutoTrust.settingsIntent(c)); } catch (Throwable t) { android.widget.Toast.makeText(c, "Could not open Android Auto: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show(); } });
+            TextView open = Neo.button(c, Txt.s(R.string.intercom_lastheard_open_auto), "intercom", Neo.AMBER); box.addView(open, bl);
+            open.setOnClickListener(x -> { try { c.startActivity(com.macdmr.radio.car.AutoTrust.settingsIntent(c)); } catch (Throwable t) { android.widget.Toast.makeText(c, Txt.s(R.string.intercom_lastheard_open_auto_failed, String.valueOf(t.getMessage())), android.widget.Toast.LENGTH_LONG).show(); } });
         }
         if (ch != null && (svc.current() == null || svc.current().number != ch.number)) {
-            TextView tune = Neo.button(c, "Tune " + ch.name, "channels", Neo.CYAN); box.addView(tune, new LinearLayout.LayoutParams(bl));
+            TextView tune = Neo.button(c, Txt.s(R.string.intercom_lastheard_tune, ch.name), "channels", Neo.CYAN); box.addView(tune, new LinearLayout.LayoutParams(bl));
             tune.setOnClickListener(x -> { String e = svc.trySelectChannel(ch.number); if (e != null) { android.widget.Toast.makeText(c, e, android.widget.Toast.LENGTH_LONG).show(); return; } if (self[0] != null) self[0].dismiss(); if (sheet[0] != null) sheet[0].dismiss(); });
         }
         self[0] = Neo.showSheet(c, box);
     }
 
-    /** {title, explanation} for a history line, matched on its wording (the lines come from RadioService, CoverageLogger and PacketEngine). */
+    /** {title, explanation, sheet icon} for a history line, matched on its stored English wording (the lines come from RadioService, CoverageLogger and PacketEngine). The icon is the one Neo.iconFor gave the English title. */
     static String[] explain(String t) {
         if (t.contains("while transmitting") && (t.contains("Android Auto dropped") || t.contains("USB cable dropped")))
-            return new String[] { "Talking knocked out the USB cable", "While you transmitted on this channel the phone's USB port reset: the phone stopped charging and, with Android Auto on a cable, the car disconnected until you stopped talking. It does not matter which Talk button you used.\n\nThe radio's own signal gets into the USB cable. Whether it does depends on the frequency, not on where the antenna is: in one car a 2 m repeater transmitting on 144.770 MHz at high power did it every time, while 146.370 MHz did not.\n\nWhat helps:\n• a snap-on ferrite choke on the cable, close to the phone\n• a shorter, better-shielded cable\n• Low power for this channel (Channels → edit the channel)\n• wireless Android Auto, if the car has it" };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_usbdrop_title), Txt.s(R.string.intercom_lastheard_ex_usbdrop_text), "radio" };
         if (t.contains("did not load SignalDeck"))
-            return new String[] { "Android Auto skipped the radio", "Android Auto connected but never loaded the radio on this connection (normally it does within a few seconds), so SignalDeck was missing from the car's app list and its card opened the app on the phone. Unknown sources was on, so this is Android Auto's own hiccup, seen once after it had just started up. Unplug the USB cable and plug it in again: on the new connection it loads the radio." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_notloaded_title), Txt.s(R.string.intercom_lastheard_ex_notloaded_text), "radio" };
         if (t.contains("hiding SignalDeck"))
-            return new String[] { "Android Auto is hiding the radio", "Android Auto only trusts apps installed from the Play Store. For this app it plays the sound and the steering-wheel buttons work, but SignalDeck is missing from the car's app list and tapping its card opens the app on the phone.\n\n" + com.macdmr.radio.car.AutoTrust.steps(com.macdmr.radio.car.AutoTrust.State.OFF) };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_hidden_title), Txt.s(R.string.intercom_lastheard_ex_hidden_text, com.macdmr.radio.car.AutoTrust.steps(com.macdmr.radio.car.AutoTrust.State.OFF)), "radio" };
         if (t.contains("took the sound away"))
-            return new String[] { "The car played something else", "Another source started playing in the car (music, an audio app, the car's own radio, or a call), so Android Auto gave it the speakers and the radio's sound paused. The radio keeps receiving, recording and decoding meanwhile. Press play on the radio's card or media screen to get the speakers back. Just before a disconnection this line is normal: Android Auto takes the sound away as it closes." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_sound_title), Txt.s(R.string.intercom_lastheard_ex_sound_text), "radio" };
         if (t.contains("Android Auto connected"))
-            return new String[] { "Android Auto connected", "The phone connected to the car. In brackets: what the car lists for the radio, the media app (SignalDeck) or the full-screen Radio controls (Device → Full-screen Radio controls in the car)." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_connected_title), Txt.s(R.string.intercom_lastheard_ex_connected_text), "radio" };
         if (t.contains("Android Auto disconnected"))
-            return new String[] { "Android Auto disconnected", "The connection to the car ended: the car was switched off, the cable was unplugged, or the link dropped. Look at Around this time below: if you were transmitting just before (a Voice TX line), the transmission probably disturbed the USB cable, and an alert says so when the app noticed." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_disconnected_title), Txt.s(R.string.intercom_lastheard_ex_disconnected_text), "radio" };
         if (t.contains("Android Auto opened"))
-            return new String[] { "The car opened the radio", "Android Auto opened the radio's screen in the car (the media app's channel list, or Radio controls)." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_opened_title), Txt.s(R.string.intercom_lastheard_ex_opened_text), "radio" };
         if (t.contains("No reply from"))
-            return new String[] { "No reply from the repeater", "After you transmitted on this repeater channel, the app listened for the repeater's answer (its signal coming back after you let go) and heard none. The coverage map marks this spot as not reaching the repeater. Either the repeater did not hear you, or you could not hear it." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_noreply_title), Txt.s(R.string.intercom_lastheard_ex_noreply_text), "repeaters" };
         if (t.contains("Keyed "))
-            return new String[] { "The repeater answered", "After you transmitted, the repeater's signal came back: this spot reaches it. The level is the repeater's tail as heard here, and the coverage map records it." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_keyed_title), Txt.s(R.string.intercom_lastheard_ex_keyed_text), "repeaters" };
         if (t.contains("Coverage logging"))
-            return new String[] { "Coverage logging", "Coverage logging records the signal and your key-ups with GPS for the coverage maps (Map → Coverage). With Device → Log coverage in the car on, it starts when Android Auto connects and stops when it disconnects." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_coverage_title), Txt.s(R.string.intercom_lastheard_ex_coverage_text), "signal" };
         if (t.contains("receive-only"))
-            return new String[] { "Receive-only channel", "NOAA weather channels (162.400 to 162.550 MHz) marine VHF channels (156.000 to 157.450 MHz) and the AAR railroad channels (159.810 to 161.565 MHz) are receive-only. The radio does not transmit there, whatever button is pressed." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_rxonly_title), Txt.s(R.string.intercom_lastheard_ex_rxonly_text), "radio" };
         if (t.contains("30 s transmit limit"))
-            return new String[] { "Too long to send", "This radio's firmware ends every transmission after 30 seconds, so the app refuses audio longer than about 28.5 seconds (for example a long recording or an SSTV mode that needs more time)." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_toolong_title), Txt.s(R.string.intercom_lastheard_ex_toolong_text), "radio" };
         if (t.contains("Channel busy"))
-            return new String[] { "Channel busy", "The radio refused to transmit because the channel was busy: another station was on it, or on DMR the repeater's time slot was in use. Wait for it to clear and try again." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_busy_title), Txt.s(R.string.intercom_lastheard_ex_busy_text), "radio" };
         if (t.contains("Repeater ID ") && t.contains("Morse"))
-            return new String[] { "Repeater identification", "The repeater sent its callsign in Morse, as repeaters must every few minutes while in use, and the app decoded it. It matches the callsign in this channel's name, so you are hearing the repeater you programmed (not another one on the same frequency). The tone and speed are shown in brackets." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_repeaterid_title), Txt.s(R.string.intercom_lastheard_ex_repeaterid_text), "repeaters" };
         if (t.contains("Morse:"))
-            return new String[] { "Morse heard", "Morse code was heard on this channel and decoded: usually a repeater's identification, or a station sending its callsign. Callsigns in it are added to the Logbook as heard. PKT \u2192 Settings \u2192 Morse decoder turns it off." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_morse_title), Txt.s(R.string.intercom_lastheard_ex_morse_text), "radio" };
         if (t.contains("Keyword"))
-            return new String[] { "Keyword heard", "Live captions heard one of your keywords in received speech. Keywords are set on the intercom: long-press TXT → Keywords." };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_keyword_title), Txt.s(R.string.intercom_lastheard_ex_keyword_text), "radio" };
         if (t.contains("Not sent"))
-            return new String[] { "Not sent", "The transmission was refused before keying. Packet radio (APRS, DTMF, SSTV) needs an analog FM channel: AFSK tones cannot go out over DMR. Tune an FM channel and try again." };
-        return new String[] { isAlert(t) ? "Alert" : "Event", "" };
+            return new String[] { Txt.s(R.string.intercom_lastheard_ex_notsent_title), Txt.s(R.string.intercom_lastheard_ex_notsent_text), "radio" };
+        return new String[] { Txt.s(isAlert(t) ? R.string.intercom_lastheard_ex_alert : R.string.intercom_lastheard_ex_event), "", "radio" };
     }
 }

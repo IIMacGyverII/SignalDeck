@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.text.InputType;
@@ -26,22 +28,22 @@ public final class TerminalDialog {
     public static void show(Context c, RadioService svc) {
         final PacketEngine pe = svc.packet(); if (pe == null) return;
         float d = Theme.dp(c);
-        LinearLayout body = Neo.sheetBody(c, "Packet terminal");
+        LinearLayout body = Neo.sheetBody(c, Txt.s(R.string.modes_term_title), "pkt");
         final TextView state = Neo.label(c, "", Theme.CYAN, 14, true); body.addView(state);
-        body.addView(Neo.sheetHint(c, "Tune the BBS or node's channel, then connect. Each exchange takes a few seconds: every transmission starts with a 1.6-second tone and lost frames are sent again. Type a line and Send; most BBSs answer with a prompt, and B or BYE ends the session."));
-        final EditText call = field(c, body, "Connect to (callsign-SSID)", c.getSharedPreferences("packet", Context.MODE_PRIVATE).getString("termCall", ""), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        final EditText via = field(c, body, "Via digipeaters (optional, e.g. RELAY)", c.getSharedPreferences("packet", Context.MODE_PRIVATE).getString("termVia", ""), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_term_hint)));
+        final EditText call = field(c, body, Txt.s(R.string.modes_term_call), c.getSharedPreferences("packet", Context.MODE_PRIVATE).getString("termCall", ""), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        final EditText via = field(c, body, Txt.s(R.string.modes_term_via), c.getSharedPreferences("packet", Context.MODE_PRIVATE).getString("termVia", ""), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         LinearLayout r1 = new LinearLayout(c); r1.setBaselineAligned(false);
-        final TextView conn = Neo.button(c, "Connect", "send", Neo.GREEN), acc = Neo.button(c, pe.acceptConnections() ? "Incoming: accept" : "Incoming: refuse", "contacts", Neo.VIOLET);
-        for (TextView b : new TextView[] { conn, acc }) { b.setTextSize(14); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), (int) (6 * d)); r1.addView(b, lp); }
+        final TextView conn = Neo.button(c, Txt.s(R.string.modes_term_connect), "send", Neo.GREEN), acc = Neo.button(c, Txt.s(pe.acceptConnections() ? R.string.modes_term_accept : R.string.modes_term_refuse), "contacts", Neo.VIOLET);
+        for (TextView b : new TextView[] { conn, acc }) { b.setTextSize(14); Neo.fit(b, true); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), (int) (6 * d)); r1.addView(b, lp); }
         body.addView(r1);
         final TextView screen = Neo.text(c, "", 0xFFCFE8D8, 13, Neo.mono(c));
         screen.setBackground(Neo.rowCard(c)); screen.setPadding((int) (10 * d), (int) (8 * d), (int) (10 * d), (int) (8 * d)); screen.setMinHeight((int) (220 * d)); screen.setTextIsSelectable(true);
         body.addView(screen, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         LinearLayout r2 = new LinearLayout(c); r2.setBaselineAligned(false);
-        final EditText input = new EditText(c); input.setSingleLine(true); input.setHint("Type a line"); input.setTextColor(Neo.TEXT); input.setHintTextColor(Neo.DIM); input.setTypeface(Neo.mono(c)); input.setImeOptions(EditorInfo.IME_ACTION_SEND);
+        final EditText input = new EditText(c); input.setSingleLine(true); input.setHint(Txt.s(R.string.modes_term_input_hint)); input.setTextColor(Neo.TEXT); input.setHintTextColor(Neo.DIM); input.setTypeface(Neo.mono(c)); input.setImeOptions(EditorInfo.IME_ACTION_SEND);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        TextView send = Neo.button(c, "Send", null, Neo.CYAN);
+        TextView send = Neo.button(c, Txt.s(R.string.common_send), null, Neo.CYAN);
         r2.addView(input, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         r2.addView(send, new LinearLayout.LayoutParams((int) (100 * d), LinearLayout.LayoutParams.MATCH_PARENT));
         body.addView(r2);
@@ -49,10 +51,10 @@ public final class TerminalDialog {
         final Runnable refresh = () -> {
             Ax25Session t = pe.terminal();
             boolean up = t != null && t.state() != Ax25Session.State.DISCONNECTED;
-            conn.setText(up ? "Disconnect" : "Connect");
-            state.setText(pe.terminalState() + (t != null && t.pending() > 0 ? "  ·  " + t.pending() + " waiting to be acknowledged" : ""));
+            conn.setText(Txt.s(up ? R.string.modes_term_disconnect : R.string.modes_term_connect));
+            state.setText(t != null && t.pending() > 0 ? Txt.p(R.plurals.modes_term_state_pending, t.pending(), pe.terminalState(), t.pending()) : pe.terminalState());
         };
-        pe.setTerminalListener((text, st) -> { String s = text.length() > 6000 ? text.substring(text.length() - 6000) : text; screen.setText(s.isEmpty() ? "Nothing yet." : s); refresh.run(); });
+        pe.setTerminalListener((text, st) -> { String s = text.length() > 6000 ? text.substring(text.length() - 6000) : text; screen.setText(s.isEmpty() ? Txt.s(R.string.modes_term_nothing) : s); refresh.run(); });
         refresh.run();
         conn.setOnClickListener(v -> {
             Ax25Session t = pe.terminal();
@@ -62,7 +64,7 @@ public final class TerminalDialog {
             c.getSharedPreferences("packet", Context.MODE_PRIVATE).edit().putString("termCall", call.getText().toString().trim().toUpperCase(java.util.Locale.US)).putString("termVia", via.getText().toString().trim().toUpperCase(java.util.Locale.US)).apply();
             refresh.run();
         });
-        acc.setOnClickListener(v -> { pe.setAcceptConnections(!pe.acceptConnections()); acc.setText(pe.acceptConnections() ? "Incoming: accept" : "Incoming: refuse"); });
+        acc.setOnClickListener(v -> { pe.setAcceptConnections(!pe.acceptConnections()); acc.setText(Txt.s(pe.acceptConnections() ? R.string.modes_term_accept : R.string.modes_term_refuse)); });
         Runnable doSend = () -> {
             String line = input.getText().toString();
             String e = pe.terminalSend(line);

@@ -52,7 +52,7 @@ public final class StockApk {
         if (a.canRead()) return a;
         if (!RootSetup.haveRoot() || apk.contains("'")) return null;
         File tmp = new File(c.getCacheDir(), tmpName);
-        RootSetup.run("cat '" + apk + "' > '" + tmp.getAbsolutePath() + "' && chmod 644 '" + tmp.getAbsolutePath() + "'");
+        RootSetup.run("cat '" + apk + "' > '" + tmp.getAbsolutePath() + "' && chmod 644 '" + tmp.getAbsolutePath() + "'");   // i18n: shell
         return tmp.length() > 0 ? tmp : null;
     }
 }

@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputType;
@@ -63,16 +65,16 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         setOrientation(VERTICAL);   // background: the window's
         float d = Theme.dp(c);
 
-        header = Neo.header(c, "Channels", "");
-        ImageView nearby = Neo.iconButton(c, "repeaters", Neo.CYAN, "Nearby repeaters");
+        header = Neo.header(c, Txt.s(R.string.channels_list_title), "");
+        ImageView nearby = Neo.iconButton(c, "repeaters", Neo.CYAN, Txt.s(R.string.channels_list_cd_nearby));
         nearby.setOnClickListener(v -> { if (svc != null) RepeatersDialog.show(c, svc); });
-        ImageView zone = Neo.iconButton(c, "zone", Neo.CYAN, "Zones");
+        ImageView zone = Neo.iconButton(c, "zone", Neo.CYAN, Txt.s(R.string.channels_list_cd_zones));
         zone.setOnClickListener(v -> { if (svc != null) ZonesDialog.show(c, svc, this::reload); });
-        ImageView add = Neo.iconButton(c, "plus", Neo.GREEN, "Add channel");
+        ImageView add = Neo.iconButton(c, "plus", Neo.GREEN, Txt.s(R.string.channels_list_cd_add));
         add.setOnClickListener(v -> { if (host != null) host.openEditor(null, true); });
-        ImageView mapBtn = Neo.iconButton(c, "map", Neo.CYAN, "Map");
+        ImageView mapBtn = Neo.iconButton(c, "map", Neo.CYAN, Txt.s(R.string.channels_list_cd_map));
         mapBtn.setOnClickListener(v -> MapDialog.show(c, svc));
-        ImageView shareBtn = Neo.iconButton(c, "send", Neo.CYAN, "Share or import channels");
+        ImageView shareBtn = Neo.iconButton(c, "send", Neo.CYAN, Txt.s(R.string.channels_list_cd_share));
         shareBtn.setOnClickListener(v -> { if (svc != null) CodeplugDialog.menu(c, svc, this::reload); });
         Neo.addAction(header, shareBtn); Neo.addAction(header, mapBtn); Neo.addAction(header, nearby); Neo.addAction(header, zone); Neo.addAction(header, add);
         addView(header);
@@ -83,7 +85,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         sf.setBackground(Neo.card(c, Neo.alpha(Neo.CYAN, 0x33), 12)); sf.setPadding((int) (14 * d), 0, (int) (10 * d), 0);
         ImageView si = new ImageView(c); si.setImageDrawable(new Neo.IconDrawable("search", Neo.MUTED));
         sf.addView(si, new LayoutParams((int) (18 * d), (int) (18 * d)));
-        search = new EditText(c); search.setHint("Name, frequency or number"); search.setSingleLine(true);
+        search = new EditText(c); search.setHint(Txt.s(R.string.channels_list_search_hint)); search.setSingleLine(true);
         search.setTextSize(16); search.setTypeface(Neo.uiSemi(c)); search.setTextColor(Neo.TEXT); search.setHintTextColor(Neo.DIM);
         search.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         search.setBackground(null); search.setPadding((int) (10 * d), 0, 0, 0);
@@ -98,7 +100,8 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         // filter chips
         HorizontalScrollView hs = new HorizontalScrollView(c); hs.setHorizontalScrollBarEnabled(false);
         LinearLayout cr = new LinearLayout(c); cr.setPadding((int) (16 * d), (int) (10 * d), (int) (16 * d), (int) (8 * d));
-        String[] names = { "ALL", "★ FAVOURITES", "ANALOG", "DMR" };
+        String[] names = { Txt.s(R.string.channels_list_filter_all), Txt.s(R.string.channels_list_filter_favourites), Txt.s(R.string.channels_list_filter_analog), "DMR" };
+
         for (int i = 0; i < 4; i++) {
             final int k = i;
             TextView t = Neo.text(c, names[i], Neo.TEXT, 14, Neo.ui(c)); t.setLetterSpacing(0.07f); t.setGravity(Gravity.CENTER);
@@ -134,24 +137,24 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         selBar = new LinearLayout(c); selBar.setOrientation(VERTICAL); selBar.setVisibility(GONE);
         selBar.setBackground(Neo.card(c, Neo.alpha(Neo.CYAN, 0x88), 14)); selBar.setPadding((int) (8 * d), (int) (6 * d), (int) (8 * d), (int) (8 * d));
         LinearLayout top = new LinearLayout(c); top.setGravity(Gravity.CENTER_VERTICAL);
-        ImageView close = Neo.iconButton(c, "close", Neo.CYAN, "Stop selecting"); close.setOnClickListener(v -> setSelecting(false));
+        ImageView close = Neo.iconButton(c, "close", Neo.CYAN, Txt.s(R.string.channels_list_cd_stop_selecting)); close.setOnClickListener(v -> setSelecting(false));
         top.addView(close, new LayoutParams((int) (40 * d), (int) (40 * d)));
         selCount = Neo.text(c, "", Neo.TEXT, 17, Neo.ui(c)); selCount.setPadding((int) (8 * d), 0, 0, 0);
         top.addView(selCount, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        TextView allBtn = Neo.button(c, "All", "check", Neo.CYAN); allBtn.setTextSize(13);
+        TextView allBtn = Neo.button(c, Txt.s(R.string.channels_list_sel_all), "check", Neo.CYAN); allBtn.setTextSize(13);
         allBtn.setOnClickListener(v -> { boolean every = !shown.isEmpty(); for (ChannelStore.Channel ch : shown) if (!picked.contains(ch.number)) every = false;
             if (every) for (ChannelStore.Channel ch : shown) picked.remove(ch.number); else for (ChannelStore.Channel ch : shown) picked.add(ch.number); selChanged(); });
         top.addView(allBtn);
         selBar.addView(top);
         LinearLayout acts = new LinearLayout(c); acts.setBaselineAligned(false);
-        String[] names = { "Star", "Zone", "Out of zone", "Delete" }; int[] accents = { Neo.AMBER, Neo.CYAN, Neo.VIOLET, Neo.RED };
+        String[] names = { Txt.s(R.string.channels_list_sel_star), Txt.s(R.string.channels_list_sel_zone), Txt.s(R.string.channels_list_sel_out), Txt.s(R.string.common_delete) }; int[] accents = { Neo.AMBER, Neo.CYAN, Neo.VIOLET, Neo.RED };
         for (int i = 0; i < 4; i++) {
             final int k = i;
             TextView b = Neo.button(c, names[i], null, accents[i]); b.setTextSize(12.5f); b.setSingleLine(true); b.setPadding((int) (4 * d), (int) (6 * d), (int) (4 * d), (int) (6 * d));
             LayoutParams lp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), 0);
             acts.addView(b, lp);
             if (k == 2) selOut = b;
-            b.setOnClickListener(v -> { if (picked.isEmpty()) { android.widget.Toast.makeText(c, "Tick some channels first", android.widget.Toast.LENGTH_SHORT).show(); return; }
+            b.setOnClickListener(v -> { if (picked.isEmpty()) { android.widget.Toast.makeText(c, Txt.s(R.string.channels_list_tick_first), android.widget.Toast.LENGTH_SHORT).show(); return; }
                 if (k == 0) starPicked(); else if (k == 1) zonePicked(); else if (k == 2) unzonePicked(); else deletePicked(); });
         }
         selBar.addView(acts);
@@ -166,7 +169,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
     }
     private void toggle(int number) { if (!picked.remove(number)) picked.add(number); selChanged(); }
     private void selChanged() {
-        selCount.setText(picked.size() + " selected");
+        selCount.setText(Txt.p(R.plurals.channels_list_selected, picked.size(), picked.size()));
         if (selOut != null) selOut.setVisibility(svc != null && svc.zoneId() > 0 ? VISIBLE : GONE);    // only when a zone is open
         adapter.notifyDataSetChanged();
     }
@@ -186,28 +189,28 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         final java.util.List<ChannelStore.Zone> zs = new java.util.ArrayList<>(); for (ChannelStore.Zone z : svc.store().zones()) if (!ChannelStore.FAV_ZONE.equals(z.name)) zs.add(z);
         String[] items = new String[zs.size() + 1];
         for (int i = 0; i < zs.size(); i++) items[i] = zs.get(i).name + "  (" + zs.get(i).numbers.length + ")";
-        items[zs.size()] = "New zone…";
-        new android.app.AlertDialog.Builder(c).setTitle("Add " + picked.size() + (picked.size() == 1 ? " channel" : " channels") + " to")
+        items[zs.size()] = Txt.s(R.string.channels_list_new_zone_item);
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.p(R.plurals.channels_list_add_to_zone, picked.size(), picked.size()))
                 .setItems(items, (dd, w) -> {
                     if (w < zs.size()) { done(svc.addChannelsToZone(zs.get(w).id, null, pickedList())); return; }
-                    final EditText name = new EditText(c); name.setHint("Zone name"); name.setSingleLine(true);
-                    new android.app.AlertDialog.Builder(c).setTitle("New zone").setView(name)
-                            .setPositiveButton("Create", (d2, w2) -> done(svc.addChannelsToZone(0, name.getText().toString(), pickedList())))
-                            .setNegativeButton("Cancel", null).show();
-                }).setNegativeButton("Cancel", null).show();
+                    final EditText name = new EditText(c); name.setHint(Txt.s(R.string.channels_list_zone_name_hint)); name.setSingleLine(true);
+                    new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.channels_list_new_zone_title)).setView(name)
+                            .setPositiveButton(Txt.s(R.string.channels_list_create), (d2, w2) -> done(svc.addChannelsToZone(0, name.getText().toString(), pickedList())))
+                            .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
+                }).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
     private void unzonePicked() {
         if (svc == null || svc.zoneId() <= 0) return;
         final long zid = svc.zoneId();
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Take " + picked.size() + (picked.size() == 1 ? " channel" : " channels") + " out of zone " + svc.zoneName() + "?")
-                .setMessage("The channels themselves stay; only this zone's list changes.")
-                .setPositiveButton("Take out", (dd, w) -> done(svc.removeChannelsFromZone(zid, pickedList()))).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.p(R.plurals.channels_list_take_out_title, picked.size(), picked.size(), svc.zoneName()))
+                .setMessage(Txt.s(R.string.channels_list_take_out_message))
+                .setPositiveButton(Txt.s(R.string.channels_list_take_out), (dd, w) -> done(svc.removeChannelsFromZone(zid, pickedList()))).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
     private void deletePicked() {
         if (svc == null) return;
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Delete " + picked.size() + (picked.size() == 1 ? " channel" : " channels") + "?")
-                .setMessage("They are removed from every zone, and the channels after them move up. This cannot be undone (a backup can bring them back).")
-                .setPositiveButton("Delete", (dd, w) -> done(svc.deleteChannels(pickedList()))).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.p(R.plurals.channels_list_delete_title, picked.size(), picked.size()))
+                .setMessage(Txt.s(R.string.channels_list_delete_message))
+                .setPositiveButton(Txt.s(R.string.common_delete), (dd, w) -> done(svc.deleteChannels(pickedList()))).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     public void setHost(Host h) { host = h; }
@@ -220,7 +223,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         all.clear(); all.addAll(svc.zoneChannels());
         favs.clear(); ChannelStore.Zone fz = favZone(); if (fz != null) for (int n : fz.numbers) favs.add(n);
         activeNumber = svc.current() != null ? svc.current().number : svc.store().activeNumber();
-        Neo.fitSubtitle(Neo.headerSubtitle(header), ("Zone " + svc.zoneName()).toUpperCase(Locale.US), (all.size() + (all.size() == 1 ? " channel" : " channels")).toUpperCase(Locale.US));
+        Neo.fitSubtitle(Neo.headerSubtitle(header), Txt.s(R.string.channels_list_subtitle_zone, svc.zoneName()).toUpperCase(Locale.US), Txt.p(R.plurals.channels_list_subtitle_count, all.size(), all.size()).toUpperCase(Locale.US));
         filter();
     }
 
@@ -248,12 +251,12 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
 
     /** The one extra detail worth a badge: colour code + slot on DMR, else repeater shift and/or tone. */
     static String detail(ChannelStore.Channel ch) {
-        if (ch.isM17()) return "CAN " + ch.can() + " · " + ch.m17Dest();
+        if (ch.isM17()) return "CAN " + ch.can() + " · " + ch.m17Dest();   // i18n: protocol word (CAN) and data
         if (ch.isDigital()) return "CC" + ch.cc + slotText(ch);
         List<String> parts = new ArrayList<>();
         int shift = ch.txFreq - ch.rxFreq;
-        if (ch.rxFreq >= 162_400_000 && ch.rxFreq <= 162_550_000) parts.add("WX · RX ONLY");
-        else if (ChannelStore.receiveOnly(ch)) parts.add("RX ONLY");
+        if (ch.rxFreq >= 162_400_000 && ch.rxFreq <= 162_550_000) parts.add(Txt.s(R.string.channels_list_badge_wx_rx_only));
+        else if (ChannelStore.receiveOnly(ch)) parts.add(Txt.s(R.string.channels_list_badge_rx_only));
         else if (Math.abs(shift) >= 100_000) parts.add((shift > 0 ? "+" : "−") + String.format(Locale.US, "%s MHz", trim(Math.abs(shift) / 1e6)));
         if (ch.rxType == 1 && com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode) > 0) parts.add(String.format(Locale.US, "%.1f", com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode)));
         else if (ch.rxType == 2 || ch.rxType == 3) parts.add(com.macdmr.radio.dsp.ToneTable.toneLabel(ch.rxType, ch.rxSubCode));
@@ -278,13 +281,13 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         box.addView(top);
         LinearLayout badges = new LinearLayout(c); badges.setPadding(0, (int) (10 * d), 0, 0);
         badges.addView(Neo.chip(c, ch.isM17() ? "M17" : ch.isDigital() ? "DMR" : "FM", ch.isM17() || ch.isDigital() ? Neo.VIOLET : Neo.CYAN));
-        String det = ch.isM17() ? "CAN " + ch.can() + " · " + ch.m17Dest() : ch.isDigital() ? "CC" + ch.cc + slotText(ch) + " · →" + ch.txContact : "SQ " + ch.sq + " · " + (ch.band == 1 ? "WIDE" : "NARROW") + (detail(ch).isEmpty() ? "" : " · " + detail(ch));
+        String det = ch.isM17() ? "CAN " + ch.can() + " · " + ch.m17Dest() : ch.isDigital() ? "CC" + ch.cc + slotText(ch) + " · →" + ch.txContact : "SQ " + ch.sq + " · " + Txt.s(ch.band == 1 ? R.string.channels_list_badge_wide : R.string.channels_list_badge_narrow) + (detail(ch).isEmpty() ? "" : " · " + detail(ch));   // i18n: protocol words (CAN, CC, SQ) and data
         TextView dc = Neo.chip(c, det, 0xFF9FB4C8); LayoutParams dl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); dl.leftMargin = (int) (6 * d);
         badges.addView(dc, dl);
         box.addView(badges);
         LinearLayout btns = new LinearLayout(c); btns.setBaselineAligned(false);
         final boolean fav = favs.contains(ch.number);
-        String[] names = { "Use", "Edit", fav ? "Unstar" : "Star", "Delete" };
+        String[] names = { Txt.s(R.string.channels_list_menu_use), Txt.s(R.string.common_edit), Txt.s(fav ? R.string.channels_list_menu_unstar : R.string.channels_list_sel_star), Txt.s(R.string.common_delete) };
         int[] accents = { Neo.GREEN, Neo.CYAN, Neo.AMBER, Neo.RED };
         for (int i = 0; i < 4; i++) {
             final int k = i;
@@ -301,20 +304,20 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         }
         box.addView(btns);
         final boolean isPrio = svc != null && svc.scanPriority() == ch.number;
-        TextView pb = Neo.button(c, isPrio ? "Stop using as scan priority" : "Make scan priority", "scan", Neo.VIOLET); pb.setTextSize(14);
+        TextView pb = Neo.button(c, Txt.s(isPrio ? R.string.channels_list_menu_prio_stop : R.string.channels_list_menu_prio_make), "scan", Neo.VIOLET); pb.setTextSize(14);
         LayoutParams pbl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); pbl.setMargins((int) (3 * d), (int) (8 * d), (int) (3 * d), 0);
         box.addView(pb, pbl);
         final int hn = svc != null ? svc.store().channelHistoryCount(ch.number) : 0;
-        TextView hb = Neo.button(c, hn > 0 ? "History (" + hn + ")" : "History", "signal", Neo.CYAN); hb.setTextSize(14);
+        TextView hb = Neo.button(c, hn > 0 ? Txt.s(R.string.channels_list_menu_history_n, hn) : Txt.s(R.string.channels_list_menu_history), "signal", Neo.CYAN); hb.setTextSize(14);
         box.addView(hb, new LayoutParams(pbl));
         hb.setOnClickListener(v -> { dlg.dismiss(); if (svc != null) ChannelHistoryDialog.show(c, svc, ch); });
-        TextView sb = Neo.button(c, "Select several", "check", Neo.CYAN); sb.setTextSize(14);
+        TextView sb = Neo.button(c, Txt.s(R.string.channels_list_menu_select), "check", Neo.CYAN); sb.setTextSize(14);
         box.addView(sb, new LayoutParams(pbl));
         sb.setOnClickListener(v -> { dlg.dismiss(); setSelecting(true); toggle(ch.number); });
         pb.setOnClickListener(v -> {
             dlg.dismiss(); if (svc == null) return;
             svc.setScanPriority(isPrio ? 0 : ch.number);
-            android.widget.Toast.makeText(c, isPrio ? "No scan priority channel" : ch.name + " is checked again after every " + com.macdmr.radio.Scanner.PRIORITY_EVERY + " channels while scanning", android.widget.Toast.LENGTH_LONG).show();
+            android.widget.Toast.makeText(c, isPrio ? Txt.s(R.string.channels_list_prio_none) : Txt.s(R.string.channels_list_prio_set, ch.name, com.macdmr.radio.Scanner.PRIORITY_EVERY), android.widget.Toast.LENGTH_LONG).show();
             reload();
         });
         dlg.setContentView(box);
@@ -322,7 +325,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         dlg.show();
     }
 
-    private static String label(ChannelStore.Channel ch) { return ch.name == null || ch.name.isEmpty() ? (ch.isM17() ? "M17 " : ch.isDigital() ? "Digital " : "Analog ") + ch.number : ch.name; }
+    private static String label(ChannelStore.Channel ch) { return ch.name == null || ch.name.isEmpty() ? (ch.isM17() ? "M17 " + ch.number : Txt.s(ch.isDigital() ? R.string.channels_list_unnamed_digital : R.string.channels_list_unnamed_analog, ch.number)) : ch.name; }
 
     private static TextView numberTile(Context c, int number, boolean active) {
         TextView n = Neo.text(c, String.format(Locale.US, "%02d", number % 100), active ? Neo.CYAN : 0xFF6FA9C0, 18, Neo.display(c)); n.setGravity(Gravity.CENTER);
@@ -337,13 +340,13 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
     private void toggleFavourite(ChannelStore.Channel ch, boolean on) {
         if (svc == null) return;
         svc.store().setFavourite(ch.number, on);
-        android.widget.Toast.makeText(getContext(), on ? "Starred: " + ch.name + " is in the ★ Favourites zone" : "Removed from ★ Favourites", android.widget.Toast.LENGTH_SHORT).show();
+        android.widget.Toast.makeText(getContext(), on ? Txt.s(R.string.channels_list_starred, ch.name) : Txt.s(R.string.channels_list_unstarred), android.widget.Toast.LENGTH_SHORT).show();
         reload();
     }
 
     private void confirmDelete(final ChannelStore.Channel ch) {
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Delete channel " + ch.number + "?").setMessage(ch.name)
-                .setPositiveButton("Delete", (dd, w) -> { if (svc != null) { svc.deleteChannel(ch); reload(); } }).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.channels_list_delete_one_title, ch.number)).setMessage(ch.name)
+                .setPositiveButton(Txt.s(R.string.common_delete), (dd, w) -> { if (svc != null) { svc.deleteChannel(ch); reload(); } }).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private final class Adapter extends BaseAdapter {
@@ -363,7 +366,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
                 LinearLayout l1 = new LinearLayout(c); l1.setGravity(Gravity.CENTER_VERTICAL);
                 TextView name = Neo.text(c, "", Neo.TEXT, 18, Neo.ui(c)); name.setSingleLine(true); name.setEllipsize(android.text.TextUtils.TruncateAt.END); name.setTag("name");
                 l1.addView(name, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-                TextView air = Neo.text(c, "ON AIR", 0xFF04121A, 10.5f, Neo.ui(c)); air.setLetterSpacing(0.14f); air.setTag("air");
+                TextView air = Neo.text(c, Txt.s(R.string.channels_list_on_air), 0xFF04121A, 10.5f, Neo.ui(c)); air.setLetterSpacing(0.14f); air.setTag("air");
                 android.graphics.drawable.GradientDrawable ag = new android.graphics.drawable.GradientDrawable(); ag.setColor(Neo.CYAN); ag.setCornerRadius(5 * d);
                 air.setBackground(ag); air.setPadding((int) (6 * d), (int) (2 * d), (int) (6 * d), (int) (2 * d));
                 LayoutParams al = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); al.leftMargin = (int) (6 * d);
@@ -377,7 +380,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
                 col.addView(l2);
                 row.addView(col, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
                 ImageView star = new ImageView(c); star.setTag("star"); star.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                int sp = (int) (12 * d); star.setPadding(sp, sp, sp, sp); star.setClickable(true); star.setContentDescription("Favourite");
+                int sp = (int) (12 * d); star.setPadding(sp, sp, sp, sp); star.setClickable(true); star.setContentDescription(Txt.s(R.string.channels_list_cd_favourite));
                 row.addView(star, new LayoutParams((int) (44 * d), (int) (44 * d)));
                 outer.addView(row, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
                 outer.setLayoutParams(new ListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -404,18 +407,18 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
             ((TextView) row.findViewWithTag("freq")).setText(mhz(ch.rxFreq));
             LinearLayout badges = row.findViewWithTag("badges"); badges.removeAllViews();
             badges.addView(Neo.chip(c, ch.isM17() ? "M17" : ch.isDigital() ? "DMR" : "FM", ch.isM17() || ch.isDigital() ? Neo.VIOLET : Neo.CYAN));
-            if (svc != null && svc.scanPriority() == ch.number) { TextView pc = Neo.chip(c, "PRIORITY", Neo.VIOLET); LayoutParams pl2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); pl2.leftMargin = (int) (6 * d); badges.addView(pc, pl2); }
+            if (svc != null && svc.scanPriority() == ch.number) { TextView pc = Neo.chip(c, Txt.s(R.string.channels_list_badge_priority), Neo.VIOLET); LayoutParams pl2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); pl2.leftMargin = (int) (6 * d); badges.addView(pc, pl2); }
             boolean canTune = ChannelStore.tunable(ch);                            // outside this radio's bands (a 2 m channel on a UHF-only radio): dimmed, never tuned
             row.setAlpha(canTune ? 1f : 0.5f);
-            if (!canTune) { TextView nt = Neo.chip(c, "NOT TUNABLE", Neo.MUTED); nt.setLetterSpacing(0.04f); nt.setTextSize(10); nt.setContentDescription("Not tunable on this radio"); /* short and tight: the full chip was cut off on a 480 px screen (W6+) */ LayoutParams nl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); nl.leftMargin = (int) (6 * d); badges.addView(nt, nl); }
+            if (!canTune) { TextView nt = Neo.chip(c, Txt.s(R.string.channels_list_badge_not_tunable), Neo.MUTED); nt.setLetterSpacing(0.04f); nt.setTextSize(10); nt.setContentDescription(Txt.s(R.string.channels_list_cd_not_tunable)); /* short and tight: the full chip was cut off on a 480 px screen (W6+) */ LayoutParams nl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); nl.leftMargin = (int) (6 * d); badges.addView(nt, nl); }
             Object[] lh = heard.get(ch.number);                                   // when the channel was last heard (owner, 2026-10-25: the colour code and tone chip came off the card; the editor has the detail and the history)
-            if (lh != null) { TextView ht = Neo.text(c, "heard " + heardWhen((Long) lh[0]), Neo.DIM, 11.5f, Neo.uiMedium(c)); ht.setSingleLine(true); ht.setEllipsize(android.text.TextUtils.TruncateAt.END); LayoutParams hl = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); hl.leftMargin = (int) (6 * d); badges.addView(ht, hl); }
+            if (lh != null) { TextView ht = Neo.text(c, Txt.s(R.string.channels_list_heard, heardWhen((Long) lh[0])), Neo.DIM, 11.5f, Neo.uiMedium(c)); ht.setSingleLine(true); ht.setEllipsize(android.text.TextUtils.TruncateAt.END); LayoutParams hl = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); hl.leftMargin = (int) (6 * d); badges.addView(ht, hl); }
             ImageView star = row.findViewWithTag("star");
             if (selecting) {                                                    // a tick box: the whole row toggles
                 star.setImageDrawable(new Neo.IconDrawable(tick ? "check" : "M5 5h14v14H5z", tick ? Neo.CYAN_LIGHT : Neo.MUTED));   // an empty box when not ticked star.setContentDescription(tick ? "Selected" : "Not selected");
                 star.setOnClickListener(x -> toggle(ch.number));
             } else {
-                star.setImageDrawable(new Neo.IconDrawable("star", fav ? Neo.AMBER : Neo.OFF, fav)); star.setContentDescription("Favourite");
+                star.setImageDrawable(new Neo.IconDrawable("star", fav ? Neo.AMBER : Neo.OFF, fav)); star.setContentDescription(Txt.s(R.string.channels_list_cd_favourite));
                 star.setOnClickListener(x -> toggleFavourite(ch, !fav));
             }
             return v;
@@ -428,7 +431,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         String hm = new java.text.SimpleDateFormat("HH:mm", Locale.US).format(new java.util.Date(ts));
         if (now.get(java.util.Calendar.YEAR) == t.get(java.util.Calendar.YEAR)) {
             int dd = now.get(java.util.Calendar.DAY_OF_YEAR) - t.get(java.util.Calendar.DAY_OF_YEAR);
-            if (dd == 0) return hm; if (dd == 1) return "yesterday " + hm;
+            if (dd == 0) return hm; if (dd == 1) return Txt.s(R.string.channels_list_yesterday, hm);
         }
         return new java.text.SimpleDateFormat("MMM d, HH:mm", Locale.US).format(new java.util.Date(ts));
     }
@@ -440,16 +443,17 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
     @Override public void onStockImportOffer() {
         if (svc == null || (importAsk != null && importAsk.isShowing())) return;
         final RadioService s = svc; final Context c = getContext();
-        importAsk = new android.app.AlertDialog.Builder(c).setTitle("Import your channels?")
-                .setMessage("SignalDeck has no channels yet. Import the channels saved in the phone's stock radio app?\n\nStart empty to add your own instead. You can import them later with Device → Re-import.")
+        importAsk = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.channels_list_import_title))
+                .setMessage(Txt.s(R.string.channels_list_import_message))
                 .setCancelable(false)
-                .setPositiveButton("Import", (d, w) -> new Thread(() -> { final String r = s.answerStockImport(true); if (r != null) post(() -> { android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show(); reload(); }); }).start())
-                .setNegativeButton("Start empty", (d, w) -> s.answerStockImport(false)).show();
+                .setPositiveButton(Txt.s(R.string.common_import), (d, w) -> new Thread(() -> { final String r = s.answerStockImport(true); if (r != null) post(() -> { android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show(); reload(); }); }).start())
+                .setNegativeButton(Txt.s(R.string.channels_list_import_start_empty), (d, w) -> s.answerStockImport(false)).show();
     }
     /** Changed elsewhere (SignalDeck Web, an import): reload. A selection ends, since channel numbers may have moved. */
     @Override public void onChannels() {
         if (importAsk != null && importAsk.isShowing() && svc != null && !svc.stockImportPending()) importAsk.dismiss();   // answered on the web
-        if (selecting) { setSelecting(false); android.widget.Toast.makeText(getContext(), "Channels changed elsewhere: selection cleared", android.widget.Toast.LENGTH_SHORT).show(); }
+        if (selecting) { setSelecting(false); android.widget.Toast.makeText(getContext(), Txt.s(R.string.channels_list_changed_elsewhere), android.widget.Toast.LENGTH_SHORT).show(); }
+
         reload();
     }
     @Override public void onRx(boolean r) { } @Override public void onTx(boolean t) { } @Override public void onRssi(int dbm) { }

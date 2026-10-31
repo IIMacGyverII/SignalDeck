@@ -30,7 +30,7 @@ public final class RegionTable {
     /** Before any region is chosen: the values the app used before regions (US band plan, miles, weather radio). */
     static final Region LEGACY = legacy();
     private static Region legacy() {
-        Region r = new Region(); r.id = ""; r.name = "Not chosen"; r.iaru = 2; r.chosen = false;
+        Region r = new Region(); r.id = ""; r.name = "Not chosen"; r.iaru = 2; r.chosen = false;   // i18n: internal name, built at class load; the screens show RegionSheet.title
         r.aprsHz = 144_390_000; r.call2mHz = 146_520_000; r.call70Hz = 446_000_000; r.weatherRadio = true; r.km = false; r.stationIdMinutes = 10;
         r.amateurBands = new long[][] { { 144_000_000L, 148_000_000L }, { 222_000_000L, 225_000_000L }, { 420_000_000L, 450_000_000L } };
         return r;
@@ -38,8 +38,8 @@ public final class RegionTable {
     public Region unchosen() { return LEGACY.copy(); }
 
     // ITU/IARU region of a country without an entry: Region 2 (the Americas), Region 3 (Asia-Pacific), the rest Region 1.
-    private static final Set<String> IARU2 = new HashSet<>(Arrays.asList(("AG AI AR AW BB BL BM BO BQ BR BS BZ CA CL CO CR CU CW DM DO EC FK GD GF GP GT GY HN HT JM KN KY LC MF MQ MS MX NI PA PE PM PR PY SR SV SX TC TT UM US UY VC VE VG VI").split(" ")));
-    private static final Set<String> IARU3 = new HashSet<>(Arrays.asList(("AF AS AU BD BN BT CC CK CN CX FJ FM GU HK ID IN IO IR JP KH KI KP KR LA LK MH MM MN MO MP MV MY NC NF NP NR NU NZ PF PG PH PK PN PW SB SG TH TK TL TO TV TW VN VU WF WS").split(" ")));
+    private static final Set<String> IARU2 = new HashSet<>(Arrays.asList(("AG AI AR AW BB BL BM BO BQ BR BS BZ CA CL CO CR CU CW DM DO EC FK GD GF GP GT GY HN HT JM KN KY LC MF MQ MS MX NI PA PE PM PR PY SR SV SX TC TT UM US UY VC VE VG VI").split(" ")));   // i18n: country codes
+    private static final Set<String> IARU3 = new HashSet<>(Arrays.asList(("AF AS AU BD BN BT CC CK CN CX FJ FM GU HK ID IN IO IR JP KH KI KP KR LA LK MH MM MN MO MP MV MY NC NF NP NR NU NZ PF PG PH PK PN PW SB SG TH TK TL TO TV TW VN VU WF WS").split(" ")));   // i18n: country codes
     public static int iaruOf(String code) { return IARU2.contains(code) ? 2 : IARU3.contains(code) ? 3 : 1; }
 
     private static Set<String> iso;
@@ -105,7 +105,8 @@ public final class RegionTable {
         List<String[]> out = new ArrayList<>();
         for (String code : isoCountries()) { Region e = byId.get(code); out.add(new String[] { code, e != null ? e.name : countryName(code) }); }
         Collections.sort(out, (x, y) -> x[1].compareToIgnoreCase(y[1]));
-        for (int i = 1; i <= 3; i++) { Region d = byId.get("iaru" + i); if (d != null) out.add(new String[] { d.id, "Custom: " + d.name }); }
+        for (int i = 1; i <= 3; i++) { Region d = byId.get("iaru" + i); if (d != null) out.add(new String[] { d.id, com.macdmr.radio.i18n.Txt.s(com.macdmr.radio.R.string.channels_region_custom, d.name) }); }
+
         return out;
     }
 }

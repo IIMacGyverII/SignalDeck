@@ -7,7 +7,7 @@ package com.macdmr.radio;
 import com.macdmr.radio.ham.HeldFit;
 import com.macdmr.radio.ham.M17Receiver;
 
-import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.i18n.Msg;
 
 import java.io.File;
 import java.util.Locale;
@@ -27,7 +27,7 @@ public final class DfeCal {
     private float[] pending;
     private String fitSrc = "";
     private int fitDbm = -999, fitFrames;
-    private String line = "";
+    private Msg line;
 
     public DfeCal(File dir, String profile) {
         this.profile = profile == null ? "unknown" : profile;
@@ -40,13 +40,15 @@ public final class DfeCal {
     /** The table this phone accepted, or null to keep the shipped one. */
     public float[] accepted() { return read(acceptedFile()); }
 
-    public String line() { return line == null ? "" : line; }
+    public String line() { return line == null ? "" : line.text(); }
+    /** The same line as its message (null when there is none): English for DIAG, the app language on screen. */
+    public Msg lineMsg() { return line; }
 
     public void reset() {
         acceptedFile().delete();
         new File(dir, "eq_" + profile + ".note").delete();
         pending = null;
-        line = "";
+        line = null;
     }
 
     /**
@@ -56,9 +58,9 @@ public final class DfeCal {
     public boolean onCall(float[] learned, int frames, short[] audio, String src, int dbm, float[] live) {
         if (src == null) src = "";
         if (pending == null) {
-            if (learned == null) { if (frames > 0) line = Txt.s(R.string.service_m17eq_unchanged, frames, MIN_FRAMES); return false; }
+            if (learned == null) { if (frames > 0) line = Msg.of(R.string.service_m17eq_unchanged, frames, MIN_FRAMES); return false; }
             pending = learned.clone(); fitSrc = src; fitDbm = dbm; fitFrames = frames;
-            line = Txt.s(R.string.service_m17eq_waiting, fitFrames);
+            line = Msg.of(R.string.service_m17eq_waiting, fitFrames);
             return false;
         }
         if (audio == null || audio.length < 8000 || live == null) return false;
@@ -67,11 +69,11 @@ public final class DfeCal {
         if (HeldFit.keep(withPending[0], withLive[0], locked, fitDbm, dbm, fitSrc, src)) {
             write(acceptedFile(), pending);
             writeNote(fitFrames, withPending[0], withLive[0]);
-            line = Txt.s(R.string.service_m17eq_fitted, fitFrames, withPending[0], withLive[0]);
+            line = Msg.of(R.string.service_m17eq_fitted, fitFrames, withPending[0], withLive[0]);
             pending = null;
             return true;
         }
-        line = Txt.s(!locked ? R.string.service_m17eq_not_kept_nolink : withPending[0] < withLive[0] ? R.string.service_m17eq_not_kept_fewer : R.string.service_m17eq_not_kept_same, withPending[0], withLive[0]);
+        line = Msg.of(!locked ? R.string.service_m17eq_not_kept_nolink : withPending[0] < withLive[0] ? R.string.service_m17eq_not_kept_fewer : R.string.service_m17eq_not_kept_same, withPending[0], withLive[0]);
         pending = null;
         return false;
     }

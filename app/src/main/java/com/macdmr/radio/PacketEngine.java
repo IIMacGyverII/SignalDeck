@@ -455,6 +455,12 @@ public final class PacketEngine {
     public synchronized void textClear() { textRx.setLength(0); textPost(); }
     /** Everything received (and sent) in the text modes so far, for SignalDeck Web. */
     public synchronized String textReceived() { return textRx.toString(); }
+    /** {@link #textStatus} as its message, in English for DIAG (the PSK offset written with a point). */
+    public Msg textStatusMsg() {
+        if (textMode == 1 && rtty != null) return rtty.locked() ? Msg.of(R.string.packet_text_rtty_listening, String.format(Locale.US, "%.0f", rtty.markHz())) : Msg.of(R.string.packet_text_rtty_looking);
+        if (textMode == 2 && psk != null) return psk.locked() ? Msg.of(R.string.packet_text_psk_listening, String.format(Locale.US, "%.1f", psk.freq())) : Msg.of(R.string.packet_text_psk_looking);
+        return Msg.of(R.string.packet_text_not_listening);
+    }
     public String textStatus() {
         if (textMode == 1 && rtty != null) return rtty.locked() ? Txt.s(R.string.packet_text_rtty_listening, String.format(Locale.US, "%.0f", rtty.markHz())) : Txt.s(R.string.packet_text_rtty_looking);
         if (textMode == 2 && psk != null) return psk.locked() ? Txt.s(R.string.packet_text_psk_listening, Txt.decimal(psk.freq(), 1)) : Txt.s(R.string.packet_text_psk_looking);
@@ -497,7 +503,7 @@ public final class PacketEngine {
             };
             String e = host.transmitTones(com.macdmr.radio.ham.ToneQueue.rtty(p, hz, 1000), com.macdmr.radio.ham.ToneQueue.AMPLITUDE, "RTTY " + (i + 1) + "/" + parts.size(), next);   // i18n: transmit label (logs and RadioService's history)
             if (e == null) return;
-            host.event(Msg.of(R.string.packet_text_rtty_no_tones, e));
+            host.event(Msg.of(R.string.packet_text_rtty_no_tones, Msg.shown(e)));
         }
         short[] pcm = m == 1 ? com.macdmr.radio.ham.Rtty.encode(p, hz, 1000) : com.macdmr.radio.ham.Psk31.encode(p, hz);
         if (pcm.length > SR * 28) { short[] cut = new short[SR * 28]; System.arraycopy(pcm, 0, cut, 0, cut.length); pcm = cut; }
@@ -511,17 +517,19 @@ public final class PacketEngine {
     public interface TerminalListener { void update(String transcript, String state); }
     private volatile com.macdmr.radio.pkt.Ax25Session terminal;
     private final StringBuilder transcript = new StringBuilder();
-    private volatile String termState = Txt.s(R.string.packet_ax25_disconnected);   // shown as it is (the terminal, SignalDeck Web, Winlink errors)
+    private volatile Msg termState = Msg.of(R.string.packet_ax25_disconnected);   // shown as it is (the terminal, SignalDeck Web, Winlink errors)
     private volatile TerminalListener termListener;
-    public void setTerminalListener(TerminalListener l) { termListener = l; if (l != null) l.update(transcriptText(), termState); }
+    public void setTerminalListener(TerminalListener l) { termListener = l; if (l != null) l.update(transcriptText(), termState.text()); }
     public synchronized String transcriptText() { return transcript.toString(); }
-    public String terminalState() { return termState; }
+    public String terminalState() { return termState.text(); }
+    /** The terminal state as its message: English for DIAG. */
+    public Msg terminalStateMsg() { return termState; }
     public boolean acceptConnections() { return prefs.getBoolean("acceptConnect", false); }
     public void setAcceptConnections(boolean on) { prefs.edit().putBoolean("acceptConnect", on).apply(); com.macdmr.radio.pkt.Ax25Session t = terminal(); if (t != null) t.setAcceptIncoming(on); }
     private boolean terminalActive() { com.macdmr.radio.pkt.Ax25Session t = terminal; return t != null && (t.state() != com.macdmr.radio.pkt.Ax25Session.State.DISCONNECTED || acceptConnections()); }
     private synchronized void termAppend(String s) {
         transcript.append(s); if (transcript.length() > 20000) transcript.delete(0, transcript.length() - 16000);
-        TerminalListener l = termListener; String t = transcript.toString(), st = termState;
+        TerminalListener l = termListener; String t = transcript.toString(), st = termState.text();
         if (l != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> l.update(t, st));
     }
     /** The session for our callsign (made on first use; null without a callsign). */
@@ -539,7 +547,7 @@ public final class PacketEngine {
                 @Override public void state(Msg m) {
                     java.util.concurrent.LinkedBlockingQueue<Integer> q = wlRx; if (q != null && m.key().startsWith("packet_ax25_disconnected")) q.offer(-1);
                     String state = m.text();
-                    termState = state; termAppend("\n*** " + state + " ***\n"); host.event(Msg.of(R.string.packet_term_event_state, m));
+                    termState = m; termAppend("\n*** " + state + " ***\n"); host.event(Msg.of(R.string.packet_term_event_state, m));
                     if (m.key().equals("packet_ax25_connected_they_called")) host.notifyUser(Txt.s(R.string.packet_term_notify_connection), state, false);
                 }
             });
@@ -717,7 +725,7 @@ public final class PacketEngine {
         if (host.tonePath()) {                                              // bench firmware: the module's tone generator, no audio path, no 1.5 s of lead
             String e = host.transmitTones(com.macdmr.radio.ham.ToneQueue.morse(callsign(), 20, 800), com.macdmr.radio.ham.ToneQueue.AMPLITUDE, "Morse ID", () -> host.event(Msg.of(R.string.packet_morse_sent_tones, callsign())));   // i18n: transmit label (logs and RadioService's history)
             if (e == null) return null;
-            host.event(Msg.of(R.string.packet_morse_no_tones, e));
+            host.event(Msg.of(R.string.packet_morse_no_tones, Msg.shown(e)));
         }
         short[] m = com.macdmr.radio.coverage.Morse.pcm(callsign(), 20, 800), pcm = new short[SR * 13 / 10 + m.length];   // the TX path needs ~1.5 s after key-up: silence first, or the first letters are lost
         System.arraycopy(m, 0, pcm, SR * 13 / 10, m.length);

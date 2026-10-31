@@ -182,7 +182,7 @@ public final class LastHeardDialog {
             return new String[] { Txt.s(R.string.intercom_lastheard_ex_coverage_title), Txt.s(R.string.intercom_lastheard_ex_coverage_text), "signal" };
         if (t.contains("receive-only"))
             return new String[] { Txt.s(R.string.intercom_lastheard_ex_rxonly_title), Txt.s(R.string.intercom_lastheard_ex_rxonly_text), "radio" };
-        if (t.contains("30 s transmit limit"))
+        if (t.contains("Too long to send"))   // service_tx_too_long_limit / _sender ("30 s transmit limit" was the wording before TxLimit)
             return new String[] { Txt.s(R.string.intercom_lastheard_ex_toolong_title), Txt.s(R.string.intercom_lastheard_ex_toolong_text), "radio" };
         if (t.contains("Channel busy"))
             return new String[] { Txt.s(R.string.intercom_lastheard_ex_busy_title), Txt.s(R.string.intercom_lastheard_ex_busy_text), "radio" };

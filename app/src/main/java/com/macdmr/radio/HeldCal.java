@@ -10,7 +10,7 @@ import com.macdmr.radio.ham.HeldFit;
 import com.macdmr.radio.ham.HeldPath;
 import com.macdmr.radio.ham.M17;
 
-import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.i18n.Msg;
 
 import java.io.File;
 import java.util.List;
@@ -23,7 +23,7 @@ public final class HeldCal {
     private double[] pending;
     private String fitSrc = "";
     private int fitDbm = -999, fitFrames;
-    private String line = "";
+    private Msg line;
 
     public HeldCal(Context ctx, String profile) {
         this.profile = profile == null ? "unknown" : profile;
@@ -39,13 +39,15 @@ public final class HeldCal {
         return t;
     }
 
-    public String line() { return line == null ? "" : line; }
+    public String line() { return line == null ? "" : line.text(); }
+    /** The same line as its message (null when there is none): English for DIAG, the app language on screen. */
+    public Msg lineMsg() { return line; }
 
     public void reset() {
         acceptedFile().delete();
         new File(dir, "held_" + profile + ".note").delete();
         pending = null;
-        line = Txt.s(R.string.service_m17cal_shipped);
+        line = Msg.of(R.string.service_m17cal_shipped);
     }
 
     /** A call just ended. {@code frames} were already guarded. {@code audio} is the last few seconds. */
@@ -53,9 +55,9 @@ public final class HeldCal {
         if (src == null) src = "";
         if (pending == null) {
             double[] w = HeldFit.fit(frames);
-            if (w == null) { line = Txt.s(R.string.service_m17cal_shipped_frames, frames.size()); return false; }
+            if (w == null) { line = Msg.of(R.string.service_m17cal_shipped_frames, frames.size()); return false; }
             pending = w; fitSrc = src; fitDbm = dbm; fitFrames = frames.size();
-            line = Txt.s(R.string.service_m17cal_fit_waiting, fitFrames, fitDbm);
+            line = Msg.of(R.string.service_m17cal_fit_waiting, fitFrames, fitDbm);
             return false;
         }
         int liveN = clean(audio, liveTaps);
@@ -64,11 +66,11 @@ public final class HeldCal {
         if (HeldFit.keep(pendN, liveN, locked, fitDbm, dbm, fitSrc, src)) {
             write(acceptedFile(), pending);
             writeNote(fitFrames, fitDbm, dbm);
-            line = Txt.s(R.string.service_m17cal_fitted, fitFrames, fitDbm, dbm);
+            line = Msg.of(R.string.service_m17cal_fitted, fitFrames, fitDbm, dbm);
             pending = null;
             return true;
         }
-        line = Txt.s(locked ? R.string.service_m17cal_not_kept_locked : R.string.service_m17cal_not_kept_nolock, pendN, liveN);
+        line = Msg.of(locked ? R.string.service_m17cal_not_kept_locked : R.string.service_m17cal_not_kept_nolock, pendN, liveN);
         pending = null;
         return false;
     }

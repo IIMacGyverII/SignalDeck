@@ -39,7 +39,7 @@ public class TxtNumbersTest {
         assertEquals(-0.6, Txt.parseDecimal("-0,6"), 1e-9);
         assertEquals(12.5, Txt.parseDecimal("12,5"), 1e-9);
         assertEquals(145.0, Txt.parseDecimal("145"), 1e-9);
-        for (String bad : new String[] { "1,234,5", "1.234,5", "", "abc" })
+        for (String bad : new String[] { "1,234,5", "1.234,5", "1,234.5", "", "abc", "12a", "12f", "1e3", "NaN", "Infinity", "0x10", "1,2,3" })
             try { Txt.parseDecimal(bad); fail(bad); } catch (NumberFormatException expected) { }
     }
 

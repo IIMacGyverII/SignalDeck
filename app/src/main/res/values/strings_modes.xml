@@ -535,6 +535,10 @@
     </plurals>
     <!-- M17 texts line: part of a packet was lost. One line. -->
     <string name="modes_m17_frames_lost">✉ M17: frames lost</string>
+    <!-- History line: an M17 data packet. %1$s the sender, %2$s the destination, %3$s what it carried ("APRS, 12 bytes"). One line. -->
+    <string name="modes_m17_event_packet">%1$s → %2$s: %3$s</string>
+    <!-- History line: an M17 text message. %1$s the sender, %2$s the destination, %3$s the message as sent. One line. -->
+    <string name="modes_m17_event_sms">✉ %1$s → %2$s: %3$s</string>
 
     <!-- ===== SSTV picture combining ===== -->
     <!-- Combine error: fewer than two pictures picked. Toast. -->
@@ -816,7 +820,7 @@
     <!-- Title of the Morse trainer sheet. One line. -->
     <string name="modes_morse_title">Morse trainer</string>
     <!-- Explanation of the Koch method and Farnsworth spacing. A paragraph. -->
-    <string name="modes_morse_hint">The Koch method: start with two characters at full speed and add one each time you copy a lesson with 90 %. Farnsworth spacing leaves longer gaps between characters while you learn; close it up as you improve. Sound plays on the phone, not on the air.</string>
+    <string name="modes_morse_hint" formatted="false">The Koch method: start with two characters at full speed and add one each time you copy a lesson with 90 %. Farnsworth spacing leaves longer gaps between characters while you learn; close it up as you improve. Sound plays on the phone, not on the air.</string>
     <!-- Lesson line. %1$d lesson, %2$d lessons in all, %3$s its characters (spaced), %4$s the new character. One line beside two buttons. -->
     <string name="modes_morse_lesson">Lesson %1$d of %2$d:\u0020 %3$s\u0020\u0020 (new: %4$s)</string>
     <!-- Speed line. %1$d character speed, %2$d the spacing (Farnsworth) speed, both in words per minute. One line beside two buttons. -->
@@ -1857,7 +1861,7 @@
     <!-- Prediction note with no marks. One line. -->
     <string name="modes_fox_mark_to_start">Mark a reading to start.</string>
     <!-- Prediction note: the map legend. One line. -->
-    <string name="modes_fox_shaded">Shaded: where the fox probably is; bright outline 50 %, faint 90 %.</string>
+    <string name="modes_fox_shaded" formatted="false">Shaded: where the fox probably is; bright outline 50 %, faint 90 %.</string>
     <!-- Prediction note: why a layer is not used. %1$s the reasons (lower case, joined with "; "). Ends with a space. Two lines. -->
     <string name="modes_fox_not_used">Not used yet: %1$s.\u0020</string>
     <!-- The same followed by the map legend. %1$s the reasons. Two lines. -->

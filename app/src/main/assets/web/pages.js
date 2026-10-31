@@ -82,7 +82,7 @@ $('ctList').onclick = e => { const it = e.target.closest('.item'); if (it) editC
 $('ctNew').onclick = () => editContact(null);
 $('ctForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const j = await act('contacts', { id: S.editing ? S.editing.id : 0, name: $('ctName').value, number: +$('ctNumber').value || 0, type: +$('ctType').value,
+  const j = await act('contacts', { id: S.editing ? S.editing.id : 0, name: $('ctName').value, number: intNum($('ctNumber').value) || 0, type: +$('ctType').value,
     callsign: $('ctCall').value, rics: $('ctRics').value, notes: $('ctNotes').value, home: $('ctHome').value, homeLabel: $('ctHomeLabel').value });
   if (j) { await loadContacts(); if (!S.editing) editContact(null); }
 });
@@ -405,7 +405,8 @@ async function loadFinder() {
 $('pfGo').onclick = async () => { try { const r = await api('finder', { action: S.pf && S.pf.running ? 'stop' : 'start' }); toast(r.message); } catch (x) { toast(x.message); } setTimeout(loadFinder, 800); };
 $('pfSet').onclick = () => { $('pfFreqs').value = (S.pf && S.pf.freqs) || ''; $('pfDwell').value = (S.pf && S.pf.dwell) || 3; $('pfHours').value = (S.pf && S.pf.hours) || 2; $('pfForm').classList.toggle('hidden'); };
 $('pfCancel').onclick = () => $('pfForm').classList.add('hidden');
-$('pfForm').onsubmit = async e => { e.preventDefault(); try { const r = await api('finder', { action: 'settings', freqs: $('pfFreqs').value, dwell: +$('pfDwell').value, hours: +$('pfHours').value }); toast(r.message); $('pfForm').classList.add('hidden'); loadFinder(); } catch (x) { toast(x.message); } };
+$('pfForm').onsubmit = async e => { e.preventDefault(); const dwell = intNum($('pfDwell').value), hours = intNum($('pfHours').value); if (isNaN(dwell) || isNaN(hours)) { toast(t('common_not_a_number')); return; }
+  try { const r = await api('finder', { action: 'settings', freqs: $('pfFreqs').value, dwell, hours }); toast(r.message); $('pfForm').classList.add('hidden'); loadFinder(); } catch (x) { toast(x.message); } };
 $('pfClear').onclick = async () => { if (!await ask(t('pkt_pf_clear_ask'))) return; try { await api('finder', { action: 'clear' }); loadFinder(); } catch (x) { toast(x.message); } };
 
 // ---- Winlink e-mail (Messages page) ----
@@ -574,7 +575,8 @@ $('scStart').onclick = async () => {
   try {
     if (j.running) { await api('scope/stop', {}); toast(t('scope_stopping')); }
     else if ($('scPreset').value === 'c') {
-      const from = Math.round(parseFloat($('scFrom').value) * 1e6), to = Math.round(parseFloat($('scTo').value) * 1e6), step = Math.round(parseFloat($('scStep').value) * 1e3);
+      const from = Math.round(num($('scFrom').value) * 1e6), to = Math.round(num($('scTo').value) * 1e6), step = Math.round(num($('scStep').value) * 1e3);
+      if (isNaN(from) || isNaN(to) || isNaN(step)) { toast(t('common_not_a_number')); return; }
       try { localStorage.setItem('scCustom', JSON.stringify({ from: $('scFrom').value, to: $('scTo').value, step: $('scStep').value })); } catch (e) { }
       await api('scope/start', { from, to, step }); toast(t('scope_sweeping_range', { from: (from / 1e6).toFixed(4), to: (to / 1e6).toFixed(4), n: scSteps(from, to, step) }));
     }
@@ -623,7 +625,7 @@ $('sfDelete').onclick = async () => { if (!await ask(t('settings_sched_delete_as
 $('schedForm').onsubmit = async e => {
   e.preventDefault();
   const [h, m] = $('sfTime').value.split(':').map(Number);
-  const body = { id: S.sfId, action: $('sfAction').value, channel: +$('sfChannel').value, record: $('sfRecord').checked, days: sfMask(), date: $('sfDate').value, hour: h, minute: m, minutes: +$('sfMinutes').value || 60, label: $('sfLabel').value, enabled: true };
+  const body = { id: S.sfId, action: $('sfAction').value, channel: +$('sfChannel').value, record: $('sfRecord').checked, days: sfMask(), date: $('sfDate').value, hour: h, minute: m, minutes: intNum($('sfMinutes').value) || 60, label: $('sfLabel').value, enabled: true };
   try { await api('schedules', body); toast(t('common_saved')); $('schedForm').classList.add('hidden'); loadSchedules(); } catch (x) { toast(x.message); }
 };
 
@@ -829,7 +831,7 @@ $('qDel').onclick = async () => { if (S.qso && confirm(t('log_delete_ask', { cal
 $('qsoForm').addEventListener('submit', async e => {
   e.preventDefault();
   const body = { id: S.qso ? S.qso.id : 0, call: $('qCall').value, mode: $('qMode').value, rstSent: $('qSent').value, rstRcvd: $('qRcvd').value, name: $('qName').value, notes: $('qNotes').value, qso: true };
-  const f = parseFloat($('qFreq').value); if (!isNaN(f)) body.freqMHz = f;
+  const fs = $('qFreq').value.trim(), f = num(fs); if (fs && isNaN(f)) { toast(t('common_not_a_number')); return; } if (!isNaN(f)) body.freqMHz = f;
   if (await act('logbook', body)) { editQso(null); loadLog(); }
 });
 
@@ -928,7 +930,7 @@ $('aprsSet').addEventListener('submit', async e => {
   e.preventDefault(); const body = {};
   $('aprsSet').querySelectorAll('[data-k]').forEach(el => {
     const k = el.dataset.k; let v = el.type === 'checkbox' ? el.checked : el.value;
-    if (['ssid', 'beaconMin', 'isPort', 'isBeaconMin', 'kissPort', 'autoBeacon', 'txPower', 'leadKind', 'leadMs', 'passive'].includes(k)) v = parseInt(v, 10);
+    if (['ssid', 'beaconMin', 'isPort', 'isBeaconMin', 'kissPort', 'autoBeacon', 'txPower', 'leadKind', 'leadMs', 'passive'].includes(k)) v = intNum(v);   // NaN goes as null and the phone refuses it
     if ((k === 'callsign' || k === 'isPasscode') && !v) return;    // write-only: empty keeps the stored value
     body[k] = v;
   });
@@ -1080,8 +1082,8 @@ $('pgRic').addEventListener('change', loadPager);
 $('pgMon').onclick = async () => { await act('pager/monitor', { on: !S.pgMon }); loadPager(); };
 $('pgForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const mhz = parseFloat($('pgMhz').value);
-  if (!mhz) { toast(t('pager_enter_frequency')); return; }
+  const mhz = num($('pgMhz').value);
+  if (!(mhz > 0)) { toast(t('pager_enter_frequency')); return; }   // NaN too: a comma decimal is read, a malformed number never goes out on a truncated frequency
   if (await act('pager/send', { hz: Math.round(mhz * 1e6), baud: +$('pgBaud').value, to: $('pgTo').value, text: $('pgText').value, sign: $('pgSign').checked, func: 3 })) {
     $('pgText').value = ''; setTimeout(loadPager, 800);
   }
@@ -1164,7 +1166,7 @@ $('f8On').onclick = () => act('ft8', { on: !(f8.j && f8.j.running) }).then(pollF
 $('f8Cq').onclick = () => act('ft8', { cq: true }).then(pollFt8);
 $('f8Halt').onclick = () => act('ft8', { halt: true }).then(pollFt8);
 $('f8Par').onchange = () => act('ft8', { parity: +$('f8Par').value });
-$('f8Hz').onchange = () => act('ft8', { txHz: +$('f8Hz').value });
+$('f8Hz').onchange = () => { const hz = num($('f8Hz').value); if (isNaN(hz)) { toast(t('common_not_a_number')); return; } act('ft8', { txHz: hz }); };
 $('f8Grid').onchange = () => act('ft8', { grid: $('f8Grid').value.trim() });
 $('f8Fall').onclick = e => { const r = e.target.getBoundingClientRect(); act('ft8', { txHz: Math.round(200 + 2600 * (e.clientX - r.left) / r.width) }).then(pollFt8); };
 $('f8List').addEventListener('click', e => { const d = e.target.closest('div[data-slot]'); if (d) act('ft8', { reply: { slot: +d.dataset.slot, text: d.dataset.text } }).then(pollFt8); });
@@ -1194,7 +1196,7 @@ function renderSettings(j) {
 }
 async function saveSetting(i, value) { const s = S.settings[i]; const j = await act('settings', { key: s.key, value }); if (j) renderSettings(j); else loadSettings(); }
 $('setList').addEventListener('click', e => { const b = e.target.closest('.switch'); if (b) saveSetting(+b.dataset.i, !S.settings[+b.dataset.i].value); });
-$('setList').addEventListener('change', e => { const el = e.target; if (el.tagName === 'SELECT') { const w = (S.settings[+el.dataset.i].warn || [])[+el.value]; if (w && !confirm(w)) { loadSettings(); return; } saveSetting(+el.dataset.i, +el.value); } else if (el.tagName === 'INPUT') { const s = S.settings[+el.dataset.i]; saveSetting(+el.dataset.i, s.kind === 'int' ? parseInt(el.value, 10) : el.value); } });
+$('setList').addEventListener('change', e => { const el = e.target; if (el.tagName === 'SELECT') { const w = (S.settings[+el.dataset.i].warn || [])[+el.value]; if (w && !confirm(w)) { loadSettings(); return; } saveSetting(+el.dataset.i, +el.value); } else if (el.tagName === 'INPUT') { const s = S.settings[+el.dataset.i]; saveSetting(+el.dataset.i, s.kind === 'int' ? intNum(el.value) : el.value); } });
 // backup and restore
 async function loadBackups() {
   try {

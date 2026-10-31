@@ -348,7 +348,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (tuned && vfo != null && sat.name.equals(vfo.name)) exitVfo();
                 if (satState == st) satState = null;
                 if (natural && sat.catalog == com.macdmr.radio.ham.Satellites.ISS_CATALOG && issRepeatMode == sat.mode)   // following every pass: the next one
-                    ui.postDelayed(() -> { if (issRepeatMode == sat.mode && satState == null) { String e = startIssMode(sat.mode); if (e != null) { history("pkt", "\uD83D\uDEF0 " + e); setIssRepeat(-1); } } }, 5000);
+                    ui.postDelayed(() -> { if (issRepeatMode == sat.mode && satState == null) { String e = startIssMode(sat.mode); if (e != null) { history("pkt", Msg.of(R.string.service_sat_repeat_failed_history, Msg.shown(e))); setIssRepeat(-1); } } }, 5000);
                 pushModes();
                 history("pkt", Msg.of(R.string.service_sat_pass_over, sat.name));
             }
@@ -624,9 +624,9 @@ public class RadioService extends Service implements RadioEngine.Events {
             ChannelStore.Channel c = current;
             voiceTx("Status. " + (level >= 0 ? "Battery " + level + " percent. " : "") + (c != null ? "Channel " + c.name + ". " : "") + (rssi != -999 ? "Signal minus " + Math.abs(rssi) + " dBm." : ""));   // i18n: sent on air (spoken reply)
         }
-        @Override public void beacon() { if (packet != null) { String e = packet.sendBeacon(); if (e != null) history("pkt", Msg.of(R.string.service_remote_beacon_failed, e)); } }
-        @Override public void parrot(boolean on) { ui.post(() -> history("pkt", "\uD83D\uDCDF " + setParrot(on))); }
-        @Override public void morseId() { if (packet != null) { String e = packet.sendCwId(); if (e != null) history("pkt", "\u26D4 " + e); } }
+        @Override public void beacon() { if (packet != null) { String e = packet.sendBeacon(); if (e != null) history("pkt", Msg.of(R.string.service_remote_beacon_failed, Msg.shown(e))); } }
+        @Override public void parrot(boolean on) { ui.post(() -> history("pkt", Msg.of(R.string.service_remote_parrot_history, Msg.shown(setParrot(on))))); }
+        @Override public void morseId() { if (packet != null) { String e = packet.sendCwId(); if (e != null) history("pkt", Msg.of(R.string.service_remote_morse_failed_history, Msg.shown(e))); } }
         @Override public void event(String line) { history("pkt", line); }
         @Override public void event(Msg m) { history("pkt", m); }
     });
@@ -672,7 +672,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             new Thread(() -> {
                 try { long wait = RETUNE_SETTLE_MS - (System.currentTimeMillis() - lastSatRetune); if (wait > 0) Thread.sleep(wait); } catch (InterruptedException ignored) { }
                 String e = packet.sendBeaconVia(new String[] { "ARISS" });
-                if (e != null) history("pkt", Msg.of(R.string.service_iss_beacon_failed, e));
+                if (e != null) history("pkt", Msg.of(R.string.service_iss_beacon_failed, Msg.shown(e)));
             }, "iss-beacon").start();
             return Txt.s(R.string.service_iss_beaconing);
         }
@@ -697,7 +697,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             try { Thread.sleep(RETUNE_SETTLE_MS); } catch (InterruptedException ignored) { }       // the retune settles before keying
             if (vfo == null || vfo.rxFreq != rxHz) { history("pkt", Msg.of(R.string.service_iss_beacon_not_tuned)); return; }   // a refused tune: never key on the channel instead
             String e = packet.sendBeaconVia(new String[] { "ARISS" });
-            if (e != null) history("pkt", Msg.of(R.string.service_iss_beacon_failed, e));
+            if (e != null) history("pkt", Msg.of(R.string.service_iss_beacon_failed, Msg.shown(e)));
             try { Thread.sleep(12000); } catch (InterruptedException ignored) { }
             if (vfo != null && vfo.rxFreq == rxHz && satState == null) exitVfo();
         }, "iss-beacon").start();
@@ -736,7 +736,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             if (satState != null) return;
             String e = startIssMode(m);
             if (e == null) { issRepeatMode = m; history("pkt", Msg.of(R.string.service_iss_resumed, m == com.macdmr.radio.ham.Satellites.SSTV ? "SSTV" : "APRS")); }
-            else { history("pkt", Msg.of(R.string.service_iss_resume_failed, e)); }
+            else { history("pkt", Msg.of(R.string.service_iss_resume_failed, Msg.shown(e))); }
         }, 4000);
     }
     public int issRepeat() { return issRepeatMode; }
@@ -2962,6 +2962,8 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** {@code chNum} is the channel the line belongs to. A page sent from a temporary VFO still records on the channel the radio left. */
     public void history(int chNum, String kind, String text) {
+        com.macdmr.radio.i18n.Msg made = Txt.madeBy(text);                                 // a line some method returned in the app language: store its English
+        if (made != null) { history(chNum, kind, made); return; }
         text = text.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]", "\u00B7");   // no control characters on screen (they also break screen readers)
         final int level = AgoldUsb.historyLevelFresh(agoldBridge(), rssiAt, rxBeganAt) ? rssi : -999;   // no stale level on the Atom XL
         store.addHistory(chNum, kind, text, level, lastCaller);
@@ -4676,7 +4678,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     ui.postDelayed(new Runnable() { @Override public void run() {
                         if (w.busy() && System.currentTimeMillis() < until) { ui.postDelayed(this, 5_000); return; }
                         if (w.busy()) w.cancel();
-                        history("pkt", Msg.of(R.string.service_sched_winlink, w.lastResult()));
+                        history("pkt", Msg.of(R.string.service_sched_winlink, Msg.shown(w.lastResult())));
                     } }, 5_000);
                 }
                 break;
@@ -4694,12 +4696,12 @@ public class RadioService extends Service implements RadioEngine.Events {
                     ChannelStore.Channel on = current;
                     if (move && (vfo != null || on == null || on.number != e.channel)) { history("pkt", Msg.of(R.string.service_sched_winlink_not_moved, e.channel)); return; }   // never transmit on another channel
                     String err = w.connectRadio(w.gateway(), w.via());
-                    if (err != null) { history("pkt", Msg.of(R.string.service_sched_winlink, err)); if (move && back >= 0) selectChannel(back); return; }
+                    if (err != null) { history("pkt", Msg.of(R.string.service_sched_winlink, Msg.shown(err))); if (move && back >= 0) selectChannel(back); return; }
                     final long until = System.currentTimeMillis() + 20 * 60_000L;   // never hold the radio longer than 20 minutes
                     ui.postDelayed(new Runnable() { @Override public void run() {
                         if (w.busy() && System.currentTimeMillis() < until) { ui.postDelayed(this, 5_000); return; }
                         if (w.busy()) w.cancel();
-                        history("pkt", move && back >= 0 ? Msg.of(R.string.service_sched_winlink_back, w.lastResult(), back) : Msg.of(R.string.service_sched_winlink, w.lastResult()));
+                        history("pkt", move && back >= 0 ? Msg.of(R.string.service_sched_winlink_back, Msg.shown(w.lastResult()), back) : Msg.of(R.string.service_sched_winlink, Msg.shown(w.lastResult())));
                         if (move && back >= 0 && store.byNumber(back) != null) selectChannel(back);
                         if (wasScan) ui.postDelayed(RadioService.this::toggleScan, RETUNE_SETTLE_MS);
                     } }, 5_000);
@@ -4708,6 +4710,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 break;
             }
         }
+        if (r instanceof String) r = Msg.shown((String) r);   // an error or status the mode returned in the app language: its English for the text column
         history("pkt", r == null ? (e.hasDuration() ? Msg.of(R.string.service_sched_started_for, what, e.minutes) : what) : e.hasDuration() ? Msg.of(R.string.service_sched_result_for, what, r, e.minutes) : Msg.of(R.string.service_sched_result, what, r));
         if (!e.hasDuration()) return;
         getSharedPreferences("schedules", MODE_PRIVATE).edit().putInt("prevCh", prevCh).putBoolean("startedRec", e.record && !wasRec)

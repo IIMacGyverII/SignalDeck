@@ -16,8 +16,8 @@ import java.io.File;
  * sysfs nodes exist.
  */
 public final class DeviceProfile {
-    /** TINY_SERVICE: PrizeTinyService; UART_PCM: a second UART; CAMCORDER: Android's camcorder input carries the radio (W6). */
-    public enum Audio { TINY_SERVICE, UART_PCM, CAMCORDER }
+    /** TINY_SERVICE: PrizeTinyService; UART_PCM: a second UART; CAMCORDER: Android's camcorder input carries the radio (W6); EXTMODULE: the vendor daemon's audio socket (Armor 3WT). */
+    public enum Audio { TINY_SERVICE, UART_PCM, CAMCORDER, EXTMODULE }
 
     public final String name;
     public final String controlPort;     // MCU command UART
@@ -57,7 +57,11 @@ public final class DeviceProfile {
     public String[][] lineSetup;         // {node, value} written in this order before the power line, every bring-up (null = none)
     /** TINY_SERVICE phones: how to reach the radio audio straight on the sound hardware when the ROM lacks the vendor service (null = not known). */
     public DirectAudio directAudio;
-    /** "mcu68" (the DMR module's 68 … 10 frames, RadioEngine), "agold" (those commands inside the 7E 96 69 envelope), or "sa818" (AT+DMO… text commands, AtModuleEngine). */
+    /**
+     * "mcu68" (the DMR module's 68 … 10 frames, RadioEngine), "agold" (those commands inside the 7E 96 69 envelope),
+     * "agold-legacy" (the envelope around the older command set, through the vendor daemon: Armor 3WT) or "sa818"
+     * (AT+DMO… text commands, AtModuleEngine).
+     */
     public String protocol = "mcu68";
     /**
      * What the module tunes, as {low, high} pairs in Hz (both ends included). The HR-C7000 module itself refuses
@@ -162,6 +166,13 @@ public final class DeviceProfile {
      * web stay off until the profile is verified. The Armor 20WT (owner, 2026-10-30).
      */
     public boolean txTestUnverified;
+    /** False on a module whose digital channel has no time slot (the Armor 3WT's legacy set): the slot is not offered. */
+    public boolean timeSlots = true;
+    /**
+     * The phone's own side key as {input device name, key code as getevent prints it}, used as the custom PTT key when the
+     * owner has not chosen one (the Armor 3WT: its key reaches only getevent). Null = none.
+     */
+    public String[] pttKey;
     /**
      * Transmit audio starts when the module reports SEND_START (status 3) after the key, not at the key: the Xplore 1's
      * QuickChat opens its microphone only on that report (2 s at most here; without it nothing is sent).
@@ -467,6 +478,34 @@ public final class DeviceProfile {
         ATOM_XL.directAudio.rate = 32000;
     }
 
+    /**
+     * Ulefone Armor 3WT (Agold, MT6771, board s62v71c2k_gq_3wt): the Atom XL's USB bridge family with an older module
+     * ({@code ver0.5.4_470M_TONE}: the legacy command set, DMR without a time slot) behind the vendor daemon
+     * {@code /system/bin/extmodule}, which the tester's own Magisk module starts at boot on a GSI. SignalDeck talks to the
+     * daemon as the intercom app does: commands on 127.0.0.1:9980, audio on 9985 ({@link ExtModuleLink}, {@link
+     * AgoldLegacyCodec}, {@link ExtModuleAudio}). Written from the intercom app, the daemon and one device report
+     * (phonedmrapp docs/armor3wt/stock-app-review.md); never run by us, so unverified: no transmit. No signal reading
+     * (the module has no known RSSI command). Bands: what the intercom app accepts, 100–470 MHz, without 174–400 MHz;
+     * below 136 MHz is the tester's airband listening and unconfirmed for the module.
+     */
+    public static final DeviceProfile ARMOR_3WT = new DeviceProfile(
+            "Ulefone Armor 3WT", ExtModuleLink.CONTROL_PORT, 0, Audio.EXTMODULE, null, 0,
+            AgoldUsb.MCU_POWER, AgoldUsb.HANDLE_PTT, "power on = 1",
+            new String[] { "android.intent.action.PTT.down", "android.intent.action.PTT.up" },
+            "com.agold.intercom",
+            new String[0],                                                       // TCP to 127.0.0.1 only: no device node, no new rule
+            null, true, false);
+    static {
+        ARMOR_3WT.id = "ulefone-armor3wt"; ARMOR_3WT.revision = 1; ARMOR_3WT.protocol = "agold-legacy";
+        ARMOR_3WT.bandsHz = new long[] { 100_000_000L, 174_000_000L, 400_000_000L, 470_000_000L };
+        ARMOR_3WT.rssi = false; ARMOR_3WT.moduleLoader = false;
+        ARMOR_3WT.bootMicInterrupt = false;                                     // its stock app: channel after the version, nothing else
+        ARMOR_3WT.timeSlots = false;
+        // what the intercom app sends, in the engine's (Armor) numbers: channels, version, volume, call info, texts
+        ARMOR_3WT.stockCommands = new int[] { 0x22, 0x23, 0x2B, 0x2C, 0x2D, 0x2E, 0x34 };
+        ARMOR_3WT.pttKey = new String[] { "mtk-kpd", "00f9" };                  // scancode 249 at getevent; no keycode reached an app in the report
+    }
+
     public static final DeviceProfile UNKNOWN = new DeviceProfile(
             Build.MANUFACTURER + " " + Build.MODEL + " (not supported yet)", "/dev/ttyS0", 57600, Audio.TINY_SERVICE, null, 0,
             null, null, "1", null, "", new String[0], null, false, false);
@@ -477,7 +516,23 @@ public final class DeviceProfile {
     /** The profile built into this release for this phone (no profile list, no advisories). */
     public static DeviceProfile detectBuiltIn() {
         String m = (Build.MANUFACTURER + " " + Build.MODEL + " " + Build.DEVICE).toLowerCase();
+        if (armor3wt(m, Build.BOARD, vendorFingerprint(), new File(ExtModuleLink.DAEMON).exists())) return ARMOR_3WT;
         return detectBuiltIn(m, new File("/sys/devices/platform/dmr009").exists(), new File("/sys/devices/platform/intercom").exists());
+    }
+
+    /**
+     * The Armor 3WT: its model, or on a GSI (model "TrebleDroid …") its board or vendor build, and in either case the radio
+     * daemon {@code extmodule} installed (without it SignalDeck has nothing to talk to).
+     */
+    static boolean armor3wt(String model, String board, String vendorFingerprint, boolean daemon) {
+        if (!daemon) return false;
+        String m = model == null ? "" : model.toLowerCase(java.util.Locale.US);
+        return m.contains("armor 3wt") || m.contains("armor_3wt") || "s62v71c2k_gq_3wt".equals(board)
+                || (vendorFingerprint != null && vendorFingerprint.contains("/Armor_3WT/"));
+    }
+    private static String vendorFingerprint() {
+        try { return (String) Class.forName("android.os.SystemProperties").getMethod("get", String.class).invoke(null, "ro.vendor.build.fingerprint"); }
+        catch (Throwable t) { return null; }
     }
 
     /** Model text first (the Armor 20WT has the same dmr009 node as the Armor 26 Ultra, on another port), then the nodes. */
@@ -555,6 +610,7 @@ public final class DeviceProfile {
         p.id = id; p.revision = revision; p.source = source; p.txBlocked = txBlocked; p.restrictedBy = restrictedBy; p.globalSquelch = globalSquelch; p.lineSetup = lineSetup; p.scanDwellMs = scanDwellMs; p.protocol = protocol; p.bandsHz = bandsHz.clone(); p.rssi = rssi; p.softSqInModule = softSqInModule; p.appPlayback = appPlayback; p.fixedModuleVolume = fixedModuleVolume; p.subaudible = subaudible; p.dataSquelch = dataSquelch; p.moduleLoader = moduleLoader; p.camcorderGain = camcorderGain; p.softSqThresholds = softSqThresholds; p.softSqCloseCap = softSqCloseCap; p.rxDetectNode = rxDetectNode; p.rxLinesOn = rxLinesOn; p.muteLines = muteLines; p.rxLinesOff = rxLinesOff; p.txLinesOn = txLinesOn; p.txLinesOff = txLinesOff; p.gatewayLinesOn = gatewayLinesOn; p.gatewayLinesOff = gatewayLinesOff; p.txAudioScale = txAudioScale; p.toneEnergyMin = toneEnergyMin; p.gatewayVolume = gatewayVolume; p.minWriteGapMs = minWriteGapMs; p.directAudio = directAudio;
         p.bootMicInterrupt = bootMicInterrupt; p.txAudioLeadMs = txAudioLeadMs; p.minKeyGapMs = minKeyGapMs; p.analogVolume = analogVolume; p.stockAreaPrefix = stockAreaPrefix; p.stockDefaultArea = stockDefaultArea; p.stockCommands = stockCommands; p.txTestUnverified = txTestUnverified;
         p.txAudioOnSendStart = txAudioOnSendStart; p.txAudioTailMs = txAudioTailMs; p.politeAfterChannel = politeAfterChannel; p.smsUtf8 = smsUtf8;
+        p.timeSlots = timeSlots; p.pttKey = pttKey;
         return p;
     }
 
@@ -589,6 +645,13 @@ public final class DeviceProfile {
         p.bootMicInterrupt = o.optBoolean("bootMicInterrupt", true); p.txTestUnverified = o.optBoolean("txTestUnverified", false);
         p.txAudioOnSendStart = o.optBoolean("txAudioOnSendStart", false); p.txAudioTailMs = Math.max(0, Math.min(1000, o.optLong("txAudioTailMs", 0)));
         p.politeAfterChannel = Math.max(-1, Math.min(1, o.optInt("politeAfterChannel", -1))); p.smsUtf8 = o.optBoolean("smsUtf8", false);
+        p.timeSlots = o.optBoolean("timeSlots", true);
+        org.json.JSONArray pk = o.optJSONArray("pttKey");                    // {input device name, key code}: compared with getevent output, never on a command line
+        if (pk != null) {
+            String[] k = strings(pk);
+            if (k.length != 2 || !k[0].matches("[A-Za-z0-9 _.:-]{1,60}") || !k[1].matches("(KEY|BTN)_[A-Z0-9_]{1,30}|[0-9a-f]{4}")) throw new org.json.JSONException("pttKey: device name, key code");
+            p.pttKey = k;
+        }
         p.txAudioLeadMs = Math.max(0, Math.min(2000, o.optLong("txAudioLeadMs", 0))); p.minKeyGapMs = Math.max(0, Math.min(5000, o.optLong("minKeyGapMs", 0)));
         p.analogVolume = Math.max(1, Math.min(8, o.optInt("analogVolume", 8)));
         p.stockAreaPrefix = o.optString("stockAreaPrefix", p.stockAreaPrefix); p.stockDefaultArea = o.optString("stockDefaultArea", p.stockDefaultArea);

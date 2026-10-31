@@ -32,8 +32,9 @@ public final class UartPort {
     private final String path;
     private final Listener listener;
     private final FrameCodec codec;
-    private FileInputStream in;
-    private FileOutputStream out;
+    private java.io.InputStream in;
+    private java.io.OutputStream out;
+    private ExtModuleLink.CommandStreams daemon;            // the Armor 3WT: the port is extmodule's command socket
     private VendorSerial.Port native_;
     private volatile long writeDeadlineMs;                  // 0: plain blocking writes; else through a TimedWriter (the Atom XL's USB bridge)
     private TimedWriter timed;
@@ -60,7 +61,11 @@ public final class UartPort {
     /** @param baud 0 = plain file open (line already configured); else configure it through the stock serial JNI. */
     public synchronized void open(int baud) throws IOException {
         if (in != null) return;
-        if (baud > 0 && VendorSerial.isLoaded()) {
+        if (ExtModuleLink.isSocket(path)) {
+            daemon = new ExtModuleLink.CommandStreams(ExtModuleLink.connect(ExtModuleLink.CMD_PORT, 3000));
+            in = daemon.in; out = daemon.out;
+            listener.onLog("extmodule command socket " + ExtModuleLink.HOST + ":" + ExtModuleLink.CMD_PORT + " open");
+        } else if (baud > 0 && VendorSerial.isLoaded()) {
             native_ = VendorSerial.openPort(path, baud);
             if (native_ == null) throw new IOException("serial open " + path + " @ " + baud + " failed");
             in = new FileInputStream(native_.fd());
@@ -83,7 +88,15 @@ public final class UartPort {
         try { if (in != null) in.close(); } catch (IOException ignored) { }
         try { if (out != null) out.close(); } catch (IOException ignored) { }
         if (native_ != null) { native_.release(); native_ = null; }
+        if (daemon != null) { daemon.close(); daemon = null; }
         in = null; out = null;
+    }
+
+    /** A daemon control on the extmodule command socket (start, stop, PTT, MCU start); only on a socket port. */
+    public synchronized void control(int cmd) throws IOException {
+        if (daemon == null) throw new IOException("not the extmodule socket");
+        daemon.control(cmd);
+        listener.onLog("extmodule control " + cmd);
     }
 
     public boolean isOpen() { return in != null; }
@@ -133,6 +146,7 @@ public final class UartPort {
     public synchronized void send(Frame f) throws IOException {
         if (out == null) throw new IOException("port closed");
         byte[] b = codec.encode(f);
+        if (b == null) { listener.onLog("not sent (no equivalent on this module): " + f); return; }
         put(b);
         listener.onLog("TX " + f + "  <" + Frame.hex(b, b.length) + ">");
     }

@@ -463,9 +463,10 @@ public final class FirstRunCheck {
     static final int[] EDGES_HZ = { 136_000_000, 135_995_000, 174_000_000, 174_005_000, 400_000_000, 399_995_000, 480_000_000, 480_005_000 };
 
     /** Which frequencies around the band edges the module takes (its 0x23 answer); the profile's bands come from this. */
-    static String bandEdgeCheck(RadioService svc, Progress p) throws InterruptedException {
+    static String bandEdgeCheck(RadioService svc, Progress p) throws InterruptedException { return bandEdgeCheck(svc, p, EDGES_HZ); }
+    static String bandEdgeCheck(RadioService svc, Progress p, int[] edges) throws InterruptedException {
         StringBuilder r = new StringBuilder("band edges (the module's answer to a receive channel write; nothing keyed):\n");
-        for (int hz : EDGES_HZ) {
+        for (int hz : edges) {
             p.step(String.format(Locale.US, "Trial: band edges, %.3f MHz", hz / 1e6));
             RadioEngine.CommandStats b = svc.engine().stats().get(RadioEngine.CMD_SET_ANALOG);
             int a0 = b == null ? 0 : b.answered, f0 = b == null ? 0 : b.refused;
@@ -478,6 +479,62 @@ public final class FirstRunCheck {
             }
             r.append(String.format(Locale.US, "  %.3f MHz: %s\n", hz / 1e6, res));
             Thread.sleep(300);
+        }
+        return r.toString();
+    }
+
+    /** The Armor 3WT's edges: the intercom app's 100 MHz floor, the tester's airband listening, the usual VHF/UHF edges, the module's "470M". */
+    static final int[] EDGES_3WT_HZ = { 100_000_000, 133_850_000, 135_995_000, 136_000_000, 174_000_000, 174_005_000, 399_995_000, 400_000_000, 470_000_000, 470_005_000, 480_000_000 };
+    /** Armor commands probed raw on the 3WT's module (receive-only queries on the Armor set; their meaning on the legacy set is what the report finds out). */
+    static final int[] PROBES_3WT = { 0x32, 0x34 };
+    /** Whether a socket listens on {@code port}, from /proc/net/tcp(6) text (local address :PORT in hex, state 0A). */
+    static boolean listening(String procNetTcp, int port) {
+        String want = String.format(Locale.US, ":%04X", port);
+        for (String l : procNetTcp.split("\n")) {
+            String[] f = l.trim().split("\\s+");
+            if (f.length > 3 && f[1].toUpperCase(Locale.US).endsWith(want) && "0A".equalsIgnoreCase(f[3])) return true;
+        }
+        return false;
+    }
+
+    /** The Armor 3WT's trial lines (phonedmrapp docs/armor3wt/stock-app-review.md, "What the next 3WT device report must bring back"). */
+    static String armor3wtChecks(RadioService svc, Progress p) throws InterruptedException {
+        StringBuilder r = new StringBuilder("Armor 3WT (extmodule):\n");
+        String pid = RootSetup.run("pidof extmodule || true").trim();
+        String tcp = RootSetup.run("cat /proc/net/tcp /proc/net/tcp6 2>/dev/null");
+        r.append("  extmodule: ").append(pid.isEmpty() ? "not running" : "running (pid " + pid + ")")
+                .append(", listening on ").append(ExtModuleLink.CMD_PORT).append(": ").append(listening(tcp, ExtModuleLink.CMD_PORT) ? "yes" : "no")
+                .append(", on ").append(ExtModuleLink.AUDIO_PORT).append(": ").append(listening(tcp, ExtModuleLink.AUDIO_PORT) ? "yes" : "no").append('\n');
+        ModuleEngine e = svc.engine();
+        String build = e instanceof RadioEngine ? ((RadioEngine) e).bridgeBuild() : null;
+        r.append("  bridge MCU build: ").append(build == null ? "(no answer to route 00 0x01)" : build).append('\n');
+        boolean started = false; for (String l : svc.recentLog()) if (l.contains("the bridge reports the MCU started")) started = true;
+        r.append("  bridge MCU-started report after the daemon's MCU start: ").append(started ? "seen" : "not seen").append('\n');
+        r.append("  ro.agold.extmodule.32k = '").append(RootSetup.run("getprop " + ExtModuleLink.PROP_32K).trim()).append("'\n");
+        ExtModuleAudio a = svc.extModuleAudio();
+        if (a != null) {
+            p.step("Trial: extmodule receive stream, 5 s");
+            long f0 = a.rxFrames(), b0 = a.rxBytes();
+            svc.benchCapture(true); Thread.sleep(5000); svc.benchCapture(false);
+            long f = a.rxFrames() - f0, b = a.rxBytes() - b0;
+            r.append(String.format(Locale.US, "  receive stream forced open 5 s: %d frames, %d bytes (%s per frame; this profile expects %d at %d kHz)\n",
+                    f, b, f > 0 ? String.valueOf(b / f) : "-", a.frameBytes, a.rate / 1000));
+        }
+        r.append(bandEdgeCheck(svc, p, EDGES_3WT_HZ));
+        for (int cmd : PROBES_3WT) {
+            p.step(String.format(Locale.US, "Trial: module command 0x%02X (query)", cmd));
+            java.util.List<String> was = svc.recentLog();
+            String mark = was.isEmpty() ? null : was.get(was.size() - 1);           // the ring drops old lines: find where it stood by content
+            try { e.writeRaw(AgoldFrames.request(0x01, cmd, 0x01)); }
+            catch (java.io.IOException x) { r.append(String.format(Locale.US, "  0x%02X: not sent (%s)\n", cmd, x.getMessage())); continue; }
+            Thread.sleep(1500);
+            java.util.List<String> log = svc.recentLog();
+            StringBuilder got = new StringBuilder();
+            for (int i = mark == null ? 0 : log.lastIndexOf(mark) + 1; i < log.size(); i++) {
+                String l = log.get(i);
+                if (l.contains(" RX ") || l.contains("legacy module frame")) got.append("\n      ").append(DeviceReport.mask(l));
+            }
+            r.append(String.format(Locale.US, "  0x%02X 01 (the Armor set's %s):", cmd, cmd == 0x32 ? "signal reading" : "version")).append(got.length() == 0 ? " no answer" : got.toString()).append('\n');
         }
         return r.toString();
     }
@@ -527,6 +584,11 @@ public final class FirstRunCheck {
                 r.append("first ").append(head.length).append(" bytes saved to rx_audio_first.bin; they start: ").append(hx.toString().trim()).append('\n');
             }
             if (!svc.profile().verified) svc.setMonitor(false);
+            if (!svc.profile().verified && "agold-legacy".equals(svc.profile().protocol)) {   // the Armor 3WT: the daemon, the bridge, the edges, two queries; receive only
+                r.append(armor3wtChecks(svc, p));
+                svc.listenTest(446_006_250, "Listen test 446.00625");
+                Thread.sleep(1500);
+            }
             if (!svc.profile().verified && "mcu68".equals(svc.profile().protocol)) {   // receive only; the module tunes, nothing is keyed
                 r.append(squelchCheck(svc, p));
                 r.append(levelCheck(svc, dir, p));

@@ -978,17 +978,18 @@ public class RadioService extends Service implements RadioEngine.Events {
                         if (!rp.contains("agoldUsbRouting")) rp.edit().putString("agoldUsbRouting", prev).apply();
                         log("USB audio routing off while SignalDeck has the radio (was " + prev + ")");
                     }
+                    else if (ExtModuleLink.isSocket(profile.controlPort)) log("control port: extmodule's command socket (" + profile.controlPort + "), no tty to set");
                     else if (!VendorSerial.load(this, profile.serialLib)) log("tty (stty fallback): " + RootSetup.ensureTty(profile));
                     if (RootSetup.stockAppEnabled(profile)) { log("stock app paused (its icon disappears while this app owns the radio; Device → Release brings it back): " + RootSetup.stockApp(profile, false)); pausedStock = true; Thread.sleep(1500); }
                 }
                 final boolean sa818 = "sa818".equals(profile.protocol);                      // the W6: no DMR, its own channel table
                 final boolean quickChat = "com.chamsion.quickchat".equals(profile.stockApp);      // Xplore 1: a Room database, no module side tables
-                final boolean prizeStock = !sa818 && !quickChat && !agold && !flyscaleDmr();                        // the Armors' stock app: DMR ID and TG lists to read
+                final boolean prizeStock = !sa818 && !quickChat && !agoldStock() && !flyscaleDmr();                        // the Armors' stock app: DMR ID and TG lists to read
                 if (store.count() == 0 && !getSharedPreferences("radio", MODE_PRIVATE).getBoolean("stockImportDeclined", false)) {   // no channels: ask before importing the stock app's (owner, 2026-10-28)
                     stockImportPending = true; log("no channels: asking whether to import the stock app's");
                     ui.post(() -> { for (Listener l : new ArrayList<>(listeners)) l.onStockImportOffer(); });
                 }
-                if (agold && !getSharedPreferences("radio", MODE_PRIVATE).contains("dmrId")) {         // the Atom XL's stock app keeps its DMR ID as device_id (unset = 1)
+                if (agoldStock() && !getSharedPreferences("radio", MODE_PRIVATE).contains("dmrId")) {   // the Agold intercom app (Atom XL, Armor 3WT) keeps its DMR ID as device_id (unset = 1)
                     java.util.regex.Matcher m = java.util.regex.Pattern.compile("name=\"device_id\" value=\"([0-9]+)\"").matcher(RootSetup.run("cat /data/data/" + profile.stockApp + "/shared_prefs/intercom_prefs.xml 2>/dev/null"));
                     if (m.find() && Integer.parseInt(m.group(1)) > 1) { setLocalIdQuiet(Integer.parseInt(m.group(1))); log("DMR ID from the stock app: " + m.group(1)); }
                 }
@@ -1070,7 +1071,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             try { if (parrot.enabled()) parrot.setEnabled(false); } catch (Throwable ignored) { }
             try { if (foxTxOn()) setFoxTx(false); } catch (Throwable ignored) { }
             try { stopSatTrack(); } catch (Throwable ignored) { }
-            try { if (audio != null) { audio.stopRx(); rxAudioOn = false; if (restoreStock) audio.releaseForStockApp(); } } catch (Throwable ignored) { }
+            try { if (audio != null) { audio.stopRx(); rxAudioOn = false; if (restoreStock || audio instanceof ExtModuleAudio) audio.releaseForStockApp(); } } catch (Throwable ignored) { }   // the 3WT: its audio socket closes either way
             if ("agold".equals(profile.protocol)) {      // both buttons give the USB port back (owner, 2026-10-28); Hand back checks the bridge first
                 try { engine.close(); } catch (Throwable ignored) { }
                 restoreUsbRouting();
@@ -1129,7 +1130,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     private void startRxAudio() {
         try {
             if (audio == null) {
-                audio = profile.audio == DeviceProfile.Audio.UART_PCM ? new UartPcmAudio(profile.pcmPort, profile.pcmBaud)
+                audio = profile.audio == DeviceProfile.Audio.EXTMODULE ? new ExtModuleAudio(ExtModuleLink.audioRate(RootSetup.run("getprop " + ExtModuleLink.PROP_32K)))   // the Armor 3WT: extmodule's audio socket
+                        : profile.audio == DeviceProfile.Audio.UART_PCM ? new UartPcmAudio(profile.pcmPort, profile.pcmBaud)
                         : profile.audio == DeviceProfile.Audio.CAMCORDER ? new CamcorderAudio(profile.appPlayback, profile.camcorderGain, profile.gatewayLinesOn, profile.gatewayLinesOff, profile.txAudioScale, (android.media.AudioManager) getSystemService(AUDIO_SERVICE), profile.gatewayVolume) : vendorOrDirectAudio();
                 audio.setSink((b, len) -> { if (!injecting) onRxPcm(b, len); });   // a bench injection replaces the live audio while it plays
                 audio.setGate(() -> squelchOpen && !muted && !rawHeld() && !(profile.appPlayback && pttDown) && !dataQuiet());   // M17 in play, a data mode without MON, or app playback while keyed: the raw FM stays off the speaker; decoded M17 voice has its own track
@@ -1916,7 +1918,7 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Stock "areas" (one channel database each): keys like default_uhf, usa, eu … */
     public java.util.List<String> stockAreas() {
-        if ("agold".equals(profile.protocol)) {                         // the Atom XL: areas in the stock app's intercom.db ("1 Default (16 channels)")
+        if (agoldStock()) {                                             // the Atom XL and Armor 3WT: areas in the stock app's intercom.db ("1 Default (16 channels)")
             java.util.List<String> a = ChannelStore.agoldAreas(this, profile.stockApp);
             if (a.isEmpty()) a.add("1 Default");
             return a;
@@ -1932,7 +1934,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** The W6Plus DMR's stock app: one channel database (128 slots), the DMR ID in its in-use slot. */
     private boolean flyscaleDmr() { return "com.flyscale.dmr".equals(profile.stockApp); }
     /** The Atom XL's stock app has channels only (no contacts, history or messages SignalDeck imports). */
-    public boolean stockImportsChannelsOnly() { return "agold".equals(profile.protocol); }
+    public boolean stockImportsChannelsOnly() { return agoldStock(); }
     /** The area the Atom XL's stock app is on (its curr_area setting, 1 when unset). */
     int agoldCurrentArea() {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("name=\"curr_area\" value=\"([0-9]+)\"").matcher(RootSetup.run("cat /data/data/" + profile.stockApp + "/shared_prefs/intercom_prefs.xml 2>/dev/null"));
@@ -1949,7 +1951,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             n = store.importFromFlyscaleDmr(this, profile.stockApp, m.find() ? Integer.parseInt(m.group(1)) : 0, id, err);
             if (n >= 0 && id[0] > 0 && !getSharedPreferences("radio", MODE_PRIVATE).contains("dmrId")) { setLocalIdQuiet(id[0]); log("DMR ID from the stock app: " + id[0]); }
         }
-        else if ("agold".equals(profile.protocol)) {                     // areaKey "3 USA FRS (14 channels)", or null for the stock app's current area
+        else if (agoldStock()) {                                         // areaKey "3 USA FRS (14 channels)", or null for the stock app's current area
             java.util.regex.Matcher m = areaKey == null ? null : java.util.regex.Pattern.compile("^(\\d+)").matcher(areaKey.trim());
             n = store.importFromAgold(this, profile.stockApp, m != null && m.find() ? Integer.parseInt(m.group(1)) : agoldCurrentArea(), err);
         }
@@ -2950,6 +2952,7 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     @Override public void status(int code, String name) {
         java.util.function.BiConsumer<Integer, String> tap = statusTap; if (tap != null) try { tap.accept(code, name); } catch (Throwable ignored) { }
+        if ((code == 1 || code == 2) && audio instanceof ExtModuleAudio) ((ExtModuleAudio) audio).reception(code == 1);   // the 3WT: extmodule streams receive audio only between these
         switch (code) {
             case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); if (!captureRunning()) bridgeCapture(true); } break; }   // a capture closed for silence reopens   // already open: an edge after a signal-started reception
                 if (agoldBridge() && !synthRx) lineReported();           // an edge from the line itself
@@ -3271,12 +3274,17 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Run all checks' trial: open (or close) the Atom XL's USB capture outside a reception, waiting for it. Other phones: nothing. */
     public void benchCapture(boolean on) {
+        if (audio instanceof ExtModuleAudio) { log("bench capture: " + ((ExtModuleAudio) audio).bench(on)); return; }   // the 3WT: ask extmodule for its receive stream with no reception reported
         if (!agoldBridge() || !rxAudioOn || !(audio instanceof AlsaDirectAudio)) return;
         try { audio.stopRx(); if (on) log("bench capture: " + audio.startRx(true)); } catch (Throwable t) { log("bench capture: " + t); }
     }
 
     /** The Atom XL's USB bridge (protocol agold). */
     private boolean agoldBridge() { return "agold".equals(profile.protocol); }
+    /** The Agold intercom app is the stock app (the Atom XL, and the Armor 3WT through its daemon): its intercom.db and intercom_prefs, same layout on both. */
+    private boolean agoldStock() { return "agold".equals(profile.protocol) || "agold-legacy".equals(profile.protocol); }
+    /** The 3WT's extmodule audio backend, or null on every other phone (the device report reads its counters). */
+    public ExtModuleAudio extModuleAudio() { AudioBackend a = audio; return a instanceof ExtModuleAudio ? (ExtModuleAudio) a : null; }
 
     @Override public void rssi(int raw, double dbm) { if (scope.running()) { scope.onRssi(raw); return; }   // a sweep step's reading: not the channel's signal, not for the coverage log
         rssi0(raw, dbm); }

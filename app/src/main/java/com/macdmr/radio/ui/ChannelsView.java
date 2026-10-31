@@ -243,10 +243,13 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
 
     static String mhz(int hz) { return String.format(Locale.US, "%.4f", hz / 1e6); }
 
+    /** " · TS1" / " · TS2", or nothing on a radio whose module has no slot setting (the Armor 3WT). */
+    static String slotText(ChannelStore.Channel ch) { return com.macdmr.radio.DeviceProfile.detect().timeSlots ? " · TS" + (ch.inSlot + 1) : ""; }
+
     /** The one extra detail worth a badge: colour code + slot on DMR, else repeater shift and/or tone. */
     static String detail(ChannelStore.Channel ch) {
         if (ch.isM17()) return "CAN " + ch.can() + " · " + ch.m17Dest();
-        if (ch.isDigital()) return "CC" + ch.cc + " · TS" + (ch.inSlot + 1);
+        if (ch.isDigital()) return "CC" + ch.cc + slotText(ch);
         List<String> parts = new ArrayList<>();
         int shift = ch.txFreq - ch.rxFreq;
         if (ch.rxFreq >= 162_400_000 && ch.rxFreq <= 162_550_000) parts.add("WX · RX ONLY");
@@ -275,7 +278,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
         box.addView(top);
         LinearLayout badges = new LinearLayout(c); badges.setPadding(0, (int) (10 * d), 0, 0);
         badges.addView(Neo.chip(c, ch.isM17() ? "M17" : ch.isDigital() ? "DMR" : "FM", ch.isM17() || ch.isDigital() ? Neo.VIOLET : Neo.CYAN));
-        String det = ch.isM17() ? "CAN " + ch.can() + " · " + ch.m17Dest() : ch.isDigital() ? "CC" + ch.cc + " · TS" + (ch.inSlot + 1) + " · →" + ch.txContact : "SQ " + ch.sq + " · " + (ch.band == 1 ? "WIDE" : "NARROW") + (detail(ch).isEmpty() ? "" : " · " + detail(ch));
+        String det = ch.isM17() ? "CAN " + ch.can() + " · " + ch.m17Dest() : ch.isDigital() ? "CC" + ch.cc + slotText(ch) + " · →" + ch.txContact : "SQ " + ch.sq + " · " + (ch.band == 1 ? "WIDE" : "NARROW") + (detail(ch).isEmpty() ? "" : " · " + detail(ch));
         TextView dc = Neo.chip(c, det, 0xFF9FB4C8); LayoutParams dl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); dl.leftMargin = (int) (6 * d);
         badges.addView(dc, dl);
         box.addView(badges);

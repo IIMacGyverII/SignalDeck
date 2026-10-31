@@ -837,6 +837,96 @@
       "photos": []
     },
     {
+      "id": "ulefone-armor3wt",
+      "aliases": [],
+      "name": "Ulefone Armor 3WT",
+      "maker": "Ulefone",
+      "variant": null,
+      "status": "exp",
+      "summary": "The Atom XL's USB radio bridge with an older DMR module, driven through the phone's own radio daemon; the profile is written from its intercom app and one report and not yet tested.",
+      "radio": {
+        "module": "Older Agold DMR module (version ver0.5.4_470M_TONE in one report; chip not known)",
+        "modes": [
+          "FM",
+          "DMR without time slot selection"
+        ],
+        "bands": [
+          {
+            "name": "VHF",
+            "lowMHz": 100.0,
+            "highMHz": 174.0
+          },
+          {
+            "name": "UHF",
+            "lowMHz": 400.0,
+            "highMHz": 470.0
+          }
+        ],
+        "txPowerW": null,
+        "link": "The phone's radio daemon (extmodule) over two local network sockets, commands on port 9980 and audio on 9985; the daemon drives the USB bridge and the radio's USB sound card."
+      },
+      "features": [
+        {
+          "id": "fm_rx",
+          "name": "FM receive",
+          "state": "untested",
+          "note": null
+        },
+        {
+          "id": "fm_tx",
+          "name": "FM transmit",
+          "state": "untested",
+          "note": "Locked until the profile is tested"
+        },
+        {
+          "id": "dmr_rx",
+          "name": "DMR receive",
+          "state": "untested",
+          "note": "No caller ID: the module's call-info answer is not decoded yet"
+        },
+        {
+          "id": "dmr_tx",
+          "name": "DMR transmit",
+          "state": "untested",
+          "note": "Locked until the profile is tested"
+        }
+      ],
+      "quirks": [
+        {
+          "title": "Untested profile",
+          "text": "This profile comes from an owner's device report, the phone's intercom app and its radio daemon. It has not run on the phone yet, so SignalDeck does not take over the radio by itself and never transmits on it. Owners can help with Device, Run all checks."
+        },
+        {
+          "title": "Needs the radio daemon",
+          "text": "SignalDeck talks to the phone's radio daemon (extmodule), as the intercom app does; on a custom ROM the daemon comes from the owner's own Magisk module and must be running. SignalDeck recognises the phone by its model or its board, and only when the daemon is installed."
+        },
+        {
+          "title": "No time slot",
+          "text": "The module's digital channel has no time slot setting, so SignalDeck does not offer TS1 or TS2 on this phone: the module chooses. Simplex DMR with other radios is the safe use; repeater channels may not work."
+        },
+        {
+          "title": "No signal meter",
+          "text": "The module has no known signal-strength command, so the S-meter, band scope and fox hunt readings are off on this phone. Run all checks asks the module once to find out."
+        },
+        {
+          "title": "Bands from the intercom app",
+          "text": "The bands are what the phone's intercom app accepts, 100 to 470 MHz without the 174 to 400 MHz gap. Below 136 MHz (an owner listens near 133.85 MHz) is not confirmed for the module; Run all checks records its answer at the edges, receive only."
+        },
+        {
+          "title": "Side key",
+          "text": "The side key reaches only the kernel, not apps, on the custom ROM in the report. SignalDeck reads it with root as its default custom PTT key; it does nothing until transmit is unlocked."
+        }
+      ],
+      "measured": [],
+      "firmware": {
+        "stock": null,
+        "modified": null,
+        "note": "SignalDeck does not load module firmware on this phone: no module image exists (two stock ROMs checked) and the phone is not certified for loading."
+      },
+      "sections": [],
+      "photos": []
+    },
+    {
       "id": "blackview-xplore1",
       "aliases": [],
       "name": "Blackview Xplore 1",

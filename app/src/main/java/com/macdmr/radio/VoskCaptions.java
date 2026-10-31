@@ -9,6 +9,8 @@ package com.macdmr.radio;
 import android.content.Context;
 import android.util.Log;
 
+import com.macdmr.radio.i18n.Txt;
+
 import org.json.JSONObject;
 import org.vosk.LibVosk;
 import org.vosk.LogLevel;
@@ -42,10 +44,12 @@ public final class VoskCaptions {
         void finished(String fullText);
     }
 
-    private static final String TAG = "VoskCaptions";
+    private static final String TAG = "VoskCaptions";   // i18n: log tag
     public static final long PAUSE_MS = 2500;
     public static final String[] MODELS = { "vosk-model-small-en-us-0.15", "vosk-model-en-us-0.22-lgraph", "vosk-model-en-us-0.22", "vosk-model-en-us-0.42-gigaspeech" };
-    public static final String[] MODEL_LABELS = { "Small — 40 MB, fastest", "Better — 125 MB, good balance", "Best — 1.8 GB, full-size English", "Max — 2.3 GB, GigaSpeech, most accurate" };
+    /** The model names in the language at start-up; {@link #modelLabels} reads them in the language now. */
+    public static final String[] MODEL_LABELS = modelLabels();
+    public static String[] modelLabels() { return new String[] { Txt.s(R.string.service_vosk_small), Txt.s(R.string.service_vosk_better), Txt.s(R.string.service_vosk_best), Txt.s(R.string.service_vosk_max) }; }
     public static final String DEFAULT_MODEL = MODELS[1];
 
     private final Context ctx;
@@ -54,7 +58,8 @@ public final class VoskCaptions {
     private volatile boolean active;
     private final StringBuilder finalText = new StringBuilder();
     private final Object loadLock = new Object();
-    private volatile Model model; private volatile String loadedName, wantedName, status = "idle";
+    /** {@code status} stays English (the web page and {@link #start} read its first word); {@code shown} is the same in the app's language. */
+    private volatile Model model; private volatile String loadedName, wantedName, status = "idle", shown;   // i18n: status code
     private volatile boolean loading;
 
     public VoskCaptions(Context c, Listener l) { ctx = c.getApplicationContext(); listener = l; wantedName = DEFAULT_MODEL; try { LibVosk.setLogLevel(LogLevel.WARNINGS); } catch (Throwable ignored) { } }
@@ -90,36 +95,36 @@ public final class VoskCaptions {
                         if (model != null && name.equals(loadedName)) break;
                         File dir = modelDir(ctx, name);
                         if (!new File(dir, "am/final.mdl").exists()) downloadAndUnzip(dir, name);
-                        setStatus("loading model");
+                        setStatus(R.string.service_vosk_loading);
                         Model m = new Model(dir.getAbsolutePath());
                         Model old = model; model = m; loadedName = name;
                         try { if (old != null) old.close(); } catch (Throwable ignored) { }
-                        setStatus("ready");
+                        setStatus(R.string.service_vosk_ready);
                         if (name.equals(wantedName)) break;
                     }
-                } catch (Throwable t) { Log.e(TAG, "model load failed", t); setStatus("model error: " + t.getMessage()); }
+                } catch (Throwable t) { Log.e(TAG, "model load failed", t); setStatus(R.string.service_vosk_error, String.valueOf(t.getMessage())); }
                 finally { loading = false; }
             }
         }, "caption-model").start();
     }
 
-    private void setStatus(String s) { status = s; Log.i(TAG, s); try { listener.status(s); } catch (Throwable ignored) { } }
+    private void setStatus(int id, Object... args) { String s = Txt.en(id, args), t = Txt.s(id, args); status = s; shown = t; Log.i(TAG, s); try { listener.status(t); } catch (Throwable ignored) { } }
 
     private void downloadAndUnzip(File dir, String name) throws Exception {
         File zip = new File(ctx.getCacheDir(), name + ".zip");
         HttpURLConnection c = (HttpURLConnection) new URL("https://alphacephei.com/vosk/models/" + name + ".zip").openConnection();
         c.setConnectTimeout(15000); c.setReadTimeout(60000);
-        if (c.getResponseCode() != 200) throw new Exception("HTTP " + c.getResponseCode() + " downloading the model");
+        if (c.getResponseCode() != 200) throw new Exception(Txt.s(R.string.service_vosk_http, c.getResponseCode()));
         long total = c.getContentLengthLong();
         try (InputStream in = new BufferedInputStream(c.getInputStream()); FileOutputStream out = new FileOutputStream(zip)) {
             byte[] buf = new byte[65536]; long done = 0; int n; long lastPct = -1;
             while ((n = in.read(buf)) > 0) {
                 out.write(buf, 0, n); done += n;
                 long pct = total > 0 ? done * 100 / total : -1;
-                if (pct != lastPct && pct % 5 == 0) { lastPct = pct; setStatus("downloading " + name.replace("vosk-model-", "") + " (" + (total / 1048576) + " MB) " + pct + "%"); }
+                if (pct != lastPct && pct % 5 == 0) { lastPct = pct; setStatus(R.string.service_vosk_downloading, name.replace("vosk-model-", ""), total / 1048576, pct); }
             }
         } finally { c.disconnect(); }
-        setStatus("unpacking model");
+        setStatus(R.string.service_vosk_unpacking);
         File root = dir.getParentFile(); root.mkdirs();
         try (ZipInputStream z = new ZipInputStream(new BufferedInputStream(new FileInputStream(zip)))) {
             ZipEntry e; byte[] buf = new byte[65536];
@@ -145,7 +150,7 @@ public final class VoskCaptions {
         new Thread(() -> {
             Recognizer rec = null;
             try {
-                if (model == null || !wantedName.equals(loadedName)) { ensureLoaded(); if (model == null) { listener.status(status.startsWith("downloading") || status.startsWith("unpacking") || status.startsWith("loading") ? status : "preparing the speech model…"); return; } }
+                if (model == null || !wantedName.equals(loadedName)) { ensureLoaded(); if (model == null) { listener.status(status.startsWith("downloading") || status.startsWith("unpacking") || status.startsWith("loading") ? shown : Txt.s(R.string.service_vosk_preparing)); return; } }
                 rec = new Recognizer(model, 16000.0f);
                 String lastPartial = ""; long fed = 0, t0 = System.currentTimeMillis(); int chunks = 0;
                 while (true) {

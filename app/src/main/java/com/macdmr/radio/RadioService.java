@@ -2999,6 +2999,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 receiving = true; rxBeganAt = System.currentTimeMillis(); dmrEvent("start", 0, 0, 0);
                 if (current != null && current.isDigital()) {           // a DMR call: forget the last talker, ask who this is now and again a second later
                     lastCaller = 0; lastCallerCc = -1; callLogged = false; dmrAdmitted = false;
+                    if (profile.dmrAppAdmission) dmrRequery(rxBeganAt);
                     if (!agoldBridge()) for (long ms : profile.dmrAppAdmission ? new long[] { 80, 300, 1200 } : new long[] { 300, 1200 }) ui.postDelayed(() -> { if (receiving) worker.execute(() -> { try { engine.queryCallerInfo(); } catch (IOException ignored) { } }); }, ms);
                 }
                 bridgeReception(true);
@@ -3422,6 +3423,15 @@ public class RadioService extends Service implements RadioEngine.Events {
     private void reopenDmrSpeaker(boolean mon) {
         try { engine.setSquelch(0); engine.setMonitor(mon); log("DMR speaker reopened (squelch 0, MON " + (mon ? "on" : "off") + ")"); } catch (IOException e) { log("DMR speaker: " + e); }
     }
+    /** While a DMR reception lasts, ask who is talking once a second: a second call inside the same reception (no new start) is admitted or muted on its own. */
+    private void dmrRequery(final long began) {
+        ui.postDelayed(() -> {
+            if (!receiving || rxBeganAt != began) return;
+            ChannelStore.Channel c = current; if (c == null || !c.isDigital()) return;
+            worker.execute(() -> { try { engine.queryCallerInfo(); } catch (IOException ignored) { } });
+            dmrRequery(began);
+        }, 1000);
+    }
     /** The receive audio may play: always off a DMR channel or without app admission; on one, with MON on or once the call is admitted. */
     private boolean dmrAudioAllowed() {
         if (!profile.dmrAppAdmission || monitorOn) return true;
@@ -3442,7 +3452,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     @Override public void callerInfo(int type, int caller, int target, int cc, int slot) {
         if (caller <= 0) return;
         ChannelStore.Channel ac = current;
-        if (ac != null && ac.isDigital() && dmrAdmits(type, target, tgOverride.groups(ac), localId(), ac.mode)) dmrAdmitted = true;
+        if (ac != null && ac.isDigital()) dmrAdmitted = dmrAdmits(type, target, tgOverride.groups(ac), localId(), ac.mode);   // every report decides again: a call that follows another within the same reception is judged on its own
         dmrEvent("caller", type, caller, target, cc, slot);
         final String ccts = cc >= 0 ? "  CC " + cc + " TS " + (slot + 1) : "";   // appended by the promiscuous firmware while MON is on
         lastCaller = caller; lastCallType = type; lastTarget = target; if (cc >= 0) lastCallerCc = cc;

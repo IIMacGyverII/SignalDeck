@@ -52,7 +52,7 @@ public final class EmergencyDialog {
 
         box.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_emergency_message)));
         final EditText msg = new EditText(c);
-        msg.setText(p.getString("text", "Need help"));   // i18n: sent on air (the default emergency message) msg.setSingleLine(true); msg.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        msg.setText(p.getString("text", "Need help")); msg.setSingleLine(true); msg.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);   // i18n: sent on air (the default emergency message)
         msg.setTextSize(17); msg.setTextColor(Neo.TEXT); msg.setHintTextColor(Neo.DIM); msg.setTypeface(Neo.uiSemi(c)); msg.setHint(Txt.s(R.string.intercom_emergency_message_hint));
         msg.setBackground(Neo.rowCard(c)); msg.setPadding((int) (12 * d), (int) (10 * d), (int) (12 * d), (int) (10 * d));
         box.addView(msg);

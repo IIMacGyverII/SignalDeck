@@ -50,7 +50,7 @@ public final class M17Station {
     private final Context ctx; private final Host host; private final String profileId;
     private volatile M17Receiver rx;                                     // swapped by the self-calibration thread
     private HeldPathReceiver held; private M17Receiver.Listener dfeEar; private HeldPathReceiver.Listener heldEar;
-    private String dfeNote = "";
+    private Msg dfeNote;
     private Codec2 codec;
     private AudioTrack track;
     private volatile boolean running;
@@ -60,7 +60,7 @@ public final class M17Station {
     private volatile float quality;
     /** Bench: also append the decoded voice to cache/m17_out.raw (8 kHz 16-bit mono). */
     public static volatile boolean benchDump;
-    private volatile String calibration = "";
+    private volatile Msg calibration;                                  // null: none yet
     private final HeldCal cal;
     private final DfeCal dfeCal;
     private float[] dfeCoef;
@@ -80,7 +80,9 @@ public final class M17Station {
     public synchronized List<Text> texts() { return new ArrayList<>(texts); }
     public synchronized void noteSent(String src, String dst, String body) { remember(new Text(System.currentTimeMillis(), true, src, dst, body)); host.sms(src, dst, body, true); host.changed(); }
     public float quality() { return quality; }
-    public String calibration() { return calibration; }
+    public String calibration() { Msg c = calibration; return c == null ? "" : c.text(); }
+    /** The calibration line in English, for DIAG. */
+    public String calibrationEnglish() { Msg c = calibration; return c == null ? "" : c.english(); }
     public void resetCalibration() {
         if (cal != null) cal.reset();
         dfeCal.reset();
@@ -96,7 +98,7 @@ public final class M17Station {
         if (coef == null) return Txt.s(R.string.modes_m17_err_calibration);
         dfeNote = calibration;
         float[] own = dfeCal.accepted();
-        if (own != null) { coef = own; calibration = Txt.s(R.string.modes_m17_cal_fitted); }
+        if (own != null) { coef = own; calibration = Msg.of(R.string.modes_m17_cal_fitted); }
         dfeCoef = coef;
         try { codec = new Codec2(Codec2.MODE_3200); } catch (Throwable t) { return Txt.s(R.string.modes_m17_err_codec, String.valueOf(t.getMessage())); }
         dfeEar = new M17Receiver.Listener() {
@@ -134,7 +136,7 @@ public final class M17Station {
         if (taps == null) { Log.i("M17Station", "held path: no taps for " + profileId); return; }
         heldTaps = taps;
         held = new HeldPathReceiver(taps, heldEar);
-        calibration = cal.line().isEmpty() ? Txt.s(R.string.modes_m17_cal_held) : cal.line();
+        calibration = cal.lineMsg() == null ? Msg.of(R.string.modes_m17_cal_held) : cal.lineMsg();
         host.changed();
     }
 
@@ -174,8 +176,8 @@ public final class M17Station {
     /** The table shipped for this phone model (sets the calibration line), else the Armor's with a warning. */
     private float[] shippedTable() {
         float[] coef = load("m17/eq_" + profileId + ".txt");
-        if (coef == null) { coef = load("m17/eq_ulefone-armor26ultra.txt"); calibration = Txt.s(R.string.modes_m17_cal_armor); }
-        else calibration = Txt.s(profileId.startsWith("ulefone-armor26") ? R.string.modes_m17_cal_model : R.string.modes_m17_cal_phone);
+        if (coef == null) { coef = load("m17/eq_ulefone-armor26ultra.txt"); calibration = Msg.of(R.string.modes_m17_cal_armor); }
+        else calibration = Msg.of(profileId.startsWith("ulefone-armor26") ? R.string.modes_m17_cal_model : R.string.modes_m17_cal_phone);
         dfeNote = calibration;
         return coef;
     }
@@ -207,10 +209,11 @@ public final class M17Station {
     private void onPacket(M17.Lsf l, byte[] body) {
         String src = l == null ? "" : l.src(), dst = l == null ? "" : l.dst();
         String sms = M17.smsText(body);
-        String shown = sms != null ? sms : Txt.p(R.plurals.modes_m17_packet, Math.max(0, body.length - 1), M17.protocolName(body.length == 0 ? -1 : body[0] & 0xFF), Math.max(0, body.length - 1));
+        Msg what = sms != null ? null : Msg.plural(R.plurals.modes_m17_packet, Math.max(0, body.length - 1), M17.protocolName(body.length == 0 ? -1 : body[0] & 0xFF), Math.max(0, body.length - 1));
+        String shown = sms != null ? sms : what.text();                             // the M17 screen's list, in the app language
         remember(new Text(System.currentTimeMillis(), false, src, dst, shown));
-        Log.i("M17Station", "sms " + src + " -> " + dst + " " + shown);
-        host.text((sms != null ? "✉ " : "") + src + " → " + dst + ": " + shown);
+        Log.i("M17Station", "sms " + src + " -> " + dst + " " + (sms != null ? sms : what.english()));
+        host.text(sms != null ? Msg.of(R.string.modes_m17_event_sms, src, dst, sms) : Msg.of(R.string.modes_m17_event_packet, src, dst, what));   // history: English text, shown localized
         if (sms != null) host.sms(src, dst, sms, false);
         host.heard(src); host.changed();
     }
@@ -255,7 +258,7 @@ public final class M17Station {
         if (hr != null) {
             try {
                 boolean kept = cal.onCall(hr.takeFrames(), hr.takeAudio(), h != null ? h.src : "", host.meter(), heldTaps);
-                calibration = cal.line().isEmpty() ? calibration : cal.line();
+                calibration = cal.lineMsg() == null ? calibration : cal.lineMsg();
                 if (kept) { swapping = true; stopHeld(); setHeldPath(true); swapping = false; }
             } catch (Throwable t) { Log.w("M17Station", "fit: " + t); }
         }
@@ -269,7 +272,7 @@ public final class M17Station {
                 try {
                     boolean kept = dfeCal.onCall(learned, learnedN, audio, src, dbm, live);
                     synchronized (M17Station.this) {
-                        if (!dfeCal.line().isEmpty()) calibration = dfeCal.line();
+                        if (dfeCal.lineMsg() != null) calibration = dfeCal.lineMsg();
                         float[] own = kept ? dfeCal.accepted() : null;
                         if (own != null && running && held == null) { dfeCoef = own; rx = new M17Receiver(own, dfeEar); }
                     }

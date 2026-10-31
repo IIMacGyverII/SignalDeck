@@ -113,7 +113,7 @@ function renderEditor() {
 /** The form's values; keepOnly = just remember them in ED.ch (for a redraw after a type change). */
 function collect(keepOnly) {
   const v = id => { const e = $(id); return e ? e.value : undefined; };
-  const o = { number: ED.isNew ? 0 : ED.ch.number, name: v('fName'), type: $('fType') ? +v('fType') : ED.ch.type, txMHz: parseFloat(v('fTx')), rxMHz: parseFloat(v('fRx')),
+  const o = { number: ED.isNew ? 0 : ED.ch.number, name: v('fName'), type: $('fType') ? +v('fType') : ED.ch.type, txMHz: num(v('fTx')), rxMHz: num(v('fRx')),
     power: +v('fPower'), relay: $('fRelay') ? +v('fRelay') : (ED.ch.relay || 2), rxOnly: v('fRxOnly') === '1', lat: v('fLat'), lon: v('fLon') };
   if ($('fNotes')) o.notes = v('fNotes');
   if ($('fCc')) Object.assign(o, { cc: +v('fCc'), mode: +v('fMode'), slot: +v('fSlot'), contactType: +v('fCtype'), txContact: v('fCall'), groups: v('fGroups'), encryptSw: +v('fEnc'), interrupt: +v('fInt') });
@@ -122,7 +122,7 @@ function collect(keepOnly) {
   if ($('fM17')) Object.assign(o, { m17dest: v('fM17'), cc: +v('fCan') });
   if (keepOnly) {   // map back onto the channel object's own field names
     return { name: o.name, txFreq: Math.round((o.txMHz || 0) * 1e6), rxFreq: Math.round((o.rxMHz || 0) * 1e6), power: o.power, relay: o.relay, rxOnly: o.rxOnly,
-      lat: o.lat ? parseFloat(o.lat) : undefined, lon: o.lon ? parseFloat(o.lon) : undefined };
+      lat: o.lat ? num(o.lat) : undefined, lon: o.lon ? num(o.lon) : undefined };
   }
   return o;
 }
@@ -131,7 +131,8 @@ function closeEditor() { ED.ch = null; $('edForm').classList.add('hidden'); $('e
 
 $('edForm').addEventListener('submit', async e => {
   e.preventDefault();
-  if (isNaN(parseFloat($('fTx').value)) || isNaN(parseFloat($('fRx').value))) { toast(t('editor_enter_frequencies')); return; }
+  if (isNaN(num($('fTx').value)) || isNaN(num($('fRx').value))) { toast(t('editor_enter_frequencies')); return; }
+  if (($('fLat') && $('fLat').value.trim() && isNaN(num($('fLat').value))) || ($('fLon') && $('fLon').value.trim() && isNaN(num($('fLon').value)))) { toast(t('common_not_a_number')); return; }
   if (ED.vfo) { const o = collect(false); o.step = +$('fStep').value; if (await act('vfo', o)) setTimeout(openVfo, 1500); return; }
   const j = await act('channel/save', collect(false));
   if (j) { await loadChannels(); openEditor(j.number); }

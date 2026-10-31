@@ -56,6 +56,9 @@ public final class Txt {
         Context a = app; if (a == null) return;
         Configuration cf = new Configuration(a.getResources().getConfiguration()); cf.setLocale(locale());
         loc = a.createConfigurationContext(cf);
+        boolean rec = !"en".equals(locale().getLanguage());
+        synchronized (SHOWN) { SHOWN.clear(); }
+        recording = rec;
     }
 
     /** The language in use: the override if one is set, else the phone's first language. */
@@ -100,14 +103,43 @@ public final class Txt {
     public static String s(int id, Object... args) {
         Context c = loc;
         if (c == null) return host(id, args);
-        return args.length == 0 ? c.getString(id) : c.getString(id, args);
+        return note(args.length == 0 ? c.getString(id) : c.getString(id, args), id, false, 0, args);
     }
 
     public static String p(int id, int n, Object... args) {
         Context c = loc;
         if (c == null) return hostPlural(id, n, args);
-        return c.getResources().getQuantityString(id, n, args);
+        return note(c.getResources().getQuantityString(id, n, args), id, true, n, args);
     }
+
+    // ---- the English of a text already shown --------------------------------------------------------------
+
+    /*
+     * Many methods return an error or a status as finished text in the app language (Txt.s), and some of those texts
+     * end up in the history's English text column or a DIAG line. In a language other than English every s/p remembers
+     * which string and arguments made its text (the last SHOWN_MAX distinct texts), so such a text can be turned back
+     * into its Msg: Msg.shown(e) as an argument, english(e) for a log. In English nothing is kept (the text is English).
+     */
+    private static final int SHOWN_MAX = 1024;
+    private static final Map<String, Msg> SHOWN = new java.util.LinkedHashMap<String, Msg>(64, 0.75f, true) {
+        @Override protected boolean removeEldestEntry(Map.Entry<String, Msg> e) { return size() > SHOWN_MAX; }
+    };
+    private static volatile boolean recording;
+
+    private static String note(String out, int id, boolean plural, int n, Object[] args) {
+        if (!recording || out == null || out.isEmpty()) return out;
+        try { Msg m = plural ? Msg.plural(id, n, args) : Msg.of(id, args); synchronized (SHOWN) { SHOWN.put(out, m); } } catch (RuntimeException ignored) { }
+        return out;
+    }
+    /** Host tests: remember texts as a non-English language does. */
+    static void recordForTest(boolean on) { synchronized (SHOWN) { SHOWN.clear(); } recording = on; }
+    static String noteForTest(String out, int id, Object... args) { return note(out, id, false, 0, args); }
+
+    /** The Msg that made a text Txt.s / Txt.p returned recently in a language other than English, else null. */
+    public static Msg madeBy(String text) { if (text == null || !recording) return null; synchronized (SHOWN) { return SHOWN.get(text); } }
+
+    /** A text returned in the app language (an error, a status) in English, for logs and DIAG; the text itself when unknown. */
+    public static String english(String text) { Msg m = madeBy(text); return m == null ? text : m.english(); }
 
     /** English, whatever the app language: the canonical history text, and text that is parsed or logged. */
     public static String en(int id, Object... args) {
@@ -172,12 +204,16 @@ public final class Txt {
     /**
      * A decimal typed by the user, with a point or a comma ("446.00625", "446,00625"). A comma counts as the decimal
      * sign only when it is the one separator in the text, so lists split on commas before this never reach it.
+     * Only a sign, digits and that one separator: "1.234,5", "1,234.5", "12a", "12f", "1e3", "NaN" and "" throw
+     * NumberFormatException (Double.parseDouble alone would take some of those), so nothing is half read.
      */
     public static double parseDecimal(String text) {
         String t = text == null ? "" : text.trim();
         if (t.indexOf('.') < 0 && t.indexOf(',') >= 0 && t.indexOf(',') == t.lastIndexOf(',')) t = t.replace(',', '.');
+        if (!DECIMAL.matcher(t).matches()) throw new NumberFormatException("not a number: \"" + t + "\"");
         return Double.parseDouble(t);
     }
+    private static final java.util.regex.Pattern DECIMAL = java.util.regex.Pattern.compile("[-+]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)");
 
     /**
      * A date/time format for the screen. English keeps {@code english} exactly as before (in {@code Locale.US}, or in

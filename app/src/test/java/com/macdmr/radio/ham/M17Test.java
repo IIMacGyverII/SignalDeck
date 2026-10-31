@@ -173,6 +173,59 @@ public class M17Test {
         assertTrue("exact " + exact, exact >= 72);
     }
 
+    /** Runs audio through a receiver with the shipped table of {@code profile}; returns {calls started, frames, LICH-confirmed frames} and the LSF callsigns rebuilt from the LICH. */
+    static int[] late(short[] audio, String profile, List<String> lichSrc) throws Exception {
+        java.util.List<String> lines = java.nio.file.Files.readAllLines(java.nio.file.Paths.get("src/main/assets/m17/eq_" + profile + ".txt"));
+        float[] cal = new float[M17Receiver.NCOEF]; for (int i = 0; i < cal.length; i++) cal[i] = Float.parseFloat(lines.get(i).trim());
+        final int[] r = new int[3];
+        M17Receiver rx = new M17Receiver(cal, new M17Receiver.Listener() {
+            public void started(M17.Lsf l) { r[0]++; }
+            public void frame(M17.Stream s, float q) { r[1]++; if (s.lich != null && s.lichErrors <= 2 && s.metric < -150) r[2]++; }
+            public void lsfFromLich(M17.Lsf l) { if (lichSrc != null) lichSrc.add(l.src()); }
+            public void ended(int f, int g, String why) { }
+        });
+        rx.feed(audio, audio.length); rx.feed(new short[8000], 8000);
+        return r;
+    }
+
+    /**
+     * Late entry (2026-10-31): a real radio's preamble and link setup are gone before a phone's receive audio opens (the
+     * Armor's FW57 stream heard by each phone: the receive line opens 45-370 ms after the carrier), so the receiver joins
+     * on the stream sync word, takes the gain from the level and rebuilds the link setup from the LICH. Before, these
+     * decoded nothing (0 of about 270 frames).
+     */
+    @Test public void joinsAnArmorStreamWithoutItsPreambleOnEachPhone() throws Exception {
+        String[][] clips = { { "m17_rx_armor_on_w6", "anysecu-w6plus" }, { "m17_rx_armor_on_w6dmr", "anysecu-w6plus-dmr" }, { "m17_rx_armor_on_atomxl", "unihertz-atomxl" } };
+        for (String[] c : clips) {
+            List<String> src = new ArrayList<>();
+            int[] r = late(wav(M17Test.class.getResourceAsStream("/m17/" + c[0] + ".wav")), c[1], src);
+            System.out.println(c[0] + ": calls " + r[0] + ", frames " + r[1] + ", confirmed " + r[2] + ", link setup from the LICH " + src);
+            assertEquals(c[0] + ": one call", 1, r[0]);
+            assertTrue(c[0] + ": joined within half a second (about 270 frames in the clip)", r[1] >= 255);
+            assertTrue(c[0] + ": confirmed " + r[2], r[2] >= 0.8 * r[1]);
+            assertEquals(c[0] + ": the link setup rebuilt from the LICH", java.util.Arrays.asList("N0CALL"), src);
+        }
+    }
+
+    /** The W6+ references with their starts muted (no preamble, no link setup): both transmissions are joined late and decode. */
+    @Test public void joinsTheW6ReferencesWithTheirStartsMuted() throws Exception {
+        short[] audio = wav(M17Test.class.getResourceAsStream("/m17/m17_rx_w6.wav"));
+        JSONArray parts = metaW6().getJSONArray("parts");
+        for (int k = 0; k < 2; k++) { int st = parts.getJSONObject(k).getInt("start8k"); for (int i = Math.max(0, st - 4000); i < st + 1200; i++) audio[i] = 0; }   // carrier, preamble, link setup and a frame gone
+        List<String> src = new ArrayList<>();
+        int[] r = late(audio, "anysecu-w6plus", src);
+        System.out.println("W6 muted starts: calls " + r[0] + ", frames " + r[1] + ", confirmed " + r[2] + ", " + src);
+        assertEquals(2, r[0]); assertTrue("frames " + r[1], r[1] >= 170); assertTrue("confirmed " + r[2], r[2] >= 160);
+        assertEquals(java.util.Arrays.asList("N0CALL", "N0CALL"), src);
+    }
+
+    /** A minute of hiss never starts a call. */
+    @Test public void noiseNeverStartsACall() throws Exception {
+        java.util.Random rnd = new java.util.Random(7); short[] n = new short[8000 * 60];
+        for (int i = 0; i < n.length; i++) n[i] = (short) (rnd.nextGaussian() * 3000);
+        for (String prof : new String[] { "anysecu-w6plus", "anysecu-w6plus-dmr", "unihertz-atomxl", "ulefone-armor26ultra" }) assertEquals(prof, 0, late(n, prof, null)[0]);
+    }
+
     /**
      * The same W6+ transmissions recorded later in a clip (2026-10-30): the 40 ms preamble then spans two of the detector's
      * 160-sample windows instead of three, the end estimate is a hop early and the sync lay outside the old +-60 symbol search.

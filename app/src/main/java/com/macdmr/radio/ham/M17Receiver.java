@@ -68,6 +68,24 @@ public final class M17Receiver {
      * identical to one that decoded 98/100 found no sync at all). The true end is never before the last strong window.
      */
     static final int SEARCH_AFTER = SEARCH + 64;
+    /**
+     * Late entry (2026-10-31): a real M17 radio sends its 40 ms preamble right after key-up, and a phone's receive audio opens
+     * tens to hundreds of ms after the carrier (the module's squelch, the Atom XL's USB capture), so on the air the preamble
+     * and the link setup are gone and acquisition from the preamble never starts (the Armor's FW57 stream: 0 of 1125 frames on
+     * the W6+, the W6Plus DMR and the Atom XL; the HackRF references decoded only because they led with a long carrier). While
+     * idle the receiver therefore looks for the stream sync word every LATE_EVERY frames in one frame's worth of positions and
+     * takes a position only when the next frame's sync follows exactly a frame later. The gain cannot come from a preamble:
+     * the stream's RMS times a factor tried from LATE_K (the preamble/stream ratio differs per phone: W6+ 0.3, W6Plus DMR 0.5,
+     * Atom XL 0.6, Armor 0.86), kept once found. The call is announced at its first confirmed frame (a false lock ends silently)
+     * and the link setup is rebuilt from six LICH chunks.
+     */
+    static final int LATE_EVERY = 2;
+    static final float[] LATE_K = { 0.25f, 0.32f, 0.4f, 0.5f, 0.63f, 0.8f, 1.0f };
+    private float lateK = -1;                                    // the factor found on this receiver's last late entry
+    private long lastLate48;
+    private boolean latePending;                                 // entered late, not yet announced
+    private boolean lateCall;                                    // this call was entered late: its gain is refined on confirmed frames
+    private long lateFloor48;                                    // never search before this: where the last call ended (else its own frames lock again)
     private State state = State.IDLE;
     private java.util.List<M17.Packet> packets;
     private long next48;                                         // where the next frame's first sync symbol is expected
@@ -99,6 +117,7 @@ public final class M17Receiver {
         interpolate(v);
         preamble(v);
         if (state == State.ACQUIRE && n48 > preEnd48 + (SEARCH_AFTER + 192 + 4) * SPS48 + 5 * L + 60) acquire();
+        if (state == State.IDLE && n48 - lastLate48 >= (long) LATE_EVERY * 192 * SPS48) { lastLate48 = n48; lateEntry(); }
         while (state == State.STREAM && n48 > next48 + 192 * SPS48 + 5 * L + 60) frame();
         while (state == State.PACKET && n48 > next48 + 192 * SPS48 + 5 * L + 60) packetFrame();
     }
@@ -198,15 +217,26 @@ public final class M17Receiver {
         int sm = 0, em = 0;
         for (int i = 0; i < 8; i++) { int s = (int) slice(sym[i]); if (s == M17.SYMBOL_MAP[(M17.SYNC_STR >> (14 - 2 * i)) & 3]) sm++; if (s == M17.EOT_SYMBOLS[i]) em++; }
         if (em >= 7 && em > sm) { end("end of transmission"); return; }
-        if (sm < 6) { if (++lost >= MAX_LOST) { end("signal lost"); return; } return; }
+        if (em >= 7 && em > sm && latePending) { reset("late entry: end"); return; }
+        if (sm < 6) { if (++lost >= (latePending ? 2 : MAX_LOST)) { if (latePending) reset("late entry: no frames"); else end("signal lost"); } return; }
         lost = 0; frames++;
         M17.Stream s = M17.decodeStream(sym, 8);
         float quality = Math.max(0, Math.min(1, 1 - mse / 0.5f));
         boolean confirmed = s.lich != null && s.lichErrors <= 2 && s.metric < -150;
+        if (latePending) {
+            if (!confirmed) { java.util.Arrays.fill(past, 0f); if (frames >= 4) reset("late entry: not confirmed"); return; }
+            latePending = false; listener.started(new M17.Lsf(new byte[30], false));   // no link setup yet: it comes from the LICH
+        }
         if (confirmed) {
             good++; adapt(chosen, before, s); collectLich(s);
             int[] exact = M17.streamSymbolsFromLich(s.lich, s.fn, s.payload);       // the frame as sent: the history the next frame needs
-            if (exact != null && exact.length == 192) { learn(chosen, before, exact); for (int i = 0; i < FB; i++) past[i] = exact[191 - i]; }
+            if (exact != null && exact.length == 192) {
+                learn(chosen, before, exact); for (int i = 0; i < FB; i++) past[i] = exact[191 - i];
+                if (lateCall) {                                                // the gain came from one frame: scale it toward what makes the output match the frame as sent
+                    double yx = 0, xx = 0; for (int i = 8; i < 192; i++) { yx += sym[i] * exact[i]; xx += (double) exact[i] * exact[i]; }
+                    double a = xx > 0 ? yx / xx : 1; if (a > 0.5 && a < 2) gain *= (float) Math.sqrt(a);
+                }
+            }
         } else java.util.Arrays.fill(past, 0f);                              // unconfirmed: feeding its decisions back spreads its errors; 0 = unknown
 
         listener.frame(s, quality);
@@ -260,7 +290,86 @@ public final class M17Receiver {
     }
 
     private void end(String why) { listener.ended(frames, good, why); reset(null); }
-    private void reset(String why) { state = State.IDLE; strong = 0; preStart48 = preEnd48 = -1; }
+    private void reset(String why) { state = State.IDLE; strong = 0; preStart48 = preEnd48 = -1; latePending = false; lateCall = false; lateFloor48 = Math.max(lateFloor48, next48); }
+
+    /** Normalized correlation of the equalizer's linear taps' output at the 8 sync symbols from p with the sync pattern (gain-free). */
+    private float linCorr(long p, int[] sync) {
+        double ys = 0, yy = 0;
+        for (int k = 0; k < 8; k++) {
+            long c = p + (long) k * SPS48; double y = 0;
+            for (int m = -L; m <= L; m++) y += coef[m + L] * at(c + 5L * m);
+            ys += y * sync[k]; yy += y * y;
+        }
+        return yy > 0 ? (float) (ys / Math.sqrt(yy * 8 * 5)) : 0;          // 8 symbols, mean square of the sync pattern 5
+    }
+    /** Sync misses (x100) plus decision error of the 8 sync symbols at p, from an unknown (zero) history with the known sync fed back. */
+    private float syncScore(long p, int[] sync) {
+        float[] h = new float[FB], ys = new float[8]; float err = run(p, 8, h, ys, 0, sync); int miss = 0;   // the known sync goes into the history, as in frame()
+        for (int i = 0; i < 8; i++) if (slice(ys[i]) != sync[i]) miss++;
+        return miss * 100 + err;
+    }
+    private void lateEntry() {
+        long frame48 = 192L * SPS48, newest = n48 - (frame48 + 8 * SPS48 + 5 * L + 60), oldest = Math.max(newest - frame48, lateFloor48);
+        if (newest <= oldest) return;
+        if (oldest - 5 * L < 0 || n48 - oldest + 5 * L >= RING) return;
+        double e = 0; int cnt = 0;
+        for (long i = oldest; i < newest + frame48; i += 3) { float v = at(i); e += v * v; cnt++; }
+        float rms = (float) Math.sqrt(e / Math.max(1, cnt)); if (rms < 1f) return;
+        int[] sync = STREAM_SYNC;
+        // 0: a cheap pass that does not depend on the gain: the equalizer's linear taps alone, correlated with the sync pattern
+        // (normalized, so the scale drops out); only the PRE best positions go on to the gain-dependent checks
+        final int PRE = 16; long[] pp = new long[PRE]; float[] pc = new float[PRE]; java.util.Arrays.fill(pc, -1f);
+        for (long p = oldest; p < newest; p += 4) {
+            float c = linCorr(p, sync); int w = 0; for (int i = 1; i < PRE; i++) if (pc[i] < pc[w]) w = i;
+            if (c > pc[w]) { pc[w] = c; pp[w] = p; }
+        }
+        // 1: a shortlist of (position, factor) whose sync comes within two misses from an unknown history
+        float[] ks = lateK > 0 ? new float[] { lateK / 1.26f, lateK, lateK * 1.26f } : LATE_K;   // once found, only its neighbours
+        final int SHORT = 8; long[] cp = new long[SHORT]; float[] ck = new float[SHORT], cs = new float[SHORT]; java.util.Arrays.fill(cs, Float.MAX_VALUE);
+        for (float k : ks) {
+            gain = rms * k;
+            for (int j = 0; j < PRE; j++) {
+                if (pc[j] < 0) continue; long p = pp[j];
+                float sc = syncScore(p, sync); if (sc >= 300) continue;
+                int w = 0; for (int i = 1; i < SHORT; i++) if (cs[i] > cs[w]) w = i;
+                if (sc < cs[w]) { cs[w] = sc; cp[w] = p; ck[w] = k; }
+            }
+        }
+        // the grid steps 4: each shortlisted position to its best within +-2 (the decode below needs the timing within a sample or two)
+        for (int i = 0; i < SHORT; i++) {
+            if (cs[i] == Float.MAX_VALUE) continue;
+            gain = rms * ck[i]; long bp = cp[i]; float bsc = cs[i];
+            for (long q = cp[i] - 2; q <= cp[i] + 2; q++) { if (q == cp[i]) continue; float sc = syncScore(q, sync); if (sc < bsc) { bsc = sc; bp = q; } }
+            cp[i] = bp; cs[i] = bsc;
+        }
+        // 2: decode the frame at each, as the receiver would (sync fed back), at every factor: its LICH must pass as frame() requires
+        // it, the next frame's sync must follow within one miss, and the best Viterbi metric picks the position and the factor
+        long bestP = -1; float best = Float.MAX_VALUE, bk = 0, rms2 = rms;
+        float[] ys = new float[192];
+        Integer[] order = new Integer[SHORT]; for (int i = 0; i < SHORT; i++) order[i] = i;
+        java.util.Arrays.sort(order, (x, y) -> Float.compare(cs[x], cs[y]));
+        for (int oi = 0; oi < 4; oi++) {                                     // the four best, each at its own factor and the two beside it
+            int i = order[oi]; if (cs[i] == Float.MAX_VALUE) break;
+            double e2 = 0; int c2 = 0;                                       // the level from these two frames (the search window can hold the quiet before the stream)
+            for (long q = cp[i]; q < cp[i] + 2 * frame48; q += 3) { float v = at(q); e2 += v * v; c2++; }
+            float r2 = (float) Math.sqrt(e2 / Math.max(1, c2));
+            for (float k : new float[] { ck[i] / 1.26f, ck[i], ck[i] * 1.26f }) {
+                gain = r2 * k; float[] h = new float[FB];
+                run(cp[i], 192, h, ys, 0, sync);
+                M17.Stream st = M17.decodeStream(ys, 8);
+                if (st.lich == null || st.lichErrors > 2 || st.metric >= -150 || st.metric >= best) continue;
+                run(cp[i] + frame48, 8, h, ys, 0, null); int miss = 0;
+                for (int j = 0; j < 8; j++) if (slice(ys[j]) != sync[j]) miss++;
+                if (miss <= 1) { best = st.metric; bestP = cp[i]; bk = k; rms2 = r2; }
+            }
+        }
+        if (bestP < 0) return;
+        lateK = bk; gain = rms2 * bk;
+        java.util.Arrays.fill(past, 0f);
+        frames = 0; good = 0; lost = 0; java.util.Arrays.fill(lichChunks, null); lsfFromLichSent = false; lsf = null;
+        learnA = new double[NCOEF][NCOEF]; learnB = new double[NCOEF]; learnFrames = 0; learnSymbols = 0;
+        next48 = bestP; latePending = true; lateCall = true; state = State.STREAM;
+    }
 
     // ---- learning from the frames the error correction confirmed (self-calibration) ---------------------------
 

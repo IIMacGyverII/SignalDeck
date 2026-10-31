@@ -104,7 +104,7 @@
 5 com/macdmr/radio/ham/HeldPathReceiver.java
 5 com/macdmr/radio/ham/Logbook.java
 3 com/macdmr/radio/ham/M17.java
-8 com/macdmr/radio/ham/M17Receiver.java
+11 com/macdmr/radio/ham/M17Receiver.java
 1 com/macdmr/radio/ham/MorseTrainer.java
 81 com/macdmr/radio/ham/NetFinder.java
 8 com/macdmr/radio/ham/NetStore.java
@@ -203,4 +203,4 @@
 14 com/macdmr/radio/winlink/B2fClient.java
 6 com/macdmr/radio/winlink/RmsList.java
 48 com/macdmr/radio/winlink/Winlink.java
-# total 6919
+# total 6922

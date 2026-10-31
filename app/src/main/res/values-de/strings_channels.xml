@@ -620,7 +620,7 @@
     <!-- Detail chip in the channel menu (capitals): narrow band FM. Very short. -->
     <string name="channels_list_badge_narrow">SCHMAL</string>
     <!-- Channel menu button: tune this channel. Very short (four buttons share a row). -->
-    <string name="channels_list_menu_use">Einstellen</string>
+    <string name="channels_list_menu_use">Wählen</string>
     <!-- Channel menu button: take out of the Favourites zone. Very short (four buttons share a row). -->
     <string name="channels_list_menu_unstar">Kein Favorit</string>
     <!-- Channel menu button. One line. -->

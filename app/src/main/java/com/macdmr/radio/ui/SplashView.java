@@ -44,7 +44,7 @@ public final class SplashView extends View {
         this.version = version; this.done = done;
         animate = ValueAnimator.areAnimatorsEnabled();
         word.setTypeface(Neo.display(c)); word.setTextAlign(Paint.Align.LEFT);
-        sub.setTypeface(Neo.uiMedium(c)); sub.setColor(GREY); sub.setTextAlign(Paint.Align.CENTER); sub.setLetterSpacing(0.08f);
+        sub.setTypeface(Neo.uiMedium(c)); sub.setColor(GREY); sub.setTextAlign(Paint.Align.CENTER); Neo.tracking(sub, 0.08f);
         small.setTypeface(Neo.uiSemi(c)); small.setColor(GREY);
         line.setStyle(Paint.Style.STROKE); line.setStrokeJoin(Paint.Join.MITER);
         wave.setStyle(Paint.Style.STROKE); wave.setStrokeCap(Paint.Cap.ROUND); wave.setStrokeJoin(Paint.Join.ROUND); wave.setColor(CYAN);

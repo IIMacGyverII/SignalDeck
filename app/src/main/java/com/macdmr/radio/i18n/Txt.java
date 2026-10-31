@@ -59,6 +59,11 @@ public final class Txt {
         boolean rec = !"en".equals(locale().getLanguage());
         synchronized (SHOWN) { SHOWN.clear(); }
         recording = rec;
+        String o = language();
+        java.util.List<Locale> phone = new java.util.ArrayList<>();
+        android.os.LocaleList sys = Resources.getSystem().getConfiguration().getLocales();
+        for (int i = 0; i < sys.size(); i++) phone.add(sys.get(i));
+        cjk = cjkLocale(o.isEmpty() ? null : Locale.forLanguageTag(o.split(",")[0]), phone, LANGUAGES);
     }
 
     /** The language in use: the override if one is set, else the phone's first language. */
@@ -87,6 +92,26 @@ public final class Txt {
         Context a = app; if (a != null) a.getSharedPreferences("radio", Context.MODE_PRIVATE).edit().putString(PREF, t).apply();
         AppCompatDelegate.setApplicationLocales(t.isEmpty() ? LocaleListCompat.getEmptyLocaleList() : LocaleListCompat.forLanguageTags(t));
         refresh();
+    }
+
+    /** Languages written without spaces in Han/kana/hangul (no tracking, phrase line breaks, own glyph forms); zh, ko when they ship. */
+    static final String[] CJK = { "ja" };
+    private static volatile Locale cjk;
+
+    /** True when the text on screen is Japanese (the override, or the phone's language when the app ships it): the layout rules of {@code ui.Neo}. */
+    public static boolean cjk() { return cjk != null; }
+    /** The locale CJK text is drawn with ("ja-JP", so shared Han characters take Japanese forms), null for any other language. */
+    public static Locale cjkLocale() { return cjk; }
+
+    /**
+     * The CJK locale of the language shown, or null: the override when one is set (even one not shipped, the layout
+     * check), else the phone's first language that ships (the one Android picks resources for), English if none does.
+     */
+    static Locale cjkLocale(Locale override, java.util.List<Locale> phone, String[] shipped) {
+        Locale shown = override;
+        if (shown == null) for (Locale l : phone) if (java.util.Arrays.asList(shipped).contains(l.getLanguage())) { shown = l; break; }
+        if (shown == null || !java.util.Arrays.asList(CJK).contains(shown.getLanguage())) return null;
+        return "ja".equals(shown.getLanguage()) ? Locale.JAPAN : shown;
     }
 
     /** A language's own name, in that language ("Deutsch", "Español"), for the Device → Language list. */

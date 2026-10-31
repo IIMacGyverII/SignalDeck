@@ -67,7 +67,7 @@ public final class CarArt {
         cv.drawRoundRect(new RectF(10, 10, W - 10, W - 10), 46, 46, border);
 
         // top: zone and state badge
-        Paint caps = text(c, Neo.ui(c), 26, Neo.MUTED); caps.setLetterSpacing(0.18f);
+        Paint caps = text(c, Neo.ui(c), 26, Neo.MUTED); Neo.tracking(caps, 0.18f);
         if (s.zone != null && !s.zone.isEmpty()) cv.drawText(Txt.s(R.string.intercom_carart_zone, s.zone).toUpperCase(Locale.US), 40, 70, caps);   // only a zone the channel is in
         String badge; int bc;
         if (!s.ready) { badge = Txt.s(R.string.intercom_carart_radio_off); bc = Neo.AMBER; }
@@ -76,7 +76,7 @@ public final class CarArt {
         else if (s.scanning) { badge = Txt.s(R.string.intercom_carart_scanning); bc = Neo.VIOLET; }
         else if (s.muted) { badge = Txt.s(R.string.intercom_carart_paused); bc = Neo.MUTED; }
         else { badge = Txt.s(R.string.intercom_carart_ready); bc = Neo.CYAN; }
-        Paint bt = text(c, Neo.ui(c), 26, bc); bt.setLetterSpacing(0.12f);
+        Paint bt = text(c, Neo.ui(c), 26, bc); Neo.tracking(bt, 0.12f);
         float bw = bt.measureText(badge) + 34;
         Paint bf = new Paint(Paint.ANTI_ALIAS_FLAG); bf.setColor(Neo.alpha(bc, 0x2A)); Paint bs = new Paint(Paint.ANTI_ALIAS_FLAG); bs.setStyle(Paint.Style.STROKE); bs.setStrokeWidth(3); bs.setColor(Neo.alpha(bc, 0xCC));
         RectF br = new RectF(W - 40 - bw, 38, W - 40, 84); cv.drawRoundRect(br, 23, 23, bf); cv.drawRoundRect(br, 23, 23, bs);
@@ -101,7 +101,7 @@ public final class CarArt {
                 if (to.isEmpty()) { chips = new String[] { who }; cc = new int[] { Neo.AMBER }; }
                 else { chips = new String[] { who, to }; cc = new int[] { Neo.AMBER, Neo.VIOLET }; }
             }
-            Paint ct = text(c, Neo.ui(c), 24, 0); ct.setLetterSpacing(0.1f);
+            Paint ct = text(c, Neo.ui(c), 24, 0); Neo.tracking(ct, 0.1f);
             float total = 0; float[] w = new float[chips.length];
             for (int i = 0; i < chips.length; i++) { w[i] = ct.measureText(chips[i]) + 30; total += w[i]; }
             total += (chips.length - 1) * 12;

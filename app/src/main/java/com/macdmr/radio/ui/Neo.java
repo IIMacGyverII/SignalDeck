@@ -24,7 +24,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.macdmr.radio.i18n.Txt;
+
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -68,15 +71,31 @@ public final class Neo {
     // ---- text helpers ----
     public static TextView text(Context c, String s, int color, float sp, Typeface tf) {
         TextView t = new TextView(c); t.setText(s); t.setTextColor(color); t.setTextSize(sp); t.setTypeface(tf); t.setIncludeFontPadding(false);
+        return lang(t);
+    }
+
+    // ---- CJK text (Txt.cjk): the bundled fonts have no CJK glyphs, so the system CJK font draws them ----
+    /** Letter spacing for text in the app language: none for CJK, where tracking pulls the glyphs apart. */
+    public static void tracking(TextView t, float em) { t.setLetterSpacing(Txt.cjk() ? 0 : em); }
+    public static void tracking(Paint p, float em) { p.setLetterSpacing(Txt.cjk() ? 0 : em); lang(p); }
+    /**
+     * CJK only: draw with the language's glyph forms (ja-JP, not the Chinese shapes of shared Han characters when the
+     * phone's language is not Japanese) and, on Android 13+, wrap between phrases instead of between any two glyphs.
+     */
+    public static TextView lang(TextView t) {
+        Locale l = Txt.cjkLocale(); if (l == null) return t;
+        t.setTextLocale(l);
+        if (android.os.Build.VERSION.SDK_INT >= 33) t.setLineBreakWordStyle(android.graphics.text.LineBreakConfig.LINE_BREAK_WORD_STYLE_PHRASE);
         return t;
     }
+    public static Paint lang(Paint p) { Locale l = Txt.cjkLocale(); if (l != null) p.setTextLocale(l); return p; }
     /** Small tracked caps label ("SIGNAL", "RADIO SETTINGS"). */
     public static TextView caps(Context c, String s) {
-        TextView t = text(c, s.toUpperCase(java.util.Locale.US), MUTED, 11.5f, ui(c)); t.setLetterSpacing(0.18f);
+        TextView t = text(c, s.toUpperCase(java.util.Locale.US), MUTED, 11.5f, ui(c)); tracking(t, 0.18f);
         return t;
     }
     public static TextView title(Context c, String s) {
-        TextView t = text(c, s.toUpperCase(java.util.Locale.US), TEXT, 15, display(c)); t.setLetterSpacing(0.08f); t.setSingleLine(true); t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        TextView t = text(c, s.toUpperCase(java.util.Locale.US), TEXT, 15, display(c)); tracking(t, 0.08f); t.setSingleLine(true); t.setEllipsize(android.text.TextUtils.TruncateAt.END);
         return t;
     }
 
@@ -111,7 +130,7 @@ public final class Neo {
 
     /** Badge chip ("DMR", "UHF", "CC15 · TS1"). */
     public static TextView chip(Context c, String s, int color) {
-        TextView t = text(c, s.toUpperCase(java.util.Locale.US), color, 11, ui(c)); t.setLetterSpacing(0.12f); t.setSingleLine(true);
+        TextView t = text(c, s.toUpperCase(java.util.Locale.US), color, 11, ui(c)); tracking(t, 0.12f); t.setSingleLine(true);
         GradientDrawable g = new GradientDrawable(); g.setColor(alpha(color, 0x22)); g.setCornerRadius(Theme.dp(c, 5)); g.setStroke(Theme.dp(c, 1), alpha(color, 0x77));
         t.setBackground(g); t.setPadding(Theme.dp(c, 6), Theme.dp(c, 2), Theme.dp(c, 6), Theme.dp(c, 2));
         return t;
@@ -120,7 +139,7 @@ public final class Neo {
     /** Accent button: outlined, tinted, optional leading icon. */
     public static TextView button(Context c, String label, String icon, int accent) {
         TextView t = text(c, label, accent == CYAN ? CYAN_LIGHT : accent == GREEN ? GREEN_LIGHT : accent == AMBER ? AMBER_LIGHT : accent == VIOLET ? VIOLET_LIGHT : accent, 15, ui(c));
-        t.setGravity(Gravity.CENTER); t.setLetterSpacing(0.04f); t.setMinHeight(Theme.dp(c, 46));
+        t.setGravity(Gravity.CENTER); tracking(t, 0.04f); t.setMinHeight(Theme.dp(c, 46));
         t.setPadding(Theme.dp(c, 12), Theme.dp(c, 8), Theme.dp(c, 12), Theme.dp(c, 8));
         android.graphics.drawable.StateListDrawable s = new android.graphics.drawable.StateListDrawable();
         s.addState(new int[] { android.R.attr.state_pressed }, outline(c, accent, 0x40, 12, 1.5f));
@@ -134,17 +153,22 @@ public final class Neo {
     /**
      * Fit a button's label in narrow rows: never break inside a word. A one-word label stays on one line and a longer
      * one wraps only between words (at most two lines); the text shrinks (down to 10 sp) instead of splitting a word,
-     * and any icon is dropped to make room.
+     * and any icon is dropped to make room. CJK without spaces: two lines when the label is wider than the room, wrapped
+     * between phrases before it shrinks, and never below 11 sp.
      */
-    public static TextView fit(TextView t) {
+    public static TextView fit(final TextView t) {
         String s = t.getText() == null ? "" : t.getText().toString().trim();
-        int words = s.isEmpty() ? 1 : s.split(" +").length;
-        float sp = t.getTextSize() / t.getResources().getDisplayMetrics().scaledDensity;
+        final boolean cjk = Txt.cjk();
+        float sd = t.getResources().getDisplayMetrics().scaledDensity, sp = t.getTextSize() / sd;
         t.setCompoundDrawables(null, null, null, null);                    // in a tight row the label needs the room more than the icon
-        t.setMaxLines(Math.min(2, words));
+        t.setMaxLines(fitLines(s, cjk, 0, 0));
         t.setBreakStrategy(android.graphics.text.LineBreaker.BREAK_STRATEGY_BALANCED);
         t.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);
-        t.setAutoSizeTextTypeUniformWithConfiguration(10, Math.max(11, Math.round(sp)), 1, android.util.TypedValue.COMPLEX_UNIT_SP);
+        t.setAutoSizeTextTypeUniformWithConfiguration(cjk ? 11 : 10, Math.max(11, Math.round(sp)), 1, android.util.TypedValue.COMPLEX_UNIT_SP);
+        if (cjk) {                                                         // the lines follow the width at the largest size, not the words
+            final float big = Math.max(11, Math.round(sp)) * sd;
+            t.addOnLayoutChangeListener((v, l, tp, r, b, ol, ot, or, ob) -> { int n = fitLines(t, big, true); if (t.getMaxLines() != n) t.post(() -> t.setMaxLines(n)); });
+        }
         return t;
     }
 
@@ -153,25 +177,30 @@ public final class Neo {
      * a one-word label stays on one line and a longer one wraps between words onto at most two lines. Only when a word
      * would break inside (a long German word), or the label is taller than a fixed-height button, the icon goes first, and if the word still does not fit the text shrinks,
      * down to 10 sp. So a row whose labels fit (English) keeps its icons, size and line breaks. Follows label changes.
+     * CJK without spaces: two lines when the label is wider than the room (wrapped between phrases), shrinking to 11 sp.
      */
     public static TextView fit(final TextView t, boolean keepIcon) {
         if (!keepIcon) return fit(t);
         final float base = t.getTextSize();
-        final int minPx = Math.round(10 * t.getResources().getDisplayMetrics().scaledDensity);
+        final boolean cjk = Txt.cjk();
+        final int minPx = Math.round((cjk ? 11 : 10) * t.getResources().getDisplayMetrics().scaledDensity);
         final boolean[] shrinking = { false };
         t.setSingleLine(false);                                            // a single-line view scrolls sideways and never shrinks
-        t.setMaxLines(fitLines(t.getText()));
+        t.setMaxLines(fitLines(t, base, cjk));
         t.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);
         final Runnable check = () -> {
-            int lines = fitLines(t.getText());
+            int lines = fitLines(t, base, cjk);
             if (t.getMaxLines() != lines) { t.setMaxLines(lines); return; }   // a new label: measure again after the layout
             int room = t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight();
             if (room <= 0 || shrinking[0]) return;
             Paint p = new Paint(t.getPaint()); p.setTextSize(base);
             boolean tooWide = false;
-            for (String w : String.valueOf(t.getText()).trim().split(" +")) if (p.measureText(w) > room) { tooWide = true; break; }
+            String s = String.valueOf(t.getText()).trim(); boolean glyphs = cjk && s.indexOf(' ') < 0;
+            if (glyphs) tooWide = lines == 1 && p.measureText(s) > room;      // on two lines the layout below says whether it fits
+            else for (String w : s.split(" +")) if (p.measureText(w) > room) { tooWide = true; break; }
             android.text.Layout lay = t.getLayout();
-            boolean tooLong = lay != null && (lay.getLineCount() > lines || lay.getHeight() > t.getHeight() - t.getTotalPaddingTop() - t.getTotalPaddingBottom());   // more lines than words allow, or taller than a fixed-height button
+            boolean tooLong = lay != null && (lay.getLineCount() > lines || lay.getHeight() > t.getHeight() - t.getTotalPaddingTop() - t.getTotalPaddingBottom()   // more lines than words allow, or taller than a fixed-height button
+                    || glyphs && lay.getLineCount() > 0 && lay.getLineEnd(Math.min(lines, lay.getLineCount()) - 1) < lay.getText().length());   // CJK: text left after the last line
             if (!tooWide && !tooLong) return;
             if (t.getCompoundDrawables()[0] != null) { t.setCompoundDrawables(null, null, null, null); return; }   // the word needs the icon's room
             if ((int) base <= minPx) return;
@@ -186,9 +215,21 @@ public final class Neo {
         });
         return t;
     }
-    private static int fitLines(CharSequence text) {
-        String s = text == null ? "" : text.toString().trim();
-        return Math.min(2, s.isEmpty() ? 1 : s.split(" +").length);
+    private static int fitLines(TextView t, float sizePx, boolean cjk) {
+        String s = t.getText() == null ? "" : t.getText().toString().trim();
+        if (!cjk) return fitLines(s, false, 0, 0);
+        Paint p = new Paint(t.getPaint()); p.setTextSize(sizePx);
+        return fitLines(s, true, p.measureText(s), t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight());
+    }
+    /**
+     * The lines a fitted label may take: one per word, at most two. A CJK label without spaces is one word to the split,
+     * so it takes two only when its width is more than the room (px; 0 before the layout) and it has four characters or
+     * more, two to a line. Every other label (all non-CJK text) gets the word count, exactly as before.
+     */
+    static int fitLines(String text, boolean cjk, float width, int room) {
+        String s = text == null ? "" : text.trim();
+        if (!cjk || s.indexOf(' ') >= 0) return Math.min(2, s.isEmpty() ? 1 : s.split(" +").length);
+        return room > 0 && width > room && s.codePointCount(0, s.length()) >= 4 ? 2 : 1;
     }
 
     /** Square icon button (header actions). */

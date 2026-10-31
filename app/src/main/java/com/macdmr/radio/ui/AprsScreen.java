@@ -64,7 +64,7 @@ public final class AprsScreen extends ModeScreen {
         String[] names = { Txt.s(R.string.packet_aprs_tab_live), Txt.s(R.string.packet_aprs_tab_stations), Txt.s(R.string.packet_aprs_tab_messages) };
         for (int i = 0; i < 3; i++) {
             final int k = i;
-            TextView t = Neo.text(c, names[i], Neo.MUTED, 14, Neo.ui(c)); t.setGravity(Gravity.CENTER); t.setLetterSpacing(0.1f); t.setPadding(0, dp(8), 0, dp(8));
+            TextView t = Neo.text(c, names[i], Neo.MUTED, 14, Neo.ui(c)); t.setGravity(Gravity.CENTER); Neo.tracking(t, 0.1f); t.setPadding(0, dp(8), 0, dp(8));
             t.setOnClickListener(v -> { tab = k; shownChanges = -1; refresh(); scrollTop(); });
             tb.addView(t, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)); tabs[i] = t;
         }
@@ -97,7 +97,7 @@ public final class AprsScreen extends ModeScreen {
         LinearLayout box = new LinearLayout(c); box.setOrientation(VERTICAL); box.setGravity(Gravity.CENTER);
         box.setBackground(Neo.card(c, Neo.LINE_SOFT, 10)); box.setPadding(dp(4), dp(8), dp(4), dp(8));
         TextView v = Neo.text(c, "0", Neo.TEXT, 20, Neo.display(c)); v.setGravity(Gravity.CENTER); v.setSingleLine(true);
-        TextView l = Neo.text(c, label, Neo.DIM, 10.5f, Neo.ui(c)); l.setGravity(Gravity.CENTER); l.setLetterSpacing(0.08f); l.setSingleLine(true);
+        TextView l = Neo.text(c, label, Neo.DIM, 10.5f, Neo.ui(c)); l.setGravity(Gravity.CENTER); Neo.tracking(l, 0.08f); l.setSingleLine(true);
         box.addView(v); box.addView(l);
         LayoutParams lp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); lp.setMargins(dp(2), 0, dp(2), 0);
         row.addView(box, lp);

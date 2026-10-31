@@ -77,7 +77,7 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
         stateDot = new View(c); stateDot.setBackground(Neo.outline(c, Neo.CYAN, 0xFF, 6, 0));
         LayoutParams dl = new LayoutParams(dp(10), dp(10)); dl.rightMargin = dp(8);
         top.addView(stateDot, dl);
-        stateText = Neo.text(c, Txt.s(R.string.intercom_mode_state_listening), Neo.CYAN, 15, Neo.ui(c)); stateText.setLetterSpacing(0.12f);
+        stateText = Neo.text(c, Txt.s(R.string.intercom_mode_state_listening), Neo.CYAN, 15, Neo.ui(c)); Neo.tracking(stateText, 0.12f);
         top.addView(stateText, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         timeText = Neo.text(c, "", Neo.MUTED, 14, Neo.mono(c));
         top.addView(timeText);

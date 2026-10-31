@@ -263,7 +263,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         infoPanel.addView(historyHeader, hh);
         historyText = Theme.label(c, "", Theme.CYAN2, 11, false); infoPanel.addView(historyText);
         if (neo) {
-            headline.setTypeface(Neo.ui(c)); headline.setTextSize(k.headSp); headline.setLetterSpacing(0.04f);
+            headline.setTypeface(Neo.ui(c)); headline.setTextSize(k.headSp); Neo.tracking(headline, 0.04f);
             historyHeader.setVisibility(GONE);   // the headline already says what the panel shows
             historyText.setTypeface(Neo.uiSemi(c)); historyText.setTextColor(Neo.TEXT_SOFT); historyText.setTextSize(k.histSp); historyText.setMaxLines(3); historyText.setEllipsize(android.text.TextUtils.TruncateAt.END);
             infoPanel.setBackground(Neo.card(c, Neo.alpha(Neo.CYAN, 0x30), 12)); infoPanel.setPadding((int) (k.infoPadH * d), (int) (k.infoPadV * d), (int) (k.infoPadH * d), (int) (k.infoPadV * d));

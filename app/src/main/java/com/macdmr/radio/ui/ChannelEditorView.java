@@ -468,7 +468,7 @@ public class ChannelEditorView extends LinearLayout {
         LinearLayout row = rowShell(); row.setOrientation(HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL);
         row.addView(Neo.text(c, label, Neo.TEXT, 15.5f, Neo.uiSemi(c)), new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         final TextView val = Neo.text(c, options != null && index >= 0 && index < options.length ? options[index] : "", Neo.CYAN_LIGHT, 15, Neo.ui(c));
-        val.setBackground(Neo.outline(c, Neo.CYAN, 0x16, 12, 1)); val.setPadding((int) (12 * d), (int) (7 * d), (int) (12 * d), (int) (7 * d)); val.setLetterSpacing(0.03f);
+        val.setBackground(Neo.outline(c, Neo.CYAN, 0x16, 12, 1)); val.setPadding((int) (12 * d), (int) (7 * d), (int) (12 * d), (int) (7 * d)); Neo.tracking(val, 0.03f);
         row.addView(val);
         row.addView(infoButton(label, help), new LayoutParams((int) (40 * d), (int) (40 * d)));
         if (options != null) {

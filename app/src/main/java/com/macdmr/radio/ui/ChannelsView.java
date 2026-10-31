@@ -104,7 +104,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
 
         for (int i = 0; i < 4; i++) {
             final int k = i;
-            TextView t = Neo.text(c, names[i], Neo.TEXT, 14, Neo.ui(c)); t.setLetterSpacing(0.07f); t.setGravity(Gravity.CENTER);
+            TextView t = Neo.text(c, names[i], Neo.TEXT, 14, Neo.ui(c)); Neo.tracking(t, 0.07f); t.setGravity(Gravity.CENTER);
             t.setPadding((int) (12 * d), 0, (int) (12 * d), 0); t.setClickable(true); t.setFocusable(true);
             t.setOnClickListener(v -> { filter = k; styleChips(); filter(); });
             LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, (int) (36 * d)); lp.rightMargin = (int) (8 * d);
@@ -366,7 +366,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
                 LinearLayout l1 = new LinearLayout(c); l1.setGravity(Gravity.CENTER_VERTICAL);
                 TextView name = Neo.text(c, "", Neo.TEXT, 18, Neo.ui(c)); name.setSingleLine(true); name.setEllipsize(android.text.TextUtils.TruncateAt.END); name.setTag("name");
                 l1.addView(name, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-                TextView air = Neo.text(c, Txt.s(R.string.channels_list_on_air), 0xFF04121A, 10.5f, Neo.ui(c)); air.setLetterSpacing(0.14f); air.setTag("air");
+                TextView air = Neo.text(c, Txt.s(R.string.channels_list_on_air), 0xFF04121A, 10.5f, Neo.ui(c)); Neo.tracking(air, 0.14f); air.setTag("air");
                 android.graphics.drawable.GradientDrawable ag = new android.graphics.drawable.GradientDrawable(); ag.setColor(Neo.CYAN); ag.setCornerRadius(5 * d);
                 air.setBackground(ag); air.setPadding((int) (6 * d), (int) (2 * d), (int) (6 * d), (int) (2 * d));
                 LayoutParams al = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); al.leftMargin = (int) (6 * d);
@@ -410,7 +410,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
             if (svc != null && svc.scanPriority() == ch.number) { TextView pc = Neo.chip(c, Txt.s(R.string.channels_list_badge_priority), Neo.VIOLET); LayoutParams pl2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); pl2.leftMargin = (int) (6 * d); badges.addView(pc, pl2); }
             boolean canTune = ChannelStore.tunable(ch);                            // outside this radio's bands (a 2 m channel on a UHF-only radio): dimmed, never tuned
             row.setAlpha(canTune ? 1f : 0.5f);
-            if (!canTune) { TextView nt = Neo.chip(c, Txt.s(R.string.channels_list_badge_not_tunable), Neo.MUTED); nt.setLetterSpacing(0.04f); nt.setTextSize(10); nt.setContentDescription(Txt.s(R.string.channels_list_cd_not_tunable)); /* short and tight: the full chip was cut off on a 480 px screen (W6+) */ LayoutParams nl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); nl.leftMargin = (int) (6 * d); badges.addView(nt, nl); }
+            if (!canTune) { TextView nt = Neo.chip(c, Txt.s(R.string.channels_list_badge_not_tunable), Neo.MUTED); Neo.tracking(nt, 0.04f); nt.setTextSize(10); nt.setContentDescription(Txt.s(R.string.channels_list_cd_not_tunable)); /* short and tight: the full chip was cut off on a 480 px screen (W6+) */ LayoutParams nl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); nl.leftMargin = (int) (6 * d); badges.addView(nt, nl); }
             Object[] lh = heard.get(ch.number);                                   // when the channel was last heard (owner, 2026-10-25: the colour code and tone chip came off the card; the editor has the detail and the history)
             if (lh != null) { TextView ht = Neo.text(c, Txt.s(R.string.channels_list_heard, heardWhen((Long) lh[0])), Neo.DIM, 11.5f, Neo.uiMedium(c)); ht.setSingleLine(true); ht.setEllipsize(android.text.TextUtils.TruncateAt.END); LayoutParams hl = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); hl.leftMargin = (int) (6 * d); badges.addView(ht, hl); }
             ImageView star = row.findViewWithTag("star");

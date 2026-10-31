@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout tab = new LinearLayout(this); tab.setOrientation(LinearLayout.VERTICAL); tab.setGravity(Gravity.CENTER);
             tab.setPadding(0, Theme.dp(this, small ? 5 : 8), 0, Theme.dp(this, small ? 3 : 6)); tab.setContentDescription(tabNames[i]);
             android.widget.ImageView e = new android.widget.ImageView(this);
-            TextView t = com.macdmr.radio.ui.Neo.text(this, tabNames[i].toUpperCase(Txt.locale()), 0xFF71879D, small ? 10f : 11.5f, com.macdmr.radio.ui.Neo.ui(this)); t.setGravity(Gravity.CENTER); t.setLetterSpacing(0.08f); t.setSingleLine(true);
+            TextView t = com.macdmr.radio.ui.Neo.text(this, tabNames[i].toUpperCase(Txt.locale()), 0xFF71879D, small ? 10f : 11.5f, com.macdmr.radio.ui.Neo.ui(this)); t.setGravity(Gravity.CENTER); com.macdmr.radio.ui.Neo.tracking(t, 0.08f); t.setSingleLine(true);
             LinearLayout.LayoutParams el = new LinearLayout.LayoutParams(Theme.dp(this, small ? 20 : 24), Theme.dp(this, small ? 20 : 24)); el.bottomMargin = Theme.dp(this, small ? 2 : 4);
             tab.addView(e, el); tab.addView(t);
             View ind = new View(this); LinearLayout.LayoutParams il = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Theme.dp(this, 3)); il.setMargins(Theme.dp(this, 14), Theme.dp(this, small ? 3 : 6), Theme.dp(this, 14), 0);
@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
         b.setPadding(Theme.dp(this, 16), Theme.dp(this, 9), Theme.dp(this, 12), Theme.dp(this, 9));
         modeBarText = com.macdmr.radio.ui.Neo.text(this, "", com.macdmr.radio.ui.Neo.GREEN_LIGHT, 15, com.macdmr.radio.ui.Neo.uiSemi(this)); modeBarText.setSingleLine(true);
         b.addView(modeBarText, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        TextView open = com.macdmr.radio.ui.Neo.text(this, Txt.s(R.string.device_main_bar_open), com.macdmr.radio.ui.Neo.GREEN, 14, com.macdmr.radio.ui.Neo.ui(this)); open.setLetterSpacing(0.1f);
+        TextView open = com.macdmr.radio.ui.Neo.text(this, Txt.s(R.string.device_main_bar_open), com.macdmr.radio.ui.Neo.GREEN, 14, com.macdmr.radio.ui.Neo.ui(this)); com.macdmr.radio.ui.Neo.tracking(open, 0.1f);
         b.addView(open);
         b.setOnClickListener(v -> openModeScreen());
         b.setContentDescription(Txt.s(R.string.device_main_bar_open_desc));
@@ -380,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
         b.setPadding(Theme.dp(this, 16), Theme.dp(this, 8), Theme.dp(this, 6), Theme.dp(this, 8));
         regionBarText = com.macdmr.radio.ui.Neo.text(this, "", com.macdmr.radio.ui.Neo.CYAN_LIGHT, 14.5f, com.macdmr.radio.ui.Neo.uiSemi(this));
         b.addView(regionBarText, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        TextView change = com.macdmr.radio.ui.Neo.text(this, Txt.s(R.string.device_main_region_change), com.macdmr.radio.ui.Neo.CYAN, 14, com.macdmr.radio.ui.Neo.ui(this)); change.setLetterSpacing(0.1f);
+        TextView change = com.macdmr.radio.ui.Neo.text(this, Txt.s(R.string.device_main_region_change), com.macdmr.radio.ui.Neo.CYAN, 14, com.macdmr.radio.ui.Neo.ui(this)); com.macdmr.radio.ui.Neo.tracking(change, 0.1f);
         change.setPadding(Theme.dp(this, 10), Theme.dp(this, 6), Theme.dp(this, 6), Theme.dp(this, 6));
         b.addView(change);
         android.widget.ImageView x = com.macdmr.radio.ui.Neo.iconButton(this, "close", com.macdmr.radio.ui.Neo.MUTED, Txt.s(R.string.device_main_region_dismiss));

@@ -81,7 +81,7 @@ public class ContactsView extends LinearLayout {
         String[] names = { Txt.s(R.string.intercom_contacts_filter_all), Txt.s(R.string.intercom_contacts_filter_private), Txt.s(R.string.intercom_contacts_filter_talkgroups) };
         for (int i = 0; i < 3; i++) {
             final int k = i;
-            TextView t = Neo.text(c, names[i], Neo.TEXT, 14, Neo.ui(c)); t.setLetterSpacing(0.07f); t.setGravity(Gravity.CENTER);
+            TextView t = Neo.text(c, names[i], Neo.TEXT, 14, Neo.ui(c)); Neo.tracking(t, 0.07f); t.setGravity(Gravity.CENTER);
             t.setPadding((int) (12 * d), 0, (int) (12 * d), 0); t.setClickable(true); t.setFocusable(true);
             t.setOnClickListener(v -> { filter = k; styleChips(); filter(); });
             LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, (int) (36 * d)); lp.rightMargin = (int) (8 * d);

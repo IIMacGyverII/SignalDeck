@@ -43,7 +43,7 @@ public final class ParrotScreen extends ModeScreen {
         LinearLayout box = new LinearLayout(c); box.setOrientation(VERTICAL); box.setGravity(Gravity.CENTER);
         box.setBackground(Neo.card(c, Neo.LINE_SOFT, 10)); box.setPadding(dp(4), dp(10), dp(4), dp(10));
         TextView v = Neo.text(c, "0", Neo.TEXT, 24, Neo.display(c)); v.setGravity(Gravity.CENTER);
-        TextView l = Neo.text(c, label, Neo.DIM, 11, Neo.ui(c)); l.setGravity(Gravity.CENTER); l.setLetterSpacing(0.08f);
+        TextView l = Neo.text(c, label, Neo.DIM, 11, Neo.ui(c)); l.setGravity(Gravity.CENTER); Neo.tracking(l, 0.08f);
         box.addView(v); box.addView(l);
         LayoutParams lp = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); lp.setMargins(dp(3), 0, dp(3), 0);
         row.addView(box, lp); return v;

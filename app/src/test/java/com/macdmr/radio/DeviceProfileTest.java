@@ -153,6 +153,14 @@ public class DeviceProfileTest {
         assertTrue(DeviceProfile.detectBuiltIn("ulefone armor 26 ultra", true, false).firmwareLoader());
     }
 
+    @Test public void armor26OnAGsiIsTheSamePhone() {
+        // detectBuiltIn() appends ro.product.vendor.model: a LineageOS GSI names itself in Build.MODEL, the vendor partition names the phone
+        DeviceProfile p = DeviceProfile.detectBuiltIn("lineageos trebledroid vanilla tdgsi_arm64_ab armor 26 ultra", true, false);
+        assertSame(DeviceProfile.ARMOR_26_ULTRA, p);
+        assertTrue("same phone, same module: the loader stays on (owner 2026-10-30)", p.firmwareLoader());
+        assertFalse(DeviceProfile.detectBuiltIn("lineageos trebledroid vanilla tdgsi_arm64_ab ", true, false).firmwareLoader());
+    }
+
     @Test public void atomXlIsTheAgoldBridgeProfile() {
         DeviceProfile p = DeviceProfile.detectBuiltIn("unihertz atom_xl atom_xl", false, false);
         assertSame(DeviceProfile.ATOM_XL, p);

@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Armor 26 Ultra on a custom ROM: recognised, and module firmware can be loaded
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Tester report (Armor 26 Ultra on a LineageOS GSI: "the firmware was not designed for that phone"); owner decision 2026-10-30 ("same phone same modules should allow the flash") | On a GSI, `Build.MODEL` names the GSI, so the phone fell to the dmr009 fallback profile (loader off) and the loader's model check refused every image. SignalDeck now also reads the phone's model from its vendor partition (`ro.product.vendor.model`, kept by a GSI): the built-in detection, the signed profile list's model match and the loader's identity checks use it, so an Armor 26 Ultra on a custom ROM gets its own profile and the certified loader. Every other loader check is unchanged (module tag, stock app and verified factory backup, file hash). Help updated. | `DeviceProfile.java`, `ProfileRegistry.java`, `fw/ImageTable.java`, `fw/FirmwareSession.java`, `ui/HelpView.java` | `DeviceProfileTest.armor26OnAGsiIsTheSamePhone`, `ImageTableTest.loaderModelUsesTheVendorModelOnAGsi`; host suite green. Not device-tested on a GSI (no GSI phone on the bench). |
+
 ## 2026-10-30 — Ulefone Armor 3WT: no channel write until the radio has finished the unkey
 
 | Backlog | Change | Files | Test |

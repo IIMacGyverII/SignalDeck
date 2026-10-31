@@ -87,6 +87,15 @@ public final class ImageTable {
         return new String(image, TAG_AT, n, StandardCharsets.US_ASCII).trim();
     }
 
+    /**
+     * The model the identity checks use: {@link android.os.Build#MODEL}, or on a GSI the vendor partition's model when that one
+     * is the phone an image was built for and Build.MODEL is not (same phone, same module; owner 2026-10-30).
+     */
+    public static String loaderModel(String build, String vendor) {
+        if (modelMatches(build) || vendor == null || vendor.trim().isEmpty()) return build;
+        return modelMatches(vendor.trim()) ? vendor.trim() : build;
+    }
+
     public static boolean modelMatches(String reported) {
         if (reported == null) return false;
         return reported.equals(FACTORY.model) || reported.endsWith(FACTORY.model);

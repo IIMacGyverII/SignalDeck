@@ -130,7 +130,10 @@ public final class ProfileRegistry {
 
     private static final Env PHONE = new Env() {
         @Override public String manufacturer() { return Build.MANUFACTURER; }
-        @Override public String model() { return Build.MODEL; }
+        @Override public String model() {                                  // a GSI: add the vendor partition's model, which still names the phone
+            String v = DeviceProfile.vendorModel();
+            return v.isEmpty() || v.equalsIgnoreCase(Build.MODEL) ? Build.MODEL : Build.MODEL + " " + v;
+        }
         @Override public String device() { return Build.DEVICE; }
         @Override public boolean exists(String path) { return new File(path).exists(); }
     };

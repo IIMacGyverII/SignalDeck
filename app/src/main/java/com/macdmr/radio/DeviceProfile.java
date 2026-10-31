@@ -522,7 +522,7 @@ public final class DeviceProfile {
 
     /** The profile built into this release for this phone (no profile list, no advisories). */
     public static DeviceProfile detectBuiltIn() {
-        String m = (Build.MANUFACTURER + " " + Build.MODEL + " " + Build.DEVICE).toLowerCase();
+        String m = (Build.MANUFACTURER + " " + Build.MODEL + " " + Build.DEVICE + " " + vendorModel()).toLowerCase();   // a GSI keeps the phone's model on its vendor partition
         if (armor3wt(m, Build.BOARD, vendorFingerprint(), new File(ExtModuleLink.DAEMON).exists())) return ARMOR_3WT;
         return detectBuiltIn(m, new File("/sys/devices/platform/dmr009").exists(), new File("/sys/devices/platform/intercom").exists());
     }
@@ -536,6 +536,15 @@ public final class DeviceProfile {
         String m = model == null ? "" : model.toLowerCase(java.util.Locale.US);
         return m.contains("armor 3wt") || m.contains("armor_3wt") || "s62v71c2k_gq_3wt".equals(board)
                 || (vendorFingerprint != null && vendorFingerprint.contains("/Armor_3WT/"));
+    }
+    /**
+     * The phone's own model from its vendor partition ({@code ro.product.vendor.model}), or "" when unset. A GSI replaces only
+     * the system, so this still names the phone (an Armor 26 Ultra on a LineageOS GSI: same phone, same module) where
+     * {@link Build#MODEL} names the GSI.
+     */
+    public static String vendorModel() {
+        try { String v = (String) Class.forName("android.os.SystemProperties").getMethod("get", String.class).invoke(null, "ro.product.vendor.model"); return v == null ? "" : v.trim(); }
+        catch (Throwable t) { return ""; }
     }
     private static String vendorFingerprint() {
         try { return (String) Class.forName("android.os.SystemProperties").getMethod("get", String.class).invoke(null, "ro.vendor.build.fingerprint"); }

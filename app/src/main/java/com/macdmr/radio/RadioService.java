@@ -3437,8 +3437,15 @@ public class RadioService extends Service implements RadioEngine.Events {
     private boolean dmrAudioAllowed() {
         if (!profile.dmrAppAdmission || monitorOn) return true;
         ChannelStore.Channel c = current;
-        return c == null || !c.isDigital() || dmrAdmitted;
+        if (c == null || !c.isDigital()) return true;
+        // The module starts a reception only for a call it admits (bench 2026-10-31: an out-of-list talkgroup starts none and
+        // is never reported), and its caller info can be stale at a call's start; so a DMR channel plays only during a reception.
+        // Between receptions the open speaker carries the discriminator: hiss when idle, 4FSK buzz from any DMR carrier.
+        boolean allow = receiving;
+        if (allow != dmrGateLogged) { dmrGateLogged = allow; log(allow ? "DMR audio on: a reception the module admitted" : "DMR audio muted: no admitted reception"); }
+        return allow;
     }
+    private volatile boolean dmrGateLogged;
     /**
      * Whether a reported call is one this radio should play: a group call to a talkgroup in the channel's list, an All-Call
      * (type 2, or the group 16777215), or a private call to this radio's ID (the channel's own ID on the VFO). Calls outside the
@@ -3453,7 +3460,11 @@ public class RadioService extends Service implements RadioEngine.Events {
     @Override public void callerInfo(int type, int caller, int target, int cc, int slot) {
         if (caller <= 0) return;
         ChannelStore.Channel ac = current;
-        if (ac != null && ac.isDigital()) dmrAdmitted = dmrAdmits(type, target, tgOverride.groups(ac), localId(), ac.mode);   // every report decides again: a call that follows another within the same reception is judged on its own
+        if (ac != null && ac.isDigital()) {
+            boolean a = dmrAdmits(type, target, tgOverride.groups(ac), localId(), ac.mode);
+            if (profile.dmrAppAdmission && a != dmrAdmitted) log("DMR caller info " + (a ? "admits" : "does not admit") + " type " + type + " target " + target);
+            dmrAdmitted = a;                                         // logged for the bench; the gate itself follows the module's reception
+        }
         dmrEvent("caller", type, caller, target, cc, slot);
         final String ccts = cc >= 0 ? "  CC " + cc + " TS " + (slot + 1) : "";   // appended by the promiscuous firmware while MON is on
         lastCaller = caller; lastCallType = type; lastTarget = target; if (cc >= 0) lastCallerCc = cc;

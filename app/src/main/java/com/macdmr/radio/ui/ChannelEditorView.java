@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.text.InputType;
 import android.view.Gravity;
@@ -43,48 +45,48 @@ public class ChannelEditorView extends LinearLayout {
     private EditText m17Dest;
     private LinearLayout digitalGroup, analogGroup, m17Group;
 
-    private static final String[] TONE_TYPES = { "None", "CTCSS", "DCS", "DCS inverted" };
+    private static String[] toneTypes() { return new String[] { Txt.s(R.string.channel_editor_tone_none), "CTCSS", "DCS", Txt.s(R.string.channel_editor_tone_dcs_inverted) }; }
     /** The field help texts, for SignalDeck Web's channel editor: {key, text}. */
     public static String[][] helpForWeb() {
-        return new String[][] { { "name", H_NAME }, { "notes", H_NOTES }, { "type", H_TYPE }, { "tx", H_TX }, { "rx", H_RX }, { "pos", H_POS }, { "power", H_POWER }, { "rxOnly", H_RXONLY }, { "band", H_BAND },
-                { "relay", H_RELAY }, { "cc", H_CC }, { "mode", H_MODE }, { "slot", H_SLOT }, { "contactType", H_CTYPE }, { "call", H_CALL }, { "groups", H_GROUPS },
-                { "encrypt", H_ENC }, { "key", H_KEY }, { "interrupt", H_INT }, { "sq", H_SQ }, { "softSq", H_SOFTSQ }, { "softSqLevel", H_SOFTSQ_LVL },
-                { "txType", H_TXT }, { "txTone", H_TXC }, { "rxType", H_RXT }, { "rxTone", H_RXC }, { "m17dest", H_M17 }, { "can", H_CAN } };
+        return new String[][] { { "name", H_NAME() }, { "notes", H_NOTES() }, { "type", H_TYPE() }, { "tx", H_TX() }, { "rx", H_RX() }, { "pos", H_POS() }, { "power", H_POWER() }, { "rxOnly", H_RXONLY() }, { "band", H_BAND() },
+                { "relay", H_RELAY() }, { "cc", H_CC() }, { "mode", H_MODE() }, { "slot", H_SLOT() }, { "contactType", H_CTYPE() }, { "call", H_CALL() }, { "groups", H_GROUPS() },
+                { "encrypt", H_ENC() }, { "key", H_KEY() }, { "interrupt", H_INT() }, { "sq", H_SQ() }, { "softSq", H_SOFTSQ() }, { "softSqLevel", H_SOFTSQ_LVL() },
+                { "txType", H_TXT() }, { "txTone", H_TXC() }, { "rxType", H_RXT() }, { "rxTone", H_RXC() }, { "m17dest", H_M17() }, { "can", H_CAN() } };
     }
 
     // ---- field help (what each setting does on this radio) ----
-    private static final String H_NOTES = "Anything worth remembering about this channel: who uses it, the repeater's owner or club, linking, hours, how to check in. It can go with the channel when you share it (Share channels \u2192 Channel notes).";
-    private static final String H_NAME = "Shown on the intercom, in the channel list and in voice announcements. Up to " + ChannelStore.NAME_MAX + " characters; the counter under the field shows how many are left. The radio itself never receives the name. Codeplug tools such as OpenGD77 CPS keep shorter names (16 characters), so a long name may be cut short in a backup opened there.";
-    private static final String H_TYPE = "Digital (DMR) channels carry voice and text as data and need a colour code, a time slot and a call target. Analog channels are classic FM. M17 channels are wide FM with M17 layered on them: a destination callsign (or everyone) and a channel access number. Switching shows the settings that apply.";
-    private static final String H_M17 = "Who this channel calls. @ALL is everyone. A callsign calls that station. Pick from contacts uses a contact that has a callsign. Your own callsign, the one you transmit from, is the station callsign in APRS settings.";
-    private static final String H_CAN = "Channel access number, 0 to 15. Radios only hear each other when this matches. 0 is the usual choice.";
-    private static final String H_TX = "The frequency you transmit on, in MHz. On a simplex channel it is the same as the receive frequency; on a repeater channel it is the repeater's input (for example +5 MHz on UHF GMRS, or ±0.6 MHz on 2 m). Left empty, it is the receive frequency (simplex). This radio tunes " + com.macdmr.radio.DeviceProfile.detect().bandsText() + ".";
-    private static final String H_RX = "The frequency you listen on, in MHz. On a repeater channel it is the repeater's output. This radio tunes " + com.macdmr.radio.DeviceProfile.detect().bandsText() + "; other frequencies (220 MHz, for example) cannot be saved.";
-    private static final String H_POS = "Optional position of the station or repeater this channel reaches. With it the intercom shows the place name and its distance and bearing from you. Use my position fills in the phone's last known location.";
-    private static final String H_RXONLY = "Receive only: this channel never transmits. Talk, the side key, the voice keyer, beacons, replies and every other transmission are refused while you are on it (a listening post, a channel you are not licensed for, a frequency that should stay quiet). NOAA weather, marine and railroad channels are always receive only, whatever this says.";
-    private static final String H_POWER = "Transmit power. High reaches further and uses more battery; Low is enough for nearby radios. Some services limit power (FRS, for example).";
-    private static final String H_BAND = "Channel width: Wide (25 kHz) or Narrow (12.5 kHz). Use what the other radios or the repeater use. On VHF (below 300 MHz) this radio is always set to Wide: Narrow makes its receiver deaf there.";
-    private static final String H_RELAY = "The radio's relay-disconnection setting. Normal (recommended): the radio stays connected to the repeater and transmits normally. Disconnect: the radio waits for repeater confirmation and may not transmit at all; use it only if your network asks for it.";
-    private static final String H_CC = "DMR's equivalent of a squelch tone, 0 to 15. Your radio and the repeater (or the other radios on a simplex channel) must use the same colour code, or you will not hear each other.";
-    private static final String H_MODE = "Direct: radio to radio (simplex). Double slot: through a DMR repeater, which carries two time slots at once. Use Double slot for repeater channels.";
-    private static final String H_NOSLOT = "Time slot: chosen by this phone's radio module. Its channel setting has no slot, so SignalDeck cannot pick TS1 or TS2 here, and repeater (double slot) channels may not work. Simplex DMR with other radios is the safe use.";
-    private static final String H_SLOT = "A DMR repeater carries two separate conversations, time slot 1 and 2. Use the slot your talkgroup is on (the repeater's listing says). On a simplex channel every radio must use the same slot, usually TS1.";
-    private static final String H_CTYPE = "Who you call: Private (one DMR ID), Group (a talkgroup) or All (every radio). On this radio a channel set to All reports callers as ID 16777215 and does not pass received audio, so use Group for normal talkgroup traffic.";
-    private static final String H_CALLFROM = "Type the call number yourself, or pick it from your contacts: group contacts (talkgroups) for a group call, private contacts (DMR IDs) for a private call. Either way the channel stores the number; add talkgroups on the Contacts page with type Group. On the intercom, a long-press on CALL picks another talkgroup for a while without editing the channel.";
-    private static final String H_CALLPICK = "The contact this channel calls. Tap to choose another one; the list follows the contact type above.";
-    private static final String H_CALL = "The DMR ID (private call) or talkgroup number (group call) you transmit to. For a group call it is added to the RX group list when you save, because the radio only passes group calls whose talkgroup is in that list.";
-    private static final String H_GROUPS = "Talkgroups you want to hear on this channel, separated by commas, up to 32. The radio passes a group call only if its talkgroup is in this list. Private calls to your own DMR ID always pass, and MON on the intercom passes every call the radio can decode. Talkgroup lists below inserts a saved list (the module's lists come over from the stock app) or saves this one under a name.";
-    private static final String H_ENC = "The radio's own DMR privacy scrambling with an 8-character key. Only radios using the same scheme and the same key hear you; most other DMR radios cannot. Encryption is not allowed on amateur frequencies.";
-    private static final String H_KEY = "Exactly 8 characters, the same on every radio in the group. Used only when Encrypt is Enabled.";
-    private static final String H_INT = "DMR transmit interrupt. ON allows a call in progress to be interrupted (for example by the radio you are calling) on radios that support it; when it is refused the radio reports that the called device does not allow interruption. OFF is the stock setting.";
-    private static final String H_SQ = "The radio's own squelch, used when Soft SQ is off for this channel. 0 keeps it fully open: you hear static and the radio reports a reception all the time. 1 to 9 close it; on this radio they behave as one threshold, about −90 dBm.";
-    private static final String H_SOFTSQ = "Soft SQ holds the radio's squelch open and lets the app decide what you hear: the channel's CTCSS tone when it has one, otherwise a noise squelch that tells speech from static. It catches weaker stations than the radio's own squelch. The SOFT SQ key on the intercom switches it too.";
-    private static final String H_SOFTSQ_LVL = "How strict Soft SQ is, from 1 (lenient: opens on weaker, noisier signals) to 9 (strict: only clean signals). Same as the slider on the intercom.";
-    private static final String H_MAPS = "Open Maps shows this position (or yours) in your maps app. Find the place there and use Share \u2192 SignalDeck, or copy its coordinates or link and come back to tap Paste. Paste reads coordinates, geo: links and Google, Apple or OpenStreetMap links from the clipboard, following short share links.";
-    private static final String H_TXT = "A sub-audible tone sent with your transmission: CTCSS (a low tone, 62.5 to 254.1 Hz) or DCS (a digital code). Repeaters and radios that use tone squelch only open for the right one; a repeater's listing gives its access tone.";
-    private static final String H_TXC = "The CTCSS frequency or DCS code to send. Tap to pick from the list.";
-    private static final String H_RXT = "Only signals carrying this tone open the squelch, so other users on the frequency stay quiet. With Soft SQ on, the app checks the CTCSS tone itself; DCS is checked by the radio.";
-    private static final String H_RXC = "The CTCSS frequency or DCS code to listen for. Tap to pick from the list.";
+    private static String H_NOTES() { return Txt.s(R.string.channel_editor_h_notes); }
+    private static String H_NAME() { return Txt.s(R.string.channel_editor_h_name, ChannelStore.NAME_MAX); }
+    private static String H_TYPE() { return Txt.s(R.string.channel_editor_h_type); }
+    private static String H_M17() { return Txt.s(R.string.channel_editor_h_m17); }
+    private static String H_CAN() { return Txt.s(R.string.channel_editor_h_can); }
+    private static String H_TX() { return Txt.s(R.string.channel_editor_h_tx, com.macdmr.radio.DeviceProfile.detect().bandsText()); }
+    private static String H_RX() { return Txt.s(R.string.channel_editor_h_rx, com.macdmr.radio.DeviceProfile.detect().bandsText()); }
+    private static String H_POS() { return Txt.s(R.string.channel_editor_h_pos); }
+    private static String H_RXONLY() { return Txt.s(R.string.channel_editor_h_rxonly); }
+    private static String H_POWER() { return Txt.s(R.string.channel_editor_h_power); }
+    private static String H_BAND() { return Txt.s(R.string.channel_editor_h_band); }
+    private static String H_RELAY() { return Txt.s(R.string.channel_editor_h_relay); }
+    private static String H_CC() { return Txt.s(R.string.channel_editor_h_cc); }
+    private static String H_MODE() { return Txt.s(R.string.channel_editor_h_mode); }
+    private static String H_NOSLOT() { return Txt.s(R.string.channel_editor_h_noslot); }
+    private static String H_SLOT() { return Txt.s(R.string.channel_editor_h_slot); }
+    private static String H_CTYPE() { return Txt.s(R.string.channel_editor_h_ctype); }
+    private static String H_CALLFROM() { return Txt.s(R.string.channel_editor_h_callfrom); }
+    private static String H_CALLPICK() { return Txt.s(R.string.channel_editor_h_callpick); }
+    private static String H_CALL() { return Txt.s(R.string.channel_editor_h_call); }
+    private static String H_GROUPS() { return Txt.s(R.string.channel_editor_h_groups); }
+    private static String H_ENC() { return Txt.s(R.string.channel_editor_h_enc); }
+    private static String H_KEY() { return Txt.s(R.string.channel_editor_h_key); }
+    private static String H_INT() { return Txt.s(R.string.channel_editor_h_int); }
+    private static String H_SQ() { return Txt.s(R.string.channel_editor_h_sq); }
+    private static String H_SOFTSQ() { return Txt.s(R.string.channel_editor_h_softsq); }
+    private static String H_SOFTSQ_LVL() { return Txt.s(R.string.channel_editor_h_softsq_lvl); }
+    private static String H_MAPS() { return Txt.s(R.string.channel_editor_h_maps); }
+    private static String H_TXT() { return Txt.s(R.string.channel_editor_h_txt); }
+    private static String H_TXC() { return Txt.s(R.string.channel_editor_h_txc); }
+    private static String H_RXT() { return Txt.s(R.string.channel_editor_h_rxt); }
+    private static String H_RXC() { return Txt.s(R.string.channel_editor_h_rxc); }
 
     public ChannelEditorView(Context c, ChannelStore.Channel channel, boolean isNew, Done done) {
         super(c);
@@ -94,11 +96,11 @@ public class ChannelEditorView extends LinearLayout {
         setClickable(true);
         float d = Theme.dp(c);
 
-        LinearLayout bar = Neo.header(c, isNew ? "New channel" : "Edit channel", isNew ? "Fill in and save" : "Channel " + ch.number);
-        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, "Back without saving"); back.setOnClickListener(v -> done.onDone(ch, false));
+        LinearLayout bar = Neo.header(c, Txt.s(isNew ? R.string.channel_editor_title_new : R.string.channel_editor_title_edit), isNew ? Txt.s(R.string.channel_editor_subtitle_new) : Txt.s(R.string.channel_editor_subtitle_number, ch.number));
+        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, Txt.s(R.string.channel_editor_cd_back)); back.setOnClickListener(v -> done.onDone(ch, false));
         LayoutParams bl = new LayoutParams((int) (44 * d), (int) (44 * d)); bl.rightMargin = (int) (12 * d);
         bar.addView(back, 0, bl);
-        TextView save = Neo.button(c, "Save", "check", Neo.GREEN); save.setMinHeight((int) (44 * d));
+        TextView save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN); save.setMinHeight((int) (44 * d));
         save.setOnClickListener(v -> { if (apply()) done.onDone(ch, true); });
         LayoutParams sl = new LayoutParams(LayoutParams.WRAP_CONTENT, (int) (44 * d)); sl.leftMargin = (int) (8 * d);
         ((LinearLayout) bar.findViewWithTag("actions")).addView(save, sl);
@@ -113,77 +115,77 @@ public class ChannelEditorView extends LinearLayout {
 
     private void build() {
         Context c = getContext(); float d = Theme.dp(c);
-        section(form, "Channel");
-        name = textInto(form, "Channel name", H_NAME, ch.name, InputType.TYPE_CLASS_TEXT);
+        section(form, Txt.s(R.string.channel_editor_sec_channel));
+        name = textInto(form, Txt.s(R.string.channel_editor_l_name), H_NAME(), ch.name, InputType.TYPE_CLASS_TEXT);
         nameCounter(name);
         if (com.macdmr.radio.DeviceProfile.detect().dmr() || ch.type != com.macdmr.radio.ChannelStore.Channel.TYPE_FM)   // an analog-only radio: every channel is analog (an old DMR channel can still be changed)
-            choiceInto(form, "Channel type", H_TYPE, new String[] { "Digital", "Analog", "M17" }, ch.type, v -> { ch.type = v; refreshGroups(); });
+            choiceInto(form, Txt.s(R.string.channel_editor_l_type), H_TYPE(), new String[] { Txt.s(R.string.channel_editor_o_digital), Txt.s(R.string.channel_editor_o_analog), "M17" }, ch.type, v -> { ch.type = v; refreshGroups(); });
         // receive first: repeater lists give the output (what you hear) and the offset
-        rx = textInto(form, "Receive frequency (MHz)", H_RX, ch.rxFreq > 0 ? String.format(Locale.US, "%.5f", ch.rxFreq / 1e6) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        tx = textInto(form, "Send frequency (MHz)", H_TX, ch.txFreq > 0 ? String.format(Locale.US, "%.5f", ch.txFreq / 1e6) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        rx = textInto(form, Txt.s(R.string.channel_editor_l_rx), H_RX(), ch.rxFreq > 0 ? String.format(Locale.US, "%.5f", ch.rxFreq / 1e6) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        tx = textInto(form, Txt.s(R.string.channel_editor_l_tx), H_TX(), ch.txFreq > 0 ? String.format(Locale.US, "%.5f", ch.txFreq / 1e6) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         form.addView(VfoDialog.bandPlanLine(getContext(), rx, tx));
 
-        section(form, "Radio");
-        choiceInto(form, "Power", H_POWER, new String[] { "Low power", "High power" }, ch.power, v -> ch.power = v);
-        choiceInto(form, "Transmit", H_RXONLY, new String[] { "Allowed", "Receive only" }, ch.rxOnly ? 1 : 0, v -> ch.rxOnly = v == 1);
-        if (com.macdmr.radio.DeviceProfile.detect().dmr()) choiceInto(form, "Relay (repeater)", H_RELAY, new String[] { "Disconnect", "Normal" }, ch.relay == 1 ? 0 : 1, v -> ch.relay = v == 0 ? 1 : 2);
+        section(form, Txt.s(R.string.channel_editor_sec_radio));
+        choiceInto(form, Txt.s(R.string.channel_editor_l_power), H_POWER(), new String[] { Txt.s(R.string.channel_editor_o_low_power), Txt.s(R.string.channel_editor_o_high_power) }, ch.power, v -> ch.power = v);
+        choiceInto(form, Txt.s(R.string.channel_editor_l_transmit), H_RXONLY(), new String[] { Txt.s(R.string.channel_editor_o_allowed), Txt.s(R.string.channel_editor_o_rx_only) }, ch.rxOnly ? 1 : 0, v -> ch.rxOnly = v == 1);
+        if (com.macdmr.radio.DeviceProfile.detect().dmr()) choiceInto(form, Txt.s(R.string.channel_editor_l_relay), H_RELAY(), new String[] { Txt.s(R.string.channel_editor_o_disconnect), Txt.s(R.string.channel_editor_o_normal) }, ch.relay == 1 ? 0 : 1, v -> ch.relay = v == 0 ? 1 : 2);
 
         digitalGroup = new LinearLayout(c); digitalGroup.setOrientation(VERTICAL); form.addView(digitalGroup);
-        section(digitalGroup, "DMR");
-        choiceInto(digitalGroup, "Color code", H_CC, names(0, 15), ch.cc, v -> ch.cc = v);
+        section(digitalGroup, "DMR");   // i18n: mode name
+        choiceInto(digitalGroup, Txt.s(R.string.channel_editor_l_cc), H_CC(), names(0, 15), ch.cc, v -> ch.cc = v);
         if (com.macdmr.radio.DeviceProfile.detect().timeSlots) {
-            choiceInto(digitalGroup, "Mode", H_MODE, new String[] { "Direct", "Double slot" }, ch.mode == 4 ? 1 : 0, v -> ch.mode = v == 1 ? 4 : 0);
-            choiceInto(digitalGroup, "Time slot", H_SLOT, new String[] { "TS1", "TS2" }, ch.inSlot, v -> { ch.inSlot = v; ch.outSlot = v; });
+            choiceInto(digitalGroup, Txt.s(R.string.channel_editor_l_mode), H_MODE(), new String[] { Txt.s(R.string.channel_editor_o_direct), Txt.s(R.string.channel_editor_o_double_slot) }, ch.mode == 4 ? 1 : 0, v -> ch.mode = v == 1 ? 4 : 0);
+            choiceInto(digitalGroup, Txt.s(R.string.channel_editor_l_slot), H_SLOT(), new String[] { "TS1", "TS2" }, ch.inSlot, v -> { ch.inSlot = v; ch.outSlot = v; });
         } else {                                                     // the Armor 3WT: its module's channel has no slot field
-            TextView noSlot = Neo.text(c, H_NOSLOT, Neo.DIM, 13, Neo.uiMedium(c)); noSlot.setPadding((int) (4 * d), (int) (6 * d), (int) (4 * d), (int) (6 * d));
+            TextView noSlot = Neo.text(c, H_NOSLOT(), Neo.DIM, 13, Neo.uiMedium(c)); noSlot.setPadding((int) (4 * d), (int) (6 * d), (int) (4 * d), (int) (6 * d));
             digitalGroup.addView(noSlot);
         }
-        choiceInto(digitalGroup, "Contact type", H_CTYPE, new String[] { "Private", "Group", "All" }, ch.contactType, v -> { ch.contactType = v; showCallSource(); });
+        choiceInto(digitalGroup, Txt.s(R.string.channel_editor_l_ctype), H_CTYPE(), new String[] { Txt.s(R.string.channel_editor_o_private), Txt.s(R.string.channel_editor_o_group), Txt.s(R.string.channel_editor_o_all) }, ch.contactType, v -> { ch.contactType = v; showCallSource(); });
         callFromContacts = contactFor(ch.txContact, ch.contactType) != null;
-        choiceInto(digitalGroup, "Call number from", H_CALLFROM, new String[] { "Typed number", "Contacts" }, callFromContacts ? 1 : 0, v -> { callFromContacts = v == 1; showCallSource(); });
-        call = textInto(digitalGroup, "Call number (DMR ID / talkgroup)", H_CALL, ch.txContact > 0 ? String.valueOf(ch.txContact) : "", InputType.TYPE_CLASS_NUMBER);
+        choiceInto(digitalGroup, Txt.s(R.string.channel_editor_l_callfrom), H_CALLFROM(), new String[] { Txt.s(R.string.channel_editor_o_typed), Txt.s(R.string.channel_editor_o_contacts) }, callFromContacts ? 1 : 0, v -> { callFromContacts = v == 1; showCallSource(); });
+        call = textInto(digitalGroup, Txt.s(R.string.channel_editor_l_call), H_CALL(), ch.txContact > 0 ? String.valueOf(ch.txContact) : "", InputType.TYPE_CLASS_NUMBER);
         callTypedRow = (View) call.getParent().getParent();
-        callPickV = choiceInto(digitalGroup, "Contact", H_CALLPICK, null, 0, null);
+        callPickV = choiceInto(digitalGroup, Txt.s(R.string.channel_editor_l_callpick), H_CALLPICK(), null, 0, null);
         callPickRow = (View) callPickV.getParent();
         callPickV.setOnClickListener(v -> pickCallContact()); callPickRow.setOnClickListener(v -> pickCallContact());
         showCallSource();
-        groups = textInto(digitalGroup, "RX group list (talkgroups, comma separated, up to 32)", H_GROUPS, join(ch.groups), InputType.TYPE_CLASS_TEXT);
-        TextView lists = Neo.button(c, "Talkgroup lists\u2026", "channels", Neo.VIOLET); lists.setTextSize(14);
+        groups = textInto(digitalGroup, Txt.s(R.string.channel_editor_l_groups), H_GROUPS(), join(ch.groups), InputType.TYPE_CLASS_TEXT);
+        TextView lists = Neo.button(c, Txt.s(R.string.channel_editor_tg_lists_button), "channels", Neo.VIOLET); lists.setTextSize(14);
         LayoutParams tll = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); tll.bottomMargin = (int) (6 * Theme.dp(c));
         digitalGroup.addView(lists, tll);
         lists.setOnClickListener(v -> tgListsMenu());
-        choiceInto(digitalGroup, "Encrypt", H_ENC, new String[] { "Disabled", "Enabled" }, ch.encryptSw == 1 ? 1 : 0, v -> ch.encryptSw = v == 1 ? 1 : 2);
-        key = textInto(digitalGroup, "Encrypt key (8 characters)", H_KEY, ch.encryptKey == null ? "" : ch.encryptKey, InputType.TYPE_CLASS_TEXT);
-        choiceInto(digitalGroup, "Interrupt transmission", H_INT, new String[] { "OFF", "ON" }, ch.interrupt == 1 ? 1 : 0, v -> ch.interrupt = v == 1 ? 1 : 2);
+        choiceInto(digitalGroup, Txt.s(R.string.channel_editor_l_enc), H_ENC(), new String[] { Txt.s(R.string.channel_editor_o_disabled), Txt.s(R.string.channel_editor_o_enabled) }, ch.encryptSw == 1 ? 1 : 0, v -> ch.encryptSw = v == 1 ? 1 : 2);
+        key = textInto(digitalGroup, Txt.s(R.string.channel_editor_l_key), H_KEY(), ch.encryptKey == null ? "" : ch.encryptKey, InputType.TYPE_CLASS_TEXT);
+        choiceInto(digitalGroup, Txt.s(R.string.channel_editor_l_int), H_INT(), new String[] { Txt.s(R.string.channel_editor_o_int_off), Txt.s(R.string.channel_editor_o_int_on) }, ch.interrupt == 1 ? 1 : 0, v -> ch.interrupt = v == 1 ? 1 : 2);
 
         analogGroup = new LinearLayout(c); analogGroup.setOrientation(VERTICAL); form.addView(analogGroup);
-        section(analogGroup, "Analog");
-        choiceInto(analogGroup, "Band", H_BAND, new String[] { "Narrow band", "Wide band" }, ch.band == 0 ? 0 : 1, v -> ch.band = v);
-        choiceInto(analogGroup, "Soft SQ", H_SOFTSQ, new String[] { "Off", "On" }, ch.softSq ? 1 : 0, v -> ch.softSq = v == 1);
-        choiceInto(analogGroup, "Soft SQ level", H_SOFTSQ_LVL, names(1, 9), Math.max(1, Math.min(9, ch.softSqLevel)) - 1, v -> ch.softSqLevel = v + 1);
-        choiceInto(analogGroup, "Squelch level", H_SQ, names(0, 9), ch.sq, v -> ch.sq = v);
-        choiceInto(analogGroup, "TX tone type", H_TXT, TONE_TYPES, ch.txType, v -> { ch.txType = v; ch.txSubCode = 0; txCodeV.setText(toneName(ch.txType, ch.txSubCode)); });
-        txCodeV = choiceInto(analogGroup, "TX tone", H_TXC, null, 0, null);
+        section(analogGroup, Txt.s(R.string.channel_editor_sec_analog));
+        choiceInto(analogGroup, Txt.s(R.string.channel_editor_l_band), H_BAND(), new String[] { Txt.s(R.string.channel_editor_o_narrow), Txt.s(R.string.channel_editor_o_wide) }, ch.band == 0 ? 0 : 1, v -> ch.band = v);
+        choiceInto(analogGroup, Txt.s(R.string.channel_editor_l_softsq), H_SOFTSQ(), new String[] { Txt.s(R.string.common_off), Txt.s(R.string.common_on) }, ch.softSq ? 1 : 0, v -> ch.softSq = v == 1);
+        choiceInto(analogGroup, Txt.s(R.string.channel_editor_l_softsq_level), H_SOFTSQ_LVL(), names(1, 9), Math.max(1, Math.min(9, ch.softSqLevel)) - 1, v -> ch.softSqLevel = v + 1);
+        choiceInto(analogGroup, Txt.s(R.string.channel_editor_l_sq), H_SQ(), names(0, 9), ch.sq, v -> ch.sq = v);
+        choiceInto(analogGroup, Txt.s(R.string.channel_editor_l_tx_tone_type), H_TXT(), toneTypes(), ch.txType, v -> { ch.txType = v; ch.txSubCode = 0; txCodeV.setText(toneName(ch.txType, ch.txSubCode)); });
+        txCodeV = choiceInto(analogGroup, Txt.s(R.string.channel_editor_l_tx_tone), H_TXC(), null, 0, null);
         txCodeV.setOnClickListener(v -> pickTone(true)); ((View) txCodeV.getParent()).setOnClickListener(v -> pickTone(true));
-        choiceInto(analogGroup, "RX tone type", H_RXT, TONE_TYPES, ch.rxType, v -> { ch.rxType = v; ch.rxSubCode = 0; rxCodeV.setText(toneName(ch.rxType, ch.rxSubCode)); });
-        rxCodeV = choiceInto(analogGroup, "RX tone", H_RXC, null, 0, null);
+        choiceInto(analogGroup, Txt.s(R.string.channel_editor_l_rx_tone_type), H_RXT(), toneTypes(), ch.rxType, v -> { ch.rxType = v; ch.rxSubCode = 0; rxCodeV.setText(toneName(ch.rxType, ch.rxSubCode)); });
+        rxCodeV = choiceInto(analogGroup, Txt.s(R.string.channel_editor_l_rx_tone), H_RXC(), null, 0, null);
         rxCodeV.setOnClickListener(v -> pickTone(false)); ((View) rxCodeV.getParent()).setOnClickListener(v -> pickTone(false));
         txCodeV.setText(toneName(ch.txType, ch.txSubCode)); rxCodeV.setText(toneName(ch.rxType, ch.rxSubCode));
 
         m17Group = new LinearLayout(c); m17Group.setOrientation(VERTICAL); form.addView(m17Group);
-        section(m17Group, "M17");
-        m17Dest = textInto(m17Group, "Destination (@ALL or a callsign)", H_M17, ch.m17Dest(), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-        TextView pick = Neo.button(c, "Pick from contacts\u2026", "contacts", Neo.VIOLET); pick.setTextSize(14);
+        section(m17Group, "M17");   // i18n: mode name
+        m17Dest = textInto(m17Group, Txt.s(R.string.channel_editor_l_m17dest), H_M17(), ch.m17Dest(), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+        TextView pick = Neo.button(c, Txt.s(R.string.channel_editor_pick_contacts), "contacts", Neo.VIOLET); pick.setTextSize(14);
         LayoutParams mpl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); mpl.bottomMargin = (int) (6 * Theme.dp(c));
         m17Group.addView(pick, mpl);
         pick.setOnClickListener(v -> pickM17Dest());
-        choiceInto(m17Group, "Channel access number", H_CAN, names(0, 15), ch.can(), v -> ch.cc = v);
+        choiceInto(m17Group, Txt.s(R.string.channel_editor_l_can), H_CAN(), names(0, 15), ch.can(), v -> ch.cc = v);
 
-        section(form, "Location");
-        lat = textInto(form, "Latitude (optional)", H_POS + "\n\n" + H_MAPS, ch.lat != 0 || ch.lon != 0 ? String.format(Locale.US, "%.5f", ch.lat) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
-        lon = textInto(form, "Longitude (optional)", H_POS, ch.lat != 0 || ch.lon != 0 ? String.format(Locale.US, "%.5f", ch.lon) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        section(form, Txt.s(R.string.channel_editor_sec_location));
+        lat = textInto(form, Txt.s(R.string.channel_editor_l_lat), H_POS() + "\n\n" + H_MAPS(), ch.lat != 0 || ch.lon != 0 ? String.format(Locale.US, "%.5f", ch.lat) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        lon = textInto(form, Txt.s(R.string.channel_editor_l_lon), H_POS(), ch.lat != 0 || ch.lon != 0 ? String.format(Locale.US, "%.5f", ch.lon) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
         LinearLayout locRow = new LinearLayout(c); locRow.setBaselineAligned(false);
-        TextView here = Neo.button(c, "My position", "radio", Neo.CYAN), maps = Neo.button(c, "Open Maps", "globe", Neo.GREEN), paste = Neo.button(c, "Paste", "import", Neo.AMBER);
+        TextView here = Neo.button(c, Txt.s(R.string.channel_editor_my_position), "radio", Neo.CYAN), maps = Neo.button(c, Txt.s(R.string.channel_editor_open_maps), "globe", Neo.GREEN), paste = Neo.button(c, Txt.s(R.string.channel_editor_paste), "import", Neo.AMBER);
         for (TextView b : new TextView[] { here, maps, paste }) { b.setTextSize(13.5f); b.setPadding((int) (6 * d), (int) (8 * d), (int) (6 * d), (int) (8 * d)); b.setCompoundDrawablePadding((int) (4 * d)); b.setSingleLine(true); }
         LayoutParams b1 = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1.15f); b1.rightMargin = (int) (3 * d);
         LayoutParams b2 = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1.15f); b2.leftMargin = (int) (3 * d); b2.rightMargin = (int) (3 * d);
@@ -194,22 +196,22 @@ public class ChannelEditorView extends LinearLayout {
         here.setOnClickListener(v -> {
             android.location.Location me = null;
             try { android.location.LocationManager lm = (android.location.LocationManager) c.getSystemService(Context.LOCATION_SERVICE); for (String p : new String[] { "gps", "network", "passive" }) { try { android.location.Location l = lm.getLastKnownLocation(p); if (l != null && (me == null || l.getTime() > me.getTime())) me = l; } catch (SecurityException ignored) { } } } catch (Throwable ignored) { }
-            if (me == null) { android.widget.Toast.makeText(c, "No position fix yet", android.widget.Toast.LENGTH_SHORT).show(); return; }
+            if (me == null) { android.widget.Toast.makeText(c, Txt.s(R.string.channel_editor_no_fix), android.widget.Toast.LENGTH_SHORT).show(); return; }
             lat.setText(String.format(Locale.US, "%.5f", me.getLatitude())); lon.setText(String.format(Locale.US, "%.5f", me.getLongitude()));
         });
         LayoutParams hl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); hl.topMargin = (int) (2 * d); form.addView(locRow, hl);
-        TextView how = Neo.text(c, "Pick a place in your maps app: Open Maps, find the place, then Share \u2192 SignalDeck. Or copy its coordinates or link and tap Paste.", Neo.DIM, 13, Neo.uiMedium(c));
+        TextView how = Neo.text(c, Txt.s(R.string.channel_editor_location_how), Neo.DIM, 13, Neo.uiMedium(c));
         how.setLineSpacing(0, 1.1f); how.setPadding((int) (4 * d), (int) (8 * d), (int) (4 * d), 0); form.addView(how);
 
-        section(form, "Notes");
-        notes = textInto(form, "Notes (optional)", H_NOTES, ch.notes == null ? "" : ch.notes, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        section(form, Txt.s(R.string.channel_editor_sec_notes));
+        notes = textInto(form, Txt.s(R.string.channel_editor_l_notes), H_NOTES(), ch.notes == null ? "" : ch.notes, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         notes.setSingleLine(false); notes.setMinLines(2); notes.setMaxLines(8);
 
-        section(form, "Nets on this channel");
+        section(form, Txt.s(R.string.channel_editor_sec_nets));
         netsBox = new LinearLayout(c); netsBox.setOrientation(VERTICAL); form.addView(netsBox);
         refreshNets();
         refreshGroups();
-        section(form, "History");
+        section(form, Txt.s(R.string.channel_editor_sec_history));
         historyBox = new LinearLayout(c); historyBox.setOrientation(VERTICAL); form.addView(historyBox);
         refreshHistory();
     }
@@ -220,8 +222,8 @@ public class ChannelEditorView extends LinearLayout {
     private void refreshHistory() {
         final Context c = getContext(); float d = Theme.dp(c);
         historyBox.removeAllViews();
-        if (isNew || svc == null) { TextView t = Neo.text(c, isNew ? "Once the channel is saved, everything heard and sent on it is listed here." : "Take over the radio to see the history.", Neo.DIM, 13, Neo.uiMedium(c)); t.setPadding((int) (4 * d), (int) (4 * d), (int) (4 * d), 0); historyBox.addView(t); return; }
-        try { ChannelHistoryDialog.fill(c, svc, ch, historyBox, 100, this::refreshHistory); } catch (Throwable t) { historyBox.addView(Neo.text(c, "History not available: " + t.getMessage(), Neo.DIM, 13, Neo.uiMedium(c))); }
+        if (isNew || svc == null) { TextView t = Neo.text(c, Txt.s(isNew ? R.string.channel_editor_history_new : R.string.channel_editor_history_no_service), Neo.DIM, 13, Neo.uiMedium(c)); t.setPadding((int) (4 * d), (int) (4 * d), (int) (4 * d), 0); historyBox.addView(t); return; }
+        try { ChannelHistoryDialog.fill(c, svc, ch, historyBox, 100, this::refreshHistory); } catch (Throwable t) { historyBox.addView(Neo.text(c, Txt.s(R.string.channel_editor_history_failed, String.valueOf(t.getMessage())), Neo.DIM, 13, Neo.uiMedium(c))); }
     }
 
     /** Nets the owner added to this channel: tap one to edit or delete it, Add a net for another. */
@@ -229,40 +231,41 @@ public class ChannelEditorView extends LinearLayout {
     private void refreshNets() {
         final Context c = getContext(); float d = Theme.dp(c);
         netsBox.removeAllViews();
-        if (isNew) { TextView t = Neo.text(c, "Save the channel first, then add the nets held on it.", Neo.DIM, 13, Neo.uiMedium(c)); t.setPadding((int) (4 * d), (int) (4 * d), (int) (4 * d), 0); netsBox.addView(t); return; }
+        if (isNew) { TextView t = Neo.text(c, Txt.s(R.string.channel_editor_nets_new), Neo.DIM, 13, Neo.uiMedium(c)); t.setPadding((int) (4 * d), (int) (4 * d), (int) (4 * d), 0); netsBox.addView(t); return; }
         for (final com.macdmr.radio.ham.NetFinder.Manual m : com.macdmr.radio.NetWatch.manualOn(c, ch.id)) {
             LinearLayout r = new LinearLayout(c); r.setOrientation(VERTICAL); r.setBackground(Neo.rowCard(c)); r.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d));
             r.addView(Neo.text(c, m.name, Neo.AMBER_LIGHT, 15.5f, Neo.ui(c)));
-            r.addView(Neo.text(c, com.macdmr.radio.ham.NetFinder.when(m) + " · " + m.durationMin + " min" + (m.notes.isEmpty() ? "" : " · " + m.notes) + " · tap to edit", Neo.MUTED, 12.5f, Neo.uiMedium(c)));
-            r.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle(m.name).setItems(new String[] { "Edit", "Delete" }, (dd, w) -> {
+            r.addView(Neo.text(c, m.notes.isEmpty() ? Txt.s(R.string.channel_editor_net_line, com.macdmr.radio.ham.NetFinder.when(m), m.durationMin)
+                    : Txt.s(R.string.channel_editor_net_line_notes, com.macdmr.radio.ham.NetFinder.when(m), m.durationMin, m.notes), Neo.MUTED, 12.5f, Neo.uiMedium(c)));
+            r.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle(m.name).setItems(new String[] { Txt.s(R.string.common_edit), Txt.s(R.string.common_delete) }, (dd, w) -> {
                 if (w == 0) NetsDialog.editManual(c, null, m, this::refreshNets);
                 else { com.macdmr.radio.NetWatch.deleteManual(c, m.id); refreshNets(); }
             }).show());
             LayoutParams rl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); rl.topMargin = (int) (6 * d);
             netsBox.addView(r, rl);
         }
-        TextView add = Neo.button(c, "Add a net", "plus", Neo.AMBER);
+        TextView add = Neo.button(c, Txt.s(R.string.channel_editor_add_net), "plus", Neo.AMBER);
         LayoutParams al = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); al.topMargin = (int) (8 * d);
         netsBox.addView(add, al);
         add.setOnClickListener(v -> { com.macdmr.radio.ham.NetFinder.Manual m = new com.macdmr.radio.ham.NetFinder.Manual(); m.channel = ch.number; m.channelId = ch.id; NetsDialog.editManual(c, null, m, this::refreshNets); });
-        TextView how = Neo.text(c, "A net or get-together held on this channel. It shows in Nets near you (Intercom menu), with an optional reminder 10 minutes before.", Neo.DIM, 13, Neo.uiMedium(c));
+        TextView how = Neo.text(c, Txt.s(R.string.channel_editor_nets_how), Neo.DIM, 13, Neo.uiMedium(c));
         how.setPadding((int) (4 * d), (int) (8 * d), (int) (4 * d), 0); netsBox.addView(how);
     }
 
     /** A position chosen elsewhere (shared from a maps app): fill the fields; Save keeps it. */
     public void setLocation(double la, double lo) {
         lat.setText(String.format(Locale.US, "%.5f", la)); lon.setText(String.format(Locale.US, "%.5f", lo));
-        android.widget.Toast.makeText(getContext(), "Location filled in: tap Save to keep it", android.widget.Toast.LENGTH_LONG).show();
+        android.widget.Toast.makeText(getContext(), Txt.s(R.string.channel_editor_location_filled), android.widget.Toast.LENGTH_LONG).show();
     }
 
     private void openMaps() {
         Context c = getContext();
         double la = 0, lo = 0;
         try { la = Double.parseDouble(lat.getText().toString().trim()); lo = Double.parseDouble(lon.getText().toString().trim()); } catch (Throwable ignored) { }
-        String label = android.net.Uri.encode(ch.name == null || ch.name.isEmpty() ? "Channel" : ch.name);
+        String label = android.net.Uri.encode(ch.name == null || ch.name.isEmpty() ? Txt.s(R.string.channel_editor_maps_label) : ch.name);
         android.net.Uri u = la != 0 || lo != 0 ? android.net.Uri.parse("geo:" + la + "," + lo + "?q=" + la + "," + lo + "(" + label + ")") : android.net.Uri.parse("geo:0,0?q=");
-        try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, u)); android.widget.Toast.makeText(c, "Find the place, then Share \u2192 SignalDeck (or copy it and tap Paste)", android.widget.Toast.LENGTH_LONG).show(); }
-        catch (Throwable t) { android.widget.Toast.makeText(c, "No maps app is installed", android.widget.Toast.LENGTH_LONG).show(); }
+        try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, u)); android.widget.Toast.makeText(c, Txt.s(R.string.channel_editor_maps_how), android.widget.Toast.LENGTH_LONG).show(); }
+        catch (Throwable t) { android.widget.Toast.makeText(c, Txt.s(R.string.channel_editor_no_maps), android.widget.Toast.LENGTH_LONG).show(); }
     }
 
     private void pasteLocation() {
@@ -270,11 +273,11 @@ public class ChannelEditorView extends LinearLayout {
         android.content.ClipboardManager cm = (android.content.ClipboardManager) c.getSystemService(Context.CLIPBOARD_SERVICE);
         CharSequence clip = null;
         try { if (cm != null && cm.hasPrimaryClip() && cm.getPrimaryClip().getItemCount() > 0) clip = cm.getPrimaryClip().getItemAt(0).coerceToText(c); } catch (Throwable ignored) { }
-        if (clip == null || clip.length() == 0) { android.widget.Toast.makeText(c, "The clipboard is empty: copy a place's coordinates or link in your maps app first", android.widget.Toast.LENGTH_LONG).show(); return; }
+        if (clip == null || clip.length() == 0) { android.widget.Toast.makeText(c, Txt.s(R.string.channel_editor_clipboard_empty), android.widget.Toast.LENGTH_LONG).show(); return; }
         final String text = clip.toString();
         new Thread(() -> {
             final double[] p = com.macdmr.radio.GeoLink.resolve(text);
-            post(() -> { if (p == null) android.widget.Toast.makeText(c, "No coordinates found in the copied text", android.widget.Toast.LENGTH_LONG).show(); else setLocation(p[0], p[1]); });
+            post(() -> { if (p == null) android.widget.Toast.makeText(c, Txt.s(R.string.channel_editor_clipboard_no_coords), android.widget.Toast.LENGTH_LONG).show(); else setLocation(p[0], p[1]); });
         }).start();
     }
 
@@ -292,24 +295,24 @@ public class ChannelEditorView extends LinearLayout {
         final List<com.macdmr.radio.ChannelStore.TgList> all = store.tgLists();
         String[] items = new String[all.size() + 1];
         for (int i = 0; i < all.size(); i++) items[i] = all.get(i).name + "  (" + all.get(i).tgs.length + ")";
-        items[all.size()] = "Save this RX list as a new list\u2026";
-        new android.app.AlertDialog.Builder(c).setTitle("Talkgroup lists").setItems(items, (d, w) -> {
+        items[all.size()] = Txt.s(R.string.channel_editor_tg_save_item);
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.channel_editor_tg_lists_title)).setItems(items, (d, w) -> {
             if (w < all.size()) {
                 List<Integer> g = groupsInField(); int added = 0;
                 for (int t : all.get(w).tgs) if (!g.contains(t) && g.size() < 32) { g.add(t); added++; }
                 StringBuilder b = new StringBuilder(); for (int t : g) { if (b.length() > 0) b.append(", "); b.append(t); }
                 groups.setText(b.toString());
-                android.widget.Toast.makeText(c, added + " talkgroups added" + (g.size() >= 32 ? " (the radio holds 32)" : "") + ": tap Save to keep them", android.widget.Toast.LENGTH_LONG).show();
+                android.widget.Toast.makeText(c, Txt.p(g.size() >= 32 ? R.plurals.channel_editor_tg_added_full : R.plurals.channel_editor_tg_added, added, added), android.widget.Toast.LENGTH_LONG).show();
                 return;
             }
-            final EditText nm = new EditText(c); nm.setHint("List name");
-            new android.app.AlertDialog.Builder(c).setTitle("Save talkgroup list").setView(nm).setPositiveButton("Save", (d2, w2) -> {
+            final EditText nm = new EditText(c); nm.setHint(Txt.s(R.string.channel_editor_tg_list_name));
+            new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.channel_editor_tg_save_title)).setView(nm).setPositiveButton(Txt.s(R.string.common_save), (d2, w2) -> {
                 List<Integer> g = groupsInField(); if (g.isEmpty() || nm.getText().toString().trim().isEmpty()) return;
                 com.macdmr.radio.ChannelStore.TgList t = new com.macdmr.radio.ChannelStore.TgList(); t.name = nm.getText().toString().trim();
                 t.tgs = new int[g.size()]; for (int i = 0; i < g.size(); i++) t.tgs[i] = g.get(i);
                 store.saveTgList(t);
-                android.widget.Toast.makeText(c, "Saved \u201C" + t.name + "\u201D", android.widget.Toast.LENGTH_SHORT).show();
-            }).setNegativeButton("Cancel", null).show();
+                android.widget.Toast.makeText(c, Txt.s(R.string.channel_editor_tg_saved, t.name), android.widget.Toast.LENGTH_SHORT).show();
+            }).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
         }).show();
     }
 
@@ -335,20 +338,20 @@ public class ChannelEditorView extends LinearLayout {
         callPickRow.setVisibility(callFromContacts ? VISIBLE : GONE);
         com.macdmr.radio.ChannelStore.Contact ct = contactFor(typedCall(), ch.contactType);
         int n = typedCall();
-        callPickV.setText(ct != null ? ct.name + " · " + ct.number : n > 0 ? n + " (not in contacts)" : "Choose…");
+        callPickV.setText(ct != null ? ct.name + " · " + ct.number : n > 0 ? Txt.s(R.string.channel_editor_call_not_contact, n) : Txt.s(R.string.channel_editor_choose));
     }
     private void pickCallContact() {
         final java.util.List<com.macdmr.radio.ChannelStore.Contact> all = callContacts(ch.contactType);
-        String kind = ch.contactType == 0 ? "private" : "group";
+        boolean priv = ch.contactType == 0;
         if (all.isEmpty()) {
-            new android.app.AlertDialog.Builder(getContext()).setTitle("No " + kind + " contacts")
-                    .setMessage("Add them on the Contacts page (type " + (ch.contactType == 0 ? "Private" : "Group") + "), or switch Call number from back to Typed number.")
-                    .setPositiveButton("OK", null).show();
+            new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(priv ? R.string.channel_editor_no_private : R.string.channel_editor_no_group))
+                    .setMessage(Txt.s(priv ? R.string.channel_editor_no_private_msg : R.string.channel_editor_no_group_msg))
+                    .setPositiveButton(Txt.s(R.string.common_ok), null).show();
             return;
         }
         String[] items = new String[all.size()];
         for (int i = 0; i < items.length; i++) items[i] = all.get(i).name + "  ·  " + all.get(i).number;
-        new android.app.AlertDialog.Builder(getContext()).setTitle(ch.contactType == 0 ? "Private contacts" : "Group contacts (talkgroups)")
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(ch.contactType == 0 ? R.string.channel_editor_private_contacts : R.string.channel_editor_group_contacts))
                 .setItems(items, (d, w) -> { call.setText(String.valueOf(all.get(w).number)); showCallSource(); }).show();
     }
 
@@ -357,13 +360,13 @@ public class ChannelEditorView extends LinearLayout {
         if (!(c instanceof com.macdmr.radio.MainActivity) || ((com.macdmr.radio.MainActivity) c).service() == null) return;
         final java.util.List<com.macdmr.radio.ChannelStore.Contact> all = ((com.macdmr.radio.MainActivity) c).service().store().contacts();
         final java.util.List<String> calls = new java.util.ArrayList<>();
-        calls.add("@ALL");
+        calls.add("@ALL");   // i18n: M17 protocol word
         for (com.macdmr.radio.ChannelStore.Contact ct : all) {
             String call = ct.baseCall();
             if (!call.isEmpty() && !calls.contains(call)) calls.add(call);
         }
         String[] items = calls.toArray(new String[0]);
-        new android.app.AlertDialog.Builder(c).setTitle("M17 destination").setItems(items, (d, w) -> m17Dest.setText(items[w])).show();
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.channel_editor_m17_dest_title)).setItems(items, (d, w) -> m17Dest.setText(items[w])).show();
     }
 
     private void refreshGroups() {
@@ -375,17 +378,17 @@ public class ChannelEditorView extends LinearLayout {
     private static String[] names(int from, int to) { String[] s = new String[to - from + 1]; for (int i = from; i <= to; i++) s[i - from] = String.valueOf(i); return s; }
     private static String join(int[] a) { StringBuilder b = new StringBuilder(); for (int x : a) { if (b.length() > 0) b.append(", "); b.append(x); } return b.toString(); }
     private static String toneName(int type, int code) {
-        if (type == 1) return com.macdmr.radio.dsp.ToneTable.ctcssHz(code) > 0 ? com.macdmr.radio.dsp.ToneTable.ctcssLabel(code) : "CTCSS #" + code;
-        if (type == 2 || type == 3) { String l = com.macdmr.radio.dsp.ToneTable.toneLabel(type, code); return l.equals("—") ? "DCS #" + code : "DCS " + l; }
+        if (type == 1) return com.macdmr.radio.dsp.ToneTable.ctcssHz(code) > 0 ? com.macdmr.radio.dsp.ToneTable.ctcssLabel(code) : "CTCSS #" + code;   // i18n: protocol word
+        if (type == 2 || type == 3) { String l = com.macdmr.radio.dsp.ToneTable.toneLabel(type, code); return l.equals("—") ? "DCS #" + code : "DCS " + l; }   // i18n: protocol word
         return "—";
     }
 
     private void pickTone(final boolean txSide) {
         int type = txSide ? ch.txType : ch.rxType;
-        if (type == 0) { android.widget.Toast.makeText(getContext(), "Choose CTCSS or DCS in the tone type above first", android.widget.Toast.LENGTH_SHORT).show(); return; }
+        if (type == 0) { android.widget.Toast.makeText(getContext(), Txt.s(R.string.channel_editor_tone_type_first), android.widget.Toast.LENGTH_SHORT).show(); return; }
         final String[] items; final int n = type == 1 ? com.macdmr.radio.dsp.ToneTable.CTCSS.length : com.macdmr.radio.dsp.ToneTable.DCS_COUNT;
         items = new String[n]; for (int i = 0; i < n; i++) items[i] = toneName(type, i);
-        new android.app.AlertDialog.Builder(getContext()).setTitle(txSide ? "TX tone" : "RX tone").setItems(items, (d, w) -> {
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(txSide ? R.string.channel_editor_l_tx_tone : R.string.channel_editor_l_rx_tone)).setItems(items, (d, w) -> {
             if (txSide) { ch.txSubCode = w; txCodeV.setText(items[w]); } else { ch.rxSubCode = w; rxCodeV.setText(items[w]); }
         }).show();
     }
@@ -402,7 +405,7 @@ public class ChannelEditorView extends LinearLayout {
     private ImageView infoButton(final String title, final String help) {
         Context c = getContext(); float d = Theme.dp(c);
         ImageView i = new ImageView(c); i.setImageDrawable(new Neo.IconDrawable("info", Neo.MUTED)); i.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        int p = (int) (11 * d); i.setPadding(p, p, p, p); i.setContentDescription("About " + title); i.setClickable(true); i.setFocusable(true);
+        int p = (int) (11 * d); i.setPadding(p, p, p, p); i.setContentDescription(Txt.s(R.string.channel_editor_cd_about, title)); i.setClickable(true); i.setFocusable(true);
         i.setOnClickListener(v -> showInfo(title, help));
         return i;
     }
@@ -419,7 +422,7 @@ public class ChannelEditorView extends LinearLayout {
         box.addView(top);
         TextView b = Neo.text(c, help, Neo.TEXT_SOFT, 15, Neo.uiMedium(c)); b.setLineSpacing(0, 1.18f); b.setPadding(0, (int) (12 * d), 0, 0);
         box.addView(b);
-        TextView ok = Neo.button(c, "Got it", null, Neo.CYAN);
+        TextView ok = Neo.button(c, Txt.s(R.string.channel_editor_got_it), null, Neo.CYAN);
         LayoutParams ol = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); ol.topMargin = (int) (16 * d);
         box.addView(ok, ol);
         ok.setOnClickListener(v -> dlg.dismiss());
@@ -492,42 +495,44 @@ public class ChannelEditorView extends LinearLayout {
     /** A typed number, or a plain message naming the field (Java's own says only "empty String" or "For input string"). */
     static double number(String text, String what) {
         String t = text == null ? "" : text.trim();
-        if (t.isEmpty()) throw new IllegalArgumentException("Enter " + what);
-        try { return Double.parseDouble(t); } catch (NumberFormatException e) { throw new IllegalArgumentException("\"" + t + "\" is not a number: check " + what); }
+        if (t.isEmpty()) throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_enter, what));
+        try { return Double.parseDouble(t); } catch (NumberFormatException e) { throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_not_number, t, what)); }
     }
     private boolean apply() {
         try {
             ch.name = ChannelStore.fitName(name.getText().toString());
             ch.notes = notes.getText().toString().trim();
-            ch.rxFreq = (int) Math.round(number(rx.getText().toString(), "the receive frequency (MHz)") * 1e6);
+            ch.rxFreq = (int) Math.round(number(rx.getText().toString(), Txt.s(R.string.channel_editor_what_rx)) * 1e6);
             String txs = tx.getText().toString().trim();
-            ch.txFreq = txs.isEmpty() ? ch.rxFreq : (int) Math.round(number(txs, "the send frequency (MHz)") * 1e6);   // empty: simplex
-            if (!ChannelStore.inBand(ch.rxFreq) || !ChannelStore.inBand(ch.txFreq)) throw new IllegalArgumentException("Frequencies must be inside " + com.macdmr.radio.DeviceProfile.detect().bandsText());
+            ch.txFreq = txs.isEmpty() ? ch.rxFreq : (int) Math.round(number(txs, Txt.s(R.string.channel_editor_what_tx)) * 1e6);   // empty: simplex
+            if (!ChannelStore.inBand(ch.rxFreq) || !ChannelStore.inBand(ch.txFreq)) throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_band, com.macdmr.radio.DeviceProfile.detect().bandsText()));
             if (ch.rxFreq < 300_000_000) ch.band = 1;                                  // VHF must be wide on this radio
             String la = lat.getText().toString().trim(), lo = lon.getText().toString().trim();
             if (la.isEmpty() && lo.isEmpty()) { ch.lat = 0; ch.lon = 0; }
-            else if (la.isEmpty() || lo.isEmpty()) throw new IllegalArgumentException("Enter both latitude and longitude, or leave both empty");
-            else { ch.lat = number(la, "the latitude"); ch.lon = number(lo, "the longitude"); if (Math.abs(ch.lat) > 90 || Math.abs(ch.lon) > 180) throw new IllegalArgumentException("Latitude must be within ±90 and longitude within ±180"); }
+            else if (la.isEmpty() || lo.isEmpty()) throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_both));
+            else { ch.lat = number(la, Txt.s(R.string.channel_editor_what_lat)); ch.lon = number(lo, Txt.s(R.string.channel_editor_what_lon)); if (Math.abs(ch.lat) > 90 || Math.abs(ch.lon) > 180) throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_latlon)); }
             if (ch.isM17()) {
                 ch.m17dest = com.macdmr.radio.ChannelStore.Channel.cleanM17Dest(m17Dest.getText().toString());
                 ch.band = 1;
                 ch.sq = 0;
                 ch.cc = ch.can();
             } else if (ch.isDigital()) {
-                ch.txContact = call.getText().toString().trim().isEmpty() ? 0 : (int) number(call.getText().toString(), "the call number");
+                ch.txContact = call.getText().toString().trim().isEmpty() ? 0 : (int) number(call.getText().toString(), Txt.s(R.string.channel_editor_what_call));
                 List<Integer> g = new ArrayList<>();
-                for (String s : groups.getText().toString().split("[,; ]+")) { s = s.trim(); if (!s.isEmpty()) g.add((int) number(s, "each RX group list entry")); }
+                for (String s : groups.getText().toString().split("[,; ]+")) { s = s.trim(); if (!s.isEmpty()) g.add((int) number(s, Txt.s(R.string.channel_editor_what_group))); }
                 // the radio passes a group call only if its talkgroup is in this list (measured on air 2026-10-15): include the call target
                 if (ch.contactType == 1 && ch.txContact > 0 && !g.contains(ch.txContact)) g.add(0, ch.txContact);
-                if (g.size() > 32) throw new IllegalArgumentException("At most 32 talkgroups in the RX list (including the call number)");
+                if (g.size() > 32) throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_groups));
                 ch.groups = new int[g.size()]; for (int i = 0; i < g.size(); i++) ch.groups[i] = g.get(i);
                 String k = key.getText().toString();
-                if (ch.encryptSw == 1 && k.length() != 8) throw new IllegalArgumentException("Encrypt key must be exactly 8 characters");
+                if (ch.encryptSw == 1 && k.length() != 8) throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_key));
                 ch.encryptKey = k;
             }
             return true;
         } catch (Exception e) {
-            new android.app.AlertDialog.Builder(getContext()).setTitle("Check the channel").setMessage(e.getMessage() == null ? e.toString() : e.getMessage()).setPositiveButton("OK", null).show();
+            new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.channel_editor_check_title)).setMessage(e.getMessage() == null ? e.toString() : e.getMessage()).setPositiveButton(Txt.s(R.string.common_ok), null).show();
+
+
             return false;
         }
     }

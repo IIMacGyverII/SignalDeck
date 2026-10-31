@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,14 +57,14 @@ public final class TalkgroupOverride {
     /** The intercom's list: the channel's programmed call, then every group contact (by name) not already listed. */
     public static List<Option> options(ChannelStore.Channel ch, List<ChannelStore.Contact> contacts) {
         List<Option> out = new ArrayList<>();
-        String kind = ch.contactType == 1 ? "TG " : ch.contactType == 2 ? "All " : "ID ";
+        String kind = ch.contactType == 1 ? "TG " : ch.contactType == 2 ? Txt.s(R.string.channels_tg_kind_all) + " " : "ID ";   // i18n: protocol words (TG, ID)
         String own = null;
         if (contacts != null) for (ChannelStore.Contact c : contacts) if (c.number == ch.txContact && c.type == (ch.contactType == 0 ? 0 : 1)) own = c.name;
-        out.add(new Option(ch.txContact, ch.contactType, kind + ch.txContact + (own != null && !own.isEmpty() ? "  " + own : "") + "  (programmed)", true));
+        out.add(new Option(ch.txContact, ch.contactType, Txt.s(R.string.channels_tg_programmed, kind + ch.txContact + (own != null && !own.isEmpty() ? "  " + own : "")), true));
         if (contacts != null) for (ChannelStore.Contact c : contacts) {
             if (c.type != 1 || c.number <= 0 || (c.number == ch.txContact && ch.contactType == 1)) continue;
             boolean dup = false; for (Option o : out) if (o.number == c.number && o.type == 1) dup = true;
-            if (!dup) out.add(new Option(c.number, 1, "TG " + c.number + (c.name.isEmpty() ? "" : "  " + c.name), false));
+            if (!dup) out.add(new Option(c.number, 1, "TG " + c.number + (c.name.isEmpty() ? "" : "  " + c.name), false));   // i18n: protocol word (TG) and data
         }
         return out;
     }

@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -119,9 +120,9 @@ public final class ChannelStore extends SQLiteOpenHelper {
 
     @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE channels (_id INTEGER PRIMARY KEY AUTOINCREMENT, number INTEGER, name TEXT, type INTEGER, rxFreq INTEGER, txFreq INTEGER,"
-                + " power INTEGER, band INTEGER, sq INTEGER, rxType INTEGER, rxSubCode INTEGER, txType INTEGER, txSubCode INTEGER, relay INTEGER, mode INTEGER,"
-                + " cc INTEGER, inSlot INTEGER, outSlot INTEGER, contactType INTEGER, txContact INTEGER, encryptSw INTEGER, encryptKey TEXT, interrupt INTEGER,"
-                + " groups TEXT, active INTEGER, location TEXT, lat REAL DEFAULT 0, lon REAL DEFAULT 0, elev REAL DEFAULT 0, softSq INTEGER DEFAULT 0, softSqLevel INTEGER DEFAULT 5)");
+                + " power INTEGER, band INTEGER, sq INTEGER, rxType INTEGER, rxSubCode INTEGER, txType INTEGER, txSubCode INTEGER, relay INTEGER, mode INTEGER,"   // i18n: SQL
+                + " cc INTEGER, inSlot INTEGER, outSlot INTEGER, contactType INTEGER, txContact INTEGER, encryptSw INTEGER, encryptKey TEXT, interrupt INTEGER,"   // i18n: SQL
+                + " groups TEXT, active INTEGER, location TEXT, lat REAL DEFAULT 0, lon REAL DEFAULT 0, elev REAL DEFAULT 0, softSq INTEGER DEFAULT 0, softSqLevel INTEGER DEFAULT 5)");   // i18n: SQL
         db.execSQL("CREATE TABLE zones (_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, numbers TEXT)");
         db.execSQL("CREATE TABLE contacts (_id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, number INTEGER, type INTEGER)");
         db.execSQL("CREATE TABLE history (_id INTEGER PRIMARY KEY AUTOINCREMENT, channel INTEGER, ts INTEGER, kind TEXT, text TEXT, rssi INTEGER, dmrId INTEGER)");
@@ -156,9 +157,9 @@ public final class ChannelStore extends SQLiteOpenHelper {
         // contact identity fields (2026-10-25): SignalDeck's own, never written to the module's contact table
         java.util.Set<String> cc = new java.util.HashSet<>();
         try (Cursor c = db.rawQuery("PRAGMA table_info(contacts)", null)) { while (c.moveToNext()) cc.add(c.getString(1)); }
-        String[][] cols = { { "callsign", "TEXT DEFAULT ''" }, { "rics", "TEXT DEFAULT ''" }, { "notes", "TEXT DEFAULT ''" }, { "homeLabel", "TEXT DEFAULT ''" },
-                { "callsignAuto", "INTEGER DEFAULT 0" }, { "homeLat", "REAL" }, { "homeLon", "REAL" }, { "lastLat", "REAL" }, { "lastLon", "REAL" },
-                { "lastTs", "INTEGER DEFAULT 0" }, { "lastSource", "TEXT DEFAULT ''" } };
+        String[][] cols = { { "callsign", "TEXT DEFAULT ''" }, { "rics", "TEXT DEFAULT ''" }, { "notes", "TEXT DEFAULT ''" }, { "homeLabel", "TEXT DEFAULT ''" },   // i18n: SQL
+                { "callsignAuto", "INTEGER DEFAULT 0" }, { "homeLat", "REAL" }, { "homeLon", "REAL" }, { "lastLat", "REAL" }, { "lastLon", "REAL" },   // i18n: SQL
+                { "lastTs", "INTEGER DEFAULT 0" }, { "lastSource", "TEXT DEFAULT ''" } };   // i18n: SQL
         for (String[] k : cols) if (!cc.contains(k[0])) db.execSQL("ALTER TABLE contacts ADD COLUMN " + k[0] + " " + k[1]);
         // when and how each contact was heard, with the position when the transmission carried one (owner, 2026-10-25)
         db.execSQL("CREATE TABLE IF NOT EXISTS contact_heard (_id INTEGER PRIMARY KEY AUTOINCREMENT, contactId INTEGER, ts INTEGER, source TEXT, detail TEXT, lat REAL, lon REAL, dir INTEGER DEFAULT 0)");
@@ -180,7 +181,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
     /** The ALTER statements a history table with these columns still needs (none once migrated). */
     static List<String> historyMigrations(java.util.Set<String> existing) {
         List<String> out = new ArrayList<>();
-        for (String[] k : HISTORY_MSG_COLUMNS) if (!existing.contains(k[0])) out.add("ALTER TABLE history ADD COLUMN " + k[0] + " " + k[1]);
+        for (String[] k : HISTORY_MSG_COLUMNS) if (!existing.contains(k[0])) out.add("ALTER TABLE history ADD COLUMN " + k[0] + " " + k[1]);   // i18n: SQL
         return out;
     }
 
@@ -242,7 +243,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                     if (g.length != ch.groups.length) { ContentValues v = new ContentValues(); v.put("groups", joinInts(g)); db.update("channels", v, "number=?", new String[] { String.valueOf(num) }); merged++; }
                 }
             }
-        } catch (Throwable t) { err.append("tglists: ").append(t.getMessage()).append("; "); }
+        } catch (Throwable t) { err.append("tglists: ").append(t.getMessage()).append("; "); }   // i18n: diagnostic (table name and exception text)
         finally { tdb.close(); }
         return merged;
     }
@@ -255,7 +256,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
     /** {@code prefix}: the stock app's per-area file and table name before the area (DeviceProfile.stockAreaPrefix). */
     public int repairModuleTgLists(Context ctx, String stockPackage, String prefix, String areaKey, StringBuilder err) {
         SQLiteDatabase sdb = copyStock(ctx, stockPackage, prefix + areaKey + ".db", "stock_repair.db");
-        if (sdb == null) { err.append("stock channels not readable"); return -1; }
+        if (sdb == null) { err.append(Txt.s(R.string.channels_store_stock_unreadable)); return -1; }
         java.util.Map<Integer, Integer> map = new java.util.HashMap<>();
         try (Cursor c = sdb.rawQuery("SELECT _id, channel_name, channel_rxFreq FROM " + prefix + areaKey, null)) {
             List<Channel> mine = all();
@@ -451,7 +452,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
 
     // ---- nets held on channels ----
 
-    private static final String NET_QUERY = "SELECT n._id, n.channelId, c.number, n.name, n.days, n.minute, n.duration, n.notes FROM nets n JOIN channels c ON c._id = n.channelId";
+    private static final String NET_QUERY = "SELECT n._id, n.channelId, c.number, n.name, n.days, n.minute, n.duration, n.notes FROM nets n JOIN channels c ON c._id = n.channelId";   // i18n: SQL
     private static com.macdmr.radio.ham.NetFinder.Manual readNet(Cursor c) {
         com.macdmr.radio.ham.NetFinder.Manual m = new com.macdmr.radio.ham.NetFinder.Manual();
         m.id = c.getLong(0); m.channelId = c.getLong(1); m.channel = c.getInt(2); m.name = c.getString(3) == null ? "" : c.getString(3);
@@ -563,7 +564,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
     }
     /** The contact with this number of the wanted type first, else any contact with the number. */
     public Contact contactByNumber(int number, int type) {
-        try (Cursor c = getReadableDatabase().query("contacts", null, "number=?", new String[] { String.valueOf(number) }, null, null, "(type=" + Math.max(0, Math.min(2, type)) + ") DESC LIMIT 1")) { return c.moveToFirst() ? readContact(c) : null; }
+        try (Cursor c = getReadableDatabase().query("contacts", null, "number=?", new String[] { String.valueOf(number) }, null, null, "(type=" + Math.max(0, Math.min(2, type)) + ") DESC LIMIT 1")) { return c.moveToFirst() ? readContact(c) : null; }   // i18n: SQL
     }
     /** The contact whose callsign is this one: exact (with SSID) first, else the same base callsign. */
     public Contact contactByCallsign(String call) {
@@ -635,7 +636,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
     /** The history of a contact, heard and sent, newest first. */
     public List<Heard> contactHeard(long id, int limit) {
         List<Heard> out = new ArrayList<>();
-        try (Cursor c = getReadableDatabase().query("contact_heard", null, "contactId=?", new String[] { String.valueOf(id) }, null, null, "ts DESC", String.valueOf(limit))) {
+        try (Cursor c = getReadableDatabase().query("contact_heard", null, "contactId=?", new String[] { String.valueOf(id) }, null, null, "ts DESC", String.valueOf(limit))) {   // i18n: SQL
             while (c.moveToNext()) {
                 Heard h = new Heard(); h.id = c.getLong(0); h.contactId = c.getLong(1); h.ts = c.getLong(2); h.source = c.getString(3) == null ? "" : c.getString(3); h.detail = c.getString(4) == null ? "" : c.getString(4);
                 if (!c.isNull(5)) h.lat = c.getDouble(5); if (!c.isNull(6)) h.lon = c.getDouble(6); h.sent = coli(c, "dir", 0) == 1; out.add(h);
@@ -709,7 +710,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 Conversation cv = new Conversation();
                 cv.threadKey = c.getString(0); cv.transport = c.getString(1); cv.lastText = c.getString(2); cv.lastTs = c.getLong(3); cv.outgoing = c.getInt(4) == 1;
                 String signer = c.getString(5); int ric = c.getInt(6); cv.unread = c.getInt(7);
-                cv.name = "m17".equals(cv.transport) ? (signer == null || signer.isEmpty() ? "M17" : signer) : (ric < 0 ? "RIC unreadable" : ric == 0 ? cv.threadKey : ("RIC " + ric));
+                cv.name = "m17".equals(cv.transport) ? (signer == null || signer.isEmpty() ? "M17" : signer) : (ric < 0 ? Txt.s(R.string.channels_store_ric_unreadable) : ric == 0 ? cv.threadKey : ("RIC " + ric));   // i18n: protocol word (RIC)
                 cv.address = "m17".equals(cv.transport) ? signer : String.valueOf(ric);
                 out.add(cv);
             }
@@ -780,11 +781,11 @@ public final class ChannelStore extends SQLiteOpenHelper {
             String r = "";
             for (String base : new String[] { "/data/user/0/", "/data/data/" }) {        // su may see a different mount view
                 String src = base + stockPackage + "/databases/" + prefix + areaKey + ".db";
-                r = RootSetup.run("cp " + src + " " + dst.getAbsolutePath() + " && chmod 644 " + dst.getAbsolutePath() + " && chown $(stat -c %u:%g " + ctx.getCacheDir().getAbsolutePath() + ") " + dst.getAbsolutePath());
+                r = RootSetup.run("cp " + src + " " + dst.getAbsolutePath() + " && chmod 644 " + dst.getAbsolutePath() + " && chown $(stat -c %u:%g " + ctx.getCacheDir().getAbsolutePath() + ") " + dst.getAbsolutePath());   // i18n: shell and diagnostic output
                 if (dst.exists() && dst.length() > 0) break;
             }
             if (!dst.exists() || dst.length() == 0) {
-                err.append("copy failed: ").append(r).append(" | ls: ").append(RootSetup.run("ls /data/user/0/" + stockPackage + "/databases/ 2>&1 | head -5; id; cat /proc/self/attr/current"));
+                err.append("copy failed: ").append(r).append(" | ls: ").append(RootSetup.run("ls /data/user/0/" + stockPackage + "/databases/ 2>&1 | head -5; id; cat /proc/self/attr/current"));   // i18n: shell and diagnostic output
                 return -1;
             }
             SQLiteDatabase sdb = SQLiteDatabase.openDatabase(dst.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY);
@@ -828,7 +829,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                     v.put("name", col(c, "contact_name", "")); v.put("number", coli(c, "contact_number", 0)); v.put("type", coli(c, "contact_type", 0));
                     db.insert("contacts", null, v);
                 }
-            } catch (Throwable t) { err.append("contacts: ").append(t.getMessage()).append("; "); }
+            } catch (Throwable t) { err.append("contacts: ").append(t.getMessage()).append("; "); }   // i18n: diagnostic (table name and exception text)
             // module side-tables: locations (per channel number) and the activity history
             try {
                 SQLiteDatabase ldb = copyStock(ctx, stockPackage, "dmrmod_locations.db", "stock_locations.db");
@@ -845,7 +846,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                     }
                     ldb.close();
                 }
-            } catch (Throwable t) { err.append("locations: ").append(t.getMessage()).append("; "); }
+            } catch (Throwable t) { err.append("locations: ").append(t.getMessage()).append("; "); }   // i18n: diagnostic (table name and exception text)
             try {
                 SQLiteDatabase hdb = copyStock(ctx, stockPackage, "dmrmod_history.db", "stock_history.db");
                 if (hdb != null) {
@@ -862,7 +863,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                     }
                     hdb.close();
                 }
-            } catch (Throwable t) { err.append("history: ").append(t.getMessage()).append("; "); }
+            } catch (Throwable t) { err.append("history: ").append(t.getMessage()).append("; "); }   // i18n: diagnostic (table name and exception text)
             try {
                 SQLiteDatabase zdb = copyStock(ctx, stockPackage, "dmrmod_zones.db", "stock_zones.db");
                 if (zdb != null) {
@@ -877,7 +878,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                     }
                     zdb.close();
                 }
-            } catch (Throwable t) { err.append("zones: ").append(t.getMessage()).append("; "); }
+            } catch (Throwable t) { err.append("zones: ").append(t.getMessage()).append("; "); }   // i18n: diagnostic (table name and exception text)
             try {
                 SQLiteDatabase qdb = copyStock(ctx, stockPackage, "dmrmod_softsq.db", "stock_softsq.db");
                 if (qdb != null) {
@@ -890,7 +891,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                     }
                     qdb.close();
                 }
-            } catch (Throwable t) { err.append("softsq: ").append(t.getMessage()).append("; "); }
+            } catch (Throwable t) { err.append("softsq: ").append(t.getMessage()).append("; "); }   // i18n: diagnostic (table name and exception text)
             importModuleTgLists(ctx, stockPackage, stockIdToNumber, err);
             sdb.close();
             changed();
@@ -913,7 +914,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
      */
     public int importFromFlyscale(Context ctx, String stockPackage, StringBuilder err) {
         SQLiteDatabase sdb = copyRoom(ctx, stockPackage, new String[] { "channel_list_detial.db" }, "fs_channels.db");
-        if (sdb == null) { err.append("stock channels not readable: ").append(RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -8")); return -1; }
+        if (sdb == null) { err.append(Txt.s(R.string.channels_store_stock_unreadable_ls, RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -8"))); return -1; }
         int n = 0, skipped = 0;
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -927,7 +928,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 db.insert("channels", null, values(ch));
             }
             db.setTransactionSuccessful();
-        } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }
+        } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }   // i18n: diagnostic (table name and exception text)
         finally { db.endTransaction(); sdb.close(); }
         if (n >= 0) skippedNote(err, skipped);
         changed();
@@ -936,14 +937,14 @@ public final class ChannelStore extends SQLiteOpenHelper {
 
     /** "3 skipped: outside what this radio tunes (400–470 MHz)" into an import's notes. */
     private static void skippedNote(StringBuilder err, int skipped) {
-        if (skipped > 0) err.append(err.length() > 0 ? "; " : "").append(skipped).append(skipped == 1 ? " channel" : " channels").append(" skipped: outside what this radio tunes (").append(com.macdmr.radio.DeviceProfile.detect().bandsText()).append(")");
+        if (skipped > 0) err.append(err.length() > 0 ? "; " : "").append(Txt.p(R.plurals.channels_store_skipped, skipped, skipped, com.macdmr.radio.DeviceProfile.detect().bandsText()));
     }
 
     /** One stock W6 channel row as a SignalDeck analog channel, or null when its frequencies do not parse. */
     static Channel flyscaleChannel(int id, String gbw, String tfv, String rfv, String txCss, String rxCss, String sq, String power) {
         try {
             Channel ch = new Channel();
-            ch.type = Channel.TYPE_FM; ch.name = "CH " + (id + 1);
+            ch.type = Channel.TYPE_FM; ch.name = "CH " + (id + 1);   // i18n: default channel name (stored)
             ch.txFreq = (int) Math.round(Double.parseDouble(tfv.trim()) * 1e6); ch.rxFreq = (int) Math.round(Double.parseDouble(rfv.trim()) * 1e6);
             ch.band = "0".equals(gbw.trim()) ? 0 : 1; ch.power = "0".equals(power.trim()) ? 0 : 1;
             ch.sq = Math.max(0, Math.min(8, Integer.parseInt(sq.trim())));
@@ -962,7 +963,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
      */
     public int importFromFlyscaleDmr(Context ctx, String stockPackage, int activeSlot, int[] dmrIdOut, StringBuilder err) {
         SQLiteDatabase sdb = copyRoom(ctx, stockPackage, new String[] { "channel_list_detial.db" }, "fsd_channels.db");
-        if (sdb == null) { err.append("stock channels not readable: ").append(RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -8")); return -1; }
+        if (sdb == null) { err.append(Txt.s(R.string.channels_store_stock_unreadable_ls, RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -8"))); return -1; }
         int n = 0;
         java.util.Map<Integer, Integer> types = new java.util.TreeMap<>();
         java.util.Map<Integer, java.util.Map<String, String>> analog = new java.util.HashMap<>(), digital = new java.util.HashMap<>();
@@ -988,7 +989,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 db.insert("channels", null, values(ch));
             }
             db.setTransactionSuccessful();
-        } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }
+        } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }   // i18n: diagnostic (table name and exception text)
         finally { db.endTransaction(); sdb.close(); }
         changed();
         return n;
@@ -1005,7 +1006,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
         if (r == null || r.get("RX_FREQ") == null) return null;
         try {
             Channel ch = new Channel();
-            ch.name = "CH " + (slot + 1);
+            ch.name = "CH " + (slot + 1);   // i18n: default channel name (stored)
             ch.rxFreq = (int) Math.round(Double.parseDouble(r.get("RX_FREQ").trim()) * 1e6);
             String tx = r.get("TX_FREQ");
             ch.txFreq = tx == null || tx.trim().isEmpty() ? ch.rxFreq : (int) Math.round(Double.parseDouble(tx.trim()) * 1e6);
@@ -1054,7 +1055,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
 
     public int importFromQuickChat(Context ctx, String stockPackage, StringBuilder err) {
         SQLiteDatabase sdb = copyRoom(ctx, stockPackage, new String[] { "channel_database", "channel.db" }, "qc_channels.db");
-        if (sdb == null) { err.append("QuickChat channels not readable: ").append(RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -8")); return -1; }
+        if (sdb == null) { err.append(Txt.s(R.string.channels_store_quickchat_unreadable, RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -8"))); return -1; }
         int n = 0, skipped = 0;
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -1063,7 +1064,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
         String table = "channel_table", where = null, order = "id";
         try (Cursor t = sdb.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='channels'", null)) {
             if (t.moveToFirst()) {
-                table = "channels"; order = "channelIdInCountry, id";
+                table = "channels"; order = "channelIdInCountry, id";   // i18n: SQL
                 try (Cursor k = sdb.rawQuery("SELECT countryId FROM channels ORDER BY enbale DESC, id LIMIT 1", null)) { if (k.moveToFirst()) where = "countryId=" + k.getInt(0); }
             }
         } catch (Throwable ignored) { }
@@ -1072,7 +1073,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
             while (c.moveToNext()) {
                 Channel ch = new Channel();
                 ch.number = ++n;
-                ch.name = col(c, "channelName", "Channel " + n); ch.type = coli(c, "channelType", 1);
+                ch.name = col(c, "channelName", "Channel " + n); ch.type = coli(c, "channelType", 1);   // i18n: default channel name (stored)
                 ch.rxFreq = coli(c, "rx_freq", 0); ch.txFreq = coli(c, "tx_freq", 0); ch.power = coli(c, "power", 1);
                 if (!tunable(ch)) { n--; skipped++; continue; }                  // outside what this radio tunes
                 ch.band = coli(c, "band", 1); ch.sq = coli(c, "sq", 2); ch.rxType = coli(c, "rx_type", 0); ch.rxSubCode = coli(c, "rx_subcode", 0);
@@ -1090,7 +1091,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 db.insert("channels", null, values(ch));
             }
             db.setTransactionSuccessful();
-        } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }
+        } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }   // i18n: diagnostic (table name and exception text)
         finally { db.endTransaction(); sdb.close(); }
         if (n >= 0) skippedNote(err, skipped);
         SQLiteDatabase cdb = copyRoom(ctx, stockPackage, new String[] { "contacts_database", "contact_database", "contacts.db" }, "qc_contacts.db");
@@ -1102,9 +1103,9 @@ public final class ChannelStore extends SQLiteOpenHelper {
                     v.put("name", col(c, "name", "")); v.put("number", coli(c, "number", 0)); v.put("type", coli(c, "type", 0));
                     db.insert("contacts", null, v);
                 }
-            } catch (Throwable t) { err.append("contacts: ").append(t.getMessage()).append("; "); }
+            } catch (Throwable t) { err.append("contacts: ").append(t.getMessage()).append("; "); }   // i18n: diagnostic (table name and exception text)
             finally { cdb.close(); }
-        } else err.append("no QuickChat contacts database; ");
+        } else err.append(Txt.s(R.string.channels_store_quickchat_no_contacts));
         changed();
         return n;
     }
@@ -1115,7 +1116,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
      */
     public int importFromAgold(Context ctx, String stockPackage, int area, StringBuilder err) {
         SQLiteDatabase sdb = copyStock(ctx, stockPackage, "intercom.db", "agold_intercom.db");
-        if (sdb == null) { err.append("the stock app's channels are not readable: ").append(RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -4")); return -1; }
+        if (sdb == null) { err.append(Txt.s(R.string.channels_store_agold_unreadable, RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -4"))); return -1; }
         String areaName = null;
         try (Cursor a = sdb.rawQuery("SELECT name FROM area WHERE num=?", new String[] { String.valueOf(area) })) { if (a.moveToFirst()) areaName = a.getString(0); } catch (Throwable ignored) { }
         int n = 0, skipped = 0;
@@ -1133,10 +1134,10 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 db.insert("channels", null, values(ch));
             }
             db.setTransactionSuccessful();
-        } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }
+        } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }   // i18n: diagnostic (table name and exception text)
         finally { db.endTransaction(); sdb.close(); }
         if (n >= 0) skippedNote(err, skipped);
-        if (n == 0 && skipped == 0) err.append("area ").append(area).append(" has no channels");
+        if (n == 0 && skipped == 0) err.append(Txt.s(R.string.channels_store_area_empty, area));
         changed();
         return n;
     }
@@ -1156,7 +1157,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
         ch.rxFreq = rx; ch.txFreq = tx > 0 ? tx : rx;
         ch.power = agoldInt(r.get("power"), 1);
         String name = r.get("name");
-        ch.name = name != null && !name.trim().isEmpty() ? name.trim() : (areaName != null && !areaName.trim().isEmpty() ? areaName.trim() : "Channel") + " " + agoldInt(r.get("num"), number);
+        ch.name = name != null && !name.trim().isEmpty() ? name.trim() : (areaName != null && !areaName.trim().isEmpty() ? areaName.trim() : "Channel") + " " + agoldInt(r.get("num"), number);   // i18n: default channel name (stored)
         if (ch.type == Channel.TYPE_DMR) {
             ch.cc = agoldInt(r.get("colorCode"), 1);
             ch.inSlot = agoldInt(r.get("inboundSlot"), 0); ch.outSlot = agoldInt(r.get("outboundSlot"), 0);
@@ -1188,7 +1189,8 @@ public final class ChannelStore extends SQLiteOpenHelper {
         SQLiteDatabase sdb = copyStock(ctx, stockPackage, "intercom.db", "agold_intercom.db");
         if (sdb == null) return out;
         try (Cursor c = sdb.rawQuery("SELECT a.num, a.name, COUNT(c._id) FROM area a LEFT JOIN channel c ON c.area = a.num GROUP BY a.num ORDER BY a.num", null)) {
-            while (c.moveToNext()) out.add(c.getInt(0) + " " + (c.isNull(1) ? "" : c.getString(1)) + " (" + c.getInt(2) + " channels)");
+            while (c.moveToNext()) out.add(Txt.s(R.string.channels_store_agold_area, c.getInt(0), c.isNull(1) ? "" : c.getString(1), c.getInt(2)));   // parsed back by its leading number only
+
         } catch (Throwable ignored) { }
         finally { sdb.close(); }
         return out;
@@ -1198,7 +1200,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
     private static SQLiteDatabase copyRoom(Context ctx, String stockPackage, String[] names, String localName) {
         File dst = new File(ctx.getCacheDir(), localName);
         for (String name : names) for (String base : new String[] { "/data/user/0/", "/data/data/" }) {
-            String src = base + stockPackage + "/databases/" + name, owner = "$(stat -c %u:%g " + ctx.getCacheDir().getAbsolutePath() + ")";
+            String src = base + stockPackage + "/databases/" + name, owner = "$(stat -c %u:%g " + ctx.getCacheDir().getAbsolutePath() + ")";   // i18n: shell and diagnostic output
             RootSetup.run("rm -f " + dst + " " + dst + "-wal " + dst + "-shm; cp " + src + " " + dst + " && (cp " + src + "-wal " + dst + "-wal; cp " + src + "-shm " + dst + "-shm; true) 2>/dev/null; chmod 666 " + dst + "*; chown " + owner + " " + dst + "*");
             if (dst.exists() && dst.length() > 0) {
                 try { return SQLiteDatabase.openDatabase(dst.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE); } catch (Throwable t) { return null; }   // the copy, so the WAL can be replayed
@@ -1210,7 +1212,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
     private static SQLiteDatabase copyStock(Context ctx, String stockPackage, String file, String localName) {
         File dst = new File(ctx.getCacheDir(), localName);
         for (String base : new String[] { "/data/user/0/", "/data/data/" }) {
-            RootSetup.run("cp " + base + stockPackage + "/databases/" + file + " " + dst.getAbsolutePath() + " && chmod 644 " + dst.getAbsolutePath());
+            RootSetup.run("cp " + base + stockPackage + "/databases/" + file + " " + dst.getAbsolutePath() + " && chmod 644 " + dst.getAbsolutePath());   // i18n: shell and diagnostic output
             if (dst.exists() && dst.length() > 0) break;
         }
         if (!dst.exists() || dst.length() == 0) return null;

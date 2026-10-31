@@ -110,7 +110,7 @@
     <!-- Subtitle of "Steering-wheel microphone". May wrap to three lines. -->
     <string name="device_set_wheel_mic_sub">Voiture (comme un appel) : le micro de la voiture ; arrêt avec la touche Raccrocher du volant ou Fin. Téléphone : le micro du téléphone ; arrêt avec le volant. Appuyez pour changer</string>
     <!-- Settings row title: unkey a wheel transmission after silence. One line. -->
-    <string name="device_set_vox">Arrêter quand je me tais</string>
+    <string name="device_set_vox">Arrêter quand je ne parle plus</string>
     <!-- Subtitle of "Stop when I stop talking". May wrap. -->
     <string name="device_set_vox_sub">Pour les émissions lancées depuis le volant : coupe l’émission après ce temps de silence. Appuyez pour changer</string>
     <!-- Settings switch title: the full-screen Talk screen in Android Auto. One line. -->
@@ -774,9 +774,9 @@
     <!-- In "Now: …": the module has not answered. Short. -->
     <string name="device_modfw_no_answer">pas encore de réponse du module</string>
     <!-- Hint on the module firmware sheet when the module runs its stock firmware. -->
-    <string name="device_modfw_hint_stock">La version d’origine est la première que le module radio de ce téléphone a signalée à SignalDeck ; elle est conservée définitivement, pour que vous sachiez toujours avec quoi le téléphone a été livré. Le module tourne sur son firmware d’origine.</string>
+    <string name="device_modfw_hint_stock">La version d’usine est la première que le module radio de ce téléphone a signalée à SignalDeck ; elle est conservée définitivement, pour que vous sachiez toujours avec quoi le téléphone a été livré. Le module tourne sur son firmware d’usine.</string>
     <!-- Hint on the module firmware sheet when other firmware is loaded. -->
-    <string name="device_modfw_hint_differs">La version d’origine est la première que le module radio de ce téléphone a signalée à SignalDeck ; elle est conservée définitivement, pour que vous sachiez toujours avec quoi le téléphone a été livré. Le module signale maintenant une autre version : un autre firmware est donc chargé. Si le téléphone avait déjà un autre firmware quand SignalDeck l’a vu pour la première fois, vous pouvez prendre la version actuelle comme version d’origine.</string>
+    <string name="device_modfw_hint_differs">La version d’usine est la première que le module radio de ce téléphone a signalée à SignalDeck ; elle est conservée définitivement, pour que vous sachiez toujours avec quoi le téléphone a été livré. Le module signale maintenant une autre version : un autre firmware est donc chargé. Si le téléphone avait déjà un autre firmware quand SignalDeck l’a vu pour la première fois, vous pouvez prendre la version actuelle comme version d’origine.</string>
     <!-- Button on the module firmware sheet. One line. -->
     <string name="device_modfw_reset">Prendre la version actuelle comme origine</string>
     <!-- Title of the confirmation. %1$s is the module's version now. One line. -->

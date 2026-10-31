@@ -44,7 +44,7 @@
     <!-- Problem line: the phone has no location, so tropo and aurora cannot be worked out. One line. -->
     <string name="modes_cond_problem_nofix">Pas de position : nécessaire pour la tropo et les aurores</string>
     <!-- Title of the VHF/UHF conditions sheet. One line. -->
-    <string name="modes_cond_title">Conditions VHF/UHF</string>
+    <string name="modes_cond_title">Propagation VHF/UHF</string>
     <!-- Explanation under the conditions sheet's title. A few lines. -->
     <string name="modes_cond_hint">Vaut-il la peine de trafiquer au-delà de la portée habituelle ? La propagation par conduit troposphérique est la principale source de liaisons VHF/UHF à longue distance ; les aurores et les essaims de météores ouvrent des liaisons brèves (surtout en BLU et dans les modes numériques, parfois en FM).</string>
     <!-- Shown while the forecasts download. One line. -->
@@ -704,9 +704,9 @@
     <!-- Card title just before the ISS rises. One line. -->
     <string name="modes_pass_rising">🛰\u0020\u0020L’ISS va se lever</string>
     <!-- Card text while the ISS is up. %1$s receive frequency (MHz), %2$s Doppler shift (kHz, signed), %3$s time until it sets (m:ss), %4$s distance in km. Two lines. -->
-    <string name="modes_pass_listening_sets">Écoute %1$s MHz (Doppler %2$s kHz)\u0020\u0020·\u0020\u0020se couche dans %3$s\u0020\u0020·\u0020\u0020à\u0020\u0020%4$s km</string>
+    <string name="modes_pass_listening_sets">Écoute %1$s MHz (Doppler %2$s kHz)\u0020\u0020·\u0020\u0020se couche dans %3$s\u0020\u0020·\u0020\u0020à %4$s km</string>
     <!-- The same before it rises: the time until the pass window ends. Two lines. -->
-    <string name="modes_pass_listening_ends">Écoute %1$s MHz (Doppler %2$s kHz)\u0020\u0020·\u0020\u0020fin du passage dans %3$s\u0020\u0020·\u0020\u0020à\u0020\u0020%4$s km</string>
+    <string name="modes_pass_listening_ends">Écoute %1$s MHz (Doppler %2$s kHz)\u0020\u0020·\u0020\u0020fin du passage dans %3$s\u0020\u0020·\u0020\u0020à %4$s km</string>
     <!-- Card line: the transmit frequency for the ISS digipeater. %1$s MHz. One line. -->
     <string name="modes_pass_talk">Émission %1$s MHz</string>
 
@@ -714,7 +714,7 @@
     <!-- Title of the packet terminal sheet. One line. -->
     <string name="modes_term_title">Terminal packet</string>
     <!-- Explanation on the terminal sheet. BBS = bulletin board; B and BYE are commands typed as is. A paragraph. -->
-    <string name="modes_term_hint">Réglez la radio sur le canal du BBS ou du nœud, puis connectez-vous. Chaque échange prend quelques secondes : chaque émission commence par une tonalité de 1,6 seconde et les trames perdues sont renvoyées. Tapez une ligne puis Envoyer ; la plupart des BBS répondent par une invite, et B ou BYE termine la session.</string>
+    <string name="modes_term_hint">Réglez la radio sur le canal du BBS ou du nœud, puis connectez-vous. Chaque échange prend quelques secondes : chaque émission commence par une tonalité de 1,6 seconde et les trames perdues sont renvoyées. Saisissez une ligne puis appuyez sur Envoyer ; la plupart des BBS répondent par une invite, et B ou BYE termine la session.</string>
     <!-- Label above the callsign field. One line. -->
     <string name="modes_term_call">Se connecter à (indicatif-SSID)</string>
     <!-- Label above the digipeater field; RELAY is an example alias. One line. -->
@@ -760,7 +760,7 @@
         <item quantity="other">%1$d caractères</item>
     </plurals>
     <!-- Explanation of signing and the pager types. A paragraph. -->
-    <string name="modes_pager_sign_hint">Pagers alphanumériques, fonction 3. L’envoi vers un pager uniquement numérique n’est pas encore pris en charge. La signature place votre indicatif et deux-points au début du texte : c’est ainsi qu’une réponse vous retrouve. Un pager autre que SignalDeck l’affiche comme partie du message. Avec le firmware d’origine du téléphone, Envoyer explique que les messages pager nécessitent le moteur de symboles.</string>
+    <string name="modes_pager_sign_hint">Pagers alphanumériques, fonction 3. L’envoi vers un pager uniquement numérique n’est pas encore pris en charge. La signature place votre indicatif et deux-points au début du texte : c’est ainsi qu’une réponse vous retrouve. Un pager autre que SignalDeck l’affiche comme partie du message. Avec le firmware d’usine du téléphone, Envoyer explique que les messages pager nécessitent le moteur de symboles.</string>
     <!-- The chosen speed. %1$d baud rate, %2$d the POCSAG function number. One line. -->
     <string name="modes_pager_speed">%1$d bauds\u0020\u0020·\u0020\u0020fonction %2$d (alphanumérique)</string>
     <!-- Toggle line: signing is on. One line. -->
@@ -848,7 +848,7 @@
     <!-- Button: play the same groups again. Half width. -->
     <string name="modes_morse_again">Rejouer</string>
     <!-- Hint in the field where the user types what was heard. Short. -->
-    <string name="modes_morse_copy_hint">Tapez ce que vous avez entendu</string>
+    <string name="modes_morse_copy_hint">Saisissez ce que vous avez entendu</string>
     <!-- Button: score what was typed. Full width. -->
     <string name="modes_morse_check">Vérifier</string>
     <!-- Copy result, monospaced: "sent:" and "you:" are padded so the two lines line up; keep them the same width. %1$s the score in percent, %2$s the verdict, %3$s what was sent, %4$s what was typed. Three lines. -->
@@ -908,7 +908,7 @@
     <!-- Toggle button: Morse ID after this message is off. Quarter-width, very short. -->
     <string name="modes_keyer_id_off">ID : non</string>
     <!-- ID clock when not counting. Large text, short. -->
-    <string name="modes_keyer_timer_idle">Minuterie ID inactive</string>
+    <string name="modes_keyer_timer_idle">Minuterie d’ID inactive</string>
     <!-- ID clock counting down. %1$s minutes and seconds (m:ss). Large text, short. -->
     <string name="modes_keyer_timer_due">Identification dans %1$s</string>
     <!-- ID clock at zero: say the callsign now. Large text, short. -->
@@ -1107,7 +1107,7 @@
 
     <!-- ===== FT8 screen ===== -->
     <!-- Button: start calling CQ. Third of a row, short. -->
-    <string name="modes_ft8_call_cq">Lancer CQ</string>
+    <string name="modes_ft8_call_cq">Lancer un CQ</string>
     <!-- Button: stop transmitting. Third of a row, short. -->
     <string name="modes_ft8_halt">Couper l’émission</string>
     <!-- Button: type a message to send. Third of a row, short. -->
@@ -1133,9 +1133,9 @@
     <!-- The same with the grid sent. %3$s the grid ("FN42"). One line. -->
     <string name="modes_ft8_status_line_grid">%1$s\u0020\u0020·\u0020\u0020émission à %2$s Hz\u0020\u0020·\u0020\u0020locator %3$s</string>
     <!-- Period button: transmit in the first period (seconds :00 and :30). Third of a row. -->
-    <string name="modes_ft8_period_first">TX 1re (:00 :30)</string>
+    <string name="modes_ft8_period_first">TX 1 (:00 :30)</string>
     <!-- Period button: transmit in the second period (seconds :15 and :45). Third of a row. -->
-    <string name="modes_ft8_period_second">TX 2e (:15 :45)</string>
+    <string name="modes_ft8_period_second">TX 2 (:15 :45)</string>
     <!-- Empty decode list. RR73 and 73 are FT8 messages; WSJT-X is a program. Two paragraphs. -->
     <string name="modes_ft8_empty_hint">Écoute. Toutes les 15 s, la dernière période est décodée et listée ici, la plus récente en haut. Appuyez sur un CQ pour y répondre ; l’application mène alors seule l’échange (locator, report, R-report, RR73, 73) et note le QSO.\n\nLe FT8 en FM dialogue avec les stations qui émettent de l’audio FT8 sur ce canal FM : un autre SignalDeck, ou WSJT-X via une radio FM. Il n’entend pas le FT8 en BLU (144,174 / 432,174 MHz), et la FM ne laisse passer que la station la plus forte de chaque période.</string>
     <!-- Toast after tapping a decode, first period. %1$s the callsign. One line. -->
@@ -1728,7 +1728,7 @@
     <!-- Hint in the gateway field; N0ABC-10 is an example. Short. -->
     <string name="modes_wl_radio_gateway_hint">Passerelle, p. ex. N0ABC-10</string>
     <!-- Hint in the digipeater field. Short. -->
-    <string name="modes_wl_radio_via_hint">Via digipeaters (facultatif)</string>
+    <string name="modes_wl_radio_via_hint">Via des digipeaters (facultatif)</string>
     <!-- Title of the radio connect dialog. One line. -->
     <string name="modes_wl_radio_title">Se connecter à une passerelle radio</string>
     <!-- Winlink settings explanation. A paragraph. -->
@@ -1980,7 +1980,7 @@
     <!-- Toast: Open in maps needs a mark. Short. -->
     <string name="modes_fox_mark_first">Marquez d’abord une mesure</string>
     <!-- Toast: no maps app. Short. -->
-    <string name="modes_fox_no_map_app">Aucune application de cartes</string>
+    <string name="modes_fox_no_map_app">Aucune application de cartographie</string>
     <!-- Confirmation title. One line. -->
     <string name="modes_fox_clear_confirm">Effacer tous les repères ?</string>
     <!-- Confirmation message. One line. -->

@@ -746,7 +746,7 @@
     <!-- Button on the repeater details sheet: open it in a map app. Very short. -->
     <string name="channels_rep_map">Carte</string>
     <!-- Toast when no map app is installed. Short. -->
-    <string name="channels_rep_no_map_app">Aucune application de cartes</string>
+    <string name="channels_rep_no_map_app">Aucune application de cartographie</string>
     <!-- Dialog title above the list of repeater installs to undo. One line. -->
     <string name="channels_rep_undo_title">Quelle installation supprimer ?</string>
 
@@ -944,7 +944,7 @@
     <!-- Label of a line on the contact's sheet: their home location. Short. -->
     <string name="channels_contact_home">Domicile</string>
     <!-- Label of a line on the contact's sheet: where and when they were last heard. Short. -->
-    <string name="channels_contact_last_heard">Dernière écoute</string>
+    <string name="channels_contact_last_heard">Dernière réception</string>
     <!-- On the contact's sheet: %1$s how long ago, %2$s how they were heard (APRS, M17…). Short. -->
     <string name="channels_contact_ago_by">%1$s via %2$s</string>
     <!-- A line on the contact's sheet: %1$s its label (Home), %2$s the value. Keep the two spaces. -->

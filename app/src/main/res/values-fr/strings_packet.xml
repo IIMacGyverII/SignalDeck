@@ -584,7 +584,7 @@
     <!-- How long ago: %1$d hours. Short. -->
     <string name="packet_map_ago_h">il y a %1$d h</string>
     <!-- How long ago: %1$d days (2 or more). Short. -->
-    <string name="packet_map_ago_days">il y a %1$d jours</string>
+    <string name="packet_map_ago_days">il y a %1$d jours</string>
     <!-- Station card subtitle: %1$s the distance and direction from you ("2.4 mi NE"; empty without a fix). -->
     <string name="packet_map_station_sub">Station APRS · %1$s</string>
     <!-- Station card: %1$s how long ago ("5 min ago"). -->
@@ -833,7 +833,7 @@
     <!-- Banner in a page thread when a page for another thread arrives. %1$s that page (sender and text). -->
     <string name="packet_msg_also_heard">Également reçu : %1$s</string>
     <!-- Toast after the pager monitor stops. One line. -->
-    <string name="packet_msg_monitor_off">Écoute pager arrêtée</string>
+    <string name="packet_msg_monitor_off">Écoute pager désactivée</string>
     <!-- Title of the dialog that edits the pager monitor's frequencies. One line. -->
     <string name="packet_msg_scan_title">Fréquences pager</string>
     <!-- Text of that dialog. Two lines. -->
@@ -879,7 +879,7 @@
     <!-- Toast when sending a DMR text on an analog channel. One line. -->
     <string name="packet_msg_err_analog">Passez sur un canal DMR pour envoyer du texte</string>
     <!-- Delivery mark under a text you sent: the other radio acknowledged it. Lower case, short. -->
-    <string name="packet_msg_st_delivered">✓✓ distribué</string>
+    <string name="packet_msg_st_delivered">✓✓ remis</string>
     <!-- Delivery mark: the text did not go out. Lower case, short. -->
     <string name="packet_msg_st_failed">✖ non envoyé</string>
     <!-- Delivery mark: sent, but no acknowledgement came back. Lower case, short. -->
@@ -919,7 +919,7 @@
     <!-- Toast when the packet finder cannot start. One or two lines. -->
     <string name="packet_finder_err_no_freqs">Aucune des fréquences packet n’est dans les bandes de cette radio (%1$s) : ajoutez-en dans Paramètres</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
-    <string name="packet_finder_err_tx">Impossible pendant une émission</string>
+    <string name="packet_finder_err_tx">Impossible pendant l’émission</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
     <string name="packet_finder_err_sat">Un passage de satellite est en cours de suivi</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
@@ -1276,7 +1276,7 @@
     <!-- Button on the PKT sheet that stops listening for the space station's pictures. Short (two buttons share a row). -->
     <string name="packet_pkt_iss_sstv_stop">Arrêter SSTV ISS</string>
     <!-- Toast after ISS SSTV stops. One line. -->
-    <string name="packet_pkt_iss_sstv_stopped">SSTV ISS arrêté</string>
+    <string name="packet_pkt_iss_sstv_stopped">SSTV ISS arrêtée</string>
     <!-- Button on the PKT sheet that tunes the SSTV calling frequency and listens. Short (two buttons share a row). -->
     <string name="packet_pkt_sstv_rx_144500">Recevoir sur 144,500</string>
     <!-- Button on the PKT sheet that listens for SSTV on this channel. Short (two buttons share a row). -->
@@ -1612,7 +1612,7 @@
     <!-- Toast when the SSID is out of range. One line. -->
     <string name="packet_set_err_ssid">Le SSID va de 0 à 15</string>
     <!-- Toast when a number in the settings cannot be read. One line. -->
-    <string name="packet_set_err_numbers">Vérifiez les nombres</string>
+    <string name="packet_set_err_numbers">Vérifiez les valeurs</string>
     <!-- State pill of a switch on the packet sheets: on. Very short, capitals. -->
     <string name="packet_toggle_on">OUI</string>
     <!-- State pill of a switch on the packet sheets: off. Very short, capitals. -->

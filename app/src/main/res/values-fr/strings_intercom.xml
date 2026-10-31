@@ -137,9 +137,9 @@
     <!-- Title of the dialog that offers the classic intercom look (intercom menu). One line. -->
     <string name="intercom_main_look_back_classic">Revenir à la page Radio classique ?</string>
     <!-- Message of the intercom look dialog: names the Device setting that does the same. -->
-    <string name="intercom_main_look_message">Le réglage Appareil → Paramètres radio → Nouvel aspect de la page Radio fait la même chose.</string>
+    <string name="intercom_main_look_message">Le réglage Appareil → Paramètres radio → Nouvelle page Radio fait la même chose.</string>
     <!-- Button of the intercom look dialog: switch to the new look. Short (dialog button). -->
-    <string name="intercom_main_look_new">Nouvel aspect</string>
+    <string name="intercom_main_look_new">Nouvelle page</string>
     <!-- Button of the intercom look dialog: switch to the classic look. Short (dialog button). -->
     <string name="intercom_main_look_classic">Classique</string>
 
@@ -429,7 +429,7 @@
     <!-- Kind of a history line: something you transmitted. Lower case, one word. -->
     <string name="intercom_chhistory_kind_transmitted">émis</string>
     <!-- Kind of a history line: a repeater sending its callsign in Morse. Lower case, two words. -->
-    <string name="intercom_chhistory_kind_repeater_id">identification de relais</string>
+    <string name="intercom_chhistory_kind_repeater_id">identification du relais</string>
     <!-- Kind of a history line: Morse code heard. One word. -->
     <string name="intercom_chhistory_kind_morse">Morse</string>
     <!-- Kind of a history line: packet radio traffic (APRS…). Lower case, one word. -->
@@ -697,13 +697,13 @@
     <!-- Toast when an offset shortcut is tapped with no receive frequency entered. One line. -->
     <string name="intercom_vfo_need_rx_toast">Saisissez d’abord la fréquence de réception</string>
     <!-- Toast when a frequency is outside the radio's bands; %1$s lists the bands (e.g. "136–174 MHz and 400–480 MHz"). One or two lines. -->
-    <string name="intercom_vfo_out_of_band_toast">Les fréquences doivent être dans %1$s</string>
+    <string name="intercom_vfo_out_of_band_toast">Les fréquences doivent être comprises dans %1$s</string>
     <!-- Toast when a private or group call has no call number. One line. -->
     <string name="intercom_vfo_need_call_toast">Un numéro d’appel est nécessaire pour un appel privé ou de groupe</string>
     <!-- Toast when more than 32 receive talkgroups are entered. One line. -->
     <string name="intercom_vfo_too_many_groups_toast">32 talkgroups en réception au maximum</string>
     <!-- Toast when a number field does not parse. Short. -->
-    <string name="intercom_vfo_check_numbers_toast">Vérifiez les nombres</string>
+    <string name="intercom_vfo_check_numbers_toast">Vérifiez les valeurs</string>
     <!-- Message of the Save as channel dialog, above the name field. One line. -->
     <string name="intercom_vfo_name_prompt">Nom du nouveau canal :</string>
     <!-- Name given to a channel saved from the VFO when the name field is left empty. Stored as the channel name. Short. -->
@@ -1049,7 +1049,7 @@
     <!-- Title of the Net control sheet (start a net, past nets). One line. -->
     <string name="intercom_net_title">Station directrice</string>
     <!-- Hint at the top of the Net control sheet. -->
-    <string name="intercom_net_start_hint">Animez un réseau : ouvrez-le, pointez les stations au fur et à mesure de leurs appels (ou appuyez sur une station que la radio vient d’entendre), signalez le trafic, les retardataires et les départs, puis clôturez-le avec un compte rendu à partager et à ajouter au carnet de trafic.</string>
+    <string name="intercom_net_start_hint">Animez un réseau : ouvrez-le, pointez les stations au fur et à mesure de leurs appels (ou appuyez sur une station que la radio vient d’entendre), signalez le trafic, les retardataires et les départs, puis terminez-le avec un compte rendu à partager et à ajouter au carnet de trafic.</string>
     <!-- Label of the net name field on the Net control sheet. Short. -->
     <string name="intercom_net_name_label">Nom du réseau</string>
     <!-- Default net name in the Net control sheet's name field, before the user has run a net. It becomes the net's stored name. -->
@@ -1099,7 +1099,7 @@
     <!-- Button on the running-net sheet that shows the net report. Short (half-width button). -->
     <string name="intercom_net_report">Compte rendu</string>
     <!-- Button on the running-net sheet that ends the net. Short (half-width button). -->
-    <string name="intercom_net_end">Clore le réseau</string>
+    <string name="intercom_net_end">Terminer le réseau</string>
     <!-- Flag chip on a check-in row: the station has traffic. Very short (chip). -->
     <string name="intercom_net_flag_traffic">Trafic</string>
     <!-- Flag chip on a check-in row: the station checked in late. Very short (chip). -->
@@ -1113,9 +1113,9 @@
     <!-- Clock on the running-net sheet. %1$d minutes, %2$02d seconds. One line, large. -->
     <string name="intercom_net_clock">Réseau en cours %1$d:%2$02d</string>
     <!-- Title of the confirmation dialog that ends the net. %1$s net name. One line. -->
-    <string name="intercom_net_end_confirm">Clore %1$s ?</string>
+    <string name="intercom_net_end_confirm">Terminer %1$s ?</string>
     <!-- Button in the end-the-net dialog. One word (dialog button). -->
-    <string name="intercom_net_end_button">Clore</string>
+    <string name="intercom_net_end_button">Terminer</string>
     <!-- Title of the Net report sheet. One line. -->
     <string name="intercom_net_report_title">Compte rendu du réseau</string>
     <!-- Button on the Net report sheet that adds every check-in to the logbook. Short (half-width button). -->

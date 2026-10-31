@@ -52,11 +52,11 @@
     <!-- Error: the file asked for is not on the phone. -->
     <string name="web_not_found">Introuvable</string>
     <!-- Error: a number in the form could not be read. -->
-    <string name="web_check_numbers">Vérifiez les valeurs numériques</string>
+    <string name="web_check_numbers">Vérifiez les valeurs</string>
     <!-- Error: a number in the form could not be read. %1$s: the technical reason. -->
-    <string name="web_check_numbers_detail">Vérifiez les valeurs numériques : %1$s</string>
+    <string name="web_check_numbers_detail">Vérifiez les valeurs : %1$s</string>
     <!-- Error: the phone has no GPS position yet. -->
-    <string name="web_no_fix">Le téléphone n’a pas de position GPS</string>
+    <string name="web_no_fix">Pas de position sur le téléphone</string>
     <!-- Error: the phone has no GPS position yet (it may get one soon). -->
     <string name="web_no_fix_yet">Le téléphone n’a pas encore de position GPS</string>
     <!-- Error: a callsign field is empty. -->
@@ -112,7 +112,7 @@
     <!-- Error in the channel editor (DMR). -->
     <string name="web_ch_groups_max">32 talkgroups au maximum dans la liste RX (numéro d’appel compris)</string>
     <!-- Error in the channel editor (DMR encryption). -->
-    <string name="web_ch_key_len">La clé de chiffrement doit comporter exactement 8 caractères</string>
+    <string name="web_ch_key_len">La clé de chiffrement doit comporter exactement 8 caractères</string>
     <!-- Error: a new DMR channel on a radio that only does analog (FM). -->
     <string name="web_ch_no_dmr">Cette radio ne fait pas de DMR : ajoutez un canal analogique</string>
     <!-- Error in the VFO editor (DMR). -->
@@ -458,7 +458,7 @@
     <!-- Reply after saving a zone. %1$s: its name. -->
     <string name="web_zone_saved">Zone enregistrée : %1$s</string>
     <!-- Error: the zone is gone. -->
-    <string name="web_zone_none">Zone inexistante</string>
+    <string name="web_zone_none">Cette zone n’existe pas</string>
     <!-- Reply after deleting a zone. %1$s: its name. -->
     <string name="web_zone_deleted">Zone supprimée : %1$s</string>
     <!-- Reply after a backup. %1$s: the backup folder's name. The path stays as it is. -->
@@ -497,9 +497,9 @@
     <string name="web_pager_add_ric">Ajoutez un RIC</string>
     <!-- Reply after sending a page. %1$d: the number of pager addresses (RICs). -->
     <plurals name="web_pager_sending">
-        <item quantity="one">Envoi vers %1$d RIC</item>
-        <item quantity="many">Envoi vers %1$d RIC</item>
-        <item quantity="other">Envoi vers %1$d RIC</item>
+        <item quantity="one">Envoi à %1$d RIC</item>
+        <item quantity="many">Envoi à %1$d RIC</item>
+        <item quantity="other">Envoi à %1$d RIC</item>
     </plurals>
     <!-- Reply after Restart the module on the web Settings page. -->
     <string name="web_device_restarting">Redémarrage du module radio</string>

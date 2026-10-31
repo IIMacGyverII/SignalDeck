@@ -318,7 +318,7 @@
     <!-- Save check on the RX group list. One line. -->
     <string name="channel_editor_err_groups">32 talkgroups au maximum dans la liste RX (numéro d’appel compris)</string>
     <!-- Save check on the encrypt key. One line. -->
-    <string name="channel_editor_err_key">La clé de chiffrement doit compter exactement 8 caractères</string>
+    <string name="channel_editor_err_key">La clé de chiffrement doit comporter exactement 8 caractères</string>
     <!-- Title of the dialog that shows a Save check. Short. -->
     <string name="channel_editor_check_title">Vérifier le canal</string>
 </resources>

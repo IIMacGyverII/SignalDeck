@@ -54,7 +54,7 @@
     <!-- History line when the parrot (simplex repeater) is switched off. %1$d is how many transmissions it repeated. Starts with an emoji; keep it. -->
     <string name="service_parrot_off_history">🦜 Perroquet arrêté (émissions répétées : %1$d)</string>
     <!-- Toast when the parrot (simplex repeater) is switched off. Short. -->
-    <string name="service_parrot_off">Perroquet arrêté</string>
+    <string name="service_parrot_off">Perroquet désactivé</string>
     <!-- SAFETY: transmit refusal (toast) when the parrot is switched on on a digital channel. One line. -->
     <string name="service_parrot_needs_fm">Le perroquet exige un canal FM analogique</string>
     <!-- Refusal (toast) when the parrot is switched on with the squelch open. Soft SQ is SignalDeck's software squelch. Two lines. -->

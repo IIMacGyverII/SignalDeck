@@ -31,6 +31,7 @@ import java.util.Map;
  *       that calls Txt runs (and says the same English) under JUnit.</li>
  * </ul>
  * Logs, diagnostics, report.json, file formats and anything sent on the air never go through {@link #s}.
+ * <p>i18n: stays English (exception messages and preference keys only; the user-facing text is in the resources).
  */
 public final class Txt {
     private Txt() { }

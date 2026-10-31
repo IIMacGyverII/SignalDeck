@@ -23,6 +23,7 @@ import org.json.JSONObject;
  *   <li>An argument may be a String, a number, or another Msg (a reason inside a sentence), which is rendered in the
  *       same language as the sentence.</li>
  * </ul>
+ * <p>i18n: stays English (exception messages and preference keys only; the user-facing text is in the resources).
  */
 public final class Msg {
     private final String name; private final boolean plural; private final int count; private final Object[] args;

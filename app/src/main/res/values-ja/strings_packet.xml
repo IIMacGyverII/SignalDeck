@@ -1,0 +1,1603 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Packet screens (PKT, APRS, messages, map, packet finder) and the packet engine, decoders and coverage map. See strings_common.xml
+     for the conventions. Anything sent on the air (APRS payloads, beacons, acks, telemetry, paths, SSTV overlays, KISS) and the
+     APRS-IS protocol stay in code, in English. -->
+<resources>
+
+    <!-- ==== Packet engine: history lines (shown in Last heard and on the intercom; %1$s etc. are callsigns, packet text and numbers as received), notifications, and the reasons returned to the PKT screens and SignalDeck Web. -->
+    <!-- APRS settings → Lead-in length choice: the default 1.6 s. Short (choice pill). -->
+    <string name="packet_lead_default">1.6 s（初期値）</string>
+    <!-- APRS settings → Lead-in length choice: no lead-in. Very short (choice pill). -->
+    <string name="packet_lead_none">なし</string>
+    <!-- APRS settings → What the lead-in is made of: a steady 1200 Hz tone. Short (choice pill). -->
+    <string name="packet_lead_kind_tone">トーン</string>
+    <!-- APRS settings → What the lead-in is made of: HDLC flags, the AX.25 standard. Short (choice pill). -->
+    <string name="packet_lead_kind_flags">フラグ（標準）</string>
+    <!-- APRS settings → What the lead-in is made of: silence. Short (choice pill). -->
+    <string name="packet_lead_kind_silence">無音</string>
+    <!-- ==== SSTV receiver status (PKT → SSTV, the SSTV screen, SignalDeck Web). Lower case, one line. Robot 36 and the other mode names stay as they are. -->
+    <!-- SSTV status: the receiver is off. -->
+    <string name="packet_sstv_idle">停止中</string>
+    <!-- SSTV status: continuous Robot 36 locked on. %1$d the line, %2$d the lines in the picture. -->
+    <string name="packet_sstv_receiving_line">Robot 36 受信中：%1$d / %2$d 行</string>
+    <!-- SSTV status: continuous Robot 36 decoder waiting for a picture. -->
+    <string name="packet_sstv_listening_continuous">受信待機中（Robot 36 連続）</string>
+    <!-- SSTV status: a continuous Robot 36 picture is complete and saved. -->
+    <string name="packet_sstv_picture_received">画像を受信しました</string>
+    <!-- SSTV status: a picture is complete but could not be saved. -->
+    <string name="packet_sstv_picture_received_unsaved">画像を受信しました（保存できません）</string>
+    <!-- SSTV status: a partial picture was kept. %1$d the lines received. -->
+    <string name="packet_sstv_picture_partial">画像を受信しました（一部、%1$d 行）</string>
+    <!-- SSTV status: a partial picture that could not be saved. %1$d the lines received. -->
+    <string name="packet_sstv_picture_partial_unsaved">画像を受信しました（一部、%1$d 行、保存できません）</string>
+    <!-- SSTV status: a picture header (VIS) was heard. %1$s the mode name. -->
+    <string name="packet_sstv_receiving_mode">%1$s 受信中</string>
+    <!-- SSTV status while a picture comes in: %1$d lines of %2$d. -->
+    <string name="packet_sstv_receiving_lines">受信中 %1$d/%2$d</string>
+    <!-- SSTV status: the decoder switched mode mid-picture. %1$s the new mode name. -->
+    <string name="packet_sstv_mode_changed">モードが %1$s に変わりました</string>
+    <!-- SSTV status: picture done. %1$s the mode name. -->
+    <string name="packet_sstv_picture_complete">画像の受信完了（%1$s）</string>
+    <!-- SSTV status: waiting for a picture header (VIS code). -->
+    <string name="packet_sstv_listening_vis">VIS ヘッダーを待機中</string>
+    <!-- History line: an SSTV picture was received and saved to the Download/DMR/SSTV folder (keep the path). %1$s the mode name. -->
+    <string name="packet_sstv_event_received">📺 SSTV 画像を受信（%1$s）→ Download/DMR/SSTV</string>
+    <!-- History line: a partial Robot 36 picture was saved. %1$d lines received of %2$d. Keep the path. -->
+    <string name="packet_sstv_event_received_partial">📺 SSTV 画像を受信（Robot 36、一部：%2$d 行中 %1$d 行）→ Download/DMR/SSTV</string>
+    <!-- Notification title when an SSTV picture arrives. One line. -->
+    <string name="packet_sstv_notify_received">SSTV 画像を受信</string>
+    <!-- Notification text for a partial Robot 36 picture. Short. -->
+    <string name="packet_sstv_notify_partial">Robot 36（一部）</string>
+    <!-- History line: an SSTV picture header was heard. %1$s the mode name. -->
+    <string name="packet_sstv_event_detected">📺 SSTV %1$s を検出</string>
+    <!-- History line: a long SSTV picture was held back by the cool-down guard. %1$s the mode name, %2$s the guard's reason. -->
+    <string name="packet_sstv_event_held">⏳ %1$s 未送信：%2$s</string>
+    <!-- History line: an SSTV picture went out. %1$s the mode name. -->
+    <string name="packet_sstv_event_sent">📺 SSTV %1$s を送信</string>
+    <!-- Toast when sending SSTV without a picture. One line. -->
+    <string name="packet_sstv_err_no_picture">画像がありません</string>
+    <!-- Toast when the chosen SSTV mode cannot be sent. One line. -->
+    <string name="packet_sstv_err_unsupported">対応していないモードです</string>
+    <!-- Toast when sending SSTV on a DMR channel. One line. -->
+    <string name="packet_sstv_err_analog">SSTV にはアナログチャンネルが必要です</string>
+    <!-- Toast: the SSTV mode is longer than the transmit limit. %1$s the mode, %2$d its seconds, %3$s the limit ("2 min"). Device → Longest transmission is the setting's path. -->
+    <string name="packet_sstv_err_too_long">%1$s は %2$d 秒かかり、送信時間制限（%3$s）を超えます（デバイス → 最長送信時間）</string>
+    <!-- ==== Reasons a packet action was refused (toasts, PKT screens, SignalDeck Web). One or two lines. -->
+    <!-- Toast: no callsign is set. PKT → Settings is where to set it. -->
+    <string name="packet_err_callsign_settings">先にコールサインを設定してください（PKT → 設定）</string>
+    <!-- Toast: no callsign is set. PKT → APRS settings is where to set it. -->
+    <string name="packet_err_callsign_aprs">先にコールサインを設定してください（PKT → APRS 設定）</string>
+    <!-- Toast: no callsign is set (APRS-IS). -->
+    <string name="packet_err_callsign">先にコールサインを設定してください</string>
+    <!-- Toast: packet cannot be sent on a DMR channel. -->
+    <string name="packet_err_analog">パケットにはアナログチャンネルが必要です</string>
+    <!-- Toast: packet cannot be sent on a DMR channel. %1$s the APRS frequency ("144.390"). -->
+    <string name="packet_err_analog_aprs">パケットにはアナログチャンネルが必要です。APRS チャンネル（この地域では %1$s MHz）に合わせてください</string>
+    <!-- Toast: the terminal cannot connect on a DMR channel. -->
+    <string name="packet_err_analog_bbs">パケットにはアナログチャンネルが必要です。BBS またはノードの周波数に合わせてください</string>
+    <!-- Toast: a weather report needs the phone's air-pressure sensor. -->
+    <string name="packet_err_no_barometer">この端末には気圧センサーがありません</string>
+    <!-- Toast: no GPS position yet. -->
+    <string name="packet_err_no_fix">位置を取得していません</string>
+    <!-- Toast: no GPS position yet for a beacon, with a hint. -->
+    <string name="packet_err_no_fix_maps">位置を取得していません（位置情報をオンにして、マップを一度開いてください）</string>
+    <!-- Toast: an APRS object needs a name. -->
+    <string name="packet_err_object_name">オブジェクトに名前を付けてください（9 文字まで）</string>
+    <!-- Toast: the bulletin text is empty. -->
+    <string name="packet_err_bulletin_empty">先に掲示文を入力してください</string>
+    <!-- Toast: the bulletin text is too long (an APRS limit). -->
+    <string name="packet_err_bulletin_long">掲示文は 67 文字までです</string>
+    <!-- Toast: the APRS message is too long (an APRS limit). -->
+    <string name="packet_err_message_long">APRS メッセージは 67 文字までです</string>
+    <!-- Toast: there is no text or DTMF code to send. -->
+    <string name="packet_err_nothing_to_send">送信する内容がありません</string>
+    <!-- Toast: an APRS message needs a callsign to send to and some text. -->
+    <string name="packet_err_addressee_text">宛先と本文が必要です</string>
+    <!-- History line: APRS telemetry went out. %1$d battery percent, %2$s volts, %3$s °C. -->
+    <string name="packet_telemetry_sent">📊 テレメトリーを送信：電池 %1$d %%、%2$s V、%3$s °C</string>
+    <!-- History line: APRS telemetry went out. %1$d battery percent, %2$s volts, %3$s °C, %4$s the air pressure in hPa. -->
+    <string name="packet_telemetry_sent_hpa">📊 テレメトリーを送信：電池 %1$d %%、%2$s V、%3$s °C、%4$s hPa</string>
+    <!-- History line: the weather report could not be sent. -->
+    <string name="packet_weather_not_sent">⛔ 気象情報は未送信：気圧の測定値がありません</string>
+    <!-- History line: an APRS weather report went out. %1$s the pressure in hPa. -->
+    <string name="packet_weather_sent">⛅ 気象情報を送信：%1$s hPa</string>
+    <!-- History line: an APRS object was placed. %1$s its name. -->
+    <string name="packet_object_placed">📌 オブジェクトを配置：%1$s</string>
+    <!-- History line: an APRS object was removed. %1$s its name. -->
+    <string name="packet_object_removed">📌 オブジェクトを削除：%1$s</string>
+    <!-- History line: an APRS bulletin went out. %1$s the bulletin slot (BLN1), %2$s its text. -->
+    <string name="packet_bulletin_sent">📢 掲示 %1$s を送信：%2$s</string>
+    <!-- ==== Keyboard text modes (RTTY, PSK31): status line on the text-mode screen and PKT, and history lines. -->
+    <!-- Status: RTTY locked on. %1$s the mark tone in Hz. -->
+    <string name="packet_text_rtty_listening">RTTY：受信中、マーク %1$s Hz</string>
+    <!-- Status: RTTY waiting for a signal. -->
+    <string name="packet_text_rtty_looking">RTTY：信号を探しています</string>
+    <!-- Status: PSK31 locked on. %1$s the audio frequency in Hz. -->
+    <string name="packet_text_psk_listening">PSK31：%1$s Hz で受信中</string>
+    <!-- Status: PSK31 waiting for a signal. -->
+    <string name="packet_text_psk_looking">PSK31：信号を探しています</string>
+    <!-- Status: the text-mode receiver is off. -->
+    <string name="packet_text_not_listening">受信していません</string>
+    <!-- Toast: text modes cannot be sent on a DMR channel. -->
+    <string name="packet_text_err_analog">テキストモードにはアナログチャンネルが必要です</string>
+    <!-- History line: RTTY went out through the module's tone generator. %1$s the text sent. -->
+    <string name="packet_text_rtty_sent_tones">⌨ RTTY を送信（トーン発生器）：%1$s</string>
+    <!-- History line: the tone generator refused, RTTY went out as audio. %1$s the reason. -->
+    <string name="packet_text_rtty_no_tones">⚠️ RTTY にトーン発生器を使えませんでした：%1$s。音声経路で送信しました</string>
+    <!-- History line: RTTY went out. %1$s the text sent. -->
+    <string name="packet_text_rtty_sent">⌨ RTTY を送信：%1$s</string>
+    <!-- History line: PSK31 went out. %1$s the text sent. -->
+    <string name="packet_text_psk_sent">⌨ PSK31 を送信：%1$s</string>
+    <!-- ==== Packet terminal (PKT → Terminal): the transcript, history lines, notification and refusals. -->
+    <!-- History line: the terminal link changed. %1$s the link state ("connected to N0ABC-1"). -->
+    <string name="packet_term_event_state">💻 パケット端末：%1$s</string>
+    <!-- Notification title when another station connects to us. One line. -->
+    <string name="packet_term_notify_connection">パケット接続</string>
+    <!-- Toast: the station to connect to is not a callsign. Keep the example callsigns. -->
+    <string name="packet_term_err_callsign">N0ABC や N0ABC-1 のようなコールサインを入力してください</string>
+    <!-- Toast: too many digipeaters in the path. -->
+    <string name="packet_term_err_digis">デジピーターは 2 局までです</string>
+    <!-- Transcript line when calling a station (starts with "> "). %1$s the callsign. -->
+    <string name="packet_term_connecting">> %1$s に接続中</string>
+    <!-- Transcript line when calling a station through digipeaters. %1$s the callsign, %2$s the digipeaters (comma list). -->
+    <string name="packet_term_connecting_via">> %2$s 経由で %1$s に接続中</string>
+    <!-- Toast: text typed while the terminal is not connected. -->
+    <string name="packet_term_err_not_connected">接続していません</string>
+    <!-- History line: a packet transmission was dropped on a DMR channel. %1$s what it was (English transmit label, e.g. "AX.25 1 frame"). -->
+    <string name="packet_event_not_sent_analog">⛔ 未送信（%1$s）：パケットにはアナログチャンネルが必要です</string>
+    <!-- History line: a packet transmission was dropped because the channel is DMR. %1$s what it was (English transmit label, e.g. "position beacon"). -->
+    <string name="packet_event_not_sent_dmr">⛔ 未送信（%1$s）：パケットにはアナログチャンネルが必要です。現在のチャンネルは DMR です</string>
+    <!-- ==== iGate and APRS-IS (internet APRS). -->
+    <!-- History line: an internet message for a nearby station was not sent on the radio. %1$s the APRS frequency, %2$s sender, %3$s addressee. -->
+    <string name="packet_igate_not_gated">🌐 無線へ中継せず（%1$s に合わせていないため）：%2$s → %3$s</string>
+    <!-- History line: an internet message was sent on the radio. %1$s sender, %2$s addressee, %3$s the message. -->
+    <string name="packet_igate_gated">🌐→📡 無線へ中継：%1$s → %2$s：%3$s</string>
+    <!-- APRS-IS status: not running. Lower case, very short (after "APRS-IS: "). -->
+    <string name="packet_is_off">オフ</string>
+    <!-- APRS-IS status: logged in. %1$d packets gated to the internet. Lower case, short. -->
+    <string name="packet_is_connected">接続中 · %1$d 件中継</string>
+    <!-- APRS-IS status: logged in without a valid passcode (receive only). %1$d packets gated. Lower case, short. -->
+    <string name="packet_is_connected_rx_only">接続中、受信専用 · %1$d 件中継</string>
+    <!-- Notification title: an APRS message for you came over the internet. %1$s the sender. -->
+    <string name="packet_is_notify_message">APRS-IS メッセージ（%1$s から）</string>
+    <!-- Toast: an internet APRS message needs a verified APRS-IS login (a passcode). -->
+    <string name="packet_is_err_not_verified">APRS-IS に認証済みのログインで接続していません</string>
+    <!-- Toast: the APRS-IS server connection failed while sending. -->
+    <string name="packet_is_err_send_failed">APRS-IS への送信に失敗しました</string>
+    <!-- History line: an APRS message went out over the internet. %1$s addressee, %2$s text. -->
+    <string name="packet_is_event_sent">🌐 %1$s へ送信：%2$s</string>
+    <!-- Toast: the KISS TNC (for APRSdroid, YAAC) is already on. %1$d the TCP port. -->
+    <string name="packet_kiss_running">KISS TNC はすでに 127.0.0.1:%1$d で動作中です</string>
+    <!-- ==== Morse: the callsign ID and Morse heard. -->
+    <!-- Toast: the Morse ID cannot be sent on a DMR channel. -->
+    <string name="packet_morse_err_analog">モールスにはアナログチャンネルが必要です</string>
+    <!-- History line: the Morse ID went out through the module's tone generator. %1$s your callsign. -->
+    <string name="packet_morse_sent_tones">🔤 CW ID %1$s を送信（トーン発生器）</string>
+    <!-- History line: the tone generator refused, the Morse ID went out as audio. %1$s the reason. -->
+    <string name="packet_morse_no_tones">⚠️ CW ID にトーン発生器を使えませんでした：%1$s。音声経路で送信しました</string>
+    <!-- History line: the Morse ID went out. %1$s your callsign. -->
+    <string name="packet_morse_sent">🔤 CW ID %1$s を送信</string>
+    <!-- History line: the repeater's own callsign was heard in Morse. %1$s the callsign, %2$s the decoded text, %3$s the tone in Hz, %4$d the speed in words per minute. Note the two spaces before "(". -->
+    <string name="packet_morse_heard_repeater">🔤 モールスでレピーター ID %1$s（このチャンネルと一致）：%2$s \u0020（%3$s Hz、%4$d WPM）</string>
+    <!-- History line: Morse was decoded. %1$s the text, %2$s the tone in Hz, %3$d words per minute. Note the two spaces before "(". -->
+    <string name="packet_morse_heard">🔤 モールス：%1$s \u0020（%2$s Hz、%3$d WPM）</string>
+    <!-- ==== APRS on the radio: notifications and history lines. -->
+    <!-- Notification title: a message to one of your APRS groups. %1$s the group, %2$s the sender. -->
+    <string name="packet_aprs_notify_group">APRS グループ %1$s：%2$s</string>
+    <!-- Notification title: an APRS message for you. %1$s the sender. -->
+    <string name="packet_aprs_notify_message">APRS メッセージ（%1$s から）</string>
+    <!-- Notification title: an APRS bulletin was heard. %1$s the sender. -->
+    <string name="packet_aprs_notify_bulletin">APRS 掲示（%1$s から）</string>
+    <!-- History line: an APRS message went out on the radio. %1$s addressee, %2$s text. -->
+    <string name="packet_aprs_event_sent">📡 %1$s へ送信：%2$s</string>
+    <!-- History line: an APRS emergency position report went out. -->
+    <string name="packet_emergency_sent_position">🆘 緊急位置を送信しました</string>
+    <!-- History line: an APRS emergency status report went out (no GPS fix). -->
+    <string name="packet_emergency_sent_status">🆘 緊急ステータス（位置未取得）を送信しました</string>
+    <!-- History line: a position beacon went out. -->
+    <string name="packet_beacon_sent">📡 ビーコンを送信しました</string>
+    <!-- History line: a position beacon went out through a path. %1$s the path (WIDE1-1,WIDE2-1 or ARISS). -->
+    <string name="packet_beacon_sent_via">📡 %1$s 経由でビーコンを送信しました</string>
+    <!-- ==== DTMF. -->
+    <!-- Shown instead of the digits when a DTMF remote-control command (with its PIN) was heard. Short, lower case. -->
+    <string name="packet_dtmf_remote_command">リモートコマンド</string>
+    <!-- History line: DTMF digits were heard. %1$s the digits (or "remote command"). -->
+    <string name="packet_dtmf_heard">📟 DTMF %1$s</string>
+    <!-- History line: DTMF went out. %1$s the digits. -->
+    <string name="packet_dtmf_sent">📟 DTMF %1$s を送信</string>
+    <!-- Toast: the DTMF code has characters that cannot be sent. -->
+    <string name="packet_dtmf_err_chars">送信できるのは 0-9、A-D、* と # だけです</string>
+    <!-- Toast: DTMF cannot be sent on a DMR channel. -->
+    <string name="packet_dtmf_err_analog">DTMF にはアナログチャンネルが必要です</string>
+    <!-- ==== Weather alert (SAME) history lines. -->
+    <!-- History line: the end-of-message burst of a weather alert. -->
+    <string name="packet_same_event_eom">⛈️ 気象警報：メッセージ終了</string>
+    <!-- History line: a weather alert. %1$s the alert line ("Tornado Warning — 1h00 — 3 areas"). -->
+    <string name="packet_same_event_alert">⛈️ %1$s</string>
+    <!-- History line: the 1050 Hz attention tone of a weather alert. -->
+    <string name="packet_same_event_attention">⛈️ 気象警報の注意喚起トーン</string>
+
+    <!-- ==== Packet terminal: AX.25 link states (PKT → Terminal, between *** marks, and the history line "Packet terminal: …"). Lower case, one line. %1$s is a callsign. -->
+    <!-- Link state while calling a BBS or node. -->
+    <string name="packet_ax25_connecting">%1$s に接続中</string>
+    <!-- Link state: the call was cancelled before the other station answered. -->
+    <string name="packet_ax25_disconnected_cancelled">切断：キャンセルしました</string>
+    <!-- Link state while hanging up. -->
+    <string name="packet_ax25_disconnecting">切断中</string>
+    <!-- Link state: the station never answered the call. -->
+    <string name="packet_ax25_disconnected_no_answer">切断：%1$s から応答なし</string>
+    <!-- Link state: the connection dropped. %1$d is the number of tries (6). -->
+    <string name="packet_ax25_disconnected_link_lost">切断：リンク喪失（%1$d 回試行しても確認応答なし）</string>
+    <!-- Link state: another station called us and we accepted. Also the text of the "Packet connection" notification. -->
+    <string name="packet_ax25_connected_they_called">%1$s と接続（相手からの接続）</string>
+    <!-- Link state: connected. -->
+    <string name="packet_ax25_connected">%1$s と接続</string>
+    <!-- Link state: the link is closed. -->
+    <string name="packet_ax25_disconnected">切断</string>
+    <!-- Link state: the station refused the call (DM). -->
+    <string name="packet_ax25_disconnected_busy">切断：%1$s は使用中か拒否しました</string>
+    <!-- Link state: the other station hung up. -->
+    <string name="packet_ax25_disconnected_by">%1$s が切断しました</string>
+    <!-- Link state: the other station rejected a frame. FRMR is a protocol word, keep it. -->
+    <string name="packet_ax25_disconnected_frmr">切断：フレーム拒否（FRMR）</string>
+
+    <!-- ==== NOAA Weather Radio / EAS (SAME) alerts: PKT → Weather alerts list, the alert notification and its history line. -->
+    <!-- The end-of-message burst (NNNN) of an alert. -->
+    <string name="packet_same_end_of_message">メッセージ終了</string>
+    <!-- Alert duration in the alert line: %1$d hours, %2$s minutes (two digits): "1h30". Very short. -->
+    <string name="packet_same_duration">%1$d時間%2$s分</string>
+    <!-- Number of areas an alert covers, in the alert line. -->
+    <plurals name="packet_same_areas">
+        <item quantity="other">%1$d 地域</item>
+    </plurals>
+    <!-- Alert line: %1$s the event name ("Tornado Warning"), %2$s the areas ("3 areas"). One line. -->
+    <string name="packet_same_summary">%1$s — %2$s</string>
+    <!-- Alert line: %1$s the event name, %2$s the areas, %3$s the sending station (as sent, e.g. KXYZ/NWS). One line. -->
+    <string name="packet_same_summary_sender">%1$s — %2$s — %3$s</string>
+    <!-- Alert line: %1$s the event name, %2$s the duration ("1h30"), %3$s the areas. One line. -->
+    <string name="packet_same_summary_dur">%1$s — %2$s — %3$s</string>
+    <!-- Alert line: %1$s the event name, %2$s the duration, %3$s the areas, %4$s the sending station. One line. -->
+    <string name="packet_same_summary_dur_sender">%1$s — %2$s — %3$s — %4$s</string>
+    <!-- SAME event names (the US National Weather Service / EAS list). Use the official name in your country where there is one. Title of the alert notification and start of the alert line. One line. -->
+    <!-- SAME event TOR. -->
+    <string name="packet_same_tor">竜巻警報</string>
+    <!-- SAME event TOA. -->
+    <string name="packet_same_toa">竜巻注意報</string>
+    <!-- SAME event SVR. -->
+    <string name="packet_same_svr">激しい雷雨警報</string>
+    <!-- SAME event SVA. -->
+    <string name="packet_same_sva">激しい雷雨注意報</string>
+    <!-- SAME event SVS. -->
+    <string name="packet_same_svs">荒天情報</string>
+    <!-- SAME event FFW. -->
+    <string name="packet_same_ffw">鉄砲水警報</string>
+    <!-- SAME event FFA. -->
+    <string name="packet_same_ffa">鉄砲水注意報</string>
+    <!-- SAME event FFS. -->
+    <string name="packet_same_ffs">鉄砲水情報</string>
+    <!-- SAME event FLW. -->
+    <string name="packet_same_flw">洪水警報</string>
+    <!-- SAME event FLA. -->
+    <string name="packet_same_fla">洪水注意報</string>
+    <!-- SAME event FLS. -->
+    <string name="packet_same_fls">洪水情報</string>
+    <!-- SAME event WSW. -->
+    <string name="packet_same_wsw">冬の嵐警報</string>
+    <!-- SAME event WSA. -->
+    <string name="packet_same_wsa">冬の嵐注意報</string>
+    <!-- SAME event BZW. -->
+    <string name="packet_same_bzw">暴風雪警報</string>
+    <!-- SAME event HWW. -->
+    <string name="packet_same_hww">強風警報</string>
+    <!-- SAME event HWA. -->
+    <string name="packet_same_hwa">強風注意報</string>
+    <!-- SAME event SMW. -->
+    <string name="packet_same_smw">特別海上警報</string>
+    <!-- SAME event SPS. -->
+    <string name="packet_same_sps">特別気象情報</string>
+    <!-- SAME event HUW. -->
+    <string name="packet_same_huw">ハリケーン警報</string>
+    <!-- SAME event HUA. -->
+    <string name="packet_same_hua">ハリケーン注意報</string>
+    <!-- SAME event HLS. -->
+    <string name="packet_same_hls">ハリケーン情報</string>
+    <!-- SAME event TRW. -->
+    <string name="packet_same_trw">熱帯暴風雨警報</string>
+    <!-- SAME event TRA. -->
+    <string name="packet_same_tra">熱帯暴風雨注意報</string>
+    <!-- SAME event TSW. -->
+    <string name="packet_same_tsw">津波警報</string>
+    <!-- SAME event TSA. -->
+    <string name="packet_same_tsa">津波注意報</string>
+    <!-- SAME event SSW. -->
+    <string name="packet_same_ssw">高潮警報</string>
+    <!-- SAME event SSA. -->
+    <string name="packet_same_ssa">高潮注意報</string>
+    <!-- SAME event EWW. -->
+    <string name="packet_same_eww">猛烈な風の警報</string>
+    <!-- SAME event DSW. -->
+    <string name="packet_same_dsw">砂嵐警報</string>
+    <!-- SAME event FRW. -->
+    <string name="packet_same_frw">火災警報</string>
+    <!-- SAME event FZW. -->
+    <string name="packet_same_fzw">凍結警報</string>
+    <!-- SAME event HMW. -->
+    <string name="packet_same_hmw">有害物質警報</string>
+    <!-- SAME event LEW. -->
+    <string name="packet_same_lew">警察からの警報</string>
+    <!-- SAME event LAE. -->
+    <string name="packet_same_lae">地域緊急事態</string>
+    <!-- SAME event NUW. -->
+    <string name="packet_same_nuw">原子力発電所警報</string>
+    <!-- SAME event RHW. -->
+    <string name="packet_same_rhw">放射線災害警報</string>
+    <!-- SAME event SPW. -->
+    <string name="packet_same_spw">屋内退避警報</string>
+    <!-- SAME event VOW. -->
+    <string name="packet_same_vow">火山警報</string>
+    <!-- SAME event CAE. -->
+    <string name="packet_same_cae">児童誘拐緊急警報</string>
+    <!-- SAME event CDW. -->
+    <string name="packet_same_cdw">市民危険警報</string>
+    <!-- SAME event CEM. -->
+    <string name="packet_same_cem">市民緊急メッセージ</string>
+    <!-- SAME event EVI. -->
+    <string name="packet_same_evi">即時避難</string>
+    <!-- SAME event EQW. -->
+    <string name="packet_same_eqw">地震警報</string>
+    <!-- SAME event AVW. -->
+    <string name="packet_same_avw">雪崩警報</string>
+    <!-- SAME event AVA. -->
+    <string name="packet_same_ava">雪崩注意報</string>
+    <!-- SAME event CFW. -->
+    <string name="packet_same_cfw">沿岸洪水警報</string>
+    <!-- SAME event CFA. -->
+    <string name="packet_same_cfa">沿岸洪水注意報</string>
+    <!-- SAME event EAN. -->
+    <string name="packet_same_ean">緊急行動通知</string>
+    <!-- SAME event EAT. -->
+    <string name="packet_same_eat">緊急行動終了</string>
+    <!-- SAME event NIC. -->
+    <string name="packet_same_nic">国家情報センター</string>
+    <!-- SAME event NPT. -->
+    <string name="packet_same_npt">全国定期試験</string>
+    <!-- SAME event RMT. -->
+    <string name="packet_same_rmt">月例試験</string>
+    <!-- SAME event RWT. -->
+    <string name="packet_same_rwt">週例試験</string>
+    <!-- SAME event ADR. -->
+    <string name="packet_same_adr">管理メッセージ</string>
+    <!-- SAME event DMO. -->
+    <string name="packet_same_dmo">訓練・デモ警報</string>
+    <!-- SAME event BHW. -->
+    <string name="packet_same_bhw">生物災害警報</string>
+    <!-- SAME event BWW. -->
+    <string name="packet_same_bww">煮沸勧告</string>
+    <!-- SAME event CHW. -->
+    <string name="packet_same_chw">化学災害警報</string>
+    <!-- SAME event TOE. -->
+    <string name="packet_same_toe">911 番通報不通</string>
+    <!-- SAME event WFW. -->
+    <string name="packet_same_wfw">山火事警報</string>
+    <!-- SAME event WFA. -->
+    <string name="packet_same_wfa">山火事注意報</string>
+
+    <!-- ==== SSTV receiver status (the VIS-started decoder). -->
+    <!-- SSTV receiver status before a picture starts. One line. -->
+    <string name="packet_sstv_rx_waiting_vis">VIS コードを待機中…</string>
+    <!-- SSTV receiver status while a picture comes in: %1$s the mode name ("Robot 36"), %2$d percent done. One line. -->
+    <string name="packet_sstv_rx_receiving">%1$s 受信中（%2$d%%）</string>
+    <!-- SSTV receiver status when the mode is not known. One line. -->
+    <string name="packet_sstv_rx_unknown_mode">不明なモード</string>
+
+    <!-- ==== APRS-IS connection status (after "APRS-IS: " on the APRS screen and PKT). Lower case, one line. -->
+    <!-- APRS-IS status while connecting. %1$s the server and port (rotate.aprs2.net:14580). -->
+    <string name="packet_is_status_connecting">%1$s に接続中</string>
+    <!-- APRS-IS status: logged in with a valid passcode. %1$s the server's name. -->
+    <string name="packet_is_status_verified">%1$s にログイン（認証済み）</string>
+    <!-- APRS-IS status: logged in without a valid passcode, so it can only receive. %1$s the server's name. -->
+    <string name="packet_is_status_unverified">%1$s にログイン（未認証：受信専用）</string>
+    <!-- APRS-IS status: the connection dropped. %1$d seconds until it tries again. -->
+    <string name="packet_is_status_retry">切断、%1$d 秒後に再試行</string>
+    <!-- Toast: the KISS TNC is already on. %1$d the TCP port. -->
+    <string name="packet_kiss_err_running">ポート %1$d ですでに動作中です</string>
+    <!-- ==== Coverage map (repeater coverage logging and the terrain prediction). -->
+    <!-- History line: coverage logging cannot start without the location permission. -->
+    <string name="packet_cov_event_no_permission">📶 エリア記録には位置情報の権限が必要です</string>
+    <!-- History line: the repeater answered your transmission here. %1$s the channel name, %2$d the repeater's signal in dBm, %3$s in S units (S7). -->
+    <string name="packet_cov_event_keyed">📶 ここから %1$s にアクセスできました（テール %2$d dBm、%3$s）</string>
+    <!-- History line: the repeater did not answer your transmission here. %1$s the channel name. -->
+    <string name="packet_cov_event_no_reply">📶 送信後、%1$s から応答がありません</string>
+    <!-- Prediction note under the coverage map (Heard layer), no readings yet. %1$s the repeater power in W, %2$s its antenna height in m. Heard is the layer's name. -->
+    <string name="packet_cov_pred_rx_uncal_erp">未校正：%1$s W、アンテナ高 %2$s m。「受信」の測定値で精度が上がります</string>
+    <!-- Prediction note (Heard layer), no readings and no known power. -->
+    <string name="packet_cov_pred_rx_uncal">未校正：50 W のレピーターを仮定。「受信」の測定値で補正されます</string>
+    <!-- Prediction note (Heard layer): %1$d squares measured, %2$s the correction in dB with its sign (+3). -->
+    <string name="packet_cov_pred_rx_cal">測定済み %1$d マスで校正（%2$s dB）</string>
+    <!-- Prediction note (Heard layer): %1$d squares measured, %2$s the correction in dB with its sign, %3$s the antenna height in m worked out from the readings. -->
+    <string name="packet_cov_pred_rx_cal_fitted">測定済み %1$d マスで校正（%2$s dB、アンテナ高 %3$s m（推定））</string>
+    <!-- Prediction note (Key-ups layer) worked out from the Heard layer: %1$d squares, %2$s the correction in dB with its sign. -->
+    <string name="packet_cov_pred_tx_from_rx">「受信」の %1$d マスから推定（%2$s dB）。アクセスするたびに精度が上がります</string>
+    <!-- Prediction note (Key-ups layer), no key-ups yet. -->
+    <string name="packet_cov_pred_tx_uncal">未校正：4 W のハンディ機を仮定。アクセスするたびに補正されます</string>
+    <!-- Prediction note (Key-ups layer): %1$d key-ups, %2$d of them keyed the repeater, %3$s the path loss limit in dB. -->
+    <string name="packet_cov_pred_tx_cal">%1$d 回のアクセス（成功 %2$d 回）で校正：到達限界 %3$s dB</string>
+    <!-- Progress line while the prediction runs. %1$d the measured squares. -->
+    <string name="packet_cov_pred_fitting">測定済み %1$d マスにアンテナ高を合わせています</string>
+    <!-- Error when the prediction cannot load the terrain. %1$d tiles missing of %2$d. -->
+    <string name="packet_cov_terrain_missing">地形タイル %2$d 枚中 %1$d 枚を読み込めませんでした（接続なし？）</string>
+
+    <!-- ==== APRS monitoring screen. -->
+    <!-- Counter label on the APRS screen, under a number. Capitals, very short (four share a row). -->
+    <string name="packet_aprs_stat_packets">パケット</string>
+    <!-- Counter label on the APRS screen, under a number. Capitals, very short (four share a row). -->
+    <string name="packet_aprs_stat_stations">局数</string>
+    <!-- Counter label on the APRS screen, under a number. Capitals, very short (four share a row). -->
+    <string name="packet_aprs_stat_for_you">自局宛</string>
+    <!-- Counter label on the APRS screen, under a number. Capitals, very short (four share a row). -->
+    <string name="packet_aprs_stat_last">最終受信</string>
+    <!-- Tab on the APRS screen. Capitals, very short (three share a row). -->
+    <string name="packet_aprs_tab_live">ライブ</string>
+    <!-- Tab on the APRS screen. Capitals, very short (three share a row). -->
+    <string name="packet_aprs_tab_stations">局</string>
+    <!-- Tab on the APRS screen. Capitals, very short (three share a row). -->
+    <string name="packet_aprs_tab_messages">メッセージ</string>
+    <!-- Button at the bottom of the APRS screen that opens the APRS message sheet. Short (three share a row). -->
+    <string name="packet_aprs_message">メッセージ</string>
+    <!-- Button at the bottom of the APRS screen that sends a position beacon. Short (three share a row). -->
+    <string name="packet_aprs_beacon">ビーコン</string>
+    <!-- Button at the bottom of the APRS screen that opens the map. Short (three share a row). -->
+    <string name="packet_aprs_map">マップ</string>
+    <!-- ==== Subtitle of the APRS screen: parts joined with " · ". -->
+    <!-- APRS screen subtitle while listening to the space station. %1$s its frequency. Short. -->
+    <string name="packet_aprs_sub_iss">ISS APRS %1$s · ドップラー補正</string>
+    <!-- APRS screen subtitle: the KISS TNC runs on the current channel. Short. -->
+    <string name="packet_aprs_sub_kiss_here">このチャンネルで KISS TNC</string>
+    <!-- APRS screen subtitle: monitoring %1$s (the frequency). Short. -->
+    <string name="packet_aprs_sub_monitoring">%1$s をワッチ中</string>
+    <!-- APRS screen subtitle, added part: the KISS TNC's TCP port %1$d. Very short. -->
+    <string name="packet_aprs_sub_kiss_port">KISS TNC :%1$d</string>
+    <!-- APRS screen subtitle, added part: the KISS TNC's TCP port %1$d. Very short. -->
+    <string name="packet_aprs_sub_port">ポート %1$d</string>
+    <!-- APRS screen subtitle, added part: no callsign is set. Short. -->
+    <string name="packet_aprs_sub_no_call">設定でコールサインを入力してください</string>
+    <!-- ==== Switch chips on the APRS screen (tap to turn on or off). One short line each. -->
+    <!-- Chip: automatic beacons off. -->
+    <string name="packet_aprs_chip_beacon_off">ビーコンオフ</string>
+    <!-- Chip: a beacon every %1$d minutes. -->
+    <string name="packet_aprs_chip_beacon_min">ビーコン %1$d 分</string>
+    <!-- Chip: SmartBeaconing (a feature name, usually kept). -->
+    <string name="packet_aprs_chip_smart">SmartBeacon</string>
+    <!-- Chip: acknowledge messages automatically. -->
+    <string name="packet_aprs_chip_autoack">自動 ACK</string>
+    <!-- Chip shown on a UHF-only radio, where auto-ack is off. -->
+    <string name="packet_aprs_chip_no_autoack">自動 ACK なし（UHF）</string>
+    <!-- Chip: the fill-in digipeater. -->
+    <string name="packet_aprs_chip_digi">デジピーター</string>
+    <!-- Chip: the APRS-IS link and its status (%1$s, e.g. "connected · 3 gated"). -->
+    <string name="packet_aprs_chip_is">APRS-IS：%1$s</string>
+    <!-- Divider in the live list before packets from before monitoring started, when none came since. Shown in capitals. Note the two spaces around ·. -->
+    <string name="packet_aprs_earlier_nothing">以前 \u0020· \u0020ワッチ開始後はまだありません</string>
+    <!-- Divider in the live list before packets from before monitoring started. Shown in capitals. -->
+    <string name="packet_aprs_earlier">以前</string>
+    <!-- The live list of the APRS screen is empty. -->
+    <string name="packet_aprs_live_empty">受信待機中です。無線機がデコードしたパケットは、届いた順にここに表示されます：位置、メッセージ、ステータス、気象、オブジェクト、そして自局が送信したもの。</string>
+    <!-- Stations card, details line: heard %1$d times. Very short. -->
+    <string name="packet_aprs_heard_n">受信 %1$d 回</string>
+    <!-- The stations tab of the APRS screen is empty. -->
+    <string name="packet_aprs_stations_empty">位置情報はまだありません。局は自局からの距離と方向付きで、新しい順に表示されます。コールサインをタップすると連絡先、カードのほかの部分をタップするとマップアプリで開きます。</string>
+    <!-- Messages tab card heading for a message to you: %1$s the sender and addressee. Note the three spaces. -->
+    <string name="packet_aprs_for_you">%1$s \u0020（自局宛）</string>
+    <!-- Last line of a message card that can be answered. Short. -->
+    <string name="packet_aprs_tap_reply">タップして返信</string>
+    <!-- The messages tab of the APRS screen is empty. -->
+    <string name="packet_aprs_msgs_empty">メッセージはまだありません。自局のコールサイン宛のメッセージ、フォロー中のグループ、掲示、送信したメッセージがここに表示されます。</string>
+    <!-- The messages tab of the APRS screen is empty (auto-ack is on). -->
+    <string name="packet_aprs_msgs_empty_ack">メッセージはまだありません。自局のコールサイン宛のメッセージ（自動で ACK を返します）、フォロー中のグループ、掲示、送信したメッセージがここに表示されます。</string>
+    <!-- APRS screen card: what the packet was (a message to you). Lower case, short. -->
+    <string name="packet_aprs_kind_msg_mine">自局宛メッセージ</string>
+    <!-- APRS screen card: what the packet was (a message). Lower case, short. -->
+    <string name="packet_aprs_kind_msg">メッセージ</string>
+    <!-- APRS screen card: what the packet was (a message you sent). Lower case, short. -->
+    <string name="packet_aprs_kind_msg_tx">送信したメッセージ</string>
+    <!-- APRS screen card: what the packet was (an acknowledgement of your message). Lower case, short. -->
+    <string name="packet_aprs_kind_ack">受信確認済み</string>
+    <!-- APRS screen card: what the packet was (your acknowledgement). Lower case, short. -->
+    <string name="packet_aprs_kind_ack_tx">自局が ACK を返信</string>
+    <!-- APRS screen card: what the packet was (a rejection of your message). Lower case, short. -->
+    <string name="packet_aprs_kind_rej">拒否</string>
+    <!-- APRS screen card: what the packet was (a position report). Lower case, short. -->
+    <string name="packet_aprs_kind_pos">位置</string>
+    <!-- APRS screen card: what the packet was (your beacon). Lower case, short. -->
+    <string name="packet_aprs_kind_beacon">自局のビーコン</string>
+    <!-- APRS screen card: what the packet was (your beacon over APRS-IS). Lower case, short. -->
+    <string name="packet_aprs_kind_is_beacon">インターネットビーコン</string>
+    <!-- APRS screen card: what the packet was (a packet you repeated). Lower case, short. -->
+    <string name="packet_aprs_kind_digi">自局がデジピート</string>
+    <!-- APRS screen card: what the packet was (a status report). Lower case, short. -->
+    <string name="packet_aprs_kind_status">ステータス</string>
+    <!-- APRS screen card: what the packet was (an APRS object). Lower case, short. -->
+    <string name="packet_aprs_kind_object">オブジェクト</string>
+    <!-- APRS screen card: what the packet was (an internet message you sent on the radio). Lower case, short. -->
+    <string name="packet_aprs_kind_igate">インターネットから中継</string>
+    <!-- APRS screen card: what the packet was (anything else). Lower case, short. -->
+    <string name="packet_aprs_kind_packet">パケット</string>
+
+    <!-- Map status line while it loads. Short. -->
+    <string name="packet_map_loading">読み込み中…</string>
+    <!-- Title of the map, and of its help sheet. One word. -->
+    <string name="packet_map_title">マップ</string>
+    <!-- Screen reader label of the map's close button. -->
+    <string name="packet_map_cd_close">マップを閉じる</string>
+    <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
+    <string name="packet_map_pill_coverage">エリア</string>
+    <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
+    <string name="packet_map_pill_repeaters">レピーター</string>
+    <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
+    <string name="packet_map_pill_channels">チャンネル</string>
+    <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
+    <string name="packet_map_pill_help">ヘルプ</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_zoom_in">拡大</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_zoom_out">縮小</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_me">現在地</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_fit">すべて表示</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_here">この付近のレピーター</string>
+    <!-- Toast when My position is tapped without a GPS fix. One line. -->
+    <string name="packet_map_err_no_fix">位置を取得していません。位置情報をオンにしてください</string>
+    <!-- Toast when Show everything has nothing to show. One line. -->
+    <string name="packet_map_err_nothing">まだ表示するものがありません</string>
+    <!-- ==== Map status line (under the title). One line. -->
+    <!-- Status while Repeaters here searches. -->
+    <string name="packet_map_st_finding_here">地図の中心付近のレピーターを探しています…</string>
+    <!-- Status after Repeaters here found nothing. %1$s the search radius ("30 mi"). -->
+    <string name="packet_map_st_none_here">地図の中心から %1$s 以内に既知のレピーターはありません</string>
+    <!-- Status after Repeaters here: %1$d repeaters found, %2$s the search radius (English keeps the plural form even for 1). -->
+    <plurals name="packet_map_st_n_here">
+        <item quantity="other">地図の中心から %2$s 以内にレピーター %1$d 局</item>
+    </plurals>
+    <!-- Repeaters filter pill while they load. Short. -->
+    <string name="packet_map_pill_repeaters_wait">レピーター…</string>
+    <!-- Repeaters filter pill: %1$d on the map. Short. -->
+    <string name="packet_map_pill_repeaters_n">レピーター %1$d</string>
+    <!-- Channels filter pill: %1$d on the map. Short. -->
+    <string name="packet_map_pill_channels_n">チャンネル %1$d</string>
+    <!-- Status without a GPS fix. -->
+    <string name="packet_map_st_no_fix">位置未取得：位置情報のあるものを表示しています</string>
+    <!-- Status while repeaters near you load. -->
+    <string name="packet_map_st_finding">近くのレピーターを探しています…</string>
+    <!-- Status when the map is ready. -->
+    <string name="packet_map_st_around">現在地周辺 · ピンチで拡大縮小、マーカーをタップ</string>
+    <!-- ==== Station card on the map. -->
+    <!-- How long ago a station was heard: %1$d seconds. Inside "Heard …". Short. -->
+    <string name="packet_map_ago_s">%1$d 秒前</string>
+    <!-- How long ago: %1$d minutes. Short. -->
+    <string name="packet_map_ago_min">%1$d 分前</string>
+    <!-- How long ago: %1$d hours. Short. -->
+    <string name="packet_map_ago_h">%1$d 時間前</string>
+    <!-- How long ago: %1$d days (2 or more). Short. -->
+    <string name="packet_map_ago_days">%1$d 日前</string>
+    <!-- Station card subtitle: %1$s the distance and direction from you ("2.4 mi NE"; empty without a fix). -->
+    <string name="packet_map_station_sub">APRS 局 · %1$s</string>
+    <!-- Station card: %1$s how long ago ("5 min ago"). -->
+    <string name="packet_map_heard">受信 %1$s</string>
+    <!-- Station card: %1$s how long ago, %2$d times heard. -->
+    <string name="packet_map_heard_times">受信 %1$s、%2$d 回</string>
+    <!-- Station card: %1$s how long ago, %2$s the digipeater it came through. -->
+    <string name="packet_map_heard_via">受信 %1$s、%2$s 経由</string>
+    <!-- Station card: %1$s how long ago, %2$d times heard, %3$s the digipeater. -->
+    <string name="packet_map_heard_times_via">受信 %1$s、%3$s 経由で %2$d 回</string>
+    <!-- Station card: speed, %1$s miles per hour. -->
+    <string name="packet_map_moving">移動中 %1$s mph</string>
+    <!-- Station card: speed and course, %1$s mph, %2$d degrees. -->
+    <string name="packet_map_moving_toward">移動中 %1$s mph、方位 %2$d°</string>
+    <!-- Station card: altitude, %1$d feet. -->
+    <string name="packet_map_altitude">高度 %1$d ft</string>
+    <!-- ==== Repeater and channel cards on the map. -->
+    <!-- Repeater card title when the repeater has no callsign. One word. -->
+    <string name="packet_map_repeater">レピーター</string>
+    <!-- Repeater card subtitle: %1$s the mode ("DMR CC1", "FM 100.0"), %2$s the distance and direction. -->
+    <string name="packet_map_repeater_sub">%1$s レピーター · %2$s</string>
+    <!-- Repeater card: %1$s the output (what you receive) and %2$s the input frequency, in MHz. -->
+    <string name="packet_map_repeater_freqs">出力 %1$s MHz、入力 %2$s MHz</string>
+    <!-- Repeater card: the listed position is rough. -->
+    <string name="packet_map_repeater_approx">位置はおおよそです</string>
+    <!-- Button on the repeater card that opens its details. Short. -->
+    <string name="packet_map_details">詳細</string>
+    <!-- Channel card subtitle: %1$d the channel number, %2$s DMR or Analog, %3$s the distance and direction. -->
+    <string name="packet_map_channel_sub">チャンネル %1$d · %2$s · %3$s</string>
+    <!-- Channel card: an analog (FM) channel. One word. -->
+    <string name="packet_map_analog">アナログ</string>
+    <!-- Channel card: %1$s receive and %2$s transmit frequency in MHz (RX, TX are radio abbreviations). -->
+    <string name="packet_map_channel_freqs">RX %1$s MHz、TX %2$s MHz</string>
+    <!-- Button on the channel card that switches to it. Short. -->
+    <string name="packet_map_use_channel">チャンネルを使用</string>
+    <!-- Toast after switching to a channel from the map: %1$d its number, %2$s its name. -->
+    <string name="packet_map_channel_toast">チャンネル %1$d：%2$s</string>
+    <!-- Button on the station card that opens the position in a maps app. Short. -->
+    <string name="packet_map_open_maps">マップで開く</string>
+    <!-- Toast when no maps app is installed. One line. -->
+    <string name="packet_map_no_maps">マップアプリがありません</string>
+    <!-- ==== Coverage legend on the map (top left). -->
+    <!-- Legend line when the terrain prediction starts. -->
+    <string name="packet_map_pred_starting">地形予測：開始中…</string>
+    <!-- Legend line while the prediction runs: %1$s what it is doing ("Fitting the antenna height …"). -->
+    <string name="packet_map_pred_progress">地形予測：%1$s</string>
+    <!-- Legend line when the prediction failed: %1$s why. -->
+    <string name="packet_map_pred_failed">地形予測に失敗しました：%1$s</string>
+    <!-- Legend line under a finished prediction: %1$s its calibration note ("Calibrated with 12 measured squares (+3 dB)"). -->
+    <string name="packet_map_pred_done">薄いマス：地形予測。%1$s</string>
+    <!-- All repeaters together (legend heading, and the first row of the repeater list). Short. -->
+    <string name="packet_map_all_repeaters">全レピーター</string>
+    <!-- Legend heading of the Heard layer: %1$s the repeater ("All repeaters" or its name). Heard is the layer's name. -->
+    <string name="packet_map_legend_heard">受信 · %1$s</string>
+    <!-- Legend heading of the Key-ups layer: %1$s the repeater. Key-ups is the layer's name. -->
+    <string name="packet_map_legend_keyups">アクセス · %1$s</string>
+    <!-- Left end of the colour scale: %1$s the S unit (S1). Very short. -->
+    <string name="packet_map_legend_weak">%1$s 弱</string>
+    <!-- Right end of the colour scale: %1$s the S unit (S9+20). Very short. -->
+    <string name="packet_map_legend_strong">%1$s 強</string>
+    <!-- Legend key of the Key-ups layer: green, the repeater answered. Very short. -->
+    <string name="packet_map_key_keyed">■ 応答あり</string>
+    <!-- Legend key of the Key-ups layer: red, no answer. Very short. -->
+    <string name="packet_map_key_no_reply">■ 応答なし</string>
+    <!-- Legend: no readings yet for the chosen repeater. -->
+    <string name="packet_map_legend_none_rep">このレピーターはまだ測定がありません</string>
+    <!-- Legend: no readings yet at all. -->
+    <string name="packet_map_legend_none">まだ測定がありません。タップして記録を開始</string>
+    <!-- Legend: %1$d squares measured (English keeps the plural form even for 1). -->
+    <plurals name="packet_map_legend_squares">
+        <item quantity="other">150 m マスの測定 %1$d 件 · マスをタップ</item>
+    </plurals>
+    <!-- ==== Coverage square cards (tap a square on the map). -->
+    <!-- Predicted square card title: about %1$d dBm, %2$s in S units. -->
+    <string name="packet_map_cell_about">約 %1$d dBm · %2$s</string>
+    <!-- Predicted square card subtitle: %1$s the repeater, %2$s the distance and direction. -->
+    <string name="packet_map_cell_predicted">予測 · %1$s · %2$s</string>
+    <!-- Predicted square card (Heard layer), no prediction details: %1$d the assumed antenna height in m. Note the two spaces before "Trees". -->
+    <string name="packet_map_cell_pred_rx_none">ここは未測定です。このマスとレピーターの間の地形から計算しています（アンテナ高：地上 %1$d m）。\u0020樹木や建物は地形データに含まれないため、森林や市街地では実際より弱くなります。</string>
+    <!-- Predicted square card (Heard layer): %1$d the antenna height in m, %2$s the calibration note. -->
+    <string name="packet_map_cell_pred_rx">ここは未測定です。このマスとレピーターの間の地形から計算しています（アンテナ高：地上 %1$d m）。%2$s。樹木や建物は地形データに含まれないため、森林や市街地では実際より弱くなります。</string>
+    <!-- Predicted square card (Heard layer) when the antenna height was fitted to the readings: %1$d the height in m, %2$s the calibration note. -->
+    <string name="packet_map_cell_pred_rx_fitted">ここは未測定です。このマスとレピーターの間の地形から計算しています（アンテナ高：地上 %1$d m、測定値から推定）。%2$s。樹木や建物は地形データに含まれないため、森林や市街地では実際より弱くなります。</string>
+    <!-- Predicted square card title (Key-ups layer): %1$d dB of margin. -->
+    <string name="packet_map_cell_should_key">アクセスできる見込み（余裕 %1$d dB）</string>
+    <!-- Predicted square card (Key-ups layer), no prediction details. Note the two spaces before "The". -->
+    <string name="packet_map_cell_pred_tx_none">地形と、ハイパワーの一般的なハンディ機から計算しています。\u0020アクセスを記録するほど精度が上がります。</string>
+    <!-- Predicted square card (Key-ups layer): %1$s the calibration note. -->
+    <string name="packet_map_cell_pred_tx">地形と、ハイパワーの一般的なハンディ機から計算しています。%1$s。アクセスを記録するほど精度が上がります。</string>
+    <!-- Measured square card title: %1$d dBm, %2$s in S units. -->
+    <string name="packet_map_cell_dbm">%1$d dBm · %2$s</string>
+    <!-- Measured square card subtitle (Heard layer): %1$s the repeater (or the next string), %2$s the distance and direction. -->
+    <string name="packet_map_cell_heard">受信 %1$s · %2$s</string>
+    <!-- In the measured square subtitle when all repeaters are shown. -->
+    <string name="packet_map_cell_best">（ここで最良のレピーター）</string>
+    <!-- Measured square card (Heard layer): %1$d readings in the square. Key-ups is the other layer's name. -->
+    <plurals name="packet_map_cell_typical">
+        <item quantity="other">この 150 m マスでの %1$d 件の測定の代表値です。これはレピーターの信号がスマートフォンに届く強さです。スマートフォンからレピーターに届くかどうかは「アクセス」レイヤーで分かります。</item>
+    </plurals>
+    <!-- Measured square card title (Key-ups layer): keyed %1$d times of %2$d tries. -->
+    <string name="packet_map_cell_keyed">応答 %1$d / %2$d 回</string>
+    <!-- Measured square card title (Key-ups layer): no answer %1$d times. -->
+    <plurals name="packet_map_cell_no_reply">
+        <item quantity="other">応答なし %1$d 回</item>
+    </plurals>
+    <!-- Measured square card subtitle (Key-ups layer) when all repeaters are shown. Short. -->
+    <string name="packet_map_cell_any">すべてのレピーター</string>
+    <!-- Measured square card (Key-ups layer): the repeater answered here. -->
+    <string name="packet_map_cell_keyed_body">このマスからの送信でレピーターが開きました。送信を終えるとすぐにテールが返ってきました。</string>
+    <!-- Measured square card (Key-ups layer): no answer here. -->
+    <string name="packet_map_cell_no_reply_body">ほかの場所では応答があるのに、ここからの送信にはレピーターが応答しませんでした。ハイパワーにするか、場所を変えてみてください。</string>
+    <!-- ==== Coverage maps sheet (and its first-time introduction). -->
+    <!-- Title of the coverage maps sheet. One line. -->
+    <string name="packet_cov_title">エリアマップ</string>
+    <!-- Badge on the coverage introduction: a new feature. Capitals, one word. -->
+    <string name="packet_cov_new">NEW</string>
+    <!-- Explanation on the coverage introduction. A few lines. -->
+    <string name="packet_cov_intro_1">レピーターが実際にどこで使えるかを調べます。記録をオンにすると、レピーターを受信した場所ごとの信号の強さと、送信したときに応答があったかどうかを記録します。普段どおり車や徒歩で移動するだけで、マップが埋まっていきます。</string>
+    <!-- Explanation on the coverage introduction (Heard and Key-ups are the layer names). A few lines. -->
+    <string name="packet_cov_intro_2">レイヤーは 2 つです。「受信」はレピーターの信号が届く強さを、弱い青から強い赤までの色で表示します。「アクセス」は自局の送信でレピーターが開いた場所（緑）と応答がなかった場所（赤）を表示します。こちらのほうがふつうは範囲が狭くなります。</string>
+    <!-- Explanation on the coverage introduction (Nearby repeaters is a page name). A few lines. -->
+    <string name="packet_cov_intro_3">位置情報のあるチャンネルで動作します。「近くのレピーター」から追加したチャンネルには、すでに位置情報があります。データはどこにも送信されず、すべてスマートフォン内に保存され、エクスポートもできます。</string>
+    <!-- Button on the coverage introduction. Short. -->
+    <string name="packet_cov_turn_on">エリア記録をオンにする</string>
+    <!-- Toast after coverage logging is turned on. One line. -->
+    <string name="packet_cov_on">エリア記録はオンです</string>
+    <!-- Toast after coverage logging is turned off. One line. -->
+    <string name="packet_cov_off">エリア記録はオフです</string>
+    <!-- Explanation on the coverage maps sheet. A few lines. -->
+    <string name="packet_cov_hint">受信：レピーターを受信した各地点での信号の強さ。アクセス：自局の送信でレピーターが開いた場所（緑）と応答がなかった場所（赤）。</string>
+    <!-- Explanation on the coverage maps sheet, on a radio without signal readings. A few lines. -->
+    <string name="packet_cov_hint_no_rssi">受信：レピーターを受信した各地点での信号の強さ。アクセス：自局の送信でレピーターが開いた場所（緑）と応答がなかった場所（赤）。この無線機は信号強度を出力しないため、アクセスだけを記録し、「受信」レイヤーは空のままです。</string>
+    <!-- Switch on the coverage sheet. Short. -->
+    <string name="packet_cov_log">エリアを記録</string>
+    <!-- Under the Log coverage switch: %1$d signal readings and %2$d transmissions stored. -->
+    <string name="packet_cov_log_sub">測定 %1$d 件、送信 %2$d 件を保存済み</string>
+    <!-- Button on the coverage sheet that transmits a short test. Short. -->
+    <string name="packet_cov_test">ここでアクセステスト</string>
+    <!-- Explanation on the coverage sheet. A few lines. -->
+    <string name="packet_cov_test_hint">FM レピーターのチャンネルで、コールサインをモールスで送信し（約 3 秒、合法な ID 送出）、この場所からレピーターが応答したかを記録します。控えめに使ってください。</string>
+    <!-- Title of the dialog that confirms the key-up test. One line. -->
+    <string name="packet_cov_test_title">アクセステストを送信しますか？</string>
+    <!-- Text of that dialog: %1$s the channel name (or the next string). -->
+    <string name="packet_cov_test_msg">%1$s でコールサインをモールスで送信し、レピーターのテールを待ちます。使用が許可されているレピーターだけをテストしてください。</string>
+    <!-- In the key-up test dialog when there is no channel name. -->
+    <string name="packet_cov_test_this_channel">このチャンネル</string>
+    <!-- Toast when the key-up test starts. One line. -->
+    <string name="packet_cov_test_sending">ID を送信中…結果は履歴に表示されます</string>
+    <!-- Section heading on the coverage sheet. One line, capitals. -->
+    <string name="packet_cov_show_section">マップに表示</string>
+    <!-- Layer choice: the Heard layer (the repeater's signal at each place). One word (three share a row). -->
+    <string name="packet_cov_layer_heard">受信</string>
+    <!-- Layer choice: the Key-ups layer (where your transmissions opened the repeater). One word (three share a row). -->
+    <string name="packet_cov_layer_keyups">アクセス</string>
+    <!-- Under All repeaters in the coverage sheet's repeater list. One line. -->
+    <string name="packet_cov_all_sub">各マスで最良のレピーター</string>
+    <!-- Under a repeater in the coverage sheet: %1$d readings, %2$d transmissions. -->
+    <string name="packet_cov_rep_sub">測定 %1$d 件 · 送信 %2$d 件</string>
+    <!-- Under a repeater in the coverage sheet: %1$d readings, %2$d transmissions, %3$d of them answered. -->
+    <string name="packet_cov_rep_sub_keyed">測定 %1$d 件 · 送信 %2$d 件（応答 %3$d 件）</string>
+    <!-- Section heading on the coverage sheet. One line, capitals. -->
+    <string name="packet_cov_pred_section">地形予測</string>
+    <!-- Explanation on the coverage sheet. A few lines. -->
+    <string name="packet_cov_pred_pick">上でレピーターを 1 つ選ぶと（またはマップ上のレピーターかチャンネルをタップ → エリア）、まだ何も測定していなくても、地形からその到達範囲を予測します。</string>
+    <!-- Switch on the coverage sheet. Short. -->
+    <string name="packet_cov_pred_show">予測を表示</string>
+    <!-- Under that switch: %1$s the repeater. -->
+    <string name="packet_cov_pred_show_sub">測定済みのマスの下に薄いマスで表示（%1$s）</string>
+    <!-- Label above the antenna height choices. One line. -->
+    <string name="packet_cov_ant_label">レピーターのアンテナ地上高</string>
+    <!-- Choice pill: worked out automatically. Very short (six share a row). -->
+    <string name="packet_cov_auto">自動</string>
+    <!-- Title of the dialog that sets the antenna height. One line. -->
+    <string name="packet_cov_ant_ask">アンテナ地上高（m）</string>
+    <!-- Explanation on the coverage sheet (Auto and Set are the pill names). A few lines. -->
+    <string name="packet_cov_ant_hint">「自動」は、「受信」の測定値がさまざまな距離をカバーした時点で、それに合わせて地上高を推定します（地上高は、信号が丘を越えてどこまで届くかを左右します）。それまでは 30 m を使います。分かっている場合は（鉄塔の登録情報に高さが載っています）「設定」で入力してください。</string>
+    <!-- Explanation on the coverage sheet (Unknown is the pill name). A few lines. -->
+    <string name="packet_cov_pwr_hint">送信出力（実効放射電力）。「不明」：50 W を仮定し、「受信」の測定値でレベルを補正します。NOAA 気象放送の局は出力を公表しています（多くは 1000 W）。</string>
+    <!-- Choice pill: transmitter power not known. Very short (six share a row). -->
+    <string name="packet_cov_unknown">不明</string>
+    <!-- Title of the dialog that sets the transmitter power. One line. -->
+    <string name="packet_cov_pwr_ask">送信出力（W）</string>
+    <!-- Explanation on the coverage sheet. A few lines. -->
+    <string name="packet_cov_range_hint">範囲：「自動」では、この送信機の出力とアンテナ高で平地を届く距離（丘があれば短くなるだけです）まで、最大 50 マイルを対象にします。固定の範囲は最小値になります。現在地と測定済みの地点は常にすべて含まれます。</string>
+    <!-- Explanation on the coverage sheet (Terrain Tiles is a data set name). A few lines. -->
+    <string name="packet_cov_tiles_hint">地形の高さはオープンデータの Terrain Tiles（約 55 m の精度）から取得し、スマートフォン内に保存します。ある地域で最初に予測するときにダウンロードします。</string>
+    <!-- Explanation on the coverage sheet. A few lines. -->
+    <string name="packet_cov_located">記録は位置情報のあるチャンネルで動作します。位置情報があるのは %1$d チャンネルです（チャンネル編集 → 位置。「近くのレピーター」から追加したチャンネルには自動で付きます）。アクセスは、送信と受信の周波数が異なるレピーターのチャンネルでだけ判定します。</string>
+    <!-- Explanation on the coverage sheet when nothing is measured. A few lines. -->
+    <string name="packet_cov_located_none">まだ何も測定していません。記録は位置情報のあるチャンネルで動作します。位置情報があるのは %1$d チャンネルです（チャンネル編集 → 位置。「近くのレピーター」から追加したチャンネルには自動で付きます）。アクセスは、送信と受信の周波数が異なるレピーターのチャンネルでだけ判定します。</string>
+    <!-- Button on the coverage sheet that saves the readings as files. Short (two share a row). -->
+    <string name="packet_cov_export">エクスポート</string>
+    <!-- Toast after the coverage export: %1$s the folder name. Keep the path and file names. -->
+    <string name="packet_cov_exported">Download/DMR/Coverage/%1$s に保存しました：CSV ファイル 2 つと Google Earth 用の coverage.kml</string>
+    <!-- Title of the dialog that deletes all coverage data. One line. -->
+    <string name="packet_cov_clear_all">エリアデータをすべて消去しますか？</string>
+    <!-- Title of the dialog that deletes one repeater's coverage data: %1$s its name. One line. -->
+    <string name="packet_cov_clear_one">%1$s のエリアデータを消去しますか？</string>
+    <!-- Text of the clear dialog. -->
+    <string name="packet_cov_clear_msg">保存された測定値とアクセスの記録がスマートフォンから削除されます。残しておく場合は先にエクスポートしてください。</string>
+    <!-- Last choice pill (and dialog button) that takes any number. Very short. -->
+    <string name="packet_cov_set">設定</string>
+    <!-- Hint in the number field: %1$d to %2$d. Short. -->
+    <string name="packet_cov_set_range">%1$d〜%2$d</string>
+    <!-- Toast when the number is out of range: between %1$d and %2$d. One line. -->
+    <string name="packet_cov_set_err">%1$d〜%2$d の範囲で入力してください</string>
+    <!-- ==== Map help sheet (the Help pill). -->
+    <!-- Explanation on the map help sheet. A few lines. -->
+    <string name="packet_map_help_1">緑の点は無線機が受信した APRS 局で、最後に報告された位置に表示されます（APRS のピルで表示・非表示を切り替えます）。シアンのひし形は FM レピーター、紫のひし形は DMR レピーターで、「近くのレピーター」の範囲内のものです。オレンジのピンは位置情報のあるチャンネルです（位置はチャンネル編集で設定します）。青い点が現在地です。</string>
+    <!-- Explanation on the map help sheet. A few lines. -->
+    <string name="packet_map_help_2">ドラッグで移動、ピンチかダブルタップで拡大縮小、マーカーをタップすると詳細を表示します。ピルで種類ごとに表示・非表示を切り替えます。右のボタンで拡大縮小、現在地への移動、全体表示ができます。</string>
+    <!-- Explanation on the map help sheet. A few lines. -->
+    <string name="packet_map_help_3">エリア：紫のピルで、各レピーターを受信した場所（受信）と自局の送信でレピーターが開いた場所（アクセス）を表示します。記録はそこでオンにします。詳しくは ヘルプ → エリアマップ を参照してください。</string>
+    <!-- Explanation on the map help sheet. A few lines. -->
+    <string name="packet_map_help_4">地図タイルは OpenStreetMap から取得し、30 日間スマートフォン内に保存されます。一度表示した場所は接続がなくても表示できます。</string>
+
+    <!-- ==== Map (APRS stations and the coverage map). -->
+    <!-- Screen reader description of the map view. One or two words. -->
+    <string name="packet_map_cd">マップ</string>
+
+    <!-- ==== Messages page (DMR text, pages, M17 text). -->
+    <!-- Title of the Messages page. One or two words. -->
+    <string name="packet_msg_title">メッセージ</string>
+    <!-- Subtitle of the Messages page when there are no conversations (shown in capitals). Short. -->
+    <string name="packet_msg_sub">DMR テキスト</string>
+    <!-- Screen reader label of the header button that starts or stops the pager monitor (long press edits its frequencies). -->
+    <string name="packet_msg_cd_monitor">ページャーワッチ</string>
+    <!-- Button (and screen reader label of the + button) that starts a new DMR text. Short. -->
+    <string name="packet_msg_new">新規メッセージ</string>
+    <!-- Heading of the empty Messages page. One line. -->
+    <string name="packet_msg_empty_title">メッセージはまだありません</string>
+    <!-- Explanation on the empty Messages page. A few lines, centred. -->
+    <string name="packet_msg_empty_body">連絡先、トークグループ、または現在のチャンネルの呼出先に送れます。テキストは DMR チャンネルで送受信され、受信したものはここと無線画面の履歴に表示されます。</string>
+    <!-- Subtitle of the Messages page: how many conversations (shown in capitals). -->
+    <plurals name="packet_msg_conversations">
+        <item quantity="other">%1$d 件の会話</item>
+    </plurals>
+    <!-- Banner in a page thread when a page for another thread arrives. %1$s that page (sender and text). -->
+    <string name="packet_msg_also_heard">ほかにも受信：%1$s</string>
+    <!-- Toast after the pager monitor stops. One line. -->
+    <string name="packet_msg_monitor_off">ページャーワッチを停止しました</string>
+    <!-- Title of the dialog that edits the pager monitor's frequencies. One line. -->
+    <string name="packet_msg_scan_title">ページャーの周波数</string>
+    <!-- Text of that dialog. Two lines. -->
+    <string name="packet_msg_scan_body">Hz 単位でカンマ区切り。各周波数で 1 バッチ分待ち、プリアンブルを受信している間はとどまります。</string>
+    <!-- Subtitle of a page thread (and its title when the sender has no name). One word. -->
+    <string name="packet_msg_kind_pager">ページャー</string>
+    <!-- Hint in the text field of a page thread. One word. -->
+    <string name="packet_msg_hint_page">ページャーメッセージ</string>
+    <!-- Hint in the text field of an M17 thread (M17 is a mode name). Short. -->
+    <string name="packet_msg_hint_m17">M17 テキスト</string>
+    <!-- Button under a page thread that saves the sender's pager address (RIC) as a contact. Short. -->
+    <string name="packet_msg_save_contact">連絡先に保存</string>
+    <!-- Hint in the contact name field. One word. -->
+    <string name="packet_msg_ric_name">名前</string>
+    <!-- Title of the dialog that saves a pager address. %1$s the RIC (a pager address number). One line. -->
+    <string name="packet_msg_ric_title">RIC %1$s を保存</string>
+    <!-- Dialog button that mutes pages from this address. Short. -->
+    <string name="packet_msg_ric_mute">ミュート</string>
+    <!-- First choice in the new-message list: the talkgroup or ID the current channel calls. One line. -->
+    <string name="packet_msg_to_current">現在のチャンネルの呼出先</string>
+    <!-- Title of the new-message list. One line. -->
+    <string name="packet_msg_to_title">宛先</string>
+    <!-- Toast when the current channel calls no talkgroup or ID. One line. -->
+    <string name="packet_msg_err_no_target">現在のチャンネルには呼出先がありません</string>
+    <!-- A talkgroup with no name: TG and its number. Very short. -->
+    <string name="packet_msg_peer_tg">TG %1$d</string>
+    <!-- An all call with no name: ALL and its number. Very short. -->
+    <string name="packet_msg_peer_all">ALL %1$d</string>
+    <!-- A DMR ID with no name: ID and its number. Very short. -->
+    <string name="packet_msg_peer_id">ID %1$d</string>
+    <!-- Subtitle of a text thread with a talkgroup. One word. -->
+    <string name="packet_msg_type_tg">トークグループ</string>
+    <!-- Subtitle of a text thread with an all call. Short. -->
+    <string name="packet_msg_type_all">一斉呼出</string>
+    <!-- Subtitle of a private text thread. One word. -->
+    <string name="packet_msg_type_private">個別</string>
+    <!-- Note at the top of a text thread on an analog channel. One or two lines. -->
+    <string name="packet_msg_analog_note">このチャンネルはアナログです。テキストを送るには DMR チャンネルに切り替えてください。</string>
+    <!-- Screen reader label of the quick replies button, and the title of the quick replies list. One line. -->
+    <string name="packet_msg_quick">定型返信</string>
+    <!-- Hint in the text field of a DMR text thread. One word. -->
+    <string name="packet_msg_hint">メッセージ</string>
+    <!-- Toast when sending a DMR text on an analog channel. One line. -->
+    <string name="packet_msg_err_analog">テキストを送るには DMR チャンネルに切り替えてください</string>
+    <!-- Delivery mark under a text you sent: the other radio acknowledged it. Lower case, short. -->
+    <string name="packet_msg_st_delivered">✓✓ 配信済み</string>
+    <!-- Delivery mark: the text did not go out. Lower case, short. -->
+    <string name="packet_msg_st_failed">✖ 未送信</string>
+    <!-- Delivery mark: sent, but no acknowledgement came back. Lower case, short. -->
+    <string name="packet_msg_st_no_ack">✓ 送信済み、受信確認なし</string>
+    <!-- Delivery mark while the text goes out. Lower case, short. -->
+    <string name="packet_msg_st_sending">送信中…</string>
+    <!-- Conversation card name for a page thread: PAGE and the sender. Note the two spaces. Capitals. -->
+    <string name="packet_msg_chip_page">PAGE \u0020%1$s</string>
+    <!-- Conversation card: the last text was yours. %1$s the text. -->
+    <string name="packet_msg_you">自分：%1$s</string>
+    <!-- Last item in the quick replies list: edit the list. One line. -->
+    <string name="packet_msg_quick_edit">定型返信を編集…</string>
+    <!-- Text of the dialog that edits the quick replies. One line. -->
+    <string name="packet_msg_quick_body">1 行に 1 メッセージ。</string>
+
+    <!-- ==== Packet finder (searches the packet frequencies for BBSs, nodes and Winlink gateways). -->
+    <!-- Kind of station found: a Winlink e-mail gateway. Short. -->
+    <string name="packet_finder_kind_gateway">Winlink ゲートウェイ</string>
+    <!-- Kind of station found: a packet bulletin board (BBS). Short. -->
+    <string name="packet_finder_kind_bbs">BBS</string>
+    <!-- Kind of station found: a packet node. Short. -->
+    <string name="packet_finder_kind_node">ノード</string>
+    <!-- Kind of station found: a station identifying itself. Short. -->
+    <string name="packet_finder_kind_id">局 ID</string>
+    <!-- Kind of station found: a beacon. Short. -->
+    <string name="packet_finder_kind_beacon">ビーコン</string>
+    <!-- Kind of station found: any other packet station. Short. -->
+    <string name="packet_finder_kind_station">パケット局</string>
+    <!-- Packet finder status: it has not run yet. One line. -->
+    <string name="packet_finder_status_idle">停止中</string>
+    <!-- Toast when saving the finder settings: %1$s the radio's bands ("400–480 MHz"), %2$s the frequencies it cannot tune. -->
+    <string name="packet_finder_err_bad_freq">この無線機で合わせられない周波数です（%1$s）：%2$s</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_running">パケット検索はすでに動作中です</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_take_over">先に無線モジュールを引き継いでください</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_no_freqs">この無線機で合わせられるパケット周波数がありません（%1$s）。設定で追加してください</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_tx">送信中は開始できません</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_sat">衛星パスを追跡中です</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_winlink">Winlink セッションが動作中です</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_no_engine">パケットエンジンが動作していません</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_terminal">パケット端末が接続中です</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_monitoring">APRS ワッチがオンです。先にオフにしてください</string>
+    <!-- History line: the packet finder started. %1$d frequencies, %2$d minutes on each, %3$s the end time (HH:mm). -->
+    <string name="packet_finder_event_started">🔎 パケット検索を開始：%1$d 周波数、各 %2$d 分、%3$s まで</string>
+    <!-- How the search ended (inside "Packet finder …" lines). Lower case. -->
+    <string name="packet_finder_why_finished">完了</string>
+    <!-- Packet finder status while it listens. %1$s the frequency in MHz. One line. -->
+    <string name="packet_finder_status_listening">%1$s MHz で受信中</string>
+    <!-- How the search ended: you transmitted. Lower case. -->
+    <string name="packet_finder_why_tx">停止：送信したため</string>
+    <!-- How the search ended: a satellite pass took the radio. Lower case. -->
+    <string name="packet_finder_why_satellite">衛星パスのため停止</string>
+    <!-- How the search ended: the channel was changed. Lower case. -->
+    <string name="packet_finder_why_channel">停止：チャンネルが変更されたため</string>
+    <!-- How the search ended: stopped by you. Lower case. -->
+    <string name="packet_finder_why_stopped">停止</string>
+    <!-- How the search ended: an error. %1$s the error (technical, English). -->
+    <string name="packet_finder_why_error">停止：%1$s</string>
+    <!-- Packet finder status after a search: %1$s how it ended ("finished"), %2$d frames decoded. One line. -->
+    <string name="packet_finder_status_last">前回の検索：%1$s · パケットフレーム %2$d 件を受信</string>
+    <!-- History line: the packet finder ended. %1$s how ("finished", "stopped: you transmitted"), %2$s the stations listed ("3 stations"). -->
+    <string name="packet_finder_event_ended">🔎 パケット検索 %1$s：リストに %2$s</string>
+    <!-- Stations in the packet finder list (inside the history line). -->
+    <plurals name="packet_finder_stations">
+        <item quantity="other">%1$d 局</item>
+    </plurals>
+    <!-- History line: the packet finder found a station. %1$s its callsign, %2$s its kind ("BBS"), %3$s the frequency in MHz. -->
+    <string name="packet_finder_event_found">🔎 パケット検索：%1$s（%2$s）%3$s MHz</string>
+
+    <!-- ==== Packet finder sheet (its title is packet_pkt_finder). -->
+    <!-- Explanation at the top of the packet finder sheet. A few lines. -->
+    <string name="packet_pfd_hint">周辺のパケット局（Winlink ゲートウェイ、BBS、ノード）を探します。SignalDeck は受信するだけで（送信は一切しません）、周波数を順に切り替え、通常の APRS 以外に受信した局をすべて一覧にします。ノードの ID 送出は 10〜30 分おきなので、1〜2 時間動かしてください（夜間に予約するのも手です）。終了後、無線機は元のチャンネルに戻ります。</string>
+    <!-- Line under the status while the finder runs: %1$s the end time, %2$d minutes per frequency, %3$d frequencies. -->
+    <string name="packet_pfd_sub_running">%1$s まで · %3$d 周波数を各 %2$d 分</string>
+    <!-- Line under the status when no frequency suits the radio: %1$s its bands. "Use my channels" is the button in Settings. -->
+    <string name="packet_pfd_sub_no_freqs">この無線機で合わせられるパケット周波数がありません（%1$s）。設定で追加してください（「自分のチャンネルを使う」で自局のチャンネルを入力できます）</string>
+    <!-- Line under the status: %1$d frequencies, %2$d minutes each, for %3$d hours. -->
+    <string name="packet_pfd_sub_idle">%1$d 周波数、各 %2$d 分、%3$d 時間（設定）</string>
+    <!-- Section heading when the finder has found nothing. One line, capitals. -->
+    <string name="packet_pfd_nothing">まだ何も受信していません</string>
+    <!-- Section heading over the stations found. %1$d how many. One line, capitals. -->
+    <string name="packet_pfd_heard">受信（%1$d）</string>
+    <!-- Details of a station found: %1$s its kind, %2$s the frequency in MHz, %3$d times heard, %4$s when last heard (day and time). -->
+    <string name="packet_pfd_row">%1$s · %2$s MHz · %3$d 回、最終 %4$s</string>
+    <!-- Details of a station found: %1$s its kind, %2$s the frequency in MHz, %3$d its best signal in dBm, %4$d times heard, %5$s when last heard. -->
+    <string name="packet_pfd_row_dbm">%1$s · %2$s MHz · %3$d dBm · %4$d 回、最終 %5$s</string>
+    <!-- Button under the stations found that empties the list. Short. -->
+    <string name="packet_pfd_clear">リストをクリア</string>
+    <!-- Title of the dialog that confirms emptying the finder list. One line. -->
+    <string name="packet_pfd_clear_q">見つかった局をクリアしますか？</string>
+    <!-- Toast when a station is tapped while the finder still runs. One line. -->
+    <string name="packet_pfd_err_running">先に検索を停止してください</string>
+    <!-- Choice for a Winlink gateway found: %1$s its frequency in MHz. One line. -->
+    <string name="packet_pfd_tune_winlink">%1$s に合わせて Winlink を開く</string>
+    <!-- Choice for a station found. One line. -->
+    <string name="packet_pfd_tune_terminal_short">合わせてパケット端末を開く</string>
+    <!-- Choice for a station found: only tune the VFO. One line. -->
+    <string name="packet_pfd_just_tune">周波数を合わせるだけ</string>
+    <!-- Choice for a BBS or node found: %1$s its frequency in MHz. One line. -->
+    <string name="packet_pfd_tune_terminal">%1$s に合わせてパケット端末を開く</string>
+    <!-- Toast after tuning to a station found: %1$s the frequency in MHz. One line. -->
+    <string name="packet_pfd_vfo_on">VFO を %1$s MHz に設定（ローパワー）</string>
+    <!-- ==== Packet finder settings dialog. -->
+    <!-- Explanation above the frequency list. Two or three lines. The list also takes ";" and spaces between items, and a comma as the decimal sign ("144,910; 145,010"): in a language that writes a decimal comma, say the items are separated by semicolons and give such an example. -->
+    <string name="packet_pfd_set_freqs">MHz 単位の周波数をカンマ区切りで入力します（空欄：通常の 2 m パケット周波数 144.910〜145.090）。地域の 70 cm パケット周波数が分かれば追加してください。</string>
+    <!-- Button that fills in the frequencies of your own analog channels. Short. -->
+    <string name="packet_pfd_set_mine">自分のチャンネルを使う</string>
+    <!-- Toast when none of your channels can be used. One line. -->
+    <string name="packet_pfd_set_mine_none">この無線機のバンド内にあるアナログチャンネルがありません</string>
+    <!-- Hint in the minutes field. One line. -->
+    <string name="packet_pfd_set_dwell">各周波数の分数</string>
+    <!-- Hint in the hours field. One line. -->
+    <string name="packet_pfd_set_hours">何時間動かすか</string>
+    <!-- Note under the two number fields. One line. -->
+    <string name="packet_pfd_set_note">各周波数の分数 / 合計の時間数。</string>
+    <!-- Title of the packet finder settings dialog. One line. -->
+    <string name="packet_pfd_set_title">パケット検索の設定</string>
+    <!-- Toast when the minutes or hours are not numbers. One line. -->
+    <string name="packet_pfd_set_err_numbers">数字のみ</string>
+    <!-- Dialog button that puts the finder settings back to the defaults. Short. -->
+    <string name="packet_pfd_set_defaults">初期値</string>
+
+    <!-- ==== PKT sheet (the packet-radio tools). -->
+    <!-- Title of the PKT sheet. One line. -->
+    <string name="packet_pkt_title">パケット通信</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_running_now">実行中</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_digital_voice">デジタル音声</string>
+    <!-- Button on the PKT sheet while the M17 receiver runs. Short (two buttons share a row). -->
+    <string name="packet_pkt_m17_listening">M17（受信中）</string>
+    <!-- Button on the PKT sheet that starts the M17 receiver. Short (two buttons share a row). -->
+    <string name="packet_pkt_m17_receive">M17 受信</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_m17_hint">M17 受信：このチャンネルまたは VFO で M17 デジタル音声の局を、相手のコールサインとメッセージ付きで受信します（受信専用：この無線機は M17 を送信できません）。</string>
+    <!-- Button on the PKT sheet that stops APRS monitoring. Short (two buttons share a row). -->
+    <string name="packet_pkt_stop_monitoring">ワッチを停止</string>
+    <!-- Button on the PKT sheet that parks the radio on the APRS frequency (%1$s, e.g. 144.390). Short (two buttons share a row). -->
+    <string name="packet_pkt_monitor">%1$s をワッチ</string>
+    <!-- Button on the PKT sheet that stops the KISS TNC (a protocol name: keep KISS TNC). Short (two buttons share a row). -->
+    <string name="packet_pkt_kiss_stop">KISS TNC 停止</string>
+    <!-- Button on the PKT sheet that starts the KISS TNC for APRSdroid or YAAC (a protocol name: keep it). Short (two buttons share a row). -->
+    <string name="packet_pkt_kiss">KISS TNC</string>
+    <!-- Toast after the KISS TNC stops. One line. -->
+    <string name="packet_pkt_kiss_stopped">KISS TNC を停止しました</string>
+    <!-- Toast after the KISS TNC starts; %1$d the TCP port. App names stay. One line. -->
+    <string name="packet_pkt_kiss_on">KISS TNC は 127.0.0.1:%1$d で動作中です。APRSdroid/YAAC の接続先に指定してください（TCP KISS）</string>
+    <!-- Button on the PKT sheet that opens the APRS message sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_send_message">メッセージ送信</string>
+    <!-- Button on the PKT sheet that sends one APRS position report. Short (two buttons share a row). -->
+    <string name="packet_pkt_position_beacon">位置ビーコン</string>
+    <!-- Toast after a position beacon is queued for sending. One line. -->
+    <string name="packet_pkt_beacon_queued">ビーコンを送信待ちにしました</string>
+    <!-- Button on the PKT sheet that opens the APRS object sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_object">オブジェクト…</string>
+    <!-- Button on the PKT sheet that opens the APRS bulletin sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_bulletin">掲示…</string>
+    <!-- Button on the PKT sheet that sends one APRS telemetry report. Short (two buttons share a row). -->
+    <string name="packet_pkt_telemetry">テレメトリー</string>
+    <!-- Toast after telemetry is queued. One line. -->
+    <string name="packet_pkt_telemetry_queued">テレメトリーを送信待ちにしました</string>
+    <!-- Button on the PKT sheet that sends one APRS weather report. Short (two buttons share a row). -->
+    <string name="packet_pkt_weather">気象</string>
+    <!-- Toast after a weather report is queued. One line. -->
+    <string name="packet_pkt_weather_queued">気象情報を送信待ちにしました</string>
+    <!-- Button on the PKT sheet while a satellite is tracked (%1$s its name, e.g. ISS). Short (two buttons share a row). -->
+    <string name="packet_pkt_sat_tracking">衛星：%1$s を追跡中</string>
+    <!-- Button on the PKT sheet that opens the satellite sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_sat_passes">衛星パス</string>
+    <!-- Button on the PKT sheet that opens the band scope. Short (two buttons share a row). -->
+    <string name="packet_pkt_band_scope">バンドスコープ</string>
+    <!-- Button on the PKT sheet that opens the band conditions sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_conditions">VHF/UHF のコンディション</string>
+    <!-- Button on the PKT sheet that decodes APRS or SSTV from a saved recording. Short (two buttons share a row). -->
+    <string name="packet_pkt_decode_recording">録音をデコード</string>
+    <!-- Button on the PKT sheet that stops listening to the space station. Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_aprs_stop">ISS APRS 停止</string>
+    <!-- Button on the PKT sheet that listens to the space station's APRS digipeater (%1$s its frequency, 145.825). Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_aprs">ISS APRS %1$s</string>
+    <!-- Toast after ISS APRS stops. One line. -->
+    <string name="packet_pkt_iss_aprs_stopped">ISS APRS を停止しました</string>
+    <!-- Button on the PKT sheet that sends a position report through the space station. Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_beacon">ISS 経由でビーコン</string>
+    <!-- Automatic beacons line: they are off. Lower case (inside the sentence). -->
+    <string name="packet_pkt_auto_off">オフ</string>
+    <!-- Automatic beacons line: timed beacons. %1$d minutes. Lower case. -->
+    <string name="packet_pkt_auto_every">%1$d 分ごと</string>
+    <!-- Automatic beacons line: SmartBeaconing (a feature name, usually kept). -->
+    <string name="packet_pkt_auto_smart">SmartBeaconing</string>
+    <!-- Automatic beacons line, added to the list. Lower case. -->
+    <string name="packet_pkt_auto_telemetry">テレメトリー 30 分ごと</string>
+    <!-- Automatic beacons line, added to the list. Lower case. -->
+    <string name="packet_pkt_auto_weather">気象 30 分ごと</string>
+    <!-- Hint on the PKT sheet. %1$s what goes out automatically ("every 15 min, telemetry every 30 min"), %2$s the APRS frequency. -->
+    <string name="packet_pkt_auto_here">自動ビーコン：%1$s（%2$s でのみ。設定で変更）。</string>
+    <!-- Hint on the PKT sheet when the radio cannot tune the APRS frequency. %1$s what goes out automatically, %2$s the APRS frequency. -->
+    <string name="packet_pkt_auto_away">自動ビーコン：%1$s（送信は %2$s で行いますが、この無線機はその周波数に合わせられません）。</string>
+    <!-- Sentence after the automatic beacons line when the two-way iGate is on. %1$d messages so far (English keeps the plural form even for 1). -->
+    <plurals name="packet_pkt_igate_on">
+        <item quantity="other">双方向 iGate オン：インターネットのメッセージ %1$d 件を無線へ送信しました。</item>
+    </plurals>
+    <!-- Sentence after the automatic beacons line: the APRS message groups followed. %1$s the groups (CQ, ARES). -->
+    <string name="packet_pkt_groups">フォロー中のグループ：%1$s。</string>
+    <!-- Button on the PKT sheet that stops the internet APRS link. Short (two buttons share a row). -->
+    <string name="packet_pkt_is_stop">APRS-IS 停止</string>
+    <!-- Button on the PKT sheet that starts the internet APRS link. Short (two buttons share a row). -->
+    <string name="packet_pkt_is_start">APRS-IS（インターネット）</string>
+    <!-- Toast after APRS-IS stops. One line. -->
+    <string name="packet_pkt_is_off">APRS-IS オフ</string>
+    <!-- Toast when APRS-IS starts; %1$s the server. One line. -->
+    <string name="packet_pkt_is_connecting">%1$s に接続中</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_is_hint">APRS-IS：%1$s。無線機が受信したものをインターネットへ中継し（パスコードが必要）、位置をオンラインでビーコンし、自局宛のインターネットメッセージを届けます。</string>
+    <!-- Button on the PKT sheet that lists the APRS stations heard; %1$d how many. Short (two buttons share a row). -->
+    <string name="packet_pkt_stations_n">受信した局（%1$d）</string>
+    <!-- Button on the PKT sheet that opens the APRS log. Short (two buttons share a row). -->
+    <string name="packet_pkt_aprs_log">APRS ログ</string>
+    <!-- Button on the PKT sheet that lists the bulletins heard. Short (two buttons share a row). -->
+    <string name="packet_pkt_bulletins">掲示</string>
+    <!-- Button on the PKT sheet that opens the APRS and packet settings. Short (two buttons share a row). -->
+    <string name="packet_pkt_settings">設定</string>
+    <!-- Where passive APRS decode runs (inside the hint below). Lower case. -->
+    <string name="packet_pkt_passive_every">すべてのアナログチャンネル</string>
+    <!-- Where passive APRS decode runs: the channels flagged for it. Lower case. -->
+    <string name="packet_pkt_passive_flagged">指定したチャンネル</string>
+    <!-- Where passive APRS decode runs: nowhere. Lower case. -->
+    <string name="packet_pkt_passive_none">チャンネルなし（オフ）</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_passive_here">パッシブデコードは%1$sで動作します。ワッチ中は無線機を %2$s MHz（地域の APRS 周波数、デバイス → 地域）に固定し、自局宛のメッセージに ACK を返します。停止すると元のチャンネルに戻ります。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_passive_here_digi">パッシブデコードは%1$sで動作します。ワッチ中は無線機を %2$s MHz（地域の APRS 周波数、デバイス → 地域）に固定し、自局宛のメッセージに ACK を返し、WIDE1-1 をデジピートします。停止すると元のチャンネルに戻ります。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_passive_away">パッシブデコードは%1$sで動作します。この無線機は %2$s MHz に合わせられないため、ワッチはできません。APRS は自分のチャンネルでデコードします。停止すると元のチャンネルに戻ります。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_passive_away_digi">パッシブデコードは%1$sで動作します。この無線機は %2$s MHz に合わせられないため、ワッチはできません。APRS は自分のチャンネルでデコードし、WIDE1-1 をデジピートします。停止すると元のチャンネルに戻ります。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_parrot_section">シンプレックスレピーター（パロット）</string>
+    <!-- Button on the PKT sheet that stops the simplex repeater. Short (two buttons share a row). -->
+    <string name="packet_pkt_parrot_stop">パロット停止</string>
+    <!-- Button on the PKT sheet that starts the simplex repeater. Short (two buttons share a row). -->
+    <string name="packet_pkt_parrot_start">このチャンネルでパロット</string>
+    <!-- Start of the parrot hint while it runs. %1$d transmissions repeated so far. -->
+    <string name="packet_pkt_parrot_on">🦜 オン、これまで %1$d 回中継。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_parrot_hint">このチャンネルで受信した送信を 1 回ずつ録音し、終わった 1 秒後に送り返します（最大 26 秒）。相手局は自分の音を確認でき、互いに届かない 2 局がこの局を介して交信することもできます。アマチュアのチャンネルでは、コールサインを最大 10 分に 1 回モールスで送信します。無音時にスケルチが閉じている必要があります（スケルチ 0 より上、または Soft SQ）。チャンネルを変えると停止します。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_text_modes">テキストモード</string>
+    <!-- Button on the PKT sheet that opens the text modes (mode names stay). Short (two buttons share a row). -->
+    <string name="packet_pkt_rtty_psk">RTTY と PSK31</string>
+    <!-- Button on the PKT sheet while FT8 runs. Short (two buttons share a row). -->
+    <string name="packet_pkt_ft8_running">FT8（動作中）</string>
+    <!-- Button on the PKT sheet that starts FT8. Short (two buttons share a row). -->
+    <string name="packet_pkt_ft8">FM で FT8</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_text_hint">fldigi で使われるキーボードチャットモード：%1$s。FM で FT8：WSJT-X のモードをこの FM チャンネルで運用し、QSO を自動で行います（SSB の FT8 は受信できません）。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_terminal_section">パケット端末</string>
+    <!-- Button on the PKT sheet that opens the packet terminal. Short (two buttons share a row). -->
+    <string name="packet_pkt_terminal">端末（BBS、ノード）</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_terminal_hint">このチャンネルでパケット BBS やノードに接続します：%1$s。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_finder_section">パケット検索</string>
+    <!-- Button on the PKT sheet while the packet finder runs. Short (two buttons share a row). -->
+    <string name="packet_pkt_finder_listening">パケット検索（受信中）</string>
+    <!-- Button on the PKT sheet that opens the packet finder; %1$d stations found. Short (two buttons share a row). -->
+    <string name="packet_pkt_finder_found">パケット検索（%1$d 局）</string>
+    <!-- Button on the PKT sheet that opens the packet finder. Short (two buttons share a row). -->
+    <string name="packet_pkt_finder">パケット検索</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_finder_hint">パケット周波数を順に受信し、聞こえた BBS、ノード、Winlink ゲートウェイを一覧にします（受信専用）。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_winlink_section">Winlink メール</string>
+    <!-- Button on the PKT sheet that opens Winlink; %1$d unread messages. Short (two buttons share a row). -->
+    <string name="packet_pkt_winlink_new">Winlink（新着 %1$d）</string>
+    <!-- Button on the PKT sheet that opens Winlink (a service name). Short (two buttons share a row). -->
+    <string name="packet_pkt_winlink">Winlink</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_winlink_hint">Winlink のパケットゲートウェイを経由して無線で、またはインターネットでメールをやりとりします：%1$s。</string>
+    <!-- End of the Winlink hint: nothing waits to be sent. Lower case. -->
+    <string name="packet_pkt_winlink_outbox_empty">送信トレイは空です</string>
+    <!-- End of the Winlink hint: %1$d messages wait to be sent. Lower case. -->
+    <string name="packet_pkt_winlink_outbox">送信トレイに %1$d 件</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_exam_section">免許試験対策（米国）</string>
+    <!-- Button on the PKT sheet that opens licence exam practice. Short (two buttons share a row). -->
+    <string name="packet_pkt_exam">試験対策</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_exam_hint">米国の Technician、General、Extra の問題集（英語）：模擬試験、分野別の学習、間違えた問題の復習。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_logbook_section">ログ</string>
+    <!-- Button on the PKT sheet that opens the logbook; %1$d contacts logged. Short. -->
+    <plurals name="packet_pkt_logbook_n">
+        <item quantity="other">ログ（%1$d 交信）</item>
+    </plurals>
+    <!-- Button on the PKT sheet during a park or summit activation; %1$s the reference (K-1234). Short (two buttons share a row). -->
+    <string name="packet_pkt_activating">%1$s をアクティベーション中</string>
+    <!-- Button on the PKT sheet that opens Parks and Summits on the Air (programme names). Short (two buttons share a row). -->
+    <string name="packet_pkt_pota">POTA / SOTA</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_logbook_hint">シグナルレポート付きの交信と、無線機が自動で受信した局。ADIF でエクスポートできます。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_fox_section">フォックスハンティング</string>
+    <!-- Button on the PKT sheet that opens the fox hunt. Short (two buttons share a row). -->
+    <string name="packet_pkt_fox">フォックスハンティング</string>
+    <!-- Start of the fox hunt hint while the fox beacon transmits. -->
+    <string name="packet_pkt_fox_on">🦊 フォックス送信機はオンです。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_fox_hint">隠された送信機を探します：リアルタイムの信号強度、コンパスによる方位、フォックスの推定位置。自分がフォックスになることもできます。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_fox_hint_tx">フォックスになる：ほかの局が探すビーコンを出します。この無線機は信号強度を出力しないため、自分で探すことはできません。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_forms_section">メッセージフォーム</string>
+    <!-- Button on the PKT sheet that opens the message forms; %1$d forms saved (ICS-213 is a form name). Short (two buttons share a row). -->
+    <string name="packet_pkt_forms">ICS-213 とラジオグラム（%1$d）</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_forms_hint">ICS-213 やラジオグラムに記入し、無線で読み上げるか APRS や DMR テキストで送信します。受信したフォームはここで元の形に組み立てられます。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_nets_section">ロールコール</string>
+    <!-- Button on the PKT sheet that lists nets nearby. Short (two buttons share a row). -->
+    <string name="packet_pkt_nets_near">近くのロールコール</string>
+    <!-- Button on the PKT sheet while you run a net; %1$s its name. Short (two buttons share a row). -->
+    <string name="packet_pkt_net_running">ロールコール中：%1$s</string>
+    <!-- Button on the PKT sheet that opens net control. Short (two buttons share a row). -->
+    <string name="packet_pkt_net_control">キー局</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_nets_hint">近くのロールコール：開催中のもの（NetLogger と無線機が受信したもの）、次回の開催、リマインダー。キー局：チェックイン、連絡あり、遅れ、退出の印を付けてロールコールを運営し、最後にレポートを作成します。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_keyer_section">ボイスメモリーと ID タイマー</string>
+    <!-- Button on the PKT sheet that opens the voice keyer. Short (two buttons share a row). -->
+    <string name="packet_pkt_keyer">ボイスメモリー</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_keyer_hint">CQ、ロールコールの開始、自局 ID を一度録音すれば、ワンタップで送信できます。</string>
+    <!-- Sentence after the voice keyer hint: the station-ID timer is not running. -->
+    <string name="packet_pkt_id_timer_idle">ID タイマーは、アマチュアのチャンネルで送信すると始まります。</string>
+    <!-- Sentence after the voice keyer hint: time left to identify. %1$d minutes, %2$s seconds (two digits). -->
+    <string name="packet_pkt_id_within">%1$d:%2$s 以内に ID を送出してください。</string>
+    <!-- Sentence after the voice keyer hint: identify now. -->
+    <string name="packet_pkt_id_due">今すぐ ID を送出してください。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_morse_section">モールス</string>
+    <!-- Button on the PKT sheet that transmits your callsign in Morse. Short (two buttons share a row). -->
+    <string name="packet_pkt_morse_id">コールサインをモールスで送信</string>
+    <!-- Toast when the Morse ID starts; %1$s your callsign. One line. -->
+    <string name="packet_pkt_morse_sending">%1$s をモールスで送信中</string>
+    <!-- Button on the PKT sheet that opens the Morse trainer. Short (two buttons share a row). -->
+    <string name="packet_pkt_morse_trainer">モールス練習</string>
+    <!-- Morse hint on the PKT sheet, first sentence: the decoder is on. -->
+    <string name="packet_pkt_morse_rx_on">アナログチャンネルで受信したモールス（レピーターの ID など）はデコードして履歴に表示します。</string>
+    <!-- Morse hint, first sentence: the decoder is off. -->
+    <string name="packet_pkt_morse_rx_off">モールスデコーダーはオフです（設定）。</string>
+    <!-- Morse hint, second sentence: the Morse ID is on. -->
+    <string name="packet_pkt_morse_id_on">アマチュアのチャンネルで送信した後、最大 10 分に 1 回、コールサインをモールスで送信します。</string>
+    <!-- Morse hint, second sentence: the Morse ID is off. -->
+    <string name="packet_pkt_morse_id_off">設定で、アマチュアのチャンネルで送信した後に 10 分ごとにコールサインをモールスで送信できます。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_schedules_section">予約操作</string>
+    <!-- Button on the PKT sheet that opens the scheduled operations. Short (two buttons share a row). -->
+    <string name="packet_pkt_schedules">スケジュール…</string>
+    <!-- Button on the PKT sheet that opens the scheduled operations; %1$d schedules. Short (two buttons share a row). -->
+    <string name="packet_pkt_schedules_n">スケジュール（%1$d）…</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_pager_section">ページャー</string>
+    <!-- Button on the PKT sheet that opens the pager page (POCSAG is a protocol name). Short (two buttons share a row). -->
+    <string name="packet_pkt_pocsag_page">POCSAG ページャー</string>
+    <!-- Button on the PKT sheet that stops the pager receiver. Short (two buttons share a row). -->
+    <string name="packet_pkt_pager_stop">ページャー受信停止</string>
+    <!-- Button on the PKT sheet that starts the pager receiver. Short (two buttons share a row). -->
+    <string name="packet_pkt_pager_hear">ページャーを受信</string>
+    <!-- Toast after the pager receiver starts. One line. -->
+    <string name="packet_pkt_pager_listening">ページャーメッセージを受信待機中</string>
+    <!-- Toast after the pager receiver stops. One line. -->
+    <string name="packet_pkt_pager_off">ページャー受信オフ</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_pager_hint">英数字のページャーメッセージを、1 回の送信で 1 つまたは複数の RIC に送ります。自局のページャー RIC は APRS 設定にあります。スマートフォン出荷時のファームウェアでは、シンボルエンジンが必要だとページャー画面に表示されます。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_sstv_section">SSTV 画像</string>
+    <!-- Button on the PKT sheet that stops the SSTV receiver. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_stop">受信停止</string>
+    <!-- Button on the PKT sheet that stops listening for the space station's pictures. Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_sstv_stop">ISS SSTV 停止</string>
+    <!-- Toast after ISS SSTV stops. One line. -->
+    <string name="packet_pkt_iss_sstv_stopped">ISS SSTV を停止しました</string>
+    <!-- Button on the PKT sheet that tunes the SSTV calling frequency and listens. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_rx_144500">144.500 で受信</string>
+    <!-- Button on the PKT sheet that listens for SSTV on this channel. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_rx_here">ここで受信</string>
+    <!-- Button on the PKT sheet that listens for the space station's pictures; %1$s its frequency. Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_sstv">ISS SSTV %1$s</string>
+    <!-- Button on the PKT sheet that shows the SSTV picture as it comes in. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_live">ライブ画像</string>
+    <!-- Button on the PKT sheet that transmits a picture by SSTV. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_send">画像を送信</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_sstv_hint">Robot、Martin、Scottie、PD の各モードを受信します（VIS 自動検出）。画像は Download/DMR/SSTV に保存されます。送信には、この無線機の 30 秒の送信時間制限に収まる Robot 24 Color、Robot 12 BW、Robot 8 BW を使います。</string>
+    <!-- Button on the PKT sheet, DTMF row (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_send">DTMF 送信</string>
+    <!-- Button on the PKT sheet, DTMF row (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_heard">受信</string>
+    <!-- Button on the PKT sheet, DTMF row (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_remote">リモート…</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_dtmf_hint">アナログチャンネルで受信したプッシュホン信号（DTMF）をデコードして記録します。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_dtmf_hint_off">アナログチャンネルで受信したプッシュホン信号（DTMF）をデコードして記録します（デコーダーは設定でオフ）。</string>
+    <!-- Button on the PKT sheet that lists the weather alerts heard (NOAA is the US weather service). Short (two buttons share a row). -->
+    <string name="packet_pkt_wx_show">NOAA 気象警報を表示</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_wx_away_hint">地域（デバイス → 地域）に NOAA のような気象放送がないため、SAME 警報デコーダーはここにしまってあります。162.400〜162.550 MHz で受信した警報は引き続きデコードします。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_wx_away_hint_off">地域（デバイス → 地域）に NOAA のような気象放送がないため、SAME 警報デコーダーはここにしまってあります。162.400〜162.550 MHz で受信した警報は引き続きデコードします（設定でオフ）。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_wx_section">NOAA 気象警報</string>
+    <!-- Button on the PKT sheet that lists the weather alerts heard. Short (two buttons share a row). -->
+    <string name="packet_pkt_wx_heard">受信した警報</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_wx_hint">162.400〜162.550 MHz の気象チャンネルの SAME 警報ヘッダーを自動でデコードし、通知します。</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_wx_hint_off">162.400〜162.550 MHz の気象チャンネルの SAME 警報ヘッダーを自動でデコードし、通知します（設定でオフ）。</string>
+    <!-- ==== APRS status line at the top of the APRS group on the PKT sheet ("N0ABC-7 · monitoring 144.390 · KISS client connected · 3 rx / 1 tx"). Lower case. -->
+    <!-- Status line: no callsign is set. -->
+    <string name="packet_pkt_status_no_call">コールサイン未設定</string>
+    <!-- Status line: APRS monitoring on %1$s (the frequency, 144.390). -->
+    <string name="packet_pkt_status_monitoring">%1$s をワッチ中</string>
+    <!-- Status line: only passive decoding. -->
+    <string name="packet_pkt_status_passive">パッシブ</string>
+    <!-- Status line with the KISS TNC on: %1$s monitoring or passive, %2$s the client state, %3$d frames received, %4$d sent. KISS is a protocol name. -->
+    <string name="packet_pkt_status_kiss">%1$s · KISS %2$s · rx %3$d / tx %4$d</string>
+    <!-- Status line: an app is connected to the KISS TNC. -->
+    <string name="packet_pkt_status_kiss_client">クライアント接続中</string>
+    <!-- Status line: no app is connected to the KISS TNC yet. -->
+    <string name="packet_pkt_status_kiss_waiting">クライアント待機中</string>
+    <!-- ==== APRS message sheet. -->
+    <!-- Title of the APRS message sheet. One line. -->
+    <string name="packet_pkt_msg_title">APRS メッセージ</string>
+    <!-- Label above a text field on the APRS message sheet. One line. -->
+    <string name="packet_pkt_msg_to">宛先（コールサイン-SSID）</string>
+    <!-- Label above a text field on the APRS message sheet. One line. -->
+    <string name="packet_pkt_msg_text">メッセージ（67 文字まで）</string>
+    <!-- Hint on the APRS message sheet. %1$s your callsign (or the next string), %2$s the digipeater path (WIDE1-1,WIDE2-1). -->
+    <string name="packet_pkt_msg_hint">%1$s から %2$s 経由で、メッセージ番号付きで送信します。相手局が ACK を返します。</string>
+    <!-- In the APRS message hint instead of your callsign when none is set. -->
+    <string name="packet_pkt_msg_no_call">（設定でコールサインを入力してください）</string>
+    <!-- Toast after an APRS message is queued. One line. -->
+    <string name="packet_pkt_msg_queued">メッセージを送信待ちにしました</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_gw_section">ゲートウェイ</string>
+    <!-- Button on the PKT sheet (APRS message sheet) that sends a text message through SMSGTE. Short (two buttons share a row). -->
+    <string name="packet_pkt_gw_sms">携帯に SMS</string>
+    <!-- Button on the PKT sheet (APRS message sheet) that sends an email through EMAIL-2. Short (two buttons share a row). -->
+    <string name="packet_pkt_gw_email">メール送信</string>
+    <!-- Explanation under a group of buttons on the APRS message sheet. A few lines. -->
+    <string name="packet_pkt_gw_hint">APRS 経由で使えるインターネットゲートウェイ：携帯電話への SMS（SMSGTE、米国とカナダの番号）やメール（EMAIL-2）。携帯の電波はないが APRS の iGate に届く場所で役立ちます。</string>
+    <!-- ==== Gateway sheets (text a phone, send an email through APRS). -->
+    <!-- Title of the text-a-phone sheet. SMSGTE is the gateway's callsign: keep it. One line. -->
+    <string name="packet_pkt_gw_sms_title">携帯に SMS（SMSGTE）</string>
+    <!-- Title of the send-an-email sheet. EMAIL-2 is the gateway's callsign: keep it. One line. -->
+    <string name="packet_pkt_gw_email_title">メール送信（EMAIL-2）</string>
+    <!-- Label above a text field on the text-a-phone sheet. One line. -->
+    <string name="packet_pkt_gw_phone">電話番号（10 桁）</string>
+    <!-- Label above a text field on the send-an-email sheet. One line. -->
+    <string name="packet_pkt_gw_address">メールアドレス</string>
+    <!-- Label above a text field on the gateway sheets. One line. -->
+    <string name="packet_pkt_gw_message">メッセージ</string>
+    <!-- Counter under the gateway message. %1$d characters left (English keeps the plural form even for 1). -->
+    <plurals name="packet_pkt_gw_left">
+        <item quantity="other">残り %1$d 文字（APRS メッセージは 67 文字まで）</item>
+    </plurals>
+    <!-- Counter under the gateway message when it is too long. %1$d characters over (English keeps the plural form even for 1). -->
+    <plurals name="packet_pkt_gw_too_long">
+        <item quantity="other">%1$d 文字オーバー</item>
+    </plurals>
+    <!-- Explanation under a group of buttons on the text-a-phone sheet. A few lines. -->
+    <string name="packet_pkt_gw_sms_hint">SMSGTE 宛の APRS メッセージとして送信し、SMSGTE が携帯電話に SMS を送ります。SMSGTE サービスに登録されていれば、携帯からの返信が APRS メッセージとして自局のコールサインに届きます（smsgte.org を参照）。受信者には通常の SMS 料金がかかります。</string>
+    <!-- Explanation under a group of buttons on the send-an-email sheet. A few lines. -->
+    <string name="packet_pkt_gw_email_hint">EMAIL-2 宛の APRS メッセージとして送信し、EMAIL-2 が自局のコールサインからメールを送ります。ほとんどのメールゲートウェイは ACK を返しますが、メールでの返信は中継されません。</string>
+    <!-- Toast when the phone number is too short. One line. -->
+    <string name="packet_pkt_gw_err_phone">10 桁の電話番号を入力してください</string>
+    <!-- Toast when the email address has no @. One line. -->
+    <string name="packet_pkt_gw_err_email">メールアドレスを入力してください</string>
+    <!-- Toast after a gateway message is queued. One line. -->
+    <string name="packet_pkt_gw_queued">ゲートウェイ宛のメッセージを送信待ちにしました</string>
+    <!-- ==== DTMF remote control sheet. -->
+    <!-- Title of the DTMF remote control sheet. One line. -->
+    <string name="packet_pkt_remote_title">DTMF リモートコントロール</string>
+    <!-- Switch on the DTMF remote sheet. One or two lines. -->
+    <string name="packet_pkt_remote_answer">この端末で DTMF コマンドに応答</string>
+    <!-- Label above a text field on the DTMF remote sheet. One line. -->
+    <string name="packet_pkt_remote_pin">PIN（4〜6 桁、他人に教えないでください）</string>
+    <!-- DTMF remote sheet, before the list of command digits. -->
+    <string name="packet_pkt_remote_intro">別の無線機から、PIN に続けてコマンドの数字を 1 つ、一続きで送信します（前に *、後ろに # を付けてもかまいません）。この端末は 1.5 秒後にそのチャンネルで応答します：</string>
+    <!-- DTMF remote sheet, after the list of command digits. -->
+    <string name="packet_pkt_remote_outro">10 分以内に PIN を 3 回間違えると、リモートは 10 分間ロックされます。PIN は履歴に一切表示されません。アマチュアのチャンネルでは、音声による応答の最後にコールサインをモールスで送信します。</string>
+    <!-- Toast when the remote PIN is not 4 to 6 digits. One line. -->
+    <string name="packet_pkt_remote_err_pin">PIN は 4〜6 桁です</string>
+    <!-- Toast after the DTMF remote settings are saved with it on. One line. -->
+    <string name="packet_pkt_remote_on">DTMF リモート オン</string>
+    <!-- Toast after the DTMF remote settings are saved with it off. One line. -->
+    <string name="packet_pkt_remote_off">DTMF リモート オフ</string>
+    <!-- ==== APRS object sheet. -->
+    <!-- Title of the APRS object sheet. One line. -->
+    <string name="packet_pkt_obj_title">APRS オブジェクト</string>
+    <!-- Label above a text field on the APRS object sheet (the examples are object names: keep them). One line. -->
+    <string name="packet_pkt_obj_name">名前（9 文字まで、例：NETCTL、HAZARD）</string>
+    <!-- Label above a text field on the APRS object sheet. One line. -->
+    <string name="packet_pkt_obj_position">位置（緯度, 経度）</string>
+    <!-- Label above a text field on the APRS object sheet (the codes /N, /!, \!, /E, /. stay). One line. -->
+    <string name="packet_pkt_obj_symbol">シンボル（テーブル + コード：/N キー局、/! 警察、\\! 緊急、/E イベント、/. X）</string>
+    <!-- Label above a text field on the APRS object sheet. One line. -->
+    <string name="packet_pkt_obj_comment">コメント</string>
+    <!-- Explanation under a group of buttons on the APRS object sheet. A few lines. -->
+    <string name="packet_pkt_obj_hint">オブジェクトは、全員の APRS マップに表示される自分専用のマーカーです：キー局の位置、イベント、危険箇所など。「削除」を押すと、削除済みとして再送信します。位置は最初は現在地です。別の場所に置くときは編集してください。</string>
+    <!-- Button on the APRS object sheet that sends the object (three share a row). Very short. -->
+    <string name="packet_pkt_obj_place">配置</string>
+    <!-- Button on the APRS object sheet that sends the object as deleted (three share a row). Very short. -->
+    <string name="packet_pkt_obj_remove">削除</string>
+    <!-- Toast after an APRS object is queued. One line. -->
+    <string name="packet_pkt_obj_queued">オブジェクトを送信待ちにしました</string>
+    <!-- Toast after an APRS object removal is queued. One line. -->
+    <string name="packet_pkt_obj_removal_queued">削除を送信待ちにしました</string>
+    <!-- Toast when the object position cannot be read. One line. -->
+    <string name="packet_pkt_obj_err_position">位置：緯度, 経度を度で入力（例：39.74, -104.99）</string>
+    <!-- ==== APRS bulletin sheet. -->
+    <!-- Title of the APRS bulletin sheet. One line. -->
+    <string name="packet_pkt_bln_title">APRS 掲示</string>
+    <!-- Label above a text field on the APRS bulletin sheet. One line. -->
+    <string name="packet_pkt_bln_number">掲示番号（0〜9）</string>
+    <!-- Label above a text field on the APRS bulletin sheet. One line. -->
+    <string name="packet_pkt_bln_text">本文（67 文字まで）</string>
+    <!-- Explanation under a group of buttons on the APRS bulletin sheet. A few lines. -->
+    <string name="packet_pkt_bln_hint">掲示は範囲内の全員に届き（BLN0〜BLN9）、ACK はありません。ほとんどの APRS アプリは掲示板に一覧表示します。内容を最新に保つには再送信してください。</string>
+    <!-- Toast after an APRS bulletin is queued. One line. -->
+    <string name="packet_pkt_bln_queued">掲示を送信待ちにしました</string>
+    <!-- Title of the list of bulletins heard. One line. -->
+    <string name="packet_pkt_blnheard_title">受信した掲示</string>
+    <!-- The list of bulletins heard is empty (NWS: the US weather service's announcements). -->
+    <string name="packet_pkt_blnheard_empty">掲示や NWS のお知らせはまだ受信していません。</string>
+    <!-- Row heading in the bulletins heard list: %1$s the bulletin (BLN1), %2$s the sender. Note the two spaces. -->
+    <string name="packet_pkt_blnheard_row">%1$s \u0020%2$s から</string>
+    <!-- ==== Send DTMF sheet. -->
+    <!-- Title of the send-DTMF sheet. One line. -->
+    <string name="packet_pkt_dtmf_title">DTMF 送信</string>
+    <!-- Label above a text field on the send-DTMF sheet. One line. -->
+    <string name="packet_pkt_dtmf_keys">キー（0-9、A-D、*、#）</string>
+    <!-- Button on the send-DTMF sheet that transmits the keys (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_transmit">送信</string>
+    <!-- Toast after DTMF is queued. One line. -->
+    <string name="packet_pkt_dtmf_queued">DTMF を送信待ちにしました</string>
+    <!-- Button on the send-DTMF sheet that opens the saved sequences (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_saved">保存済み…</string>
+    <!-- Last item in the saved DTMF list: save what is typed. One line. -->
+    <string name="packet_pkt_dtmf_save_as">💾 現在のキーに名前を付けて保存…</string>
+    <!-- Title of the saved DTMF sequences list. One line. -->
+    <string name="packet_pkt_dtmf_saved_title">保存済みの DTMF シーケンス</string>
+    <!-- Hint in the name field when saving a DTMF sequence. -->
+    <string name="packet_pkt_dtmf_name_hint">名前（例：レピーター オン）</string>
+    <!-- Title of the dialog that names a DTMF sequence. %1$s the keys. -->
+    <string name="packet_pkt_dtmf_save_title">%1$s を保存</string>
+    <!-- Toast after something is saved. One line. -->
+    <string name="packet_pkt_saved">保存しました</string>
+    <!-- Dialog button in the saved DTMF list that deletes one. Short. -->
+    <string name="packet_pkt_dtmf_delete_one">1 つ削除…</string>
+    <!-- Title of the list that picks the DTMF sequence to delete. One line. -->
+    <string name="packet_pkt_dtmf_delete_which">どれを削除しますか？</string>
+    <!-- Toast after something is deleted. One line. -->
+    <string name="packet_pkt_deleted">削除しました</string>
+    <!-- Explanation under a group of buttons on the SSTV live picture sheet (keep the folder path). A few lines. -->
+    <string name="packet_pkt_sstv_live_hint">デコード中は、画像が 1 行ずつ描かれていきます。完成した画像は Download/DMR/SSTV にあります。</string>
+    <!-- Toast when Send picture is opened from somewhere that cannot pick a picture. One line. -->
+    <string name="packet_pkt_sstv_err_main">メイン画面から開いてください</string>
+    <!-- SSTV mode list: a mode longer than 30 s (the cool-down guard applies). %1$s the mode and its length ("Martin M1 (≈115 s)"). Note the two spaces. -->
+    <string name="packet_pkt_sstv_mode_long">%1$s \u0020· 長い</string>
+    <!-- Title of the SSTV mode list. One line. -->
+    <string name="packet_pkt_sstv_mode_title">SSTV モード</string>
+    <!-- Toast when an SSTV picture starts going out; %1$s the mode. One line. -->
+    <string name="packet_pkt_sstv_sending">%1$s を送信中</string>
+    <!-- Toast when the chosen picture cannot be opened. One line. -->
+    <string name="packet_pkt_sstv_err_read">その画像を読み込めませんでした</string>
+    <!-- ==== Stations heard list. -->
+    <!-- Title of the APRS stations heard list. One line. -->
+    <string name="packet_pkt_stations_title">受信した局</string>
+    <!-- The stations heard list is empty. Mic-E and NMEA are APRS format names. -->
+    <string name="packet_pkt_stations_empty">まだ何もデコードしていません。位置、Mic-E、オブジェクト、NMEA のレポートが、自局からの距離と方位付きでここに表示されます。</string>
+    <!-- Row heading in the stations list: %1$s the callsign, %2$s the distance in miles, %3$s the compass direction (N, NE …). Note the two spaces. -->
+    <string name="packet_pkt_station_dist">%1$s \u0020%2$s mi %3$s</string>
+    <!-- Stations list, details line: speed. %1$s miles per hour. Very short. -->
+    <string name="packet_pkt_station_mph">%1$s mph</string>
+    <!-- Stations list, details line: altitude. %1$d feet. Very short. -->
+    <string name="packet_pkt_station_ft">%1$d ft</string>
+    <!-- Stations list, details line: the digipeater it came through. %1$s its callsign. Very short. -->
+    <string name="packet_pkt_station_via">%1$s 経由</string>
+    <!-- Toast when no map app can show the station. One line. -->
+    <string name="packet_pkt_no_map_app">地図アプリがありません</string>
+    <!-- Button under the stations list that saves them as a GPX file (GPX is a file format). Short. -->
+    <string name="packet_pkt_export_gpx">GPX をエクスポート</string>
+    <!-- Toast after the GPX file is saved; %1$s the file name. Keep the folder path. One line. -->
+    <string name="packet_pkt_gpx_saved">Download/DMR/APRS/%1$s に保存しました</string>
+    <!-- Title of Android's share sheet for the GPX file. One line. -->
+    <string name="packet_pkt_share_gpx">GPX を共有</string>
+    <!-- Toast when the GPX file cannot be written; %1$s the system's reason. One line. -->
+    <string name="packet_pkt_export_failed">エクスポートに失敗しました：%1$s</string>
+    <!-- Button under the stations list that empties it. Short. -->
+    <string name="packet_pkt_clear_list">リストをクリア</string>
+    <!-- ==== APRS log. -->
+    <!-- Title of the APRS log. One line. -->
+    <string name="packet_pkt_log_title">APRS ログ</string>
+    <!-- The APRS log is empty. -->
+    <string name="packet_pkt_log_empty">メッセージ、ACK、ビーコン、デジピート、ステータスレポートが新しい順にここに表示されます。</string>
+    <!-- APRS log row for a message to you: %1$s the sender and addressee ("💬 N0ABC → N0XYZ-7"). Note the two spaces. -->
+    <string name="packet_pkt_log_for_you">%1$s \u0020（自局宛）</string>
+    <!-- ==== DTMF heard list. -->
+    <!-- Title of the DTMF heard list. One line. -->
+    <string name="packet_pkt_dtmflog_title">受信した DTMF</string>
+    <!-- The DTMF heard list is empty. -->
+    <string name="packet_pkt_dtmflog_empty">DTMF シーケンスはまだデコードしていません。</string>
+    <!-- DTMF heard row: %1$s the time, %2$d the channel number, %3$s its name. "ch" is short for channel. Note the two spaces. -->
+    <string name="packet_pkt_dtmflog_row">%1$s \u0020ch %2$d %3$s</string>
+    <!-- ==== Weather alerts heard list. -->
+    <!-- Title of the weather alerts heard list. One line. -->
+    <string name="packet_pkt_wxlog_title">受信した気象警報</string>
+    <!-- The weather alerts list is empty. RWT is the SAME code of the weekly test: keep it. -->
+    <string name="packet_pkt_wxlog_empty">SAME 警報ヘッダーはまだデコードしていません。NOAA の気象チャンネルに合わせておくと、ふつう最初に受信するのは週例試験（RWT）です。</string>
+    <!-- ==== APRS and packet settings sheet. -->
+    <!-- Title of the APRS and packet settings sheet. One line. -->
+    <string name="packet_set_title">APRS とパケットの設定</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_callsign">コールサイン</string>
+    <!-- Label above a text field on the APRS settings (SSID is the APRS station number). One line. -->
+    <string name="packet_set_ssid">SSID（0〜15。7 = ハンディ機、9 = モービル）</string>
+    <!-- Label above a text field on the APRS settings (RIC is a pager address). One line. -->
+    <string name="packet_set_rics">ページャーの RIC（POCSAG。1 つ以上、例：1234567; 1234568）</string>
+    <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
+    <string name="packet_set_identity_hint">コールサイン、SSID、RIC は一つの局の識別情報です。APRS と M17 はこのコールサインで送信し、送るページャーメッセージには送信者タグとして付きます。ページャー画面は自局の RIC を受信します。</string>
+    <!-- Label above a text field on the APRS settings (the codes /[, />, /- stay). One line. -->
+    <string name="packet_set_symbol">シンボル（テーブル + コード、例：/[ 人、/> 車、/- 家）</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_comment">ビーコンのコメント</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_path">デジピーターパス</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_kiss_port">KISS TNC ポート</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_set_is_section">APRS-IS（インターネット）</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_server">サーバー</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_port">ポート</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_passcode">パスコード（-1 = 受信専用。表示も記録もされません）</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_beacon_min">インターネットビーコンの間隔（分、0 = オフ）</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_comment">インターネットビーコンのコメント</string>
+    <!-- Section heading in the APRS settings. %1$s the APRS frequency. One line, shown in capitals. -->
+    <string name="packet_set_auto_section">自動ビーコン（%1$s のみ）</string>
+    <!-- Choice pill for automatic beacons: timed. Short. -->
+    <string name="packet_set_auto_every">N 分ごと</string>
+    <!-- Label of the automatic beacon choice. Short. -->
+    <string name="packet_set_beacon">ビーコン</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_beacon_min">間隔（分）（「N 分ごと」モード）</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_telemetry">テレメトリーを 30 分ごと（電池、電圧、温度、気圧、信号）</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_weather">気象情報を 30 分ごと（気圧）</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_igate">双方向 iGate：ここで受信した局宛のインターネットメッセージを無線で送信</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_groups">フォローするメッセージグループ（カンマ区切り、例：CQ,ARES）</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_set_passive_section">パッシブ APRS デコード</string>
+    <!-- Choice pill for passive decode: only flagged channels. Short. -->
+    <string name="packet_set_passive_flagged">指定チャンネル</string>
+    <!-- Choice pill for passive decode: all analog channels. Short. -->
+    <string name="packet_set_passive_every">全アナログチャンネル</string>
+    <!-- Label of the passive decode choice. Short. -->
+    <string name="packet_set_decode_on">デコード対象</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_set_power_section">送信出力</string>
+    <!-- Label of the transmit power choice. Short. -->
+    <string name="packet_set_power">出力</string>
+    <!-- Choice pill: high power, the default. Short. -->
+    <string name="packet_set_power_high">ハイ（初期値）</string>
+    <!-- Choice pill: low power. Short. -->
+    <string name="packet_set_power_low">ロー</string>
+    <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
+    <string name="packet_set_power_hint">アプリが自分で合わせる周波数で使います：%1$s での APRS ワッチ（自動ビーコン、自動 ACK、デジピート）、ISS APRS とそのビーコン、144.500 での SSTV。自分のチャンネルから送るメッセージやビーコンは、そのチャンネルの出力を使います。</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_set_lead_section">パケット前置き（テスト用）</string>
+    <!-- Label of the lead-in kind choice (tone, flags, silence). Short. -->
+    <string name="packet_set_lead_sound">音</string>
+    <!-- Label of the lead-in length choice. Short. -->
+    <string name="packet_set_lead_length">長さ</string>
+    <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
+    <string name="packet_set_lead_hint">無線機の送信音声が安定するまでの間、各パケットの前に送ります（キャリアから約 1 秒後に電波に乗ります）。フラグ（初期値）はどの TNC も送る標準の AX.25 TXDELAY、トーンは 1200 Hz の連続音、無音は無変調です。ベンチテスト（252 パケット）：1.6 s では 3 つともデコード率は同じで、短くすると無音が最も弱くなります。短い長さは、近くのデジピーターでのテスト用です。SSTV と DTMF は独自の前置きを使います。</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_autoack">自局宛のメッセージに自動 ACK（ワッチ中）</string>
+    <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
+    <string name="packet_set_autoack_off">この無線機では自動 ACK はオフです。2 m バンドがないため、メッセージに自動で ACK を返しません。</string>
+    <!-- Switch in the APRS settings (WIDE1-1 is a path name). One or two lines. -->
+    <string name="packet_set_digi">WIDE1-1 のフィルインデジピーター（ワッチ中）</string>
+    <!-- Switch in the APRS settings. One line. -->
+    <string name="packet_set_dtmf">DTMF デコーダー</string>
+    <!-- Switch in the APRS settings. One line. -->
+    <string name="packet_set_same">NOAA SAME 気象警報</string>
+    <!-- Switch in the APRS settings. One line. -->
+    <string name="packet_set_morse">モールスデコーダー</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_morse_id">送信後に CW ID（アマチュアのチャンネル、10 分ごと）</string>
+    <!-- Toast when the callsign is not valid. One line. -->
+    <string name="packet_set_err_callsign">コールサイン：英数字 1〜6 文字。SSID は専用の欄に入力してください</string>
+    <!-- Toast when the SSID is out of range. One line. -->
+    <string name="packet_set_err_ssid">SSID は 0〜15 です</string>
+    <!-- Toast when a number in the settings cannot be read. One line. -->
+    <string name="packet_set_err_numbers">数値を確認してください</string>
+    <!-- State pill of a switch on the packet sheets: on. Very short, capitals. -->
+    <string name="packet_toggle_on">オン</string>
+    <!-- State pill of a switch on the packet sheets: off. Very short, capitals. -->
+    <string name="packet_toggle_off">オフ</string>
+    <!-- ==== Joining text. -->
+    <!-- Between two whole sentences built separately (a space in English; empty for languages that write no space). -->
+    <string name="packet_sentence_sep"></string>
+    <!-- Between the items of a short list ("every 15 min, telemetry every 30 min"). -->
+    <string name="packet_list_sep">、</string>
+</resources>

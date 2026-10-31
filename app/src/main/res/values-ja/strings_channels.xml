@@ -1,0 +1,920 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Channels page: the channel list, zones, presets, contacts, codeplug, repeaters, region, backup. See strings_common.xml for the conventions. -->
+<resources>
+
+    <!-- ===== Channel lists (Add a zone): where each list applies, what it is, the licence it needs ===== -->
+    <!-- Where a channel list applies, shown with it on the Add-a-zone sheet. Short (countries). -->
+    <string name="channels_preset_where_us_canada">米国 / カナダ</string>
+    <!-- Where a channel list applies (Marine VHF). Short. -->
+    <string name="channels_preset_where_us_intl">米国 / 国際</string>
+    <!-- Where a channel list applies: everywhere. Short. -->
+    <string name="channels_preset_where_worldwide">全世界</string>
+    <!-- Where a channel list applies (UHF CB). Short. -->
+    <string name="channels_preset_where_au_nz">オーストラリア / NZ</string>
+    <!-- Where a channel list applies (PMR446). Short. -->
+    <string name="channels_preset_where_eu_uk">欧州 / 英国</string>
+    <!-- Licence line of a licence-free channel list (FRS, MURS). One line. -->
+    <string name="channels_preset_licence_none">免許不要</string>
+    <!-- Licence line of a listen-only channel list (weather, marine, railroad). One line. -->
+    <string name="channels_preset_licence_rx_only">受信専用</string>
+    <!-- Licence line of an amateur channel list. One line. -->
+    <string name="channels_preset_licence_amateur">アマチュア無線の免許が必要</string>
+    <!-- Licence line of the satellite list: listening is free. One line. -->
+    <string name="channels_preset_licence_amateur_tx">送信にはアマチュア無線の免許が必要</string>
+    <!-- Description of the FRS channel list (US Family Radio Service). Paragraph. -->
+    <string name="channels_preset_frs_about">Family Radio Service（米国）：店頭でパック売りされているトランシーバーの 22 チャンネルです。ナロー、低出力。</string>
+    <!-- Description of the GMRS channel list. Paragraph. -->
+    <string name="channels_preset_gmrs_about">General Mobile Radio Service（米国）：FRS と同じ 22 チャンネル（FRS の無線機と交信できます）に、レピーターチャンネル 15R〜22R の 8 つを加えたものです。レピーターチャンネルは 462 MHz で受信し、5 MHz 上で送信します。チャンネル 8〜14 はナロー、低出力です。</string>
+    <!-- Licence line of the GMRS list. One or two lines. -->
+    <string name="channels_preset_gmrs_licence">FCC の GMRS 免許が必要（試験なし、家族も対象）</string>
+    <!-- Description of the NOAA weather channel list. PKT is the packet page. Paragraph. -->
+    <string name="channels_preset_wx_about">NOAA Weather Radio（と Environment Canada）の 7 つの放送チャンネルです。受信専用で、いちばん強く入るのが地元の局です。SAME 警報をオンにすると（PKT）、無線機が警報をデコードします。</string>
+    <!-- Description of the MURS channel list. Paragraph. -->
+    <string name="channels_preset_murs_about">Multi-Use Radio Service：米国で免許不要の VHF 5 チャンネルです。FRS より空いていて、屋外ではより遠くまで届きます。低出力（上限 2 W）。</string>
+    <!-- Description of the Marine VHF channel list. Paragraph. -->
+    <string name="channels_preset_marine_about">船舶、港湾、沿岸警備隊の通信を聞くための国際 VHF チャンネルです。16 は遭難・呼出、9 はプレジャーボートの呼出、13 は船舶間の航行安全、22A は米国沿岸警備隊です。受信専用：この無線機は船舶用の無線機ではありません。</string>
+    <!-- Description of the DMR simplex channel list. Paragraph. -->
+    <string name="channels_preset_dmr_about">アマチュア無線の DMR シンプレックス：ほとんどの DMR 無線機に入っているチャンネルで、すべてカラーコード 1、タイムスロット 1、トークグループ 99 です。</string>
+    <!-- Description of the US business channel list; "dot" and "star" are the colour names of these frequencies. Paragraph. -->
+    <string name="channels_preset_biz_about">業務用の移動（itinerant）チャンネル：レンタルや量販店の業務用無線機に最初から設定されている「dot」「star」の周波数で、イベント、店舗、農場、工事現場などで使われます。受信は自由です。VHF ではこの無線機はワイドでしか動作せず、これらのチャンネルではワイドでの送信がもう認められていません。送信は UHF のチャンネルで行ってください。</string>
+    <!-- Licence line of the business list. One line. -->
+    <string name="channels_preset_biz_licence">FCC の業務用（Part 90）免許が必要</string>
+    <!-- Description of the AAR railroad channel list. Paragraph. -->
+    <string name="channels_preset_rail_about">AAR の鉄道チャンネル 96 個（02〜97、159.810〜161.565 MHz。02〜04 はカナダで使用）：指令員、列車、操車場、そして車軸数を読み上げる沿線の故障検知装置。受信専用です。ゾーンをスキャンして地元の鉄道のチャンネルを見つけ、お気に入りに登録してください。</string>
+    <!-- Description of the ISS and satellites list. Channel names (ISS APRS, ISS SSTV, ISS Rptr, SO-50) stay as written. Long paragraph. -->
+    <string name="channels_preset_sat_about">国際宇宙ステーション（ISS）と FM 衛星 SO-50 です。どちらも 1 回のパスで約 10 分間受信できます（時刻は Heavens-Above などのアプリで確認できます）。ISS Voice：145.800 でのクルーとの交信（南北アメリカではクルーは 144.490 を受信しています）。ISS APRS：ISS のパケットデジピーターで、2026 年からは 437.825 です（以前は 145.825 を使っていました）。ISS SSTV：437.550 での画像イベント（受信専用）。70 cm ではドップラー効果で信号が最大 10 kHz ずれるため、APRS と SSTV のチャンネルには +（昇るとき）、記号なし（真上）、-（沈むとき）があります。PKT → ISS APRS と ISS SSTV はずれに自動で追従するので、こちらのほうが確実です。ISS Rptr と SO-50 は 2 m で受信して 70 cm で送信し、67 Hz のトーンで開きます。パスの始まりは + のチャンネル、真上では記号なし、終わりは - のチャンネルを使ってください。ARISS は ISS のモードをよく変更するので、ariss.org で確認してください。ハンディ機で衛星を経由して交信するのは難しいので、まず受信から始めてください。クロスバンド（2 m で送信、70 cm で受信）は、この無線機では未検証です。</string>
+    <!-- Description of the Australian UHF CB channel list. Paragraph. -->
+    <string name="channels_preset_cb_about">80 チャンネルの UHF CB バンド（476.425〜477.4125 MHz、ナロー、5 W）。R チャンネルはレピーターを使います。1〜8 と 41〜48 で受信し、750 kHz 上（31〜38 と 71〜78。これらはシンプレックスチャンネルとしては含めていません）で送信します。チャンネル 5 は緊急用（ニュージーランドを除く）、40 は幹線道路用、18 はキャラバンや車列用、10 は四輪駆動車のクラブ用、11 は呼出用です。22 と 23（データ専用）と 61〜63（予約）は含めていません。</string>
+    <!-- Licence line of the UHF CB list. One or two lines. -->
+    <string name="channels_preset_cb_licence">オーストラリアと NZ では免許不要。米国では使用できません</string>
+    <!-- Description of the PMR446 channel list. Paragraph. -->
+    <string name="channels_preset_pmr_about">PMR446：欧州と英国の免許不要トランシーバー用チャンネルで、ナローの 16 チャンネルです。低出力（上限 0.5 W）。</string>
+    <!-- Licence line of the PMR446 list. One or two lines. -->
+    <string name="channels_preset_pmr_licence">欧州では免許不要。米国では使用できません</string>
+    <!-- Description of the ham simplex list. %1$s is the region's APRS frequency in MHz ("144.390"). Paragraph. -->
+    <string name="channels_preset_ham_about">アマチュア無線の FM シンプレックス：2 m と 70 cm の呼出チャンネル、そして APRS（%1$s。地域の APRS 周波数で、無線機が位置報告をデコードします）。「デバイス → 地域」で設定します。</string>
+    <!-- Description of the ham simplex list, with an SSTV channel. %1$s is the APRS frequency in MHz. Paragraph. -->
+    <string name="channels_preset_ham_about_sstv">アマチュア無線の FM シンプレックス：2 m と 70 cm の呼出チャンネル、APRS（%1$s。地域の APRS 周波数で、無線機が位置報告をデコードします）、FM SSTV。「デバイス → 地域」で設定します。</string>
+    <!-- Description of the ham simplex list, with the North American simplex channels. %1$s is the APRS frequency in MHz. Paragraph. -->
+    <string name="channels_preset_ham_about_common">アマチュア無線の FM シンプレックス：2 m と 70 cm の呼出チャンネル、よく使われるシンプレックスチャンネル、APRS（%1$s。地域の APRS 周波数で、無線機が位置報告をデコードします）。「デバイス → 地域」で設定します。</string>
+    <!-- Description of the ham simplex list, with simplex channels and SSTV. %1$s is the APRS frequency in MHz. Paragraph. -->
+    <string name="channels_preset_ham_about_common_sstv">アマチュア無線の FM シンプレックス：2 m と 70 cm の呼出チャンネル、よく使われるシンプレックスチャンネル、APRS（%1$s。地域の APRS 周波数で、無線機が位置報告をデコードします）、FM SSTV。「デバイス → 地域」で設定します。</string>
+    <!-- Toast after adding a channel list. %1$d channels added, %2$s the zone name. One line. -->
+    <plurals name="channels_preset_added">
+        <item quantity="other">%1$d チャンネルを追加しました · ゾーン %2$s</item>
+    </plurals>
+    <!-- Toast after adding a channel list. %1$d added, %3$d already there, %2$s the zone name. One line. -->
+    <plurals name="channels_preset_added_reused">
+        <item quantity="other">%1$d チャンネルを追加、%3$d チャンネルは登録済み · ゾーン %2$s</item>
+    </plurals>
+    <!-- Toast after adding a channel list. %1$d added, %3$d left out (this radio cannot tune them), %2$s the zone name. One line. -->
+    <plurals name="channels_preset_added_skipped">
+        <item quantity="other">%1$d チャンネルを追加、この無線機の範囲外の %3$d チャンネルは除外 · ゾーン %2$s</item>
+    </plurals>
+    <!-- Toast after adding a channel list. %1$d added, %3$d already there, %4$d left out, %2$s the zone name. One line. -->
+    <plurals name="channels_preset_added_reused_skipped">
+        <item quantity="other">%1$d チャンネルを追加、%3$d チャンネルは登録済み、この無線機の範囲外の %4$d チャンネルは除外 · ゾーン %2$s</item>
+    </plurals>
+    <!-- Tag after a channel in the list preview (monospace): listen only. Very short. -->
+    <string name="channels_preset_preview_rx_only">受信専用</string>
+    <!-- Tag after a channel in the list preview (monospace): low power. Very short. -->
+    <string name="channels_preset_preview_low">ロー</string>
+    <!-- Tag after a channel in the list preview (monospace): this radio cannot tune it, so Add leaves it out. Short. -->
+    <string name="channels_preset_preview_not_tunable">範囲外</string>
+    <!-- Reason in the toast "Could not add <list>: ..." when no channel of the list is in this radio's bands. %1$s is the bands ("400-480 MHz"). One line. -->
+    <string name="channels_preset_none_tunable">この無線機で使える範囲（%1$s）に入るチャンネルがありません</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_cw_moonbounce_eme">2 m CW と月面反射（EME）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_no_fm_here">ここでは FM を使いません</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_weak_signal_ssb">2 m 微弱信号 SSB（呼出 144.200）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_do_not_transmit">送信しないでください</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_aprs_north_american_packet_frequency">APRS（北米のパケット周波数）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_new_satellite_miscellaneous">2 m 新しい衛星用とその他</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_keep_fm_off">FM で使わないでください</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_linear_translator_inputs">2 m リニアトランスポンダーの入力</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_satellites_translators_not_fm">衛星とトランスポンダー用で、FM 用ではありません</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_fm_repeater_inputs">2 m FM レピーターの入力</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_weak_signal_fm">2 m 微弱信号と FM シンプレックス</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_linear_translator_outputs">2 m リニアトランスポンダーの出力</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_not_fm">FM 用ではありません</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_fm_repeater_outputs">2 m FM レピーターの出力</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_miscellaneous_experimental">2 m その他と実験</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_voice_downlink">ISS 音声ダウンリンク</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_satellite_aprs_iss_moved_437">衛星 APRS（ISS は 437.825 に移動）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_repeater_uplink">ISS レピーターのアップリンク</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_satellite_subband">2 m 衛星サブバンド</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_satellites_only_no_terrestrial_fm">衛星専用：地上の FM で使わないでください</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_national_fm_simplex">2 m 全国 FM シンプレックス呼出</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_fm_simplex">2 m FM シンプレックス</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_fm_repeater_outputs_2">2 m FM レピーターの出力（プラスオフセット）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_amateur_television_links">70 cm アマチュアテレビとリンク</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_moonbounce_eme">70 cm 月面反射（EME）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_weak_signal_cw">70 cm 微弱信号 CW と SSB（呼出 432.100）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_weak_signal_beacons">70 cm 微弱信号とビーコン</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_auxiliary_repeater_links">70 cm 補助局とレピーターのリンク</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_aprs_digipeater">ISS APRS デジピーター</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_sstv_downlink">ISS SSTV ダウンリンク</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_repeater_downlink">ISS レピーターのダウンリンク</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_satellite_subband">70 cm 衛星サブバンド</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_amateur_television_repeaters">70 cm アマチュアテレビ、レピーター、リンク（地域のバンドプランで異なる）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_fm_repeaters_local">70 cm FM レピーター（地域のバンドプランで異なる）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_national_fm_simplex">70 cm 全国 FM シンプレックス呼出</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_fm_simplex_links">70 cm FM シンプレックスとリンク</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_space_operations_aviation">宇宙運用と航空</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_receive_only">受信専用</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_weather_other_satellites_downlinks">気象衛星などのダウンリンク</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_us_government_military">米国の政府と軍</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_murs_licence_free_2_w">MURS（米国で免許不要、2 W）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_land_mobile_public_safety_business">陸上移動：公共安全と業務</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_licensed_users_only_public_safety">免許を持つ利用者専用。公共安全の通信を絶対に妨害しないでください</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_marine_vhf">国際 VHF（船舶）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_receive_only_radio">この無線機では受信専用</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_aar_railroad_channels">AAR 鉄道チャンネル</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_marine_shore_stations_land_mobile">船舶の海岸局と陸上移動</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_land_mobile_business_industry_utilities">陸上移動：業務、産業、公益事業</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_licensed_users_only">免許を持つ利用者専用</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_noaa_weather_radio">NOAA Weather Radio</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_us_federal_government">米国連邦政府</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_weather_balloons_satellites">気象観測気球と衛星</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_frs_gmrs_channels_8_14">FRS と GMRS（チャンネル 8〜14、0.5 W）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_frs_gmrs">FRS と GMRS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_gmrs_needs_fcc_licence_frs">GMRS には FCC の免許が必要。FRS の無線機のみ、低出力</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_gmrs_repeater_inputs">GMRS レピーターの入力</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_fcc_gmrs_licence_needed">FCC の GMRS 免許が必要</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_land_mobile_business_public_safety">陸上移動：業務、公共安全、GMRS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_land_mobile_some_cities_tv">一部の都市では陸上移動（ほかの地域ではテレビの 14〜15 チャンネル）</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_beacons">2 m ビーコン</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_packet">2 m パケット</string>
+    <!-- Band-plan text: what the frequency is for (%1$s), then the caution (%2$s). One line. -->
+    <string name="channels_bandplan_use_caution">%1$s。%2$s</string>
+    <!-- Band-plan line for a frequency: %1$s is the frequency in MHz ("146.5200"), %2$s what it is for. One line. -->
+    <string name="channels_bandplan_line">%1$s MHz：%2$s</string>
+    <!-- Band-plan line for a frequency this radio cannot tune. One line. -->
+    <string name="channels_bandplan_outside">この無線機の範囲外</string>
+
+    <!-- ===== Nets (NetFinder): schedules and where a net came from ===== -->
+    <!-- Where a net on the Nets sheet came from: the owner added it. Short, after a " · ". -->
+    <string name="channels_net_source_mine">自分で追加</string>
+    <!-- Where a net on the Nets sheet came from: learned from what the radio heard. Short, after a " · ". -->
+    <string name="channels_net_source_heard">受信から</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_sun">日</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_mon">月</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_tue">火</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_wed">水</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_thu">木</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_fri">金</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_sat">土</string>
+    <!-- Separator between weekday names in a net's schedule ("Mon, Wed"). Keep the trailing space if your language uses one. -->
+    <string name="channels_net_day_sep">、</string>
+    <!-- A net's schedule when no weekday is ticked. Short. -->
+    <string name="channels_net_no_day">曜日なし</string>
+    <!-- A net's schedule: %1$s the weekdays ("Mon, Wed"), %2$s the time ("7:30 PM"). Short. -->
+    <string name="channels_net_when_days">%1$s %2$s</string>
+    <!-- A daily net's schedule; %1$s is the time ("7:00 AM"). Short. -->
+    <string name="channels_net_when_daily">毎日 %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_sundays">毎週日曜 %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_mondays">毎週月曜 %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_tuesdays">毎週火曜 %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_wednesdays">毎週水曜 %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_thursdays">毎週木曜 %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_fridays">毎週金曜 %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_saturdays">毎週土曜 %1$s</string>
+
+    <!-- ===== Region (Device → Region): values, labels, how it was chosen ===== -->
+    <!-- A value on the Device → Region sheet, under its label. Short. The region lists no such frequency. -->
+    <string name="channels_region_none_listed">記載なし</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. Weather radio exists here. -->
+    <string name="channels_region_yes">あり</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. No weather radio here. -->
+    <string name="channels_region_no">なし</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. Distances are shown in kilometres. -->
+    <string name="channels_region_km">キロメートル</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. Distances are shown in miles. -->
+    <string name="channels_region_miles">マイル</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. %1$d is minutes between station identifications. -->
+    <string name="channels_region_id_every">%1$d 分ごと</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. The app's own station-ID interval. -->
+    <string name="channels_region_id_default">10 分ごと（アプリの初期値）</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. -->
+    <string name="channels_region_label_aprs">APRS 周波数</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. The 2 m FM calling frequency. -->
+    <string name="channels_region_label_call2">2 m FM 呼出</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. The 70 cm FM calling frequency. -->
+    <string name="channels_region_label_call70">70 cm FM 呼出</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. The FM SSTV frequency. -->
+    <string name="channels_region_label_sstv">FM SSTV</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. Whether NOAA-style weather radio (SAME alerts) exists. -->
+    <string name="channels_region_label_weather">気象放送（NOAA 方式、SAME）</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. Kilometres or miles. -->
+    <string name="channels_region_label_units">距離の単位</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. How often the station-ID reminder comes. -->
+    <string name="channels_region_label_station_id">ID 送出の通知</string>
+    <!-- How the region was chosen, after its name on the Region sheet and the region bar ("Belgium (from your SIM)"). Short. -->
+    <string name="channels_region_how_sim">SIM から</string>
+    <!-- How the region was chosen, after its name on the Region sheet and the region bar ("Belgium (from your SIM)"). Short. -->
+    <string name="channels_region_how_network">モバイルネットワークから</string>
+    <!-- How the region was chosen, after its name on the Region sheet and the region bar ("Belgium (from your SIM)"). Short. -->
+    <string name="channels_region_how_locale">端末の言語設定から</string>
+    <!-- How the region was chosen, after its name on the Region sheet and the region bar ("Belgium (from your SIM)"). Short. -->
+    <string name="channels_region_how_user">手動で選択</string>
+    <!-- A starting point in the region picker, and the Region sheet title for it: %1$s is an IARU default ("IARU Region 1 …"). One line. -->
+    <string name="channels_region_custom">カスタム：%1$s</string>
+
+    <!-- ===== Region sheet (Device → Region) and the region picker ===== -->
+    <!-- Toast when the region is tapped in Restricted mode (an admin item). One line. -->
+    <string name="channels_region_locked">制限モードでは地域を変更できません</string>
+    <!-- Region sheet title before any region is chosen. Short. -->
+    <string name="channels_region_not_chosen">未選択</string>
+    <!-- Device → Region row before a region is chosen. One or two lines. -->
+    <string name="channels_region_summary_unchosen">未選択：北米の初期値（APRS 144.390）。タップして選択</string>
+    <!-- Device → Region row: %1$s the region, %2$s its APRS frequency in MHz. One line. -->
+    <string name="channels_region_summary">%1$s · APRS %2$s</string>
+    <!-- Device → Region row when the user changed some values: %1$s the region, %2$s its APRS frequency, %3$d how many values. One line. -->
+    <plurals name="channels_region_summary_changed">
+        <item quantity="other">%1$s · APRS %2$s · %3$d 件を変更済み</item>
+    </plurals>
+    <!-- Title of the Region sheet. One or two words. -->
+    <string name="channels_region_title">地域</string>
+    <!-- Intro paragraph of the Region sheet. -->
+    <string name="channels_region_intro">地域は SignalDeck の初期値を決めます。APRS 周波数、呼出周波数と SSTV 周波数、最初に表示する免許不要の無線サービス、気象放送の有無、CW ID と ID 送出の通知に使うアマチュアバンドの範囲、距離の単位（キロメートルかマイル）です。地域の設定で送信したり、モードを開始したり、チャンネルを変更したりすることはありません。免許と国の法令を守るのは、引き続き自分自身の責任です。</string>
+    <!-- Under the region name: %1$s how it was chosen ("from your SIM"), %2$s the country the mobile network reports. One line. -->
+    <string name="channels_region_how_roam">%1$s（ネットワークの国：%2$s）</string>
+    <!-- Under the region name, for a country with no entry of its own: %1$s how it was chosen, %2$d the IARU region number (1 to 3). One or two lines. -->
+    <string name="channels_region_how_generic">%1$s。この国専用の項目はまだないため、IARU 第 %2$d 地域の初期値を使います</string>
+    <!-- Under the region name: %1$s how it was chosen, %2$s the network's country, %3$d the IARU region number. Two lines. -->
+    <string name="channels_region_how_roam_generic">%1$s（ネットワークの国：%2$s）。この国専用の項目はまだないため、IARU 第 %3$d 地域の初期値を使います</string>
+    <!-- Region sheet hint before a region is chosen. One or two lines. -->
+    <string name="channels_region_unchosen_hint">端末から現在の国がわからなかったため、選択するまでは北米の値を使います。</string>
+    <!-- Button on the Region sheet. Short. -->
+    <string name="channels_region_choose_another">別の地域を選択</string>
+    <!-- Button on the Region sheet when no region is chosen. Short. -->
+    <string name="channels_region_choose">地域を選択</string>
+    <!-- Section heading on the Region sheet (shown in capitals). Short. -->
+    <string name="channels_region_section_sets">設定される項目</string>
+    <!-- A Region value the user set: %1$s is the value. Keep the two spaces. Short. -->
+    <string name="channels_region_value_yours">%1$s \u0020（自分で設定）</string>
+    <!-- A Region value not yet checked against a national source: %1$s is the value. Keep the two spaces. Short. -->
+    <string name="channels_region_value_unconfirmed">%1$s \u0020（未確認）</string>
+    <!-- Chip on a Region value: back to the region's own value. Very short. -->
+    <string name="channels_region_reset">リセット</string>
+    <!-- Chip on a Region value: set your own. Very short. -->
+    <string name="channels_region_change">変更</string>
+    <!-- Region sheet hint: %1$s the bands this radio tunes ("400-480 MHz"), %2$s the region's APRS frequency in MHz. Two lines. -->
+    <string name="channels_region_aprs_untunable">この無線機で使えるのは %1$s で、%2$s MHz は使えません。そのため APRS ワッチは使えませんが、自分のチャンネルでは APRS を引き続きデコードします。</string>
+    <!-- Section heading on the Region sheet (shown in capitals): licence-free services. Short. -->
+    <string name="channels_region_section_free">この地域の免許不要無線</string>
+    <!-- Region sheet hint under the licence-free heading, before a region is chosen. One or two lines. -->
+    <string name="channels_region_free_unchosen">地域を選ぶと、その地域の免許不要サービスが表示されます。それまでは「ゾーンを追加」にすべて表示されます。</string>
+    <!-- Region sheet: no licence-free services listed; %1$s is the region. One line. -->
+    <string name="channels_region_free_none">%1$s の項目はまだありません。</string>
+    <!-- Separator between the details of a licence-free service ("446.0–446.2 MHz, 16 ch, 500 mW"). Keep the trailing space if your language uses one. -->
+    <string name="channels_region_list_sep">,\u0020</string>
+    <!-- Number of channels of a licence-free service; %1$d is the count. Very short. -->
+    <string name="channels_region_service_ch">%1$d ch</string>
+    <!-- A licence-free service on the Region sheet: %1$s its name (PMR446), %2$s its band, channels and power, %3$s its notes. Paragraph. -->
+    <string name="channels_region_service">%1$s：%2$s。%3$s</string>
+    <!-- A licence-free service not yet checked: %1$s its name, %2$s band and power, %3$s notes, %4$s the region. Paragraph. -->
+    <string name="channels_region_service_unconfirmed">%1$s：%2$s。%3$s（%4$s については未確認）</string>
+    <!-- Region sheet caution about licence-free use; %1$s is the region. Paragraph. Transmit legality: keep the meaning exact. -->
+    <string name="channels_region_free_caution">ここにサービスが表示されていても、それは %1$s でそのサービス用に認証された無線機ならこのバンドを免許不要で使える、という意味にすぎません。この端末がそうした無線機だという意味ではありません。免許不要で使うには、通常、認証済みの機器、出力の上限、固定アンテナが必要です。送信する前に必ず確認してください。</string>
+    <!-- Region sheet footer; "not legal here" and "to be confirmed" quote labels shown elsewhere. Paragraph. -->
+    <string name="channels_region_free_footer">「ゾーンを追加」（チャンネル）では、これらのリストが最初に表示されます。ほかのリストも「この地域では送信不可」と表示されて残っています。「未確認」と表示された値は、規制当局自身のページと照合している最中です。</string>
+    <!-- Dialog title when choosing a new region after changing values. Short. -->
+    <string name="channels_region_own_title">自分で設定した値</string>
+    <!-- Dialog message: %1$d is how many values the user changed. Two lines. -->
+    <plurals name="channels_region_own_message">
+        <item quantity="other">以前の地域で %1$d 件の値を変更しています。新しい地域の値を使いますか、それとも自分の値を残しますか？</item>
+    </plurals>
+    <!-- Dialog button: use the new region's values. Short. -->
+    <string name="channels_region_own_use">地域の値を使用</string>
+    <!-- Dialog button: keep the user's own values. Short. -->
+    <string name="channels_region_own_keep">自分の値を残す</string>
+    <!-- Choice in the Weather radio dialog. One line. -->
+    <string name="channels_region_wx_yes">あり：気象チャンネルと SAME 警報を表示する</string>
+    <!-- Choice in the Weather radio dialog; Show all is a button on the Add-a-zone sheet. One line. -->
+    <string name="channels_region_wx_no">なし：非表示にする（「すべてのリストを表示」には残ります）</string>
+    <!-- Hint of the Station-ID editor: %1$s is the region's value ("Every 10 min"). Two lines. -->
+    <string name="channels_region_edit_minutes">ID 送出の間隔（分、1〜60）：通知と CW ID に使われます。地域の値：%1$s。</string>
+    <!-- Hint of the APRS frequency editor; Reset is the chip on the Region sheet. Two lines. -->
+    <string name="channels_region_edit_aprs">MHz 単位。APRS ワッチ、ビーコン、テレメトリー、iGate で使われます。地域の値にはワンタップで戻せます（リセット）。</string>
+    <!-- Hint of a calling or SSTV frequency editor; Reset is the chip on the Region sheet. One or two lines. -->
+    <string name="channels_region_edit_mhz">MHz 単位。使わない場合は 0。地域の値にはワンタップで戻せます（リセット）。</string>
+    <!-- Toast when the station-ID minutes are out of range. Short. -->
+    <string name="channels_region_err_minutes">1〜60 分</string>
+    <!-- Toast when a frequency entered on the Region sheet is not valid. Short. -->
+    <string name="channels_region_err_mhz">MHz 単位の周波数（例：144.800）</string>
+    <!-- Toast: the value was saved but this radio cannot tune it. %1$s the radio's bands, %2$s the frequency in MHz. Two lines. -->
+    <string name="channels_region_saved_untunable">保存しました。この無線機で使えるのは %1$s のため、%2$s MHz は使えません</string>
+    <!-- Title of the region picker sheet. Short. -->
+    <string name="channels_region_picker_title">地域を選択</string>
+    <!-- Hint of the region picker; Custom is the name of the IARU starting points in the list. Two lines. -->
+    <string name="channels_region_picker_hint">専用の項目がある国では確認済みの値を使い、それ以外の国では IARU 地域の初期値を使います。「カスタム」は IARU 地域の値から始めて、あとでどの値も変更できます。</string>
+    <!-- Hint in the region picker's search field. One word. -->
+    <string name="channels_region_picker_search">国</string>
+    <!-- Region picker hint above the Custom entries. One line. -->
+    <string name="channels_region_picker_type">入力してほかの国を検索します。</string>
+    <!-- Region picker: the search matches no country. One line. -->
+    <string name="channels_region_picker_none">一致する国がありません。</string>
+
+    <!-- ===== Nearby repeaters: status, programming plan, results ===== -->
+    <!-- Status of a repeater the hearham list marks as down, after "Status: " on the repeater sheet. Short. -->
+    <string name="channels_rep_not_operational">運用停止中</string>
+    <!-- Warning when there is no repeater to program. Short. -->
+    <string name="channels_rep_warn_none">レピーターがありません</string>
+    <!-- Warning when programming a DMR-only repeater on a radio without DMR (toast). One line. -->
+    <string name="channels_rep_warn_no_dmr">DMR レピーターです：この無線機は DMR に対応していません</string>
+    <!-- Warning when a repeater is neither DMR nor FM (toast). One line. -->
+    <string name="channels_rep_warn_not_dmr_fm">DMR や FM のレピーターではありません</string>
+    <!-- Warning when a DMR repeater lists no talkgroups (toast). One line. -->
+    <string name="channels_rep_warn_no_tgs">このレピーターのトークグループが不明です</string>
+    <!-- Warning in the programming preview: %1$d the time slot (1 or 2), %2$d how many talkgroups it has, %3$d how many fit. One line. -->
+    <string name="channels_rep_warn_truncated">スロット %1$d には %2$d 個のトークグループがあります。登録されるのは最初の %3$d 個だけです</string>
+    <!-- Repeater sheet status: the BrandMeister list could not be loaded. Keep the trailing space (the next status follows). Short. -->
+    <string name="channels_rep_unavailable_bm">BrandMeister を利用できません。\u0020</string>
+    <!-- Repeater sheet status: the hearham list could not be loaded. Keep the trailing space. Short. -->
+    <string name="channels_rep_unavailable_hh">hearham を利用できません。\u0020</string>
+    <!-- Repeater sheet status: the RadioID list could not be loaded. Keep the trailing space. Short. -->
+    <string name="channels_rep_unavailable_rid">RadioID のリストを利用できません。\u0020</string>
+    <!-- Repeater sheet status: %1$d, %2$d, %3$d repeaters known from BrandMeister, hearham and RadioID; %4$d within %5$s (the radius, "50 km"). One or two lines. -->
+    <string name="channels_rep_known">BrandMeister %1$d 件、hearham %2$d 件、RadioID %3$d 件、うち %5$s 以内に %4$d 件</string>
+    <!-- A radius in miles in the repeater status; %1$s is the number. Short. -->
+    <string name="channels_rep_miles">%1$s マイル</string>
+    <!-- Line in the repeater programming preview: %1$d talkgroup contacts will be created. One line. -->
+    <plurals name="channels_rep_preview_contacts">
+        <item quantity="other">トークグループの連絡先 %1$d 件</item>
+    </plurals>
+    <!-- Last line of the repeater programming preview: %1$s is the zone that will hold the channels. One line. -->
+    <string name="channels_rep_preview_zone">ゾーン「%1$s」</string>
+    <!-- Toast after programming a repeater: %1$d channels added in zone %2$s. One line. -->
+    <plurals name="channels_rep_programmed">
+        <item quantity="other">ゾーン「%2$s」に %1$d チャンネルを追加しました</item>
+    </plurals>
+    <!-- Toast after programming a repeater: %1$d channels and %3$d contacts added in zone %2$s. One line. -->
+    <plurals name="channels_rep_programmed_contacts">
+        <item quantity="other">ゾーン「%2$s」に %1$d チャンネルと %3$d 件の連絡先を追加しました</item>
+    </plurals>
+    <!-- Toast when programming or undoing a repeater fails; %1$s is the error. One line. -->
+    <string name="channels_rep_failed">失敗しました：%1$s</string>
+    <!-- Toast when the install to undo is no longer known. Short. -->
+    <string name="channels_rep_undo_not_found">見つかりません</string>
+    <!-- Toast after undoing a repeater install: %1$d channels removed, %2$s the repeater's callsign. One line. -->
+    <string name="channels_rep_undo_removed">%1$d チャンネルを削除しました（%2$s）</string>
+
+    <!-- ===== RadioID database (caller names) ===== -->
+    <!-- State of the RadioID caller database before its first download. Short. -->
+    <string name="channels_radioid_not_downloaded">未ダウンロード</string>
+    <!-- State of the RadioID caller database: %1$s the number of IDs ("312,456"), %2$s the date it was updated (yyyy-MM-dd). One line. -->
+    <string name="channels_radioid_status">%1$s 件の ID、%2$s 更新</string>
+    <!-- Progress while the RadioID database downloads; %1$d is the percentage. Short. -->
+    <string name="channels_radioid_downloading_pct">ダウンロード中… %1$d%%</string>
+    <!-- Progress while the RadioID database downloads (size unknown); %1$s is the megabytes so far. Short. -->
+    <string name="channels_radioid_downloading_mb">ダウンロード中… %1$s MB</string>
+    <!-- Progress while the RadioID database is imported; %1$s is the rows so far ("120,000"). Short. -->
+    <string name="channels_radioid_importing">インポート中… %1$s</string>
+
+    <!-- ===== Talkgroup override (intercom list) ===== -->
+    <!-- Kind of a DMR call in the intercom's talkgroup list: an all call, before the number ("All 16777215"). Very short. -->
+    <string name="channels_tg_kind_all">一斉</string>
+    <!-- The channel's own call in the intercom's talkgroup list: %1$s is "TG 9  Local". Keep the two spaces. One line. -->
+    <string name="channels_tg_programmed">%1$s \u0020（チャンネル設定）</string>
+
+    <!-- ===== Shared into SignalDeck (import, location) ===== -->
+    <!-- Toast when something shared to SignalDeck holds no channels. One line. -->
+    <string name="channels_import_nothing_shared">共有されたデータに SignalDeck のチャンネルも CHIRP CSV もありません</string>
+    <!-- Toast when a shared file cannot be opened; %1$s is the error. One line. -->
+    <string name="channels_import_open_failed">開けませんでした：%1$s</string>
+    <!-- Toast when something shared to SignalDeck holds no coordinates. One line. -->
+    <string name="channels_share_no_coords">共有されたデータに座標が見つかりません</string>
+
+    <!-- ===== Codeplug: shared channel lists (share text, import preview) ===== -->
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s is the channel name. One line. -->
+    <string name="channels_codeplug_skip_dmr">%1$s：DMR（この無線機は DMR 非対応）</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s the channel name, %2$s the bands this radio tunes ("400-480 MHz"). One line. -->
+    <string name="channels_codeplug_skip_outside">%1$s：%2$s の範囲外</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. A damaged line in the import code. One line. -->
+    <string name="channels_codeplug_skip_line">チャンネルの行を読み取れませんでした</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s the channel name, %2$s its frequency in MHz as the CSV has it, %3$s the bands this radio tunes. One line. -->
+    <string name="channels_codeplug_skip_outside_mhz">%1$s（%2$s MHz）：%3$s の範囲外</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s is the channel name. One line. -->
+    <string name="channels_codeplug_skip_tx_outside">%1$s：送信周波数が無線機の範囲外</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s the channel name, %2$s its mode in the CSV (AM, USB, DMR…). One line. -->
+    <string name="channels_codeplug_skip_not_fm">%1$s：%2$s は FM ではありません</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$d is the CSV row number. One line. -->
+    <string name="channels_codeplug_skip_row">%1$d 行目を読み取れませんでした</string>
+    <!-- First line of the shared channel list (text the user sends): %1$s the list's name, %2$d how many channels. One line. -->
+    <plurals name="channels_codeplug_share_head">
+        <item quantity="other">%1$s · %2$d チャンネル</item>
+    </plurals>
+    <!-- Separator between the details of a channel in the shared list ("146.9400 MHz, FM, tone 100.0"). Keep the trailing space if your language uses one. -->
+    <string name="channels_codeplug_sep">,\u0020</string>
+    <!-- Detail of a channel in the shared list: it has no transmit frequency. Short. -->
+    <string name="channels_codeplug_rx_only">受信専用</string>
+    <!-- Detail of a channel in the shared list: %1$s the repeater offset in MHz with its sign ("−0.6000"), %2$s the transmit frequency in MHz. Short. -->
+    <string name="channels_codeplug_offset">オフセット %1$s MHz（送信 %2$s）</string>
+    <!-- Detail of a DMR channel in the shared list: it calls one station; %1$d is its DMR ID. Short. -->
+    <string name="channels_codeplug_private_call">個別呼出 %1$d</string>
+    <!-- Detail of an analog channel in the shared list: FM, narrow band. Short. -->
+    <string name="channels_codeplug_fm_narrow">FM ナロー</string>
+    <!-- Detail of a channel in the shared list: %1$s its transmit tone ("100.0", "D023N"). Short. -->
+    <string name="channels_codeplug_tone">トーン %1$s</string>
+    <!-- Detail of a channel in the shared list: %1$s its receive tone, when it differs. Short. -->
+    <string name="channels_codeplug_rx_tone">受信トーン %1$s</string>
+    <!-- Line under a channel in the shared list: %1$s its notes. Keep the three leading spaces (indent). -->
+    <string name="channels_codeplug_notes">\u0020\u0020\u0020メモ：%1$s</string>
+    <!-- Line under a channel in the shared list: %1$s a net's name, %2$s its schedule ("Tue 7:30 PM"), %3$d its length in minutes. Keep the three leading spaces. -->
+    <string name="channels_codeplug_net">\u0020\u0020\u0020ロールコール：%1$s、%2$s、%3$d 分</string>
+    <!-- The same with the net's notes (%4$s) in brackets. Keep the three leading spaces. -->
+    <string name="channels_codeplug_net_notes">\u0020\u0020\u0020ロールコール：%1$s、%2$s、%3$d 分（%4$s）</string>
+    <!-- Last line of the shared channel list, above the import code. Channels → Share → Import names the app's menu. One or two lines. -->
+    <string name="channels_codeplug_share_footer">SignalDeck にインポートするには、これを SignalDeck に共有するか、全体をコピーして「チャンネル → 共有 → インポート」を使ってください。</string>
+
+    <!-- ===== Backup restore (Device → Backup, SignalDeck Web) ===== -->
+    <!-- Result after restoring a backup: %1$d channels, %2$d contacts, %3$d zones, %4$s the backup folder's name. One or two lines. -->
+    <string name="channels_backup_restored">%4$s から %1$d チャンネル、%2$d 件の連絡先、%3$d ゾーンを復元しました</string>
+    <!-- Result after restoring a backup with SignalDeck extras: %1$d channels, %2$d contacts, %3$d zones, %5$d channel notes, %6$d nets, %7$d contact identities, %4$s the backup folder's name. Two lines. -->
+    <string name="channels_backup_restored_extras">%4$s から %1$d チャンネル、%2$d 件の連絡先、%3$d ゾーン、%5$d 件のチャンネルメモ、%6$d 件のロールコール、%7$d 件の連絡先の識別情報を復元しました</string>
+    <!-- Second line of the restore result: %1$d channels left out, %2$s the bands this radio tunes, %3$s the first few of them ("Club 222.100, …"). Two lines. -->
+    <string name="channels_backup_skipped">%1$d 件をスキップ：この無線機で使える範囲（%2$s）の外です：%3$s</string>
+
+    <!-- ===== Channel store: importing the stock app's channels ===== -->
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). The stock app's channel database could not be read. Short. -->
+    <string name="channels_store_stock_unreadable">純正チャンネルを読み取れません</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$s is a technical folder listing for the bug report. Short. -->
+    <string name="channels_store_stock_unreadable_ls">純正チャンネルを読み取れません：%1$s</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). QuickChat is the stock app's name; %1$s is a technical folder listing. Short. -->
+    <string name="channels_store_quickchat_unreadable">QuickChat のチャンネルを読み取れません：%1$s</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). QuickChat is the stock app's name. Keep the "; " at the end (another note may follow). -->
+    <string name="channels_store_quickchat_no_contacts">QuickChat の連絡先データベースがありません。</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$s is a technical folder listing. Short. -->
+    <string name="channels_store_agold_unreadable">純正アプリのチャンネルを読み取れません：%1$s</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). The chosen stock area (%1$d is its number) holds no channels. Short. -->
+    <string name="channels_store_area_empty">エリア %1$d にはチャンネルがありません</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$d channels left out, %2$s the bands this radio tunes ("400–470 MHz"). One line. -->
+    <plurals name="channels_store_skipped">
+        <item quantity="other">%1$d チャンネルをスキップ：この無線機で使える範囲（%2$s）の外です</item>
+    </plurals>
+    <!-- Name of a pager conversation whose RIC (pager address) could not be read. Short. -->
+    <string name="channels_store_ric_unreadable">RIC を読み取れません</string>
+    <!-- A stock app area in the import chooser: %1$d its number, %2$s its name, %3$d how many channels it holds. The leading number must stay first. One line. -->
+    <string name="channels_store_agold_area">%1$d %2$s（%3$d チャンネル）</string>
+
+    <!-- ===== Channels page: the list, its header, selection and the row menu ===== -->
+    <!-- Title of the Channels page header. One word. -->
+    <string name="channels_list_title">チャンネル</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_nearby">近くのレピーター</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_zones">ゾーン</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_add">チャンネルを追加</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_map">マップ</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_share">チャンネルの共有とインポート</string>
+    <!-- Hint in the Channels search field. Short. -->
+    <string name="channels_list_search_hint">名前、周波数、番号</string>
+    <!-- Content description of the close button of the selection bar. Short. -->
+    <string name="channels_list_cd_stop_selecting">選択を終了</string>
+    <!-- Selection bar button: tick every channel shown. Very short. -->
+    <string name="channels_list_sel_all">すべて</string>
+    <!-- Button (selection bar and channel menu): add to the Favourites zone. Very short (four buttons share a row). -->
+    <string name="channels_list_sel_star">お気に入り</string>
+    <!-- Selection bar button: add the ticked channels to a zone. Very short (four buttons share a row). -->
+    <string name="channels_list_sel_zone">ゾーン</string>
+    <!-- Selection bar button: take the ticked channels out of the current zone. Very short (four buttons share a row). -->
+    <string name="channels_list_sel_out">除外</string>
+    <!-- Toast when a selection bar button is tapped with nothing ticked. Short. -->
+    <string name="channels_list_tick_first">先にチャンネルを選択してください</string>
+    <!-- Count in the selection bar; %1$d channels are ticked. Short. -->
+    <plurals name="channels_list_selected">
+        <item quantity="other">%1$d 件選択</item>
+    </plurals>
+    <!-- Last item of the zone list when adding ticked channels to a zone: make a new one. Short. -->
+    <string name="channels_list_new_zone_item">新規ゾーン…</string>
+    <!-- Dialog title above the list of zones; %1$d channels are ticked. One line. -->
+    <plurals name="channels_list_add_to_zone">
+        <item quantity="other">%1$d チャンネルの追加先</item>
+    </plurals>
+    <!-- Hint in the new-zone name field. Short. -->
+    <string name="channels_list_zone_name_hint">ゾーン名</string>
+    <!-- Dialog title: name a new zone. Short. -->
+    <string name="channels_list_new_zone_title">新規ゾーン</string>
+    <!-- Dialog button: create the new zone. Short. -->
+    <string name="channels_list_create">作成</string>
+    <!-- Dialog title: %1$d ticked channels, %2$s the current zone. One or two lines. -->
+    <plurals name="channels_list_take_out_title">
+        <item quantity="other">%1$d チャンネルをゾーン %2$s から除外しますか？</item>
+    </plurals>
+    <!-- Dialog message when taking channels out of a zone. One or two lines. -->
+    <string name="channels_list_take_out_message">チャンネル自体は残ります。変わるのはこのゾーンのリストだけです。</string>
+    <!-- Dialog button: take the channels out of the zone. Short. -->
+    <string name="channels_list_take_out">除外</string>
+    <!-- Dialog title: delete %1$d ticked channels. One line. -->
+    <plurals name="channels_list_delete_title">
+        <item quantity="other">%1$d チャンネルを削除しますか？</item>
+    </plurals>
+    <!-- Dialog message when deleting ticked channels. Two or three lines. -->
+    <string name="channels_list_delete_message">すべてのゾーンから削除され、後ろのチャンネルが繰り上がります。この操作は元に戻せません（バックアップがあれば復元できます）。</string>
+    <!-- Header subtitle (shown in capitals): %1$s is the current zone. Short. -->
+    <string name="channels_list_subtitle_zone">ゾーン %1$s</string>
+    <!-- Header subtitle (shown in capitals): %1$d channels in the zone. Short. -->
+    <plurals name="channels_list_subtitle_count">
+        <item quantity="other">%1$d チャンネル</item>
+    </plurals>
+    <!-- Badge on a channel card (small chip, shown in capitals). Very short: the screen can be 480 px wide. A NOAA weather channel, listen only. WX stays as it is. -->
+    <string name="channels_list_badge_wx_rx_only">WX · 受信専用</string>
+    <!-- Badge on a channel card (small chip, shown in capitals). Very short: the screen can be 480 px wide. A listen-only channel. -->
+    <string name="channels_list_badge_rx_only">受信専用</string>
+    <!-- Detail chip in the channel menu (capitals): wide band FM. Very short. -->
+    <string name="channels_list_badge_wide">ワイド</string>
+    <!-- Detail chip in the channel menu (capitals): narrow band FM. Very short. -->
+    <string name="channels_list_badge_narrow">ナロー</string>
+    <!-- Channel menu button: tune this channel. Very short (four buttons share a row). -->
+    <string name="channels_list_menu_use">使用</string>
+    <!-- Channel menu button: take out of the Favourites zone. Very short (four buttons share a row). -->
+    <string name="channels_list_menu_unstar">★解除</string>
+    <!-- Channel menu button. One line. -->
+    <string name="channels_list_menu_prio_stop">スキャン優先を解除</string>
+    <!-- Channel menu button: the scanner checks this channel often. One line. -->
+    <string name="channels_list_menu_prio_make">優先にする</string>
+    <!-- Channel menu button: this channel's history, %1$d entries. Short. -->
+    <string name="channels_list_menu_history_n">履歴（%1$d）</string>
+    <!-- Channel menu button: this channel's history. Short. -->
+    <string name="channels_list_menu_history">履歴</string>
+    <!-- Channel menu button: start ticking several channels. Short. -->
+    <string name="channels_list_menu_select">複数選択</string>
+    <!-- Toast after the scan priority is turned off. Short. -->
+    <string name="channels_list_prio_none">優先チャンネルなし</string>
+    <!-- Toast after a channel is made scan priority: %1$s its name, %2$d how many channels are scanned between checks. One or two lines. -->
+    <string name="channels_list_prio_set">スキャン中は %2$d チャンネルごとに %1$s を再確認します</string>
+    <!-- Name shown for a DMR channel with no name; %1$d is its number. Short. -->
+    <string name="channels_list_unnamed_digital">デジタル %1$d</string>
+    <!-- Name shown for an FM channel with no name; %1$d is its number. Short. -->
+    <string name="channels_list_unnamed_analog">アナログ %1$d</string>
+    <!-- Toast after starring a channel; %1$s is its name. ★ Favourites is the zone's name. One line. -->
+    <string name="channels_list_starred">お気に入りに追加：%1$s は「★ お気に入り」ゾーンに入りました</string>
+    <!-- Toast after unstarring a channel. ★ Favourites is the zone's name. Short. -->
+    <string name="channels_list_unstarred">「★ お気に入り」から外しました</string>
+    <!-- Dialog title: delete channel number %1$d. One line. -->
+    <string name="channels_list_delete_one_title">チャンネル %1$d を削除しますか？</string>
+    <!-- Tag on the channel card that is tuned now (tiny, capitals). Very short. -->
+    <string name="channels_list_on_air">使用中</string>
+    <!-- Content description of the star on a channel card. Short. -->
+    <string name="channels_list_cd_favourite">お気に入り</string>
+    <!-- Badge on a channel card (small chip, shown in capitals). Very short: the screen can be 480 px wide. The scan priority channel. -->
+    <string name="channels_list_badge_priority">優先</string>
+    <!-- Badge on a channel card (small chip, shown in capitals). Very short: the screen can be 480 px wide. Outside this radio's bands. It was cut off on a 480 px screen at 16 characters: keep it very short. -->
+    <string name="channels_list_badge_not_tunable">範囲外</string>
+    <!-- Content description of the NOT TUNABLE badge. Short. -->
+    <string name="channels_list_cd_not_tunable">この無線機では使えない周波数</string>
+    <!-- On a channel card: when it was last heard; %1$s is "14:02", "yesterday 09:11" or "Oct 22, 09:11". Short, one line. -->
+    <string name="channels_list_heard">受信 %1$s</string>
+    <!-- Last-heard time on a channel card; %1$s is the time (HH:mm). Short. -->
+    <string name="channels_list_yesterday">昨日 %1$s</string>
+    <!-- Dialog title on first start: import the stock app's channels? Short. -->
+    <string name="channels_list_import_title">チャンネルをインポートしますか？</string>
+    <!-- Dialog message on first start. Device → Re-import names a button. Paragraph. -->
+    <string name="channels_list_import_message">SignalDeck にはまだチャンネルがありません。スマートフォンの純正無線アプリに保存されているチャンネルをインポートしますか？\n\n自分でチャンネルを追加する場合は「空で開始」を選んでください。あとで「デバイス → 再インポート」でインポートすることもできます。</string>
+    <!-- Dialog button: do not import, start with no channels. Short. -->
+    <string name="channels_list_import_start_empty">空で開始</string>
+    <!-- Toast when the channel list changed (e.g. from SignalDeck Web) while channels were ticked. One line. -->
+    <string name="channels_list_changed_elsewhere">ほかの場所でチャンネルが変更されたため、選択を解除しました</string>
+    <!-- Filter chip above the channel list (capitals): every channel. Very short. -->
+    <string name="channels_list_filter_all">すべて</string>
+    <!-- Filter chip above the channel list (capitals): the starred channels. Keep the star. Short. -->
+    <string name="channels_list_filter_favourites">★ お気に入り</string>
+    <!-- Filter chip above the channel list (capitals): FM channels. Very short. -->
+    <string name="channels_list_filter_analog">アナログ</string>
+
+    <!-- ===== Nearby repeaters sheet ===== -->
+    <!-- Title of the Nearby repeaters sheet. Short. -->
+    <string name="channels_rep_title">近くのレピーター</string>
+    <!-- Intro of the Nearby repeaters sheet; BrandMeister, RadioID and hearham are the list sources. Paragraph. -->
+    <string name="channels_rep_intro">BrandMeister と RadioID の DMR レピーター、hearham の FM レピーターを、スマートフォンからの距離順に表示します。距離の下の行でモードとバンドを絞り込めます。タップすると詳細が表示され、チャンネルに追加できます。追加はあとで取り消せます。</string>
+    <!-- Filter chip on the Nearby repeaters sheet: every mode or every band. Very short. -->
+    <string name="channels_rep_filter_all">すべて</string>
+    <!-- Status line of the Nearby repeaters sheet while it loads. Short. -->
+    <string name="channels_rep_loading">読み込み中…</string>
+    <!-- Button on the Nearby repeaters sheet: remove the channels an earlier install added. Short. -->
+    <string name="channels_rep_undo_button">追加を取り消す…</string>
+    <!-- Status line when the phone has no position yet. One or two lines. -->
+    <string name="channels_rep_no_fix">位置を取得していません：位置情報をオンにして地図アプリを一度開いてから、もう一度お試しください。</string>
+    <!-- Status line while the repeater lists download. Short. -->
+    <string name="channels_rep_downloading">レピーターリストをダウンロード中…</string>
+    <!-- Nearby repeaters: none found; %1$s is the radius ("30 mi"). One line. -->
+    <string name="channels_rep_nothing_within">%1$s 以内には見つかりません。範囲を広げてみてください。</string>
+    <!-- Nearby repeaters: %1$d found within %2$s (the radius), none passes the mode and band filters. One or two lines. -->
+    <plurals name="channels_rep_none_match">
+        <item quantity="other">%2$s 以内の %1$d 件のレピーターに、この条件に合うものはありません。</item>
+    </plurals>
+    <!-- Nearby repeaters: %1$d of %2$d pass the filters. Short. -->
+    <string name="channels_rep_shown">%2$d 件中 %1$d 件を表示</string>
+    <!-- After the town of a repeater whose position is approximate (in a list row). Very short. -->
+    <string name="channels_rep_approx_short">（おおよそ）</string>
+    <!-- Detail of a DMR repeater; %1$d is its colour code. Short. -->
+    <string name="channels_rep_colour_code">カラーコード %1$d</string>
+    <!-- Detail of an FM repeater: %1$s the tone to send ("100.0"). Short. -->
+    <string name="channels_rep_tx_tone">送信トーン %1$s</string>
+    <!-- Repeater details: %1$s its town and region, %2$s the distance and direction ("↘SE 12.3mi (19.8km)"). Keep the dots and spaces. One line. -->
+    <string name="channels_rep_where">%1$s \u0020· \u0020%2$s</string>
+    <!-- The same for a repeater whose position is approximate. One line. -->
+    <string name="channels_rep_where_approx">%1$s \u0020· \u0020%2$s（位置はおおよそ）</string>
+    <!-- Repeater details: %1$s its status from the list ("not operational"). One line. -->
+    <string name="channels_rep_status">状態：%1$s</string>
+    <!-- Repeater details: %1$s when the network last saw it (as the list gives it). One line. -->
+    <string name="channels_rep_last_seen">最終確認：%1$s</string>
+    <!-- Repeater details while its talkgroups load. Short. -->
+    <string name="channels_rep_loading_tgs">トークグループを読み込み中…</string>
+    <!-- Repeater details: BrandMeister lists no talkgroups. Two lines. -->
+    <string name="channels_rep_no_tgs">このレピーターのトークグループリストはありません。トークグループがわかれば、スロットごとに受信用のチャンネルが作成されます。トークグループはチャンネル編集画面で手動で追加してください。</string>
+    <!-- Section heading (capitals) above the repeater's talkgroups. One line. -->
+    <string name="channels_rep_tgs_section">トークグループ（送信用チャンネルを作るものにチェック）</string>
+    <!-- Button on the repeater details sheet. Short. -->
+    <string name="channels_rep_add_button">チャンネルに追加</string>
+    <!-- Toast when the repeater gives no channel to add. Short. -->
+    <string name="channels_rep_nothing_to_program">追加するものがありません</string>
+    <!-- Dialog title before adding a repeater; %1$s is its callsign. One line. -->
+    <string name="channels_rep_add_title">%1$s を追加しますか？</string>
+    <!-- Button on the repeater details sheet: open it in a map app. Very short. -->
+    <string name="channels_rep_map">マップ</string>
+    <!-- Toast when no map app is installed. Short. -->
+    <string name="channels_rep_no_map_app">地図アプリがありません</string>
+    <!-- Dialog title above the list of repeater installs to undo. One line. -->
+    <string name="channels_rep_undo_title">どの追加を取り消しますか？</string>
+
+    <!-- ===== Share channels and Import channels sheets ===== -->
+    <!-- Title of the Share channels menu and sheet. Short. -->
+    <string name="channels_share_title">チャンネルを共有</string>
+    <!-- Item in the Share channels menu: open the share sheet. Short. -->
+    <string name="channels_share_menu_share">チャンネルを共有…</string>
+    <!-- Item in the Share channels menu. Short. -->
+    <string name="channels_share_menu_clipboard">クリップボードからインポート</string>
+    <!-- Item in the Share channels menu; SignalDeck and CHIRP are file formats. Short. -->
+    <string name="channels_share_menu_file">ファイルをインポート（SignalDeck または CHIRP）</string>
+    <!-- Toast when the clipboard holds no channels; SDCP1 is the import code's prefix. Two lines. -->
+    <string name="channels_share_clipboard_empty">クリップボードに共有されたチャンネルがありません。先にメッセージ全体（SDCP1 コードを含む）か CHIRP CSV をコピーしてください。</string>
+    <!-- Toast when a file holds no channels; %1$s is its name. One or two lines. -->
+    <string name="channels_share_file_empty">%1$s に SignalDeck のチャンネルも CHIRP CSV もありません</string>
+    <!-- Toast when a file with no name holds no channels. One line. -->
+    <string name="channels_share_file_empty_unnamed">そのファイルに SignalDeck のチャンネルも CHIRP CSV もありません</string>
+    <!-- Toast when sharing with no channels. Short. -->
+    <string name="channels_share_no_channels">チャンネルがまだありません</string>
+    <!-- Intro of the Share channels sheet. Paragraph. -->
+    <string name="channels_share_intro">チャンネルを選んで、メッセージ、Facebook、WhatsApp、Discord、メール、Drive など、どのアプリでも送れます。メッセージにはすべてのチャンネルが記載されるので、だれでも手動で設定できます。最後には、SignalDeck が読み込めるインポートコードが付きます（メッセージ、投稿、貼り付けたコピーのどれからでも）。暗号化キーは絶対に含まれません。</string>
+    <!-- Section heading (capitals) above the name field of the shared list. One word. -->
+    <string name="channels_share_section_name">名前</string>
+    <!-- Count on the Share channels sheet: %1$d of %2$d channels picked. Short. -->
+    <string name="channels_share_picked">%2$d 件中 %1$d 件を選択</string>
+    <!-- Quick-pick chip on the Share channels sheet. Very short (four chips share a row). -->
+    <string name="channels_share_quick_all">すべて</string>
+    <!-- Quick-pick chip: untick everything. Very short (four chips share a row). -->
+    <string name="channels_share_quick_none">なし</string>
+    <!-- Quick-pick chip: only the FM channels. Very short (four chips share a row). -->
+    <string name="channels_share_quick_analog">アナログ</string>
+    <!-- Quick-pick chip: the channels of one zone. Very short (four chips share a row). -->
+    <string name="channels_share_quick_zone">ゾーン…</string>
+    <!-- Toast when there is no zone to pick from. Short. -->
+    <string name="channels_share_no_zones">ゾーンがまだありません</string>
+    <!-- Dialog title above the list of zones (the sentence ends with the zone). Short. -->
+    <string name="channels_share_pick_zone_title">チャンネルを選ぶゾーン</string>
+    <!-- Section heading (capitals) above the switches of what to include. One word. -->
+    <string name="channels_share_section_include">含める項目</string>
+    <!-- Switch on the Share channels sheet. Short, one line. -->
+    <string name="channels_share_inc_nets">ロールコールの予定</string>
+    <!-- Line under that switch. One or two lines. -->
+    <string name="channels_share_inc_nets_sub">これらのチャンネルに追加したロールコール（名前、曜日、時刻、長さ）</string>
+    <!-- Switch on the Share channels sheet. Short, one line. -->
+    <string name="channels_share_inc_notes">チャンネルメモ</string>
+    <!-- Line under that switch. One or two lines. -->
+    <string name="channels_share_inc_notes_sub">各チャンネルのメモ（個人的な内容のこともあるため、オンにしない限りオフです）</string>
+    <!-- Switch on the Share channels sheet. Short, one line. -->
+    <string name="channels_share_inc_loc">チャンネルの位置</string>
+    <!-- Line under that switch. One or two lines. -->
+    <string name="channels_share_inc_loc_sub">チャンネル編集画面で設定したレピーターの位置</string>
+    <!-- Switch on the Share channels sheet. Short, one line. -->
+    <string name="channels_share_inc_file">SignalDeck ファイル</string>
+    <!-- Line under that switch. One or two lines. -->
+    <string name="channels_share_inc_file_sub">同じリストとコードをファイルにしたもの（ファイルを送れるアプリ用）</string>
+    <!-- Switch on the Share channels sheet. Short, one line. CHIRP is a programming app. -->
+    <string name="channels_share_inc_chirp">ほかの無線機用の CHIRP ファイル</string>
+    <!-- Line under that switch. One or two lines. The radio brands stay. -->
+    <string name="channels_share_inc_chirp_sub">アナログチャンネルを CHIRP CSV で（Baofeng、Yaesu、Kenwood など）</string>
+    <!-- Button on the Share channels sheet: copy the text to the clipboard. Short. -->
+    <string name="channels_share_copy">テキストをコピー</string>
+    <!-- Toast when sharing with nothing picked. Short. -->
+    <string name="channels_share_pick_one">チャンネルを 1 つ以上選んでください</string>
+    <!-- Toast after copying the shared list. One line. -->
+    <string name="channels_share_copied">コピーしました：投稿やメッセージに貼り付けてください</string>
+    <!-- Toast when sharing fails; %1$s is the error. One line. -->
+    <string name="channels_share_failed">共有できませんでした：%1$s</string>
+    <!-- Subject of the share (email apps use it): %1$s the list's name, %2$d how many channels. One line. -->
+    <plurals name="channels_share_subject">
+        <item quantity="other">%1$s · 無線チャンネル %2$d 件</item>
+    </plurals>
+    <!-- Title of Android's share chooser; %1$s is the list's name. Short. -->
+    <string name="channels_share_chooser">「%1$s」を共有</string>
+    <!-- Toast when channels are shared to SignalDeck before its service is up. One line. -->
+    <string name="channels_share_starting">SignalDeck はまだ起動中です。しばらくしてからもう一度お試しください</string>
+    <!-- Title of the Import channels sheet. Short. -->
+    <string name="channels_import_title">チャンネルをインポート</string>
+    <!-- Intro of the Import channels sheet: %1$s the list's name, %2$d how many channels, shared from SignalDeck. Paragraph. -->
+    <plurals name="channels_import_intro">
+        <item quantity="other">「%1$s」：SignalDeck から共有された %2$d チャンネルです。不要なものはチェックを外してください。すでにあるチャンネルは最初からチェックが外れています。チャンネルは今あるチャンネルの後ろに追加され、既存のものは何も変更されません。</item>
+    </plurals>
+    <!-- The same for a CHIRP file. Paragraph. -->
+    <plurals name="channels_import_intro_chirp">
+        <item quantity="other">「%1$s」：CHIRP ファイルの %2$d チャンネルです。不要なものはチェックを外してください。すでにあるチャンネルは最初からチェックが外れています。チャンネルは今あるチャンネルの後ろに追加され、既存のものは何も変更されません。</item>
+    </plurals>
+    <!-- Heading of the list of channels left out of an import (each reason follows on its own line). One line. -->
+    <string name="channels_import_left_out">除外（この無線機では使えません）：</string>
+    <!-- Count on the Import channels sheet: %1$d of %2$d channels ticked. Short. -->
+    <string name="channels_import_ticked">%2$d 件中 %1$d 件にチェック</string>
+    <!-- Note on an imported channel the user already has. Short. -->
+    <string name="channels_import_have_it">登録済み</string>
+    <!-- Switch on the Import channels sheet. Short. -->
+    <string name="channels_import_extras">メモとロールコールの予定</string>
+    <!-- Line under that switch; Nets near you is a sheet's name. One line. -->
+    <string name="channels_import_extras_sub">チャンネルと一緒に保存され、ロールコールは「近くのロールコール」に表示されます</string>
+    <!-- Switch on the Import channels sheet. Short. -->
+    <string name="channels_import_zone">ゾーンにまとめる</string>
+    <!-- Line under that switch; %1$s is the new zone's name. One or two lines. -->
+    <string name="channels_import_zone_sub">新しいゾーン「%1$s」に入れるので、探しやすく、スキャンや削除も簡単です</string>
+    <!-- Toast when importing with nothing ticked. Short. -->
+    <string name="channels_import_tick_one">チャンネルを 1 つ以上チェックしてください</string>
+    <!-- Toast after importing %1$d channels. Short. -->
+    <plurals name="channels_import_added">
+        <item quantity="other">%1$d チャンネルを追加しました</item>
+    </plurals>
+    <!-- Toast after importing %1$d channels into the new zone %2$s. One line. -->
+    <plurals name="channels_import_added_zone">
+        <item quantity="other">ゾーン「%2$s」に %1$d チャンネルを追加しました</item>
+    </plurals>
+    <!-- Note on an imported channel: it carries notes. Very short. -->
+    <string name="channels_import_note_notes">メモ</string>
+    <!-- Note on an imported channel: it carries %1$d net schedules. Very short. -->
+    <plurals name="channels_import_note_nets">
+        <item quantity="other">ロールコール %1$d 件</item>
+    </plurals>
+    <!-- Note on an imported channel: %1$d net schedules and notes. Short. -->
+    <plurals name="channels_import_note_nets_notes">
+        <item quantity="other">ロールコール %1$d 件、メモ</item>
+    </plurals>
+
+    <!-- ===== Contacts: the identity sheet, the contact editor and the contact sheet ===== -->
+    <!-- Hint on the sheet of a caller who is not a contact. One line. -->
+    <string name="channels_contact_unknown">まだ連絡先にありません。</string>
+    <!-- The same, with where they were heard: %1$s the grid square and coordinates. Keep the two spaces. One or two lines. -->
+    <string name="channels_contact_unknown_heard">まだ連絡先にありません。 \u0020%1$s で受信しました。</string>
+    <!-- The same with when: %1$s the position, %2$s how long ago ("5 min ago"). Keep the two spaces. Two lines. -->
+    <string name="channels_contact_unknown_heard_ago">まだ連絡先にありません。 \u0020%1$s で受信しました（%2$s）。</string>
+    <!-- Button on a caller's sheet: make a new contact. Short. -->
+    <string name="channels_contact_add">連絡先に追加</string>
+    <!-- Button on a caller's sheet: add the callsign or RIC to a contact you have. Short. -->
+    <string name="channels_contact_merge">既存の連絡先に追加</string>
+    <!-- Toast when there are no contacts to pick from. Short. -->
+    <string name="channels_contact_none_yet">連絡先がまだありません</string>
+    <!-- A contact with no name and no ID in the pick list. Short. -->
+    <string name="channels_contact_no_name">（名前なし）</string>
+    <!-- Dialog title above the contact list; %1$s is the callsign, "ID 3100001" or "RIC 1234567". One line. -->
+    <string name="channels_contact_merge_title">%1$s の追加先…</string>
+    <!-- Line added to a contact's notes when it already has another callsign; %1$s is the new one. Short. -->
+    <string name="channels_contact_also">ほかに %1$s</string>
+    <!-- Toast after adding a callsign or RIC to a contact; %1$s is the contact. One line. -->
+    <string name="channels_contact_added_to">%1$s に追加しました</string>
+    <!-- Label above a field in the contact editor. One line. -->
+    <string name="channels_contact_f_name">名前</string>
+    <!-- Label above a field in the contact editor. One line. -->
+    <string name="channels_contact_f_number">DMR ID またはトークグループ（なければ空欄）</string>
+    <!-- Label above a field in the contact editor. One line. -SSID is the APRS suffix. -->
+    <string name="channels_contact_f_call">コールサイン（APRS、M17、ページャーのタグ。-SSID は任意）</string>
+    <!-- Hint under the callsign field when it came from the RadioID list. One line. -->
+    <string name="channels_contact_call_auto">RadioID のリストから取得したコールサインです。正しいものがわかれば変更してください。</string>
+    <!-- Label above a field in the contact editor. One line. RIC is a pager address. -->
+    <string name="channels_contact_f_rics">ページャーの RIC（1 つ以上。例：1234567; 1234568）</string>
+    <!-- Label above a field in the contact editor. One line. -->
+    <string name="channels_contact_f_home">自宅の位置（グリッドロケーター、または緯度, 経度）</string>
+    <!-- Label above a field in the contact editor. One line. QTH is the ham word for a home station's place. -->
+    <string name="channels_contact_f_home_label">自宅の表示名（町名、QTH）</string>
+    <!-- Hint in the contact editor: %1$s the last position, %2$s how long ago. Two lines. -->
+    <string name="channels_contact_last_hint">最終受信：%1$s（%2$s）。アプリが自動で入力し、自宅の位置とは別に保存します。</string>
+    <!-- The same with %3$s, how it was heard (APRS, M17…). Two lines. -->
+    <string name="channels_contact_last_hint_by">最終受信：%1$s（%2$s、%3$s 経由）。アプリが自動で入力し、自宅の位置とは別に保存します。</string>
+    <!-- Label above a field in the contact editor. One line. -->
+    <string name="channels_contact_f_notes">メモ</string>
+    <!-- Title of the contact editor for a new contact. Short. -->
+    <string name="channels_contact_new_title">新規連絡先</string>
+    <!-- Title of the contact editor. Short. -->
+    <string name="channels_contact_edit_title">連絡先編集</string>
+    <!-- Why a contact was not saved (after "Not saved: "). One line. -->
+    <string name="channels_contact_err_call">コールサイン：英字と数字、-SSID は任意</string>
+    <!-- Why a contact was not saved. One line. -->
+    <string name="channels_contact_err_id">ID は 1〜16776415 の範囲です</string>
+    <!-- Why a contact was not saved. One line. -->
+    <string name="channels_contact_err_rics">RIC は 0〜2097151 の数字です</string>
+    <!-- Why a contact was not saved. One line. -->
+    <string name="channels_contact_err_empty">連絡先には DMR ID、コールサイン、ページャーの RIC のいずれかが必要です</string>
+    <!-- Why a contact was not saved; EM12ab is an example grid square. One line. -->
+    <string name="channels_contact_err_home">自宅：グリッドロケーター（EM12ab）または緯度, 経度</string>
+    <!-- Toast when a contact cannot be saved; %1$s is the reason. One line. -->
+    <string name="channels_contact_not_saved">保存できません：%1$s</string>
+    <!-- On a contact's sheet: %1$s its pager RICs. Short. -->
+    <string name="channels_contact_pager">ページャー %1$s</string>
+    <!-- Label of a line on the contact's sheet: their home location. Short. -->
+    <string name="channels_contact_home">自宅</string>
+    <!-- Label of a line on the contact's sheet: where and when they were last heard. Short. -->
+    <string name="channels_contact_last_heard">最終受信</string>
+    <!-- On the contact's sheet: %1$s how long ago, %2$s how they were heard (APRS, M17…). Short. -->
+    <string name="channels_contact_ago_by">%1$s（%2$s 経由）</string>
+    <!-- A line on the contact's sheet: %1$s its label (Home), %2$s the value. Keep the two spaces. -->
+    <string name="channels_contact_line">%1$s： \u0020%2$s</string>
+    <!-- Section heading (capitals) on the contact's sheet: %1$d history entries. Short. -->
+    <string name="channels_contact_history_n">履歴（%1$d）</string>
+    <!-- History entry on the contact's sheet: something sent to them; %1$s is how (APRS, DMR SMS…). Keep the arrow and the two spaces. Short. -->
+    <string name="channels_contact_hist_sent">⬆ 送信 \u0020%1$s</string>
+    <!-- History entry: something heard from them; %1$s is how. Keep the arrow and the two spaces. Short. -->
+    <string name="channels_contact_hist_heard">⬇ 受信 \u0020%1$s</string>
+    <!-- Button on the contact's sheet: open the message thread. Very short (three buttons share a row). -->
+    <string name="channels_contact_message">メッセージ</string>
+    <!-- Dialog title: delete the contact %1$s? One line. -->
+    <string name="channels_contact_delete_title">%1$s を削除しますか？</string>
+    <!-- How long ago a contact was heard: under a minute. Short. -->
+    <string name="channels_contact_just_now">たった今</string>
+    <!-- How long ago a contact was heard; %1$d minutes. Short. -->
+    <string name="channels_contact_min_ago">%1$d 分前</string>
+    <!-- How long ago a contact was heard; %1$d hours. Short. -->
+    <string name="channels_contact_h_ago">%1$d 時間前</string>
+</resources>

@@ -19,7 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
+import com.macdmr.radio.i18n.Txt;
 
 /**
  * A full-screen page for a mode that takes the radio over (APRS monitoring, SSTV receive, the parrot): what the
@@ -58,12 +60,12 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
         setClickable(true);                                  // nothing underneath takes touches
 
         header = Neo.header(c, title, "");
-        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, "Back to the intercom (keeps running)");
+        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, Txt.s(R.string.intercom_mode_back));
         back.setOnClickListener(v -> onClose.run());
         LayoutParams bl = new LayoutParams(dp(44), dp(44)); bl.rightMargin = dp(12);
         header.addView(back, 0, bl);
         ImageView mark = Neo.iconTile(c, accentIcon, accent, 40);
-        mark.setContentDescription("All packet tools"); mark.setOnClickListener(v -> PktDialog.show(c, svc));   // the whole PKT sheet, without leaving the mode
+        mark.setContentDescription(Txt.s(R.string.intercom_mode_all_packet_tools)); mark.setOnClickListener(v -> PktDialog.show(c, svc));   // the whole PKT sheet, without leaving the mode
         Neo.addAction(header, mark);
         addView(header);
 
@@ -75,7 +77,7 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
         stateDot = new View(c); stateDot.setBackground(Neo.outline(c, Neo.CYAN, 0xFF, 6, 0));
         LayoutParams dl = new LayoutParams(dp(10), dp(10)); dl.rightMargin = dp(8);
         top.addView(stateDot, dl);
-        stateText = Neo.text(c, "LISTENING", Neo.CYAN, 15, Neo.ui(c)); stateText.setLetterSpacing(0.12f);
+        stateText = Neo.text(c, Txt.s(R.string.intercom_mode_state_listening), Neo.CYAN, 15, Neo.ui(c)); Neo.tracking(stateText, 0.12f);
         top.addView(stateText, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         timeText = Neo.text(c, "", Neo.MUTED, 14, Neo.mono(c));
         top.addView(timeText);
@@ -88,7 +90,7 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
         signal = new SignalBar(c);
         sig.addView(signal, new LayoutParams(dp(narrow ? 84 : 120), dp(14)));
         if (svc != null && !svc.profile().rssi) signal.setVisibility(GONE);   // no signal readings (the W6): the text says receiving or quiet
-        signalText = Neo.text(c, svc != null && !svc.profile().rssi ? "quiet" : "no signal", Neo.DIM, 12, Neo.mono(c)); signalText.setGravity(Gravity.END); signalText.setPadding(0, dp(3), 0, 0);
+        signalText = Neo.text(c, svc != null && !svc.profile().rssi ? Txt.s(R.string.intercom_mode_signal_quiet) : Txt.s(R.string.intercom_mode_signal_none), Neo.DIM, 12, Neo.mono(c)); signalText.setGravity(Gravity.END); signalText.setPadding(0, dp(3), 0, 0);
         sig.addView(signalText);
         mid.addView(sig);
         strip.addView(mid);
@@ -132,7 +134,13 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
     protected static String ago(long ts) {
         if (ts <= 0) return "—";
         long s = Math.max(0, (System.currentTimeMillis() - ts) / 1000);
-        return s < 60 ? s + " s ago" : s < 3600 ? (s / 60) + " min ago" : (s / 3600) + " h " + (s % 3600 / 60) + " min ago";
+        return s < 60 ? Txt.s(R.string.intercom_mode_ago_s, s) : s < 3600 ? Txt.s(R.string.intercom_mode_ago_min, s / 60) : Txt.s(R.string.intercom_mode_ago_h_min, s / 3600, s % 3600 / 60);
+    }
+    /** The same time since {@code ts} without "ago" ("12 s", "3 min", "1 h 5 min"), for a stat tile that is already labelled. */
+    protected static String since(long ts) {
+        if (ts <= 0) return "—";
+        long s = Math.max(0, (System.currentTimeMillis() - ts) / 1000);
+        return s < 60 ? Txt.s(R.string.intercom_mode_since_s, s) : s < 3600 ? Txt.s(R.string.intercom_mode_since_min, s / 60) : Txt.s(R.string.intercom_mode_since_h_min, s / 3600, s % 3600 / 60);
     }
     private static String elapsed(long since) {
         long s = Math.max(0, (System.currentTimeMillis() - since) / 1000);
@@ -157,24 +165,24 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
         long hz = waitingHz();
         boolean w = hz > 0;
         if (w) {
-            set(stateText, "WAITING FOR THE PASS"); color(stateText, Neo.AMBER);
+            set(stateText, Txt.s(R.string.intercom_mode_state_waiting_pass)); color(stateText, Neo.AMBER);
             stateDot.setBackground(Neo.outline(c, Neo.AMBER, 0xFF, 6, 0));
             android.text.SpannableString f = freqSpan(hz);
             if (!android.text.TextUtils.equals(freqText.getText(), f)) freqText.setText(f);
             color(freqText, Neo.MUTED);
             set(timeText, "");
-            set(signalText, "tunes at " + new java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(new java.util.Date(waitingUntil())));
+            set(signalText, Txt.s(R.string.intercom_mode_tunes_at, new java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(new java.util.Date(waitingUntil()))));
             if (signal.getVisibility() != GONE) signal.setVisibility(GONE);      // nothing to measure yet: the radio is still on your channel
         } else if (waiting) {                                 // the pass began: back to the live radio
             boolean rs = svc == null || svc.profile().rssi;
-            if (rs) signal.setVisibility(VISIBLE); set(signalText, rs ? "no signal" : rx ? "receiving" : "quiet");
+            if (rs) signal.setVisibility(VISIBLE); set(signalText, rs ? Txt.s(R.string.intercom_mode_signal_none) : rx ? Txt.s(R.string.intercom_mode_signal_receiving) : Txt.s(R.string.intercom_mode_signal_quiet));
             waiting = false; color(freqText, Neo.TEXT); showState();
             com.macdmr.radio.ChannelStore.Channel ch = svc.current(); if (ch != null) freqText.setText(freqSpan(ch.rxFreq));
         }
         waiting = w;
     }
     private static android.text.SpannableString freqSpan(long hz) {
-        android.text.SpannableString f = new android.text.SpannableString(String.format(java.util.Locale.US, "%.4f", hz / 1e6) + " MHz");
+        android.text.SpannableString f = new android.text.SpannableString(Txt.freqMhz(hz, 4) + " MHz");   // i18n: unit (the last 4 characters are styled)
         f.setSpan(new android.text.style.RelativeSizeSpan(0.5f), f.length() - 4, f.length(), 0);
         f.setSpan(new android.text.style.ForegroundColorSpan(Neo.MUTED), f.length() - 4, f.length(), 0);
         return f;
@@ -183,7 +191,7 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
         if (waiting) return;
         boolean loading = svc.firmwareLoading();
         int col = loading ? Neo.AMBER : tx ? Neo.RED : rx ? Neo.GREEN : Neo.CYAN;
-        set(stateText, loading ? "RADIO BUSY, LOADING FIRMWARE" : tx ? "TRANSMITTING" : rx ? "RECEIVING" : "LISTENING"); color(stateText, col);
+        set(stateText, loading ? Txt.s(R.string.intercom_mode_state_loading) : tx ? Txt.s(R.string.intercom_mode_state_transmitting) : rx ? Txt.s(R.string.intercom_mode_state_receiving) : Txt.s(R.string.intercom_mode_state_listening)); color(stateText, col);
         stateDot.setBackground(Neo.outline(c, col, 0xFF, 6, 0));
     }
 
@@ -197,11 +205,11 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
     }
     @Override public void onRx(boolean receiving) {
         rx = receiving; showState();
-        if (svc != null && !svc.profile().rssi) { if (!waiting) signalText.setText(receiving ? "receiving" : "quiet"); return; }
-        if (!receiving && !waiting) { signal.set(-999); signalText.setText("no signal"); }
+        if (svc != null && !svc.profile().rssi) { if (!waiting) signalText.setText(receiving ? Txt.s(R.string.intercom_mode_signal_receiving) : Txt.s(R.string.intercom_mode_signal_quiet)); return; }
+        if (!receiving && !waiting) { signal.set(-999); signalText.setText(Txt.s(R.string.intercom_mode_signal_none)); }
     }
     @Override public void onTx(boolean transmitting) { tx = transmitting; showState(); }
-    @Override public void onRssi(int dbm) { if (waiting || (svc != null && !svc.profile().rssi)) return; signal.set(dbm); signalText.setText(dbm <= -999 ? "no signal" : SMeterView.sUnits(dbm) + "  " + dbm + " dBm"); }
+    @Override public void onRssi(int dbm) { if (waiting || (svc != null && !svc.profile().rssi)) return; signal.set(dbm); signalText.setText(dbm <= -999 ? Txt.s(R.string.intercom_mode_signal_none) : Txt.s(R.string.intercom_mode_signal_dbm, SMeterView.sUnits(dbm), dbm)); }
     @Override public void onAudioLevel(int amplitude) { }
     @Override public void onHistory(String line) { }
     @Override public void onCaller(String text) { }

@@ -10,6 +10,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -27,7 +30,7 @@ import java.util.Map;
  */
 public final class Terrain implements Predictor.Elevation {
     static final int Z = 11, N = 1 << Z;
-    private static final String URL_FMT = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/%d/%d/%d.png";
+    private static final String URL_FMT = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/%d/%d/%d.png";   // i18n: URL
     private final File dir;
     private final Map<Long, short[]> tiles = new HashMap<>();
 
@@ -45,7 +48,7 @@ public final class Terrain implements Predictor.Elevation {
                 if (!tiles.containsKey(key(x, y))) { short[] t = fetch(x, y); if (t != null) tiles.put(key(x, y), t); else missing++; }
                 done++;
             }
-        return missing == 0 ? null : missing + " of " + total + " terrain tiles could not be loaded (no connection?)";
+        return missing == 0 ? null : Txt.s(R.string.packet_cov_terrain_missing, missing, total);
     }
 
     /** {tiles covering the box, of which not on the phone yet}: whether a load would download, and how much. */

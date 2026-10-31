@@ -17,88 +17,88 @@
 <div id="login" class="login hidden">
   <form class="login-card" id="loginForm" autocomplete="off">
     <img src="icon.svg" alt="" class="login-icon">
-    <h1>SIGNAL<span>DECK</span></h1>
-    <p class="muted">Enter the PIN shown on the phone under <b>Device → SignalDeck Web</b>.</p>
-    <input id="pin" maxlength="12" placeholder="PIN" spellcheck="false" autocapitalize="characters" aria-label="PIN">
-    <button type="submit" class="btn primary">Log in</button>
+    <h1 translate="no">SIGNAL<span>DECK</span></h1>
+    <p class="muted" data-i18n-html="login_enter_pin_shown_phone">Enter the PIN shown on the phone under <b>Device → SignalDeck Web</b>.</p>
+    <input id="pin" maxlength="12" placeholder="PIN" spellcheck="false" autocapitalize="characters" aria-label="PIN" data-i18n-aria="login_pin" data-i18n-placeholder="login_pin">
+    <button type="submit" class="btn primary" data-i18n="login_log_in">Log in</button>
     <p id="loginErr" class="err"></p>
   </form>
 </div>
 
 <div id="app" class="hidden">
   <header class="top">
-    <div class="brand"><img src="icon.svg" alt=""><b>SIGNAL</b><span>DECK</span></div>
+    <div class="brand" translate="no"><img src="icon.svg" alt=""><b>SIGNAL</b><span>DECK</span></div>
     <nav id="nav">
-      <a href="#intercom" data-page="intercom">Intercom</a>
-      <a href="#channels" data-page="channels">Channels</a>
-      <a href="#messages" data-page="messages">Messages</a>
-      <a href="#contacts" data-page="contacts">Contacts</a>
-      <a href="#aprs" data-page="aprs">APRS</a>
-      <a href="#sstv" data-page="sstv">SSTV</a>
-      <a href="#pkt" data-page="pkt">Packet</a>
-      <a href="#pager" data-page="pager">Pager</a>
-      <a href="#sat" data-page="sat">Satellites</a>
-      <a href="#scope" data-page="scope">Scope</a>
-      <a href="#map" data-page="map">Map</a>
-      <a href="#log" data-page="log">Logbook</a>
-      <a href="#rec" data-page="rec">Recordings</a>
-      <a href="#trans" data-page="trans">Transcripts</a>
-      <a href="#exam" data-page="exam">Exam</a>
-      <a href="#settings" data-page="settings">Settings</a>
-      <a href="#help" data-page="help">Help</a>
+      <a href="#intercom" data-page="intercom" data-i18n="nav_intercom">Intercom</a>
+      <a href="#channels" data-page="channels" data-i18n="nav_channels">Channels</a>
+      <a href="#messages" data-page="messages" data-i18n="nav_messages">Messages</a>
+      <a href="#contacts" data-page="contacts" data-i18n="nav_contacts">Contacts</a>
+      <a href="#aprs" data-page="aprs" translate="no">APRS</a>
+      <a href="#sstv" data-page="sstv" translate="no">SSTV</a>
+      <a href="#pkt" data-page="pkt" data-i18n="nav_packet">Packet</a>
+      <a href="#pager" data-page="pager" data-i18n="nav_pager">Pager</a>
+      <a href="#sat" data-page="sat" data-i18n="nav_satellites">Satellites</a>
+      <a href="#scope" data-page="scope" data-i18n="nav_scope">Scope</a>
+      <a href="#map" data-page="map" data-i18n="nav_map">Map</a>
+      <a href="#log" data-page="log" data-i18n="nav_logbook">Logbook</a>
+      <a href="#rec" data-page="rec" data-i18n="nav_recordings">Recordings</a>
+      <a href="#trans" data-page="trans" data-i18n="nav_transcripts">Transcripts</a>
+      <a href="#exam" data-page="exam" data-i18n="nav_exam">Exam</a>
+      <a href="#settings" data-page="settings" data-i18n="common_settings">Settings</a>
+      <a href="#help" data-page="help" data-i18n="nav_help">Help</a>
     </nav>
-    <div class="conn"><span id="connDot" class="dot"></span><span id="connText">Connecting…</span><button id="logout" class="link">Log out</button></div>
+    <div class="conn"><span id="connDot" class="dot"></span><span id="connText" data-i18n="top_connecting">Connecting…</span><button id="logout" class="link" data-i18n="top_log_out">Log out</button></div>
   </header>
 
-  <div id="modebar" class="modebar hidden"><span id="modeText"></span><a id="modeOpen" href="#aprs">Open ›</a></div>
+  <div id="modebar" class="modebar hidden"><span id="modeText"></span><a id="modeOpen" href="#aprs" data-i18n="top_open">Open ›</a></div>
 
   <main>
     <!-- INTERCOM -->
     <section id="page-intercom" class="page">
       <div class="grid2">
         <div class="panel radio">
-          <div class="row between"><span class="label">CHANNEL</span><span id="link" class="chip"></span></div>
+          <div class="row between"><span class="label" data-i18n="intercom_channel">CHANNEL</span><span id="link" class="chip"></span></div>
           <div class="chan">
-            <button class="arrow" id="chDown" aria-label="Previous channel">‹</button>
+            <button class="arrow" id="chDown" aria-label="Previous channel" data-i18n-aria="intercom_previous_channel">‹</button>
             <div class="chan-mid"><div id="chNum" class="digits">--</div><div id="chName" class="chname">—</div></div>
-            <button class="arrow" id="chUp" aria-label="Next channel">›</button>
+            <button class="arrow" id="chUp" aria-label="Next channel" data-i18n-aria="intercom_next_channel">›</button>
           </div>
           <div class="freqrow"><span id="freq" class="mono freq">---.----</span><span id="chType" class="chip"></span><span id="tone" class="chip dim"></span></div>
-          <div class="smeter rssi-only"><div class="smeter-fill" id="smeterFill"></div><span id="smeterText" class="mono">— dBm</span></div>
-          <div class="state"><span id="rxtx" class="badge">IDLE</span><span id="caller" class="caller"></span><div class="vu" aria-hidden="true"><div id="vuFill"></div></div></div>
-          <canvas id="specCv" class="spec" aria-label="Spectrum of the received audio" title="Spectrum of what is received: low notes left, high right (200 Hz – 3.6 kHz)"></canvas>
+          <div class="smeter rssi-only"><div class="smeter-fill" id="smeterFill"></div><span id="smeterText" class="mono" data-i18n="intercom_dbm">— dBm</span></div>
+          <div class="state"><span id="rxtx" class="badge" data-i18n="intercom_idle">IDLE</span><span id="caller" class="caller"></span><div class="vu" aria-hidden="true"><div id="vuFill"></div></div></div>
+          <canvas id="specCv" class="spec" aria-label="Spectrum of the received audio" title="Spectrum of what is received: low notes left, high right (200 Hz – 3.6 kHz)" data-i18n-aria="intercom_spectrum_received_audio" data-i18n-title="intercom_spectrum_what_received_low"></canvas>
           <div class="controls">
-            <button class="tog" id="scanBtn">SCAN</button>
-            <button class="tog" id="monBtn">MON</button>
-            <button class="tog" id="recBtn">REC</button>
-            <button class="tog" id="sqBtn">SOFT SQ</button>
-            <button class="tog" id="vfoBtn" title="Tune any frequency">VFO</button>
-            <button class="tog" id="txtBtn" title="Live captions of what is received; engine and models on the Transcripts page">TXT</button>
-            <select id="zoneSel" aria-label="Zone"></select>
+            <button class="tog" id="scanBtn" data-i18n="intercom_scan">SCAN</button>
+            <button class="tog" id="monBtn" data-i18n="intercom_mon">MON</button>
+            <button class="tog" id="recBtn" data-i18n="intercom_rec">REC</button>
+            <button class="tog" id="sqBtn" data-i18n="intercom_soft_sq">SOFT SQ</button>
+            <button class="tog" id="vfoBtn" title="Tune any frequency" translate="no">VFO</button>
+            <button class="tog" id="txtBtn" title="Live captions of what is received; engine and models on the Transcripts page" translate="no">TXT</button>
+            <select id="zoneSel" aria-label="Zone" data-i18n-aria="intercom_zone"></select>
           </div>
-          <div class="sq"><span class="label">SOFT SQ</span><input type="range" id="sqLevel" min="1" max="9" step="1" aria-label="Soft SQ level, 1 to 9 as on the phone"><span id="sqVal" class="mono">--</span></div>
-          <div class="sq listen"><button class="tog" id="listenBtn" title="Play the radio's audio in this browser">🔈 LISTEN</button><input type="range" id="vol" min="0" max="200" value="100" aria-label="Volume"><span id="listenState" class="mono small muted"></span></div>
-          <button id="ptt" class="ptt" disabled>PTT</button>
+          <div class="sq"><span class="label" data-i18n="intercom_soft_sq">SOFT SQ</span><input type="range" id="sqLevel" min="1" max="9" step="1" aria-label="Soft SQ level, 1 to 9 as on the phone" data-i18n-aria="intercom_soft_sq_level_1"><span id="sqVal" class="mono">--</span></div>
+          <div class="sq listen"><button class="tog" id="listenBtn" title="Play the radio's audio in this browser" data-i18n="intercom_listen" data-i18n-title="intercom_play_radio_s_audio">🔈 LISTEN</button><input type="range" id="vol" min="0" max="200" value="100" aria-label="Volume" data-i18n-aria="intercom_volume"><span id="listenState" class="mono small muted"></span></div>
+          <button id="ptt" class="ptt" disabled translate="no">PTT</button>
           <p id="pttNote" class="muted small center"></p>
         </div>
         <div class="panel">
-          <div class="row between"><span class="label">HISTORY</span><div class="row"><span id="captionState" class="chip dim"></span></div></div>
+          <div class="row between"><span class="label" data-i18n="intercom_history">HISTORY</span><div class="row"><span id="captionState" class="chip dim"></span></div></div>
           <div id="caption" class="caption hidden"></div>
           <div id="capList" class="caplist hidden"></div>
           <div id="history" class="history mono"></div>
         </div>
       </div>
       <div class="panel" id="phonePanel">
-        <div class="row between"><span class="label">PHONE</span><span id="phoneAge" class="chip dim"></span></div>
+        <div class="row between"><span class="label" data-i18n="intercom_phone">PHONE</span><span id="phoneAge" class="chip dim"></span></div>
         <div class="phone-grid">
-          <div class="ptile" id="pBat"><div class="pt-h">BATTERY</div><div class="pt-v mono" id="pBatV">--</div><div class="pbar"><i id="pBatBar"></i></div><div class="pt-s" id="pBatS"></div></div>
-          <div class="ptile" id="pCell"><div class="pt-h">CELL</div><div class="pt-v"><span class="mono" id="pCellV">--</span><span class="sbars" id="pCellBars"><i></i><i></i><i></i><i></i></span></div><div class="pt-s" id="pCellS"></div></div>
-          <div class="ptile" id="pWifi"><div class="pt-h">WI-FI</div><div class="pt-v"><span class="mono" id="pWifiV">--</span><span class="sbars" id="pWifiBars"><i></i><i></i><i></i><i></i></span></div><div class="pt-s" id="pWifiS"></div></div>
+          <div class="ptile" id="pBat"><div class="pt-h" data-i18n="intercom_battery">BATTERY</div><div class="pt-v mono" id="pBatV">--</div><div class="pbar"><i id="pBatBar"></i></div><div class="pt-s" id="pBatS"></div></div>
+          <div class="ptile" id="pCell"><div class="pt-h" data-i18n="intercom_cell">CELL</div><div class="pt-v"><span class="mono" id="pCellV">--</span><span class="sbars" id="pCellBars"><i></i><i></i><i></i><i></i></span></div><div class="pt-s" id="pCellS"></div></div>
+          <div class="ptile" id="pWifi"><div class="pt-h" data-i18n="intercom_wi_fi">WI-FI</div><div class="pt-v"><span class="mono" id="pWifiV">--</span><span class="sbars" id="pWifiBars"><i></i><i></i><i></i><i></i></span></div><div class="pt-s" id="pWifiS"></div></div>
         </div>
       </div>
       <div class="grid2">
-        <div class="panel"><div class="row between"><span class="label">LAST HEARD</span><button class="btn small-btn" id="heardRefresh">Refresh</button></div><div id="heardList" class="list small"></div></div>
-        <div class="panel"><span class="label">ALERTS AND EVENTS · 7 DAYS</span><div id="eventList" class="list small"></div></div>
+        <div class="panel"><div class="row between"><span class="label" data-i18n="intercom_last_heard">LAST HEARD</span><button class="btn small-btn" id="heardRefresh" data-i18n="common_refresh">Refresh</button></div><div id="heardList" class="list small"></div></div>
+        <div class="panel"><span class="label" data-i18n="intercom_alerts_events_7_days">ALERTS AND EVENTS · 7 DAYS</span><div id="eventList" class="list small"></div></div>
       </div>
     </section>
 
@@ -106,26 +106,26 @@
     <section id="page-channels" class="page hidden">
       <div class="grid-side wide">
         <div class="panel">
-          <div class="row between"><span class="label">CHANNELS</span><div class="row"><button class="btn small-btn" id="chSelect" title="Tick several channels to delete them, star them or put them in a zone">Select</button><button class="btn small-btn" id="chVfo">VFO</button><button class="btn small-btn" id="chNew">New channel</button></div></div>
-          <div class="row wrap chtools"><select id="chZone" aria-label="Zone shown in the list (the radio steps and scans in it)"></select>
-            <div class="seg" id="chFilter"><button type="button" data-f="0" class="on">All</button><button type="button" data-f="1">★ Favourites</button><button type="button" data-f="2" class="dmr-only">Analog</button><button type="button" data-f="3" class="dmr-only">DMR</button></div></div>
-          <input id="chSearch" placeholder="Search name, frequency or number" class="search full" style="margin-top:10px">
-          <div id="chSelBar" class="sel-bar hidden"><span id="chSelCount" class="mono">0 selected</span><div class="row wrap"><button class="btn small-btn" id="chSelAll">All</button><button class="btn small-btn" id="chSelStar">Star</button><select id="chSelZoneTo" aria-label="Zone to add the selected channels to"></select><button class="btn small-btn" id="chSelZone">Add to zone</button><button class="btn small-btn" id="chSelOut" title="Take the selected channels out of the zone shown">Out of zone</button><button class="btn small-btn danger" id="chSelDel">Delete</button><button class="btn small-btn" id="chSelDone">Done</button></div></div>
+          <div class="row between"><span class="label" data-i18n="channels_channels">CHANNELS</span><div class="row"><button class="btn small-btn" id="chSelect" title="Tick several channels to delete them, star them or put them in a zone" data-i18n="common_select" data-i18n-title="channels_tick_several_channels_delete">Select</button><button class="btn small-btn" id="chVfo" translate="no">VFO</button><button class="btn small-btn" id="chNew" data-i18n="channels_new_channel">New channel</button></div></div>
+          <div class="row wrap chtools"><select id="chZone" aria-label="Zone shown in the list (the radio steps and scans in it)" data-i18n-aria="channels_zone_shown_list_radio"></select>
+            <div class="seg" id="chFilter"><button type="button" data-f="0" class="on" data-i18n="common_all">All</button><button type="button" data-f="1" data-i18n="channels_favourites">★ Favourites</button><button type="button" data-f="2" class="dmr-only" data-i18n="channels_analog">Analog</button><button type="button" data-f="3" class="dmr-only" translate="no">DMR</button></div></div>
+          <input id="chSearch" placeholder="Search name, frequency or number" class="search full" style="margin-top:10px" data-i18n-placeholder="channels_search_name_frequency_number">
+          <div id="chSelBar" class="sel-bar hidden"><span id="chSelCount" class="mono" data-i18n="channels_0_selected">0 selected</span><div class="row wrap"><button class="btn small-btn" id="chSelAll" data-i18n="common_all">All</button><button class="btn small-btn" id="chSelStar" data-i18n="channels_star">Star</button><select id="chSelZoneTo" aria-label="Zone to add the selected channels to" data-i18n-aria="channels_zone_add_selected_channels"></select><button class="btn small-btn" id="chSelZone" data-i18n="channels_add_to_zone">Add to zone</button><button class="btn small-btn" id="chSelOut" title="Take the selected channels out of the zone shown" data-i18n="channels_out_of_zone" data-i18n-title="channels_take_selected_channels_out">Out of zone</button><button class="btn small-btn danger" id="chSelDel" data-i18n="common_delete">Delete</button><button class="btn small-btn" id="chSelDone" data-i18n="common_done">Done</button></div></div>
           <div id="chList" class="list"></div>
         </div>
         <div class="panel" id="edPanel">
-          <div class="row between"><span class="label" id="edTitle">CHANNEL</span><span id="edSub" class="chip dim"></span></div>
-          <div id="edEmpty" class="empty">Click a channel's Edit to change it, or New channel. Clicking a channel's name tunes it.</div>
+          <div class="row between"><span class="label" id="edTitle" data-i18n="channels_channel">CHANNEL</span><span id="edSub" class="chip dim"></span></div>
+          <div id="edEmpty" class="empty" data-i18n="channels_click_channel_s_edit">Click a channel's Edit to change it, or New channel. Clicking a channel's name tunes it.</div>
           <form id="edForm" class="edform hidden" autocomplete="off"></form>
         </div>
       </div>
       <div class="panel">
-        <div class="row between wrap"><span class="label">ZONES</span><button class="btn small-btn" id="zNew">New zone</button></div>
+        <div class="row between wrap"><span class="label" data-i18n="channels_zones">ZONES</span><button class="btn small-btn" id="zNew" data-i18n="channels_new_zone">New zone</button></div>
         <div class="grid-side" style="margin-top:12px">
           <div id="zList" class="list"></div>
           <form id="zForm" class="hidden" autocomplete="off">
-            <div class="row wrap"><input id="zName" placeholder="Zone name" maxlength="24" class="grow"><button class="btn primary">Save zone</button><button type="button" class="btn danger" id="zDel">Delete</button></div>
-            <div class="row wrap" style="margin-top:8px"><button type="button" class="btn small-btn" id="zAll">All</button><button type="button" class="btn small-btn" id="zNone">None</button><input id="zFilter" placeholder="Filter channels" class="search grow"></div>
+            <div class="row wrap"><input id="zName" placeholder="Zone name" maxlength="24" class="grow" data-i18n-placeholder="channels_zone_name"><button class="btn primary" data-i18n="channels_save_zone">Save zone</button><button type="button" class="btn danger" id="zDel" data-i18n="common_delete">Delete</button></div>
+            <div class="row wrap" style="margin-top:8px"><button type="button" class="btn small-btn" id="zAll" data-i18n="common_all">All</button><button type="button" class="btn small-btn" id="zNone" data-i18n="common_none">None</button><input id="zFilter" placeholder="Filter channels" class="search grow" data-i18n-placeholder="channels_filter_channels"></div>
             <div id="zChans" class="zchans"></div>
           </form>
         </div>
@@ -135,51 +135,51 @@
     <!-- MESSAGES -->
     <section id="page-messages" class="page hidden">
       <div class="panel" id="formsPanel">
-        <div class="row between wrap"><span class="label">MESSAGE FORMS · ICS-213 AND RADIOGRAM</span><div class="row"><button class="btn small-btn" id="fmNew213">New ICS-213</button><button class="btn small-btn" id="fmNewRg">New radiogram</button></div></div>
+        <div class="row between wrap"><span class="label" data-i18n="messages_message_forms_ics_213">MESSAGE FORMS · ICS-213 AND RADIOGRAM</span><div class="row"><button class="btn small-btn" id="fmNew213" data-i18n="messages_new_ics_213">New ICS-213</button><button class="btn small-btn" id="fmNewRg" data-i18n="messages_new_radiogram">New radiogram</button></div></div>
         <form id="fmEdit" class="sched-form hidden" autocomplete="off"><div id="fmFields" class="fm-fields"></div>
-          <div class="row wrap" style="grid-column:1/-1"><select id="fmVia" aria-label="Send by"><option value="save">Save only</option><option value="aprs">Send by APRS to a callsign</option><option value="dmr" class="dmr-only">Send by DMR text to a contact</option><option value="winlink">Send by Winlink (outbox)</option></select><input id="fmTo" placeholder="Callsign" style="text-transform:uppercase" maxlength="12"><select id="fmContact" class="hidden" aria-label="Contact"></select><button class="btn small-btn" type="submit">Go</button><button class="btn small-btn" type="button" id="fmCancel">Cancel</button></div></form>
-        <div id="fmView" class="hidden"><pre id="fmText" class="dec-out" style="font-size:16px"></pre><div class="row"><button class="btn small-btn" id="fmReply" type="button">Reply</button><button class="btn small-btn danger" id="fmDel" type="button">Delete</button><button class="btn small-btn" id="fmClose" type="button">Close</button></div></div>
+          <div class="row wrap" style="grid-column:1/-1"><select id="fmVia" aria-label="Send by" data-i18n-aria="messages_send_by"><option value="save" data-i18n="messages_save_only">Save only</option><option value="aprs" data-i18n="messages_send_by_aprs_callsign">Send by APRS to a callsign</option><option value="dmr" class="dmr-only" data-i18n="messages_send_by_dmr_text">Send by DMR text to a contact</option><option value="winlink" data-i18n="messages_send_by_winlink_outbox">Send by Winlink (outbox)</option></select><input id="fmTo" placeholder="Callsign" style="text-transform:uppercase" maxlength="12" data-i18n-placeholder="common_callsign"><select id="fmContact" class="hidden" aria-label="Contact" data-i18n-aria="messages_contact"></select><button class="btn small-btn" type="submit" data-i18n="messages_go">Go</button><button class="btn small-btn" type="button" id="fmCancel" data-i18n="common_cancel">Cancel</button></div></form>
+        <div id="fmView" class="hidden"><pre id="fmText" class="dec-out" style="font-size:16px"></pre><div class="row"><button class="btn small-btn" id="fmReply" type="button" data-i18n="common_reply">Reply</button><button class="btn small-btn danger" id="fmDel" type="button" data-i18n="common_delete">Delete</button><button class="btn small-btn" id="fmClose" type="button" data-i18n="common_close">Close</button></div></div>
         <div id="fmList" class="list small"></div>
       </div>
       <div class="panel" id="wlPanel">
-        <div class="row between wrap"><span class="label">WINLINK E-MAIL</span><div class="row"><button class="btn small-btn" id="wlNew">New message</button><button class="btn small-btn" id="wlNet">Connect: internet</button><button class="btn small-btn" id="wlRf">Connect: radio</button><button class="btn small-btn" id="wlGwB">Gateways</button><button class="btn small-btn" id="wlSet">Settings</button><button class="btn small-btn" id="wlLogB">Session log</button></div></div>
-        <p class="wl-beta" id="wlBeta">New: not yet tested with the real Winlink system. Please tell us if it works for you: <a href="https://github.com/IIMacGyverII/SignalDeck/issues" target="_blank" rel="noopener">report it on GitHub</a>.</p>
+        <div class="row between wrap"><span class="label" data-i18n="messages_winlink_e_mail">WINLINK E-MAIL</span><div class="row"><button class="btn small-btn" id="wlNew" data-i18n="messages_new_message">New message</button><button class="btn small-btn" id="wlNet" data-i18n="messages_connect_internet">Connect: internet</button><button class="btn small-btn" id="wlRf" data-i18n="messages_connect_radio">Connect: radio</button><button class="btn small-btn" id="wlGwB" data-i18n="messages_gateways">Gateways</button><button class="btn small-btn" id="wlSet" data-i18n="common_settings">Settings</button><button class="btn small-btn" id="wlLogB" data-i18n="messages_session_log">Session log</button></div></div>
+        <p class="wl-beta" id="wlBeta" data-i18n-html="messages_new_not_yet_tested">New: not yet tested with the real Winlink system. Please tell us if it works for you: <a href="https://github.com/IIMacGyverII/SignalDeck/issues" target="_blank" rel="noopener">report it on GitHub</a>.</p>
         <p class="muted small" id="wlState"></p>
         <form id="wlCompose" class="sched-form hidden" autocomplete="off">
-          <label>To (callsigns or e-mail addresses, commas)<input id="wlTo" required></label>
-          <label>Cc (optional)<input id="wlCc"></label>
-          <label class="wide">Subject<input id="wlSubj" maxlength="128"></label>
-          <label class="wide">Message<textarea id="wlText" rows="6"></textarea></label>
-          <div class="row" style="grid-column:1/-1"><button class="btn primary small-btn">Put in the outbox</button><button class="btn small-btn" id="wlCancelC" type="button">Cancel</button><span class="muted small">It goes out at the next connection.</span></div>
+          <label data-i18n="messages_callsigns_e_mail_addresses">To (callsigns or e-mail addresses, commas)<input id="wlTo" required></label>
+          <label data-i18n="messages_cc_optional">Cc (optional)<input id="wlCc"></label>
+          <label class="wide" data-i18n="messages_subject">Subject<input id="wlSubj" maxlength="128"></label>
+          <label class="wide" data-i18n="common_message">Message<textarea id="wlText" rows="6"></textarea></label>
+          <div class="row" style="grid-column:1/-1"><button class="btn primary small-btn" data-i18n="messages_put_in_the_outbox">Put in the outbox</button><button class="btn small-btn" id="wlCancelC" type="button" data-i18n="common_cancel">Cancel</button><span class="muted small" data-i18n="messages_goes_out_at_next">It goes out at the next connection.</span></div>
         </form>
         <form id="wlRfForm" class="sched-form hidden" autocomplete="off">
-          <label>Gateway callsign (e.g. N0ABC-10)<input id="wlGw"></label>
-          <label>Via digipeaters (optional)<input id="wlVia"></label>
-          <p class="muted small" style="grid-column:1/-1">Tune the gateway's channel first (an analog channel). A session takes minutes: every transmission starts with a 1.6-second lead-in.</p>
-          <div class="row" style="grid-column:1/-1"><button class="btn primary small-btn">Connect</button><button class="btn small-btn" id="wlRfCancel" type="button">Cancel</button></div>
+          <label data-i18n="messages_gateway_callsign_e_g">Gateway callsign (e.g. N0ABC-10)<input id="wlGw"></label>
+          <label data-i18n="messages_via_digipeaters_optional">Via digipeaters (optional)<input id="wlVia"></label>
+          <p class="muted small" style="grid-column:1/-1" data-i18n="messages_tune_gateway_s_channel">Tune the gateway's channel first (an analog channel). A session takes minutes: every transmission starts with a 1.6-second lead-in.</p>
+          <div class="row" style="grid-column:1/-1"><button class="btn primary small-btn" data-i18n="common_connect">Connect</button><button class="btn small-btn" id="wlRfCancel" type="button" data-i18n="common_cancel">Cancel</button></div>
         </form>
         <form id="wlSetForm" class="sched-form hidden" autocomplete="off">
-          <label>Winlink password<input id="wlPw" type="password" autocomplete="new-password"></label>
-          <label>Grid square (optional, e.g. JO01)<input id="wlGrid"></label>
-          <label class="chk"><input type="checkbox" id="wlDiag"> Detailed diagnostic log (timing, raw protocol bytes, every radio frame)</label>
-          <label class="chk"><input type="checkbox" id="wlDiagC"> Include the messages' data in that log</label>
-          <p class="muted small" style="grid-column:1/-1">Your callsign comes from the PKT settings. The password is write-only here: it is kept in SignalDeck's private settings and never shown, logged or backed up. Leave it empty to keep the saved one; "-" clears it.</p>
-          <div class="row" style="grid-column:1/-1"><button class="btn primary small-btn">Save</button><button class="btn small-btn" id="wlSetCancel" type="button">Cancel</button></div>
+          <label data-i18n="messages_winlink_password">Winlink password<input id="wlPw" type="password" autocomplete="new-password"></label>
+          <label data-i18n="messages_grid_square_optional_e">Grid square (optional, e.g. JO01)<input id="wlGrid"></label>
+          <label class="chk" data-i18n="messages_detailed_diagnostic_log_timing"><input type="checkbox" id="wlDiag"> Detailed diagnostic log (timing, raw protocol bytes, every radio frame)</label>
+          <label class="chk" data-i18n="messages_include_messages_data_that"><input type="checkbox" id="wlDiagC"> Include the messages' data in that log</label>
+          <p class="muted small" style="grid-column:1/-1" data-i18n="messages_your_callsign_comes_from">Your callsign comes from the PKT settings. The password is write-only here: it is kept in SignalDeck's private settings and never shown, logged or backed up. Leave it empty to keep the saved one; "-" clears it.</p>
+          <div class="row" style="grid-column:1/-1"><button class="btn primary small-btn" data-i18n="common_save">Save</button><button class="btn small-btn" id="wlSetCancel" type="button" data-i18n="common_cancel">Cancel</button></div>
         </form>
-        <div id="wlGw" class="hidden"><p class="muted small">Winlink lists its gateways at <a href="https://winlink.org/RMSChannels" target="_blank" rel="noopener">winlink.org (RMS Channels)</a>: choose Packet, download the CSV, then import it here. SignalDeck keeps the 1200-baud packet gateways this radio can tune, nearest first (distance worked out on the phone).</p>
-          <div class="row wrap"><input type="file" id="wlGwFile" accept=".csv,text/csv"><button class="btn small-btn danger" id="wlGwClear" type="button">Remove the list</button></div><div id="wlGwList" class="list small"></div></div>
-        <div id="wlLogBox" class="hidden"><div class="row"><a class="btn small-btn" href="api/winlink/log" download>Download log</a><span class="muted small">Send it to us (e-mail, or attach it to a <a href="https://github.com/IIMacGyverII/SignalDeck/issues" target="_blank" rel="noopener">GitHub issue</a>), whether it worked or not. The password is never in it.</span></div><pre id="wlLog" class="dec-out"></pre></div>
+        <div id="wlGw" class="hidden"><p class="muted small" data-i18n-html="messages_winlink_lists_its_gateways">Winlink lists its gateways at <a href="https://winlink.org/RMSChannels" target="_blank" rel="noopener">winlink.org (RMS Channels)</a>: choose Packet, download the CSV, then import it here. SignalDeck keeps the 1200-baud packet gateways this radio can tune, nearest first (distance worked out on the phone).</p>
+          <div class="row wrap"><input type="file" id="wlGwFile" accept=".csv,text/csv"><button class="btn small-btn danger" id="wlGwClear" type="button" data-i18n="messages_remove_the_list">Remove the list</button></div><div id="wlGwList" class="list small"></div></div>
+        <div id="wlLogBox" class="hidden"><div class="row"><a class="btn small-btn" href="api/winlink/log" download data-i18n="messages_download_log">Download log</a><span class="muted small" data-i18n-html="messages_send_us_e_mail">Send it to us (e-mail, or attach it to a <a href="https://github.com/IIMacGyverII/SignalDeck/issues" target="_blank" rel="noopener">GitHub issue</a>), whether it worked or not. The password is never in it.</span></div><pre id="wlLog" class="dec-out"></pre></div>
         <div id="wlView" class="hidden"><div id="wlHead" class="muted small"></div><pre id="wlBody" class="dec-out" style="font-size:15px;white-space:pre-wrap"></pre><div id="wlFiles" class="row wrap"></div>
-          <div class="row"><button class="btn small-btn" id="wlReply" type="button">Reply</button><button class="btn small-btn" id="wlFwd" type="button">Forward</button><button class="btn small-btn danger" id="wlDel" type="button">Delete</button><button class="btn small-btn" id="wlClose" type="button">Close</button></div></div>
+          <div class="row"><button class="btn small-btn" id="wlReply" type="button" data-i18n="common_reply">Reply</button><button class="btn small-btn" id="wlFwd" type="button" data-i18n="messages_forward">Forward</button><button class="btn small-btn danger" id="wlDel" type="button" data-i18n="common_delete">Delete</button><button class="btn small-btn" id="wlClose" type="button" data-i18n="common_close">Close</button></div></div>
         <div id="wlList" class="list small"></div>
       </div>
       <div class="grid-side">
-        <div class="panel"><div class="row between"><span class="label">CONVERSATIONS</span><button class="btn small-btn" id="newMsg">New</button></div><div id="convList" class="list"></div></div>
+        <div class="panel"><div class="row between"><span class="label" data-i18n="messages_conversations">CONVERSATIONS</span><button class="btn small-btn" id="newMsg" data-i18n="common_new">New</button></div><div id="convList" class="list"></div></div>
         <div class="panel thread">
-          <div class="row between"><span class="label" id="threadTitle">MESSAGES</span><span id="threadSub" class="chip dim"></span></div>
+          <div class="row between"><span class="label" id="threadTitle" data-i18n="messages_messages">MESSAGES</span><span id="threadSub" class="chip dim"></span></div>
           <div id="thread" class="bubbles"></div>
           <div id="quick" class="quick"></div>
-          <form id="sendForm" class="row"><input id="sendText" placeholder="Text (up to 140 characters)" maxlength="140" class="grow"><button class="btn primary">Send</button></form>
+          <form id="sendForm" class="row"><input id="sendText" placeholder="Text (up to 140 characters)" maxlength="140" class="grow" data-i18n-placeholder="messages_text_up_140_characters"><button class="btn primary" data-i18n="common_send">Send</button></form>
           <p id="sendNote" class="muted small"></p>
         </div>
       </div>
@@ -188,22 +188,22 @@
     <!-- CONTACTS -->
     <section id="page-contacts" class="page hidden">
       <div class="grid-side">
-        <div class="panel"><div class="row between"><span class="label">CONTACTS</span><input id="ctSearch" placeholder="Search" class="search"></div><div id="ctList" class="list"></div></div>
+        <div class="panel"><div class="row between"><span class="label" data-i18n="contacts_contacts">CONTACTS</span><input id="ctSearch" placeholder="Search" class="search" data-i18n-placeholder="common_search"></div><div id="ctList" class="list"></div></div>
         <div class="panel">
-          <span class="label" id="ctFormTitle">NEW CONTACT</span>
+          <span class="label" id="ctFormTitle" data-i18n="contacts_new_contact">NEW CONTACT</span>
           <form id="ctForm" class="form">
-            <label>Name<input id="ctName" maxlength="32"></label>
-            <label>DMR ID or talkgroup<input id="ctNumber" inputmode="numeric" maxlength="8"></label>
-            <label>Type<select id="ctType"><option value="0">Private call</option><option value="1">Group call (talkgroup)</option><option value="2">All call</option></select></label>
-            <label>Callsign (APRS, M17, pager tag; -SSID optional)<input id="ctCall" maxlength="12" style="text-transform:uppercase"></label>
-            <label>Pager RICs (one or more, e.g. 1234567, 1234568)<input id="ctRics" maxlength="80"></label>
-            <label>Home location (grid square or lat, lon)<input id="ctHome" maxlength="40"></label>
-            <label>Home label<input id="ctHomeLabel" maxlength="40"></label>
-            <label>Notes<textarea id="ctNotes" rows="2" maxlength="500"></textarea></label>
+            <label data-i18n="common_name">Name<input id="ctName" maxlength="32"></label>
+            <label data-i18n="contacts_dmr_id_or_talkgroup">DMR ID or talkgroup<input id="ctNumber" inputmode="numeric" maxlength="8"></label>
+            <label data-i18n="contacts_type">Type<select id="ctType"><option value="0" data-i18n="contacts_private_call">Private call</option><option value="1" data-i18n="contacts_group_call_talkgroup">Group call (talkgroup)</option><option value="2" data-i18n="contacts_all_call">All call</option></select></label>
+            <label data-i18n="contacts_callsign_aprs_m17_pager">Callsign (APRS, M17, pager tag; -SSID optional)<input id="ctCall" maxlength="12" style="text-transform:uppercase"></label>
+            <label data-i18n="contacts_pager_rics_one_more">Pager RICs (one or more, e.g. 1234567, 1234568)<input id="ctRics" maxlength="80"></label>
+            <label data-i18n="contacts_home_location_grid_square">Home location (grid square or lat, lon)<input id="ctHome" maxlength="40"></label>
+            <label data-i18n="contacts_home_label">Home label<input id="ctHomeLabel" maxlength="40"></label>
+            <label data-i18n="common_notes">Notes<textarea id="ctNotes" rows="2" maxlength="500"></textarea></label>
             <div class="sub" id="ctLast"></div>
-            <div class="row"><button class="btn primary">Save</button><button type="button" class="btn" id="ctNew">Clear</button><button type="button" class="btn danger hidden" id="ctDel">Delete</button><button type="button" class="btn hidden" id="ctText">Text</button></div>
+            <div class="row"><button class="btn primary" data-i18n="common_save">Save</button><button type="button" class="btn" id="ctNew" data-i18n="common_clear">Clear</button><button type="button" class="btn danger hidden" id="ctDel" data-i18n="common_delete">Delete</button><button type="button" class="btn hidden" id="ctText" data-i18n="contacts_text">Text</button></div>
           </form>
-          <span class="label">HISTORY</span><div id="ctHistory" class="list"></div>
+          <span class="label" data-i18n="contacts_history">HISTORY</span><div id="ctHistory" class="list"></div>
         </div>
       </div>
     </section>
@@ -212,18 +212,18 @@
     <section id="page-aprs" class="page hidden">
       <div class="panel">
         <div class="row between wrap">
-          <div><span class="label">APRS</span> <span id="aprsState" class="chip"></span></div>
-          <div class="row"><button class="btn aprs-terr-only" id="aprsToggle">Monitor APRS</button><button class="btn" id="beaconBtn">Send beacon</button></div>
+          <div><span class="label" translate="no">APRS</span> <span id="aprsState" class="chip"></span></div>
+          <div class="row"><button class="btn aprs-terr-only" id="aprsToggle" data-i18n="aprs_monitor_aprs">Monitor APRS</button><button class="btn" id="beaconBtn" data-i18n="aprs_send_beacon">Send beacon</button></div>
         </div>
-        <div class="stats"><div><b id="aprsCount">0</b><span>PACKETS</span></div><div><b id="stationCount">0</b><span>STATIONS</span></div><div><b id="forYou">0</b><span>FOR YOU</span></div></div>
+        <div class="stats"><div><b id="aprsCount">0</b><span data-i18n="aprs_packets">PACKETS</span></div><div><b id="stationCount">0</b><span data-i18n="aprs_stations">STATIONS</span></div><div><b id="forYou">0</b><span data-i18n="aprs_for_you">FOR YOU</span></div></div>
       </div>
       <div class="grid2">
-        <div class="panel"><span class="label">PACKETS</span><div id="aprsLog" class="list mono small"></div></div>
-        <div class="panel"><span class="label">STATIONS</span><div id="stations" class="list small"></div></div>
+        <div class="panel"><span class="label" data-i18n="aprs_packets">PACKETS</span><div id="aprsLog" class="list mono small"></div></div>
+        <div class="panel"><span class="label" data-i18n="aprs_stations">STATIONS</span><div id="stations" class="list small"></div></div>
       </div>
       <div class="panel">
-        <span class="label">SEND A MESSAGE</span>
-        <form id="msgForm" class="row wrap"><input id="msgTo" placeholder="To (callsign)" maxlength="9" class="w9"><input id="msgText" placeholder="Message" maxlength="67" class="grow"><button class="btn primary">Send</button></form>
+        <span class="label" data-i18n="aprs_send_a_message">SEND A MESSAGE</span>
+        <form id="msgForm" class="row wrap"><input id="msgTo" placeholder="To (callsign)" maxlength="9" class="w9" data-i18n-placeholder="aprs_to_callsign"><input id="msgText" placeholder="Message" maxlength="67" class="grow" data-i18n-placeholder="common_message"><button class="btn primary" data-i18n="common_send">Send</button></form>
         <p id="msgNote" class="muted small"></p>
       </div>
     </section>
@@ -232,23 +232,23 @@
     <section id="page-sstv" class="page hidden">
       <div class="grid2">
         <div class="panel">
-          <div class="row between"><span class="label">SSTV</span><span id="sstvState" class="chip"></span></div>
-          <div class="sstvbox"><img id="sstvLive" alt="Live SSTV picture" class="hidden"><div id="sstvEmpty" class="muted">No picture yet</div></div>
-          <div class="row"><button class="btn" id="sstvToggle">Listen on this channel</button></div>
-          <span class="label" style="display:block;margin-top:18px">SEND A PICTURE</span>
+          <div class="row between"><span class="label" translate="no">SSTV</span><span id="sstvState" class="chip"></span></div>
+          <div class="sstvbox"><img id="sstvLive" alt="Live SSTV picture" class="hidden" data-i18n-alt="sstv_live_sstv_picture"><div id="sstvEmpty" class="muted" data-i18n="sstv_no_picture_yet">No picture yet</div></div>
+          <div class="row"><button class="btn" id="sstvToggle" data-i18n="sstv_listen_on_this_channel">Listen on this channel</button></div>
+          <span class="label" style="display:block;margin-top:18px" data-i18n="sstv_send_a_picture">SEND A PICTURE</span>
           <form id="sstvSend" class="row wrap" style="margin-top:10px">
             <input type="file" id="sstvFile" accept="image/png,image/jpeg,image/webp" class="grow">
-            <select id="sstvMode"><option value="0">Robot 8 BW (≈8 s)</option><option value="1">Robot 12 BW (≈12 s)</option><option value="2" selected>Robot 24 Color (≈24 s)</option><option value="3">Robot 36 (≈37 s, long)</option><option value="4">Martin M2 (≈59 s, long)</option><option value="5">Scottie S2 (≈72 s, long)</option><option value="6">PD 90 (≈91 s, long)</option><option value="7">Scottie S1 (≈111 s, long)</option><option value="8">Martin M1 (≈115 s, long)</option></select>
-            <button class="btn primary">Send</button>
+            <select id="sstvMode"><option value="0" data-i18n="sstv_robot_8_bw_8">Robot 8 BW (≈8 s)</option><option value="1" data-i18n="sstv_robot_12_bw_12">Robot 12 BW (≈12 s)</option><option value="2" selected data-i18n="sstv_robot_24_color_24">Robot 24 Color (≈24 s)</option><option value="3" data-i18n="sstv_robot_36_37_s">Robot 36 (≈37 s, long)</option><option value="4" data-i18n="sstv_martin_m2_59_s">Martin M2 (≈59 s, long)</option><option value="5" data-i18n="sstv_scottie_s2_72_s">Scottie S2 (≈72 s, long)</option><option value="6" data-i18n="sstv_pd_90_91_s">PD 90 (≈91 s, long)</option><option value="7" data-i18n="sstv_scottie_s1_111_s">Scottie S1 (≈111 s, long)</option><option value="8" data-i18n="sstv_martin_m1_115_s">Martin M1 (≈115 s, long)</option></select>
+            <button class="btn primary" data-i18n="common_send">Send</button>
           </form>
-          <p id="sstvSendNote" class="muted small">Sends on the current analog channel. The long modes run up to the radio's own 120 s time-out; after one of them the phone cools down before the next long picture (a short mode can go meanwhile).</p>
+          <p id="sstvSendNote" class="muted small" data-i18n="sstv_sends_current_analog_channel">Sends on the current analog channel. The long modes run up to the radio's own 120 s time-out; after one of them the phone cools down before the next long picture (a short mode can go meanwhile).</p>
         </div>
-        <div class="panel"><div class="row between"><span class="label">PICTURES</span><button class="btn small-btn" id="picSelect">Select</button></div>
-          <div id="selBar" class="sel-bar hidden"><span id="selCount" class="mono">0 selected</span><div class="row wrap"><button class="btn small-btn" id="selAll">All</button><button class="btn small-btn" id="selComb" title="Combine receptions of the same picture">Combine</button><button class="btn small-btn" id="selShare">Share</button><button class="btn small-btn danger" id="selDel">Delete</button><button class="btn small-btn" id="selDone">Done</button></div></div>
+        <div class="panel"><div class="row between"><span class="label" data-i18n="sstv_pictures">PICTURES</span><button class="btn small-btn" id="picSelect" data-i18n="common_select">Select</button></div>
+          <div id="selBar" class="sel-bar hidden"><span id="selCount" class="mono" data-i18n="sstv_0_selected">0 selected</span><div class="row wrap"><button class="btn small-btn" id="selAll" data-i18n="common_all">All</button><button class="btn small-btn" id="selComb" title="Combine receptions of the same picture" data-i18n="sstv_combine" data-i18n-title="sstv_combine_receptions_same_picture">Combine</button><button class="btn small-btn" id="selShare" data-i18n="common_share">Share</button><button class="btn small-btn danger" id="selDel" data-i18n="common_delete">Delete</button><button class="btn small-btn" id="selDone" data-i18n="common_done">Done</button></div></div>
           <div id="gallery" class="gallery"></div></div>
-        <div class="panel"><div class="row between wrap"><span class="label">DECODE A RECORDING</span><div class="row wrap"><select id="decMode" aria-label="What to look for"><option value="sstv">SSTV pictures (every mode)</option><option value="aprs">APRS packets</option></select><button class="btn small-btn" id="decUpload">Upload…</button><input type="file" id="decFile" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.opus,.flac" hidden><button class="btn small-btn" id="decRefresh">Refresh</button></div></div>
-          <p class="muted small">A pass recording (Satellite passes → Record each pass), a REC recording, or one from anywhere (Upload…: WAV, MP3, M4A, OGG, FLAC, up to 200 MB), decoded on the phone in the background, faster than it plays; the radio is not used. SSTV finds every mode from its header (Robot, Martin, Scottie, PD…) and Robot 36 pictures whose header was lost. Pictures join the gallery, packets are listed below.</p>
-          <div id="decJob" class="dec-job hidden"><div class="row between"><b id="decName"></b><span id="decPct" class="mono"></span></div><div class="pbar"><i id="decBar"></i></div><div id="decState" class="muted small"></div><pre id="decOut" class="dec-out"></pre><button class="btn small-btn danger" id="decStop">Stop</button></div>
+        <div class="panel"><div class="row between wrap"><span class="label" data-i18n="sstv_decode_a_recording">DECODE A RECORDING</span><div class="row wrap"><select id="decMode" aria-label="What to look for" data-i18n-aria="sstv_what_to_look_for"><option value="sstv" data-i18n="sstv_sstv_pictures_every_mode">SSTV pictures (every mode)</option><option value="aprs" data-i18n="sstv_aprs_packets">APRS packets</option></select><button class="btn small-btn" id="decUpload" data-i18n="sstv_upload">Upload…</button><input type="file" id="decFile" accept="audio/*,.wav,.mp3,.m4a,.aac,.ogg,.opus,.flac" hidden><button class="btn small-btn" id="decRefresh" data-i18n="common_refresh">Refresh</button></div></div>
+          <p class="muted small" data-i18n="sstv_pass_recording_satellite_passes">A pass recording (Satellite passes → Record each pass), a REC recording, or one from anywhere (Upload…: WAV, MP3, M4A, OGG, FLAC, up to 200 MB), decoded on the phone in the background, faster than it plays; the radio is not used. SSTV finds every mode from its header (Robot, Martin, Scottie, PD…) and Robot 36 pictures whose header was lost. Pictures join the gallery, packets are listed below.</p>
+          <div id="decJob" class="dec-job hidden"><div class="row between"><b id="decName"></b><span id="decPct" class="mono"></span></div><div class="pbar"><i id="decBar"></i></div><div id="decState" class="muted small"></div><pre id="decOut" class="dec-out"></pre><button class="btn small-btn danger" id="decStop" data-i18n="common_stop">Stop</button></div>
           <div id="decList" class="list small"></div>
         </div>
       </div>
@@ -257,74 +257,74 @@
     <!-- SATELLITES -->
     <section id="page-scope" class="page hidden">
       <div class="panel rssi-only">
-        <div class="row between wrap"><span class="label">BAND SCOPE</span><div class="row"><select id="scPreset" aria-label="Band"></select><span id="scCustom" class="row hidden"><input id="scFrom" inputmode="decimal" placeholder="from MHz" style="width:92px"><input id="scTo" inputmode="decimal" placeholder="to MHz" style="width:92px"><input id="scStep" inputmode="decimal" placeholder="step kHz" style="width:76px"></span><button class="btn small-btn" id="scStart">Start</button><button class="btn small-btn" id="scClear">Clear peaks</button></div></div>
-        <p class="muted small" id="scSub">Receive only: the radio sweeps the band step by step (about a second a step: its signal reading needs 0.7 s after each retune) and comes back to your channel when it stops. Pick a band or a custom range; click the graph to pick a frequency.</p>
-        <canvas id="scCv" class="scope-cv" aria-label="Band scope: signal strength across the band and a waterfall of the recent sweeps"></canvas>
-        <div class="row between wrap"><span id="scSel" class="mono"></span><button class="btn small-btn hidden" id="scListen">Listen here</button></div>
+        <div class="row between wrap"><span class="label" data-i18n="scope_band_scope">BAND SCOPE</span><div class="row"><select id="scPreset" aria-label="Band" data-i18n-aria="scope_band"></select><span id="scCustom" class="row hidden"><input id="scFrom" inputmode="decimal" placeholder="from MHz" style="width:92px" data-i18n-placeholder="scope_from_mhz"><input id="scTo" inputmode="decimal" placeholder="to MHz" style="width:92px" data-i18n-placeholder="scope_to_mhz"><input id="scStep" inputmode="decimal" placeholder="step kHz" style="width:76px" data-i18n-placeholder="scope_step_khz"></span><button class="btn small-btn" id="scStart" data-i18n="common_start">Start</button><button class="btn small-btn" id="scClear" data-i18n="scope_clear_peaks">Clear peaks</button></div></div>
+        <p class="muted small" id="scSub" data-i18n="scope_receive_only_radio_sweeps">Receive only: the radio sweeps the band step by step (about a second a step: its signal reading needs 0.7 s after each retune) and comes back to your channel when it stops. Pick a band or a custom range; click the graph to pick a frequency.</p>
+        <canvas id="scCv" class="scope-cv" aria-label="Band scope: signal strength across the band and a waterfall of the recent sweeps" data-i18n-aria="scope_band_scope_signal_strength"></canvas>
+        <div class="row between wrap"><span id="scSel" class="mono"></span><button class="btn small-btn hidden" id="scListen" data-i18n="scope_listen_here">Listen here</button></div>
         <div id="scPeaks" class="list small"></div>
       </div>
     </section>
     <section id="page-sat" class="page hidden">
       <div class="panel">
-        <span class="label">ISS</span>
+        <span class="label" translate="no">ISS</span>
         <div id="satCard" class="satcard"></div>
-        <div class="row wrap"><button class="btn" data-iss="aprs">ISS APRS 437.825</button><button class="btn" data-iss="sstv">ISS SSTV 437.550</button><button class="btn danger" data-iss="stop">Stop tracking</button></div>
-        <p class="muted small">Tracking follows every pass: the radio tunes a few minutes before it, corrects the Doppler shift and listens only.</p>
+        <div class="row wrap"><button class="btn" data-iss="aprs" translate="no">ISS APRS 437.825</button><button class="btn" data-iss="sstv" translate="no">ISS SSTV 437.550</button><button class="btn danger" data-iss="stop" data-i18n="sat_stop_tracking">Stop tracking</button></div>
+        <p class="muted small" data-i18n="sat_tracking_follows_every_pass">Tracking follows every pass: the radio tunes a few minutes before it, corrects the Doppler shift and listens only.</p>
       </div>
       <div class="panel" id="condPanel">
-          <div class="row between"><span class="label">VHF/UHF CONDITIONS</span><span id="condAge" class="chip dim"></span></div>
+          <div class="row between"><span class="label" data-i18n="sat_vhf_uhf_conditions">VHF/UHF CONDITIONS</span><span id="condAge" class="chip dim"></span></div>
           <div class="cond-grid">
-            <div class="ptile"><div class="pt-h">TROPO · 48 H</div><div class="pt-v cond-v" id="condTropo">--</div><div class="tropo-strip" id="condStrip"></div><div class="pt-s">Grey normal · cyan slightly enhanced · green super-refraction · amber ducting likely. From the weather forecast's lowest layers (Open-Meteo, position rounded to about 50 km); thin ducts near the ground are underestimated.</div></div>
-            <div class="ptile"><div class="pt-h">AURORA</div><div class="pt-v cond-v" id="condKp">--</div><div class="pt-s" id="condAur"></div></div>
-            <div class="ptile"><div class="pt-h">METEOR SHOWERS</div><div class="pt-s" id="condMet"></div></div>
+            <div class="ptile"><div class="pt-h" data-i18n="sat_tropo_48_h">TROPO · 48 H</div><div class="pt-v cond-v" id="condTropo">--</div><div class="tropo-strip" id="condStrip"></div><div class="pt-s" data-i18n="sat_grey_normal_cyan_slightly">Grey normal · cyan slightly enhanced · green super-refraction · amber ducting likely. From the weather forecast's lowest layers (Open-Meteo, position rounded to about 50 km); thin ducts near the ground are underestimated.</div></div>
+            <div class="ptile"><div class="pt-h" data-i18n="sat_aurora">AURORA</div><div class="pt-v cond-v" id="condKp">--</div><div class="pt-s" id="condAur"></div></div>
+            <div class="ptile"><div class="pt-h" data-i18n="sat_meteor_showers">METEOR SHOWERS</div><div class="pt-s" id="condMet"></div></div>
           </div>
           <div class="muted small" id="condProb"></div>
         </div>
         <div class="panel">
-        <div class="row between wrap"><span class="label">PASSES · NEXT 24 HOURS</span><div class="row"><span id="passNote" class="chip dim"></span><button class="btn small-btn" id="satUpdate">Update orbits</button></div></div>
+        <div class="row between wrap"><span class="label" data-i18n="sat_passes_next_24_hours">PASSES · NEXT 24 HOURS</span><div class="row"><span id="passNote" class="chip dim"></span><button class="btn small-btn" id="satUpdate" data-i18n="sat_update_orbits">Update orbits</button></div></div>
         <div id="passList" class="passgrid"></div>
       </div>
     </section>
-    <div id="picDlg" class="dlg hidden" role="dialog" aria-modal="true" aria-label="SSTV picture">
-      <div class="dlg-card pic-card"><button type="button" class="dlg-x" id="picX" aria-label="Close">×</button>
-        <div class="row between pic-top"><span class="label">SSTV PICTURE</span><span id="picCount" class="chip dim"></span></div>
-        <div class="pic-stage"><button type="button" class="pic-nav" id="picPrev" aria-label="Previous picture">‹</button><img id="picImg" alt=""><button type="button" class="pic-nav" id="picNext" aria-label="Next picture">›</button></div>
-        <div class="row between pic-bottom"><span id="picWhen" class="muted"></span><div class="row"><a class="btn small-btn" id="picDl" href="#" download>Download</a><button type="button" class="btn small-btn" id="picShare">Share</button><button type="button" class="btn small-btn danger" id="picDel">Delete</button></div></div>
+    <div id="picDlg" class="dlg hidden" role="dialog" aria-modal="true" aria-label="SSTV picture" data-i18n-aria="sstv_picture_dialog">
+      <div class="dlg-card pic-card"><button type="button" class="dlg-x" id="picX" aria-label="Close" data-i18n-aria="common_close">×</button>
+        <div class="row between pic-top"><span class="label" data-i18n="sstv_picture_heading">SSTV PICTURE</span><span id="picCount" class="chip dim"></span></div>
+        <div class="pic-stage"><button type="button" class="pic-nav" id="picPrev" aria-label="Previous picture" data-i18n-aria="sstv_previous_picture">‹</button><img id="picImg" alt=""><button type="button" class="pic-nav" id="picNext" aria-label="Next picture" data-i18n-aria="sstv_next_picture">›</button></div>
+        <div class="row between pic-bottom"><span id="picWhen" class="muted"></span><div class="row"><a class="btn small-btn" id="picDl" href="#" download data-i18n="common_download">Download</a><button type="button" class="btn small-btn" id="picShare" data-i18n="common_share">Share</button><button type="button" class="btn small-btn danger" id="picDel" data-i18n="common_delete">Delete</button></div></div>
       </div>
     </div>
     <div id="combDlg" class="dlg hidden" role="dialog" aria-modal="true" aria-labelledby="combTitle">
-      <div class="dlg-card comb-card"><button type="button" class="dlg-x" id="combX" aria-label="Close">&times;</button>
-        <h3 id="combTitle">Combine pictures</h3>
-        <img id="combImg" class="comb-img" alt="Combined picture">
+      <div class="dlg-card comb-card"><button type="button" class="dlg-x" id="combX" aria-label="Close" data-i18n-aria="common_close">&times;</button>
+        <h3 id="combTitle" data-i18n="sstv_combine_pictures">Combine pictures</h3>
+        <img id="combImg" class="comb-img" alt="Combined picture" data-i18n-alt="sstv_combined_picture">
         <p id="combNote" class="sub"></p>
-        <div class="row comb-pick"><span>Picture</span><select id="combSel"></select><label class="comb-use"><input type="checkbox" id="combUse"> in</label></div>
-        <div class="row comb-nudge"><button type="button" class="btn small-btn" id="combUp" title="Move up a line (Shift: 8)">&#9650;</button><button type="button" class="btn small-btn" id="combDown" title="Move down a line (Shift: 8)">&#9660;</button><button type="button" class="btn small-btn" id="combLeft" title="Move left a pixel (Shift: 8)">&#9664;</button><button type="button" class="btn small-btn" id="combRight" title="Move right a pixel (Shift: 8)">&#9654;</button><span id="combShift" class="mono"></span><button type="button" class="btn small-btn" id="combAuto">Automatic</button></div>
-        <div class="row ask-btns"><button type="button" class="btn" id="combNo">Cancel</button><button type="button" class="btn" id="combSave">Save</button></div>
+        <div class="row comb-pick"><span data-i18n="sstv_picture">Picture</span><select id="combSel"></select><label class="comb-use" data-i18n="sstv_in"><input type="checkbox" id="combUse"> in</label></div>
+        <div class="row comb-nudge"><button type="button" class="btn small-btn" id="combUp" title="Move up a line (Shift: 8)" data-i18n-title="sstv_move_up_line_shift">&#9650;</button><button type="button" class="btn small-btn" id="combDown" title="Move down a line (Shift: 8)" data-i18n-title="sstv_move_down_line_shift">&#9660;</button><button type="button" class="btn small-btn" id="combLeft" title="Move left a pixel (Shift: 8)" data-i18n-title="sstv_move_left_pixel_shift">&#9664;</button><button type="button" class="btn small-btn" id="combRight" title="Move right a pixel (Shift: 8)" data-i18n-title="sstv_move_right_pixel_shift">&#9654;</button><span id="combShift" class="mono"></span><button type="button" class="btn small-btn" id="combAuto" data-i18n="sstv_automatic">Automatic</button></div>
+        <div class="row ask-btns"><button type="button" class="btn" id="combNo" data-i18n="common_cancel">Cancel</button><button type="button" class="btn" id="combSave" data-i18n="common_save">Save</button></div>
       </div>
     </div>
     <div id="askDlg" class="dlg hidden" role="alertdialog" aria-modal="true" aria-labelledby="askText">
-      <div class="dlg-card ask-card"><p id="askText" class="ask-text"></p><div class="row ask-btns"><button type="button" class="btn" id="askNo">Cancel</button><button type="button" class="btn danger" id="askYes">Delete</button></div></div>
+      <div class="dlg-card ask-card"><p id="askText" class="ask-text"></p><div class="row ask-btns"><button type="button" class="btn" id="askNo" data-i18n="common_cancel">Cancel</button><button type="button" class="btn danger" id="askYes" data-i18n="common_delete">Delete</button></div></div>
     </div>
     <div id="missionDlg" class="dlg hidden" role="dialog" aria-modal="true" aria-labelledby="missionTitle">
-      <div class="dlg-card"><button type="button" class="dlg-x" id="missionX" aria-label="Close">×</button>
-        <div class="label" id="missionTitle">MISSION STATEMENT</div>
+      <div class="dlg-card"><button type="button" class="dlg-x" id="missionX" aria-label="Close" data-i18n-aria="common_close">×</button>
+        <div class="label" id="missionTitle" data-i18n="settings_mission_statement">MISSION STATEMENT</div>
         <p id="missionText" class="mission-text"></p><p id="missionBy" class="mission-by"></p>
-        <div class="label" style="margin-top:16px">ABOUT AND LICENSE</div><p id="missionLegal" class="mission-legal"></p></div>
+        <div class="label" style="margin-top:16px" data-i18n="settings_about_and_license">ABOUT AND LICENSE</div><p id="missionLegal" class="mission-legal"></p></div>
     </div>
     <!-- TRANSCRIPTS -->
     <section id="page-trans" class="page hidden">
       <div class="panel">
-        <div class="row between wrap"><div><span class="label">TRANSCRIPTS</span> <span id="trCount" class="chip dim"></span></div>
-          <div class="row"><button class="tog" id="trTxt">TXT</button><button class="btn" id="trDownload">Download .txt</button></div></div>
-        <input id="trSearch" placeholder="Search the captions (a word, a callsign, a name)" class="search full" style="margin-top:10px">
-        <p class="muted small">Every finished caption sentence the phone kept, newest first, with its time, channel and (on DMR) the caller. New ones appear as they are heard. Captions are made on the phone: turn TXT on here or on the phone.</p>
+        <div class="row between wrap"><div><span class="label" data-i18n="trans_transcripts">TRANSCRIPTS</span> <span id="trCount" class="chip dim"></span></div>
+          <div class="row"><button class="tog" id="trTxt" translate="no">TXT</button><button class="btn" id="trDownload" data-i18n="trans_download_txt">Download .txt</button></div></div>
+        <input id="trSearch" placeholder="Search the captions (a word, a callsign, a name)" class="search full" style="margin-top:10px" data-i18n-placeholder="trans_search_captions_word_callsign">
+        <p class="muted small" data-i18n="trans_every_finished_caption_sentence">Every finished caption sentence the phone kept, newest first, with its time, channel and (on DMR) the caller. New ones appear as they are heard. Captions are made on the phone: turn TXT on here or on the phone.</p>
         <div id="trList" class="list"></div>
       </div>
       <div class="panel" style="margin-top:14px">
-        <div class="row between wrap"><span class="label">CAPTION ENGINE</span><span id="cmStatus" class="chip dim"></span></div>
-        <div class="row wrap" style="gap:8px;margin-top:10px"><div class="seg" id="cmEngine"><button type="button" data-e="vosk">On the phone (Vosk)</button><button type="button" data-e="google">Google Cloud Speech</button></div></div>
-        <div id="cmGoogle" class="row wrap hidden" style="gap:8px;margin-top:10px"><input id="cmKey" type="password" autocomplete="off" placeholder="Google Cloud Speech API key" class="search" style="flex:1;min-width:220px"><button class="btn" id="cmKeySave">Save key</button><span id="cmKeyState" class="muted small"></span></div>
-        <p class="muted small">On the phone: speech is recognised on the phone itself, nothing leaves it. The model is downloaded once (over the phone's connection) and kept; bigger models are more accurate but need more space and memory. Google: your own API key, audio is sent to Google.</p>
+        <div class="row between wrap"><span class="label" data-i18n="trans_caption_engine">CAPTION ENGINE</span><span id="cmStatus" class="chip dim"></span></div>
+        <div class="row wrap" style="gap:8px;margin-top:10px"><div class="seg" id="cmEngine"><button type="button" data-e="vosk" data-i18n="trans_on_the_phone_vosk">On the phone (Vosk)</button><button type="button" data-e="google" data-i18n="trans_google_cloud_speech">Google Cloud Speech</button></div></div>
+        <div id="cmGoogle" class="row wrap hidden" style="gap:8px;margin-top:10px"><input id="cmKey" type="password" autocomplete="off" placeholder="Google Cloud Speech API key" class="search" style="flex:1;min-width:220px" data-i18n-placeholder="trans_google_cloud_speech_api"><button class="btn" id="cmKeySave" data-i18n="trans_save_key">Save key</button><span id="cmKeyState" class="muted small"></span></div>
+        <p class="muted small" data-i18n="trans_phone_speech_recognised_phone">On the phone: speech is recognised on the phone itself, nothing leaves it. The model is downloaded once (over the phone's connection) and kept; bigger models are more accurate but need more space and memory. Google: your own API key, audio is sent to Google.</p>
         <div id="cmModels" class="list"></div>
         <p id="cmFree" class="muted small"></p>
       </div>
@@ -332,47 +332,47 @@
     <!-- MAP -->
     <section id="page-map" class="page hidden">
       <div class="panel mappanel">
-        <div class="row between wrap"><div><span class="label">MAP</span> <span id="mapCount" class="chip dim"></span></div>
-          <div class="row"><label class="chk"><input type="checkbox" id="mapAprs" checked> APRS stations</label><label class="chk"><input type="checkbox" id="mapCh" checked> Channels</label><label class="chk"><input type="checkbox" id="mapRpt"> Repeaters</label><button class="btn small-btn" id="mapRptHere" title="Repeaters around the middle of the map, wherever you have moved it">Repeaters here</button><select id="mapCov" aria-label="Coverage layer"><option value="">Coverage: off</option><option value="rx">Coverage: signal heard</option><option value="tx">Coverage: transmit reached</option></select><select id="mapCovRpt" aria-label="Coverage of which repeater"><option value="">All repeaters</option></select><label class="chk" title="One repeater: its range calculated from the terrain, under what was measured"><input type="checkbox" id="mapPred" checked> Terrain prediction</label><button class="btn" id="mapFit">Fit all</button></div></div>
+        <div class="row between wrap"><div><span class="label" data-i18n="map_map">MAP</span> <span id="mapCount" class="chip dim"></span></div>
+          <div class="row"><label class="chk" data-i18n="map_aprs_stations"><input type="checkbox" id="mapAprs" checked> APRS stations</label><label class="chk" data-i18n="map_channels"><input type="checkbox" id="mapCh" checked> Channels</label><label class="chk" data-i18n="map_repeaters"><input type="checkbox" id="mapRpt"> Repeaters</label><button class="btn small-btn" id="mapRptHere" title="Repeaters around the middle of the map, wherever you have moved it" data-i18n="map_repeaters_here" data-i18n-title="map_repeaters_around_middle_map">Repeaters here</button><select id="mapCov" aria-label="Coverage layer" data-i18n-aria="map_coverage_layer"><option value="" data-i18n="map_coverage_off">Coverage: off</option><option value="rx" data-i18n="map_coverage_signal_heard">Coverage: signal heard</option><option value="tx" data-i18n="map_coverage_transmit_reached">Coverage: transmit reached</option></select><select id="mapCovRpt" aria-label="Coverage of which repeater" data-i18n-aria="map_coverage_of_which_repeater"><option value="" data-i18n="map_all_repeaters">All repeaters</option></select><label class="chk" title="One repeater: its range calculated from the terrain, under what was measured" data-i18n="map_terrain_prediction" data-i18n-title="map_one_repeater_its_range"><input type="checkbox" id="mapPred" checked> Terrain prediction</label><button class="btn" id="mapFit" data-i18n="map_fit_all">Fit all</button></div></div>
         <div id="mapCovNote" class="covnote hidden"></div>
         <div id="map" class="map"><div id="mapTiles" class="tiles"></div><canvas id="mapPredCv" class="predcv"></canvas><div id="mapCells" class="marks"></div><div id="mapMarks" class="marks"></div>
-          <div class="zoom"><button id="zIn" aria-label="Zoom in">+</button><button id="zOut" aria-label="Zoom out">−</button></div>
+          <div class="zoom"><button id="zIn" aria-label="Zoom in" data-i18n-aria="map_zoom_in">+</button><button id="zOut" aria-label="Zoom out" data-i18n-aria="map_zoom_out">−</button></div>
           <div id="mapCard" class="mapcard hidden"></div>
-          <div class="attrib">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</div></div>
+          <div class="attrib" data-i18n-html="map_openstreetmap_contributors">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</div></div>
       </div>
     </section>
 
     <!-- LOGBOOK -->
     <section id="page-log" class="page hidden">
       <div class="panel" id="potaPanel">
-        <div class="row between wrap"><span class="label">POTA / SOTA</span><div class="row"><button class="btn small-btn" id="potaRefresh">Refresh</button></div></div>
+        <div class="row between wrap"><span class="label" translate="no">POTA / SOTA</span><div class="row"><button class="btn small-btn" id="potaRefresh" data-i18n="common_refresh">Refresh</button></div></div>
         <div id="potaAct" class="pota-act"></div>
-        <form id="potaStart" class="row wrap hidden" autocomplete="off"><input id="potaRef" placeholder="Park (US-1234) or summit (W0C/FR-001)" style="text-transform:uppercase" maxlength="14"><button class="btn small-btn" type="submit">Start the activation</button><button class="btn small-btn" type="button" id="potaParks">Parks near the phone</button></form>
+        <form id="potaStart" class="row wrap hidden" autocomplete="off"><input id="potaRef" placeholder="Park (US-1234) or summit (W0C/FR-001)" style="text-transform:uppercase" maxlength="14" data-i18n-placeholder="log_park_us_1234_summit"><button class="btn small-btn" type="submit" data-i18n="log_start_the_activation">Start the activation</button><button class="btn small-btn" type="button" id="potaParks" data-i18n="log_parks_near_the_phone">Parks near the phone</button></form>
         <div id="potaParkList" class="list small"></div>
-        <form id="potaLog" class="row wrap hidden" autocomplete="off"><input id="plCall" placeholder="Callsign" style="text-transform:uppercase" maxlength="12"><input id="plSent" value="59" size="4" aria-label="Report sent"><input id="plRcvd" value="59" size="4" aria-label="Report received"><input id="plTheir" placeholder="Their park/summit (optional)" style="text-transform:uppercase" maxlength="14"><button class="btn small-btn" type="submit">Log</button></form>
-        <div class="label" style="margin-top:12px">ON THE AIR NOW</div>
+        <form id="potaLog" class="row wrap hidden" autocomplete="off"><input id="plCall" placeholder="Callsign" style="text-transform:uppercase" maxlength="12" data-i18n-placeholder="common_callsign"><input id="plSent" value="59" size="4" aria-label="Report sent" data-i18n-aria="log_report_sent"><input id="plRcvd" value="59" size="4" aria-label="Report received" data-i18n-aria="log_report_received"><input id="plTheir" placeholder="Their park/summit (optional)" style="text-transform:uppercase" maxlength="14" data-i18n-placeholder="log_their_park_summit_optional"><button class="btn small-btn" type="submit" data-i18n="common_log">Log</button></form>
+        <div class="label" style="margin-top:12px" data-i18n="log_on_the_air_now">ON THE AIR NOW</div>
         <div id="potaSpots" class="list small"></div>
       </div>
       <div class="grid-side wide">
         <div class="panel">
-          <span class="label" id="qsoTitle">LOG A CONTACT</span>
+          <span class="label" id="qsoTitle" data-i18n="log_log_a_contact">LOG A CONTACT</span>
           <form id="qsoForm" class="form" autocomplete="off">
-            <label>Callsign<input id="qCall" maxlength="12" style="text-transform:uppercase"></label>
-            <div class="row"><label class="grow">Frequency (MHz)<input id="qFreq" inputmode="decimal"></label><label class="grow">Mode<select id="qMode"><option>FM</option><option class="dmr-only">DMR</option><option>SSB</option><option>CW</option><option>APRS</option><option>SSTV</option><option>DIGITAL</option></select></label></div>
-            <div class="row"><label class="grow">Report sent<input id="qSent" maxlength="6" placeholder="59"></label><label class="grow">Report received<input id="qRcvd" maxlength="6" placeholder="59"></label></div>
-            <label>Name<input id="qName" maxlength="40"></label>
-            <label>Notes<input id="qNotes" maxlength="200"></label>
-            <div class="row"><button class="btn primary">Save</button><button type="button" class="btn" id="qClear">Clear</button><button type="button" class="btn danger hidden" id="qDel">Delete</button></div>
+            <label data-i18n="common_callsign">Callsign<input id="qCall" maxlength="12" style="text-transform:uppercase"></label>
+            <div class="row"><label class="grow" data-i18n="log_frequency_mhz">Frequency (MHz)<input id="qFreq" inputmode="decimal"></label><label class="grow" data-i18n="log_mode">Mode<select id="qMode"><option translate="no">FM</option><option class="dmr-only" translate="no">DMR</option><option translate="no">SSB</option><option translate="no">CW</option><option translate="no">APRS</option><option translate="no">SSTV</option><option translate="no">DIGITAL</option></select></label></div>
+            <div class="row"><label class="grow" data-i18n="log_report_sent">Report sent<input id="qSent" maxlength="6" placeholder="59"></label><label class="grow" data-i18n="log_report_received">Report received<input id="qRcvd" maxlength="6" placeholder="59"></label></div>
+            <label data-i18n="common_name">Name<input id="qName" maxlength="40"></label>
+            <label data-i18n="common_notes">Notes<input id="qNotes" maxlength="200"></label>
+            <div class="row"><button class="btn primary" data-i18n="common_save">Save</button><button type="button" class="btn" id="qClear" data-i18n="common_clear">Clear</button><button type="button" class="btn danger hidden" id="qDel" data-i18n="common_delete">Delete</button></div>
           </form>
         </div>
         <div class="panel">
-          <div class="row between wrap"><div><span class="label">LOGBOOK</span> <span id="logCount" class="chip dim"></span></div>
-            <div class="row"><label class="chk"><input type="checkbox" id="logQso"> Contacts only</label><a class="btn small-btn" id="adifBtn" href="/api/logbook?format=adif">Export ADIF</a></div></div>
+          <div class="row between wrap"><div><span class="label" data-i18n="log_logbook">LOGBOOK</span> <span id="logCount" class="chip dim"></span></div>
+            <div class="row"><label class="chk" data-i18n="log_contacts_only"><input type="checkbox" id="logQso"> Contacts only</label><a class="btn small-btn" id="adifBtn" href="/api/logbook?format=adif" data-i18n="log_export_adif">Export ADIF</a></div></div>
           <div id="logList" class="list"></div>
         </div>
       </div>
       <div class="panel">
-        <div class="row between wrap"><div><span class="label">NET CONTROL</span> <span id="netState" class="chip dim"></span></div><div class="row" id="netActions"></div></div>
+        <div class="row between wrap"><div><span class="label" data-i18n="log_net_control">NET CONTROL</span> <span id="netState" class="chip dim"></span></div><div class="row" id="netActions"></div></div>
         <div id="netBody"></div>
       </div>
     </section>
@@ -380,7 +380,7 @@
     <!-- RECORDINGS -->
     <section id="page-rec" class="page hidden">
       <div class="panel">
-        <div class="row between wrap"><span class="label">RECORDINGS</span><span class="muted small">REC on the intercom saves every reception to Download/DMR/Audio on the phone.</span></div>
+        <div class="row between wrap"><span class="label" data-i18n="rec_recordings">RECORDINGS</span><span class="muted small" data-i18n="rec_rec_intercom_saves_every">REC on the intercom saves every reception to Download/DMR/Audio on the phone.</span></div>
         <audio id="player" controls class="player"></audio>
         <div id="recList" class="list"></div>
       </div>
@@ -390,53 +390,53 @@
     <section id="page-pkt" class="page hidden">
       <div class="grid-side wide">
         <div>
-          <div class="panel"><span class="label">TOOLS</span><div id="pktTools"></div>
-            <div class="row" style="margin-top:12px"><button class="btn" id="cwIdBtn">Send Morse ID</button></div></div>
-          <div class="panel" id="pfPanel"><div class="row between wrap"><span class="label">PACKET FINDER</span><div class="row"><button class="btn small-btn" id="pfGo">Start</button><button class="btn small-btn" id="pfSet">Settings</button><button class="btn small-btn danger" id="pfClear">Clear</button></div></div>
-            <p class="muted small">Listens across the packet frequencies (never transmits) and lists the Winlink gateways, BBSs and nodes it hears. Nodes identify only every 10 to 30 minutes: let it run an hour or two, or schedule it for the night. The radio goes back to its channel afterwards.</p>
+          <div class="panel"><span class="label" data-i18n="pkt_tools">TOOLS</span><div id="pktTools"></div>
+            <div class="row" style="margin-top:12px"><button class="btn" id="cwIdBtn" data-i18n="pkt_send_morse_id">Send Morse ID</button></div></div>
+          <div class="panel" id="pfPanel"><div class="row between wrap"><span class="label" data-i18n="pkt_packet_finder">PACKET FINDER</span><div class="row"><button class="btn small-btn" id="pfGo" data-i18n="common_start">Start</button><button class="btn small-btn" id="pfSet" data-i18n="common_settings">Settings</button><button class="btn small-btn danger" id="pfClear" data-i18n="common_clear">Clear</button></div></div>
+            <p class="muted small" data-i18n="pkt_listens_across_packet_frequencies">Listens across the packet frequencies (never transmits) and lists the Winlink gateways, BBSs and nodes it hears. Nodes identify only every 10 to 30 minutes: let it run an hour or two, or schedule it for the night. The radio goes back to its channel afterwards.</p>
             <p class="muted small" id="pfState"></p>
             <form id="pfForm" class="sched-form hidden" autocomplete="off">
-              <label class="wide">Frequencies (MHz, commas; empty = 144.910–145.090)<input id="pfFreqs"></label>
-              <label>Minutes on each<input id="pfDwell" inputmode="numeric"></label>
-              <label>Hours in total<input id="pfHours" inputmode="numeric"></label>
-              <div class="row" style="grid-column:1/-1"><button class="btn primary small-btn">Save</button><button class="btn small-btn" id="pfCancel" type="button">Cancel</button></div>
+              <label class="wide" data-i18n="pkt_frequencies_mhz_commas_empty">Frequencies (MHz, commas; empty = 144.910–145.090)<input id="pfFreqs"></label>
+              <label data-i18n="pkt_minutes_on_each">Minutes on each<input id="pfDwell" inputmode="numeric"></label>
+              <label data-i18n="pkt_hours_in_total">Hours in total<input id="pfHours" inputmode="numeric"></label>
+              <div class="row" style="grid-column:1/-1"><button class="btn primary small-btn" data-i18n="common_save">Save</button><button class="btn small-btn" id="pfCancel" type="button" data-i18n="common_cancel">Cancel</button></div>
             </form>
             <div id="pfList" class="list small"></div></div>
-          <div class="panel"><div class="row between wrap"><span class="label">VOICE KEYER</span><span id="idTimer" class="chip dim"></span></div><div id="keyerList"></div>
-            <p class="muted small">Upload a recording (any audio file; it is converted to the radio's 8 kHz and cut at 25 s), play it here, then Send it on the current analog channel. Messages recorded on the phone show up here too.</p></div>
-          <div class="panel"><span class="label">DTMF</span>
-            <form id="dtmfForm" class="row" style="margin-top:12px"><input id="dtmfSeq" placeholder="Digits (0-9, A-D, *, #)" maxlength="32" class="grow mono"><button class="btn primary">Send</button></form>
+          <div class="panel"><div class="row between wrap"><span class="label" data-i18n="pkt_voice_keyer">VOICE KEYER</span><span id="idTimer" class="chip dim"></span></div><div id="keyerList"></div>
+            <p class="muted small" data-i18n="pkt_upload_recording_any_audio">Upload a recording (any audio file; it is converted to the radio's 8 kHz and cut at 25 s), play it here, then Send it on the current analog channel. Messages recorded on the phone show up here too.</p></div>
+          <div class="panel"><span class="label" translate="no">DTMF</span>
+            <form id="dtmfForm" class="row" style="margin-top:12px"><input id="dtmfSeq" placeholder="Digits (0-9, A-D, *, #)" maxlength="32" class="grow mono" data-i18n-placeholder="pkt_digits_0_9_d"><button class="btn primary" data-i18n="common_send">Send</button></form>
             <div id="dtmfSaved" class="quick" style="margin-top:10px"></div>
             <div id="dtmfLog" class="list small"></div></div>
-          <div class="panel wx-only"><div class="row between wrap"><span class="label">WEATHER ALERTS (SAME)</span><span id="alertState" class="chip dim"></span></div><div id="alertList" class="list small"></div></div>
-          <div class="panel"><div class="row between wrap"><span class="label">TEXT MODES</span><span id="tmStatus" class="chip dim"></span></div>
-            <div class="row wrap" style="margin-top:10px"><select id="tmMode" aria-label="Listen"></select><select id="tmTx" aria-label="Send as"><option value="2">Send as PSK31</option><option value="1">Send as RTTY 45</option></select><button class="btn small-btn" id="tmClear">Clear</button></div>
+          <div class="panel wx-only"><div class="row between wrap"><span class="label" data-i18n="pkt_weather_alerts_same">WEATHER ALERTS (SAME)</span><span id="alertState" class="chip dim"></span></div><div id="alertList" class="list small"></div></div>
+          <div class="panel"><div class="row between wrap"><span class="label" data-i18n="pkt_text_modes">TEXT MODES</span><span id="tmStatus" class="chip dim"></span></div>
+            <div class="row wrap" style="margin-top:10px"><select id="tmMode" aria-label="Listen" data-i18n-aria="pkt_listen"></select><select id="tmTx" aria-label="Send as" data-i18n-aria="pkt_send_as"><option value="2" data-i18n="pkt_send_as_psk31">Send as PSK31</option><option value="1" data-i18n="pkt_send_as_rtty_45">Send as RTTY 45</option></select><button class="btn small-btn" id="tmClear" data-i18n="common_clear">Clear</button></div>
             <pre id="tmText" class="term"></pre>
-            <form id="tmForm" class="row"><input id="tmLine" placeholder="Text to send" class="grow"><button class="btn primary">Send</button></form></div>
-          <div class="panel"><div class="row between wrap"><span class="label">M17 RECEIVE</span><span id="m7State" class="chip dim"></span></div>
-            <div class="row wrap" style="margin-top:10px"><button class="btn primary" id="m7On">Start M17</button></div>
+            <form id="tmForm" class="row"><input id="tmLine" placeholder="Text to send" class="grow" data-i18n-placeholder="pkt_text_to_send"><button class="btn primary" data-i18n="common_send">Send</button></form></div>
+          <div class="panel"><div class="row between wrap"><span class="label" data-i18n="pkt_m17_receive">M17 RECEIVE</span><span id="m7State" class="chip dim"></span></div>
+            <div class="row wrap" style="margin-top:10px"><button class="btn primary" id="m7On" data-i18n="pkt_start_m17">Start M17</button></div>
             <div id="m7Now" class="m7now"></div>
-            <form id="m7Form" class="row wrap" style="margin-top:10px"><input id="m7Dest" placeholder="To (@ALL or a callsign)" class="w9" style="text-transform:uppercase"><input id="m7Text" placeholder="Text message" maxlength="200" class="grow"><button class="btn primary">Send</button></form>
+            <form id="m7Form" class="row wrap" style="margin-top:10px"><input id="m7Dest" placeholder="To (@ALL or a callsign)" class="w9" style="text-transform:uppercase" data-i18n-placeholder="pkt_all_callsign"><input id="m7Text" placeholder="Text message" maxlength="200" class="grow" data-i18n-placeholder="pkt_text_message"><button class="btn primary" data-i18n="common_send">Send</button></form>
             <div id="m7Texts" class="list small"></div>
             <div id="m7List" class="list small"></div>
-            <p class="muted small">M17 digital voice on the phone's current channel or VFO: the caller, who it is for and their message; press Listen on the Intercom page to hear the decoded voice. Receive only (this radio cannot transmit M17). <span id="m7Cal"></span></p></div>
-          <div class="panel"><div class="row between wrap"><span class="label">FT8 OVER FM</span><span id="f8State" class="chip dim"></span></div>
-            <div class="row wrap" style="margin-top:10px"><button class="btn primary" id="f8On">Start FT8</button><button class="btn" id="f8Cq">Call CQ</button><button class="btn" id="f8Halt">Halt TX</button>
-              <select id="f8Par" aria-label="Transmit period"><option value="0">TX 1st (:00 :30)</option><option value="1">TX 2nd (:15 :45)</option></select>
-              <label class="small muted">TX Hz <input id="f8Hz" inputmode="numeric" style="width:70px"></label><label class="small muted">Grid <input id="f8Grid" style="width:80px;text-transform:uppercase" placeholder="location"></label></div>
+            <p class="muted small" data-i18n="pkt_m17_digital_voice_phone">M17 digital voice on the phone's current channel or VFO: the caller, who it is for and their message; press Listen on the Intercom page to hear the decoded voice. Receive only (this radio cannot transmit M17). <span id="m7Cal"></span></p></div>
+          <div class="panel"><div class="row between wrap"><span class="label" data-i18n="pkt_ft8_over_fm">FT8 OVER FM</span><span id="f8State" class="chip dim"></span></div>
+            <div class="row wrap" style="margin-top:10px"><button class="btn primary" id="f8On" data-i18n="pkt_start_ft8">Start FT8</button><button class="btn" id="f8Cq" data-i18n="pkt_call_cq">Call CQ</button><button class="btn" id="f8Halt" data-i18n="pkt_halt_tx">Halt TX</button>
+              <select id="f8Par" aria-label="Transmit period" data-i18n-aria="pkt_transmit_period"><option value="0" data-i18n="pkt_tx_1st_00_30">TX 1st (:00 :30)</option><option value="1" data-i18n="pkt_tx_2nd_15_45">TX 2nd (:15 :45)</option></select>
+              <label class="small muted" data-i18n="pkt_tx_hz">TX Hz <input id="f8Hz" inputmode="numeric" style="width:70px"></label><label class="small muted" data-i18n="pkt_grid">Grid <input id="f8Grid" style="width:80px;text-transform:uppercase" placeholder="location" data-i18n-placeholder="pkt_location"></label></div>
             <div id="f8Clock" class="f8clock"><div></div><span></span></div>
-            <canvas id="f8Fall" class="f8fall" width="400" height="90" title="Click to set the transmit frequency"></canvas>
+            <canvas id="f8Fall" class="f8fall" width="400" height="90" title="Click to set the transmit frequency" data-i18n-title="pkt_click_set_transmit_frequency"></canvas>
             <div id="f8Next" class="small mono" style="margin:6px 0"></div>
             <div id="f8List" class="term f8list"></div>
-            <form id="f8Form" class="row"><input id="f8Line" placeholder="Message or free text (13 characters)" maxlength="40" class="grow mono" style="text-transform:uppercase"><button class="btn primary">Send</button></form>
-            <p class="muted small">The WSJT-X mode on the phone's current FM channel. Click a CQ to answer it: the phone runs the exchange and logs the contact. It cannot hear SSB FT8 (144.174 / 432.174), and FM lets one station through per slot. Your callsign shows as (you). Sending needs Allow transmit from the web.</p></div>
-          <div class="panel"><div class="row between wrap"><span class="label">PACKET TERMINAL</span><span id="trState" class="chip dim"></span></div>
-            <form id="trConnect" class="row wrap" style="margin-top:10px"><input id="trCall" placeholder="BBS or node (N0ABC-1)" style="text-transform:uppercase"><input id="trVia" placeholder="via (optional, up to 2)" style="text-transform:uppercase" class="grow"><button class="btn primary">Connect</button><button type="button" class="btn" id="trDisc">Disconnect</button></form>
-            <label class="chk" style="margin-top:8px"><input type="checkbox" id="trAccept"> Accept incoming connections</label>
+            <form id="f8Form" class="row"><input id="f8Line" placeholder="Message or free text (13 characters)" maxlength="40" class="grow mono" style="text-transform:uppercase" data-i18n-placeholder="pkt_message_free_text_13"><button class="btn primary" data-i18n="common_send">Send</button></form>
+            <p class="muted small" data-i18n="pkt_wsjt_x_mode_phone">The WSJT-X mode on the phone's current FM channel. Click a CQ to answer it: the phone runs the exchange and logs the contact. It cannot hear SSB FT8 (144.174 / 432.174), and FM lets one station through per slot. Your callsign shows as (you). Sending needs Allow transmit from the web.</p></div>
+          <div class="panel"><div class="row between wrap"><span class="label" data-i18n="pkt_packet_terminal">PACKET TERMINAL</span><span id="trState" class="chip dim"></span></div>
+            <form id="trConnect" class="row wrap" style="margin-top:10px"><input id="trCall" placeholder="BBS or node (N0ABC-1)" style="text-transform:uppercase" data-i18n-placeholder="pkt_bbs_node_n0abc_1"><input id="trVia" placeholder="via (optional, up to 2)" style="text-transform:uppercase" class="grow" data-i18n-placeholder="pkt_via_optional_up_2"><button class="btn primary" data-i18n="common_connect">Connect</button><button type="button" class="btn" id="trDisc" data-i18n="pkt_disconnect">Disconnect</button></form>
+            <label class="chk" style="margin-top:8px" data-i18n="pkt_accept_incoming_connections"><input type="checkbox" id="trAccept"> Accept incoming connections</label>
             <pre id="trText" class="term"></pre>
-            <form id="trForm" class="row"><input id="trLine" placeholder="Command or text" class="grow mono"><button class="btn primary">Send</button></form></div>
+            <form id="trForm" class="row"><input id="trLine" placeholder="Command or text" class="grow mono" data-i18n-placeholder="pkt_command_or_text"><button class="btn primary" data-i18n="common_send">Send</button></form></div>
         </div>
-        <div class="panel"><span class="label">APRS SETTINGS</span><form id="aprsSet" class="edform" autocomplete="off"></form></div>
+        <div class="panel"><span class="label" data-i18n="pkt_aprs_settings">APRS SETTINGS</span><form id="aprsSet" class="edform" autocomplete="off"></form></div>
       </div>
     </section>
 
@@ -444,71 +444,71 @@
     <section id="page-pager" class="page hidden">
       <div class="panel">
         <div class="row between wrap">
-          <div><span class="label">PAGER</span> <span id="pgState" class="chip dim"></span></div>
-          <button class="btn" id="pgMon" type="button">Monitor</button>
+          <div><span class="label" data-i18n="pager_pager">PAGER</span> <span id="pgState" class="chip dim"></span></div>
+          <button class="btn" id="pgMon" type="button" data-i18n="pager_monitor">Monitor</button>
         </div>
         <p class="muted small" id="pgScan"></p>
         <form id="pgForm" class="form" autocomplete="off">
-          <label>Frequency (MHz)<input id="pgMhz" inputmode="decimal"></label>
-          <label>Speed<select id="pgBaud"><option value="1200">1200</option><option value="512">512</option><option value="2400">2400</option></select></label>
-          <label class="wide">To (RIC numbers, or a contact's name or callsign)<input id="pgTo" placeholder="1001 or a contact"></label>
-          <label class="wide">Message<textarea id="pgText" rows="3" maxlength="40"></textarea></label>
-          <label class="chk"><input type="checkbox" id="pgSign" checked> Sign with my callsign</label>
-          <div class="row"><button class="btn primary">Send</button></div>
+          <label data-i18n="pager_frequency_mhz">Frequency (MHz)<input id="pgMhz" inputmode="decimal"></label>
+          <label data-i18n="pager_speed">Speed<select id="pgBaud"><option value="1200">1200</option><option value="512">512</option><option value="2400">2400</option></select></label>
+          <label class="wide" data-i18n="pager_ric_numbers_contact_s">To (RIC numbers, or a contact's name or callsign)<input id="pgTo" placeholder="1001 or a contact" data-i18n-placeholder="pager_1001_or_a_contact"></label>
+          <label class="wide" data-i18n="common_message">Message<textarea id="pgText" rows="3" maxlength="40"></textarea></label>
+          <label class="chk" data-i18n="pager_sign_with_my_callsign"><input type="checkbox" id="pgSign" checked> Sign with my callsign</label>
+          <div class="row"><button class="btn primary" data-i18n="common_send">Send</button></div>
         </form>
         <p id="pgNote" class="muted small"></p>
       </div>
-      <div class="panel"><div class="row between"><span class="label">PAGES</span><input id="pgRic" placeholder="Filter by RIC" class="search" inputmode="numeric"></div><div id="pgList" class="list"></div></div>
+      <div class="panel"><div class="row between"><span class="label" data-i18n="pager_pages">PAGES</span><input id="pgRic" placeholder="Filter by RIC" class="search" inputmode="numeric" data-i18n-placeholder="pager_filter_by_ric"></div><div id="pgList" class="list"></div></div>
     </section>
 
     <!-- EXAM -->
     <section id="page-exam" class="page hidden">
-      <div class="panel"><span class="label">LICENCE EXAM PRACTICE</span><div id="examBody" style="margin-top:12px"></div></div>
-      <div class="panel"><span class="label">MORSE TRAINER (KOCH)</span><div id="mtBody" style="margin-top:12px"></div></div>
+      <div class="panel"><span class="label" data-i18n="exam_licence_exam_practice">LICENCE EXAM PRACTICE</span><div id="examBody" style="margin-top:12px"></div></div>
+      <div class="panel"><span class="label" data-i18n="exam_morse_trainer_koch">MORSE TRAINER (KOCH)</span><div id="mtBody" style="margin-top:12px"></div></div>
     </section>
 
     <!-- SETTINGS -->
     <section id="page-settings" class="page hidden">
-      <button class="btn mission-btn" id="missionBtn">★ Mission Statement</button>
+      <button class="btn mission-btn" id="missionBtn" data-i18n="settings_mission_button">★ Mission Statement</button>
       <div class="panel" id="schedPanel">
-        <div class="row between"><span class="label">SCHEDULED OPERATIONS</span><button class="btn small-btn" id="schedAdd">Add</button></div>
-        <p class="muted small">Start something at a set time, once or every week; when the time is up the radio goes back to what it was doing. A satellite pass being tracked comes first.</p>
+        <div class="row between"><span class="label" data-i18n="settings_scheduled_operations">SCHEDULED OPERATIONS</span><button class="btn small-btn" id="schedAdd" data-i18n="common_add">Add</button></div>
+        <p class="muted small" data-i18n="settings_start_something_at_set">Start something at a set time, once or every week; when the time is up the radio goes back to what it was doing. A satellite pass being tracked comes first.</p>
         <div id="schedList" class="list small"></div>
         <form id="schedForm" class="sched-form hidden">
-          <label>What <select id="sfAction"><option value="listen">Listen to a channel</option><option value="scan">Scan the zone</option><option value="aprs" class="aprs-terr-only">APRS monitoring</option><option value="sstv">SSTV receive</option><option value="beacon">Send an APRS beacon</option><option value="winlink">Check Winlink mail (radio gateway)</option><option value="winlinknet">Check Winlink mail (internet)</option><option value="finder">Packet finder (listen for BBSs, nodes, gateways)</option></select></label>
-          <label id="sfChWrap">Channel <select id="sfChannel"></select></label>
-          <label id="sfRecWrap" class="chk"><input type="checkbox" id="sfRecord"> Record it</label>
+          <label data-i18n="settings_what">What <select id="sfAction"><option value="listen" data-i18n="settings_listen_to_a_channel">Listen to a channel</option><option value="scan" data-i18n="settings_scan_the_zone">Scan the zone</option><option value="aprs" class="aprs-terr-only" data-i18n="settings_aprs_monitoring">APRS monitoring</option><option value="sstv" data-i18n="settings_sstv_receive">SSTV receive</option><option value="beacon" data-i18n="settings_send_an_aprs_beacon">Send an APRS beacon</option><option value="winlink" data-i18n="settings_check_winlink_mail_radio">Check Winlink mail (radio gateway)</option><option value="winlinknet" data-i18n="settings_check_winlink_mail_internet">Check Winlink mail (internet)</option><option value="finder" data-i18n="settings_packet_finder_listen_bbss">Packet finder (listen for BBSs, nodes, gateways)</option></select></label>
+          <label id="sfChWrap" data-i18n="settings_channel">Channel <select id="sfChannel"></select></label>
+          <label id="sfRecWrap" class="chk" data-i18n="settings_record_it"><input type="checkbox" id="sfRecord"> Record it</label>
           <div class="sf-days" id="sfDays"></div>
-          <label id="sfDateWrap">Once, on <input type="date" id="sfDate"></label>
-          <label>Starts <input type="time" id="sfTime" value="19:00" required></label>
-          <label id="sfMinWrap">Minutes <input type="number" id="sfMinutes" min="1" max="1440" value="60"></label>
-          <label>Name <input type="text" id="sfLabel" maxlength="40" placeholder="optional"></label>
-          <div class="row"><button type="submit" class="btn small-btn">Save</button><button type="button" class="btn small-btn" id="sfCancel">Cancel</button><button type="button" class="btn small-btn danger hidden" id="sfDelete">Delete</button></div>
+          <label id="sfDateWrap" data-i18n="settings_once_on">Once, on <input type="date" id="sfDate"></label>
+          <label data-i18n="settings_starts">Starts <input type="time" id="sfTime" value="19:00" required></label>
+          <label id="sfMinWrap" data-i18n="settings_minutes">Minutes <input type="number" id="sfMinutes" min="1" max="1440" value="60"></label>
+          <label data-i18n="common_name">Name <input type="text" id="sfLabel" maxlength="40" placeholder="optional" data-i18n-placeholder="settings_optional"></label>
+          <div class="row"><button type="submit" class="btn small-btn" data-i18n="common_save">Save</button><button type="button" class="btn small-btn" id="sfCancel" data-i18n="common_cancel">Cancel</button><button type="button" class="btn small-btn danger hidden" id="sfDelete" data-i18n="common_delete">Delete</button></div>
         </form>
       </div>
       <div class="grid-side wide">
         <div class="panel">
-          <span class="label">RADIO</span>
+          <span class="label" data-i18n="settings_radio">RADIO</span>
           <div id="radioCard" class="satcard"></div>
-          <div class="row wrap"><button class="btn" id="takeOver">Take over</button><button class="btn danger" id="handBack">Hand back</button></div>
-          <p class="muted small">Take over gives the radio to SignalDeck; Hand back returns it to the stock walkie-talkie app (and this page loses the radio until you take it over again).</p>
-          <span class="label" style="display:block;margin-top:18px">RADIO MODULE</span>
+          <div class="row wrap"><button class="btn" id="takeOver" data-i18n="settings_take_over">Take over</button><button class="btn danger" id="handBack" data-i18n="settings_hand_back">Hand back</button></div>
+          <p class="muted small" data-i18n="settings_take_over_gives_radio">Take over gives the radio to SignalDeck; Hand back returns it to the stock walkie-talkie app (and this page loses the radio until you take it over again).</p>
+          <span class="label" style="display:block;margin-top:18px" data-i18n="settings_radio_module">RADIO MODULE</span>
           <div id="devCard" class="satcard"></div>
-          <div class="row wrap"><button class="btn" id="devRestart" type="button">Restart the module</button><button class="btn" id="devUpdate" type="button">Check for updates</button></div>
-          <p class="muted small">Restart and installing an update each ask you to confirm. The firmware loader, Own the radio at boot and Allow unlisted images stay on the phone.</p>
-          <span class="label" style="display:block;margin-top:18px">THIS CONNECTION</span>
+          <div class="row wrap"><button class="btn" id="devRestart" type="button" data-i18n="settings_restart_the_module">Restart the module</button><button class="btn" id="devUpdate" type="button" data-i18n="settings_check_for_updates">Check for updates</button></div>
+          <p class="muted small" data-i18n="settings_restart_installing_update_each">Restart and installing an update each ask you to confirm. The firmware loader, Own the radio at boot and Allow unlisted images stay on the phone.</p>
+          <span class="label" style="display:block;margin-top:18px" data-i18n="settings_this_connection">THIS CONNECTION</span>
           <div id="webCard" class="satcard"></div>
-          <p class="muted small">Web access, the PIN and “Allow transmit from the web” are changed only on the phone (Device → SignalDeck Web), so a browser can never give itself more rights.</p>
-          <span class="label" style="display:block;margin-top:18px">BACKUP AND RESTORE</span>
-          <div class="row wrap" style="margin-top:10px"><button class="btn primary" id="backupNow">Back up now</button></div>
+          <p class="muted small" data-i18n="settings_web_access_pin_allow">Web access, the PIN and “Allow transmit from the web” are changed only on the phone (Device → SignalDeck Web), so a browser can never give itself more rights.</p>
+          <span class="label" style="display:block;margin-top:18px" data-i18n="settings_backup_and_restore">BACKUP AND RESTORE</span>
+          <div class="row wrap" style="margin-top:10px"><button class="btn primary" id="backupNow" data-i18n="settings_back_up_now">Back up now</button></div>
           <div id="backupList" class="list small"></div>
-          <label class="f" style="margin-top:12px"><span class="muted">Restore from files on this computer (select Contacts.csv, TG_Lists.csv, Channels.csv, Zones.csv and DTMF.csv of one backup or OpenGD77 CPS export)</span>
+          <label class="f" style="margin-top:12px"><span class="muted" data-i18n="settings_restore_from_files_this">Restore from files on this computer (select Contacts.csv, TG_Lists.csv, Channels.csv, Zones.csv and DTMF.csv of one backup or OpenGD77 CPS export)</span>
             <input type="file" id="restoreFiles" accept=".csv,text/csv" multiple></label>
-          <p class="muted small">A restore replaces every channel, contact and zone with the backup; history, messages and settings are kept.</p>
+          <p class="muted small" data-i18n="settings_restore_replaces_every_channel">A restore replaces every channel, contact and zone with the backup; history, messages and settings are kept.</p>
         </div>
         <div>
-          <div class="panel"><span class="label">SETTINGS</span><div id="setList"></div></div>
-          <div class="panel"><div class="row between"><span class="label">DIAGNOSTICS LOG</span><button class="btn small-btn" id="logRefresh">Refresh</button></div><pre id="diagLog" class="term" style="height:320px"></pre></div>
+          <div class="panel"><span class="label" data-i18n="settings_settings">SETTINGS</span><div id="setList"></div></div>
+          <div class="panel"><div class="row between"><span class="label" data-i18n="settings_diagnostics_log">DIAGNOSTICS LOG</span><button class="btn small-btn" id="logRefresh" data-i18n="common_refresh">Refresh</button></div><pre id="diagLog" class="term" style="height:320px"></pre></div>
         </div>
       </div>
     </section>
@@ -516,7 +516,7 @@
     <!-- HELP -->
     <section id="page-help" class="page hidden">
       <div class="grid-side">
-        <div class="panel"><input id="helpSearch" placeholder="Search the guide" class="search full"><div id="helpList" class="list"></div></div>
+        <div class="panel"><input id="helpSearch" placeholder="Search the guide" class="search full" data-i18n-placeholder="help_search_the_guide"><div id="helpList" class="list"></div></div>
         <div class="panel"><div id="helpBody" class="helpbody"></div></div>
       </div>
     </section>

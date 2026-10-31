@@ -26,7 +26,7 @@ async function talkMic() {
     for (let k = 0; k < 2; k++) { const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3400; lp.Q.value = 0.707; last.connect(lp); last = lp; }
     TALK.resample = { step: ctx.sampleRate / 8000, pos: 0 };
   }
-  const code = "class Cap extends AudioWorkletProcessor { process(i) { const c = i[0] && i[0][0]; if (c) this.port.postMessage(c.slice(0)); return true; } } registerProcessor('cap', Cap);";
+  const code = /* i18n: code */ "class Cap extends AudioWorkletProcessor { process(i) { const c = i[0] && i[0][0]; if (c) this.port.postMessage(c.slice(0)); return true; } } registerProcessor('cap', Cap);";
   await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([code], { type: 'application/javascript' })));
   const node = new AudioWorkletNode(ctx, 'cap');
   node.port.onmessage = e => talkSamples(e.data);
@@ -55,7 +55,7 @@ function talkSocket() {
     if (TALK.ws && TALK.ws.readyState === 1) return resolve(TALK.ws);
     const ws = new WebSocket('wss://' + location.host + '/api/ws/talk'); ws.binaryType = 'arraybuffer';
     ws.onopen = () => { TALK.ws = ws; resolve(ws); };
-    ws.onerror = () => reject(new Error('Could not open the talk link'));
+    ws.onerror = () => reject(new Error(t('talk_link_failed')));
     ws.onclose = () => { if (TALK.ws === ws) TALK.ws = null; if (TALK.down) talkRelease(); };
     ws.onmessage = e => {
       try {
@@ -75,7 +75,7 @@ async function talkPtt(down) {
       const ws = await talkSocket();
       if (!TALK.down) return;                                              // released while the mic or link was opening
       ws.send('down');
-    } catch (e) { toast(e.name === 'NotAllowedError' ? 'The browser did not allow the microphone' : e.message); talkRelease(true); }
+    } catch (e) { toast(e.name === 'NotAllowedError' ? t('talk_mic_denied') : e.message); talkRelease(true); }
   } else talkRelease();
 }
 function talkRelease(quiet) {

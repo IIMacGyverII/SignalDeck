@@ -6,6 +6,10 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
+
 /**
  * DTMF remote control: another radio keys in the PIN and a command digit (for example 1234 then 2, sent as one
  * sequence "12342", an optional * before and # after), and the phone answers on the channel. Three wrong PINs within
@@ -19,9 +23,16 @@ public final class DtmfRemote {
     public interface Actions {
         void speakPosition(); void speakStatus(); void beacon(); void parrot(boolean on); void morseId();
         void event(String line);
+        /** The same line kept as a message, so the history can show it in the app's language; by default its English. */
+        default void event(Msg m) { event(m.english()); }
     }
 
-    public static final String[] COMMANDS = { "", "Position by voice", "Status by voice", "APRS position beacon", "Parrot on", "Parrot off", "Morse ID" };
+    private static final int[] COMMAND_NAMES = { 0, R.string.modes_dtmf_cmd_position, R.string.modes_dtmf_cmd_status, R.string.modes_dtmf_cmd_beacon, R.string.modes_dtmf_cmd_parrot_on, R.string.modes_dtmf_cmd_parrot_off, R.string.modes_dtmf_cmd_morse_id };
+    /** The commands' names in English, by digit ([0] is empty); {@link #commandName} gives them in the app's language. */
+    public static final String[] COMMANDS = new String[COMMAND_NAMES.length];
+    static { COMMANDS[0] = ""; for (int i = 1; i < COMMANDS.length; i++) COMMANDS[i] = Txt.en(COMMAND_NAMES[i]); }
+    /** Command {@code i}'s name (1 to 6) in the app's language. */
+    public static String commandName(int i) { return i <= 0 || i >= COMMAND_NAMES.length ? "" : Txt.s(COMMAND_NAMES[i]); }
     private static final long WINDOW_MS = 10 * 60_000L;
 
     private final Actions actions;
@@ -39,15 +50,15 @@ public final class DtmfRemote {
         if (now < lockedUntil) return 0;
         if (!s.startsWith(pin)) {
             if (failures == 0 || now - firstFailureMs > WINDOW_MS) { failures = 0; firstFailureMs = now; }
-            if (++failures >= 3) { lockedUntil = now + WINDOW_MS; failures = 0; actions.event("🔒 DTMF remote locked for 10 minutes after 3 wrong PINs"); }
-            else actions.event("🔒 DTMF remote: wrong PIN");
+            if (++failures >= 3) { lockedUntil = now + WINDOW_MS; failures = 0; actions.event(Msg.of(R.string.modes_dtmf_event_locked)); }
+            else actions.event(Msg.of(R.string.modes_dtmf_event_wrong_pin));
             return 0;
         }
         failures = 0;
         char c = s.charAt(pin.length());
         int cmd = c >= '1' && c <= '6' ? c - '0' : 0;
-        if (cmd == 0) { actions.event("📟 DTMF remote: unknown command " + c); return 0; }
-        actions.event("📟 DTMF remote: " + COMMANDS[cmd]);
+        if (cmd == 0) { actions.event(Msg.of(R.string.modes_dtmf_event_unknown, String.valueOf(c))); return 0; }
+        actions.event(Msg.of(R.string.modes_dtmf_event_command, Msg.of(COMMAND_NAMES[cmd])));
         switch (cmd) {
             case 1: actions.speakPosition(); break;
             case 2: actions.speakStatus(); break;

@@ -16,6 +16,8 @@ import androidx.car.app.model.Row;
 import androidx.car.app.model.Template;
 
 import com.macdmr.radio.RadioService;
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class LastHeardScreen extends Screen {
         try {
             int max = 30;
             try { max = Math.min(max, getCarContext().getCarService(androidx.car.app.constraints.ConstraintManager.class).getContentLimit(androidx.car.app.constraints.ConstraintManager.CONTENT_LIMIT_TYPE_LIST)); } catch (Throwable ignored) { }
-            if (s == null) list.addItem(new Row.Builder().setTitle("The radio is off").build());
+            if (s == null) list.addItem(new Row.Builder().setTitle(Txt.s(R.string.intercom_car_radio_off)).build());
             else {
                 List<LastHeard.Item> items = LastHeard.items(s, max);
                 for (LastHeard.Item it : items) {
@@ -38,10 +40,10 @@ public class LastHeardScreen extends Screen {
                     if (it.known && com.macdmr.radio.ChannelStore.tunable(s.store().byNumber(chNum))) row.setOnClickListener(() -> { RadioService x = RadioService.running; if (x != null) x.selectChannel(chNum); getScreenManager().popToRoot(); });   // a channel outside this radio's bands is listed, not tuned
                     list.addItem(row.build());
                 }
-                if (items.isEmpty()) list.setNoItemsMessage("Nothing heard yet");
+                if (items.isEmpty()) list.setNoItemsMessage(Txt.s(R.string.intercom_car_nothing_heard));
             }
-        } catch (Throwable t) { list.addItem(new Row.Builder().setTitle("Unavailable").addText(String.valueOf(t.getMessage())).build()); }
-        return new ListTemplate.Builder().setSingleList(list.build()).setTitle("Last heard").setHeaderAction(Action.BACK).build();
+        } catch (Throwable t) { list.addItem(new Row.Builder().setTitle(Txt.s(R.string.intercom_car_unavailable)).addText(String.valueOf(t.getMessage())).build()); }
+        return new ListTemplate.Builder().setSingleList(list.build()).setTitle(Txt.s(R.string.intercom_car_last_heard)).setHeaderAction(Action.BACK).build();
     }
 
 }

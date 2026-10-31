@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import android.content.Context;
 import android.graphics.Typeface;
 import android.text.method.ScrollingMovementMethod;
@@ -33,24 +36,24 @@ public class DiagnosticsView extends LinearLayout implements RadioService.Listen
         int pad = Theme.dp(c, 10); setPadding(pad, pad, pad, pad);
         state = Theme.label(c, "", Theme.CYAN, 13, false); state.setTypeface(Typeface.MONOSPACE); addView(state);
         LinearLayout row = new LinearLayout(c); row.setGravity(Gravity.CENTER);
-        TextView up = Theme.pillButton(c, "Bring radio up"), down = Theme.pillButton(c, "Release (stock app on)"), rssi = Theme.pillButton(c, "RSSI"), clear = Theme.pillButton(c, "Clear");
+        TextView up = Theme.pillButton(c, Txt.s(R.string.device_diag_bring_up)), down = Theme.pillButton(c, Txt.s(R.string.device_diag_release)), rssi = Theme.pillButton(c, "RSSI"), clear = Theme.pillButton(c, Txt.s(R.string.common_clear));
         for (TextView t : new TextView[] { up, down, rssi, clear }) { LayoutParams p = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); p.setMargins(4, 8, 4, 8); row.addView(t, p); }
         addView(row);
         up.setOnClickListener(v -> { if (svc != null) svc.bringUp(); });
-        TextView ver = Theme.pillButton(c, "Module version"), cyc = Theme.pillButton(c, "Power-cycle module"), tone = Theme.pillButton(c, "1 kHz test tone (3 s)");
+        TextView ver = Theme.pillButton(c, Txt.s(R.string.device_diag_version)), cyc = Theme.pillButton(c, Txt.s(R.string.device_diag_power_cycle)), tone = Theme.pillButton(c, Txt.s(R.string.device_diag_tone));
         ver.setOnClickListener(v -> { if (svc != null) svc.diagVersion(); });
-        cyc.setOnClickListener(v -> { if (svc != null) new android.app.AlertDialog.Builder(c).setTitle("Power-cycle the radio module?").setMessage("Pulls the module's power line low and back up, waits for its boot banner and re-applies the channel. Use it if the radio stops answering.").setPositiveButton("Power-cycle", (d, w) -> svc.diagPowerCycle()).setNegativeButton("Cancel", null).show(); });
-        tone.setOnClickListener(v -> { if (svc != null) new android.app.AlertDialog.Builder(c).setTitle("Transmit a 3 s test tone?").setMessage("Keys the radio on the current channel with a 1 kHz tone, for a bench receiver or SDR.").setPositiveButton("Transmit", (d, w) -> svc.diagTestTone(3000)).setNegativeButton("Cancel", null).show(); });
+        cyc.setOnClickListener(v -> { if (svc != null) new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_diag_power_cycle_q)).setMessage(Txt.s(R.string.device_diag_power_cycle_msg)).setPositiveButton(Txt.s(R.string.device_diag_power_cycle_go), (d, w) -> svc.diagPowerCycle()).setNegativeButton(Txt.s(R.string.common_cancel), null).show(); });
+        tone.setOnClickListener(v -> { if (svc != null) new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_diag_tone_q)).setMessage(Txt.s(R.string.device_diag_tone_msg)).setPositiveButton(Txt.s(R.string.device_diag_tone_go), (d, w) -> svc.diagTestTone(3000)).setNegativeButton(Txt.s(R.string.common_cancel), null).show(); });
         LinearLayout row2 = new LinearLayout(c); row2.setGravity(Gravity.CENTER);
         for (TextView t : new TextView[] { ver, cyc, tone }) { LayoutParams p = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); p.setMargins(4, 0, 4, 8); row2.addView(t, p); }
         addView(row2);
-        TextView rt = Theme.pillButton(c, "Check backup round trip");
+        TextView rt = Theme.pillButton(c, Txt.s(R.string.device_diag_backup_check));
         LayoutParams rtl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); rtl.setMargins(4, 0, 4, 8); addView(rt, rtl);
-        rt.setOnClickListener(v -> { if (svc == null) return; say("backup round trip: exporting and restoring into a scratch database…");
-            new Thread(() -> { final String r = com.macdmr.radio.Backup.selfTest(c, svc.store(), svc.packet() != null ? svc.packet().dtmfSaved() : null); post(() -> { for (String l : r.split("\n")) say(l); new android.app.AlertDialog.Builder(c).setTitle("Backup round trip").setMessage(r).setPositiveButton("OK", null).show(); }); }).start(); });
-        TextView cm = Theme.pillButton(c, "Post a test car message");
+        rt.setOnClickListener(v -> { if (svc == null) return; say("backup round trip: exporting and restoring into a scratch database…");   // i18n: diagnostics log
+            new Thread(() -> { final String r = com.macdmr.radio.Backup.selfTest(c, svc.store(), svc.packet() != null ? svc.packet().dtmfSaved() : null); post(() -> { for (String l : r.split("\n")) say(l); new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_diag_backup_title)).setMessage(r).setPositiveButton(Txt.s(R.string.common_ok), null).show(); }); }).start(); });   // r: the self-test report (English)
+        TextView cm = Theme.pillButton(c, Txt.s(R.string.device_diag_car_message));
         LayoutParams cml = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); cml.setMargins(4, 0, 4, 8); addView(cm, cml);
-        cm.setOnClickListener(v -> { com.macdmr.radio.CarMessages.test(c); say("test message posted (shows on the phone and in Android Auto; its reply is not sent)"); });
+        cm.setOnClickListener(v -> { com.macdmr.radio.CarMessages.test(c); say("test message posted (shows on the phone and in Android Auto; its reply is not sent)"); });   // i18n: diagnostics log
         down.setOnClickListener(v -> { if (svc != null) svc.shutDown(true); });
         rssi.setOnClickListener(v -> { if (svc != null) svc.pollRssiMeasure(); });
         ScrollView sv = new ScrollView(c);
@@ -60,7 +63,7 @@ public class DiagnosticsView extends LinearLayout implements RadioService.Listen
         addView(sv, new LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f));
     }
 
-    public void attach(RadioService s) { svc = s; s.addListener(this); state.setText("profile " + s.profile().name + " · uart " + s.profile().controlPort + " · audio " + s.profile().audio); }
+    public void attach(RadioService s) { svc = s; s.addListener(this); state.setText("profile " + s.profile().name + " · uart " + s.profile().controlPort + " · audio " + s.profile().audio); }   // i18n: diagnostics (engine state line)
     public void detach() { if (svc != null) svc.removeListener(this); svc = null; }
 
     /** Last 300 lines only, and the text view is refreshed only while this page is on screen: an unbounded TextView.append
@@ -83,15 +86,15 @@ public class DiagnosticsView extends LinearLayout implements RadioService.Listen
     }
     @Override protected void onDetachedFromWindow() { super.onDetachedFromWindow(); if (svc != null) svc.setUiLog(false); }
 
-    @Override public void onChannel(ChannelStore.Channel ch) { say("channel " + ch.number + " " + ch.name); }
-    @Override public void onRx(boolean r) { say(r ? "RECEIVE_START" : "RECEIVE_STOP"); }
+    @Override public void onChannel(ChannelStore.Channel ch) { say("channel " + ch.number + " " + ch.name); }   // i18n: diagnostics log
+    @Override public void onRx(boolean r) { say(r ? "RECEIVE_START" : "RECEIVE_STOP"); }   // i18n: diagnostics log
     @Override public void onTx(boolean t) { say(t ? "SEND_START" : "SEND_STOP"); }
-    @Override public void onRssi(int dbm) { say("RSSI " + dbm + " dBm"); }
+    @Override public void onRssi(int dbm) { say("RSSI " + dbm + " dBm"); }   // i18n: diagnostics log
     @Override public void onAudioLevel(int a) { }
     @Override public void onHistory(String line) { }
-    @Override public void onCaller(String text) { say("caller " + text); }
+    @Override public void onCaller(String text) { say("caller " + text); }   // i18n: diagnostics log
     @Override public void onLog(String s) { say(s); }
-    @Override public void onLink(String st) { say("link: " + st); }
+    @Override public void onLink(String st) { say("link: " + st); }   // i18n: diagnostics log
     @Override public void onSms(int from, int type, String text) { }
     @Override public void onSmsResult(boolean ok) { }
     @Override public void onLocation(String text) { }

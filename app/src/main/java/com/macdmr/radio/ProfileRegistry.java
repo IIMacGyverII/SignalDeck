@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -40,7 +42,7 @@ import java.util.function.Predicate;
  * fetched profiles altogether.
  */
 public final class ProfileRegistry {
-    public static final String LIST_URL = "https://raw.githubusercontent.com/IIMacGyverII/SignalDeck/main/profiles/profiles.json";
+    public static final String LIST_URL = "https://raw.githubusercontent.com/IIMacGyverII/SignalDeck/main/profiles/profiles.json";   // i18n: URL
     /** ECDSA P-256 public key of the profile list's signing key (the private key never leaves the maintainer's PC). */
     public static final String PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESoOXZsfoRfdkCfyCAdZjNm6gL6MOU42q08UQGUYonPEgZruRBwTh1uo+9toFUqopphqIb9i7WV2zuSBRZRB6GQ==";
 
@@ -48,9 +50,9 @@ public final class ProfileRegistry {
     public static final class Advisory {
         public String id, title, why, restrict, issued, expires; public boolean overridden;
         public String restrictionText() {
-            return "profile".equals(restrict) ? "SignalDeck does not use this phone's profile (the stock app keeps the radio)"
-                    : "takeover".equals(restrict) ? "SignalDeck no longer takes the radio over by itself (and does not transmit)"
-                    : "transmit".equals(restrict) ? "transmitting is switched off" : restrict;
+            return "profile".equals(restrict) ? Txt.s(R.string.device_profile_restrict_profile)
+                    : "takeover".equals(restrict) ? Txt.s(R.string.device_profile_restrict_takeover)
+                    : "transmit".equals(restrict) ? Txt.s(R.string.device_profile_restrict_transmit) : restrict;
         }
     }
     /** What was chosen and why. */
@@ -189,49 +191,49 @@ public final class ProfileRegistry {
 
     /** Fetch the signed list now (worker thread). @return a one-line result for the owner */
     public static String fetch() {
-        Context c = app; if (c == null) return "not ready";
+        Context c = app; if (c == null) return "not ready";   // i18n: bench result line (adb diagnostics)
         try {
             com.macdmr.radio.repeaters.HttpClient.Response r = com.macdmr.radio.repeaters.HttpClient.get(LIST_URL + "?t=" + System.currentTimeMillis() / 600_000);
-            com.macdmr.radio.repeaters.HttpClient.Response s = com.macdmr.radio.repeaters.HttpClient.get(LIST_URL + ".sig?t=" + System.currentTimeMillis() / 600_000);
+            com.macdmr.radio.repeaters.HttpClient.Response s = com.macdmr.radio.repeaters.HttpClient.get(LIST_URL + ".sig?t=" + System.currentTimeMillis() / 600_000);   // i18n: URL
             prefs(c).edit().putLong("lastCheck", System.currentTimeMillis()).apply();
-            if (!r.isOk() || !s.isOk()) return "Profile list not reachable (HTTP " + r.code + "/" + s.code + "); the profiles on this phone stay in use";
+            if (!r.isOk() || !s.isOk()) return Txt.s(R.string.device_profile_unreachable, r.code, s.code);
             byte[] data = r.body; String sig = s.bodyUtf8();
-            if (!verify(data, sig, PUBLIC_KEY)) return "Profile list ignored: its signature is not valid";
+            if (!verify(data, sig, PUBLIC_KEY)) return Txt.s(R.string.device_profile_bad_signature);
             JSONObject list = new JSONObject(new String(data, StandardCharsets.UTF_8));
             JSONObject old = cachedList(c);
-            if (old != null && list.optInt("serial", 0) < old.optInt("serial", 0)) return "Profile list ignored: older than the one on this phone";
-            if (old != null && list.optInt("serial", 0) == old.optInt("serial", 0)) return "Profiles are up to date (list " + list.optInt("serial") + ")";
+            if (old != null && list.optInt("serial", 0) < old.optInt("serial", 0)) return Txt.s(R.string.device_profile_older);
+            if (old != null && list.optInt("serial", 0) == old.optInt("serial", 0)) return Txt.s(R.string.device_profile_current, list.optInt("serial"));
             Set<String> before = advisoryIds(selection());
             java.nio.file.Files.write(new File(dir(c), "profiles.json").toPath(), data);
             java.nio.file.Files.write(new File(dir(c), "profiles.json.sig").toPath(), sig.getBytes(StandardCharsets.US_ASCII));
             reselect();
             Selection now = selection();
             for (Advisory a : now.advisories) if (!before.contains(a.id) && !a.overridden) notifyAdvisory(a);
-            return "Profile list " + list.optInt("serial") + " loaded: this phone uses " + describe(now);
-        } catch (Throwable t) { return "Profile check failed: " + t.getMessage() + "; the profiles on this phone stay in use"; }
+            return Txt.s(R.string.device_profile_loaded, list.optInt("serial"), describe(now));
+        } catch (Throwable t) { return Txt.s(R.string.device_profile_failed, String.valueOf(t.getMessage())); }
     }
 
     /** Bench only (adb diagnostics): a signed list from a file, ignoring the serial rule. */
     static String loadForTest(File f) {
-        Context c = app; if (c == null) return "not ready";
+        Context c = app; if (c == null) return "not ready";   // i18n: bench result line (adb diagnostics)
         try {
             byte[] data = java.nio.file.Files.readAllBytes(f.toPath());
             String sig = new String(java.nio.file.Files.readAllBytes(new File(f.getPath() + ".sig").toPath()), StandardCharsets.US_ASCII);
-            if (!verify(data, sig, PUBLIC_KEY)) return "signature not valid";
+            if (!verify(data, sig, PUBLIC_KEY)) return "signature not valid";   // i18n: bench result line (adb diagnostics)
             Set<String> before = advisoryIds(selection());
             java.nio.file.Files.write(new File(dir(c), "profiles.json").toPath(), data);
             java.nio.file.Files.write(new File(dir(c), "profiles.json.sig").toPath(), sig.getBytes(StandardCharsets.US_ASCII));
             reselect();
             for (Advisory a : selection().advisories) if (!before.contains(a.id) && !a.overridden) notifyAdvisory(a);
-            return "loaded: " + describe(selection()) + ", " + selection().advisories.size() + " advisories";
-        } catch (Throwable t) { return "failed: " + t; }
+            return "loaded: " + describe(selection()) + ", " + selection().advisories.size() + " advisories";   // i18n: bench result line (adb diagnostics)
+        } catch (Throwable t) { return "failed: " + t; }   // i18n: bench result line (adb diagnostics)
     }
     static String clearForTest() {
-        Context c = app; if (c == null) return "not ready";
+        Context c = app; if (c == null) return "not ready";   // i18n: bench result line (adb diagnostics)
         new File(dir(c), "profiles.json").delete(); new File(dir(c), "profiles.json.sig").delete();
         prefs(c).edit().remove("overrides").remove("lastCheck").apply();
         reselect();
-        return "cleared: " + describe(selection());
+        return "cleared: " + describe(selection());   // i18n: bench result line (adb diagnostics)
     }
 
     /** At most every 12 hours, in the background. */
@@ -244,10 +246,10 @@ public final class ProfileRegistry {
 
     private static void notifyAdvisory(Advisory a) {
         RadioService svc = RadioService.running;
-        if (svc != null) svc.notifyUser("SignalDeck advisory: " + a.title, a.restrictionText() + ". " + a.why + " — Device page → Profile to read it or to keep using it anyway.", false);
+        if (svc != null) svc.notifyUser(Txt.s(R.string.device_profile_advisory_title, a.title), Txt.s(R.string.device_profile_advisory_text, a.restrictionText(), a.why), false);
     }
 
     public static String describe(Selection s) {
-        return s.profile.name + " profile r" + s.profile.revision + " (" + ("updated".equals(s.source) ? "updated from the profile list" : "built in") + ")";
+        return Txt.s("updated".equals(s.source) ? R.string.device_profile_describe_updated : R.string.device_profile_describe_builtin, s.profile.name, String.valueOf(s.profile.revision));
     }
 }

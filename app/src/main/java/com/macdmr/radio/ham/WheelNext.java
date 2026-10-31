@@ -5,6 +5,7 @@
  * (keep this notice and the author credit, mark modified versions, no rights to the SignalDeck name or icon).
  */
 package com.macdmr.radio.ham;
+// i18n: stays English (the notes go to the wheel log only)
 
 /**
  * The steering wheel's Next button as a talk key, without trusting the release. Measured in the owner's car

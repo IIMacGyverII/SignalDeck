@@ -15,13 +15,15 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.macdmr.radio.i18n.Txt;
+
 /**
  * Home-screen widget and the notification's buttons. Both send {@link #ACTION} broadcasts here; the commands go to
  * the running {@link RadioService}. Talk is tap-to-start / tap-to-stop (a widget cannot see a held finger) and the
  * service's transmit limit (Device → Longest transmission) ends it.
  */
 public class RadioWidget extends AppWidgetProvider {
-    public static final String ACTION = "com.macdmr.radio.CONTROL";
+    public static final String ACTION = "com.macdmr.radio.CONTROL";   // i18n: intent action
     public static final String CMD_PREV = "prev", CMD_NEXT = "next", CMD_SCAN = "scan", CMD_TALK = "talk", CMD_EXIT = "exit";
 
     @Override public void onUpdate(Context c, AppWidgetManager m, int[] ids) { refresh(c, RadioService.running); }
@@ -32,16 +34,16 @@ public class RadioWidget extends AppWidgetProvider {
         String cmd = i.getStringExtra("cmd");
         RadioService s = RadioService.running;
         if (CMD_EXIT.equals(cmd)) {                                   // the notification's Exit: radio off, service stopped, the app closed if open
-            if (s != null) s.exit(false, r -> { Toast.makeText(c, "Radio switched off. Open SignalDeck to turn it on again", Toast.LENGTH_LONG).show(); c.sendBroadcast(new Intent(MainActivity.ACTION_FINISH).setPackage(c.getPackageName())); });
+            if (s != null) s.exit(false, r -> { Toast.makeText(c, Txt.s(R.string.intercom_widget_exited), Toast.LENGTH_LONG).show(); c.sendBroadcast(new Intent(MainActivity.ACTION_FINISH).setPackage(c.getPackageName())); });
             return;
         }
-        if (s == null || !s.isReady()) { Toast.makeText(c, "Open the radio app first: the radio is not on", Toast.LENGTH_SHORT).show(); refresh(c, s); return; }
+        if (s == null || !s.isReady()) { Toast.makeText(c, Txt.s(R.string.intercom_widget_not_on), Toast.LENGTH_SHORT).show(); refresh(c, s); return; }
         if (CMD_PREV.equals(cmd)) s.stepChannel(-1);
         else if (CMD_NEXT.equals(cmd)) s.stepChannel(1);
         else if (CMD_SCAN.equals(cmd)) { String r = s.toggleScan(); if (r != null) Toast.makeText(c, r, Toast.LENGTH_SHORT).show(); }
         else if (CMD_TALK.equals(cmd)) {
             if (s.pttHeld()) s.ptt(false);
-            else if (s.txInhibited()) Toast.makeText(c, "This channel is receive-only", Toast.LENGTH_SHORT).show();
+            else if (s.txInhibited()) Toast.makeText(c, Txt.s(R.string.intercom_widget_rx_only), Toast.LENGTH_SHORT).show();
             else s.ptt(true);
         }
     }
@@ -57,17 +59,22 @@ public class RadioWidget extends AppWidgetProvider {
     }
 
     /** One line for the widget and the notification: TX / receiving / scanning / ready, or the link state. */
-    public static String status(RadioService s) {
-        if (s == null) return "Radio off · tap to open";
-        if (s.firmwareLoading()) return "Radio busy, loading firmware";
-        if (!s.isReady()) return "Radio " + s.link();
+    public static String status(RadioService s) { return status(s, true); }
+
+    /** The same; {@code coverage} false leaves out "Mapping coverage" (the car screens, which say it elsewhere). */
+    public static String status(RadioService s, boolean coverage) {
+        if (s == null) return Txt.s(R.string.intercom_widget_off);
+        if (s.firmwareLoading()) return Txt.s(R.string.intercom_car_firmware_loading);
+        if (!s.isReady()) return Txt.s(R.string.intercom_car_radio_link, s.link());
         ChannelStore.Channel ch = s.current();
-        String f = ch == null ? "" : ch.freqText(ch.rxFreq) + " MHz · ";
-        if (s.coverageLogging() && !s.isTransmitting() && !s.hearing()) f = f + "Mapping coverage · ";
-        if (s.isTransmitting()) return f + "TRANSMITTING";
-        if (s.hearing()) return f + "Receiving";
-        if (s.isScanning()) return f + (s.isScanHolding() ? "Scan holding" : "Scanning " + s.zoneName());
-        return f + "Ready";
+        java.util.List<String> parts = new java.util.ArrayList<>();
+        if (ch != null) parts.add(Txt.s(R.string.intercom_widget_freq, ch.freqText(ch.rxFreq)));
+        if (coverage && s.coverageLogging() && !s.isTransmitting() && !s.hearing()) parts.add(Txt.s(R.string.intercom_widget_mapping));
+        if (s.isTransmitting()) parts.add(Txt.s(R.string.intercom_widget_transmitting));
+        else if (s.hearing()) parts.add(Txt.s(R.string.intercom_widget_receiving));
+        else if (s.isScanning()) parts.add(s.isScanHolding() ? Txt.s(R.string.intercom_widget_scan_holding) : Txt.s(R.string.intercom_widget_scanning, s.zoneName()));
+        else parts.add(Txt.s(R.string.intercom_widget_ready));
+        return String.join(Txt.s(R.string.intercom_widget_sep), parts);
     }
 
     private static android.graphics.Typeface orbitron;
@@ -100,7 +107,7 @@ public class RadioWidget extends AppWidgetProvider {
             RemoteViews v = new RemoteViews(c.getPackageName(), R.layout.widget_radio);
             ChannelStore.Channel ch = s == null ? null : s.current();
             v.setTextViewText(R.id.w_num, ch == null ? "--" : String.format(java.util.Locale.US, "%02d", ch.number));
-            v.setTextViewText(R.id.w_name, ch == null ? "SignalDeck" : ch.name);
+            v.setTextViewText(R.id.w_name, ch == null ? "SignalDeck" : ch.name);   // i18n: product name
             String st = status(s);
             boolean tx = s != null && s.isTransmitting(), rx = s != null && s.hearing();
             v.setTextViewText(R.id.w_status, st);
@@ -116,7 +123,7 @@ public class RadioWidget extends AppWidgetProvider {
             boolean held = s != null && s.pttHeld();
             v.setImageViewResource(R.id.w_talk, held ? R.drawable.ic_w_ptt_tx : R.drawable.ic_w_ptt);
             v.setInt(R.id.w_talk, "setBackgroundResource", held ? R.drawable.widget_btn_tx : R.drawable.widget_btn_talk);
-            v.setContentDescription(R.id.w_talk, held ? "Stop talking" : "Talk");
+            v.setContentDescription(R.id.w_talk, Txt.s(held ? R.string.intercom_media_stop_talking : R.string.intercom_media_talk));
             v.setOnClickPendingIntent(R.id.w_open, openApp(c));
             v.setOnClickPendingIntent(R.id.w_prev, command(c, CMD_PREV, 1));
             v.setOnClickPendingIntent(R.id.w_next, command(c, CMD_NEXT, 2));

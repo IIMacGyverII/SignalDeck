@@ -4,6 +4,9 @@
  */
 package com.macdmr.radio.fw;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import android.content.Context;
 
 import com.macdmr.radio.ProfileRegistry;
@@ -22,7 +25,7 @@ import java.util.List;
  */
 public final class FirmwareCatalog {
     public static final String URL =
-            "https://raw.githubusercontent.com/IIMacGyverII/AndroidRadio_Firmware_Project/main/catalog/firmware.json";
+            "https://raw.githubusercontent.com/IIMacGyverII/AndroidRadio_Firmware_Project/main/catalog/firmware.json";   // i18n: URL
 
     public static final class Image {
         public final String tag, sha256, summary, baseTag, model, stockPackage, stockVersion, url, status, device;
@@ -193,24 +196,31 @@ public final class FirmwareCatalog {
             seen = true;
             if (v.supportedBase && pkg != null && pkg.equals(v.stockPackage)) supported = true;
         }
-        return seen && !supported ? "This phone's module variant is not supported yet" : null;
+        return seen && !supported ? Txt.s(R.string.device_fw_variant_unsupported) : null;
     }
+
+    /**
+     * Whether a line came from {@link #fetch}. The page used to test for the English "Firmware catalogue" prefix, which every
+     * line of fetch() has; a translation need not start that way, so this is the language-independent form (always true
+     * for a fetch() result).
+     */
+    public static boolean isFetchLine(String msg) { return msg != null; }
 
     /** Fetch and store the catalogue. @return one line for the page */
     public static String fetch(Context c) {
         try {
             com.macdmr.radio.repeaters.HttpClient.Response body = com.macdmr.radio.repeaters.HttpClient.get(URL + "?t=" + System.currentTimeMillis() / 600_000);
-            com.macdmr.radio.repeaters.HttpClient.Response sig = com.macdmr.radio.repeaters.HttpClient.get(URL + ".sig?t=" + System.currentTimeMillis() / 600_000);
-            if (!body.isOk() || !sig.isOk()) return "Firmware catalogue not reachable";
+            com.macdmr.radio.repeaters.HttpClient.Response sig = com.macdmr.radio.repeaters.HttpClient.get(URL + ".sig?t=" + System.currentTimeMillis() / 600_000);   // i18n: URL
+            if (!body.isOk() || !sig.isOk()) return Txt.s(R.string.device_fw_catalogue_unreachable);
             Doc old = cached(c);
             int previous = old == null ? 0 : old.serial;
             Doc doc = accept(body.body, sig.bodyUtf8(), previous);
-            if (doc == null) return "Firmware catalogue ignored";
-            if (old != null && doc.serial == old.serial) return "Firmware catalogue is up to date (" + doc.serial + ")";
+            if (doc == null) return Txt.s(R.string.device_fw_catalogue_ignored);
+            if (old != null && doc.serial == old.serial) return Txt.s(R.string.device_fw_catalogue_current, doc.serial);
             java.nio.file.Files.write(new File(dir(c), "firmware.json").toPath(), body.body);
             java.nio.file.Files.write(new File(dir(c), "firmware.json.sig").toPath(), sig.bodyUtf8().trim().getBytes(StandardCharsets.US_ASCII));
-            return "Firmware catalogue " + doc.serial + " loaded: " + doc.images.size() + " image" + (doc.images.size() == 1 ? "" : "s");
-        } catch (Exception e) { return "Firmware catalogue check failed"; }
+            return Txt.p(R.plurals.device_fw_catalogue_loaded, doc.images.size(), doc.serial, doc.images.size());
+        } catch (Exception e) { return Txt.s(R.string.device_fw_catalogue_failed); }
     }
 
     /**

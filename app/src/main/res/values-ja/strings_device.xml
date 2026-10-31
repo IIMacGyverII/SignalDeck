@@ -1,0 +1,1524 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Device page: settings rows, sheets and dialogs. See strings_common.xml for the conventions. -->
+<resources>
+    <!-- Device → Radio settings row and its dialog title: the language SignalDeck's screens use. One or two words. -->
+    <string name="device_language">言語</string>
+    <!-- First choice in the Language list: follow the phone. %1$s is the phone's language in its own name ("English", "Deutsch"). -->
+    <string name="device_language_phone">端末の言語（%1$s）</string>
+
+    <!-- ==== Device page (DeviceView): the link card at the top ==== -->
+    <!-- Title in the Device page header (the tab's page). One or two words. -->
+    <string name="device_title">デバイス</string>
+    <!-- SAFETY: toast when the owner taps the module-firmware line on a phone where the firmware loader is not certified. Long toast. -->
+    <string name="device_link_fw_not_certified">この端末では、モジュールのファームウェア書き込みはまだ認定されていません。書き込み手順がテストされていないためです。書き込みは、テスト済みの端末でのみ使用できます。</string>
+    <!-- Button on the link card, tile in Tools and title of the Contribute sheet: ways to help the project. One or two words. -->
+    <string name="device_contribute">協力する</string>
+    <!-- Button on the link card (and in the untested-profile dialog): SignalDeck takes the radio from the stock app. Short, half-width button. -->
+    <string name="device_link_take_over">引き継ぐ</string>
+    <!-- Button on the link card: give the radio back to the stock app. Short, half-width button. -->
+    <string name="device_link_hand_back">戻す</string>
+    <!-- SAFETY: title of the dialog before taking over a phone whose profile has never run on it. One line. -->
+    <string name="device_link_untested_title">未テストのプロファイル</string>
+    <!-- SAFETY: take-over warning for an untested profile. %1$s is the phone model, %2$s the stock app's package name. "Hand back", "Device report", "Generate device report" and "Radio probe (root)" are button names on the Device page. -->
+    <string name="device_link_untested_msg">SignalDeck には %1$s 用のプロファイルがあります。純正アプリと所有者の報告をもとに作成したものですが、この端末ではまだ一度も動作していません。引き継ぐと %2$s が一時停止し、無線機のシリアルポートを開きます。失敗した場合は純正アプリが再び有効になります。「戻す」または再起動でも無線モジュールは純正アプリに戻ります。\n\nまず「デバイスレポート」→「デバイスレポートを作成」と「無線プローブ（root）」を実行して共有してください。それによって、このプロファイルがテスト済みになります。</string>
+    <!-- Button on the link card and title of the exit sheet: stop SignalDeck properly. Short. -->
+    <string name="device_exit">SignalDeck を終了</string>
+    <!-- Button on the link card: install the Magisk boot module so SignalDeck keeps root access to the radio after a reboot. One line. -->
+    <string name="device_link_keep_access">再起動後もアクセスを維持</string>
+    <!-- Message of the Boot persistence dialog when the radio service has not started. Short. -->
+    <string name="device_link_boot_not_ready">サービスが準備できていません</string>
+    <!-- Title of the dialog with the result of installing the boot module. One line. -->
+    <string name="device_link_boot_title">起動時の維持</string>
+    <!-- Button on the link card (unsupported or untested phone) and title of its menu: the guided steps that help make this phone supported. One line. -->
+    <string name="device_support">この端末の対応に協力する</string>
+    <!-- SAFETY: note under the link card buttons: what taking over and handing back do to the stock app. A paragraph. -->
+    <string name="device_link_note">root（Magisk）が必要です。このアプリが無線モジュールを使っている間は、純正のトランシーバーアプリは一時停止し、アイコンも非表示になります。「戻す」で元に戻ります。Magisk モジュールは再起動後も SELinux ルールを維持するので、起動直後から無線モジュールを引き継げます。</string>
+
+    <!-- ==== Device page: Radio settings card ==== -->
+    <!-- Heading of the Radio settings card (shown in capitals). Short. -->
+    <string name="device_set_title">無線設定</string>
+    <!-- Settings row title: the region (its APRS frequency, presets and units). One word. -->
+    <string name="device_set_region">地域</string>
+    <!-- Settings switch title. One line. -->
+    <string name="device_set_own_boot">起動時に無線モジュールを引き継ぐ</string>
+    <!-- Subtitle of "Own the radio at boot". One line, may wrap. -->
+    <string name="device_set_own_boot_sub">オフの場合、再起動後は純正アプリに戻ります</string>
+    <!-- Settings switch title: the phone's side push-to-talk key transmits. One line. -->
+    <string name="device_set_side_ptt">側面の PTT キー</string>
+    <!-- Subtitle of "Side PTT key". May wrap. -->
+    <string name="device_set_side_ptt_sub">端末本体の PTT ボタンで送信します</string>
+    <!-- Settings switch title: the volume-up key transmits. One line. -->
+    <string name="device_set_vol_ptt">音量アップで送信</string>
+    <!-- Subtitle of "Volume-up transmits". One line. -->
+    <string name="device_set_vol_ptt_sub">無線画面を開いている間</string>
+    <!-- Settings switch title: a learned button transmits. One line. -->
+    <string name="device_set_custom_ptt">カスタム PTT キー</string>
+    <!-- Subtitle of "Custom PTT key" when no key is learned yet. May wrap. -->
+    <string name="device_set_custom_ptt_sub">未設定。タップしてから、使いたいボタンを押して登録します</string>
+    <!-- Settings switch title: soft squelch while scanning. One line. -->
+    <string name="device_set_scan_sq">スキャン中の Soft SQ</string>
+    <!-- Subtitle of "Soft SQ while scanning". May wrap. -->
+    <string name="device_set_scan_sq_sub">すべてのアナログチャンネルで、それぞれのレベルを使用（未設定なら 5）</string>
+    <!-- Settings switch title: spoken announcements on the phone. One line. -->
+    <string name="device_set_voice">音声アナウンス</string>
+    <!-- Subtitle of "Voice announcements". May wrap. -->
+    <string name="device_set_voice_sub">チャンネル変更、相手の名前、キーワード通知</string>
+    <!-- Settings switch title: the new intercom page design. One line. -->
+    <string name="device_set_new_look">新しい無線画面</string>
+    <!-- Subtitle of "New intercom look". One line. -->
+    <string name="device_set_new_look_sub">オフ：従来の無線画面</string>
+    <!-- Settings switch title: the animated panel on an idle channel. One line. -->
+    <string name="device_set_anim">待機中のアニメーション</string>
+    <!-- Subtitle of "Animated panel when quiet". May wrap. -->
+    <string name="device_set_anim_sub">使われていないチャンネルで線が流れます（バッテリーを少し使います）</string>
+    <!-- Settings switch title: record signal reports for the coverage map. One line. -->
+    <string name="device_set_coverage">エリア記録</string>
+    <!-- Subtitle of "Coverage logging" on a radio that reports signal strength. May wrap. -->
+    <string name="device_set_coverage_sub_rssi">信号とアクセスを GPS 付きで記録し、エリアマップに表示します（マップ → エリア）</string>
+    <!-- Subtitle of "Coverage logging" on a radio with no signal readings. May wrap. -->
+    <string name="device_set_coverage_sub_no_rssi">自局のアクセスを GPS 付きで記録し、エリアマップに表示します（マップ → エリア）。この無線機は信号強度を出さないため、受信は記録されません</string>
+    <!-- Settings switch title: DMR repeater roaming. One line. -->
+    <string name="device_set_roaming">DMR ローミング</string>
+    <!-- Subtitle of "DMR roaming". May wrap. -->
+    <string name="device_set_roaming_sub">移動中、このゾーンで同じトークグループの最寄りのレピーターに切り替えます</string>
+    <!-- Toast when DMR roaming is switched on. -->
+    <string name="device_set_roaming_on">DMR ローミングはオンです：移動中は 30 秒ごとに確認します</string>
+    <!-- Toast when DMR roaming is switched off. -->
+    <string name="device_set_roaming_off">DMR ローミングはオフです</string>
+    <!-- Settings switch title: use the car's microphone in Android Auto. One line. -->
+    <string name="device_set_car_mic">Android Auto で車のマイクを使用</string>
+    <!-- Subtitle of "Car microphone in Android Auto". May wrap. -->
+    <string name="device_set_car_mic_sub">送信時、ハンズフリー接続で車のマイクを使います</string>
+    <!-- Warning row title: Android Auto does not list SignalDeck. One line. -->
+    <string name="device_set_auto_hidden">Android Auto がこのアプリを非表示にしています</string>
+    <!-- Subtitle of the Android Auto warning row. May wrap. -->
+    <string name="device_set_auto_hidden_sub">「提供元不明のアプリ」がオフのため、車に SignalDeck が表示されません。タップで対処法を表示</string>
+    <!-- Settings switch title: coverage logging while in the car. One line. -->
+    <string name="device_set_car_cov">車でエリアを記録</string>
+    <!-- Subtitle of "Log coverage in the car". One line. -->
+    <string name="device_set_car_cov_sub">Android Auto 接続中にエリアを記録します</string>
+    <!-- Settings switch title: the steering wheel's play/pause key transmits. One line. -->
+    <string name="device_set_wheel">ハンドルの再生/一時停止で送信</string>
+    <!-- Subtitle of "Steering-wheel play/pause talks". May wrap. -->
+    <string name="device_set_wheel_sub">Android Auto で、ハンドルの再生/一時停止キーで送信を開始・停止します</string>
+    <!-- Settings row title: the steering wheel's Next key transmits. One line. -->
+    <string name="device_set_wheel_next">ハンドルの「次へ」で送信</string>
+    <!-- Subtitle of "Steering-wheel Next talks": the two modes. May wrap to three lines. -->
+    <string name="device_set_wheel_next_sub">長押し：「次へ」を押している間は送信。送信が止まらないときはもう一度押します。ダブル押し：2 回押すと送信、1 回で停止。タップで変更</string>
+    <!-- Settings row title: which microphone a wheel transmission uses. One line. -->
+    <string name="device_set_wheel_mic">ハンドル送信のマイク</string>
+    <!-- Subtitle of "Steering-wheel microphone". May wrap to three lines. -->
+    <string name="device_set_wheel_mic_sub">車（通話として）：車のマイクを使用。ハンドルの終話キーか「終了」で停止。端末：端末のマイクを使用。ハンドルで停止。タップで変更</string>
+    <!-- Settings row title: unkey a wheel transmission after silence. One line. -->
+    <string name="device_set_vox">話し終えたら停止</string>
+    <!-- Subtitle of "Stop when I stop talking". May wrap. -->
+    <string name="device_set_vox_sub">ハンドルから始めた送信は、この時間無音が続くと止まります。タップで変更</string>
+    <!-- Settings switch title: the full-screen Talk screen in Android Auto. One line. -->
+    <string name="device_set_car_screen">車で全画面の無線操作</string>
+    <!-- Subtitle of "Full-screen Radio controls in the car". May wrap. -->
+    <string name="device_set_car_screen_sub">オフ：メディアアプリとして表示（どの車でも動作）。オン：大きな送信画面を表示。変更後は車に再接続してください</string>
+    <!-- Toast when coverage logging is switched on. -->
+    <string name="device_set_coverage_on">エリア記録はオンです</string>
+    <!-- Toast when coverage logging is switched off. -->
+    <string name="device_set_coverage_off">エリア記録はオフです</string>
+    <!-- Settings row title: a short tone when the talk key is released. One line. -->
+    <string name="device_roger">ロジャービープ</string>
+    <!-- Subtitle of "Roger beep". May wrap. -->
+    <string name="device_roger_sub">送信キーを離したときに短い音を鳴らします。タップで変更と試聴</string>
+
+    <!-- ==== Device page: Longest transmission (transmit limit) ==== -->
+    <!-- SAFETY: settings row title and dialog title: the transmit time limit. One line. -->
+    <string name="device_txlimit">最長送信時間</string>
+    <!-- SAFETY: subtitle of "Longest transmission" (transmit limit and heat guard). May wrap. -->
+    <string name="device_txlimit_sub">この時間を過ぎると、SignalDeck はどの送信も終了します。端末が高温になれば、時間内でも過熱保護が長い送信を止めます。タップで変更</string>
+    <!-- SAFETY: toast when the transmit limit cannot be changed in Restricted mode. -->
+    <string name="device_txlimit_locked">制限モードでは送信時間制限を変更できません</string>
+    <!-- SAFETY: the default preset in the transmit-limit list. %1$s is the time ("2 min"). -->
+    <string name="device_txlimit_default">%1$s（初期値）</string>
+    <!-- SAFETY: last item of the transmit-limit list when a custom limit is set. %1$s is the time. -->
+    <string name="device_txlimit_custom_value">カスタム：%1$s</string>
+    <!-- SAFETY: last item of the transmit-limit list: enter your own limit. Short. -->
+    <string name="device_txlimit_custom">カスタム…</string>
+    <!-- SAFETY: title of the dialog to type a custom transmit limit. One line. -->
+    <string name="device_txlimit_custom_title">カスタム制限</string>
+    <!-- SAFETY: message of the custom-limit dialog. %1$d is the minimum in seconds. -->
+    <string name="device_txlimit_custom_msg">秒単位の整数で、%1$d 以上。</string>
+    <!-- SAFETY: toast when the custom limit is not a whole number of seconds at or above the minimum (%1$d). -->
+    <string name="device_txlimit_custom_bad">%1$d 秒以上を入力してください</string>
+    <!-- SAFETY: title of the heat warning before switching the transmit limit off. One line. -->
+    <string name="device_txlimit_none_title">時間制限なし</string>
+    <!-- SAFETY: title of the heat warning before a limit over 2 minutes. %1$s is the time ("5 min"). One line. -->
+    <string name="device_txlimit_long_title">%1$s の送信</string>
+
+    <!-- ==== Device page: SignalDeck Web card ==== -->
+    <!-- Switch title on the SignalDeck Web card: run the web server. One line. -->
+    <string name="device_web_access">Web アクセス</string>
+    <!-- Subtitle of "Web access" while it is off. One line, may wrap. -->
+    <string name="device_web_access_sub">同じ Wi-Fi のブラウザから SignalDeck を使用</string>
+    <!-- SAFETY: switch title: a browser may key the radio. One line. -->
+    <string name="device_web_allow_tx">Web からの送信を許可</string>
+    <!-- SAFETY: subtitle of "Allow transmit from the web". May wrap. -->
+    <string name="device_web_allow_tx_sub">オフ：ブラウザは受信とチャンネル変更はできますが、絶対に送信しません</string>
+    <!-- Row title on the web card: make a new PIN. Short. -->
+    <string name="device_web_new_pin">新しい PIN</string>
+    <!-- Subtitle of "New PIN". One line. -->
+    <string name="device_web_new_pin_sub">新しい PIN を作り、すべてのブラウザをログアウトします</string>
+    <!-- Web card subtitle: the server is switched on but not running. Short. -->
+    <string name="device_web_not_running">停止中</string>
+    <!-- Web card subtitle: the server is not running, with the reason (%1$s, from the server). -->
+    <string name="device_web_not_running_err">停止中：%1$s</string>
+    <!-- Web card subtitle, first line: the phone has no Wi-Fi address. One line. -->
+    <string name="device_web_no_address">Wi-Fi に接続するとアドレスが表示されます</string>
+    <!-- Web card subtitle, first line: the address(es) to open in a browser. %1$s is one or more URLs joined by device_web_url_or. -->
+    <string name="device_web_open">%1$s を開く</string>
+    <!-- Separator between two web addresses in device_web_open, with two spaces on each side. Keep the spaces. -->
+    <string name="device_web_url_or">\u0020\u0020または \u0020</string>
+    <!-- Web card subtitle, second line: the PIN to log in. Starts with a line break; two spaces after PIN. %1$s is the PIN. -->
+    <string name="device_web_pin">\nPIN \u0020%1$s</string>
+    <!-- Web card subtitle, third line: the secure address for the microphone. Starts with a line break. %1$s is the https URL, %2$s the start of the certificate fingerprint. -->
+    <string name="device_web_tls">\nパソコンのマイクで送信するには：%1$s（証明書の警告を一度だけ承認してください。フィンガープリント %2$s…）</string>
+    <!-- Web card subtitle, last line: how many browsers are connected (%1$d). Starts with a line break. -->
+    <plurals name="device_web_clients">
+        <item quantity="other">\n%1$d 台のブラウザが接続中</item>
+    </plurals>
+
+    <!-- ==== Device page: Your DMR ID card ==== -->
+    <!-- Heading of the DMR ID card and title of its dialog. Short. -->
+    <string name="device_id_title">自局の DMR ID</string>
+    <!-- Button on the DMR ID card: edit the ID. Short button. -->
+    <string name="device_id_change">変更</string>
+    <!-- Message of the DMR ID dialog. -->
+    <string name="device_id_msg">デジタルチャンネルでは、無線機はこの ID を発信者 ID として送信します。</string>
+    <!-- Toast when the DMR ID typed is not valid. -->
+    <string name="device_id_bad">1〜16776415 の ID を入力してください</string>
+    <!-- The DMR ID on its card, large monospaced. %1$s is the number. Very short. -->
+    <string name="device_id_value">ID %1$s</string>
+
+    <!-- ==== Device page: Mission Statement ==== -->
+    <!-- Button above the tools and title of its sheet. Short. -->
+    <string name="device_mission">ミッション</string>
+    <!-- The project's mission statement on its sheet, in quotation marks (use your language's quotation marks). Large text, a paragraph. -->
+    <string name="device_mission_text">「このプロジェクトは、Android のアマチュア無線機に何ができるかを示すショーケースです。革新のために作られ、先人たちの革新と発見と努力の上に築かれています。これが誰かの創作のきっかけとなり、次の一歩を探す力になることを願っています。」</string>
+    <!-- Section heading on the Mission Statement sheet (shown in capitals). Short. -->
+    <string name="device_mission_legal">概要とライセンス</string>
+
+    <!-- ==== Device page: Tools tiles and the footer ==== -->
+    <!-- Heading above the tool tiles (shown in capitals). One word. -->
+    <string name="device_tools">ツール</string>
+    <!-- Tool tile title: back up channels and contacts. Short (half-width tile). -->
+    <string name="device_tool_backup">バックアップ</string>
+    <!-- Subtitle of the Back up tile. Short (half-width tile). -->
+    <string name="device_tool_backup_sub">CSV 5 個、CPS 対応</string>
+    <!-- Tool tile title and the confirmation button: restore a backup. Short. -->
+    <string name="device_restore">復元</string>
+    <!-- Subtitle of the Restore tile. Short (half-width tile). -->
+    <string name="device_tool_restore_sub">バックアップフォルダから</string>
+    <!-- Tool tile title: import the channels again from the stock app. Short (half-width tile). -->
+    <string name="device_tool_reimport">再インポート</string>
+    <!-- Subtitle of the Re-import tile. Short (half-width tile). -->
+    <string name="device_tool_reimport_sub">純正アプリのチャンネル</string>
+    <!-- Tool tile title and dialog title: the radioid.net list of DMR ID names. Short (half-width tile). -->
+    <string name="device_radioid">RadioID リスト</string>
+    <!-- Tool tile title and title of its menu and dialogs: the device report. Short (half-width tile). -->
+    <string name="device_report">デバイスレポート</string>
+    <!-- Subtitle of the Device report tile. Short (half-width tile). -->
+    <string name="device_tool_report_sub">サポート用レポートと確認</string>
+    <!-- Tool tile title and title of its sheet: notes about this phone's radio. Short (half-width tile). -->
+    <string name="device_about_radio">この無線機について</string>
+    <!-- Subtitle of the About this radio tile. Short (half-width tile). -->
+    <string name="device_tool_about_sub">仕様と既知の癖</string>
+    <!-- Tool tile title: app updates. One word (half-width tile). -->
+    <string name="device_tool_updates">アップデート</string>
+    <!-- Subtitle of the Updates tile. Short (half-width tile). -->
+    <string name="device_tool_updates_sub">正式版とベータ版</string>
+    <!-- Tool tile title: the in-app guide. Short (half-width tile). -->
+    <string name="device_tool_help">ヘルプと使い方</string>
+    <!-- Subtitle of the Help tile. Short (half-width tile). -->
+    <string name="device_tool_help_sub">全画面を解説</string>
+    <!-- Tool tile title: the live protocol log. One word (half-width tile). -->
+    <string name="device_tool_diag">診断</string>
+    <!-- Subtitle of the Diagnostics tile. Short (half-width tile). -->
+    <string name="device_tool_diag_sub">ライブのプロトコルログ</string>
+    <!-- Tool tile title and title of its sheet: the home-screen widget. Short (half-width tile). -->
+    <string name="device_widget">ホームウィジェット</string>
+    <!-- Subtitle of the Home widget tile. Short (half-width tile). -->
+    <string name="device_tool_widget_sub">チャンネル、スキャン、送信</string>
+    <!-- Tool tile title: send an emergency message with your position. One word (half-width tile). -->
+    <string name="device_tool_sos">緊急</string>
+    <!-- Subtitle of the Emergency tile. Short (half-width tile). -->
+    <string name="device_tool_sos_sub">位置を送信</string>
+    <!-- Subtitle of the Contribute tile. Short (half-width tile). -->
+    <string name="device_tool_contribute_sub">寄付、テスト、端末追加</string>
+    <!-- Small print at the bottom of the Device page on a DMR phone. The CSV file names are file names (keep them). %1$s is the app version. -->
+    <string name="device_foot_dmr">バックアップは、DMRModHooks モジュールと OpenGD77 CPS のフォークが使う 5 個の CSV ファイル（Contacts、TG_Lists、Channels、Zones、DTMF）で、Download/DMR/DMR_Backups に保存されます。\n\nSignalDeck %1$s。DMRModHooks の単体版です。</string>
+    <!-- Small print at the bottom of the Device page on an analog-only phone. %1$s is the app version. -->
+    <string name="device_foot_analog">バックアップは CSV ファイル（Channels、Zones、DTMF など。OpenGD77 CPS のフォークが読める形式）で、Download/DMR/DMR_Backups に保存されます。\n\nSignalDeck %1$s。DMRModHooks の単体版です。</string>
+
+    <!-- ==== About this radio sheet (the notes come from assets/radios/radios.json and are data) ==== -->
+    <!-- Hint on the About this radio sheet when there are no notes for the phone. -->
+    <string name="device_notes_none">この無線機についての情報はありません。</string>
+    <!-- Section heading on the About this radio sheet (capitals). Short. -->
+    <string name="device_notes_radio">無線機</string>
+    <!-- Label in the spec table: the radio module. Short (38 percent of the width). -->
+    <string name="device_notes_module">モジュール</string>
+    <!-- Label in the spec table: the modes (FM, DMR…). Short. -->
+    <string name="device_notes_modes">モード</string>
+    <!-- Label in the spec table: the frequency bands. Short. -->
+    <string name="device_notes_bands">バンド</string>
+    <!-- Label in the spec table: transmit power. Short. -->
+    <string name="device_notes_power">出力</string>
+    <!-- Value in the spec table when the transmit power has not been measured. Short. -->
+    <string name="device_notes_power_unknown">未測定</string>
+    <!-- Label in the spec table: how the phone talks to the module (serial port…). Short. -->
+    <string name="device_notes_link">接続</string>
+    <!-- Label in the spec table: the firmware the phone ships with. Short. -->
+    <string name="device_notes_fw_stock">純正ファームウェア</string>
+    <!-- Label in the spec table: modified firmware available. Short. -->
+    <string name="device_notes_fw_mod">改造ファームウェア</string>
+    <!-- Section heading on the About this radio sheet (capitals): the feature list. Short. -->
+    <string name="device_notes_works">動作状況</string>
+    <!-- Feature state in the What works list: works. One word. -->
+    <string name="device_notes_yes">動作</string>
+    <!-- Feature state in the What works list: partly works. One word. -->
+    <string name="device_notes_partly">一部</string>
+    <!-- Feature state in the What works list: does not work. One word. -->
+    <string name="device_notes_no">不可</string>
+    <!-- Feature state in the What works list: not tested. Short. -->
+    <string name="device_notes_untested">未テスト</string>
+    <!-- Section heading on the About this radio sheet (capitals). Short. -->
+    <string name="device_notes_quirks">既知の癖</string>
+    <!-- Section heading on the About this radio sheet (capitals): bench measurements. One line. -->
+    <string name="device_notes_measured">テスト機での測定値</string>
+    <!-- Hint under "Measured on our test unit". -->
+    <string name="device_notes_measured_hint">テスト機 1 台での測定値です。お使いの無線機とは異なる場合があります。</string>
+    <!-- Last hint on the About this radio sheet. %1$s is the notes entry id. -->
+    <string name="device_notes_source">この情報は SignalDeck に組み込まれており（%1$s）、プロジェクトのリポジトリの docs/radios にもあります。</string>
+
+    <!-- ==== Contribute sheet ==== -->
+    <!-- First paragraph of the Contribute sheet. -->
+    <string name="device_contrib_intro">SignalDeck は無料のオープンソースプロジェクト（GPL-3.0）です。自由に使い、自由に調べ、自由に改良でき、それはこれからも変わりません。気に入っていただけたら、プロジェクトを育てる方法が 3 つあります。</string>
+    <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. Short. -->
+    <string name="device_contrib_donate">1 \u0020寄付</string>
+    <!-- Paragraph under "1 Donate". -->
+    <string name="device_contrib_donate_text">SignalDeck が役に立っているなら、ぜひ寄付をご検討ください。開発と保守には費用がかかります。寄付は開発・対応用の端末の購入にあてられ、新機能の開発を支えます。金額は問いません。ありがとうございます。</string>
+    <!-- Button: open the Ko-fi donation page. Ko-fi is a site name. One line. -->
+    <string name="device_contrib_kofi">Ko-fi で寄付</string>
+    <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. One line. -->
+    <string name="device_contrib_develop">2 \u0020開発に参加</string>
+    <!-- Paragraph under "2 Take part in the development". -->
+    <string name="device_contrib_develop_text">不具合を探してテストし、機能のアイデアを出し、ほかの SignalDeck ユーザーと交流してください。不具合の報告や機能の提案は GitHub で、コミュニティへの参加はウェブサイトでできます。</string>
+    <!-- Button: open the GitHub issues page. One line. -->
+    <string name="device_contrib_issue">不具合やアイデアを報告</string>
+    <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. One line. -->
+    <string name="device_contrib_phone">3 \u0020自分の端末を対応させる</string>
+    <!-- Paragraph under "3 Make your own phone compatible". "Help support this phone" and "Device report" are button names. -->
+    <string name="device_contrib_phone_text">プロジェクトをフォークして、自分の端末で動くようにしてください。完全に対応できたと思ったら知らせてください。内容を確認してから取り込み、その端末を持つ全員が使えるようになります。「この端末の対応に協力する」（「デバイスレポート」の中）で、新しい端末に必要な情報を集められます。</string>
+    <!-- Button: open the SignalDeck repository on GitHub. One line. -->
+    <string name="device_contrib_repo">GitHub の SignalDeck</string>
+    <!-- Toast when no browser can open a link. %1$s is the web address. -->
+    <string name="device_no_browser">%1$s を開くブラウザがありません</string>
+
+    <!-- ==== Home widget sheet ==== -->
+    <!-- Hint on the Home widget sheet. "Longest transmission" is the settings row name. -->
+    <string name="device_widget_hint">チャンネル、無線機の状態、「前へ / スキャン / 次へ / 送信」ボタンをホーム画面に表示します。「送信」はタップで開始、もう一度タップで停止し、送信時間制限（「最長送信時間」。変更しなければ 2 分）に達すると自動で終了します。通知にも同じチャンネルとスキャンのボタンがあります。</string>
+    <!-- Hint on the Home widget sheet when the preview cannot be drawn. %1$s is the error. -->
+    <string name="device_widget_no_preview">プレビューを表示できません：%1$s</string>
+    <!-- Button on the Home widget sheet: ask the launcher to add the widget. One line. -->
+    <string name="device_widget_add">ホーム画面に追加</string>
+    <!-- Toast when the launcher cannot add the widget itself. -->
+    <string name="device_widget_manual">ホーム画面を長押しし、「ウィジェット」を選んで SignalDeck をドラッグしてください</string>
+
+    <!-- ==== Back up, Restore, Re-import, RadioID list ==== -->
+    <!-- Toast after a backup. %1$s is the new folder's name. -->
+    <string name="device_backup_done">Download/DMR/DMR_Backups/%1$s にバックアップしました</string>
+    <!-- Toast when the backup fails. %1$s is the error. -->
+    <string name="device_backup_failed">バックアップに失敗しました：%1$s</string>
+    <!-- Last item of the restore list: pick a folder. One line. -->
+    <string name="device_restore_browse">バックアップフォルダを選択…</string>
+    <!-- Title of the list of backups to restore. One line. -->
+    <string name="device_restore_which">どのバックアップを復元しますか？</string>
+    <!-- Toast when a restore fails. %1$s is the error. -->
+    <string name="device_restore_failed">復元に失敗しました：%1$s</string>
+    <!-- Title of the restore confirmation. %1$s is the backup folder name. One line. -->
+    <string name="device_restore_confirm">%1$s を復元しますか？</string>
+    <!-- Message of the restore confirmation. -->
+    <string name="device_restore_msg">このアプリのチャンネル、連絡先、ゾーンをすべてバックアップの内容に置き換えます（OpenGD77 CPS のエクスポートも使えます）。履歴、メッセージ、設定はそのまま残ります。</string>
+    <!-- Title of the re-import confirmation on a phone whose stock app has one channel list. One line. -->
+    <string name="device_reimport_title">純正アプリのチャンネルを再インポートしますか？</string>
+    <!-- Message of the re-import confirmation (one channel list). -->
+    <string name="device_reimport_msg">SignalDeck のチャンネルをすべて、端末の純正無線アプリに保存されているチャンネルに置き換えます。</string>
+    <!-- Title of the list of the stock app's areas to import. One line. -->
+    <string name="device_reimport_which">純正アプリのどのエリアをインポートしますか？</string>
+    <!-- Title of the re-import confirmation. %1$s is the stock area's name. One line. -->
+    <string name="device_reimport_confirm">%1$s を再インポートしますか？</string>
+    <!-- Message of the re-import confirmation when only channels are imported. -->
+    <string name="device_reimport_msg_channels">SignalDeck のチャンネルをすべて、純正アプリのそのエリアのチャンネルに置き換えます。</string>
+    <!-- Message of the re-import confirmation when channels, contacts, history and messages are imported. -->
+    <string name="device_reimport_msg_all">このアプリのチャンネル、連絡先、履歴、メッセージをすべて、純正アプリのそのエリアの現在のデータに置き換えます。</string>
+    <!-- Message of the RadioID list dialog. %1$s is the list's status (how many IDs, when downloaded). -->
+    <string name="device_radioid_msg">受信した DMR ID の名前です。radioid.net からダウンロードして端末に保存します。\n\n現在：%1$s</string>
+    <!-- Button in the RadioID list dialog. Short. -->
+    <string name="device_radioid_download">ダウンロード/更新</string>
+    <!-- Progress message while the RadioID list downloads. -->
+    <string name="device_radioid_connecting">radioid.net に接続中…</string>
+    <!-- Toast after the RadioID list is loaded. %1$s is the number of IDs, with thousands separators. -->
+    <plurals name="device_radioid_loaded">
+        <item quantity="other">%1$s 件の DMR ID を読み込みました</item>
+    </plurals>
+    <!-- Toast when the RadioID download fails. %1$s is the error. -->
+    <string name="device_radioid_failed">ダウンロードに失敗しました：%1$s</string>
+
+    <!-- ==== Device report menu and Help support this phone ==== -->
+    <!-- Item in the Device report menu: the guided support steps. One line. -->
+    <string name="device_report_support">この端末の対応に協力する（手順付き）</string>
+    <!-- Item in the Device report menu. One line. -->
+    <string name="device_report_generate">デバイスレポートを作成</string>
+    <!-- Item in the Device report menu. One line. -->
+    <string name="device_report_share_last">前回のレポートを共有</string>
+    <!-- Item in the Device report menu: record what the PTT key sends for 10 seconds. One line. -->
+    <string name="device_report_capture">PTT キーを記録（10 秒）</string>
+    <!-- Item in the Device report menu: the root radio probe. One line. -->
+    <string name="device_report_probe">無線プローブ（root）</string>
+    <!-- Item in the Device report menu. One line, may wrap. -->
+    <string name="device_report_issue">情報を記入済みの GitHub Issue を開く</string>
+    <!-- Item in the Device report menu: explains the report. One line. -->
+    <string name="device_report_what">内容について</string>
+    <!-- Toast when "Open a GitHub issue" finds no browser to open the page in. The report itself stays English. One line. -->
+    <string name="device_report_no_browser">ブラウザがありません</string>
+    <!-- Title of the Android share chooser for the device report zip (the report and its message stay English). One line. -->
+    <string name="device_report_share_title">デバイスレポートを共有</string>
+    <!-- Item in the Device report menu: the audio check. One line, may wrap. -->
+    <string name="device_report_audio">無線音声チェック（無音、DMR またはアナログ）</string>
+    <!-- Item in the Device report menu: the test with a second radio. One line. -->
+    <string name="device_report_second">2 台目の無線機でテスト（手順付き）</string>
+    <!-- Item in the Device report menu: list the phone's radio firmware files. One line. -->
+    <string name="device_report_fwfiles">無線ファームウェアのファイル（root、選択式）</string>
+    <!-- SAFETY: item in the Device report menu: the transmit test session, which keys the radio. One line. -->
+    <string name="device_report_txtest">送信テストのセッション（送信します）</string>
+    <!-- Message explaining what the device report gathers. A paragraph. -->
+    <string name="device_report_what_msg">プロファイルのない端末のため、またはプロファイルのデバッグのために、プロファイルに必要な情報（シリアルポート、無線モジュールのノード、純正のトランシーバーアプリとその APK、ベンダーライブラリ、フレームワークの jar、サービス。root があれば SELinux ラベルと PTT キーのブロードキャストも）を集め、Download/DMR/DeviceReport に保存し、zip を GitHub Issue に共有できるようにします。端末の内容は一切変更しません。</string>
+    <!-- Row 1 of the Help support this phone list: title line, then a line break and the details. Two spaces after the number. May be prefixed with a tick. -->
+    <string name="device_support_step1">1 \u0020すべてチェック\n約 2 分、受信のみ。Magisk の root が必要</string>
+    <!-- Row 2 of the Help support this phone list: title line, line break, details. Two spaces after the number. May be prefixed with a tick or a lock. -->
+    <string name="device_support_step2">2 \u00202 台目の無線機でテスト（推奨）\nほかの FM 無線機なら何でも可。指示に合わせて送信すると、SignalDeck が受信、スケルチ、MON、トーンスケルチを自動で測定します</string>
+    <!-- Row 2b of the Help support this phone list: title line, line break, details. May be prefixed with a tick or a lock. -->
+    <string name="device_support_step2b">2b 受信音チェック（ほかの無線機なし）\n無線モジュールを引き継ぎ、局が聞こえるチャンネルを選んで、ノイズ（10 秒）と局の音声（50 秒）を記録します</string>
+    <!-- Row 3 of the Help support this phone list: title line, line break, details. Two spaces after the number. May be prefixed with a lock. -->
+    <string name="device_support_step3">3 \u0020結果を送る\nレポートの zip（冒頭に概要）を共有するか、GitHub Issue を開きます</string>
+    <!-- Last row of the Help support this phone list: explains it. Short. -->
+    <string name="device_support_what">これは何？</string>
+    <!-- Title of the Help support this phone list. %1$s is the phone model. One line. -->
+    <string name="device_support_title">この端末の対応に協力する — %1$s</string>
+    <!-- Toast when a locked step is tapped before the checks have run. -->
+    <string name="device_support_locked">先にすべてチェックを実行してください。</string>
+    <!-- Toast when Send the results is tapped before any test has run. -->
+    <string name="device_support_locked_send">先にすべてチェックを実行し、次にテストを行ってください。</string>
+    <!-- Message explaining the Help support this phone steps. "Device → Updates" is a menu path. -->
+    <string name="device_support_what_msg">各ステップで、この端末の無線部の動き方がわかります。各ステップの後に結果を送ってください（ステップ 3）。その結果からこの端末のプロファイルを作成・修正し、新しいバージョンを「デバイス → アップデート」で受け取れます。どのステップも受信するだけで、送信は一切しません。</string>
+
+    <!-- ==== Exit SignalDeck sheet ==== -->
+    <!-- SAFETY: first hint on the Exit sheet: closing the app keeps the radio running; Exit stops it properly. A paragraph. -->
+    <string name="device_exit_hint">アプリを閉じたりスワイプして消したりしても、無線機はバックグラウンドで動作し続けます（画面オフでも受信を続けるための仕組みです）。「終了」は正しく停止します。進行中の送信と、動作中のすべて（スキャン、APRS、FT8、M17、衛星追尾、パロット）を終了し、音声を止め、無線機のシリアルポートを閉じます。</string>
+    <!-- Button on the Exit sheet: switch the radio module off and exit. One line, full width. -->
+    <string name="device_exit_off">無線モジュールをオフにして終了</string>
+    <!-- SAFETY: hint under "Turn the radio off and exit". -->
+    <string name="device_exit_off_hint">無線モジュールの電源を切ります。受信は止まり、バッテリーも使いません。SignalDeck を開くと再びオンになります（数秒かかります）。</string>
+    <!-- Button on the Exit sheet: give the radio back to the stock app and exit. One line, full width. -->
+    <string name="device_exit_handback">純正アプリに戻して終了</string>
+    <!-- SAFETY: hand-back hint on the Exit sheet. -->
+    <string name="device_exit_handback_hint">端末のトランシーバーアプリを再び有効にし、無線モジュールをそのアプリに任せます。予約操作は、設定した時刻に SignalDeck を起動します。</string>
+    <!-- SAFETY: hand-back hint on the Exit sheet when SignalDeck owns the radio at boot. "Keep access after reboot" is a button name. -->
+    <string name="device_exit_handback_hint_boot">端末のトランシーバーアプリを再び有効にし、無線モジュールをそのアプリに任せます。ただし次の再起動で、SignalDeck が再び無線モジュールを引き継ぎます（「再起動後もアクセスを維持」）。予約操作は、設定した時刻に SignalDeck を起動します。</string>
+
+    <!-- ==== Phone profile dialog and advisories (advisory titles and reasons are data from the signed profile list) ==== -->
+    <!-- Phone profile dialog: a paragraph (starts with two line breaks). %1$s is the date and time, or device_profsheet_never. -->
+    <string name="device_profsheet_last_checked">\n\nプロファイルリストの最終確認：%1$s</string>
+    <!-- In "Profile list last checked": the list was never checked. One word. -->
+    <string name="device_profsheet_never">未確認</string>
+    <!-- Phone profile dialog: a line (starts with a line break) when updated profiles are switched off. -->
+    <string name="device_profsheet_builtin">\n更新プロファイルはオフです：内蔵プロファイルを使用しています。</string>
+    <!-- SAFETY: one advisory in the Phone profile dialog (starts with two line breaks). %1$s is the advisory title, %2$s what it restricts, %3$s why (all from the signed list). -->
+    <string name="device_advisory_line">\n\n⚠ %1$s\n%2$s。\n%3$s</string>
+    <!-- SAFETY: one advisory the owner overrode, in the Phone profile dialog (starts with two line breaks). %1$s title, %2$s what it restricts, %3$s why. -->
+    <string name="device_advisory_line_kept">\n\n⚠ %1$s — 使用を続けることを選択済み\n%2$s。\n%3$s</string>
+    <!-- SAFETY: after an advisory with an end date (starts with a line break). %1$s is the date as written in the list. -->
+    <string name="device_advisory_until">\n（更新されなければ %1$s まで）</string>
+    <!-- Last paragraph of the Phone profile dialog (starts with two line breaks). -->
+    <string name="device_profsheet_note">\n\nテスト済みのプロファイルは SignalDeck の各リリースに含まれており、インターネットなしで動作します。新しい改訂版や不具合に関する注意情報は、プロジェクトの署名付きプロファイルリストから届くことがあります。送信以外の変更は、次に SignalDeck を起動したときに反映されます。</string>
+    <!-- Title of the Phone profile dialog. One line. -->
+    <string name="device_profsheet_title">端末プロファイル</string>
+    <!-- Button in the Phone profile dialog: fetch the profile list now. Short. -->
+    <string name="device_profsheet_check">今すぐ確認</string>
+    <!-- Button in the Phone profile dialog: use profiles from the signed list again. Short. -->
+    <string name="device_profsheet_allow">更新プロファイルを許可</string>
+    <!-- Button in the Phone profile dialog: ignore the signed list. Short. -->
+    <string name="device_profsheet_use_builtin">内蔵プロファイルを使用</string>
+    <!-- Button in the Phone profile dialog: list the advisories. One word. -->
+    <string name="device_advisory_list">注意情報</string>
+    <!-- SAFETY: a row in the advisory list: the owner overrode it. %1$s is the advisory title. -->
+    <string name="device_advisory_row_overridden">自分で解除 · %1$s</string>
+    <!-- SAFETY: a row in the advisory list: the advisory applies. %1$s is the advisory title. -->
+    <string name="device_advisory_row_active">適用中 · %1$s</string>
+    <!-- Title of the advisory list. One line. -->
+    <string name="device_advisory_list_title">この端末の注意情報</string>
+    <!-- SAFETY: one advisory's text. %1$s what it restricts, %2$s why, %3$s the date it was issued (all from the signed list). -->
+    <string name="device_advisory_body">%1$s。\n\n理由：%2$s\n\n発行：%3$s。</string>
+    <!-- SAFETY: one advisory's text with an end date. %1$s what it restricts, %2$s why, %3$s issued, %4$s the end date. -->
+    <string name="device_advisory_body_lapses">%1$s。\n\n理由：%2$s\n\n発行：%3$s。更新されなければ %4$s に失効します。</string>
+    <!-- SAFETY: an overridden advisory's text. %1$s is device_advisory_body. -->
+    <string name="device_advisory_body_kept">%1$s\n\nそれでも使用を続けることを選択しました。</string>
+    <!-- SAFETY: button: apply an overridden advisory again. One line. -->
+    <string name="device_advisory_reapply">注意情報を再び適用</string>
+    <!-- SAFETY: button: keep the advisory's restriction. Short. -->
+    <string name="device_advisory_keep">制限を維持</string>
+    <!-- SAFETY: button: start overriding the advisory (two confirmations follow). Short. -->
+    <string name="device_advisory_override">このまま使用…</string>
+    <!-- SAFETY: title of the first override confirmation. One line. -->
+    <string name="device_advisory_confirm1">このまま使用しますか？（1/2）</string>
+    <!-- SAFETY: first override confirmation. %1$s is what the advisory restricts (lower case), %2$s why. -->
+    <string name="device_advisory_confirm1_msg">この注意情報の内容：%1$s。理由：\n\n%2$s\n\n続行すると、SignalDeck はこの端末で、注意情報が存在しないものとして動作します。</string>
+    <!-- SAFETY: title of the second override confirmation. One line. -->
+    <string name="device_advisory_confirm2">自分の判断（2/2）</string>
+    <!-- SAFETY: second override confirmation: the owner takes responsibility. -->
+    <string name="device_advisory_confirm2_msg">これはご自身の端末であり、ご自身の判断です。注意情報があるにもかかわらず使用する責任は、ご自身が負います。この選択はこの注意情報にのみ適用され、デバイス画面からいつでも再び適用できます。</string>
+    <!-- SAFETY: button that overrides the advisory. One line. -->
+    <string name="device_advisory_confirm2_ok">理解したうえで使用する</string>
+    <!-- SAFETY: toast after an advisory is overridden. -->
+    <string name="device_advisory_overridden">解除しました：送信には今すぐ、それ以外は次回の起動時に反映されます</string>
+
+    <!-- ==== Learn a PTT key sheet ==== -->
+    <!-- Subtitle of "Custom PTT key" when a key is learned. %1$s is the key's name. -->
+    <string name="device_learn_learned">%1$s · タップで別のキーを登録</string>
+    <!-- Title of the sheet that learns a custom PTT key. One line. -->
+    <string name="device_learn_title">PTT キーを登録</string>
+    <!-- Hint on the Learn a PTT key sheet. Two paragraphs. -->
+    <string name="device_learn_hint">端末本来の PTT キー以外のボタン用です：ほかの側面キー、有線ヘッドセットのボタン、Bluetooth の PTT ボタン、音量キーなど。「開始」をタップし、ボタンを約 2 秒押し続けてから離してください。登録中は何も送信しません。\n\n続いて SignalDeck がボタンを確認します：押し続けている状態を報告するか、電源・ホーム・戻るキー、タッチスクリーン、指紋センサーではないか、押したときにほかのアプリが開いたり端末で別の動作が起きたりしないかを調べます。</string>
+    <!-- After the Learn a PTT key hint: the key learned now (starts with two line breaks). %1$s is the key's name. -->
+    <string name="device_learn_now">\n\n現在：%1$s。</string>
+    <!-- Button on the Learn a PTT key sheet: keep the learned key. One line. -->
+    <string name="device_learn_use">このキーを使用</string>
+    <!-- Button on the Learn a PTT key sheet. One line. -->
+    <string name="device_learn_forget">登録したキーを削除</string>
+    <!-- Toast after a key is learned. %1$s is the key's name. -->
+    <string name="device_learn_saved">%1$s で送信するようになりました</string>
+    <!-- Toast after a key is learned on a phone with an untested profile. %1$s is the key's name. -->
+    <string name="device_learn_saved_untested">%1$s で送信するようになりました（この端末のプロファイルがテスト済みになってから有効）</string>
+    <!-- Progress message when a check or test starts. Short. -->
+    <string name="device_starting">開始中…</string>
+    <!-- Button on the Learn a PTT key sheet after a try. Short. -->
+    <string name="device_learn_again">再試行</string>
+    <!-- Result on the Learn a PTT key sheet: the key cannot be used. %1$s is the key's name. One line. -->
+    <string name="device_learn_blocked">%1$s：使用できません</string>
+    <!-- Result on the Learn a PTT key sheet: no conflicts. %1$s is the key's name. One line. -->
+    <string name="device_learn_clean">%1$s：問題は見つかりません</string>
+    <!-- Result on the Learn a PTT key sheet: usable, the notes follow. %1$s is the key's name. One line. -->
+    <string name="device_learn_note">%1$s：使用可能、ただし注意あり</string>
+    <!-- Button on the Learn a PTT key sheet when the key has warnings. One line. -->
+    <string name="device_learn_anyway">このまま使用</string>
+
+    <!-- ==== Radio audio check (the report itself stays English) ==== -->
+    <!-- Title of the radio audio check dialogs. One line. -->
+    <string name="device_audio">無線音声チェック</string>
+    <!-- Instructions before the radio audio check. Several paragraphs; "Start" is the button name, MON the monitor key. -->
+    <string name="device_audio_intro">DMR またはアナログで「無線機から音が出ない」場合のチェックです。SignalDeck はまず端末のシステムにベンダーの音声サービスがあるかを確認し（カスタム ROM にはないことがあります）、次に現在のチャンネルを受信して、無線機の報告内容、端末の無線音声サービスから音声が届いたかとその音量、端末での再生方法を記録します。\n\nアナログチャンネル（NOAA 気象放送のチャンネルなら常に局が出ているので簡単です）：最初の 10 秒はスケルチを開いたまま（MON）にするので、誰も送信していなくても受信ノイズが届くはずです。その後 1 分間は通常のスケルチで受信します。\nDMR チャンネル：1 分間。その間に誰かにトークグループで話してもらってください。\n\n1. 無線画面でチャンネルを選びます。\n2. 「開始」をタップします。\n\n何も送信しません。音声は測定するだけで保存せず、レポートの発信者 ID は短縮されます。最後にレポートを共有できます。</string>
+    <!-- Added to the audio check instructions when SignalDeck does not own the radio (starts with two line breaks). "Take over" is the button name. -->
+    <string name="device_audio_need_radio">\n\nSignalDeck はまだ無線モジュールを使っていません：先に「引き継ぐ」をタップしてください（システムのチェックは実行されます）。</string>
+    <!-- Result of the audio check. %1$s is the verdict (English, from the report). -->
+    <string name="device_audio_result">%1$s\n\n詳細はデバイスレポート（Download/DMR/DeviceReport）にあります。</string>
+    <!-- Button after a check: share the device report. Short. -->
+    <string name="device_share_report">レポートを共有</string>
+
+    <!-- ==== Second radio test (the report itself stays English) ==== -->
+    <!-- Toast when a test needs SignalDeck to own the radio. -->
+    <string name="device_take_over_first">先に無線モジュールを引き継いでください（デバイス画面）。</string>
+    <!-- Title of the second radio test dialogs. One line. -->
+    <string name="device_second">2 台目の無線機でテスト</string>
+    <!-- SAFETY: instructions for the second radio test, with the licence note. %1$s is the phone's tuning range ("400–480 MHz"). Keep the frequencies and service names as they are. -->
+    <string name="device_second_intro">ほかの FM 無線機（安いハンディ機で十分です）と約 5 分が必要です。\n\n1. 無線画面で、誰も使っていないアナログ（FM）チャンネルを選びます。周波数は、もう一方の無線機が送信できるものにしてください。VHF でも UHF でもかまいません（この端末で合わせられる範囲は %1$s）。免許不要の例：PMR446 チャンネル 1、446.00625 MHz（欧州）、FRS チャンネル 1、462.5625 MHz（米国）。アマチュア無線の免許があれば、アマチュアのシンプレックス周波数も使えます。\n2. もう一方の無線機を同じ周波数、トーンなし、ロー出力にし、この端末から数 m 離して置きます。\n3. 「開始」をタップし、各ステップの指示に従ってください。測定は SignalDeck がすべて行います。\n\nこの端末は受信するだけで、この端末からは何も送信しません。トーンスケルチのテストではチャンネルの一時コピーを使うので、チャンネルの設定は変わりません。</string>
+    <!-- Button in a second radio test step: the owner is ready. Short. -->
+    <string name="device_second_ready">準備完了</string>
+    <!-- Button in a second radio test step. Short. -->
+    <string name="device_second_cancel">テストを中止</string>
+    <!-- Result of the second radio test. %1$s is the step verdicts (English, from the report). -->
+    <string name="device_second_result">%1$s\n\n結果の詳細はデバイスレポートにあります。「共有」で送信できます（冒頭に概要付き）。</string>
+
+    <!-- ==== Listen check (the report itself stays English; the answers go into it in English) ==== -->
+    <!-- Added to the listen check instructions when SignalDeck does not own the radio (starts with two line breaks). -->
+    <string name="device_listen_need_radio">\n\nSignalDeck はまだ無線モジュールを使っていません：先にデバイス画面で「引き継ぐ」をタップしてください。</string>
+    <!-- Title of the listen check instructions. One line. -->
+    <string name="device_listen">受信音チェック</string>
+    <!-- Instructions for the listen check. Numbered steps; "Start" is the button name. -->
+    <string name="device_listen_intro">1. 無線画面で、今まさに局が聞こえるチャンネルを選びます（混んでいるレピーター、気象チャンネル、別の無線機で呼んでくれる友人など）。\n2. ここに戻り、「開始」をタップします。\n3. パート 1、10 秒：SignalDeck がスケルチを開いたまま（MON）にするので、スピーカーから何か聞こえるはずです。ノイズか、局が話していればその声です。何が聞こえたかを尋ねます（DMR チャンネルではノイズがないため省略します）。\n4. パート 2、通常のスケルチで 50 秒：局が話すとスケルチが自動で開きます。SignalDeck が信号強度と音声を記録します。その後、局がはっきり聞こえたかを答えてください。\n\n先にメディアの音量を上げてください。</string>
+    <!-- Title of the listen check, part 1. One line. -->
+    <string name="device_listen_part1">受信音チェック · パート 1/2：ノイズ</string>
+    <!-- Progress of the listen check, part 1. %1$s is the live status (English, from the check). -->
+    <string name="device_listen_part1_msg">スピーカーを聞いてください：スケルチを開いたままなので、何か聞こえるはずです。ノイズ（サーッという音）か、局が送信していればその声です。\n\n%1$s</string>
+    <!-- Answer to "Did you hear anything from the speaker?". One line. -->
+    <string name="device_listen_ans_static">はい：ノイズ（サーッという音）</string>
+    <!-- Answer to "Did you hear anything from the speaker?". One line. -->
+    <string name="device_listen_ans_talking">はい：局の声</string>
+    <!-- Answer to both listen check questions: nothing was heard. One line. -->
+    <string name="device_listen_ans_none">まったく音がしない</string>
+    <!-- Answer to "Did you hear anything from the speaker?". One line. -->
+    <string name="device_listen_ans_unsure">わからない</string>
+    <!-- Question after part 1 of the listen check. One line, may wrap. -->
+    <string name="device_listen_q1">スピーカーから何か聞こえましたか？</string>
+    <!-- Title of the listen check, part 2 instructions. One line. -->
+    <string name="device_listen_part2">受信音チェック · パート 2/2：局</string>
+    <!-- Instructions for part 2 of the listen check. -->
+    <string name="device_listen_part2_msg">次に、このチャンネルで通常のスケルチのまま 50 秒受信します。局が送信するとスケルチが自動で開きます。よく聞いて、はっきり聞こえたかを答えてください。</string>
+    <!-- Button that starts part 2 of the listen check. Short. -->
+    <string name="device_listen_part2_start">パート 2 開始</string>
+    <!-- Title of the listen check progress, part 2. One line. -->
+    <string name="device_listen_part2_progress">受信音チェック · パート 2/2</string>
+    <!-- Answer to "Did you hear the station?". One line. -->
+    <string name="device_listen_ans_clear">はい、はっきり</string>
+    <!-- Answer to "Did you hear the station?". One line, may wrap. -->
+    <string name="device_listen_ans_distorted">はい、ただし歪み・途切れ・音が小さい</string>
+    <!-- Answer to "Did you hear the station?". One line. -->
+    <string name="device_listen_ans_nobody">誰も話していなかった</string>
+    <!-- Question after part 2 of the listen check. One line. -->
+    <string name="device_listen_q2">局の声は聞こえましたか？</string>
+    <!-- Title after the listen check is saved. One line. -->
+    <string name="device_listen_saved">受信音チェックを保存しました</string>
+    <!-- After the listen check. %1$s is the check's result (English, from the report), %2$s the owner's answer. "Help support this phone → 3 Send the results" names the menu and its step. -->
+    <string name="device_listen_saved_msg">%1$s\n回答：%2$s\n\n次へ：「この端末の対応に協力する」→「3 結果を送る」。</string>
+    <!-- Button after the listen check: share the report now. Short. -->
+    <string name="device_listen_send">今すぐ送る</string>
+    <!-- Title after the device report is generated. One line. -->
+    <string name="device_report_ready">レポート完成</string>
+    <!-- Message after the device report is generated. "Capture the PTT key" and "Share last report" are menu items. -->
+    <string name="device_report_ready_msg">Download/DMR/DeviceReport に保存しました。端末に側面の PTT キーがあれば「PTT キーを記録」を実行し、root があれば無線プローブも実行してから、「前回のレポートを共有」を使ってください。共有時に内容の説明が表示されます。</string>
+    <!-- Toast when the device report fails. %1$s is the error. -->
+    <string name="device_report_failed">レポートに失敗しました：%1$s</string>
+
+    <!-- ==== Intercom layout row ==== -->
+    <!-- Intercom layout choice (and the row's value): automatic, which is compact on this phone. %1$d is the screen height in dp. One line. -->
+    <string name="device_layout_auto_compact">自動（この端末ではコンパクト、高さ %1$d dp）</string>
+    <!-- Intercom layout choice (and the row's value): automatic, which is regular on this phone. %1$d is the screen height in dp. One line. -->
+    <string name="device_layout_auto_regular">自動（この端末では標準、高さ %1$d dp）</string>
+    <!-- Intercom layout choice: the regular layout. One word. -->
+    <string name="device_layout_regular">標準</string>
+    <!-- Intercom layout choice: the compact layout for short screens. One word. -->
+    <string name="device_layout_compact">コンパクト</string>
+    <!-- Settings row title and dialog title: the intercom page layout. One line. -->
+    <string name="device_layout">無線画面のレイアウト</string>
+
+    <!-- ==== Run all checks (the first-run checks) ==== -->
+    <!-- First paragraph of the checks dialog at first launch, on a phone with an untested profile. Ends with two line breaks. -->
+    <string name="device_checks_intro_known">SignalDeck にはこの端末用のプロファイルがありますが、この端末ではまだテストされていません。チェックを一度実行すれば、動作させるのに必要な情報がわかります。所要時間は約 2 分です。\n\n</string>
+    <!-- First paragraph of the checks dialog at first launch, on a phone with no profile. Ends with two line breaks. -->
+    <string name="device_checks_intro_unknown">SignalDeck はこの端末をまだ知りません。チェックを一度実行すれば、動作させるのに必要な情報がわかります。所要時間は約 2 分です。\n\n</string>
+    <!-- The checks dialog: what happens, as bullet lines (each ends with a line break). -->
+    <string name="device_checks_steps">実行内容：\n• デバイスレポート（端末、ポート、無線モジュール、純正のトランシーバーアプリ。読み取りのみ）\n• 10 秒間、側面の PTT キーを数回押す\n• root があれば、純正のトランシーバーアプリを閉じてから 15 秒間開き、無線機の起動方法と送るデータを確認して（この間は PTT を押さないでください）、再び閉じる\n</string>
+    <!-- Bullet line in the checks dialog: the radio probe. SA818 AT is a protocol name. Ends with a line break. -->
+    <string name="device_checks_probe">• Magisk の root があれば、無線プローブ（トランシーバーアプリが使うシリアルポートでモジュールに型番を問い合わせます：DMR のバージョン照会と SA818 AT ハンドシェイク。応答がなければモジュールの電源を入れます）\n</string>
+    <!-- Bullet line in the checks dialog on a phone with no profile: the radio probe. Ends with a line break. -->
+    <string name="device_checks_probe_no_profile">• Magisk の root があれば、無線プローブ（トランシーバーアプリが使うシリアルポートでモジュールに型番を問い合わせます：DMR のバージョン照会と SA818 AT ハンドシェイク。応答がなければモジュールの電源を入れます。これはプロファイルのある端末のみ）\n</string>
+    <!-- Bullet line in the checks dialog: the receive-only trial. %1$s is the stock app's package name. Ends with a line break. -->
+    <string name="device_checks_trial">• 任意で試運転（30 秒、未テストの端末では約 1 分半）：SignalDeck が無線モジュールを引き継ぎ（受信のみ、何も送信しません）、モジュールと音声の動作を記録してから、%1$s に戻します\n</string>
+    <!-- Bullet line in the checks dialog on an untested phone: the receive-only trial. %1$s is the stock app's package name. Ends with a line break. -->
+    <string name="device_checks_trial_untested">• 任意で試運転（30 秒、未テストの端末では約 1 分半）：SignalDeck が無線モジュールを引き継ぎ（受信のみ、何も送信しません）、モジュールと音声の動作、スケルチ・受信レベル・信号表示のふるまい、バンド端で合わせられる周波数を記録してから、%1$s に戻します\n</string>
+    <!-- Line in the checks dialog (starts and ends with a line break). %1$s is the stock app's package name. -->
+    <string name="device_checks_stock_closed">\nチェックの間は %1$s を閉じます。終わったら、いつもどおり開き直してください。\n</string>
+    <!-- Last line of the checks dialog (starts with a line break). -->
+    <string name="device_checks_end">\n最後に、送っていただく zip が 1 つできます。</string>
+    <!-- Title of the checks dialog at first launch. One line. -->
+    <string name="device_checks_first_title">この端末の対応にご協力ください</string>
+    <!-- Title of the checks dialog. One line. -->
+    <string name="device_checks">すべてチェック</string>
+    <!-- Button in the checks dialog: checks and the receive-only trial. Short. -->
+    <string name="device_checks_with_trial">チェック + 試運転</string>
+    <!-- Button in the checks dialog. Short. -->
+    <string name="device_checks_run">チェック実行</string>
+    <!-- Button in the checks dialog: checks without the trial. Short. -->
+    <string name="device_checks_only">チェックのみ</string>
+    <!-- Progress while SignalDeck looks for the stock walkie-talkie app. -->
+    <string name="device_checks_finding_app">トランシーバーアプリを探しています…</string>
+    <!-- Row in the app list: the profile's stock app. %1$s is the app's name, %2$s its package, %3$s the phone model. Two lines. -->
+    <string name="device_checks_app_stock">%1$s\n%2$s · %3$s の純正アプリ</string>
+    <!-- Row in the app list: choose any app. Two lines. -->
+    <string name="device_checks_app_other">ほかのアプリを選択…\nトランシーバーアプリが一覧にない場合</string>
+    <!-- Row in the app list: open no app. One line. -->
+    <string name="device_checks_app_none">なし — この手順を省略</string>
+    <!-- Title of the app list: which app to open for 15 seconds. One line, may wrap. -->
+    <string name="device_checks_app_title">15 秒間開くトランシーバーアプリは？</string>
+    <!-- Row in the list of all apps: a system app. %1$s is the app's name, %2$s its package. Two lines. -->
+    <string name="device_checks_app_system">%1$s\n%2$s · システムアプリ</string>
+    <!-- Title of the list of all apps. One line. -->
+    <string name="device_checks_any_title">どれがトランシーバーアプリですか？</string>
+    <!-- Title of the confirmation before opening an app. %1$s is the app's name. One line. -->
+    <string name="device_checks_open_app">%1$s を 15 秒間開きますか？</string>
+    <!-- Message of the confirmation before opening an app. -->
+    <string name="device_checks_open_app_msg">チェックはアイコンから開くのと同じ方法でアプリを開き、無線機の起動方法を記録して、再び閉じます。開いている間は PTT を押さないでください。</string>
+    <!-- Title of the progress dialog while the checks run. One line. -->
+    <string name="device_checks_running">この端末をチェック中</string>
+    <!-- Title after the checks. One line. -->
+    <string name="device_checks_done">チェック完了</string>
+    <!-- After the checks (after the English summary). %1$s is the zip size in kB, %2$s the report folder name. "Send" is the button name; keep the adb command. -->
+    <string name="device_checks_done_msg">すべて 1 つの zip（%1$s kB）にまとめました。「送信」をタップしてメール、メッセンジャー、クラウドドライブで共有するか、GitHub Issue を開いて zip をドラッグしてください。\n\nフォルダは端末にも残っています：Download/DMR/DeviceReport/%2$s（パソコンからは：adb pull /sdcard/Download/DMR/DeviceReport）。</string>
+    <!-- Button after the checks: open a GitHub issue. Short. -->
+    <string name="device_checks_issue">GitHub Issue</string>
+    <!-- Toast when the checks fail. %1$s is the error. -->
+    <string name="device_checks_failed">チェックに失敗しました：%1$s</string>
+
+    <!-- ==== Sharing the device report ==== -->
+    <!-- Title of the dialog before sharing the device report. One line. -->
+    <string name="device_share_title">デバイスレポートを共有</string>
+    <!-- What the device report holds, before sharing it. Two paragraphs. File names (stock_serial.txt, rx_audio_raw.bin) stay. -->
+    <string name="device_share_msg">レポートに含まれるもの：端末の型番とビルド情報、シリアルポートと無線モジュールのノード名、トランシーバーアプリのパッケージ情報、ライブラリとフレームワークのファイル名、動作中の無線関連プロセス、（root があれば）SELinux ラベルと無線関連の短いログ抜粋（メッセージ本文は削除、長い数字は伏せ字）。「すべてチェック」の後は、SignalDeck 自身のログ（パケット・位置・メッセージ・発信者の行は削除、コールサインと ID は伏せ字）、純正アプリが起動時に無線モジュールとやり取りしたバイト列（stock_serial.txt：コマンド、チャンネルの周波数、モジュールの応答。無線 ID は空欄化）、試運転の後は無線機が受信したものの 5 秒間の生データ（rx_audio_raw.bin：チャンネルに流れていたものすべて）も含まれます。アカウント、連絡先、メッセージ、位置情報、IMEI などの識別子は含まれません。\n\nコピーされた純正のトランシーバー APK はメーカーのソフトウェアです。公開してよければ含め、そうでなければ除いて共有してください（後で個別にお願いすることがあります）。</string>
+    <!-- Button: share the report with the stock APK. Short. -->
+    <string name="device_share_all">すべて共有</string>
+    <!-- Button: share the report without the stock APK. Short. -->
+    <string name="device_share_no_apk">APK を除く</string>
+    <!-- Title: include the listen check's station recording? One line. -->
+    <string name="device_share_station_q">局の録音を含めますか？</string>
+    <!-- Choice: leave the station recording out. One line. -->
+    <string name="device_share_station_no">含めない</string>
+    <!-- Choice: include the station recording. May wrap. -->
+    <string name="device_share_station_yes">含める（局が送信した最大 20 秒。ほかの人の声が入っている可能性があります）</string>
+    <!-- Toast when there is no report to share. -->
+    <string name="device_share_none">レポートがまだありません：先に作成してください</string>
+    <!-- Title while the PTT key is captured. One line. -->
+    <string name="device_capture_title">今すぐ PTT キーを押してください</string>
+    <!-- Message while the PTT key is captured. -->
+    <string name="device_capture_msg">これから 10 秒の間に、端末側面の PTT ボタンを数回押して離してください。端末がこのボタンについて報告する内容をすべて記録します。</string>
+    <!-- Toast after the PTT capture when there is no report to save it in. -->
+    <string name="device_capture_no_report">記録しましたが、保存するには先にレポートを作成してください</string>
+    <!-- Toast after the PTT capture was saved. -->
+    <string name="device_capture_saved">レポートに保存しました</string>
+
+    <!-- ==== Radio firmware files (list, copy on request) ==== -->
+    <!-- Title of the radio firmware files dialogs. One line. -->
+    <string name="device_fwfiles">無線ファームウェアのファイル</string>
+    <!-- What the radio firmware files search does, before it runs. A paragraph. -->
+    <string name="device_fwfiles_intro">Magisk の root が必要です。無線機付き端末が無線チップのイメージを置くフォルダと、純正のトランシーバーアプリの中を探し、見つかったものを一覧にします：名前、サイズ、フィンガープリント（SHA-256）、内部に書かれたモジュールのバージョン。SignalDeck 自身のファイル（シリアルの記録、録音、レポート）は除外し、/sdcard/DMR ではモジュールのイメージだけを対象にします。SignalDeck またはそのファームウェアカタログが既に持っているファイルには「既知」と表示されるので、そのコピーは不要です。一覧はデバイスレポートに入ります。ファイルにチェックを入れない限り何もコピーせず、チェックを入れてもこの端末の Download/DMR/FoundFirmware にコピーするだけです。どこにも送信しません。これらのファイルは端末メーカーのものです：共有するのは SignalDeck の管理者から依頼があった場合だけにし、必ず非公開で共有してください。</string>
+    <!-- Button: start the firmware file search. Short. -->
+    <string name="device_fwfiles_look">検索</string>
+    <!-- Result when no readable firmware file was found. -->
+    <string name="device_fwfiles_none">読み取れるものは見つかりませんでした。</string>
+    <!-- Result when no readable firmware file was found, and the search was saved in the report. -->
+    <string name="device_fwfiles_none_in_report">読み取れるものは見つかりませんでした。検索結果はデバイスレポートにあります。</string>
+    <!-- Line in a found firmware file's row (starts with a line break). %1$s says where it is known from. -->
+    <string name="device_fwfiles_known">\n既知：%1$s</string>
+    <!-- Title of the list of found firmware files. %1$d is how many. One line. -->
+    <plurals name="device_fwfiles_found">
+        <item quantity="other">%1$d 件見つかりました（レポートに記載）</item>
+    </plurals>
+    <!-- Button: copy the ticked files. Short. -->
+    <string name="device_fwfiles_copy">選択をコピー</string>
+    <!-- After copying firmware files. %1$d is how many, %2$s the new folder's name. SOURCES.txt is a file name. -->
+    <plurals name="device_fwfiles_copied">
+        <item quantity="other">%1$d 個のファイルを SOURCES.txt 付きで Download/DMR/FoundFirmware/%2$s にコピーしました。どこにも送信していません。依頼があればフォルダを非公開で共有してください。</item>
+    </plurals>
+    <!-- When copying firmware files fails. %1$s is the error. -->
+    <string name="device_fwfiles_copy_failed">コピーに失敗しました：%1$s</string>
+    <!-- Button: copy no files. Short. -->
+    <string name="device_fwfiles_copy_none">コピーしない</string>
+
+    <!-- ==== Radio probe ==== -->
+    <!-- Title of the radio probe dialogs. One line. -->
+    <string name="device_probe">無線プローブ</string>
+    <!-- What the radio probe does, before it runs; ends with a question about the power pulse. -->
+    <string name="device_probe_msg">Magisk の root が必要です。シリアルポートの SELinux ラベルを読み取り、このセッション用のルールを導いて適用し、各ポートで複数の速度でモジュールのバージョン照会を送り、電源ノードを読み取り、PCM ストリームを探します。純正のトランシーバーアプリは閉じておいてください。電源ノードのパルスも行いますか？</string>
+    <!-- Button: run the probe. Short. -->
+    <string name="device_probe_run">プローブ</string>
+    <!-- Button: run the probe and pulse the module's power. Short. -->
+    <string name="device_probe_pulse">応答確認 + 電源パルス</string>
+    <!-- Before the probe's output when there is no report to save it in. %1$s is the output (English). -->
+    <string name="device_probe_not_saved">（保存するには先にレポートを作成してください）\n\n%1$s</string>
+
+    <!-- ==== Show the radio in the car (Android Auto trust) ==== -->
+    <!-- Title of the sheet that explains how to make Android Auto list SignalDeck. One line. -->
+    <string name="device_auto_title">車に無線機を表示</string>
+    <!-- First hint on the Android Auto sheet. -->
+    <string name="device_auto_hint">Android Auto は Play ストアからインストールしたアプリしか信頼しません。SignalDeck の場合、音声は再生されハンドルのボタンも使えますが、車のアプリ一覧には表示されず、カードをタップすると端末側でアプリが開きます。</string>
+    <!-- Button: open Android Auto's settings. One line. -->
+    <string name="device_auto_open">Android Auto の設定を開く</string>
+    <!-- Button: check again whether Android Auto hides the app. Short. -->
+    <string name="device_auto_again">再確認</string>
+
+    <!-- ==== New firmware variant (submit to the catalogue) ==== -->
+    <!-- Title of the dialog offering to submit an unknown firmware variant. One line. -->
+    <string name="device_variant">新しいファームウェアの種類</string>
+    <!-- First paragraphs of the firmware variant dialog (ends with two line breaks). %1$s is why the firmware is new (from the check). "Submit" is GitHub's button. -->
+    <string name="device_variant_msg">この端末の無線ファームウェアは、まだ SignalDeck のファームウェアカタログにありません：%1$s。\n\n登録すると、ファームウェアプロジェクトがカタログに追加し、SignalDeck が認識できるようになり、今後のファームウェア開発でも対応できるようになります。ブラウザで GitHub が開き、端末の型番、モジュールのバージョン、純正アプリのバージョン、ファームウェアファイルのフィンガープリントが記入されています。内容を確認し、そこで「Submit」を押してください（GitHub アカウントが必要です）。登録しない限り何も送信されず、内容に個人を特定する情報は含まれません。\n\n</string>
+    <!-- Paragraph of the firmware variant dialog when the firmware file is new too (ends with two line breaks). -->
+    <string name="device_variant_attach">ファームウェアファイル自体も新しいものです：SignalDeck がこの端末の Download/DMR/FoundFirmware にコピーし、Issue にその場所を記載します。添付するかどうかは任意です。Issue の添付ファイルは公開され、誰でもダウンロードできます。また、このファイルは端末メーカーのものです。\n\n</string>
+    <!-- Paragraph of the firmware variant dialog when the file is known (ends with two line breaks). -->
+    <string name="device_variant_stays">ファームウェアファイル自体はこの端末に残ります。\n\n</string>
+    <!-- Last paragraph of the firmware variant dialog. -->
+    <string name="device_variant_notice">カタログにこのファームウェアが載るまで、デバイス画面に通知が表示されます。</string>
+    <!-- Button: open the GitHub issue form. Short. -->
+    <string name="device_variant_open">GitHub を開く</string>
+    <!-- Toast after the firmware file is copied for the issue. -->
+    <string name="device_variant_copied">ファームウェアファイルを Download/DMR/FoundFirmware にコピーしました：添付するかどうかは任意です</string>
+    <!-- Toast when no browser can open GitHub. -->
+    <string name="device_variant_no_browser">GitHub を開くブラウザがありません</string>
+
+    <!-- ==== Radio module firmware sheet ==== -->
+    <!-- Title of the sheet about the radio module's firmware version. One line. -->
+    <string name="device_modfw_title">無線モジュールのファームウェア</string>
+    <!-- Two lines on the module firmware sheet. %1$s is the stock version (or device_modfw_stock_unknown), %2$s the version now (or device_modfw_no_answer). -->
+    <string name="device_modfw_versions">純正：%1$s\n現在：%2$s</string>
+    <!-- In "Stock: …": the stock version is not known. Short. -->
+    <string name="device_modfw_stock_unknown">まだ不明</string>
+    <!-- In "Now: …": the module has not answered. Short. -->
+    <string name="device_modfw_no_answer">モジュールからまだ応答がありません</string>
+    <!-- Hint on the module firmware sheet when the module runs its stock firmware. -->
+    <string name="device_modfw_hint_stock">純正バージョンは、この端末の無線モジュールが最初に SignalDeck に報告したバージョンで、ずっと保存されます。出荷時のバージョンがいつでもわかります。モジュールは純正ファームウェアで動作しています。</string>
+    <!-- Hint on the module firmware sheet when other firmware is loaded. -->
+    <string name="device_modfw_hint_differs">純正バージョンは、この端末の無線モジュールが最初に SignalDeck に報告したバージョンで、ずっと保存されます。出荷時のバージョンがいつでもわかります。モジュールは現在別のバージョンを報告しているので、別のファームウェアが書き込まれています。SignalDeck が最初に認識した時点で既に別のファームウェアだった場合は、現在のバージョンを純正として扱えます。</string>
+    <!-- Button on the module firmware sheet. One line. -->
+    <string name="device_modfw_reset">現在のバージョンを純正にする</string>
+    <!-- Title of the confirmation. %1$s is the module's version now. One line. -->
+    <string name="device_modfw_reset_title">%1$s を純正にしますか？</string>
+    <!-- Message of the confirmation. %1$s is the stock version. -->
+    <string name="device_modfw_reset_msg">SignalDeck は、%1$s をこの端末の出荷時のファームウェアとして記憶しなくなります。</string>
+    <!-- Button that takes the current version as stock. Short. -->
+    <string name="device_modfw_reset_ok">純正にする</string>
+
+    <!-- ==== Link card status lines ==== -->
+    <!-- Item in the profile line on the link card (items are joined with " · "): the audio path. Very short. -->
+    <string name="device_status_audio_vendor">ベンダー音声</string>
+    <!-- Item in the profile line: the audio path. Very short. -->
+    <string name="device_status_audio_camcorder">カムコーダー入力</string>
+    <!-- Item in the profile line: the audio path. Very short. -->
+    <string name="device_status_audio_ext">extmodule 音声ソケット</string>
+    <!-- Item in the profile line: the audio path (audio over the serial port). Very short. -->
+    <string name="device_status_audio_uart">UART PCM</string>
+    <!-- Item in the profile line: the radio module is an analog AT-command module. Very short. -->
+    <string name="device_status_analog_at">アナログ AT モジュール</string>
+    <!-- Item in the profile line: the profile revision (r%1$s), updated from the signed list. Very short. -->
+    <string name="device_status_rev_updated">r%1$s 更新済み</string>
+    <!-- SAFETY: item in the profile line: an advisory applies. Very short. -->
+    <string name="device_status_advisory">⚠ 注意情報</string>
+    <!-- Item in the profile line: the profile has not been tested on this phone. One word. -->
+    <string name="device_status_untested">未テスト</string>
+    <!-- The firmware line on the link card before the stock version is known (tap opens the firmware screen). Short. -->
+    <string name="device_status_module_fw">モジュールのファームウェア</string>
+    <!-- Notice line on the link card: the firmware is not in the catalogue; tap to submit it. One line, may wrap. -->
+    <string name="device_status_variant_new">⚠ カタログにないファームウェア · タップで登録</string>
+    <!-- Notice line on the link card after the firmware was submitted. One line, may wrap. -->
+    <string name="device_status_variant_sent">⚠ カタログにないファームウェア · GitHub に送信済み、カタログ待ち</string>
+    <!-- Link state on the link card (large): SignalDeck owns the radio. One line. -->
+    <string name="device_status_ready">このアプリが無線モジュールを使用中</string>
+    <!-- Link state on the link card: root was not granted. One line. -->
+    <string name="device_status_no_root">root が許可されていません（Magisk → スーパーユーザー）</string>
+    <!-- Link state on the link card: the stock app has the radio. One line. -->
+    <string name="device_status_stopped">純正アプリが無線モジュールを使用中</string>
+    <!-- Link state on the link card: no profile for this phone. One line. -->
+    <string name="device_status_unsupported">この端末のプロファイルはまだありません</string>
+    <!-- Link state on the link card while it starts. %1$s is the current step (English, from the service). -->
+    <string name="device_status_starting">起動中：%1$s</string>
+    <!-- ===== About (legal notices) ===== -->
+    <!-- The legal notices on the Mission Statement sheet and in SignalDeck Web (GPL "Appropriate Legal Notices"). Keep the
+         meaning exact: copyright, the GPL terms, the section 7 terms and the credits. Names, licence names and "NO WARRANTY"
+         wording follow the licence. %1$s is the app version, %2$s the source URL. Long text, scrolls. -->
+    <string name="device_about_legal">SignalDeck %1$s\nCopyright (C) 2026 IIMacGyverII\n\nフリーソフトウェア：GNU 一般公衆利用許諾書（GNU General Public License）バージョン 3 以降の条件のもとで、使用、調査、共有、改変ができます。本ソフトウェアは無保証です（NO WARRANTY）。\n\n追加条項（GPL 第 7 条）：著作権表示とこの作者表示を残すこと。改変版には改変版であることを明記し、オリジナルの SignalDeck または作者の作品として示さないこと。このライセンスは「SignalDeck」という名前とそのアイコンに対する権利を与えないため、改変版には独自の名前とアイコンが必要です。\n\nソースコード、公式の署名付きビルド、ライセンス全文（LICENSE、COPYRIGHT）：%2$s\n\n使用しているもの：robot36 SSTV（Ahmet Inan、GPL v3）、ft8_lib FT8（Karlis Goba、MIT）、M17 用の Codec 2（David Rowe VK5DGR、LGPL 2.1）、Vosk 音声認識とモデル、JNA、AndroidX、HiddenApiBypass（Apache 2.0）、Orbitron、Rajdhani、Share Tech Mono フォント（SIL OFL 1.1）、米国の試験問題集（NCVEC、パブリックドメイン）。データ：地図タイル © OpenStreetMap contributors（ODbL）、Terrain Tiles on AWS Open Data、RadioID.net、BrandMeister、hearham.com、NetLogger、CelesTrak、AMSAT、ARISS。</string>
+
+    <!-- ===== Root setup (Magisk boot module) ===== -->
+    <!-- Message after Device → install the boot module, when the app has no root. One sentence. -->
+    <string name="device_root_not_granted">root が許可されていません。</string>
+    <!-- Message after the Magisk boot module installed. "SignalDeck access" is the module's name as Magisk lists it (stays as is). A few lines. -->
+    <string name="device_root_module_installed">インストールしました。一度再起動してください。以降は起動のたびにルールが読み込まれます（Magisk →「モジュール」に「SignalDeck access」と表示されます）。</string>
+    <!-- Message when Magisk refused the module. %1$s is Magisk's own output (English, several lines). -->
+    <string name="device_root_module_failed">モジュールをインストールできませんでした：\n%1$s</string>
+    <!-- Message when the module zip could not be written. %1$s is the Java error. One line. -->
+    <string name="device_root_module_zip_failed">モジュールの zip を作成できませんでした：%1$s</string>
+
+    <!-- ===== Update paths ===== -->
+    <!-- Under a version in the update sheet's "What changed" list, when that release has no notes. Short. -->
+    <string name="device_paths_no_notes">（説明なし）</string>
+
+    <!-- ===== Module firmware line (Device page) ===== -->
+    <!-- Device page firmware line when the module now runs other firmware than it shipped with. %1$s the current version, %2$s the stock one (codes like DMR003.TEST.V001). Two short lines. -->
+    <string name="device_firmware_line_changed">ファームウェア %1$s\n純正 %2$s</string>
+    <!-- Device page firmware line when the module still runs its stock firmware. %1$s is the version code. One short line. -->
+    <string name="device_firmware_line_stock">ファームウェア %1$s（純正）</string>
+
+    <!-- ===== Radio notes (About this radio) ===== -->
+    <!-- Status chip on the About this radio sheet: SignalDeck is tested on this radio. One or two words. -->
+    <string name="device_notes_status_tested">テスト済み</string>
+    <!-- Status chip: support for this radio is in beta testing. Two or three words. -->
+    <string name="device_notes_status_testing">テスト中</string>
+    <!-- Status chip: support for this radio is still being developed. A few words. -->
+    <string name="device_notes_status_bringup">開発中</string>
+    <!-- Status chip: this radio is no longer supported or sold. One or two words. -->
+    <string name="device_notes_status_discontinued">終了</string>
+    <!-- Status chip: SignalDeck has not been tried on this radio. One or two words. -->
+    <string name="device_notes_status_untested">未テスト</string>
+
+    <!-- ===== Walkie-talkie app finder (why an app is a candidate) ===== -->
+    <!-- Evidence that an installed app is the phone's own walkie-talkie app; shown after the app's name in a picker, several joined by device_radioapp_why_separator. Lower case, short phrase. -->
+    <string name="device_radioapp_why_serial_open">シリアルポートを開いている</string>
+    <!-- Evidence (see device_radioapp_why_serial_open). PTT is the push-to-talk key. Short phrase. -->
+    <string name="device_radioapp_why_ptt">PTT キーを監視している</string>
+    <!-- Evidence (see device_radioapp_why_serial_open): the package name contains radio-like words. Short phrase. -->
+    <string name="device_radioapp_why_name">無線アプリらしい名前</string>
+    <!-- Evidence (see device_radioapp_why_serial_open): the app shows in the launcher. Short phrase. -->
+    <string name="device_radioapp_why_launcher">ランチャーにアイコンがある</string>
+    <!-- Evidence (see device_radioapp_why_serial_open): the app bundles a native serial-port library. Short phrase. -->
+    <string name="device_radioapp_why_serial_lib">シリアルポートのライブラリを含む</string>
+    <!-- Evidence (see device_radioapp_why_serial_open). /dev/tty… is a file path; keep it. Short phrase. -->
+    <string name="device_radioapp_why_tty">コードが /dev/tty… ポートを開く</string>
+    <!-- Evidence (see device_radioapp_why_serial_open). /sys/devices/platform is a path; keep it. Short phrase. -->
+    <string name="device_radioapp_why_sys">コードが /sys/devices/platform を使う</string>
+    <!-- Separator between the evidence phrases above in one line. A comma and a space in English. -->
+    <string name="device_radioapp_why_separator">、</string>
+
+    <!-- ===== Heat guard (long transmissions) ===== -->
+    <!-- SAFETY: why a long transmission may not start: the phone's radio area is already hot. Shown and stored in the history. %1$s is the temperature now, %2$s the stop temperature, %3$s the start limit (numbers like 65.0 and 70). Keep °C. A few lines. -->
+    <string name="device_thermal_zone_hot">端末の無線部は現在 %1$s °C です。長い送信をすると停止温度の %2$s °C を超えてしまいます。先に %3$s °C 未満まで冷ましてください。短い送信なら今すぐできます。</string>
+    <!-- SAFETY: why a long transmission may not start: the battery is already hot. %1$s the battery temperature, %2$s the stop temperature, %3$s the start limit. A few lines. -->
+    <string name="device_thermal_battery_hot">バッテリーは現在 %1$s °C です。長い送信をすると停止温度の %2$s °C 近くまで上がります。先に %3$s °C 未満まで冷ましてください。短い送信なら今すぐできます。</string>
+    <!-- SAFETY: reason a running transmission was stopped for heat, inside a longer history line ("… ended early: <this>. Let the phone cool …"). Lower case start. %1$s the stop temperature, %2$s the reading. -->
+    <string name="device_thermal_stop_zone">端末の無線部が %1$s °C を超えました（%2$s）</string>
+    <!-- SAFETY: heat-stop reason (see device_thermal_stop_zone): the battery. %1$s the stop temperature, %2$s the reading. -->
+    <string name="device_thermal_stop_battery">バッテリーが %1$s °C を超えました（%2$s）</string>
+    <!-- SAFETY: heat-stop reason (see device_thermal_stop_zone): the radio area warmed too fast. %1$s the rise in °C. -->
+    <string name="device_thermal_stop_zone_rise">無線部が 10 秒で %1$s °C 上昇しました</string>
+    <!-- SAFETY: heat-stop reason (see device_thermal_stop_zone): the battery warmed too fast. %1$s the rise in °C. -->
+    <string name="device_thermal_stop_battery_rise">バッテリーが 10 秒で %1$s °C 上昇しました</string>
+    <!-- SAFETY: why a long transmission waits: cool-down after the last long one. %1$d its length in seconds, %2$s how far the radio area is above where it started, %3$s the temperature now. A few lines. -->
+    <string name="device_thermal_cooling_zone">前回の %1$d 秒の送信後、冷却中です：端末の無線部はまだ送信前より %2$s °C 高い状態です（現在 %3$s °C）。差が 1 °C 以内になるまで、長い送信は待機します。短い送信なら今すぐできます。</string>
+    <!-- SAFETY: why a long transmission waits when the temperature cannot be read: a fixed 17-minute cool-down. %1$d the last transmission in seconds, %2$d minutes left. A few lines. -->
+    <string name="device_thermal_cooling_timer">前回の %1$d 秒の送信後、冷却中です：この端末では温度を読み取れないため、長い送信は 17 分間待機します（残り約 %2$d 分）。短い送信なら今すぐできます。</string>
+
+    <!-- ===== Longest transmission (transmit limit) ===== -->
+    <!-- SAFETY: heat warning shown once when a transmit limit over 2 minutes (or none) is picked, on the phone and on the Web page. Keep the numbers. A few lines. -->
+    <string name="device_txlimit_heat_warning">長い送信は端末を発熱させます。テストでは、ハイ出力で 2 分間送信すると無線部の温度が約 11 °C 上昇しました。端末が高温になりすぎた場合（無線部 70 °C、バッテリー 48 °C）は、時間制限に関係なく SignalDeck が必ず送信を停止します。</string>
+    <!-- SAFETY: the transmit limit setting's value when SignalDeck sets no time limit. Chip on the Device page and in history lines. Short. -->
+    <string name="device_txlimit_none">制限なし</string>
+    <!-- The transmit limit in seconds ("30 s"), on a chip and inside history lines. %1$d is the number. Very short. -->
+    <string name="device_txlimit_seconds">%1$d s</string>
+    <!-- The transmit limit in whole minutes ("2 min"). %1$d is the number. Very short. -->
+    <string name="device_txlimit_minutes">%1$d min</string>
+    <!-- The transmit limit in minutes and seconds ("1 min 30 s"). %1$d minutes, %2$d seconds. Very short. -->
+    <string name="device_txlimit_minutes_seconds">%1$d min %2$d s</string>
+
+    <!-- ===== Run all checks (progress lines in the checks dialog; the report itself stays English) ===== -->
+    <!-- Progress line while the checks start. %1$s is the stock walkie-talkie app's package name (com.…). One line. -->
+    <string name="device_firstrun_closing_stock">ポートを空けるため %1$s を閉じています</string>
+    <!-- Progress line while the device report is written. %1$s is the report's own step, in English (developer text). One line. -->
+    <string name="device_firstrun_step_report">レポート：%1$s</string>
+    <!-- Progress line: reading the chosen app's code for clues. %1$s is its package name. One line. -->
+    <string name="device_firstrun_reading_code">%1$s のコードを読み取り中</string>
+    <!-- Progress line asking the owner to press the phone's side PTT key (the key press is recorded, nothing is transmitted). One or two lines. -->
+    <string name="device_firstrun_press_ptt">今すぐ側面の PTT キーを数回押して離してください（10 秒）</string>
+    <!-- Progress line on phones whose radio sits behind a USB bridge: the probe turns USB to a computer off meanwhile. One or two lines. -->
+    <string name="device_firstrun_probe_bridge">プローブ：USB ブリッジ経由で無線機に問い合わせ中（約 10 秒間、パソコンとの USB 接続はオフになります）</string>
+    <!-- Progress line during the radio probe. %1$s is the probe's own step, in English (developer text). One line. -->
+    <string name="device_firstrun_step_probe">プローブ：%1$s</string>
+    <!-- Progress line during the second probe, with the module's power switched on. %1$s is the probe's step (English). One line. -->
+    <string name="device_firstrun_step_probe_power">電源オンでプローブ：%1$s</string>
+    <!-- Progress line: the report folder is being zipped. One word. -->
+    <string name="device_firstrun_zipping">zip 作成中</string>
+    <!-- Progress line of the Listen check. %1$d seconds done, %2$d seconds in all, %3$d seconds with a signal. One line. -->
+    <string name="device_firstrun_listening">受信中：%1$d/%2$d 秒、信号あり %3$d 秒</string>
+    <!-- SAFETY: progress line while the stock walkie-talkie app runs for 15 s; the owner must not transmit. One or two lines. -->
+    <string name="device_firstrun_watch_open">純正のトランシーバーアプリを 15 秒間開いています — PTT は押さないでください</string>
+    <!-- SAFETY: the same, on phones whose radio uses the USB port (USB to a computer is off). Two lines. -->
+    <string name="device_firstrun_watch_open_bridged">純正のトランシーバーアプリを 15 秒間開いています — PTT は押さないでください（この間、パソコンとの USB 接続はオフです）</string>
+    <!-- Progress line of the trial take-over (receive only): squelch check with squelch level 0. One line. -->
+    <string name="device_firstrun_trial_squelch_alone">試運転：スケルチ確認、スケルチ 0 のみ</string>
+    <!-- Progress line of the trial: squelch check with squelch 0 and the monitor (MON) on. One line. -->
+    <string name="device_firstrun_trial_squelch_monitor">試運転：スケルチ確認、スケルチ 0 と MON</string>
+    <!-- Progress line of the trial: receive level at a module volume step. %1$d is the step (1–8). One line. -->
+    <string name="device_firstrun_trial_level">試運転：音量 %1$d での受信レベル</string>
+    <!-- Progress line of the trial: timing the signal reading after a retune. %1$d is the run (1 to 5). One line. -->
+    <string name="device_firstrun_trial_retune">試運転：再同調後の信号表示、%1$d/5</string>
+    <!-- Progress line of the trial: testing a band edge (nothing transmitted). %1$s is the frequency (446.000). One line. -->
+    <string name="device_firstrun_trial_band_edges">試運転：バンド端、%1$s MHz</string>
+    <!-- Progress line of the trial on the Armor 3WT: the extmodule daemon's receive stream for 5 s. "extmodule" is the daemon's name. One line. -->
+    <string name="device_firstrun_trial_extmodule">試運転：extmodule の受信ストリーム、5 秒</string>
+    <!-- Progress line of the trial: a query command to the module. %1$s is its code (0x2F). One line. -->
+    <string name="device_firstrun_trial_command">試運転：モジュールコマンド %1$s（照会）</string>
+    <!-- SAFETY: progress line: SignalDeck takes the radio over from the stock app for the trial; it only receives. One line. -->
+    <string name="device_firstrun_trial_take_over">試運転：無線モジュールを引き継ぎ中（受信のみ）</string>
+    <!-- Progress line during the trial take-over. %1$s is the radio link state as the service reports it (English: "opening port", "ready"…). One line. -->
+    <string name="device_firstrun_trial_link">試運転：%1$s</string>
+    <!-- Progress line of the trial: listening with the squelch held open. %1$s is the frequency (446.00625). One line. -->
+    <string name="device_firstrun_trial_listening">試運転：スケルチを開いて %1$s MHz を受信中</string>
+    <!-- Progress line of the trial: reading the signal strength and the audio stream. One line. -->
+    <string name="device_firstrun_trial_reading">試運転：信号強度と音声を読み取り中</string>
+    <!-- SAFETY: progress line: the trial ends and the radio goes back to the stock app. One line. -->
+    <string name="device_firstrun_trial_hand_back">試運転：無線モジュールを戻しています</string>
+    <!-- Name of the temporary receive-only channel the trial tunes (shown on the Intercom meanwhile). %1$s is its frequency in MHz (446.00625). Keep short (a channel name). -->
+    <string name="device_firstrun_listen_channel">受信テスト %1$s</string>
+
+    <!-- ===== Custom PTT key (Device → PTT key: learning a button) ===== -->
+    <!-- Name of the learned PTT key when none is chosen. Short (a value on a settings row). -->
+    <string name="device_ptt_no_key">キーなし</string>
+    <!-- Name of a learned PTT key: the volume-up key of a wired headset. Short. -->
+    <string name="device_ptt_headset_volume_up">ヘッドセットの音量アップ</string>
+    <!-- Name of a learned PTT key: the phone's volume-up key. Short. -->
+    <string name="device_ptt_volume_up">音量アップ</string>
+    <!-- Name of a learned PTT key: a wired headset's volume-down key. Short. -->
+    <string name="device_ptt_headset_volume_down">ヘッドセットの音量ダウン</string>
+    <!-- Name of a learned PTT key: the phone's volume-down key. Short. -->
+    <string name="device_ptt_volume_down">音量ダウン</string>
+    <!-- Name of a learned PTT key: a wired headset's button. Short. -->
+    <string name="device_ptt_headset_button">ヘッドセットのボタン</string>
+    <!-- Name of a learned PTT key: a media play/pause button (Bluetooth remote, steering wheel). Short. -->
+    <string name="device_ptt_play_pause">再生/一時停止ボタン</string>
+    <!-- Name of a learned PTT key: a wired headset's button held down (it sends the voice-command key). Short. -->
+    <string name="device_ptt_headset_button_hold">ヘッドセットのボタン（長押し）</string>
+    <!-- Name of a learned PTT key: a voice-command button. Short. -->
+    <string name="device_ptt_voice_command">音声コマンドボタン</string>
+    <!-- Name of a learned PTT key: the camera button. Short. -->
+    <string name="device_ptt_camera_button">カメラボタン</string>
+    <!-- Name of a learned PTT key the app has no word for: a "BTN_" input code. %1$s is the kernel's name for it (A, TRIGGER). Short. -->
+    <string name="device_ptt_button_named">ボタン %1$s</string>
+    <!-- Name of a learned PTT key the app has no word for: a "KEY_" input code. %1$s is the kernel's name for it (CD, F9). Short. -->
+    <string name="device_ptt_key_named">キー %1$s</string>
+    <!-- As device_ptt_button_named, with the input device's name (%2$s, e.g. "mtk-kpd"). Short. -->
+    <string name="device_ptt_button_named_on">ボタン %1$s（%2$s）</string>
+    <!-- As device_ptt_key_named, with the input device's name (%2$s, e.g. "mtk-kpd"). Short. -->
+    <string name="device_ptt_key_named_on">キー %1$s（%2$s）</string>
+    <!-- Finding (blocks the key) after learning: it is already the phone's PTT key. "Side PTT key" is the name of the Device setting. One or two sentences. -->
+    <string name="device_ptt_check_own_ptt">これは端末本来の PTT キーです。「側面の PTT キー」がオンなら既に送信できるので、登録は不要です。</string>
+    <!-- Finding (blocks the key): the power key. One sentence. -->
+    <string name="device_ptt_check_power">電源キーは画面をオフにし、長押しすると電源メニューが開きます。</string>
+    <!-- Finding (blocks the key): a navigation key. One sentence. -->
+    <string name="device_ptt_check_nav">ナビゲーションキー（ホーム、戻る、メニュー）です：送信するたびに端末がこのキーに反応してしまいます。</string>
+    <!-- Finding (blocks the key): the event came from the touch screen. One sentence. -->
+    <string name="device_ptt_check_touch">ボタンではなく、タッチスクリーン（ジェスチャー）からの入力でした。</string>
+    <!-- Finding (blocks the key): the event came from the fingerprint sensor. One sentence. -->
+    <string name="device_ptt_check_fingerprint">指紋センサーからの入力でした。指紋センサーはスワイプを報告するもので、ボタンの押し続けは報告しません。</string>
+    <!-- SAFETY: finding (blocks the key): no release was seen, so the key could leave the radio transmitting. Two sentences. -->
+    <string name="device_ptt_check_no_release">ボタンを離したという報告がありませんでした。約 2 秒押し続けてから離してください。</string>
+    <!-- Finding (blocks the key): the button cannot report being held. %1$s is the milliseconds it reported. Two sentences. -->
+    <string name="device_ptt_check_no_hold">押し続けていたのに、%1$s ms で離したと報告されました。このボタンは押し続けている状態を報告しないため、PTT としては使えません。</string>
+    <!-- Finding (warning): pressing the button also opened an app. %1$s is the app's package name. Two sentences. -->
+    <string name="device_ptt_check_opens_app">押すと %1$s も前面に表示されました。送信するたびにこれが起きます。端末の「設定」でこのボタンの設定を変えるか、別のボタンを選んでください。</string>
+    <!-- Finding (warning) for a volume key. Two sentences. -->
+    <string name="device_ptt_check_volume">SignalDeck の外では、押している間に端末の音量も変わります。離すと SignalDeck が音量を元に戻します。</string>
+    <!-- Finding (warning): "Volume-up transmits" is the name of an Intercom setting, switched off by this key. Two sentences. -->
+    <string name="device_ptt_check_vol_ptt">「音量アップで送信」が無線画面で同じキーを使っています。このキーで置き換えるため、そちらはオフになります。</string>
+    <!-- Finding (warning) for a media button. One sentence. -->
+    <string name="device_ptt_check_media">メディアボタンです：音楽の再生・一時停止も行い、長押しで音声アシスタントが起動することがあります。</string>
+    <!-- Finding (warning): "Steering-wheel play/pause talks" is the name of a car setting. Two sentences. -->
+    <string name="device_ptt_check_wheel">「ハンドルの再生/一時停止で送信」がオンです。車ではこの設定が既に再生/一時停止を使っています。両方オンでも問題ありませんが、同じ動作になります。</string>
+    <!-- Finding (warning) for the camera button. One sentence. -->
+    <string name="device_ptt_check_camera">カメラボタンでカメラが起動することがあります。</string>
+    <!-- SAFETY: finding (warning) for a Bluetooth button: a lost release is caught by the transmit limit. "Device → Longest transmission" is a menu path. A few lines. -->
+    <string name="device_ptt_check_bluetooth">Bluetooth ボタンです：接続中は使え、再接続すると SignalDeck が再び検出します。離した信号が届くかどうかはボタンの電池と通信距離次第です。送信が止まらなくなった場合は、送信時間制限（デバイス → 最長送信時間）が停止させます。</string>
+    <!-- Error when learning a PTT key: the input devices could not be read (needs root). Two sentences. -->
+    <string name="device_ptt_learn_no_devices">端末の入力デバイスを読み取れませんでした。キーの登録には root（Magisk）が必要です。</string>
+    <!-- Learning a PTT key, first step in the dialog. One sentence. -->
+    <string name="device_ptt_learn_press">送信に使いたいボタンを約 2 秒押し続けてから離してください。</string>
+    <!-- Learning a PTT key: the button is down. %1$s is its name ("Volume up"). One line. -->
+    <string name="device_ptt_learn_held">%1$s を押しています… 離してください。</string>
+    <!-- Learning a PTT key: the button was released; checking for side effects. One line. -->
+    <string name="device_ptt_learn_got_it">登録しました。そのボタンがほかの動作もしないか確認しています…</string>
+    <!-- Learning a PTT key: nothing was pressed in time. %1$d is the seconds waited. One sentence. -->
+    <string name="device_ptt_learn_none">%1$d 秒以内にボタンが押されませんでした。</string>
+    <!-- Learning a PTT key failed. %1$s is the error (English). One line. -->
+    <string name="device_ptt_learn_failed">登録に失敗しました：%1$s</string>
+
+    <!-- ===== Main screen (tabs, bars, sheets, toasts) ===== -->
+    <!-- Bottom tab: the radio's main page. Shown in capitals, ≤ 9 characters (five tabs share a phone's width). -->
+    <string name="device_main_tab_intercom">無線</string>
+    <!-- Bottom tab: the channel list. Capitals, ≤ 9 characters. -->
+    <string name="device_main_tab_channels">チャンネル</string>
+    <!-- Bottom tab: the contact list. Capitals, ≤ 9 characters. -->
+    <string name="device_main_tab_contacts">連絡先</string>
+    <!-- Bottom tab: text messages. Capitals, ≤ 9 characters. -->
+    <string name="device_main_tab_messages">メッセージ</string>
+    <!-- Bottom tab: the Device page (settings, reports). Capitals, ≤ 9 characters. -->
+    <string name="device_main_tab_device">デバイス</string>
+    <!-- Placeholder page for a tab not built yet. %1$s is the tab name. -->
+    <string name="device_main_coming_next">%1$s\n\n近日対応</string>
+    <!-- Title of the one-time sheet announcing the coverage maps feature. One line. -->
+    <string name="device_main_coverage_title">エリアマップ</string>
+    <!-- Small label in capitals on the coverage maps sheet. Two words. -->
+    <string name="device_main_coverage_new">新機能</string>
+    <!-- Text of the coverage maps sheet. A few lines. -->
+    <string name="device_main_coverage_hint">各レピーターの電波がどこまで届くか、どこからアクセスできるかがわかります。エリア記録をオンにすると、車や徒歩での移動中にアプリが測定し、マップに描きます。いつでも Google Earth にエクスポートできます。</string>
+    <!-- Button on the coverage maps sheet that opens the map. Short (button, about 60 % of the width). -->
+    <string name="device_main_coverage_open">マップを開く</string>
+    <!-- Toast when shared channels contained nothing to import. Short. -->
+    <string name="device_main_nothing_to_import">インポートするものはありません</string>
+    <!-- Title of the channel list after a place was shared from a maps app. %1$s latitude, %2$s longitude (decimal degrees); the channel picked follows. One line. -->
+    <string name="device_main_location_title">%1$s, %2$s を位置に設定するチャンネル</string>
+    <!-- Toast after a shared place was stored on a channel. %1$s is the channel name. Short. -->
+    <string name="device_main_location_set">%1$s：位置を設定しました</string>
+    <!-- Name of the running band scope in the mode picker. Short. -->
+    <string name="device_main_mode_band_scope">バンドスコープ</string>
+    <!-- A satellite mode in the mode picker while it waits for the pass. %1$s is the mode name ("ISS SSTV", "ISS APRS"). Short. -->
+    <string name="device_main_mode_waiting_pass">%1$s（パス待ち）</string>
+    <!-- SSTV picture receive in the mode picker. SSTV is a mode name. Short. -->
+    <string name="device_main_mode_sstv_rx">SSTV 受信</string>
+    <!-- APRS monitoring in the mode picker. APRS is a mode name. Short. -->
+    <string name="device_main_mode_aprs_monitoring">APRS ワッチ</string>
+    <!-- The parrot (repeats what it hears) in the mode picker. Short. -->
+    <string name="device_main_mode_parrot">パロット</string>
+    <!-- M17 receive in the mode picker. M17 is a mode name. Short. -->
+    <string name="device_main_mode_m17_rx">M17 受信</string>
+    <!-- Green bar over the Intercom while the band scope runs. One line (single line, cut off if long). -->
+    <string name="device_main_bar_scope">バンドスコープで掃引中</string>
+    <!-- The same, with the frequency being swept (%1$s, MHz). Keep the two spaces around the dot. One line. -->
+    <string name="device_main_bar_scope_at">バンドスコープで掃引中  ·  %1$s MHz</string>
+    <!-- Mode bar for a satellite mode waiting for its pass. %1$s is the mode with its emoji ("📺  ISS SSTV"), %2$s the pass time (HH:mm). One line. -->
+    <string name="device_main_bar_sat_next">%1$s  ·  次のパス %2$s</string>
+    <!-- Mode bar for a satellite mode during the pass. %1$s is the mode with its emoji. One line. -->
+    <string name="device_main_bar_sat_now">%1$s  ·  パス中</string>
+    <!-- Mode bar: SSTV picture receive. Keep the emoji and the two spaces. One line. -->
+    <string name="device_main_bar_sstv_rx">📺  SSTV 受信</string>
+    <!-- Mode bar: APRS monitoring. %1$s is the frequency (MHz). Keep the emoji and the spacing. One line. -->
+    <string name="device_main_bar_aprs">📡  APRS ワッチ  ·  %1$s</string>
+    <!-- Mode bar: the parrot is on. Keep the emoji and the two spaces. One line. -->
+    <string name="device_main_bar_parrot">🦜  パロット</string>
+    <!-- Mode bar: M17 receive, nothing heard. Keep the emoji and spacing. One line. -->
+    <string name="device_main_bar_m17_listening">📻  M17  ·  受信待ち</string>
+    <!-- Mode bar: M17, a station is being received (no callsign yet). One line. -->
+    <string name="device_main_bar_m17_receiving">📻  M17  ·  受信中</string>
+    <!-- Mode bar: M17, a station is heard. %1$s the sender's callsign, %2$s the destination. One line. -->
+    <string name="device_main_bar_m17_heard">📻  M17  ·  %1$s → %2$s</string>
+    <!-- Mode bar: FT8 running and transmitting in its time slot. One line. -->
+    <string name="device_main_bar_ft8_tx">〰  FT8  ·  自局の周期で送信中</string>
+    <!-- Mode bar: FT8 running, listening only. One line. -->
+    <string name="device_main_bar_ft8_listening">〰  FT8  ·  受信中</string>
+    <!-- Link at the right of the mode bar that opens the mode's page. Capitals, very short, keep "  ›". -->
+    <string name="device_main_bar_open">開く  ›</string>
+    <!-- Screen-reader description of the mode bar. -->
+    <string name="device_main_bar_open_desc">動作中のモードの画面を開く</string>
+    <!-- Link on the one-time region bar that opens the region sheet. Capitals, very short, keep "  ›". -->
+    <string name="device_main_region_change">変更  ›</string>
+    <!-- Screen-reader description of the region bar's close button. -->
+    <string name="device_main_region_dismiss">閉じる</string>
+    <!-- Region bar on the Intercom: the region in use. %1$s region name, %2$s how it was chosen ("from the network"…), %3$s the APRS frequency (MHz). One or two lines. -->
+    <string name="device_main_region_set">地域：%1$s（%2$s）。APRS %3$s</string>
+    <!-- The same while roaming. %1$s region, %2$s how chosen, %3$s the country of the mobile network, %4$s the APRS frequency. One or two lines. -->
+    <string name="device_main_region_roaming">地域：%1$s（%2$s。ネットワークは %3$s のもの）。APRS %4$s</string>
+    <!-- Region bar when no region is chosen yet. One or two lines. -->
+    <string name="device_main_region_choose">地域を選ぶと、その地域の APRS 周波数とチャンネルリストを使います</string>
+    <!-- Toast: no app on the phone can pick a picture. Short. -->
+    <string name="device_main_no_picture_app">画像を選べるアプリがありません</string>
+    <!-- Toast: no app on the phone can pick a file or folder. Short. -->
+    <string name="device_main_no_file_picker">ファイル選択アプリがありません</string>
+    <!-- SAFETY: toast after Exit when the radio went back to the phone's own walkie-talkie app. One line. -->
+    <string name="device_main_exit_handed_back">無線モジュールを純正アプリに戻しました</string>
+    <!-- Toast after Exit when the radio was switched off. One or two lines. -->
+    <string name="device_main_exit_switched_off">無線モジュールをオフにしました。SignalDeck を開くと再びオンになります</string>
+    <!-- ==== Device → Module firmware page (ui/FirmwareScreen) ==== -->
+    <!-- Module firmware page: label under one of eight segments of the progress bar (checks before the load). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_prepare">準備</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the module enters update mode). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_update">更新</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the handshake with the bootloader). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_hello">接続</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the module erases its flash). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_erasing">消去</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the image is sent). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_transfer">転送</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the transfer is closed). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_finish">完了</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the module restarts). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_restart">再起動</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the version string is read back). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_verify">検証</string>
+    <!-- SAFETY: Module firmware page, progress figures while the module erases its flash. Line 1 is the phase, line 2 the seconds left (%1$d). Two short lines. -->
+    <string name="device_fw_erasing_left">消去中\nこの段階の残り %1$d 秒</string>
+    <!-- Title of the Module firmware page (header; the phone name is under it). Short. -->
+    <string name="device_fw_title">モジュールのファームウェア</string>
+    <!-- SAFETY: Module firmware page, heading above the disclaimer (shown in capitals). Short. -->
+    <string name="device_fw_risk_heading">自己責任</string>
+    <!-- SAFETY: Module firmware page, the owner's disclaimer for loading module firmware (legal wording: translate faithfully, keep every point). A paragraph. -->
+    <string name="device_fw_disclaimer">モジュールのファームウェア書き込みは自己責任で行ってください。公開しているイメージはテスト済みで、書き込む前にこの画面が端末、モジュール、ファイルを確認します。また、純正ファームウェアはいつでも書き込み直せます。それでも、SignalDeck とその貢献者は一切の保証をせず、動作しなくなった無線モジュールや、無線モジュールが送信する内容について責任を負いません。</string>
+    <!-- Module firmware page, heading of the section that shows the firmware now in the module (capitals). Short. -->
+    <string name="device_fw_installed">書き込み済み</string>
+    <!-- Module firmware page, heading of the section about the image picked to load (capitals). Short. -->
+    <string name="device_fw_chosen">選択したイメージ</string>
+    <!-- Module firmware page, heading of the factory-backup section, and the name of a pre-flight check (the verified copy of the firmware the phone shipped with). Short. -->
+    <string name="device_fw_factory_backup">出荷時バックアップ</string>
+    <!-- Module firmware page, heading above the list of firmware images to choose from (capitals). One word. -->
+    <string name="device_fw_images">イメージ</string>
+    <!-- SAFETY: Module firmware page, heading above the checks that must pass before a load (capitals). One or two words. -->
+    <string name="device_fw_preflight">事前チェック</string>
+    <!-- Module firmware page, heading of the advanced section (unlisted images) (capitals). One word. -->
+    <string name="device_fw_advanced">詳細設定</string>
+    <!-- Module firmware page, progress figures before a load starts. One word. -->
+    <string name="device_fw_waiting">待機中</string>
+    <!-- Module firmware page, button that shows or hides the technical log of the load (the log itself stays English). Short button. -->
+    <string name="device_fw_handshake_log">ハンドシェイクログ</string>
+    <!-- Module firmware page, button that loads the chosen image into the radio module (one of three buttons in a row; also the confirm button). Very short. -->
+    <string name="device_fw_load">書き込む</string>
+    <!-- Module firmware page, button that loads the factory image back (one of three buttons in a row). Short. -->
+    <string name="device_fw_restore_factory">出荷時に戻す</string>
+    <!-- Module firmware page, button that downloads the verified factory image from the catalogue. Full-width button. -->
+    <string name="device_fw_download_factory">純正ファームウェアをダウンロード</string>
+    <!-- Module firmware page, button that downloads the chosen catalogue image. %1$s is the image's version string (DMR003.FW57.V022). Full-width button. -->
+    <string name="device_fw_download_tag">%1$s をダウンロード</string>
+    <!-- Module firmware page, button that fetches the signed firmware catalogue again. Full-width button. -->
+    <string name="device_fw_check_new">新しいファームウェアを確認</string>
+    <!-- SAFETY: Module firmware page, switch button for loading files that are not in the catalogue; now off. Full-width button. -->
+    <string name="device_fw_unlisted_off">未登録のイメージを許可 · オフ</string>
+    <!-- SAFETY: Module firmware page, switch button for loading files that are not in the catalogue; now on. Full-width button. -->
+    <string name="device_fw_unlisted_on">未登録のイメージを許可 · オン</string>
+    <!-- SAFETY: Module firmware page, hint in the field where the user types the start of an unlisted file's hash to confirm it. One line. -->
+    <string name="device_fw_hash_hint">ハッシュの先頭 8 文字</string>
+    <!-- Module firmware page, result line while the signed catalogue is fetched. One line. -->
+    <string name="device_fw_checking_catalogue">ファームウェアカタログを確認中</string>
+    <!-- Module firmware page, result line while an image downloads. %1$s is the version string. One line. -->
+    <string name="device_fw_downloading">%1$s をダウンロード中</string>
+    <!-- Module firmware page, result line after a download that matched its catalogue entry. %1$s is the version string. One line. -->
+    <string name="device_fw_downloaded_checked">%1$s をダウンロードし、確認しました</string>
+    <!-- SAFETY: Module firmware page, result line when a download did not arrive or did not match its signed catalogue entry. One or two lines. -->
+    <string name="device_fw_download_failed">ダウンロード失敗：ファイルが届かなかったか、カタログの登録内容と一致しません</string>
+    <!-- Module firmware page, result line after the factory image was downloaded. One line. -->
+    <string name="device_fw_factory_downloaded">純正ファームウェアをダウンロードしました</string>
+    <!-- SAFETY: Title of the first of two dialogs before unlisted firmware files are allowed. One line. -->
+    <string name="device_fw_unlisted_q1_title">未登録のイメージを許可しますか？（1/2）</string>
+    <!-- SAFETY: Message of the first dialog before unlisted firmware files are allowed: what the user takes on. A paragraph. -->
+    <string name="device_fw_unlisted_q1">未登録のファイルはカタログにないものです。書き込み後は、バージョン文字列以外は検証できません。このファイルはこのプロジェクトの保証対象外であり、無線機が送信する内容にはご自身が責任を負います。</string>
+    <!-- SAFETY: Title of the second of two dialogs before unlisted firmware files are allowed. One line. -->
+    <string name="device_fw_unlisted_q2_title">自分の判断（2/2）</string>
+    <!-- SAFETY: Message of the second dialog before unlisted firmware files are allowed. A short paragraph. -->
+    <string name="device_fw_unlisted_q2">これはご自身の無線機であり、ご自身の判断です。このスイッチは書き込みの後、自動でオフになります。後でまたオンにできます。</string>
+    <!-- SAFETY: Confirm button of the second dialog: allows unlisted firmware files. Dialog button, keep short. -->
+    <string name="device_fw_unlisted_allow">理解したうえで許可する</string>
+    <!-- SAFETY: Module firmware page, result line when the typed hash start is missing or wrong for an unlisted file. One line. -->
+    <string name="device_fw_type_hash">ハッシュの先頭 8 文字を入力してください</string>
+    <!-- SAFETY: Module firmware page, the confirmation card before a load. %1$s is the image's version string. "Talk" is the push-to-talk button's name on the Intercom screen. A paragraph. -->
+    <string name="device_fw_confirm">%1$s を書き込みますか？モジュールは別のイメージを書き込むまで、再起動後もこのイメージを保持します。書き込み中は無線機が使用中になり、「送信」は機能しません。自己責任です：保証はありません。</string>
+    <!-- Module firmware page, a line in the handshake log when the image is fetched before the load. %1$s is the version string. One line. -->
+    <string name="device_fw_log_downloading">ファームウェアカタログから %1$s をダウンロード中</string>
+    <!-- Module firmware page, a line in the handshake log after the image was fetched and checked. %1$s is the version string. One line. -->
+    <string name="device_fw_log_downloaded">%1$s をダウンロードしました。サイズ、ハッシュ、バージョンが一致しています</string>
+    <!-- SAFETY: Module firmware page, result line: the factory image could not be loaded because its copy is not on the phone. One line. -->
+    <string name="device_fw_no_factory_copy">この端末に出荷時コピーがありません</string>
+    <!-- Module firmware page, result line: the chosen unlisted file is no longer in the folder. "Download/DMR/Firmware" is a folder path: keep it. One line. -->
+    <string name="device_fw_not_in_folder">そのイメージは Download/DMR/Firmware にありません</string>
+    <!-- Module firmware page, Installed section when the module has not reported its version. One or two lines. -->
+    <string name="device_fw_not_answered">モジュールがまだ応答していません。リカバリーで純正ファームウェアを書き込めます。</string>
+    <!-- Module firmware page, Installed section: %1$s is the module's version string, and the second line says it is not a known image. Two lines. -->
+    <string name="device_fw_unknown_version">%1$s\nこのバージョンは既知のリストにありません。</string>
+    <!-- Module firmware page, Factory backup section when the backup is verified. %1$s is where it came from ("stock app" or "saved copy"); the second line is the file path (keep it: %2$s is the version string, %3$s the start of its hash). Two lines. -->
+    <string name="device_fw_backup_verified">検証済み · %1$s\nDownload/DMR/Firmware/factory-%2$s-%3$s.bin</string>
+    <!-- SAFETY: Module firmware page, Factory backup section: no verified backup, the stock app's copy could not be read. One or two lines. -->
+    <string name="device_fw_backup_unread">まだ検証されていません。純正アプリのコピーを読み取れませんでした。</string>
+    <!-- SAFETY: Module firmware page, Factory backup section: no verified backup, the stock app's copy is not the known factory image. One or two lines. -->
+    <string name="device_fw_backup_mismatch">まだ検証されていません。純正のコピーが既知の純正ファームウェアと一致しません。</string>
+    <!-- Module firmware page, Chosen image section, the line after the image's name and description: %1$s is its size in bytes (already formatted), %2$s its hash; the file is on the phone. One line (it wraps). -->
+    <string name="device_fw_chosen_here">%1$s バイト · ハッシュ %2$s · ファイルはこの端末にあります</string>
+    <!-- Module firmware page, Chosen image section, the line after the image's name and description: %1$s is its size in bytes (already formatted), %2$s its hash; the file is not on the phone yet. One line (it wraps). -->
+    <string name="device_fw_chosen_missing">%1$s バイト · ハッシュ %2$s · ファイルはこの端末にありません</string>
+    <!-- Module firmware page, progress figures during the transfer, monospace, three lines: blocks sent of total (%1$d, %2$d); bytes sent (%3$s, formatted) and speed (%4$s bytes per second); time elapsed (%5$d:%6$02d) and left (%7$d:%8$02d) in minutes:seconds, and retries (%9$d). Keep each line short. -->
+    <string name="device_fw_progress">%1$d / %2$d ブロック\n%3$s バイト\u0020\u0020·\u0020\u0020%4$s B/s\n経過 %5$d:%6$02d\u0020\u0020·\u0020\u0020残り %7$d:%8$02d\u0020\u0020·\u0020\u0020再試行 %9$d 回</string>
+
+    <!-- ==== Module firmware: the signed catalogue (fw/FirmwareCatalog) ==== -->
+    <!-- SAFETY: Module firmware pre-flight, the "This phone" check fails: the catalogue knows this phone, and no variant of it is a supported base. One line. -->
+    <string name="device_fw_variant_unsupported">この端末のモジュールの種類はまだ対応していません</string>
+    <!-- Module firmware page, result line after a catalogue check: the server could not be reached. One line. -->
+    <string name="device_fw_catalogue_unreachable">ファームウェアカタログに接続できません</string>
+    <!-- Module firmware page, result line after a catalogue check: the downloaded list failed its signature or is older than the one on the phone, so it was not used. One line. -->
+    <string name="device_fw_catalogue_ignored">ファームウェアカタログを無視しました</string>
+    <!-- Module firmware page, result line after a catalogue check: nothing new. %1$d is the catalogue's serial number. One line. -->
+    <string name="device_fw_catalogue_current">ファームウェアカタログは最新です（%1$d）</string>
+    <!-- Module firmware page, result line after a new catalogue was stored. %1$d is its serial number, %2$d the number of images in it. One line. -->
+    <plurals name="device_fw_catalogue_loaded">
+        <item quantity="other">ファームウェアカタログ %1$d を読み込みました：%2$d 個のイメージ</item>
+    </plurals>
+    <!-- Module firmware page, result line after a catalogue check that failed. One line. -->
+    <string name="device_fw_catalogue_failed">ファームウェアカタログの確認に失敗しました</string>
+
+    <!-- ==== Module firmware: pre-flight checks and load results (fw/FirmwareSession) ==== -->
+    <!-- SAFETY: Module firmware pre-flight, a check fails: the image file is not the known image (size, hash or version string). One line. -->
+    <string name="device_fw_file_mismatch">ファイルが既知のイメージと一致しません</string>
+    <!-- Module firmware pre-flight, name of the check that the radio module reports its version. Shown as "● name — detail". Short. -->
+    <string name="device_fw_check_module">モジュールの応答</string>
+    <!-- Module firmware pre-flight, detail of the module check: no version reported yet. Short. -->
+    <string name="device_fw_check_module_none">バージョン未取得</string>
+    <!-- Module firmware pre-flight, name of the check that nothing is using the radio. Short. -->
+    <string name="device_fw_check_idle">無線機が待機中</string>
+    <!-- SAFETY: Module firmware pre-flight, detail when the radio is busy: what to stop before a load. One line. -->
+    <string name="device_fw_check_idle_busy">先に送信、スキャン、データモードを停止してください</string>
+    <!-- Module firmware pre-flight, detail when the radio is idle. One word. -->
+    <string name="device_fw_check_idle_ok">待機中</string>
+    <!-- Module firmware pre-flight, name of the check that the phone's own radio app is paused (SignalDeck has taken over the radio). Short. -->
+    <string name="device_fw_check_stock">純正アプリの一時停止</string>
+    <!-- SAFETY: Module firmware pre-flight, detail when the stock radio app still runs: take over first ("Take over" is the Device page's button). One line. -->
+    <string name="device_fw_check_stock_on">先に無線モジュールを引き継いでください</string>
+    <!-- Module firmware pre-flight, detail when the stock app is paused. One word. -->
+    <string name="device_fw_check_stock_ok">一時停止中</string>
+    <!-- Module firmware pre-flight, name of the battery check (over 60 %, or over 40 % while charging). One word. -->
+    <string name="device_fw_check_battery">バッテリー</string>
+    <!-- Module firmware pre-flight, battery detail: %1$d is the charge in percent, and the phone is charging. Short. -->
+    <string name="device_fw_check_battery_charging">%1$d%% 充電中</string>
+    <!-- Module firmware pre-flight, battery detail: %1$d is the charge in percent, and the phone is not charging. Short. -->
+    <string name="device_fw_check_battery_on">%1$d%% バッテリー駆動</string>
+    <!-- Module firmware pre-flight, name of the check that the image file is the known one (its hash is the detail). Short. -->
+    <string name="device_fw_check_hash">イメージのハッシュ</string>
+    <!-- SAFETY: Module firmware pre-flight, detail of the factory-backup check when there is no verified backup. Short. -->
+    <string name="device_fw_check_backup_missing">なし、または不一致</string>
+    <!-- Module firmware pre-flight, name of the check that this phone, its stock app and its module may take the image (the reason is the detail). Short. -->
+    <string name="device_fw_check_phone">この端末</string>
+    <!-- SAFETY: Last heard / activity history line: after a load the module reported a different version string, so the factory image is loaded back. %1$s is the wanted version string, %2$s what the module said. One or two lines. -->
+    <string name="device_fw_hist_mismatch">ファームウェア書き込みの不一致：期待値 %1$s、モジュールの応答 %2$s。純正ファームウェアに戻しています。</string>
+    <!-- SAFETY: Module firmware page, result line: after the load the module reported the wrong version string (%1$s), and the factory copy to restore is not on the phone. One or two lines. -->
+    <string name="device_fw_answered_no_copy">モジュールの応答は %1$s で、出荷時コピーがこの端末にありません</string>
+    <!-- SAFETY: Module firmware page, result line: after the load the module reported no version string, and the factory copy to restore is not on the phone. One or two lines. -->
+    <string name="device_fw_answered_nothing_no_copy">モジュールから応答がなく、出荷時コピーがこの端末にありません</string>
+    <!-- SAFETY: Module firmware page, result line (shown green): the version string did not match after a load, so the factory image (%1$s) was loaded back. One or two lines. -->
+    <string name="device_fw_restored_tag">バージョン文字列が一致しなかったため、純正ファームウェア（%1$s）に戻しました</string>
+    <!-- SAFETY: Module firmware page, result line: loading the factory image back failed. %1$s is the result code or version string the module gave. One line. -->
+    <string name="device_fw_restore_failed">純正ファームウェアへの復元に失敗しました（%1$s）</string>
+    <!-- SAFETY: Last heard / activity history line: the flash sample read back after a load did not match, so the factory image is loaded back. %1$s is the version string. One line. -->
+    <string name="device_fw_hist_readback">ファームウェア %1$s の読み戻しに失敗しました。純正ファームウェアに戻しています。</string>
+    <!-- SAFETY: Module firmware page, result line: %1$s is the read-back failure (a sentence such as "Flash sample differs at byte 12"), then the factory image was loaded back. One or two lines. -->
+    <string name="device_fw_sample_restored">%1$s 純正ファームウェアに戻しました。</string>
+    <!-- SAFETY: Module firmware page, result line: %1$s is the read-back failure (a sentence), then loading the factory image back failed too. One or two lines. -->
+    <string name="device_fw_sample_restore_failed">%1$s 純正ファームウェアへの復元にも失敗しました。</string>
+    <!-- Last heard / activity history line after a firmware load. %1$s is the version string now in the module. One line. -->
+    <string name="device_fw_hist_loaded">ファームウェアを書き込みました：%1$s</string>
+    <!-- Module firmware page, result line (green) after a load whose flash sample was read back and matched. %1$s is the version string and must stay first. One line. -->
+    <string name="device_fw_loaded_sample">%1$s · フラッシュのサンプルが一致</string>
+    <!-- SAFETY: Module firmware page, start of a result line: reading the flash back failed at byte offset %1$d (the factory restore result follows). One sentence. -->
+    <string name="device_fw_flash_read_at">フラッシュの読み取りがオフセット %1$d で失敗しました</string>
+    <!-- SAFETY: Module firmware page, start of a result line: the flash read back differs from the image at byte %1$d (the factory restore result follows). One sentence. -->
+    <string name="device_fw_flash_differs">フラッシュのサンプルがバイト %1$d で異なります</string>
+    <!-- SAFETY: Module firmware page, start of a result line: reading the flash back failed with an error (%1$s, technical, English). One sentence. -->
+    <string name="device_fw_flash_read_error">フラッシュの読み取りに失敗しました：%1$s</string>
+
+    <!-- ==== Module firmware: the built-in images and why one may not be loaded (fw/ImageTable) ==== -->
+    <!-- Module firmware page, description of the factory image (the firmware the phone shipped with). Two or three lines. -->
+    <string name="device_fw_factory_summary">この端末の出荷時のファームウェアです。書き込むとモジュールが元の状態に戻ります。別のイメージを書き込むまで、再起動後もこのイメージが残ります。</string>
+    <!-- SAFETY: Module firmware page, description of the bench image FW22 (it has its own 120 s transmit limit). A short paragraph. -->
+    <string name="device_fw_fw22_summary">試験用イメージです。ほかに何も送るものがないときもトーンが鳴り、モジュールが自身のフラッシュを読み取れます。このイメージでは、無線機自体の送信時間制限は 120 秒です。別のイメージを書き込むまで、再起動後も残ります。バンドや出力は変わりません。</string>
+    <!-- SAFETY: Module firmware pre-flight, why the file may not be loaded: it is not a known module image. One line. -->
+    <string name="device_fw_not_known_image">そのファイルは既知のモジュールイメージではありません</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the module is silent, and recovery loads only the factory image. One line. -->
+    <string name="device_fw_recovery_factory_only">モジュールが応答しませんでした。リカバリーで書き込めるのは純正ファームウェアだけです</string>
+    <!-- SAFETY: Module firmware pre-flight, why recovery cannot start: no verified factory backup; the stock app's copy is needed. One or two lines. -->
+    <string name="device_fw_backup_needed_recovery">出荷時バックアップがないか一致しません。リカバリーの前に純正アプリのコピーを用意してください</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the stock radio app is uninstalled and there is no verified factory copy. One or two lines. -->
+    <string name="device_fw_stock_gone">純正アプリがなく、この端末に検証済みの出荷時コピーもありません</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the module runs a firmware this build does not know. %1$s is its version string. One line. -->
+    <string name="device_fw_variant_tag">まだ対応していないファームウェアの種類です（%1$s）</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: it was built for another phone model. One line. -->
+    <string name="device_fw_wrong_model">このイメージは別の端末の機種用に作られたものです</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the phone's stock radio app is not the one the image belongs to. One or two lines. -->
+    <string name="device_fw_wrong_stock_app">この端末の純正無線アプリは、このイメージに対応するものではありません</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the stock app's firmware file is not the known factory image and there is no verified backup. One or two lines. -->
+    <string name="device_fw_stock_mismatch">純正アプリのファームウェアが既知の純正ファームウェアと一致せず、検証済みのバックアップもありません</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded yet: the factory backup must be on the phone first. One line. -->
+    <string name="device_fw_backup_first">ほかのイメージを書き込む前に、出荷時バックアップをこの端末に用意してください</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: it was not built from this phone's factory firmware. One line. -->
+    <string name="device_fw_wrong_base">そのイメージは、この端末の出荷時ファームウェアをもとに作られていません</string>
+    <!-- Module firmware pre-flight, warning (amber) on the "This phone" check: the stock app's version differs from the recorded one (%1$s found, %2$s expected), but its firmware file matches. One or two lines. -->
+    <string name="device_fw_stock_version_note">純正アプリは %1$s で、%2$s ではありません。ファームウェアファイルは一致するので、書き込みを続行できます</string>
+
+    <!-- ==== Module firmware: where the factory backup came from (fw/FirmwareVault) ==== -->
+    <!-- Module firmware page, where the verified factory backup came from: read out of the stock radio app (after "Verified · "). A few words, lower case. -->
+    <string name="device_fw_source_stock">純正アプリ</string>
+    <!-- Module firmware page, where the verified factory backup came from: the copy SignalDeck saved earlier (after "Verified · "). A few words, lower case. -->
+    <string name="device_fw_source_saved">保存済みコピー</string>
+    <!-- SAFETY: Module firmware page, description of an unlisted firmware file (not from the catalogue). %1$s is the version string read from the file. Two lines. -->
+    <string name="device_fw_unlisted_summary">カタログにありません。書き込まれる内容は、このプロジェクトの保証対象外です。ファイル内のバージョン文字列は %1$s です。</string>
+
+
+    <!-- ==== Device → Device report → Transmit test session sheets (ui/TxTestScreen). The steps, questions and results come from the session and stay English (bench text). ==== -->
+    <!-- SAFETY: Title of the transmit test session sheets, and the Device report menu item that opens them (a guided series of transmit tests for the certification guide). Sheet title, one line. -->
+    <string name="device_txtest_title">送信テストのセッション</string>
+    <!-- SAFETY: Transmit test session: SignalDeck does not control the radio yet. "Take over" is the Device page's button. One line. -->
+    <string name="device_txtest_take_over">先に無線モジュールを引き継いでください（デバイス画面）。</string>
+    <!-- SAFETY: Transmit test session, first sheet: what the session does (it transmits; it has its own 28 s transmit limit). "tx-report.json" is a file name: keep it. A paragraph. -->
+    <string name="device_txtest_intro">認定ガイド（3.3 節）の送信テストを順に案内します：FM での送信、送信解除の確認、制限の確認（このセッションは独自の 28 秒制限を使います）、周波数とデビエーション、DMR 端末では DMR のグループ呼出、発熱。SignalDeck が自分で送信し、すべての送信を記録します。受信側の無線機で何が聞こえたかを答えてください。結果の tx-report.json はデバイスレポートに入ります。コールサインと DMR ID は削除されます。</string>
+    <!-- Transmit test session, first sheet, under the build details: this app was not built by the project. A short paragraph. -->
+    <string name="device_txtest_fork">これは公式ビルドではありません：レポートにはその旨が、上記のコミットとリポジトリとともに記載されるので、管理者はテストされたものを正確に再ビルドできます。</string>
+    <!-- SAFETY: Transmit test session, section heading above the safety rules the tester switches on before anything transmits (capitals). Short. -->
+    <string name="device_txtest_before">最初の送信の前に</string>
+    <!-- SAFETY: Transmit test session, button that starts the session (it will transmit). Full-width button. -->
+    <string name="device_txtest_start">セッションを開始</string>
+    <!-- SAFETY: Toast when Start is tapped before every safety rule is switched on. Short. -->
+    <string name="device_txtest_confirm_rules">先にすべてのルールを確認してください</string>
+    <!-- Transmit test results sheet, part of the problem line: saving the results failed. %1$s is the error (technical, English). Short. -->
+    <string name="device_txtest_saving">保存：%1$s</string>
+    <!-- Title of the sheet that shows the transmit test session's results. One line. -->
+    <string name="device_txtest_results">送信テストの結果</string>
+    <!-- Transmit test results sheet, line under the results when something went wrong. %1$s is the error (technical, English). One line. -->
+    <string name="device_txtest_problem">問題：%1$s</string>
+    <!-- Transmit test results sheet: where the results were saved. %1$s is the file name (tx-report.json), %2$s the report folder's name; the paths and file names stay as they are. A paragraph. -->
+    <string name="device_txtest_saved">デバイスレポート（Download/DMR/DeviceReport/%2$s）に %1$s として保存しました。report.txt と 00_SUMMARY.txt に読みやすい項目もあります。送信テスト結果の Issue またはプルリクエストに、レポートの zip を添付してください。</string>
+    <!-- Transmit test results sheet, when the results could not be written. One line. -->
+    <string name="device_txtest_not_saved">結果を保存できませんでした。</string>
+    <!-- Transmit test results sheet, button that shares the whole device report as a zip. Full-width button. -->
+    <string name="device_txtest_share_zip">レポートの zip を共有</string>
+    <!-- Transmit test results sheet, button that shares only the results file. %1$s is its file name (tx-report.json). Full-width button. -->
+    <string name="device_txtest_share_json">%1$s だけを共有</string>
+    <!-- Title of Android's share chooser for the transmit test results file. %1$s is its file name (tx-report.json). One line. -->
+    <string name="device_txtest_share_file">%1$s を共有</string>
+    <!-- Toast when sharing the results file failed. %1$s is the error (technical, English). One line. -->
+    <string name="device_txtest_share_failed">共有に失敗しました：%1$s</string>
+    <!-- Transmit test session, button under a question form: go on without answering. Full-width button. -->
+    <string name="device_txtest_leave_empty">空欄のまま進む</string>
+    <!-- Transmit test session, title of the sheet shown while the tester picks the recording of the received signal. One word. -->
+    <string name="device_txtest_recording">録音</string>
+    <!-- Transmit test session, recording sheet: the file picker is open. A short paragraph. -->
+    <string name="device_txtest_pick">ファイル選択画面でファイルを選んでください。SignalDeck は SHA-256 を計算するために一度だけ読み取り、ファイル自体はコピーしません。</string>
+    <!-- Transmit test session, recording sheet, button: go on without a recording. Full-width button. -->
+    <string name="device_txtest_no_file">ファイルなしで進む</string>
+    <!-- Transmit test session, recording sheet, while the picked file is read. One line. -->
+    <string name="device_txtest_hashing">SHA-256 を計算中…</string>
+    <!-- Toast when the picked recording could not be read. %1$s is the error (technical, English). One line. -->
+    <string name="device_txtest_read_failed">ファイルを読み取れませんでした：%1$s</string>
+    <!-- SAFETY: Transmit test session, title of the sheet shown while the radio transmits. One word. -->
+    <string name="device_txtest_transmitting">送信中</string>
+    <!-- SAFETY: Transmit test session, the button that stops the transmission at once. Big full-width button, short. -->
+    <string name="device_txtest_release">今すぐ送信停止</string>
+
+    <!-- ==== Settings → Diagnostics page (ui/DiagnosticsView). The engine log itself stays English. ==== -->
+    <!-- SAFETY: Diagnostics page, pill button that takes over the radio (powers the module up for SignalDeck). One of four buttons in a row: very short. -->
+    <string name="device_diag_bring_up">無線を起動</string>
+    <!-- SAFETY: Diagnostics page, pill button that hands the radio back to the phone's own radio app. One of four buttons in a row: short. -->
+    <string name="device_diag_release">解放（純正アプリ有効）</string>
+    <!-- Diagnostics page, pill button that asks the radio module for its firmware version (into the log). One of three in a row: short. -->
+    <string name="device_diag_version">バージョン</string>
+    <!-- Diagnostics page, pill button that switches the radio module off and on. One of three in a row: short. -->
+    <string name="device_diag_power_cycle">電源再投入</string>
+    <!-- SAFETY: Diagnostics page, pill button that transmits a 1 kHz test tone for 3 seconds. One of three in a row: short. -->
+    <string name="device_diag_tone">1 kHz テストトーン（3 秒）</string>
+    <!-- Title of the dialog before the radio module is power-cycled. One line. -->
+    <string name="device_diag_power_cycle_q">無線モジュールの電源を入れ直しますか？</string>
+    <!-- Message of the power-cycle dialog: what it does. A short paragraph. -->
+    <string name="device_diag_power_cycle_msg">モジュールの電源ラインを一度 Low にしてから戻し、起動メッセージを待ってチャンネルを再設定します。無線機が応答しなくなったときに使います。</string>
+    <!-- Confirm button of the power-cycle dialog. Dialog button, short. -->
+    <string name="device_diag_power_cycle_go">電源再投入</string>
+    <!-- SAFETY: Title of the dialog before the 3-second test tone is transmitted. One line. -->
+    <string name="device_diag_tone_q">3 秒のテストトーンを送信しますか？</string>
+    <!-- SAFETY: Message of the test tone dialog: it transmits on the current channel. One or two lines. -->
+    <string name="device_diag_tone_msg">現在のチャンネルで 1 kHz のトーンを送信します。測定用の受信機や SDR で確認するためのものです。</string>
+    <!-- SAFETY: Confirm button of the test tone dialog: transmits. Dialog button, short. -->
+    <string name="device_diag_tone_go">送信</string>
+    <!-- Diagnostics page, full-width pill button: exports a backup and restores it into a scratch database to check it. Short. -->
+    <string name="device_diag_backup_check">バックアップの往復を確認</string>
+    <!-- Title of the dialog with the result of the backup round-trip check (the result itself is a technical English report). One line. -->
+    <string name="device_diag_backup_title">バックアップの往復確認</string>
+    <!-- Diagnostics page, full-width pill button that posts a test message notification for Android Auto. Short. -->
+    <string name="device_diag_car_message">車にテストメッセージを送る</string>
+
+    <!-- ==== Device → Updates sheet, update check and install (Updater) ==== -->
+    <!-- Title of the Device → Updates sheet, and the Device page row that opens it. One word. -->
+    <string name="device_update_title">アップデート</string>
+    <!-- Updates sheet, intro when the installed build is a beta. %1$s is the installed version (1.0.0-beta.24). "Release", "Beta" and "Update" are the names of the sections and button below. A paragraph. -->
+    <string name="device_update_intro_beta">インストール済みは %1$s（ベータ版）です。正式版（完成したビルド）とベータ版（テスト用ビルド）の 2 系統があります。ベータ版はテスト中の 1 機種向けに作られることが多いので、更新前に変更内容を読んでください。「更新」をタップするまで何もインストールされません。</string>
+    <!-- Updates sheet, intro when the installed build is a release. %1$s is the installed version (1.0.0). "Release", "Beta" and "Update" are the names of the sections and button below. A paragraph. -->
+    <string name="device_update_intro_release">インストール済みは %1$s（正式版）です。正式版（完成したビルド）とベータ版（テスト用ビルド）の 2 系統があります。ベータ版はテスト中の 1 機種向けに作られることが多いので、更新前に変更内容を読んでください。「更新」をタップするまで何もインストールされません。</string>
+    <!-- Updates sheet, status line while the releases are fetched from GitHub. One line. -->
+    <string name="device_update_checking_github">GitHub を確認中…</string>
+    <!-- Updates sheet status line, or toast, when the update check failed. %1$s is the error (technical, English). One line. -->
+    <string name="device_update_failed">アップデートの確認に失敗しました：%1$s</string>
+    <!-- Updates sheet, section heading for the finished builds (capitals). One word. -->
+    <string name="device_update_path_release">正式版</string>
+    <!-- Updates sheet, section heading for the test builds (capitals). One word. -->
+    <string name="device_update_path_beta">ベータ版</string>
+    <!-- Updates sheet, Beta section: no test build has been published. One line. -->
+    <string name="device_update_no_beta">公開されているベータ版はありません。</string>
+    <!-- Updates sheet, Release section: no finished build yet. One line. -->
+    <string name="device_update_no_release">正式版はまだありません：SignalDeck はまだベータ版です。</string>
+    <!-- Updates sheet, Beta section: nothing newer than the installed build. %1$s is the newest beta's version. One line. -->
+    <string name="device_update_newest_beta">新しいものはありません：最新のベータ版は %1$s です。</string>
+    <!-- Updates sheet, Beta section: the newest beta (%1$s) is the one installed. One line. -->
+    <string name="device_update_newest_beta_yours">新しいものはありません：最新のベータ版は %1$s です（インストール済み）。</string>
+    <!-- Updates sheet, Release section: nothing newer than the installed build. %1$s is the newest release's version. One line. -->
+    <string name="device_update_newest_release">新しいものはありません：最新の正式版は %1$s です。</string>
+    <!-- Updates sheet, Release section: the newest release (%1$s) is the one installed. One line. -->
+    <string name="device_update_newest_release_yours">新しいものはありません：最新の正式版は %1$s です（インストール済み）。</string>
+    <!-- Updates sheet, a section's headline when one newer build is available. %1$s is its version. One line. -->
+    <string name="device_update_available">%1$s を利用できます。</string>
+    <!-- Updates sheet, Beta section headline when several newer betas exist (shown only for 2 or more). %1$s is the newest version, %2$d how many betas came out since the installed one. One line. -->
+    <plurals name="device_update_available_betas">
+        <item quantity="other">%1$s を利用できます（インストール済みの後に %2$d 個のベータ版）。</item>
+    </plurals>
+    <!-- Updates sheet, Release section headline when several newer releases exist (shown only for 2 or more). %1$s is the newest version, %2$d how many releases came out since the installed one. One line. -->
+    <plurals name="device_update_available_releases">
+        <item quantity="other">%1$s を利用できます（インストール済みの後に %2$d 個の正式版）。</item>
+    </plurals>
+    <!-- Updates sheet, Release section when the installed beta is newer than the newest release (%1$s). Two lines. -->
+    <string name="device_update_downgrade_head">最新の正式版（%1$s）より新しいベータ版を使用中です。正式版に戻せます。</string>
+    <!-- Updates sheet: heading line over the release notes of every newer build. %1$s is the installed version; %2$s the notes (from GitHub, English). Heading, then the notes. -->
+    <string name="device_update_changes">%1$s からの変更点：\n\n%2$s</string>
+    <!-- Updates sheet, button that downloads and installs the newest build. %1$s is its version, %2$s its size in MB. Full-width button. -->
+    <string name="device_update_to">%1$s に更新（%2$s MB）</string>
+    <!-- Updates sheet, going back from a beta: heading over the release's notes. %1$s is the release's version, %2$s its notes (from GitHub, English). -->
+    <string name="device_update_release_notes">正式版 %1$s：\n\n%2$s</string>
+    <!-- Updates sheet, going back from a beta: heading over the release's notes. %1$s is the release's version, %2$s its date (2026-10-30), %3$s its notes (from GitHub, English). -->
+    <string name="device_update_release_notes_dated">正式版 %1$s（%2$s）：\n\n%3$s</string>
+    <!-- Updates sheet, in place of a release's notes when it has none. Short. -->
+    <string name="device_update_no_notes">（説明なし）</string>
+    <!-- Updates sheet, button that installs the newest release over a newer beta. %1$s is the release's version, %2$s its size in MB. Full-width button. -->
+    <string name="device_update_back_button">正式版 %1$s に戻す（%2$s MB）</string>
+    <!-- Title of the dialog before going back from a beta to a release. %1$s is the release's version. One line. -->
+    <string name="device_update_back_q">正式版 %1$s に戻しますか？</string>
+    <!-- Message of the go-back dialog. %1$s is the installed beta, %2$s the release that replaces it. Two paragraphs. -->
+    <string name="device_update_back_msg">%1$s を正式版 %2$s に置き換えます。チャンネル、設定、録音、root アクセスはそのまま残ります。%2$s より後のベータ版で追加された機能は、次の正式版まで使えなくなります。\n\nAndroid が古いバージョンをインストールするには root が必要ですが、SignalDeck は既に root を持っています。SignalDeck は終了し、%2$s として再起動します。無線機を使用中だった場合は、アプリを開くと元に戻ります。</string>
+    <!-- Confirm button of the go-back dialog. Dialog button, short. -->
+    <string name="device_update_back_go">戻す</string>
+    <!-- Toast when the release download starts for going back from a beta. %1$s is the release's version. One or two lines. -->
+    <string name="device_update_back_downloading">%1$s をダウンロード中… インストールが終わると、SignalDeck は正式版として再起動します</string>
+    <!-- Toast when the update download did not finish. Short. -->
+    <string name="device_update_download_failed">ダウンロードに失敗しました</string>
+    <!-- Toast while the downloaded release is installed with root. %1$s is its version. One line. -->
+    <string name="device_update_installing">root で %1$s をインストール中…</string>
+    <!-- Toast when installing with root failed. %1$s is the shell output (technical, English). One or two lines. -->
+    <string name="device_update_root_failed">root でインストールできませんでした：%1$s</string>
+    <!-- Toast when the download could not be started. %1$s is the error (technical, English). One line. -->
+    <string name="device_update_start_failed">ダウンロードを開始できませんでした：%1$s</string>
+    <!-- Toast when a quick update check starts. Short. -->
+    <string name="device_update_checking">アップデートを確認中…</string>
+    <!-- Toast after the update check when no build is published. %1$s is the installed version. One line. -->
+    <string name="device_update_none_published">SignalDeck のリリースはまだ公開されていません（インストール済みは %1$s）</string>
+    <!-- Toast after the update check when nothing newer exists. %1$s is the installed version. One line. -->
+    <string name="device_update_latest">最新バージョンです（%1$s）</string>
+    <!-- Title of the dialog that offers a newer build. %1$s is its version. One line. -->
+    <string name="device_update_offer_title">アップデートあり：%1$s</string>
+    <!-- Message of the update offer when the build has no notes. %1$s is the installed version, %2$s the APK file name, %3$s its size in MB. Two paragraphs. -->
+    <string name="device_update_offer">インストール済みは %1$s です。\n\n%2$s（%3$s MB）をダウンロードしてインストールしますか？Android がインストールの確認を求めます。チャンネルと設定はそのまま残ります。</string>
+    <!-- Message of the update offer. %1$s is the installed version, %2$s the release notes (from GitHub, English), %3$s the APK file name, %4$s its size in MB. Several paragraphs. -->
+    <string name="device_update_offer_notes">インストール済みは %1$s です。\n\n新機能：\n%2$s\n\n%3$s（%4$s MB）をダウンロードしてインストールしますか？Android がインストールの確認を求めます。チャンネルと設定はそのまま残ります。</string>
+    <!-- Confirm button of the update offer: downloads the APK. Dialog button, short. -->
+    <string name="device_update_download">ダウンロード</string>
+    <!-- Toast when the update download starts. One line. -->
+    <string name="device_update_downloading">ダウンロード中… 完了するとインストーラーが開きます</string>
+    <!-- Toast when the installer could not be opened after the download. One line. -->
+    <string name="device_update_open_apk">ダウンロードした APK を「ダウンロード」から開いてインストールしてください</string>
+
+    <!-- ==== Device report → Find radio firmware: progress (FirmwareFinder). The findings are device report text and stay English. ==== -->
+    <!-- Progress dialog while the phone is searched for radio firmware files. %1$s is a folder path or an APK file name. One line (… is added after it). -->
+    <string name="device_fw_finder_looking">%1$s を検索中</string>
+
+
+    <!-- ==== Device → Profile: the signed profile list and its advisories (ProfileRegistry). Advisory titles and reasons are data from the list. ==== -->
+    <!-- SAFETY: What an advisory from the signed profile list does on this phone: the phone's profile is not used, the stock radio app keeps the radio. Starts with a capital; shown as a sentence, and also lower-cased inside "This advisory says: …". One line. -->
+    <string name="device_profile_restrict_profile">SignalDeck はこの端末のプロファイルを使いません（無線モジュールは純正アプリのまま）</string>
+    <!-- SAFETY: What an advisory does on this phone: SignalDeck no longer takes over the radio by itself and does not transmit. Shown as a sentence, and also lower-cased inside "This advisory says: …". One line. -->
+    <string name="device_profile_restrict_takeover">SignalDeck は自動では無線モジュールを引き継がなくなります（送信もしません）</string>
+    <!-- SAFETY: What an advisory does on this phone: transmitting is switched off. Lower case at the start (it is used inside sentences too). Short. -->
+    <string name="device_profile_restrict_transmit">送信はオフになっています</string>
+    <!-- Toast after Device → Profile → Check now: the list could not be fetched. %1$d and %2$d are the HTTP status codes of the list and its signature. One or two lines. -->
+    <string name="device_profile_unreachable">プロファイルリストに接続できません（HTTP %1$d/%2$d）。この端末のプロファイルを引き続き使います</string>
+    <!-- SAFETY: Toast after a profile check: the downloaded list was not used because its signature is not valid. One line. -->
+    <string name="device_profile_bad_signature">プロファイルリストを無視しました：署名が無効です</string>
+    <!-- Toast after a profile check: the downloaded list is older than the one on the phone, so it was not used. One line. -->
+    <string name="device_profile_older">プロファイルリストを無視しました：この端末にあるものより古いリストです</string>
+    <!-- Toast after a profile check: nothing new. %1$d is the list's serial number. One line. -->
+    <string name="device_profile_current">プロファイルは最新です（リスト %1$d）</string>
+    <!-- Toast after a new profile list was stored. %1$d is its serial number, %2$s the profile this phone now uses (e.g. "Armor 26 Ultra profile r3 (built in)"). One or two lines. -->
+    <string name="device_profile_loaded">プロファイルリスト %1$d を読み込みました：この端末は %2$s を使用します</string>
+    <!-- Toast after a profile check that failed. %1$s is the error (technical, English). One or two lines. -->
+    <string name="device_profile_failed">プロファイルの確認に失敗しました：%1$s。この端末のプロファイルを引き続き使います</string>
+    <!-- SAFETY: Notification title when a new advisory from the signed profile list applies to this phone. %1$s is the advisory's title (from the list). One line. -->
+    <string name="device_profile_advisory_title">SignalDeck の注意情報：%1$s</string>
+    <!-- SAFETY: Notification text of a new advisory. %1$s is what it does on this phone (a sentence such as "transmitting is switched off"), %2$s its reason (from the list). "Device page → Profile" is where to read it. A few lines. -->
+    <string name="device_profile_advisory_text">%1$s。%2$s — 内容の確認や、それでも使い続ける場合は「デバイス画面 → プロファイル」へ。</string>
+    <!-- Device → Profile and the profile-check toast: the profile this phone uses, taken from the downloaded list. %1$s is the profile's name (a phone model), %2$s its revision number. One line. -->
+    <string name="device_profile_describe_updated">%1$s プロファイル r%2$s（プロファイルリストから更新）</string>
+    <!-- Device → Profile and the profile-check toast: the profile this phone uses, built into the app. %1$s is the profile's name (a phone model), %2$s its revision number. One line. -->
+    <string name="device_profile_describe_builtin">%1$s プロファイル r%2$s（内蔵）</string>
+
+    <!-- ==== Phone profiles: the band list used in many messages (DeviceProfile). Profile names and hardware values are data. ==== -->
+    <!-- The word before the last band in a list of the bands a radio tunes ("136–174 and 400–480 MHz"; the others are joined with ", "). Keep the spaces around it. -->
+    <string name="device_profile_bands_and">\u0020と\u0020</string>
+</resources>

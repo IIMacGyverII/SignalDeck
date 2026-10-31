@@ -44,12 +44,12 @@ public final class SplashView extends View {
         this.version = version; this.done = done;
         animate = ValueAnimator.areAnimatorsEnabled();
         word.setTypeface(Neo.display(c)); word.setTextAlign(Paint.Align.LEFT);
-        sub.setTypeface(Neo.uiMedium(c)); sub.setColor(GREY); sub.setTextAlign(Paint.Align.CENTER); sub.setLetterSpacing(0.08f);
+        sub.setTypeface(Neo.uiMedium(c)); sub.setColor(GREY); sub.setTextAlign(Paint.Align.CENTER); Neo.tracking(sub, 0.08f);
         small.setTypeface(Neo.uiSemi(c)); small.setColor(GREY);
         line.setStyle(Paint.Style.STROKE); line.setStrokeJoin(Paint.Join.MITER);
         wave.setStyle(Paint.Style.STROKE); wave.setStrokeCap(Paint.Cap.ROUND); wave.setStrokeJoin(Paint.Join.ROUND); wave.setColor(CYAN);
         setLayerType(LAYER_TYPE_HARDWARE, null);
-        setContentDescription("SignalDeck " + version);
+        setContentDescription("SignalDeck " + version);   // i18n: product name
         setOnClickListener(v -> finish());
     }
 
@@ -74,7 +74,7 @@ public final class SplashView extends View {
         inner.lineTo(x(l + k), y(b)); inner.lineTo(x(l), y(b - k)); inner.lineTo(x(l), y(t + k)); inner.close();
         tab.reset(); chamfer(tab, 268, 768, 516, 806, 9);
         float target = 572 * s; word.setTextSize(100 * s);
-        float wd = word.measureText("SignalDeck"); word.setTextSize(100 * s * target / wd);
+        float wd = word.measureText("SignalDeck"); word.setTextSize(100 * s * target / wd);   // i18n: product name (the logo wordmark)
         sub.setTextSize(29 * s); small.setTextSize(19 * s);
         glint.setShader(null);
     }
@@ -105,21 +105,21 @@ public final class SplashView extends View {
 
         // wordmark: "Signal" rises in, "Deck" follows; a light glint crosses once
         float base = y(497);
-        float wSig = word.measureText("Signal"), wAll = word.measureText("SignalDeck"), left = x(392) - wAll / 2;
+        float wSig = word.measureText("Signal"), wAll = word.measureText("SignalDeck"), left = x(392) - wAll / 2;   // i18n: product name (the logo wordmark)
         float a1 = span(t, 120, 520), a2 = span(t, 260, 520);
         word.setColor(CYAN); word.setAlpha((int) (255 * a1)); word.setShadowLayer(14 * s * a1, 0, 0, Neo.alpha(CYAN, (int) (0x70 * a1)));
-        cv.drawText("Signal", left, base + (1 - a1) * 26 * s, word);
+        cv.drawText("Signal", left, base + (1 - a1) * 26 * s, word);   // i18n: product name (the logo wordmark)
         word.setShadowLayer(0, 0, 0, 0); word.setColor(0xFFFFFFFF); word.setAlpha((int) (255 * a2));
-        cv.drawText("Deck", left + wSig, base + (1 - a2) * 26 * s, word);
+        cv.drawText("Deck", left + wSig, base + (1 - a2) * 26 * s, word);   // i18n: product name (the logo wordmark)
         float g = (t - 950) / 650f;
         if (g > 0 && g < 1) {
             float gx = left - 120 * s + g * (wAll + 240 * s);
             glint.setShader(new LinearGradient(gx - 60 * s, 0, gx + 60 * s, 0, new int[] { 0x00FFFFFF, 0x99FFFFFF, 0x00FFFFFF }, null, Shader.TileMode.CLAMP));
             glint.setTypeface(word.getTypeface()); glint.setTextSize(word.getTextSize());
-            cv.drawText("SignalDeck", left, base, glint);
+            cv.drawText("SignalDeck", left, base, glint);   // i18n: product name (the logo wordmark)
         }
         sub.setAlpha((int) (255 * span(t, 520, 500)));
-        cv.drawText("Advanced Radio Control", x(392), y(560), sub);
+        cv.drawText(com.macdmr.radio.i18n.Txt.s(com.macdmr.radio.R.string.intercom_splash_tagline), x(392), y(560), sub);
 
         // panel: frames trace themselves in
         float p1 = span(t, 300, 700), p2 = span(t, 450, 700), p3 = span(t, 650, 450);
@@ -136,8 +136,8 @@ public final class SplashView extends View {
         drawWave(cv, cx, phase, on);
         drawMeter(cv, 124, true, on * (0.35f + 0.65f * tx), animate ? now : 0);
         drawMeter(cv, 598, false, on * (0.25f + 0.75f * rx), animate ? now + 333 : 0);
-        small.setAlpha((int) (255 * on)); small.setTextAlign(Paint.Align.LEFT); cv.drawText("TX", x(143), y(734), small);
-        small.setTextAlign(Paint.Align.RIGHT); cv.drawText("RX", x(647), y(734), small);
+        small.setAlpha((int) (255 * on)); small.setTextAlign(Paint.Align.LEFT); cv.drawText("TX", x(143), y(734), small);   // i18n: radio abbreviation on the logo
+        small.setTextAlign(Paint.Align.RIGHT); cv.drawText("RX", x(647), y(734), small);   // i18n: radio abbreviation on the logo
         fill.setStyle(Paint.Style.FILL);
         fill.setColor(CYAN); fill.setAlpha((int) (255 * on * (0.35f + 0.65f * tx))); cv.drawCircle(x(130), y(727), 5 * s, fill);
         fill.setColor(rx > 0.2f ? CYAN : DOT); fill.setAlpha((int) (255 * on * (rx > 0.2f ? 0.35f + 0.65f * rx : 1))); cv.drawCircle(x(609), y(727), 5 * s, fill);

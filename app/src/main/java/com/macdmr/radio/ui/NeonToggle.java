@@ -23,7 +23,7 @@ public class NeonToggle extends TextView {
         setText(emoji + "\n" + label);
         setGravity(Gravity.CENTER); setTextSize(13); setTypeface(Typeface.DEFAULT_BOLD); setIncludeFontPadding(false); setLineSpacing(0, 0.95f);
         setTextColor(accent[3]); setLines(2);
-        setPadding(Theme.dp(c, 2), 0, Theme.dp(c, 2), 0);
+        setPadding(Theme.dp(c, 2), 0, Theme.dp(c, 2), 0); Neo.lang(this);
         setClickable(true); setFocusable(true);
         setOn(false);
     }

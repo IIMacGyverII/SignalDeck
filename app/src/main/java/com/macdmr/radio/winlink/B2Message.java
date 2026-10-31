@@ -25,6 +25,7 @@ import java.util.TreeMap;
  * the body, then each attachment followed by CRLF. Addresses are callsigns, or "SMTP:" + an internet address
  * (call@winlink.org is just the callsign). Dates are UTC "yyyy/MM/dd HH:mm". The body is ISO-8859-1 unless the
  * Content-Type names another character set, as Winlink Express and Pat do.
+ * i18n: stays English (Winlink message format)
  */
 public final class B2Message {
     public static final class Attachment {

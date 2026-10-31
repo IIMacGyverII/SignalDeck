@@ -109,7 +109,7 @@ public final class ToneQueue {
 
     // ---- RTTY (45.45 baud, 170 Hz shift, ITA2, 1.5 stop bits) ----
 
-    private static final String LTRS = "\0E\nA SIU\rDRJNFCKTZLWHYPQOBG\u000EMXV\u000F";
+    private static final String LTRS = "\0E\nA SIU\rDRJNFCKTZLWHYPQOBG\u000EMXV\u000F";   // i18n: Baudot code table
     private static final String FIGS = "\u0000" + "3\n- \u000787\r$4',!:(5\")2#6019?&\u000E./;\u000F";
     private static final int LTRS_CODE = 31, FIGS_CODE = 27;
     /** One bit at 45.45 baud is 22.0 ms; the stop element 33 ms. The queue takes whole milliseconds, so the character is 22 × 6 + 33 = 165 ms (165.0 at the nominal rate). */

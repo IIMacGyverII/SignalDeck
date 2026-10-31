@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -41,7 +44,11 @@ public final class Conditions {
         return 77.6 / tk * (pHpa + 4810.0 * e / tk);
     }
     public static final int NORMAL = 0, ENHANCED = 1, SUPER = 2, DUCT = 3;
-    public static final String[] CLASS_NAMES = { "Normal", "Slightly enhanced", "Super-refraction: longer range", "Ducting likely: long range" };
+    private static final int[] CLASS_NAMES = { R.string.modes_cond_class_normal, R.string.modes_cond_class_enhanced, R.string.modes_cond_class_super, R.string.modes_cond_class_duct };
+    /** A class's name in the app's language. */
+    public static String className(int cls) { return Txt.s(CLASS_NAMES[cls]); }
+    /** All the class names, in class order. */
+    public static String[] classNames() { String[] o = new String[CLASS_NAMES.length]; for (int i = 0; i < o.length; i++) o[i] = className(i); return o; }
     /** dN/dh in N-units per km → class. */
     public static int classify(double gradientPerKm) { return gradientPerKm <= -157 ? DUCT : gradientPerKm <= -79 ? SUPER : gradientPerKm <= -55 ? ENHANCED : NORMAL; }
 
@@ -77,7 +84,7 @@ public final class Conditions {
 
     // ---- aurora (pure) ----
     /** NOAA's Kp in words. */
-    public static String kpWords(double kp) { return kp >= 7 ? "severe storm" : kp >= 6 ? "strong storm" : kp >= 5 ? "storm" : kp >= 4 ? "active" : kp >= 3 ? "unsettled" : "quiet"; }
+    public static String kpWords(double kp) { return Txt.s(kp >= 7 ? R.string.modes_cond_kp_severe : kp >= 6 ? R.string.modes_cond_kp_strong : kp >= 5 ? R.string.modes_cond_kp_storm : kp >= 4 ? R.string.modes_cond_kp_active : kp >= 3 ? R.string.modes_cond_kp_unsettled : R.string.modes_cond_kp_quiet); }
     /** OVATION's grid ("coordinates": [lon 0..359, lat, percent]) at a place, nearest point. */
     public static int ovationAt(JSONArray coords, double lat, double lon) {
         int la = (int) Math.round(lat), lo = (int) Math.round(((lon % 360) + 360) % 360) % 360; int best = -1;
@@ -86,18 +93,20 @@ public final class Conditions {
     }
 
     // ---- meteor showers (pure) ----
-    public static final class Shower { public final String name; public final int month, day, zhr, halfWidthDays; public final String note; public long peak;
-        Shower(String n, int m, int d, int z, int w, String note) { name = n; month = m; day = d; zhr = z; halfWidthDays = w; this.note = note; } }
+    public static final class Shower { public final String name; public final int month, day, zhr, halfWidthDays; final int noteId; public long peak;
+        Shower(String n, int m, int d, int z, int w, int noteId) { name = n; month = m; day = d; zhr = z; halfWidthDays = w; this.noteId = noteId; }
+        /** The shower's note in the app's language, "" when it has none. */
+        public String note() { return noteId == 0 ? "" : Txt.s(noteId); } }
     static final Shower[] SHOWERS = {
-        new Shower("Quadrantids", 1, 3, 110, 2, "short, sharp peak"),
-        new Shower("Lyrids", 4, 22, 18, 2, ""),
-        new Shower("Eta Aquariids", 5, 6, 50, 4, "best before dawn"),
-        new Shower("Arietids", 6, 7, 60, 5, "daytime shower: radio only"),
-        new Shower("Southern Delta Aquariids", 7, 30, 25, 5, ""),
-        new Shower("Perseids", 8, 12, 100, 4, "the summer favourite"),
-        new Shower("Orionids", 10, 21, 20, 4, ""),
-        new Shower("Leonids", 11, 17, 15, 2, ""),
-        new Shower("Geminids", 12, 14, 150, 3, "the strongest of the year"),
+        new Shower("Quadrantids", 1, 3, 110, 2, R.string.modes_cond_shower_quadrantids),   // i18n: proper name
+        new Shower("Lyrids", 4, 22, 18, 2, 0),   // i18n: proper name
+        new Shower("Eta Aquariids", 5, 6, 50, 4, R.string.modes_cond_shower_eta_aquariids),   // i18n: proper name
+        new Shower("Arietids", 6, 7, 60, 5, R.string.modes_cond_shower_arietids),   // i18n: proper name
+        new Shower("Southern Delta Aquariids", 7, 30, 25, 5, 0),   // i18n: proper name
+        new Shower("Perseids", 8, 12, 100, 4, R.string.modes_cond_shower_perseids),   // i18n: proper name
+        new Shower("Orionids", 10, 21, 20, 4, 0),   // i18n: proper name
+        new Shower("Leonids", 11, 17, 15, 2, 0),   // i18n: proper name
+        new Shower("Geminids", 12, 14, 150, 3, R.string.modes_cond_shower_geminids),   // i18n: proper name
     };
     /** The showers whose peak is within {@code days} from now (or now), soonest first. */
     public static List<Shower> showers(long now, int days, TimeZone tz) {
@@ -106,7 +115,7 @@ public final class Conditions {
         for (int y = year; y <= year + 1; y++) for (Shower s : SHOWERS) {
             Calendar p = Calendar.getInstance(tz, Locale.US); p.clear(); p.set(y, s.month - 1, s.day, 12, 0);
             long peak = p.getTimeInMillis();
-            if (peak + s.halfWidthDays * 86_400_000L >= now && peak - now <= days * 86_400_000L) { Shower x = new Shower(s.name, s.month, s.day, s.zhr, s.halfWidthDays, s.note); x.peak = peak; out.add(x); }
+            if (peak + s.halfWidthDays * 86_400_000L >= now && peak - now <= days * 86_400_000L) { Shower x = new Shower(s.name, s.month, s.day, s.zhr, s.halfWidthDays, s.noteId); x.peak = peak; out.add(x); }
         }
         out.sort((a, b) -> Long.compare(a.peak, b.peak));
         return out;
@@ -141,19 +150,19 @@ public final class Conditions {
                 if (!"predicted".equals(o.optString("observed"))) r.kpNow = v;
                 else if (v > r.kpMax) { r.kpMax = v; r.kpMaxAt = t; }
             }
-        } catch (Throwable t) { r.problems.add("Kp (NOAA SWPC) unreachable"); }
+        } catch (Throwable t) { r.problems.add(Txt.s(R.string.modes_cond_problem_kp)); }
         if (hasFix) {
             try { JSONObject ov = new JSONObject(get("https://services.swpc.noaa.gov/json/ovation_aurora_latest.json")); r.aurora = ovationAt(ov.getJSONArray("coordinates"), lat, lon); }
-            catch (Throwable t) { r.problems.add("Aurora map (NOAA SWPC) unreachable"); }
+            catch (Throwable t) { r.problems.add(Txt.s(R.string.modes_cond_problem_aurora)); }
             try {
                 double la = Math.round(lat * 2) / 2.0, lo = Math.round(lon * 2) / 2.0;          // about 50 km: the weather service does not need more
                 StringBuilder v = new StringBuilder("temperature_2m,relative_humidity_2m,surface_pressure");
-                for (int p : new int[] { 1000, 975, 950, 925, 900, 850 }) v.append(",temperature_").append(p).append("hPa,relative_humidity_").append(p).append("hPa,geopotential_height_").append(p).append("hPa");
-                JSONObject om = new JSONObject(get(String.format(Locale.US, "https://api.open-meteo.com/v1/forecast?latitude=%.1f&longitude=%.1f&hourly=%s&forecast_days=3&timezone=GMT", la, lo, v)));
+                for (int p : new int[] { 1000, 975, 950, 925, 900, 850 }) v.append(",temperature_").append(p).append("hPa,relative_humidity_").append(p).append("hPa,geopotential_height_").append(p).append("hPa");   // i18n: API parameter names
+                JSONObject om = new JSONObject(get(String.format(Locale.US, "https://api.open-meteo.com/v1/forecast?latitude=%.1f&longitude=%.1f&hourly=%s&forecast_days=3&timezone=GMT", la, lo, v)));   // i18n: URL
                 List<Slot> all = tropo(om.getJSONObject("hourly"), om.optDouble("elevation", 0));
                 long now = System.currentTimeMillis(); for (Slot s : all) if (s.time >= now - 3_600_000L && s.time <= now + 48 * 3_600_000L) r.tropo.add(s);
-            } catch (Throwable t) { r.problems.add("Tropo forecast (Open-Meteo) unreachable"); }
-        } else r.problems.add("No position fix: tropo and aurora need one");
+            } catch (Throwable t) { r.problems.add(Txt.s(R.string.modes_cond_problem_tropo)); }
+        } else r.problems.add(Txt.s(R.string.modes_cond_problem_nofix));
         cache = r; cacheLat = lat; cacheLon = lon;
         return r;
     }
@@ -168,8 +177,8 @@ public final class Conditions {
     public static JSONObject json(Report r) throws Exception {
         JSONObject o = new JSONObject().put("kpNow", r.kpNow).put("kpWords", r.kpNow < 0 ? "" : kpWords(r.kpNow)).put("kpMax", r.kpMax).put("kpMaxAt", r.kpMaxAt).put("aurora", r.aurora).put("fetched", r.fetched);
         JSONArray t = new JSONArray(); for (Slot s : r.tropo) t.put(new JSONObject().put("t", s.time).put("g", Math.round(s.gradient)).put("c", s.cls));
-        JSONArray m = new JSONArray(); for (Shower s : r.showers) m.put(new JSONObject().put("name", s.name).put("peak", s.peak).put("zhr", s.zhr).put("note", s.note));
+        JSONArray m = new JSONArray(); for (Shower s : r.showers) m.put(new JSONObject().put("name", s.name).put("peak", s.peak).put("zhr", s.zhr).put("note", s.note()));
         long[] w = r.bestWindow(); JSONArray p = new JSONArray(); for (String x : r.problems) p.put(x);
-        return o.put("tropo", t).put("showers", m).put("best", w == null ? JSONObject.NULL : new JSONObject().put("from", w[0]).put("to", w[1]).put("c", (int) w[2]).put("name", CLASS_NAMES[(int) w[2]])).put("classNames", new JSONArray(java.util.Arrays.asList(CLASS_NAMES))).put("problems", p);
+        return o.put("tropo", t).put("showers", m).put("best", w == null ? JSONObject.NULL : new JSONObject().put("from", w[0]).put("to", w[1]).put("c", (int) w[2]).put("name", className((int) w[2]))).put("classNames", new JSONArray(java.util.Arrays.asList(classNames()))).put("problems", p);
     }
 }

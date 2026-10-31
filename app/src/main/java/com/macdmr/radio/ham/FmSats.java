@@ -8,6 +8,9 @@ package com.macdmr.radio.ham;
 
 import android.content.Context;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,7 +38,7 @@ import java.util.regex.Pattern;
 public final class FmSats {
     private FmSats() { }
 
-    static final String AMSAT_STATUS = "https://www.amsat.org/status/", AMSAT_API = "https://www.amsat.org/status/api/v1/sat_info.php?name=";
+    static final String AMSAT_STATUS = "https://www.amsat.org/status/", AMSAT_API = "https://www.amsat.org/status/api/v1/sat_info.php?name=";   // i18n: URL
     static final String SATNOGS = "https://db.satnogs.org/api/";
     /** If AMSAT's page cannot be read: its FM list as of 2026-10-22 (the built-in three are left out). */
     static final String[] FALLBACK = { "AO-123", "AO-91", "CAS-3H", "IO-86", "RS83S", "RS95S", "TEVEL2-1", "TEVEL2-2", "TEVEL2-3", "TEVEL2-4", "TEVEL2-5", "TEVEL2-6", "TEVEL2-7", "TEVEL2-8", "TEVEL2-9" };
@@ -71,7 +74,7 @@ public final class FmSats {
             if (names.isEmpty()) for (String n : FALLBACK) names.add(n);
             names.removeIf(n -> { for (String b : BUILT_IN) if (b.equalsIgnoreCase(n)) return true; return false; });
             String sj = get(SATNOGS + "satellites/?format=json"), tj = get(SATNOGS + "transmitters/?format=json&alive=true&status=active");
-            if (sj == null || tj == null) return "Could not reach SatNOGS for the FM satellites";
+            if (sj == null || tj == null) return Txt.s(R.string.modes_fmsat_unreachable);
             JSONArray sats = new JSONArray(sj), txs = new JSONArray(tj);
             List<Entry> out = pick(names, sats, txs);
             StringBuilder tle = new StringBuilder();
@@ -84,7 +87,7 @@ public final class FmSats {
             Files.write(tleFile(c).toPath(), tle.toString().getBytes(StandardCharsets.US_ASCII));
             Files.write(file(c).toPath(), new JSONObject().put("updated", System.currentTimeMillis()).put("sats", js).toString().getBytes(StandardCharsets.UTF_8));
             return null;
-        } catch (Throwable t) { return "FM satellites: " + t.getMessage(); }
+        } catch (Throwable t) { return Txt.s(R.string.modes_fmsat_failed, String.valueOf(t.getMessage())); }
     }
 
     /** AMSAT's status page lists every satellite people report on as option values like "AO-123_[FM]". */
@@ -103,7 +106,7 @@ public final class FmSats {
         Map<String, JSONObject> byName = new HashMap<>();
         for (int i = 0; i < sats.length(); i++) {
             JSONObject s = sats.getJSONObject(i);
-            if (!"in orbit".equals(s.optString("status"))) continue;
+            if (!"in orbit".equals(s.optString("status"))) continue;   // i18n: SatNOGS API value
             byName.put(norm(s.optString("name")), s);
             for (String a : s.optString("names", "").split(",")) if (!a.trim().isEmpty()) byName.putIfAbsent(norm(a), s);
         }
@@ -181,14 +184,17 @@ public final class FmSats {
     }
     /** One line for the satellite list. */
     public static String describe(Status s, long now) {
-        if (s == null) return "AMSAT status: offline";
-        if (s.heard + s.notHeard + s.telemetry + s.crew == 0) return "AMSAT: no reports in the last 4 days";
-        StringBuilder b = new StringBuilder("AMSAT, 4 days: ");
-        if (s.heard + s.crew > 0) b.append("heard ").append(s.heard + s.crew).append('×');
-        if (s.telemetry > 0) b.append(b.length() > 15 ? ", " : "").append("telemetry only ").append(s.telemetry).append('×');
-        if (s.notHeard > 0) b.append(b.length() > 15 ? ", " : "").append("not heard ").append(s.notHeard).append('×');
-        if (s.lastHeard > 0) { long h = (now - s.lastHeard) / 3_600_000L; b.append(" · last heard ").append(h < 1 ? "within the hour" : h < 48 ? h + " h ago" : (h / 24) + " days ago"); }
-        return b.toString();
+        if (s == null) return Txt.s(R.string.modes_fmsat_status_offline);
+        if (s.heard + s.notHeard + s.telemetry + s.crew == 0) return Txt.s(R.string.modes_fmsat_status_none);
+        List<String> parts = new ArrayList<>();
+        if (s.heard + s.crew > 0) parts.add(Txt.s(R.string.modes_fmsat_status_heard, s.heard + s.crew));
+        if (s.telemetry > 0) parts.add(Txt.s(R.string.modes_fmsat_status_telemetry, s.telemetry));
+        if (s.notHeard > 0) parts.add(Txt.s(R.string.modes_fmsat_status_not_heard, s.notHeard));
+        String list = String.join(Txt.s(R.string.modes_list_separator), parts);
+        if (s.lastHeard <= 0) return Txt.s(R.string.modes_fmsat_status, list);
+        long h = (now - s.lastHeard) / 3_600_000L;
+        String when = h < 1 ? Txt.s(R.string.modes_fmsat_last_hour) : h < 48 ? Txt.s(R.string.modes_fmsat_last_hours, (int) h) : Txt.p(R.plurals.modes_fmsat_last_days, (int) (h / 24), (int) (h / 24));
+        return Txt.s(R.string.modes_fmsat_status_last, list, when);
     }
 
     private static String get(String url) {

@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,7 +68,7 @@ public final class NetFinder {
         if (xml == null) return out;
         Matcher sm = SERVER.matcher(xml);
         while (sm.find()) {
-            String server = tag(sm.group(1), "ServerName");
+            String server = tag(sm.group(1), "ServerName");   // i18n: XML tag
             Matcher nm = NET.matcher(sm.group(1));
             while (nm.find()) {
                 String b = nm.group(1); Net n = new Net();
@@ -155,17 +158,17 @@ public final class NetFinder {
     /** "146.730 MHz", "TG 3148", or what net control typed. */
     public static String where(Net n) {
         if (n.freqHz > 0) return String.format(Locale.US, "%.3f MHz", n.freqHz / 1e6);
-        if (n.talkgroup > 0) return "TG " + n.talkgroup;
+        if (n.talkgroup > 0) return "TG " + n.talkgroup;   // i18n: protocol word (talkgroup)
         return n.freqText.isEmpty() ? n.band : n.freqText;
     }
 
     // ---- where on the map: NetLogger has no locations, a frequency is shared by many towns ----
 
     private static final String[][] STATES = {
-        {"West Virginia","WV"},{"North Carolina","NC"},{"South Carolina","SC"},{"North Dakota","ND"},{"South Dakota","SD"},{"New Hampshire","NH"},{"New Jersey","NJ"},{"New Mexico","NM"},{"New York","NY"},{"Rhode Island","RI"},
-        {"Alabama","AL"},{"Alaska","AK"},{"Arizona","AZ"},{"Arkansas","AR"},{"California","CA"},{"Colorado","CO"},{"Connecticut","CT"},{"Delaware","DE"},{"Florida","FL"},{"Georgia","GA"},{"Hawaii","HI"},{"Idaho","ID"},{"Illinois","IL"},{"Indiana","IN"},{"Iowa","IA"},{"Kansas","KS"},{"Kentucky","KY"},{"Louisiana","LA"},{"Maine","ME"},{"Maryland","MD"},{"Massachusetts","MA"},{"Michigan","MI"},{"Minnesota","MN"},{"Mississippi","MS"},{"Missouri","MO"},{"Montana","MT"},{"Nebraska","NE"},{"Nevada","NV"},{"Ohio","OH"},{"Oklahoma","OK"},{"Oregon","OR"},{"Pennsylvania","PA"},{"Tennessee","TN"},{"Texas","TX"},{"Utah","UT"},{"Vermont","VT"},{"Virginia","VA"},{"Washington","WA"},{"Wisconsin","WI"},{"Wyoming","WY"}};
+        {"West Virginia","WV"},{"North Carolina","NC"},{"South Carolina","SC"},{"North Dakota","ND"},{"South Dakota","SD"},{"New Hampshire","NH"},{"New Jersey","NJ"},{"New Mexico","NM"},{"New York","NY"},{"Rhode Island","RI"},   // i18n: data (matched against English net names)
+        {"Alabama","AL"},{"Alaska","AK"},{"Arizona","AZ"},{"Arkansas","AR"},{"California","CA"},{"Colorado","CO"},{"Connecticut","CT"},{"Delaware","DE"},{"Florida","FL"},{"Georgia","GA"},{"Hawaii","HI"},{"Idaho","ID"},{"Illinois","IL"},{"Indiana","IN"},{"Iowa","IA"},{"Kansas","KS"},{"Kentucky","KY"},{"Louisiana","LA"},{"Maine","ME"},{"Maryland","MD"},{"Massachusetts","MA"},{"Michigan","MI"},{"Minnesota","MN"},{"Mississippi","MS"},{"Missouri","MO"},{"Montana","MT"},{"Nebraska","NE"},{"Nevada","NV"},{"Ohio","OH"},{"Oklahoma","OK"},{"Oregon","OR"},{"Pennsylvania","PA"},{"Tennessee","TN"},{"Texas","TX"},{"Utah","UT"},{"Vermont","VT"},{"Virginia","VA"},{"Washington","WA"},{"Wisconsin","WI"},{"Wyoming","WY"}};   // i18n: data (matched against English net names)
     /** US call districts (the digit in a US callsign; where a station was first licensed, still a good regional hint). */
-    private static final String[] DISTRICTS = { "CO IA KS MN MO NE ND SD", "CT ME MA NH RI VT", "NJ NY", "DE DC MD PA", "AL FL GA KY NC SC TN VA", "AR LA MS NM OK TX", "CA", "AZ ID MT NV OR UT WA WY", "MI OH WV", "IL IN WI" };
+    private static final String[] DISTRICTS = { "CO IA KS MN MO NE ND SD", "CT ME MA NH RI VT", "NJ NY", "DE DC MD PA", "AL FL GA KY NC SC TN VA", "AR LA MS NM OK TX", "CA", "AZ ID MT NV OR UT WA WY", "MI OH WV", "IL IN WI" };   // i18n: data (state codes)
     private static final Set<String> AMBIGUOUS = new HashSet<>(java.util.Arrays.asList("IN", "ME", "OR", "HI", "OK", "OH", "AL", "LA", "MA", "CO", "DE", "PA", "ID", "MD"));
 
     /** A full state name ("North Texas ARES" → TX) or an unambiguous capitalised code ("NTX"/"TX ARES" → TX) in a net's name. */
@@ -265,7 +268,7 @@ public final class NetFinder {
         return out;
     }
     private static Slot slot(Net n, int dow, int minute, List<Integer> dur, int seen) {
-        Slot s = new Slot(); s.name = n.name; s.netControl = n.netControl; s.logger = n.logger; s.source = "NetLogger"; s.dow = dow; s.minute = minute; s.seen = seen;
+        Slot s = new Slot(); s.name = n.name; s.netControl = n.netControl; s.logger = n.logger; s.source = "NetLogger"; s.dow = dow; s.minute = minute; s.seen = seen;   // i18n: service name
         s.freqHz = n.freqHz; s.talkgroup = n.talkgroup; s.durationMin = dur.isEmpty() ? 60 : Math.max(10, median(dur));
         return s;
     }
@@ -288,7 +291,7 @@ public final class NetFinder {
             if ((m.days & ALL_DAYS) == ALL_DAYS) dows.add(0); else for (int d = Calendar.SUNDAY; d <= Calendar.SATURDAY; d++) if (m.on(d)) dows.add(d);
             for (int d : dows) {
                 Slot s = new Slot(); s.name = m.name; s.channel = m.channel; s.dow = d; s.minute = m.minute; s.durationMin = Math.max(5, m.durationMin);
-                s.source = "added by you"; s.near = 1; s.manualId = m.id; s.notes = m.notes;
+                s.source = Txt.s(R.string.channels_net_source_mine); s.near = 1; s.manualId = m.id; s.notes = m.notes;
                 out.add(s);
             }
         }
@@ -320,14 +323,15 @@ public final class NetFinder {
         }
         return out;
     }
-    private static final String[] SHORT = { "", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+    private static final int[] SHORT = { 0, R.string.channels_net_sun, R.string.channels_net_mon, R.string.channels_net_tue, R.string.channels_net_wed,
+            R.string.channels_net_thu, R.string.channels_net_fri, R.string.channels_net_sat };
     /** "Mon, Wed, Fri 7:30 PM" / "Daily 8:00 AM". */
     public static String when(Manual m) {
-        int h = m.minute / 60, mi = m.minute % 60; String t = String.format(Locale.US, " %d:%02d %s", h % 12 == 0 ? 12 : h % 12, mi, h < 12 ? "AM" : "PM");
-        if ((m.days & ALL_DAYS) == ALL_DAYS) return "Daily" + t;
+        int h = m.minute / 60, mi = m.minute % 60; String t = String.format(Locale.US, "%d:%02d %s", h % 12 == 0 ? 12 : h % 12, mi, h < 12 ? "AM" : "PM");
+        if ((m.days & ALL_DAYS) == ALL_DAYS) return Txt.s(R.string.channels_net_when_daily, t);
         StringBuilder b = new StringBuilder();
-        for (int d = Calendar.SUNDAY; d <= Calendar.SATURDAY; d++) if (m.on(d)) { if (b.length() > 0) b.append(", "); b.append(SHORT[d]); }
-        return (b.length() == 0 ? "No day" : b.toString()) + t;
+        for (int d = Calendar.SUNDAY; d <= Calendar.SATURDAY; d++) if (m.on(d)) { if (b.length() > 0) b.append(Txt.s(R.string.channels_net_day_sep)); b.append(Txt.s(SHORT[d])); }
+        return Txt.s(R.string.channels_net_when_days, b.length() == 0 ? Txt.s(R.string.channels_net_no_day) : b.toString(), t);
     }
 
     // ---- learned from what the radio heard ----
@@ -419,7 +423,7 @@ public final class NetFinder {
                 }
                 if (g.size() < (pass == 0 ? 3 : 2)) continue;
                 if (pass == 0) { Set<Integer> dows = new HashSet<>(); for (int j : g) dows.add(dow[j]); if (dows.size() < 3) continue; }
-                Slot s = new Slot(); s.source = "Heard"; s.channel = nets.get(i).channel; s.dow = pass == 0 ? 0 : dow[i]; s.seen = g.size();
+                Slot s = new Slot(); s.source = Txt.s(R.string.channels_net_source_heard); s.channel = nets.get(i).channel; s.dow = pass == 0 ? 0 : dow[i]; s.seen = g.size();
                 List<Integer> mins = new ArrayList<>(), durs = new ArrayList<>(); int st = 0;
                 for (int j : g) {
                     used[j] = true; mins.add(min[j]); durs.add(nets.get(j).minutes()); st = Math.max(st, nets.get(j).stations);
@@ -445,10 +449,13 @@ public final class NetFinder {
         return Long.MAX_VALUE;
     }
 
-    private static final String[] DAYS = { "", "Sundays", "Mondays", "Tuesdays", "Wednesdays", "Thursdays", "Fridays", "Saturdays" };
+    private static final int[] DAYS = { 0, R.string.channels_net_sundays, R.string.channels_net_mondays, R.string.channels_net_tuesdays, R.string.channels_net_wednesdays,
+            R.string.channels_net_thursdays, R.string.channels_net_fridays, R.string.channels_net_saturdays };
     /** "Tuesdays 7:30 PM" / "Daily 8:00 AM". */
     public static String when(Slot s) {
         int h = s.minute / 60, m = s.minute % 60;
-        return (s.dow == 0 ? "Daily" : DAYS[s.dow]) + String.format(Locale.US, " %d:%02d %s", h % 12 == 0 ? 12 : h % 12, m, h < 12 ? "AM" : "PM");
+        String t = String.format(Locale.US, "%d:%02d %s", h % 12 == 0 ? 12 : h % 12, m, h < 12 ? "AM" : "PM");
+        return s.dow == 0 ? Txt.s(R.string.channels_net_when_daily, t) : Txt.s(DAYS[s.dow], t);
     }
+
 }

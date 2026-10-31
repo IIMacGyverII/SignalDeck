@@ -17,8 +17,10 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
 import com.macdmr.radio.RootSetup;
+import com.macdmr.radio.i18n.Txt;
 
 /**
  * Device tab: a link card (who owns the radio, port and speed, take over / hand back, boot persistence),
@@ -122,6 +124,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         regionSub = (TextView) ((LinearLayout) regionRow.getChildAt(1)).getChildAt(1);
         regionRow.setOnClickListener(v -> RegionSheet.show(c, svc, this::updateRegion));
         addRow(set, regionRow); updateRegion();
+        addRow(set, languageRow(c));
         addRow(set, Neo.switchRow(c, "power", Neo.GREEN, "Own the radio at boot", "Otherwise the stock app is restored after a reboot", ownAtBoot));
         addRow(set, Neo.switchRow(c, "ptt", Neo.AMBER, "Side PTT key", "The phone's hardware push-to-talk button transmits", hwPttSw));
         addRow(set, Neo.switchRow(c, "volume", Neo.AMBER, "Volume-up transmits", "While the Intercom page is open", volPttSw));
@@ -876,6 +879,26 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
             try { com.macdmr.radio.DeviceReport.generate(c, s -> post(() -> pd.setMessage(s + "…"))); post(() -> { pd.dismiss(); new android.app.AlertDialog.Builder(c).setTitle("Report ready").setMessage("Saved under Download/DMR/DeviceReport. If the phone has a side PTT key, run \"Capture the PTT key\" and, with root, the radio probe, then use Share last report, which explains what it contains.").setPositiveButton("OK", null).show(); }); }
             catch (Throwable t) { post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, "Report failed: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show(); }); }
         }).start();
+    }
+
+    /** Language: the phone's, or one SignalDeck ships (debug builds add the pseudo-locales for the layout check). */
+    private LinearLayout languageRow(final Context c) {
+        java.util.List<String> tags = new java.util.ArrayList<>(); tags.add("");
+        java.util.Collections.addAll(tags, Txt.LANGUAGES);
+        if (com.macdmr.radio.BuildConfig.DEBUG) java.util.Collections.addAll(tags, Txt.PSEUDO);
+        final String[] names = new String[tags.size()];
+        java.util.Locale phone = android.content.res.Resources.getSystem().getConfiguration().getLocales().get(0);
+        for (int i = 0; i < names.length; i++) names[i] = tags.get(i).isEmpty() ? Txt.s(R.string.device_language_phone, Txt.nativeName(phone.toLanguageTag())) : Txt.nativeName(tags.get(i));
+        int sel = Math.max(0, tags.indexOf(Txt.language()));
+        final LinearLayout row = Neo.switchRow(c, "globe", Neo.CYAN, Txt.s(R.string.device_language), names[sel], null);
+        final int pick = sel;
+        row.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_language))
+                .setSingleChoiceItems(names, pick, (dd, w) -> {
+                    dd.dismiss();
+                    if (w == pick) return;
+                    Txt.setLanguage(tags.get(w));   // appcompat recreates the activity in the new language
+                }).setNegativeButton(Txt.s(R.string.common_cancel), null).show());
+        return row;
     }
 
     /** Intercom layout: Automatic (compact below 700 dp of screen height), Regular, or Compact. The page and the tab bar follow it. */

@@ -7,6 +7,9 @@
 package com.macdmr.radio;
 
 import android.app.Application;
+import android.content.res.Configuration;
+
+import com.macdmr.radio.i18n.Txt;
 
 import org.lsposed.hiddenapibypass.HiddenApiBypass;
 
@@ -17,5 +20,12 @@ public class RadioApp extends Application {
         // The vendor audio classes (android.os.PrizeTinyService / ITinyRecvCallback) are hidden API;
         // exempt everything before any class that references them is loaded.
         try { HiddenApiBypass.addHiddenApiExemptions(""); } catch (Throwable ignored) { }
+        Txt.init(this);   // user-facing text in the app's language, for every class (services and the car included)
+    }
+
+    /** The phone's language changed: rebuild the localised text context (the override, if set, still wins). */
+    @Override public void onConfigurationChanged(Configuration c) {
+        super.onConfigurationChanged(c);
+        Txt.init(this);
     }
 }

@@ -12,6 +12,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.macdmr.radio.i18n.Msg;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +165,27 @@ public final class ChannelStore extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX IF NOT EXISTS contact_heard_ix ON contact_heard (contactId, ts)");
         db.execSQL("CREATE TABLE IF NOT EXISTS pages (_id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, hz INTEGER, ric INTEGER, func INTEGER, baud INTEGER, text TEXT, corrected INTEGER, signer TEXT, threadKey TEXT, transport TEXT, outgoing INTEGER DEFAULT 0, unread INTEGER DEFAULT 1)");
         db.execSQL("CREATE INDEX IF NOT EXISTS pages_thread ON pages (threadKey, ts)");
+        java.util.Set<String> hc = new java.util.HashSet<>();
+        try (Cursor c = db.rawQuery("PRAGMA table_info(history)", null)) { while (c.moveToNext()) hc.add(c.getString(1)); }
+        for (String sql : historyMigrations(hc)) db.execSQL(sql);
     }
+
+    /**
+     * History lines as a string resource and its arguments (2026-10-30, translations): {@code text} stays the English
+     * sentence that everything parses and logs, and these two columns let a screen show the line in the app's
+     * language ({@link com.macdmr.radio.i18n.Msg}). Older rows have none and show their English text.
+     */
+    static final String[][] HISTORY_MSG_COLUMNS = { { "msgKey", "TEXT" }, { "msgArgs", "TEXT" } };
+
+    /** The ALTER statements a history table with these columns still needs (none once migrated). */
+    static List<String> historyMigrations(java.util.Set<String> existing) {
+        List<String> out = new ArrayList<>();
+        for (String[] k : HISTORY_MSG_COLUMNS) if (!existing.contains(k[0])) out.add("ALTER TABLE history ADD COLUMN " + k[0] + " " + k[1]);
+        return out;
+    }
+
+    /** A history row's text for the screen: its message in the app's language, else the stored English. */
+    private static String shown(Cursor c, int text, int key, int args) { return Msg.display(c.getString(text), c.getString(key), c.getString(args)); }
 
     /** A named talkgroup list (the module's TG lists): a set of talkgroups to drop into a channel's RX group list. */
     public static final class TgList { public long id; public String name = ""; public int[] tgs = new int[0]; }
@@ -318,9 +340,15 @@ public final class ChannelStore extends SQLiteOpenHelper {
         return bad.size();
     }
 
-    public void addHistory(int channel, String kind, String text, int rssi, int dmrId) {
+    public void addHistory(int channel, String kind, String text, int rssi, int dmrId) { addHistory(channel, kind, text, null, rssi, dmrId); }
+
+    /** A line kept as its message: English in {@code text}, the key and arguments to show it in any language. */
+    public void addHistory(int channel, String kind, Msg m, int rssi, int dmrId) { addHistory(channel, kind, m.english(), m, rssi, dmrId); }
+
+    private void addHistory(int channel, String kind, String text, Msg m, int rssi, int dmrId) {
         ContentValues v = new ContentValues();
         v.put("channel", channel); v.put("ts", System.currentTimeMillis()); v.put("kind", kind); v.put("text", text); v.put("rssi", rssi); v.put("dmrId", dmrId);
+        if (m != null) { v.put("msgKey", m.key()); v.put("msgArgs", m.args()); }
         getWritableDatabase().insert("history", null, v);
     }
 
@@ -344,41 +372,41 @@ public final class ChannelStore extends SQLiteOpenHelper {
         return out;
     }
 
-    /** A channel's own history, newest first: [ts, kind, text, rssi, dmrId]. Captions (their own page) and car, media, coverage and channel-change events (Last heard's event sections) are left out. */
+    /** A channel's own history, newest first: [ts, kind, text (English), rssi, dmrId, text as shown]. Captions (their own page) and car, media, coverage and channel-change events (Last heard's event sections) are left out. */
     public List<Object[]> channelHistory(int number, int limit) {
         List<Object[]> out = new ArrayList<>();
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, kind, text, rssi, dmrId FROM history WHERE channel=? AND kind NOT IN ('txt','car','media','cov','chan') ORDER BY ts DESC LIMIT " + limit, new String[] { String.valueOf(number) })) {
-            while (c.moveToNext()) out.add(new Object[] { c.getLong(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4) });
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, kind, text, rssi, dmrId, msgKey, msgArgs FROM history WHERE channel=? AND kind NOT IN ('txt','car','media','cov','chan') ORDER BY ts DESC LIMIT " + limit, new String[] { String.valueOf(number) })) {
+            while (c.moveToNext()) out.add(new Object[] { c.getLong(0), c.getString(1), c.getString(2), c.getInt(3), c.getInt(4), shown(c, 2, 5, 6) });
         }
         return out;
     }
     public int channelHistoryCount(int number) { try (Cursor c = getReadableDatabase().rawQuery("SELECT COUNT(*) FROM history WHERE channel=? AND kind NOT IN ('txt','car','media','cov','chan')", new String[] { String.valueOf(number) })) { return c.moveToFirst() ? c.getInt(0) : 0; } }
     /** Removes a channel's history lines except the captions (they have their own page). */
     public void clearChannelHistory(int number) { getWritableDatabase().delete("history", "channel=? AND kind<>'txt'", new String[] { String.valueOf(number) }); }
-    /** Per channel, the newest thing heard on it: channel number to [ts, kind, text]. */
+    /** Per channel, the newest thing heard on it: channel number to [ts, kind, text (English), text as shown]. */
     public java.util.Map<Integer, Object[]> channelLastHeard() {
         java.util.Map<Integer, Object[]> out = new java.util.HashMap<>();
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT channel, MAX(ts), kind, text FROM history WHERE kind IN ('rx','dmr','sms','pkt','tone','rec','m17') GROUP BY channel", null)) {
-            while (c.moveToNext()) out.put(c.getInt(0), new Object[] { c.getLong(1), c.getString(2), c.getString(3) });
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT channel, MAX(ts), kind, text, msgKey, msgArgs FROM history WHERE kind IN ('rx','dmr','sms','pkt','tone','rec','m17') GROUP BY channel", null)) {
+            while (c.moveToNext()) out.put(c.getInt(0), new Object[] { c.getLong(1), c.getString(2), c.getString(3), shown(c, 3, 4, 5) });
         }
         return out;
     }
 
-    /** Newest events first for Last heard: [ts, channel, kind, text, dmrId]. */
+    /** Newest events first for Last heard: [ts, channel, kind, text (English), dmrId, text as shown]. */
     public List<Object[]> lastHeard(int limit) {
         List<Object[]> out = new ArrayList<>();
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, channel, kind, text, dmrId FROM history WHERE kind IN ('rx','dmr','sms','rec','pkt') ORDER BY ts DESC LIMIT " + limit, null)) {
-            while (c.moveToNext()) out.add(new Object[] { c.getLong(0), c.getInt(1), c.getString(2), c.getString(3), c.getInt(4) });
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, channel, kind, text, dmrId, msgKey, msgArgs FROM history WHERE kind IN ('rx','dmr','sms','rec','pkt') ORDER BY ts DESC LIMIT " + limit, null)) {
+            while (c.moveToNext()) out.add(new Object[] { c.getLong(0), c.getInt(1), c.getString(2), c.getString(3), c.getInt(4), shown(c, 3, 5, 6) });
         }
         return out;
     }
 
-    /** Warnings, errors and car/coverage events (the Alerts and Events sections of Last heard), newest first. */
+    /** Warnings, errors and car/coverage events (the Alerts and Events sections of Last heard), newest first: [ts, channel, kind, text (English), dmrId, text as shown]. */
     public List<Object[]> events(long sinceTs, int limit) {
         List<Object[]> out = new ArrayList<>();
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, channel, kind, text, dmrId FROM history WHERE ts>=? AND (kind IN ('car','cov','warn','busy','alert') OR text LIKE '⛔%' OR text LIKE '⚠%') ORDER BY ts DESC LIMIT " + limit,
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, channel, kind, text, dmrId, msgKey, msgArgs FROM history WHERE ts>=? AND (kind IN ('car','cov','warn','busy','alert') OR text LIKE '⛔%' OR text LIKE '⚠%') ORDER BY ts DESC LIMIT " + limit,
                 new String[] { String.valueOf(sinceTs) })) {
-            while (c.moveToNext()) out.add(new Object[] { c.getLong(0), c.getInt(1), c.getString(2), c.getString(3), c.getInt(4) });
+            while (c.moveToNext()) out.add(new Object[] { c.getLong(0), c.getInt(1), c.getString(2), c.getString(3), c.getInt(4), shown(c, 3, 5, 6) });
         }
         return out;
     }
@@ -401,12 +429,12 @@ public final class ChannelStore extends SQLiteOpenHelper {
         return out;
     }
 
-    /** Every history line within {@code ms} of {@code ts}, oldest first (the "Around this time" list of an event). */
+    /** Every history line within {@code ms} of {@code ts}, oldest first (the "Around this time" list of an event): [ts, channel, kind, text (English), text as shown]. */
     public List<Object[]> around(long ts, long ms) {
         List<Object[]> out = new ArrayList<>();
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, channel, kind, text FROM history WHERE ts BETWEEN ? AND ? ORDER BY ts ASC LIMIT 40",
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, channel, kind, text, msgKey, msgArgs FROM history WHERE ts BETWEEN ? AND ? ORDER BY ts ASC LIMIT 40",
                 new String[] { String.valueOf(ts - ms), String.valueOf(ts + ms) })) {
-            while (c.moveToNext()) out.add(new Object[] { c.getLong(0), c.getInt(1), c.getString(2), c.getString(3) });
+            while (c.moveToNext()) out.add(new Object[] { c.getLong(0), c.getInt(1), c.getString(2), c.getString(3), shown(c, 3, 4, 5) });
         }
         return out;
     }
@@ -414,9 +442,9 @@ public final class ChannelStore extends SQLiteOpenHelper {
     public List<String> recentHistory(int channel, int limit) {
         List<String> out = new ArrayList<>();
         // the module shows the newest N lines in chronological order (oldest at the top)
-        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, text, rssi FROM (SELECT ts, text, rssi FROM history WHERE channel=? AND kind<>'txt' ORDER BY ts DESC LIMIT ?) ORDER BY ts ASC", new String[] { String.valueOf(channel), String.valueOf(limit) })) {
+        try (Cursor c = getReadableDatabase().rawQuery("SELECT ts, text, rssi, msgKey, msgArgs FROM (SELECT ts, text, rssi, msgKey, msgArgs FROM history WHERE channel=? AND kind<>'txt' ORDER BY ts DESC LIMIT ?) ORDER BY ts ASC", new String[] { String.valueOf(channel), String.valueOf(limit) })) {
             java.text.SimpleDateFormat f = new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US);
-            while (c.moveToNext()) out.add(f.format(new java.util.Date(c.getLong(0))) + " " + c.getString(1) + (c.getInt(2) != -999 ? " " + c.getInt(2) + " dBm" : ""));
+            while (c.moveToNext()) out.add(f.format(new java.util.Date(c.getLong(0))) + " " + shown(c, 1, 3, 4) + (c.getInt(2) != -999 ? " " + c.getInt(2) + " dBm" : ""));
         }
         return out;
     }

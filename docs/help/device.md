@@ -1,4 +1,4 @@
-<!-- Generated from app/src/main/java/com/macdmr/radio/ui/HelpView.java by HelpExportTest. Do not edit by hand. -->
+<!-- Generated from app/src/main/assets/guide/en.json by HelpExportTest. Do not edit by hand. -->
 
 # Device
 
@@ -41,6 +41,10 @@ The learned button works with the screen off and SignalDeck in the background: i
 ## Region
 
 Device → Region: the country whose defaults SignalDeck uses, such as the APRS frequency. See Region.
+
+## Language
+
+Device → Radio settings → Language sets the language of SignalDeck's screens, notifications, the car screens and this guide: the phone's language (the default, which follows the phone when you change it) or one SignalDeck ships. English is the only one so far; others are being translated. A text not yet translated shows in English. Logs, the device and transmit-test reports and anything sent on the air stay in English.
 
 ## Your DMR ID
 

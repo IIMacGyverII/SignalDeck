@@ -8,6 +8,8 @@ package com.macdmr.radio.ui;
 
 import static org.junit.Assert.*;
 
+import com.macdmr.radio.i18n.Guide;
+
 import org.junit.Test;
 
 import java.io.File;
@@ -23,13 +25,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The in-app guide (HelpView.TOPICS) exported to docs/help/: one Markdown page per topic, an index, and help.json,
- * which signaldeckradio.com reads at build time. HelpView stays the only place the guide is written; these files are
- * generated from it and the test fails when they are out of date. Regenerate with:
+ * The in-app guide (assets/guide/en.json, the English source) exported to docs/help/: one Markdown page per topic
+ * (named by the topic's id, so a renamed title keeps its URL), an index, and help.json, which signaldeckradio.com reads
+ * at build time. en.json stays the only place the guide is written; these files are generated from it and the test
+ * fails when they are out of date. Regenerate with:
  *   ./gradlew testReleaseUnitTest --tests '*HelpExportTest' -PexportHelp=true
  */
 public class HelpExportTest {
-    static final String SOURCE = "app/src/main/java/com/macdmr/radio/ui/HelpView.java";
+    static final String SOURCE = Guide.SOURCE;
     static final String REGENERATE = "./gradlew testReleaseUnitTest --tests '*HelpExportTest' -PexportHelp=true";
 
     /** URL-safe name for a topic title: "POTA and SOTA" -> "pota-and-sota". */
@@ -75,18 +78,19 @@ public class HelpExportTest {
         js.append("{\n  \"format\": 1,\n  \"source\": ").append(json(SOURCE)).append(",\n  \"topics\": [");
         String group = null;
         int n = 0;
-        for (HelpView.Topic t : HelpView.TOPICS) {
+        Guide.Topic[] topics = Guide.topics();
+        for (Guide.Topic t : topics) {
             n++;
-            String slug = slug(t.title);
+            String slug = t.id;
             if (!t.group.equals(group)) { group = t.group; index.append("\n## ").append(md(group)).append("\n\n"); }
             index.append("- [").append(md(t.title)).append("](").append(slug).append(".md): ").append(md(t.summary)).append('\n');
 
             StringBuilder page = new StringBuilder();
             page.append("<!-- Generated from ").append(SOURCE).append(" by HelpExportTest. Do not edit by hand. -->\n\n")
                 .append("# ").append(md(t.title)).append("\n\n")
-                .append("*").append(md(t.group)).append(" · ").append(n).append(" of ").append(HelpView.TOPICS.length).append("*\n\n")
+                .append("*").append(md(t.group)).append(" · ").append(n).append(" of ").append(topics.length).append("*\n\n")
                 .append(md(t.summary)).append('\n');
-            for (HelpView.Section s : t.sections) {
+            for (Guide.Section s : t.sections) {
                 page.append("\n## ").append(md(s.head)).append("\n\n");
                 for (String para : s.text.split("\n")) if (!para.trim().isEmpty()) page.append(md(para.trim())).append("\n\n");
             }
@@ -118,15 +122,17 @@ public class HelpExportTest {
 
     @Test public void topicsAreComplete() {
         Set<String> slugs = new HashSet<>();
-        assertTrue(HelpView.TOPICS.length > 0);
-        for (HelpView.Topic t : HelpView.TOPICS) {
-            String slug = slug(t.title);
-            assertFalse("empty title", slug.isEmpty());
+        assertTrue(Guide.topics().length > 0);
+        for (Guide.Topic t : Guide.topics()) {
+            String slug = t.id;
+            assertTrue(t.title + ": the id is the page name, lower case letters, digits and hyphens", slug.matches("[a-z0-9]+(-[a-z0-9]+)*"));
             assertTrue("two topics would share the page " + slug + ".md: rename one", slugs.add(slug));
+            Set<String> secIds = new HashSet<>();
             assertFalse(t.title + ": no group", t.group.trim().isEmpty());
             assertFalse(t.title + ": no summary", t.summary.trim().isEmpty());
             assertTrue(t.title + ": no sections", t.sections.length > 0);
-            for (HelpView.Section s : t.sections) {
+            for (Guide.Section s : t.sections) {
+                assertTrue(t.title + ": two sections share the id " + s.id, secIds.add(s.id));
                 assertFalse(t.title + ": a section has no heading", s.head.trim().isEmpty());
                 assertFalse(t.title + " / " + s.head + ": no text", s.text.trim().isEmpty());
             }
@@ -144,12 +150,12 @@ public class HelpExportTest {
 
     @Test public void exportCoversEveryTopicAndSection() {
         Map<String, String> files = export();
-        assertEquals(HelpView.TOPICS.length + 2, files.size());
+        assertEquals(Guide.topics().length + 2, files.size());
         String js = files.get("help.json");
         int sections = 0;
-        for (HelpView.Topic t : HelpView.TOPICS) {
-            assertTrue(t.title, files.containsKey(slug(t.title) + ".md"));
-            assertTrue(t.title, files.get("README.md").contains("(" + slug(t.title) + ".md)"));
+        for (Guide.Topic t : Guide.topics()) {
+            assertTrue(t.title, files.containsKey(t.id + ".md"));
+            assertTrue(t.title, files.get("README.md").contains("(" + t.id + ".md)"));
             sections += t.sections.length;
         }
         int heads = 0;
@@ -157,7 +163,7 @@ public class HelpExportTest {
         assertEquals(sections, heads);
     }
 
-    /** docs/help must match HelpView. With -PexportHelp=true the files are written instead of checked. */
+    /** docs/help must match the guide. With -PexportHelp=true the files are written instead of checked. */
     @Test public void committedGuideIsCurrent() throws IOException {
         Map<String, String> files = export();
         File dir = helpDir();
@@ -177,6 +183,6 @@ public class HelpExportTest {
         }
         File[] present = dir.listFiles();
         if (present != null) for (File f : present) if (f.isFile() && !files.containsKey(f.getName())) stale.add(f.getName() + " (no longer a topic)");
-        assertTrue("docs/help is out of date with HelpView (" + stale + "). Regenerate it with: " + REGENERATE, stale.isEmpty());
+        assertTrue("docs/help is out of date with the guide (" + stale + "). Regenerate it with: " + REGENERATE, stale.isEmpty());
     }
 }

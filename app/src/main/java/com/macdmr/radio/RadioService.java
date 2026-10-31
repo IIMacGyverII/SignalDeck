@@ -2175,12 +2175,12 @@ public class RadioService extends Service implements RadioEngine.Events {
                         ChannelStore.Channel tc = current;
                         short[] id = tc != null && !tc.isDigital() && amateurBand(tc.txFreq) && packet != null && (txLimitMs() < 0 || System.currentTimeMillis() - txStartedAt < txLimitMs() - 3000) ? packet.cwIdIfDue(System.currentTimeMillis()) : null;
                         tail = profile.txAudioTailMs > 0 && audio != null && roger == null && id == null;   // the Xplore 1's QuickChat stops the microphone 200 ms after the release
-                        if (!tail) { if (audio != null) audio.stopTx(); stopBluetoothMic(); }
+                        if (!tail) { if (audio != null) log(audio.stopTx()); stopBluetoothMic(); }
                         if (roger != null && audio != null) audio.playPcm(roger);    // still keyed: the tone goes out before the carrier drops
                         if (id != null && audio != null) { log("Morse ID after the transmission"); audio.playPcm(id); history("pkt", "\uD83D\uDD24 Morse ID " + packet.callsign()); }   // the station identification every ten minutes
                     } finally {
                         unkey();
-                        if (tail) { try { Thread.sleep(profile.txAudioTailMs); } catch (InterruptedException ignored) { } audio.stopTx(); stopBluetoothMic(); }
+                        if (tail) { try { Thread.sleep(profile.txAudioTailMs); } catch (InterruptedException ignored) { } log(audio.stopTx()); stopBluetoothMic(); }
                     }
                     int heldMs = (int) Math.min(Integer.MAX_VALUE, Math.max(0, txEndedAt - txStartedAt));
                     thermal.after(heldMs);                                                    // a voice key past 30 s starts the cool-down like a long picture

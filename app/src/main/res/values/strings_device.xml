@@ -5,4 +5,18 @@
     <string name="device_language">Language</string>
     <!-- First choice in the Language list: follow the phone. %1$s is the phone's language in its own name ("English", "Deutsch"). -->
     <string name="device_language_phone">Phone\'s language (%1$s)</string>
+    <!-- Transmit test session (Device report): button on a step that needs another channel; opens a list of channels to tune. Short (button). -->
+    <string name="txtest_choose_channel">Choose a channel</string>
+    <!-- Transmit test session, DMR group call step: why the step needs another channel. One sentence. -->
+    <string name="txtest_need_dmr_call">This step needs a DMR channel whose talkgroup the other DMR radio listens to (same colour code and time slot).</string>
+    <!-- Transmit test session, DMR text step: why the step needs another channel. One sentence. -->
+    <string name="txtest_need_dmr_text">This step needs a DMR channel whose call number the other DMR radio receives texts on (its own ID for a private text, or a talkgroup it listens to).</string>
+    <!-- Transmit test session, FM steps: why the step needs another channel. One sentence. -->
+    <string name="txtest_need_fm">This step needs an FM (analog) channel: a simplex frequency you may use, at low power.</string>
+    <!-- Transmit test session: added after the sentence above when the channel list has no DMR channel at all. -->
+    <string name="txtest_no_dmr_channel">Your channel list has no DMR channel.</string>
+    <!-- Transmit test session: added after the sentence above when the channel list has no FM channel at all. -->
+    <string name="txtest_no_fm_channel">Your channel list has no FM channel.</string>
+    <!-- Transmit test session: one row of the channel list (a button). %1$d channel number, %2$s channel name, %3$s frequency in MHz ("446.006"). -->
+    <string name="txtest_channel_row">%1$d · %2$s · %3$s MHz</string>
 </resources>

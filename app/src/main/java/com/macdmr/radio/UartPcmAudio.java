@@ -130,25 +130,40 @@ public final class UartPcmAudio implements AudioBackend {
                 rec.startRecording();
             }
             txRunning = true;
-            txThread = new Thread(() -> {
+            final PcmPacer pacer = new PcmPacer(TX_PREBUFFER, TX_MAX_BLOCKS); txPacer = pacer;
+            txThread = new Thread(() -> {                                        // the source, in whatever bursts it delivers
                 byte[] buf = new byte[PACKET * 2];
                 while (txRunning) {
                     int n = feed != null ? feed.read(buf, 0, buf.length) : rec.read(buf, 0, buf.length);
                     if (n <= 0) continue;
                     Level lv = txLevel; if (lv != null) { int pk = 0; for (int i = 0; i + 1 < n; i += 2) pk = Math.max(pk, Math.abs((short) ((buf[i] & 0xFF) | (buf[i + 1] << 8)))); lv.peak(pk); }
-                    try { out.write(buf, 0, n); out.flush(); } catch (Throwable t) { break; }
+                    pacer.offer(buf, 0, n);
                 }
             }, "uart-pcm-tx");
-            txThread.start();
-            return "UART PCM TX started";
+            txWriter = new Thread(() -> {                                        // to the module: one 160-byte block every 10 ms, as QuickChat sends it
+                while (txRunning) {
+                    long now = System.nanoTime();
+                    byte[] b = pacer.poll(now);
+                    if (b != null) { try { out.write(b); out.flush(); } catch (Throwable t) { break; } continue; }
+                    long w = pacer.waitNs(now);
+                    try { Thread.sleep(w / 1_000_000, (int) (w % 1_000_000)); } catch (InterruptedException e) { break; }
+                }
+            }, "uart-pcm-tx-pace");
+            txThread.start(); txWriter.start();
+            return "UART PCM TX started (paced, " + TX_PREBUFFER * 10 + " ms buffer)";   // i18n: log line
         } catch (Throwable t) { return "startTx failed: " + t; }
     }
 
+    /** Transmit pacing: 80 ms queued before the first block (the microphone's bursts were ~64 ms apart), at most 250 ms. */
+    static final int TX_PREBUFFER = 8, TX_MAX_BLOCKS = 25;
+    private volatile PcmPacer txPacer; private Thread txWriter;
+
     @Override public synchronized String stopTx() {
         txRunning = false;
-        try { if (txThread != null) txThread.join(500); } catch (InterruptedException ignored) { }
+        try { if (txThread != null) txThread.join(500); if (txWriter != null) txWriter.join(500); } catch (InterruptedException ignored) { }
         try { if (rec != null) { rec.stop(); rec.release(); rec = null; } } catch (Throwable ignored) { }
-        return "UART PCM TX stopped";
+        PcmPacer p = txPacer; txPacer = null;
+        return "UART PCM TX stopped" + (p != null ? " (" + p.stats() + ")" : "");   // i18n: log line
     }
 
     private volatile boolean abortPlay;

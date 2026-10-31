@@ -62,8 +62,8 @@
 10 com/macdmr/radio/TranscriptionClient.java
 4 com/macdmr/radio/TxLimit.java
 42 com/macdmr/radio/TxReport.java
-119 com/macdmr/radio/TxTestSession.java
-13 com/macdmr/radio/UartPcmAudio.java
+112 com/macdmr/radio/TxTestSession.java
+11 com/macdmr/radio/UartPcmAudio.java
 11 com/macdmr/radio/UartPort.java
 1 com/macdmr/radio/UpdatePaths.java
 63 com/macdmr/radio/Updater.java
@@ -203,4 +203,4 @@
 14 com/macdmr/radio/winlink/B2fClient.java
 6 com/macdmr/radio/winlink/RmsList.java
 48 com/macdmr/radio/winlink/Winlink.java
-# total 6922
+# total 6913

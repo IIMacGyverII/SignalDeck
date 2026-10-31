@@ -1,0 +1,1392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Intercom group: the intercom page, its sheets (Last heard, channel history, VFO, zones, schedule, nets, emergency,
+     activity), contacts, the mode screen, splash, help chrome, Android Auto, the widget, media and car messages.
+     See strings_common.xml for the conventions. -->
+<resources>
+    <!-- ===== Intercom page (ui/IntercomView.java). The key legends (SCAN, ZONE, SOFT SQ, TXT, VFO, REC, MON, PKT) and
+         the readout abbreviations (TX, RX, CC, SQ, CAN, TG) stay English in code. "Classic" strings are on the old
+         module-style page, "neo" strings on the new look. ===== -->
+    <!-- Classic intercom page, info block: label before the power level. Very short; no space after the colon (the value follows directly). -->
+    <string name="intercom_main_classic_power">Puissance :</string>
+    <!-- Classic intercom page, info block: label before the squelch level. Short. -->
+    <string name="intercom_main_classic_squelch">Niveau de squelch :</string>
+    <!-- Classic intercom page, info block: label before the transmit frequency. Very short. -->
+    <string name="intercom_main_classic_send">Émission :</string>
+    <!-- Classic intercom page, info block: label before the receive frequency. Very short. -->
+    <string name="intercom_main_classic_receive">Réception :</string>
+    <!-- Classic intercom page, info block: the channel transmits on high power. Short line. -->
+    <string name="intercom_main_classic_power_high">Puissance : haute</string>
+    <!-- Classic intercom page, info block: the channel transmits on low power. Short line. -->
+    <string name="intercom_main_classic_power_low">Puissance : basse</string>
+    <!-- Classic intercom page, info block, M17 channel: %1$s the channel access number (CAN), %2$s the destination. Keep the two spaces. Short. -->
+    <string name="intercom_main_classic_can">CAN :%1$s  %2$s</string>
+    <!-- Classic intercom page, info block, DMR channel: %1$s the colour code (a number). Short. -->
+    <string name="intercom_main_classic_color_code">Code couleur :%1$s</string>
+    <!-- Classic intercom page, info block, FM channel: %1$s the squelch level (a number). Short. -->
+    <string name="intercom_main_classic_squelch_level">Niveau de squelch :%1$s</string>
+    <!-- Classic intercom page, info block: %1$s the transmit frequency. Short. -->
+    <string name="intercom_main_classic_send_value">Émission :%1$s</string>
+    <!-- Classic intercom page, info block: %1$s the receive frequency. Short. -->
+    <string name="intercom_main_classic_receive_value">Réception :%1$s</string>
+    <!-- Classic intercom page, yellow signal box before any reading. One short line, must not wrap. -->
+    <string name="intercom_main_classic_signal_none_yet">Signal : --</string>
+    <!-- Classic intercom page, yellow signal box: %1$d the signal level in dBm. One short line, must not wrap. -->
+    <string name="intercom_main_classic_signal_dbm">Signal : %1$d dBm</string>
+    <!-- Classic intercom page, yellow signal box: nothing heard. One short line. -->
+    <string name="intercom_main_classic_signal_none">Aucun signal</string>
+    <!-- Classic intercom page, yellow signal box on phones without signal strength: something is being received. One short line. -->
+    <string name="intercom_main_classic_signal_receiving">Réception</string>
+    <!-- Classic intercom page, activity box header for an FM channel. Short. -->
+    <string name="intercom_main_classic_history_analog">Historique analogique</string>
+    <!-- Classic intercom page, activity box header for a DMR channel. Short. -->
+    <string name="intercom_main_classic_history_dmr">Activité DMR</string>
+    <!-- Classic intercom page, activity box headline: the radio is up and idle. Keep the emoji. One line. -->
+    <string name="intercom_main_classic_ready">📻 Prête</string>
+    <!-- Classic intercom page, headline: the module is busy loading firmware. One line. -->
+    <string name="intercom_main_classic_loading">Radio occupée, chargement du firmware</string>
+    <!-- Classic intercom page, headline: transmitting. Keep the emoji. One line. -->
+    <string name="intercom_main_classic_transmitting">🔴 Émission</string>
+    <!-- Classic intercom page, headline: receiving. Keep the emoji. One line. -->
+    <string name="intercom_main_classic_receiving">📻 Réception…</string>
+    <!-- Classic intercom page, headline: no root access yet. "Device → Bring radio up" names the Device page and its button. One line (ellipsised). -->
+    <string name="intercom_main_classic_root_needed">🔒 Accès root requis : autorisez-le dans Magisk, puis Appareil → Démarrer la radio</string>
+    <!-- Classic intercom page, headline: this phone model is not supported. "Device → Device report" names the Device page and its row. One line (ellipsised). -->
+    <string name="intercom_main_classic_unsupported">📱 Ce téléphone n’est pas encore pris en charge : Appareil → Rapport d’appareil</string>
+    <!-- Classic intercom page, headline: who is calling. %1$s the caller (name, callsign or DMR ID). Keep the emoji. One line. -->
+    <string name="intercom_main_classic_caller">📻 %1$s</string>
+
+    <!-- New-look intercom headline, all caps: the module is busy loading firmware. One line. -->
+    <string name="intercom_main_neo_loading">RADIO OCCUPÉE, CHARGEMENT DU FIRMWARE</string>
+    <!-- New-look intercom headline, all caps: transmitting. One line. -->
+    <string name="intercom_main_neo_transmitting">ÉMISSION</string>
+    <!-- New-look intercom headline, all caps: receiving. One line. -->
+    <string name="intercom_main_neo_receiving">RÉCEPTION</string>
+    <!-- New-look intercom headline: no root access yet. "Device → Take over" names the Device page and its button. One line (ellipsised). -->
+    <string name="intercom_main_neo_root_needed">ROOT REQUIS · autorisez-le dans Magisk, puis Appareil → Prendre la main</string>
+    <!-- New-look intercom headline: this phone model is not supported. "Device → Device report" names the Device page and its row. One line (ellipsised). -->
+    <string name="intercom_main_neo_unsupported">TÉLÉPHONE PAS ENCORE PRIS EN CHARGE · Appareil → Rapport d’appareil</string>
+    <!-- New-look intercom headline, all caps: the radio is up and idle. One line. -->
+    <string name="intercom_main_neo_ready">PRÊTE</string>
+    <!-- New-look intercom headline: a dot, two spaces, then %1$s the state or the caller. Keep the dot and the two spaces. -->
+    <string name="intercom_main_neo_headline">●  %1$s</string>
+    <!-- New-look intercom, activity box header for a DMR channel (hidden on the new look, kept in caps). Short. -->
+    <string name="intercom_main_neo_history_dmr">ACTIVITÉ DMR</string>
+    <!-- New-look intercom, activity box header for an FM channel (hidden on the new look, kept in caps). Short. -->
+    <string name="intercom_main_neo_history_analog">HISTORIQUE ANALOGIQUE</string>
+
+    <!-- Screen-reader label of the X on the intercom activity box: empties it and hides it until the next reception. -->
+    <string name="intercom_main_panel_close">Effacer et masquer jusqu’à la prochaine réception</string>
+    <!-- Screen-reader label of the small button that brings the hidden activity box back. -->
+    <string name="intercom_main_panel_restore">Afficher le cadre d’activité</string>
+    <!-- Header of the live-caption box on the intercom panel. Keep the emoji. Short. -->
+    <string name="intercom_main_transcription">📝 Transcription</string>
+
+    <!-- Title of the dialog after the radio heard a CTCSS tone on the channel: %1$s the tone in Hz ("88.5"). One line. -->
+    <string name="intercom_main_tone_heard_title">CTCSS %1$s Hz détecté</string>
+    <!-- Message of the tone-heard dialog: %1$s the channel name. -->
+    <string name="intercom_main_tone_heard_message">L’utiliser comme tonalité de réception et d’émission sur %1$s ? Avec cette tonalité, Soft SQ ne s’ouvre que pour elle, et les stations qui l’exigent vous entendront.</string>
+    <!-- Button in the tone-heard dialog: set the heard tone on the channel. Short (dialog button). -->
+    <string name="intercom_main_tone_heard_use">L’utiliser</string>
+    <!-- Button in the tone-heard dialog and item in the intercom menu: opens the Last heard sheet. Short. -->
+    <string name="intercom_main_last_heard">Derniers entendus</string>
+
+    <!-- Toast after tapping TXT when the Google engine has no API key. "TXT" is the key legend and stays as on the key. -->
+    <string name="intercom_main_captions_need_key">Appuyez de manière prolongée sur TXT et saisissez une clé d’API Google Cloud, ou passez au moteur local</string>
+    <!-- Toast after tapping TXT when live captions cannot run. -->
+    <string name="intercom_main_captions_unavailable">Les sous-titres ne sont pas disponibles pour le moment</string>
+    <!-- Title of the list that opens on a long-press of TXT (live caption settings). Short. -->
+    <string name="intercom_main_captions_menu_title">Sous-titres en direct</string>
+    <!-- First item of the live captions list while the Google engine is in use; tapping it switches to Vosk. One or two lines. -->
+    <string name="intercom_main_captions_engine_google">Moteur : Google Cloud (passer à Vosk, sur l’appareil)</string>
+    <!-- First item of the live captions list while the on-device Vosk engine is in use; tapping it switches to Google. One or two lines. -->
+    <string name="intercom_main_captions_engine_vosk">Moteur : Vosk, sur l’appareil (passer à Google Cloud)</string>
+    <!-- Item of the live captions list: pick the Vosk speech model. Opens a dialog. One line. -->
+    <string name="intercom_main_captions_menu_model">Modèle de reconnaissance (Vosk)…</string>
+    <!-- Item of the live captions list: enter the Google Cloud API key. Opens a dialog. One line. -->
+    <string name="intercom_main_captions_menu_key">Clé d’API Google Cloud…</string>
+    <!-- Item of the live captions list: edit the keyword alerts. Opens a dialog. One line. -->
+    <string name="intercom_main_captions_menu_keywords">Alertes par mot-clé…</string>
+    <!-- Toast after switching the caption engine to on-device Vosk. -->
+    <string name="intercom_main_captions_now_vosk">Les sous-titres utilisent désormais la reconnaissance Vosk sur l’appareil</string>
+    <!-- Toast after switching the caption engine to Google Cloud. -->
+    <string name="intercom_main_captions_now_google">Les sous-titres utilisent désormais Google Cloud Speech</string>
+    <!-- Hint in the Google Cloud API key field. One line. -->
+    <string name="intercom_main_key_hint">Clé d’API Google Cloud Speech-to-Text</string>
+    <!-- Title of the Google Cloud API key dialog. One line. -->
+    <string name="intercom_main_key_title">Clé d’API Google Cloud</string>
+    <!-- Message of the Google Cloud API key dialog. -->
+    <string name="intercom_main_key_message">Utilisée seulement avec le moteur Google Cloud. La clé reste dans les paramètres privés de l’application et n’est jamais écrite dans les journaux ni dans les sauvegardes.</string>
+    <!-- Hint in the keyword alerts field: example words. One line. -->
+    <string name="intercom_main_keywords_hint">p. ex. urgence, mayday, votre nom, votre ville</string>
+    <!-- Title of the keyword alerts dialog. One line. -->
+    <string name="intercom_main_keywords_title">Alertes par mot-clé</string>
+    <!-- Message of the keyword alerts dialog. -->
+    <string name="intercom_main_keywords_message">Mots ou expressions, un par ligne ou séparés par des virgules. Quand les sous-titres en direct en entendent un, le téléphone vibre, affiche une notification et, si les annonces vocales sont activées, le prononce.</string>
+    <!-- Title of the live-caption model picker. One line. -->
+    <string name="intercom_main_model_title">Modèle de sous-titrage</string>
+    <!-- Button of the live-caption model picker: switch to the selected model. Short (dialog button). -->
+    <string name="intercom_main_model_use">Utiliser</string>
+    <!-- Toast after picking a live-caption model. -->
+    <string name="intercom_main_model_switching">Changement de modèle : il n’est téléchargé qu’une fois et reste disponible après les mises à jour de l’application</string>
+
+    <!-- Toast after a long-press on the VFO key turned VFO mode off. "VFO" stays as on the key. Short. -->
+    <string name="intercom_main_vfo_off_toast">VFO désactivé</string>
+
+    <!-- Title of the dialog that offers the new intercom look (long-press on the classic title). One line. -->
+    <string name="intercom_main_look_try_new">Essayer la nouvelle page Radio ?</string>
+    <!-- Title of the dialog that offers the classic intercom look (intercom menu). One line. -->
+    <string name="intercom_main_look_back_classic">Revenir à la page Radio classique ?</string>
+    <!-- Message of the intercom look dialog: names the Device setting that does the same. -->
+    <string name="intercom_main_look_message">Le réglage Appareil → Paramètres radio → Nouvel aspect de la page Radio fait la même chose.</string>
+    <!-- Button of the intercom look dialog: switch to the new look. Short (dialog button). -->
+    <string name="intercom_main_look_new">Nouvel aspect</string>
+    <!-- Button of the intercom look dialog: switch to the classic look. Short (dialog button). -->
+    <string name="intercom_main_look_classic">Classique</string>
+
+    <!-- New-look intercom header subtitle: %1$s the zone name. Shown in caps. Short. -->
+    <string name="intercom_main_zone_subtitle">Zone · %1$s</string>
+    <!-- Screen-reader label of the menu button in the new-look intercom header. -->
+    <string name="intercom_main_menu">Menu</string>
+    <!-- Intercom menu item: opens the zone picker. One line. -->
+    <string name="intercom_main_menu_zone">Choisir la zone</string>
+    <!-- Intercom menu item: opens the nets sheet. One line. -->
+    <string name="intercom_main_menu_nets">Réseaux près de vous</string>
+    <!-- Intercom menu item: opens the map and coverage sheet. One line. -->
+    <string name="intercom_main_menu_map">Carte et couverture</string>
+    <!-- Intercom menu item: opens the fox hunt (direction finding) sheet. One line. -->
+    <string name="intercom_main_menu_fox">Chasse au renard</string>
+    <!-- Intercom menu item: opens the emergency sheet. One line. -->
+    <string name="intercom_main_menu_emergency">Urgence</string>
+    <!-- Intercom menu item: switch back to the classic intercom page. One line. -->
+    <string name="intercom_main_menu_classic">Page Radio classique</string>
+    <!-- Screen-reader label of the left arrow beside the channel number. -->
+    <string name="intercom_main_prev_channel">Canal précédent</string>
+    <!-- Screen-reader label of the right arrow beside the channel number. -->
+    <string name="intercom_main_next_channel">Canal suivant</string>
+
+    <!-- Chip under the channel number: the channel transmits on high power. All caps, very short (small chip; compact screens 8.5 sp). -->
+    <string name="intercom_main_chip_high_power">P. HAUTE</string>
+    <!-- Chip under the channel number: the channel transmits on low power. All caps, very short (small chip). -->
+    <string name="intercom_main_chip_low_power">P. BASSE</string>
+    <!-- Readout cell label, M17 channel: the destination callsign. All caps, very short (a quarter of the card width). -->
+    <string name="intercom_main_read_dest">DEST</string>
+    <!-- Readout cell label, DMR channel: who a transmission calls (talkgroup or ID). All caps, very short. -->
+    <string name="intercom_main_read_call">APPEL</string>
+    <!-- Readout cell label, DMR channel, when a talkgroup was picked here instead of the programmed one. All caps, short (a quarter of the card width). -->
+    <string name="intercom_main_read_call_picked">APPEL · CHOISI</string>
+    <!-- Readout cell label, FM channel: the receive tone. All caps, very short. -->
+    <string name="intercom_main_read_tone">TONALITÉ</string>
+    <!-- Readout cell value, FM channel: no receive tone set. All caps, very short. -->
+    <string name="intercom_main_read_tone_none">AUCUNE</string>
+    <!-- Caps label above the S-meter on the new-look intercom. Very short. -->
+    <string name="intercom_main_meter_label">Signal</string>
+    <!-- S-meter text: nothing received. All caps, short. -->
+    <string name="intercom_main_meter_none">AUCUN SIGNAL</string>
+    <!-- S-meter text, nothing received, with the noise floor: %1$d the floor in dBm. Keep the spacing around the dot. One line. -->
+    <string name="intercom_main_meter_floor">AUCUN SIGNAL  ·  bruit %1$d dBm</string>
+    <!-- S-meter text on phones without signal strength: something is received. All caps, short. -->
+    <string name="intercom_main_meter_receiving">RÉCEPTION</string>
+    <!-- S-meter text on phones without signal strength: nothing received. All caps, short. -->
+    <string name="intercom_main_meter_quiet">CALME</string>
+    <!-- S-meter reading: %1$s the S-units ("S7", "S9+10"), %2$d the level in dBm. Keep the two spaces. Short. -->
+    <string name="intercom_main_meter_dbm">%1$s  %2$d dBm</string>
+
+    <!-- Title of the talkgroup picker (long-press on CALL): %1$s the channel name. One line. -->
+    <string name="intercom_main_tg_title">Talkgroup sur %1$s</string>
+    <!-- Message of the talkgroup picker when there are no group contacts. "Contacts" names the page, "Group" the contact type. -->
+    <string name="intercom_main_tg_none">Aucun contact de groupe pour l’instant. Ajoutez des talkgroups sur la page Contacts (type Groupe) pour les choisir ici.</string>
+
+    <!-- ===== Help page (ui/HelpView.java). The guide text itself is assets/guide/en.json. ===== -->
+    <!-- Title of the Help page header. One short line. -->
+    <string name="intercom_help_title">Aide et mode d’emploi</string>
+    <!-- Subtitle of the Help page header: how many guide topics there are. Shown in caps. Short. English says "topics" for every count, as before (one = other). -->
+    <plurals name="intercom_help_topics">
+        <item quantity="one">%1$d sujet</item>
+        <item quantity="many">%1$d de sujets</item>
+        <item quantity="other">%1$d sujets</item>
+    </plurals>
+    <!-- Screen-reader label of the X button that closes the Help page. -->
+    <string name="intercom_help_close">Fermer l’aide</string>
+    <!-- Hint in the search field at the top of the Help page. One line. -->
+    <string name="intercom_help_search_hint">Rechercher dans le guide</string>
+    <!-- Small caps label above the "getting started" card on the Help page. Very short. -->
+    <string name="intercom_help_start_here">Pour commencer</string>
+    <!-- Small caps label above the featured-topic card on the Help page. Very short. -->
+    <string name="intercom_help_featured_kicker">Nouveau · à la une</string>
+    <!-- Text of the featured card on the Help page (the coverage maps topic). Two or three lines. -->
+    <string name="intercom_help_featured_text">Voyez où chaque relais vous parvient et d’où vous pouvez le déclencher, mesuré automatiquement en voiture ou à pied. Deux couches de carte, export vers Google Earth.</string>
+    <!-- Shown when a Help search finds nothing. %1$s is what the user typed. -->
+    <string name="intercom_help_no_match">Rien dans le guide ne correspond à « %1$s ».</string>
+    <!-- Subtitle of a Help topic page, shown in caps: %1$s the topic's group, %2$d its number, %3$d how many topics. Keep the spaced dot. Short. -->
+    <string name="intercom_help_topic_position">%1$s  ·  %2$d sur %3$d</string>
+    <!-- Back button (screen-reader label) and the button at the end of a Help topic that go back to the topic list. Short. -->
+    <string name="intercom_help_all_topics">Tous les sujets</string>
+    <!-- Caps label on the card at the end of a Help topic that opens the previous topic. Keep the arrow. Very short. -->
+    <string name="intercom_help_previous">← Précédent</string>
+    <!-- Caps label on the card at the end of a Help topic that opens the next topic. Keep the arrow. Very short. -->
+    <string name="intercom_help_next">Suivant →</string>
+
+    <!-- ===== Start-up splash (ui/SplashView.java) ===== -->
+    <!-- Tagline under the SignalDeck logo on the start-up splash. Drawn centred on one line under the wordmark; keep it about as long. -->
+    <string name="intercom_splash_tagline">Contrôle radio avancé</string>
+
+    <!-- ===== Full-screen mode pages (ui/ModeScreen.java: APRS monitoring, SSTV receive, parrot) ===== -->
+    <!-- Screen-reader label of the back arrow on a mode page: leaves the page, the mode keeps running. -->
+    <string name="intercom_mode_back">Retour à la page Radio (le mode continue)</string>
+    <!-- Screen-reader label of the mode icon in a mode page's header, which opens the packet tools sheet. -->
+    <string name="intercom_mode_all_packet_tools">Tous les outils packet</string>
+    <!-- State line of a mode page (all caps): the radio is listening. Short. -->
+    <string name="intercom_mode_state_listening">ÉCOUTE</string>
+    <!-- State line of a mode page (all caps): the radio is receiving. Short. -->
+    <string name="intercom_mode_state_receiving">RÉCEPTION</string>
+    <!-- State line of a mode page (all caps): the radio is transmitting. Short. -->
+    <string name="intercom_mode_state_transmitting">ÉMISSION</string>
+    <!-- State line of a mode page (all caps): the module is busy loading firmware. One line. -->
+    <string name="intercom_mode_state_loading">RADIO OCCUPÉE, CHARGEMENT DU FIRMWARE</string>
+    <!-- State line of a mode page (all caps): waiting for a satellite pass to begin. One line. -->
+    <string name="intercom_mode_state_waiting_pass">EN ATTENTE DU PASSAGE</string>
+    <!-- Signal text on a mode page: nothing received (RSSI at the floor). Lower case, very short. -->
+    <string name="intercom_mode_signal_none">aucun signal</string>
+    <!-- Signal text on a mode page for radios without signal strength: nothing received. Lower case, very short. -->
+    <string name="intercom_mode_signal_quiet">calme</string>
+    <!-- Signal text on a mode page for radios without signal strength: a signal is being received. Lower case, very short. -->
+    <string name="intercom_mode_signal_receiving">réception</string>
+    <!-- Signal text on a mode page: %1$s the S-meter reading ("S7", "S9+10"), %2$d the level in dBm. Keep the two spaces. Short. -->
+    <string name="intercom_mode_signal_dbm">%1$s  %2$d dBm</string>
+    <!-- Signal text on a mode page while waiting for a satellite pass: %1$s the time (HH:mm) the radio tunes to it. Lower case, short. -->
+    <string name="intercom_mode_tunes_at">réglage à %1$s</string>
+    <!-- How long ago something happened, under a minute: %1$d seconds. Short. -->
+    <string name="intercom_mode_ago_s">il y a %1$d s</string>
+    <!-- How long ago something happened, under an hour: %1$d minutes. Short. -->
+    <string name="intercom_mode_ago_min">il y a %1$d min</string>
+    <!-- How long ago something happened, an hour or more: %1$d hours, %2$d minutes. Short. -->
+    <string name="intercom_mode_ago_h_min">il y a %1$d h %2$d min</string>
+    <!-- Time since something happened, without "ago", in a stat tile that is already labelled (APRS "Last packet"): under a minute, %1$d seconds. Very short. -->
+    <string name="intercom_mode_since_s">%1$d s</string>
+    <!-- The same, under an hour: %1$d minutes. Very short. -->
+    <string name="intercom_mode_since_min">%1$d min</string>
+    <!-- The same, an hour or more: %1$d hours, %2$d minutes. Very short. -->
+    <string name="intercom_mode_since_h_min">%1$d h %2$d min</string>
+
+    <!-- A DMR radio ID shown where there is no name for it, e.g. "ID 3120001". ID is the DMR abbreviation. Very short. -->
+    <string name="intercom_dmr_id">ID %1$d</string>
+    <!-- A DMR talkgroup shown where there is no name for it, e.g. "TG 91". TG is the DMR abbreviation. Very short. -->
+    <string name="intercom_dmr_tg">TG %1$d</string>
+    <!-- Where a history line was heard when the channel no longer exists: "channel 12". Lower case, short. -->
+    <string name="intercom_channel_n">canal %1$d</string>
+
+    <!-- ===== Last heard sheet ===== -->
+    <!-- Title of the Last heard sheet (opened from the intercom). One line. -->
+    <string name="intercom_lastheard_title">Derniers entendus</string>
+    <!-- Hint under the Last heard title: what the list holds and what tapping does. Two to four lines. -->
+    <string name="intercom_lastheard_hint">Du plus récent au plus ancien, tous canaux confondus : alertes et événements voiture, puis appels, messages texte et trafic APRS, enregistrements. Appuyez sur une alerte ou un événement pour savoir ce qu’il signifie, sur un appelant pour ouvrir le contact, sur une ligne entendue pour passer sur ce canal.</string>
+    <!-- Button on the Last heard sheet that opens the recordings list. One of three buttons in a row: short. -->
+    <string name="intercom_lastheard_recordings">Enregistrements</string>
+    <!-- Button on the Last heard sheet that opens the captions list. One of three buttons in a row: short. -->
+    <string name="intercom_lastheard_captions">Sous-titres</string>
+    <!-- Button on the Last heard sheet that opens the activity statistics. One of three buttons in a row: short. -->
+    <string name="intercom_lastheard_activity">Activité</string>
+    <!-- Section heading on the Last heard sheet: stations and traffic heard. Shown in caps. One or two words. -->
+    <string name="intercom_lastheard_section_heard">Entendus</string>
+    <!-- Section heading on the Last heard sheet: warnings and refusals of the last week. Shown in caps. One line. -->
+    <string name="intercom_lastheard_section_alerts">Alertes (7 derniers jours)</string>
+    <!-- Section heading on the Last heard sheet: Android Auto and coverage-logging events. Shown in caps. One line. -->
+    <string name="intercom_lastheard_section_events">Voiture et couverture</string>
+    <!-- Shown on the Last heard sheet when nothing has been heard. One line. -->
+    <string name="intercom_lastheard_empty">Rien d’entendu pour l’instant.</string>
+    <!-- Second line of an alert or event row on Last heard. %1$s is the date and time, %2$s the channel name. One line. -->
+    <string name="intercom_lastheard_event_sub">%1$s  ·  %2$s  ·  appuyez pour les détails</string>
+    <!-- The same when the line came several times in a row. %3$d is how many times (shown as "3×"). One line. -->
+    <string name="intercom_lastheard_event_sub_n">%1$s  ·  %2$s  ·  %3$d×  ·  appuyez pour les détails</string>
+    <!-- When an alert happened, on its details sheet, when it came several times in a row. %1$s is the date and time, %2$d the count. One line. -->
+    <string name="intercom_lastheard_when_n">%1$s (la dernière de %2$d d’affilée)</string>
+    <!-- Where an alert happened, on its details sheet. %1$s channel name, %2$s transmit and %3$s receive frequency (MHz), %4$s the mode (DMR or FM). One or two lines. -->
+    <string name="intercom_lastheard_where_high">%1$s  ·  TX %2$s / RX %3$s MHz  ·  %4$s, puissance haute</string>
+    <!-- The same for a channel set to low power. -->
+    <string name="intercom_lastheard_where_low">%1$s  ·  TX %2$s / RX %3$s MHz  ·  %4$s, puissance basse</string>
+    <!-- Section heading on an alert's details sheet: the history lines within 20 seconds of it. Shown in caps. One line. -->
+    <string name="intercom_lastheard_around">Au même moment (±20 s)</string>
+    <!-- Button on the details sheet of the Android Auto is hiding the radio alert: opens Android Auto's settings. Full-width button, one line. -->
+    <string name="intercom_lastheard_open_auto">Ouvrir les paramètres d’Android Auto</string>
+    <!-- Toast when Android Auto's settings could not be opened (Last heard and the Device page). %1$s is the system's error message. -->
+    <string name="intercom_lastheard_open_auto_failed">Impossible d’ouvrir Android Auto : %1$s</string>
+    <!-- Button on an alert's details sheet that tunes the channel it happened on. %1$s is the channel name. Full-width button, one line. -->
+    <string name="intercom_lastheard_tune">Régler sur %1$s</string>
+    <!-- Title of the details sheet of an alert the app has no explanation for. One word. -->
+    <string name="intercom_lastheard_ex_alert">Alerte</string>
+    <!-- Title of the details sheet of an event the app has no explanation for. One word. -->
+    <string name="intercom_lastheard_ex_event">Événement</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_usbdrop_title">L’émission a coupé le câble USB</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_usbdrop_text">Pendant que vous émettiez sur ce canal, le port USB du téléphone s’est réinitialisé : le téléphone a cessé de charger et, avec Android Auto par câble, la voiture s’est déconnectée jusqu’à la fin de votre émission. La touche d’émission utilisée n’y change rien.\n\nLe signal de la radio elle-même entre dans le câble USB. Cela dépend de la fréquence, pas de la position de l’antenne : dans une voiture, émettre vers un relais 2 m sur 144,770 MHz en puissance haute le provoquait à chaque fois, alors que 146,370 MHz non.\n\nCe qui aide :\n• une ferrite à clipser sur le câble, près du téléphone\n• un câble plus court et mieux blindé\n• la puissance basse pour ce canal (Canaux → modifier le canal)\n• Android Auto sans fil, si la voiture le permet</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_notloaded_title">Android Auto a ignoré la radio</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_notloaded_text">Android Auto s’est connecté mais n’a jamais chargé la radio sur cette connexion (normalement, il le fait en quelques secondes) : SignalDeck manquait donc dans la liste des applications de la voiture, et sa carte ouvrait l’application sur le téléphone. Les sources inconnues étaient autorisées : c’est donc un raté d’Android Auto lui-même, observé une fois juste après son démarrage. Débranchez puis rebranchez le câble USB : à la nouvelle connexion, il charge la radio.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_hidden_title">Android Auto masque la radio</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. %1$s is the steps to turn on Unknown sources (intercom_autotrust_steps_*), after a blank line. -->
+    <string name="intercom_lastheard_ex_hidden_text">Android Auto ne fait confiance qu’aux applications installées depuis le Play Store. Pour celle-ci, il diffuse le son et les commandes au volant fonctionnent, mais SignalDeck manque dans la liste des applications de la voiture, et appuyer sur sa carte ouvre l’application sur le téléphone.\n\n%1$s</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_sound_title">La voiture a diffusé autre chose</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_sound_text">Une autre source a commencé à jouer dans la voiture (musique, application audio, la radio de la voiture ou un appel) : Android Auto lui a donné les haut-parleurs et le son de la radio s’est mis en pause. Pendant ce temps, la radio continue de recevoir, d’enregistrer et de décoder. Appuyez sur lecture sur la carte ou l’écran multimédia de la radio pour récupérer les haut-parleurs. Juste avant une déconnexion, cette ligne est normale : Android Auto retire le son en se fermant.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_connected_title">Android Auto connecté</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_connected_text">Le téléphone s’est connecté à la voiture. Entre parenthèses : ce que la voiture affiche pour la radio, l’application multimédia (SignalDeck) ou les commandes radio plein écran (Appareil → Commandes radio plein écran en voiture).</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_disconnected_title">Android Auto déconnecté</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_disconnected_text">La connexion à la voiture s’est terminée : la voiture a été éteinte, le câble débranché ou la liaison a été perdue. Regardez « Au même moment » ci-dessous : si vous émettiez juste avant (une ligne Voice TX), l’émission a probablement perturbé le câble USB, et une alerte le signale quand l’application l’a remarqué.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_opened_title">La voiture a ouvert la radio</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_opened_text">Android Auto a ouvert l’écran de la radio dans la voiture (la liste des canaux de l’application multimédia, ou les commandes radio).</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_noreply_title">Pas de réponse du relais</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_noreply_text">Après votre émission sur ce canal relais, l’application a guetté la réponse du relais (son signal qui revient quand vous relâchez) et n’a rien entendu. La carte de couverture marque cet endroit comme n’atteignant pas le relais. Soit le relais ne vous a pas entendu, soit vous ne pouviez pas l’entendre.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_keyed_title">Le relais a répondu</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_keyed_text">Après votre émission, le signal du relais est revenu : cet endroit l’atteint. Le niveau est celui de la traîne du relais reçue ici, et la carte de couverture l’enregistre.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_coverage_title">Relevé de couverture</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_coverage_text">Le relevé de couverture enregistre le signal et vos déclenchements avec le GPS pour les cartes de couverture (Carte → Couverture). Avec Appareil → Relever la couverture en voiture activé, il démarre à la connexion d’Android Auto et s’arrête à sa déconnexion.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_rxonly_title">Canal en réception seule</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_rxonly_text">Les canaux météo NOAA (162,400 à 162,550 MHz), les canaux VHF marine (156,000 à 157,450 MHz) et les canaux ferroviaires AAR (159,810 à 161,565 MHz) sont en réception seule. La radio n’y émet jamais, quelle que soit la touche appuyée.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_toolong_title">Trop long pour être émis</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_toolong_text">Le firmware de cette radio coupe chaque émission au bout de 30 secondes : l’application refuse donc tout audio de plus d’environ 28,5 secondes (par exemple un long enregistrement ou un mode SSTV qui demande plus de temps).</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_busy_title">Canal occupé</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_busy_text">La radio a refusé d’émettre parce que le canal était occupé : une autre station l’utilisait ou, en DMR, le slot du relais était pris. Attendez qu’il se libère et réessayez.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_repeaterid_title">Identification du relais</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_repeaterid_text">Le relais a envoyé son indicatif en Morse, comme les relais doivent le faire toutes les quelques minutes quand ils sont utilisés, et l’application l’a décodé. Il correspond à l’indicatif du nom de ce canal : vous entendez donc bien le relais que vous avez programmé (et pas un autre sur la même fréquence). La tonalité et la vitesse sont indiquées entre parenthèses.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_morse_title">Morse entendu</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_morse_text">Du Morse a été entendu sur ce canal et décodé : en général l’identification d’un relais, ou une station qui envoie son indicatif. Les indicatifs qu’il contient sont ajoutés au carnet de trafic comme entendus. PKT → Paramètres → Décodeur Morse permet de le désactiver.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_keyword_title">Mot-clé entendu</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_keyword_text">Les sous-titres en direct ont entendu l’un de vos mots-clés dans la parole reçue. Les mots-clés se règlent sur la page Radio : appui long sur TXT → Mots-clés.</string>
+    <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
+    <string name="intercom_lastheard_ex_notsent_title">Non envoyé</string>
+    <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
+    <string name="intercom_lastheard_ex_notsent_text">L’émission a été refusée avant le passage en émission. Le packet radio (APRS, DTMF, SSTV) exige un canal FM analogique : les tonalités AFSK ne peuvent pas passer en DMR. Réglez un canal FM et réessayez.</string>
+
+    <!-- ===== One channel's history (sheet, and the history card in the channel editor) ===== -->
+    <!-- Start of the summary on a channel's history: when it was last heard. %1$s is how long ago ("5 min ago"), %2$s what it was (voice, DMR text…). -->
+    <string name="intercom_chhistory_last_heard">Dernière réception %1$s (%2$s).</string>
+    <!-- Summary on a channel's history when nothing was heard on it. One line. -->
+    <string name="intercom_chhistory_none">Rien d’entendu sur ce canal pour l’instant.</string>
+    <!-- The summary with the counts. %1$s is the sentence above, %2$s the number of entries (intercom_chhistory_entries), then the counts of each kind. Two lines. -->
+    <string name="intercom_chhistory_summary">%1$s  %2$s : %3$d voix, %4$d textes, %5$d tonalités, %6$d identifications de relais, %7$d packet, %8$d de vous.</string>
+    <!-- Number of history entries in a channel's summary. -->
+    <plurals name="intercom_chhistory_entries">
+        <item quantity="one">%1$d entrée</item>
+        <item quantity="many">%1$d d’entrées</item>
+        <item quantity="other">%1$d entrées</item>
+    </plurals>
+    <!-- Number of history entries when only the newest are listed. %1$d is the total, %2$d how many are shown. -->
+    <plurals name="intercom_chhistory_entries_newest">
+        <item quantity="one">%1$d entrée, les %2$d plus récentes affichées</item>
+        <item quantity="many">%1$d d’entrées, les %2$d plus récentes affichées</item>
+        <item quantity="other">%1$d entrées, les %2$d plus récentes affichées</item>
+    </plurals>
+    <!-- Second line of a DMR caller's row in a channel's history. %1$s is time, kind and level, %2$s the caller (name and ID). Tapping opens the contact. One or two lines. -->
+    <string name="intercom_chhistory_row_caller">%1$s  ·  %2$s  ·  appuyez pour le contact</string>
+    <!-- Shown in a channel's history when it is empty: what will be listed. Two lines. -->
+    <string name="intercom_chhistory_empty">La voix, les appelants, les textes, les tonalités, les identifications de relais, le trafic packet et vos propres émissions sur ce canal s’afficheront ici.</string>
+    <!-- Button under a channel's history that removes it. Full-width button, one line. -->
+    <string name="intercom_chhistory_clear">Effacer l’historique de ce canal</string>
+    <!-- Title of the confirmation before clearing a channel's history. %1$s is the channel name. -->
+    <string name="intercom_chhistory_clear_title">Effacer l’historique de %1$s ?</string>
+    <!-- Message of the confirmation before clearing a channel's history. -->
+    <string name="intercom_chhistory_clear_msg">Les sous-titres sont conservés ; tout le reste entendu sur ce canal est supprimé.</string>
+    <!-- Kind of a history line, in a channel's history row and summary: analog voice received. Lower case, one or two words. -->
+    <string name="intercom_chhistory_kind_voice">voix</string>
+    <!-- Kind of a history line: a DMR voice call. One or two words. -->
+    <string name="intercom_chhistory_kind_dmr_voice">voix DMR</string>
+    <!-- Kind of a history line: an M17 voice call. One or two words. -->
+    <string name="intercom_chhistory_kind_m17_voice">voix M17</string>
+    <!-- Kind of a history line: a DMR text message. One or two words. -->
+    <string name="intercom_chhistory_kind_dmr_text">texte DMR</string>
+    <!-- Kind of a history line: a tone (CTCSS/DCS or a call tone). Lower case, one word. -->
+    <string name="intercom_chhistory_kind_tone">tonalité</string>
+    <!-- Kind of a history line: a recording. Lower case, one word. -->
+    <string name="intercom_chhistory_kind_recording">enregistrement</string>
+    <!-- Kind of a history line: something you transmitted. Lower case, one word. -->
+    <string name="intercom_chhistory_kind_transmitted">émis</string>
+    <!-- Kind of a history line: a repeater sending its callsign in Morse. Lower case, two words. -->
+    <string name="intercom_chhistory_kind_repeater_id">identification de relais</string>
+    <!-- Kind of a history line: Morse code heard. One word. -->
+    <string name="intercom_chhistory_kind_morse">Morse</string>
+    <!-- Kind of a history line: packet radio traffic (APRS…). Lower case, one word. -->
+    <string name="intercom_chhistory_kind_packet">packet</string>
+    <!-- Kind of a history line: a warning or refusal. Lower case, one word. -->
+    <string name="intercom_chhistory_kind_alert">alerte</string>
+    <!-- Kind of a history line: an Android Auto event. Lower case, one word. -->
+    <string name="intercom_chhistory_kind_car">voiture</string>
+    <!-- Kind of a history line: a coverage-logging event. Lower case, one word. -->
+    <string name="intercom_chhistory_kind_coverage">couverture</string>
+    <!-- Kind of a history line: a channel change. Lower case, one word. -->
+    <string name="intercom_chhistory_kind_channel">canal</string>
+
+    <!-- ===== Android Auto screens (car templates: rows are short) ===== -->
+    <!-- History line (Last heard) when Android Auto opens the Radio controls screen. Stored in English; Last heard explains lines starting "🚗 Android Auto opened". Keep the leading emoji. One line. -->
+    <string name="intercom_car_history_opened_controls">🚗 Android Auto a ouvert les commandes radio</string>
+    <!-- History line (Last heard) when Android Auto opens the media app. Stored in English, as above. Keep the leading emoji. One line. -->
+    <string name="intercom_car_history_opened_media">🚗 Android Auto a ouvert l’application multimédia</string>
+    <!-- Car screen row title and media app folder: the Last heard list. Short. -->
+    <string name="intercom_car_last_heard">Derniers entendus</string>
+    <!-- Car screen row subtitle under Last heard, and the media app folder's subtitle. Car screen row: one short line. -->
+    <string name="intercom_car_last_heard_sub">Ce qui a été reçu, plus récent d’abord</string>
+    <!-- Car screen row when the radio service is not running. Short. -->
+    <string name="intercom_car_radio_off">La radio est éteinte</string>
+    <!-- Car screen row title when the screen could not be built; the error follows on the next line. One word. -->
+    <string name="intercom_car_unavailable">Indisponible</string>
+    <!-- Car screen: shown in the empty Last heard list. Short. -->
+    <string name="intercom_car_nothing_heard">Rien d’entendu pour l’instant</string>
+    <!-- Car screen row title on Last heard for a line with no text of its own. One word. -->
+    <string name="intercom_car_received">Reçu</string>
+    <!-- Car screen row subtitle on Last heard. %1$s is the time, %2$d the channel number, %3$s its name. Car screen row: short. -->
+    <string name="intercom_car_heard_sub">%1$s · Can. %2$d %3$s</string>
+    <!-- Title of the car screen channel list (the zones) and the button that opens it on Radio controls. One word. -->
+    <string name="intercom_car_channels">Canaux</string>
+    <!-- Car screen row subtitle when the radio is off: what to do. Car screen row: short. -->
+    <string name="intercom_car_open_phone">Ouvrez SignalDeck sur le téléphone</string>
+    <!-- Car screen row subtitle under Favourites before any channel is starred. Car screen row: short. -->
+    <string name="intercom_car_star_hint">Mettez des canaux en favori sur le téléphone (page Canaux) pour les voir ici</string>
+    <!-- Car screen row subtitle and media app folder subtitle: how many channels a zone has. Car screen row: short. -->
+    <plurals name="intercom_car_zone_count">
+        <item quantity="one">%1$d canal</item>
+        <item quantity="many">%1$d de canaux</item>
+        <item quantity="other">%1$d canaux</item>
+    </plurals>
+    <!-- Car screen row and media app folder: the list of every channel. Short. -->
+    <string name="intercom_car_all_channels">Tous les canaux</string>
+    <!-- Car screen row subtitle under All channels: how many there are. English keeps "channels" for 1 too (as before); other languages use their own forms. Car screen row: short. -->
+    <plurals name="intercom_car_all_count">
+        <item quantity="one">%1$d canal</item>
+        <item quantity="many">%1$d de canaux</item>
+        <item quantity="other">%1$d canaux</item>
+    </plurals>
+    <!-- Car screen row subtitle of a channel. %1$s is the frequency, %2$s the mode (DMR or FM). Car screen row: short. -->
+    <string name="intercom_car_channel_sub">%1$s MHz · %2$s</string>
+    <!-- The same for the channel that is tuned now. Car screen row: short. -->
+    <string name="intercom_car_channel_sub_tuned">%1$s MHz · %2$s · actif</string>
+    <!-- Car screen: shown in an empty zone. Short. -->
+    <string name="intercom_car_zone_empty">Aucun canal dans cette zone</string>
+    <!-- Car screen button and media app button that starts a scan. One word. -->
+    <string name="intercom_car_scan">Balayage</string>
+    <!-- Car screen button and media app button that stops the scan. Two words. -->
+    <string name="intercom_car_stop_scan">Arrêter le balayage</string>
+    <!-- Title of the car's own Radio controls screen. Short. -->
+    <string name="intercom_car_controls">Commandes radio</string>
+    <!-- Car screen row title when Radio controls could not be built; the error follows. Car screen row: short. -->
+    <string name="intercom_car_controls_unavailable">Commandes radio indisponibles</string>
+    <!-- Car screen row subtitle on Radio controls when the radio is off. Car screen row: short. -->
+    <string name="intercom_car_open_phone_start">Ouvrez SignalDeck sur le téléphone pour démarrer la radio</string>
+    <!-- Status on the widget, the notification and the car while the module firmware is loaded. Short. -->
+    <string name="intercom_car_firmware_loading">Radio occupée, chargement du firmware</string>
+    <!-- Status while the radio is not ready. %1$s is the link state word (in English, from the radio service). Short. -->
+    <string name="intercom_car_radio_link">Radio : %1$s</string>
+    <!-- Car screen row title on Radio controls when no channel is tuned. Short. -->
+    <string name="intercom_car_no_channel">Aucun canal</string>
+    <!-- Car screen row title on Radio controls: the tuned channel. %1$d its number, %2$s its name. Car screen row: short. -->
+    <string name="intercom_car_channel_title">Can. %1$d · %2$s</string>
+    <!-- Car screen row title on Radio controls during a DMR call. %1$s is the caller (callsign or "ID …"). Car screen row: short. -->
+    <string name="intercom_car_talking">Au micro : %1$s</string>
+    <!-- The same with the caller's DMR ID. %2$d is the ID. Car screen row: short. -->
+    <string name="intercom_car_talking_id">Au micro : %1$s · %2$d</string>
+    <!-- The big Talk button on the car's Radio controls. All caps on screen, short. -->
+    <string name="intercom_car_btn_talk">PARLER</string>
+    <!-- The big Talk button while transmitting: tap to stop. All caps on screen, short. -->
+    <string name="intercom_car_btn_stop_talking">ARRÊTER D’ÉMETTRE</string>
+    <!-- The big Talk button while the module firmware loads (it does nothing then). All caps on screen, short. -->
+    <string name="intercom_car_btn_loading">CHARGEMENT DU FIRMWARE</string>
+    <!-- Name of the self-managed calling account the car uses for a steering-wheel transmission (seen in the phone's call settings). Short. -->
+    <string name="intercom_car_call_account">SignalDeck Émission</string>
+    <!-- Caller name the car shows during a steering-wheel transmission (it is placed as a call). Short. -->
+    <string name="intercom_car_call_name">SignalDeck : en émission</string>
+
+    <!-- ===== Car's now-playing picture (drawn on a 512 px square: short, shown in caps) ===== -->
+    <!-- Top line of the car's now-playing picture: the zone. %1$s is the zone name. Upper-cased on screen, short. -->
+    <string name="intercom_carart_zone">ZONE · %1$s</string>
+    <!-- State badge on the car's now-playing picture. All caps, at most about 12 characters. -->
+    <string name="intercom_carart_radio_off">ÉTEINTE</string>
+    <!-- State badge on the car's now-playing picture: transmitting. All caps, at most about 12 characters. -->
+    <string name="intercom_carart_transmitting">ÉMISSION</string>
+    <!-- State badge on the car's now-playing picture: receiving. All caps, at most about 12 characters. -->
+    <string name="intercom_carart_receiving">RÉCEPTION</string>
+    <!-- State badge on the car's now-playing picture: scanning. All caps, at most about 12 characters. -->
+    <string name="intercom_carart_scanning">BALAYAGE</string>
+    <!-- State badge on the car's now-playing picture: the sound is paused. All caps, at most about 12 characters. -->
+    <string name="intercom_carart_paused">EN PAUSE</string>
+    <!-- State badge on the car's now-playing picture: ready. All caps, at most about 12 characters. -->
+    <string name="intercom_carart_ready">PRÊTE</string>
+    <!-- Chip on the car's now-playing picture: the channel is set to high power. All caps, very short. -->
+    <string name="intercom_carart_high_pwr">P. HAUTE</string>
+    <!-- Chip on the car's now-playing picture: the channel is set to low power. All caps, very short. -->
+    <string name="intercom_carart_low_pwr">P. BASSE</string>
+    <!-- Signal meter label on the car's now-playing picture when nothing is received. All caps, short. -->
+    <string name="intercom_carart_no_signal">AUCUN SIGNAL</string>
+
+    <!-- ===== Media app (Android Auto media screen, phone media controls) ===== -->
+    <!-- Subtitle of a channel in the car's media list. %1$d channel number, %2$s frequency, %3$s mode (DMR or FM). Car screen row: short. -->
+    <string name="intercom_media_channel_sub">Can. %1$d · %2$s MHz · %3$s</string>
+    <!-- Media button in the car and the widget's Talk button description: start transmitting. One word. -->
+    <string name="intercom_media_talk">Parler</string>
+    <!-- Media button in the car and the widget's Talk button description while transmitting: stop. Two words. -->
+    <string name="intercom_media_stop_talking">Arrêter d’émettre</string>
+
+    <!-- ===== Home-screen widget and the notification's status line ===== -->
+    <!-- Toast after the notification's Exit button switched the radio off. -->
+    <string name="intercom_widget_exited">Radio éteinte. Ouvrez SignalDeck pour la rallumer</string>
+    <!-- Toast when a widget button is pressed while the radio is not on. -->
+    <string name="intercom_widget_not_on">Ouvrez d’abord l’application radio : la radio n’est pas allumée</string>
+    <!-- Toast when the widget's Talk is pressed on a receive-only channel. -->
+    <string name="intercom_widget_rx_only">Ce canal est en réception seule</string>
+    <!-- Widget status when the radio service is not running. One short line. -->
+    <string name="intercom_widget_off">Radio éteinte · appuyez pour ouvrir</string>
+    <!-- Part of the widget and notification status line: the frequency. %1$s is the frequency in MHz. Parts are joined with intercom_widget_sep. -->
+    <string name="intercom_widget_freq">%1$s MHz</string>
+    <!-- Separator between the parts of the widget and notification status line (a middle dot with a space each side). -->
+    <string name="intercom_widget_sep">\u0020·\u0020</string>
+    <!-- Part of the status line while coverage is being logged. Short. -->
+    <string name="intercom_widget_mapping">Relevé de couverture en cours</string>
+    <!-- Part of the status line while transmitting. All caps on purpose, short. -->
+    <string name="intercom_widget_transmitting">ÉMISSION</string>
+    <!-- Part of the status line while a signal is received. One word. -->
+    <string name="intercom_widget_receiving">Réception</string>
+    <!-- Part of the status line while scan holds on a busy channel. Short. -->
+    <string name="intercom_widget_scan_holding">Balayage en pause</string>
+    <!-- Part of the status line while scanning. %1$s is the zone name (may be empty). Short. -->
+    <string name="intercom_widget_scanning">Balayage %1$s</string>
+    <!-- Part of the status line when the radio is idle and ready. One word. -->
+    <string name="intercom_widget_ready">Prête</string>
+
+    <!-- ===== Message notifications (phone, read aloud by Android Auto) ===== -->
+    <!-- Your own name in a message conversation (your replies). One word. -->
+    <string name="intercom_carmsg_me">Moi</string>
+    <!-- Conversation title of the sample message (Diagnostics). Short. -->
+    <string name="intercom_carmsg_test_title">Message de test</string>
+    <!-- Text of the sample message (Diagnostics); read aloud in the car. -->
+    <string name="intercom_carmsg_test_text">Voici comment un message texte DMR ou APRS s’affiche dans la voiture.</string>
+    <!-- Conversation title of weather alerts (NOAA is the US weather service). Short. -->
+    <string name="intercom_carmsg_noaa">Météo NOAA</string>
+    <!-- Name of the notification channel for messages, in Android's notification settings. -->
+    <string name="intercom_carmsg_channel">Messages (DMR, APRS, météo)</string>
+    <!-- Notification action and car voice action: mark the conversation read. Short. -->
+    <string name="intercom_carmsg_mark_read">Marquer comme lu</string>
+    <!-- Notification action, and the label of the reply field. One word. -->
+    <string name="intercom_carmsg_reply">Répondre</string>
+    <!-- Your reply in the conversation when it could not be sent. %1$s is why (one of the intercom_carmsg_err_* texts, or a packet error), %2$s your text. -->
+    <string name="intercom_carmsg_not_sent">Non envoyé (%1$s) : %2$s</string>
+    <!-- Why a reply was not sent: the radio service is not running. Lower case, short. -->
+    <string name="intercom_carmsg_err_off">la radio est éteinte</string>
+    <!-- Why a DMR reply was not sent: an FM channel is tuned. Lower case, short. -->
+    <string name="intercom_carmsg_err_tune_dmr">réglez un canal DMR pour répondre</string>
+    <!-- Why an APRS reply was not sent. Lower case, short. -->
+    <string name="intercom_carmsg_err_no_packet">packet radio indisponible</string>
+    <!-- Why the reply to the sample message was not sent. Lower case, short. -->
+    <string name="intercom_carmsg_err_test">test uniquement</string>
+    <!-- Why a reply was not sent: this message cannot be answered. Lower case, short. -->
+    <string name="intercom_carmsg_err_no_reply">réponse impossible à ce message</string>
+
+    <!-- ===== Android Auto trust and USB notifications ===== -->
+    <!-- Steps to make Android Auto show the app, when its developer settings are still locked. Shown in Device, the notification and Last heard. Keep the menu names as Android Auto shows them in your language. -->
+    <string name="intercom_autotrust_steps_locked">Sur le téléphone, ouvrez les paramètres d’Android Auto, faites défiler jusqu’en bas et appuyez dix fois sur Version (confirmez la demande) pour déverrouiller les paramètres pour les développeurs. Appuyez ensuite sur le menu ⋮ en haut à droite, choisissez Paramètres pour les développeurs et activez Sources inconnues. Déconnectez puis reconnectez la voiture : SignalDeck apparaît dans la liste des applications de la voiture, et sa carte ouvre l’écran multimédia de la voiture.</string>
+    <!-- The same when the developer settings are already unlocked. -->
+    <string name="intercom_autotrust_steps_off">Sur le téléphone, ouvrez les paramètres d’Android Auto, appuyez sur le menu ⋮ en haut à droite, choisissez Paramètres pour les développeurs et activez Sources inconnues. Déconnectez puis reconnectez la voiture : SignalDeck apparaît dans la liste des applications de la voiture, et sa carte ouvre l’écran multimédia de la voiture.</string>
+    <!-- Notification title: Android Auto leaves the app off the car's app list. One line. -->
+    <string name="intercom_autotrust_hidden_title">Android Auto masque SignalDeck</string>
+    <!-- Notification text (collapsed) under that title. One line. -->
+    <string name="intercom_autotrust_hidden_text">Activez Sources inconnues dans les paramètres pour les développeurs d’Android Auto</string>
+    <!-- Notification title: transmitting reset the USB port and Android Auto dropped. One line. -->
+    <string name="intercom_autotrust_usb_title_car">Android Auto coupé pendant l’émission</string>
+    <!-- Notification title: transmitting reset the USB port (not in the car). One line. -->
+    <string name="intercom_autotrust_usb_title">USB coupé pendant l’émission</string>
+    <!-- Notification text (expanded), in the car. %1$s is the channel name, %2$s its frequency. Keep the advice. -->
+    <string name="intercom_autotrust_usb_text_car">L’émission sur %1$s (%2$s) a perturbé le câble USB : Android Auto s’est déconnecté jusqu’à la fin de votre émission. Le signal de la radio entre dans le câble ; cela dépend de la fréquence, d’autres canaux peuvent donc fonctionner sans problème. Ce qui aide : une ferrite à clipser sur le câble près du téléphone, un câble blindé plus court, la puissance basse pour ce canal (Canaux → modifier) ou Android Auto sans fil.</string>
+    <!-- Notification text (expanded), not in the car. %1$s is the channel name, %2$s its frequency. Keep the advice. -->
+    <string name="intercom_autotrust_usb_text">L’émission sur %1$s (%2$s) a perturbé le câble USB. Le signal de la radio entre dans le câble ; cela dépend de la fréquence, d’autres canaux peuvent donc fonctionner sans problème. Ce qui aide : une ferrite à clipser sur le câble près du téléphone, un câble blindé plus court, la puissance basse pour ce canal (Canaux → modifier) ou Android Auto sans fil.</string>
+    <!-- Notification text (collapsed) for the USB drop. %1$s is the channel name, %2$s its frequency. One line. -->
+    <string name="intercom_autotrust_usb_short">%1$s (%2$s) a perturbé le câble USB</string>
+    <!-- Notification text (expanded): Android Auto connected but did not load the radio. -->
+    <string name="intercom_autotrust_notloaded_text">Android Auto s’est connecté sans charger la radio : SignalDeck manque dans la liste des applications de la voiture, et sa carte ouvre le téléphone. Débranchez puis rebranchez le câble USB : Android Auto la charge à la nouvelle connexion.</string>
+    <!-- Notification title for that. One line. -->
+    <string name="intercom_autotrust_notloaded_title">Reconnectez pour afficher SignalDeck dans la voiture</string>
+    <!-- Notification text (collapsed) for that. One line. -->
+    <string name="intercom_autotrust_notloaded_short">Débranchez puis rebranchez le câble</string>
+
+    <!-- ==== VFO sheet (intercom VFO key) ==== -->
+    <!-- Hint at the top of the VFO sheet. A few lines. -->
+    <string name="intercom_vfo_hint">Réglez n’importe quelle fréquence sans enregistrer de canal. Tant que le VFO est actif, les flèches de la page Radio changent la fréquence par pas ; appui long sur VFO pour revenir à votre canal.</string>
+    <!-- VFO sheet: mode pill for analog FM. Short pill (half the width). -->
+    <string name="intercom_vfo_mode_fm">FM analogique</string>
+    <!-- VFO sheet: mode pill for DMR. Short pill (half the width). -->
+    <string name="intercom_vfo_mode_dmr">DMR numérique</string>
+    <!-- VFO sheet: label above the receive frequency field (in MHz). Short. -->
+    <string name="intercom_vfo_rx_mhz">Réception MHz</string>
+    <!-- VFO sheet: label above the transmit frequency field (in MHz). Short. -->
+    <string name="intercom_vfo_tx_mhz">Émission MHz</string>
+    <!-- VFO sheet: hint above the repeater offset pills (Simplex, −0.600, +0.600 …). One line. -->
+    <string name="intercom_vfo_offset_hint">Les raccourcis de décalage relais calculent l’émission à partir de la réception :</string>
+    <!-- VFO sheet: offset pill that makes Transmit equal Receive (no offset). Very short (one of five pills in a row). -->
+    <string name="intercom_vfo_simplex">Simplex</string>
+    <!-- VFO sheet: section title above the step pills (how far the intercom arrows move the frequency). Short, shown in caps. -->
+    <string name="intercom_vfo_arrow_step">Pas des flèches</string>
+    <!-- VFO sheet: section title above the Low/High power pills. Short, shown in caps. -->
+    <string name="intercom_vfo_power">Puissance</string>
+    <!-- VFO sheet: low transmit power pill. Short pill. -->
+    <string name="intercom_vfo_power_low">Basse</string>
+    <!-- VFO sheet: high transmit power pill. Short pill. -->
+    <string name="intercom_vfo_power_high">Haute</string>
+    <!-- VFO sheet: section title above the bandwidth pills (analog). Short, shown in caps. -->
+    <string name="intercom_vfo_bandwidth">Largeur de bande</string>
+    <!-- VFO sheet: narrow bandwidth pill. Short pill (half the width). -->
+    <string name="intercom_vfo_band_narrow">Étroite 12,5 kHz</string>
+    <!-- VFO sheet: wide bandwidth pill. Short pill (half the width). -->
+    <string name="intercom_vfo_band_wide">Large 25 kHz</string>
+    <!-- VFO sheet: row label for the receive tone (CTCSS/DCS) and the title of its tone list. Short. -->
+    <string name="intercom_vfo_rx_tone">Tonalité RX</string>
+    <!-- VFO sheet: row label for the transmit tone (CTCSS/DCS) and the title of its tone list. Short. -->
+    <string name="intercom_vfo_tx_tone">Tonalité TX</string>
+    <!-- VFO sheet: tone type, no tone. Short value chip. -->
+    <string name="intercom_vfo_tone_none">Aucune</string>
+    <!-- VFO sheet: tone type, inverted DCS code. Short value chip. -->
+    <string name="intercom_vfo_tone_dcs_inverted">DCS inversé</string>
+    <!-- VFO sheet: DMR colour code row label. Short. -->
+    <string name="intercom_vfo_colour_code">Code couleur</string>
+    <!-- VFO sheet: section title above the DMR time slot pills. Short, shown in caps. -->
+    <string name="intercom_vfo_time_slot">Slot</string>
+    <!-- VFO sheet: DMR time slot pill; %1$d is 1 or 2. Short pill. -->
+    <string name="intercom_vfo_slot">Slot %1$d</string>
+    <!-- VFO sheet: DMR call type row label. Short. -->
+    <string name="intercom_vfo_call_type">Type d’appel</string>
+    <!-- VFO sheet: DMR call type value, a call to one DMR ID. Value chip, one line. -->
+    <string name="intercom_vfo_call_private">Privé (ID DMR)</string>
+    <!-- VFO sheet: DMR call type value, a talkgroup call. Value chip, one line. -->
+    <string name="intercom_vfo_call_group">Groupe (talkgroup)</string>
+    <!-- VFO sheet: DMR call type value, receive every call. Value chip, one line. -->
+    <string name="intercom_vfo_call_all">Tous (tout recevoir)</string>
+    <!-- VFO sheet: label above the DMR call number field. One line. -->
+    <string name="intercom_vfo_call_number">Numéro d’appel (talkgroup ou ID DMR)</string>
+    <!-- VFO sheet: label above the receive talkgroups field. One or two lines. -->
+    <string name="intercom_vfo_rx_groups">Talkgroups en réception (séparés par des virgules, le numéro d’appel est ajouté)</string>
+    <!-- VFO sheet: label above the DMR ID override field; %1$s is the user's own DMR ID. One line. -->
+    <string name="intercom_vfo_id_override">Émettre avec l’ID DMR (vide = le vôtre, %1$s)</string>
+    <!-- VFO sheet: button that tunes the radio to the entered settings. Short (one of three buttons in a row). -->
+    <string name="intercom_vfo_tune">Régler</string>
+    <!-- VFO sheet: button that saves the tuned settings as a new channel; also the title of its name dialog. Short (one of three buttons in a row). -->
+    <string name="intercom_vfo_save_as_channel">Enregistrer en canal</string>
+    <!-- VFO sheet: button that leaves VFO mode (shown instead of Cancel while VFO is on). Short (one of three buttons in a row). -->
+    <string name="intercom_vfo_off">Quitter VFO</string>
+    <!-- Toast when an offset shortcut is tapped with no receive frequency entered. One line. -->
+    <string name="intercom_vfo_need_rx_toast">Saisissez d’abord la fréquence de réception</string>
+    <!-- Toast when a frequency is outside the radio's bands; %1$s lists the bands (e.g. "136–174 MHz and 400–480 MHz"). One or two lines. -->
+    <string name="intercom_vfo_out_of_band_toast">Les fréquences doivent être dans %1$s</string>
+    <!-- Toast when a private or group call has no call number. One line. -->
+    <string name="intercom_vfo_need_call_toast">Un numéro d’appel est nécessaire pour un appel privé ou de groupe</string>
+    <!-- Toast when more than 32 receive talkgroups are entered. One line. -->
+    <string name="intercom_vfo_too_many_groups_toast">32 talkgroups en réception au maximum</string>
+    <!-- Toast when a number field does not parse. Short. -->
+    <string name="intercom_vfo_check_numbers_toast">Vérifiez les nombres</string>
+    <!-- Message of the Save as channel dialog, above the name field. One line. -->
+    <string name="intercom_vfo_name_prompt">Nom du nouveau canal :</string>
+    <!-- Name given to a channel saved from the VFO when the name field is left empty. Stored as the channel name. Short. -->
+    <string name="intercom_vfo_default_channel_name">Canal VFO</string>
+    <!-- Toast after the VFO settings were saved as a channel; %1$d is the new channel number. One line. -->
+    <string name="intercom_vfo_saved_toast">Enregistré comme canal %1$d</string>
+    <!-- Band-plan line under the frequency fields, receive only; %1$s is what the band is used for (e.g. "2 m amateur, FM simplex"). One or two lines. -->
+    <string name="intercom_vfo_bandplan_rx">Réception : %1$s</string>
+    <!-- Band-plan line under the frequency fields, transmit only; %1$s is what the band is used for. One or two lines. -->
+    <string name="intercom_vfo_bandplan_tx">Émission : %1$s</string>
+    <!-- Band-plan lines under the frequency fields when receive and transmit differ; %1$s and %2$s say what each band is used for. Two lines. -->
+    <string name="intercom_vfo_bandplan_both">Réception : %1$s\nÉmission : %2$s</string>
+
+    <!-- ==== Zones sheet ==== -->
+    <!-- Title of the Zones sheet. One line. -->
+    <string name="intercom_zones_title">Zones</string>
+    <!-- Hint at the top of the Zones sheet. ⋮ is the menu button on each row. A few lines. -->
+    <string name="intercom_zones_hint">La zone détermine les canaux qu’utilisent les flèches, le balayage et la liste des canaux de la voiture. Appuyez sur une zone pour l’utiliser ; ⋮ la renomme, la remplit à nouveau ou la supprime.</string>
+    <!-- Name of the built-in zone holding every channel (first row of the Zones sheet). "ALL" in caps on purpose. Short. -->
+    <string name="intercom_zones_all_channels">TOUS les canaux</string>
+    <!-- Button that opens the Add a zone sheet; also that sheet's title. Short. -->
+    <string name="intercom_zones_add">Ajouter une zone</string>
+    <!-- Zones sheet row: how many channels the zone holds. One line. -->
+    <plurals name="intercom_zones_row_count">
+        <item quantity="one">%1$d canal</item>
+        <item quantity="many">%1$d de canaux</item>
+        <item quantity="other">%1$d canaux</item>
+    </plurals>
+    <!-- Zones sheet row: how many channels the zone holds, for the zone in use. One line. -->
+    <plurals name="intercom_zones_row_count_in_use">
+        <item quantity="one">%1$d canal  ·  en cours</item>
+        <item quantity="many">%1$d de canaux  ·  en cours</item>
+        <item quantity="other">%1$d canaux  ·  en cours</item>
+    </plurals>
+    <!-- Content description (screen reader) of a zone row's ⋮ button; %1$s is the zone name. -->
+    <string name="intercom_zones_options_cd">Options de la zone %1$s</string>
+    <!-- Hint at the top of the Add a zone sheet. Mentions the licence line shown under each list. A few lines. -->
+    <string name="intercom_zones_add_hint">Une liste standard ajoute ses canaux et une zone qui les regroupe. Les canaux que vous avez déjà sur la même fréquence sont réutilisés, pas dupliqués. Lisez la ligne sur la licence : l’écoute est toujours permise, l’émission ne l’est pas sur toutes les listes.</string>
+    <!-- Add a zone sheet: section title above the "your own channels" card. Short, shown in caps. -->
+    <string name="intercom_zones_your_own">Les vôtres</string>
+    <!-- Add a zone sheet: card title for a zone made from your own channels. One line. -->
+    <string name="intercom_zones_own_title">Nouvelle zone avec vos canaux</string>
+    <!-- Add a zone sheet: card subtitle for the own-channels zone. One line. -->
+    <string name="intercom_zones_own_sub">Nommez-la, puis cochez les canaux qu’elle contient</string>
+    <!-- Title of the name dialog for a new zone. Short. -->
+    <string name="intercom_zones_new_zone">Nouvelle zone</string>
+    <!-- Toast when the new zone's name is already taken; %1$s is the existing zone's name. One line. -->
+    <string name="intercom_zones_exists_toast">Une zone nommée %1$s existe déjà</string>
+    <!-- Add a zone sheet: section title above the standard channel lists, when a region is chosen; %1$s is the region (e.g. "United States"). Short, shown in caps. -->
+    <string name="intercom_zones_standard_for">Listes standard pour : %1$s</string>
+    <!-- Add a zone sheet: section title above the standard channel lists, no region chosen. Short, shown in caps. -->
+    <string name="intercom_zones_standard">Listes standard</string>
+    <!-- Add a zone sheet: section title above lists that are not legal to transmit on in the chosen region; also the start of such a list's subtitle. Legal text: keep the meaning exact. Short. -->
+    <string name="intercom_zones_not_legal">Non autorisé ici</string>
+    <!-- Add a zone sheet: hint under "Not legal here"; %1$s is the region. Legal text: keep the meaning exact. A few lines. -->
+    <string name="intercom_zones_not_legal_hint">Services sans licence que %1$s ne prévoit pas. Ils restent ici parce que vous pouvez en avoir besoin ailleurs ; savoir si vous avez le droit d’y émettre relève de votre responsabilité.</string>
+    <!-- Add a zone sheet: status in a list's subtitle, the list is only partly legal in the region. Legal text. Short (followed by more items, separated by "  ·  "). -->
+    <string name="intercom_zones_partly_legal">Partiellement autorisé ici (certains canaux)</string>
+    <!-- Add a zone sheet: hint under the standard lists when some are hidden because this radio can tune none of their channels. %1$d is how many lists; %2$s is the radio's bands as text ("400–480 MHz"). A few lines. -->
+    <plurals name="intercom_zones_out_of_band_hint">
+        <item quantity="one">%1$d liste standard n’est pas affichée : aucun de ses canaux n’est dans la plage de cette radio (%2$s).</item>
+        <item quantity="many">%1$d de listes standard ne sont pas affichées : aucun de leurs canaux n’est dans la plage de cette radio (%2$s).</item>
+        <item quantity="other">%1$d listes standard ne sont pas affichées : aucun de leurs canaux n’est dans la plage de cette radio (%2$s).</item>
+    </plurals>
+    <!-- Add a zone sheet: status in a list's subtitle; %1$d of %2$d channels can be tuned on this radio. Short (followed by more items). -->
+    <string name="intercom_zones_some_in_bands">%1$d sur %2$d dans les bandes de cette radio</string>
+    <!-- Add a zone sheet: a standard list's card title; %1$s is the list name (FRS, GMRS …), %2$d its channel count. English keeps "channels" for 1 too. One line. -->
+    <plurals name="intercom_zones_preset_title">
+        <item quantity="one">%1$s  ·  %2$d canal</item>
+        <item quantity="many">%1$s  ·  %2$d de canaux</item>
+        <item quantity="other">%1$s  ·  %2$d canaux</item>
+    </plurals>
+    <!-- Add a zone sheet: a standard list's subtitle when you already have a zone of that name; %1$s is the status line (region · licence), %2$s the zone name. Two lines. -->
+    <string name="intercom_zones_preset_sub_have">%1$s\nVous avez une zone nommée %2$s : les canaux manquants y sont ajoutés</string>
+    <!-- Add a zone sheet: button that shows the lists of other regions. Short. -->
+    <string name="intercom_zones_show_all">Afficher toutes les listes</string>
+    <!-- Add a zone sheet: section title above the lists of other regions. Short, shown in caps. -->
+    <string name="intercom_zones_other_regions">Listes d’autres régions</string>
+    <!-- Standard list sheet: section title and dialog title for the repeater CTCSS tone. Short. -->
+    <string name="intercom_zones_repeater_tone">Tonalité du relais</string>
+    <!-- Standard list sheet: hint about the GMRS repeater tone. myGMRS.com is a website name. A few lines. -->
+    <string name="intercom_zones_repeater_tone_hint">La plupart des relais GMRS exigent une tonalité CTCSS pour s’ouvrir. Choisissez celle de votre relais local (son responsable ou myGMRS.com l’indique) ; elle sert dans les deux sens sur les canaux R. Laissez Aucune pour la régler plus tard dans chaque canal.</string>
+    <!-- Standard list sheet: tone button, no tone chosen. Short (button). -->
+    <string name="intercom_zones_tone_none_button">Tonalité : aucune</string>
+    <!-- Standard list sheet: tone button; %1$s is the tone (e.g. "141.3 Hz"). Short (button). -->
+    <string name="intercom_zones_tone_button">Tonalité : %1$s</string>
+    <!-- Standard list sheet: first item of the tone list, no tone. Short. -->
+    <string name="intercom_zones_tone_none">Aucune</string>
+    <!-- Standard list sheet: section title above the channel preview; %1$d is the channel count. English keeps "channels" for 1 too. Short, shown in caps. -->
+    <plurals name="intercom_zones_preset_count">
+        <item quantity="one">%1$d canal</item>
+        <item quantity="many">%1$d de canaux</item>
+        <item quantity="other">%1$d canaux</item>
+    </plurals>
+    <!-- Standard list sheet: section title above the channel preview when this radio can tune only some of the list; %1$d of %2$d channels. Short, shown in caps. -->
+    <string name="intercom_zones_preset_tunable">%1$d canaux sur %2$d accessibles ici</string>
+    <!-- Standard list sheet: hint under that title; %1$s is the radio's bands as text ("400–480 MHz"). "Add" is the button below. One or two lines. -->
+    <string name="intercom_zones_preset_tunable_hint">Cette radio couvre %1$s : Ajouter laisse de côté les canaux marqués hors plage.</string>
+    <!-- Standard list sheet: button that adds the list; %1$s is the list name (FRS, GMRS …). Short (button). -->
+    <string name="intercom_zones_add_preset">Ajouter %1$s</string>
+    <!-- Toast when a standard list could not be added; %1$s is the list name, %2$s the error. One or two lines. -->
+    <string name="intercom_zones_add_failed_toast">Impossible d’ajouter %1$s : %2$s</string>
+    <!-- Zone sheet (⋮): how many channels the zone holds. One line. -->
+    <plurals name="intercom_zones_menu_count">
+        <item quantity="one">%1$d canal</item>
+        <item quantity="many">%1$d de canaux</item>
+        <item quantity="other">%1$d canaux</item>
+    </plurals>
+    <!-- Zone sheet (⋮) of the Favourites zone: channel count and how starring works. "Channels page" names the page. One or two lines. -->
+    <plurals name="intercom_zones_menu_count_fav">
+        <item quantity="one">%1$d canal. Canaux favoris : ajoutez ou retirez l’étoile sur la page Canaux.</item>
+        <item quantity="many">%1$d de canaux. Canaux favoris : ajoutez ou retirez l’étoile sur la page Canaux.</item>
+        <item quantity="other">%1$d canaux. Canaux favoris : ajoutez ou retirez l’étoile sur la page Canaux.</item>
+    </plurals>
+    <!-- Zone sheet (⋮): button that makes this zone the one in use. Short (button). -->
+    <string name="intercom_zones_use">Utiliser cette zone</string>
+    <!-- Zone sheet (⋮): button that opens the channel tick list. Short (button). -->
+    <string name="intercom_zones_choose_channels">Choisir ses canaux</string>
+    <!-- Zone sheet (⋮): button that renames the zone. Short (button). -->
+    <string name="intercom_zones_rename">Renommer</string>
+    <!-- Title of the rename dialog. Short. -->
+    <string name="intercom_zones_rename_title">Renommer la zone</string>
+    <!-- Zone sheet (⋮): button that deletes the zone but not its channels. One line (button). -->
+    <string name="intercom_zones_delete_keep">Supprimer la zone (garder ses canaux)</string>
+    <!-- Title of the delete-zone confirmation; %1$s is the zone name. One line. -->
+    <string name="intercom_zones_delete_title">Supprimer la zone %1$s ?</string>
+    <!-- Message of the delete-zone confirmation. "ALL channels" is the built-in zone (intercom_zones_all_channels). One or two lines. -->
+    <string name="intercom_zones_delete_message">Les canaux restent dans TOUS les canaux et dans les autres zones.</string>
+    <!-- Zone sheet (⋮): button that deletes the zone and the channels only it holds; %1$d is how many. One line (button). -->
+    <plurals name="intercom_zones_delete_all">
+        <item quantity="one">Supprimer la zone et %1$d canal</item>
+        <item quantity="many">Supprimer la zone et ses %1$d de canaux</item>
+        <item quantity="other">Supprimer la zone et ses %1$d canaux</item>
+    </plurals>
+    <!-- Zone sheet (⋮): hint under the delete-all button, every channel is only in this zone. One line. -->
+    <string name="intercom_zones_only_here">Ses canaux ne sont dans aucune autre zone.</string>
+    <!-- Zone sheet (⋮): hint under the delete-all button; %1$d channels are also in another zone. English keeps "channels" for 1 too. One or two lines. -->
+    <plurals name="intercom_zones_kept">
+        <item quantity="one">%1$d de ses canaux est aussi dans une autre zone et sera conservé.</item>
+        <item quantity="many">%1$d de ses canaux sont aussi dans une autre zone et seront conservés.</item>
+        <item quantity="other">%1$d de ses canaux sont aussi dans une autre zone et seront conservés.</item>
+    </plurals>
+    <!-- Title of the delete-zone-and-channels confirmation; %1$s is the zone name, %2$d the channel count. English keeps "channels" for 1 too. One line. -->
+    <plurals name="intercom_zones_delete_all_title">
+        <item quantity="one">Supprimer %1$s et %2$d canal ?</item>
+        <item quantity="many">Supprimer %1$s et %2$d de canaux ?</item>
+        <item quantity="other">Supprimer %1$s et %2$d canaux ?</item>
+    </plurals>
+    <!-- Message of the delete-zone-and-channels confirmation. One or two lines. -->
+    <string name="intercom_zones_delete_all_message">Les canaux sont supprimés définitivement (une sauvegarde en garde une copie).</string>
+    <!-- Toast after a zone and its channels were deleted; %1$s is the zone name, %2$d the channel count. English keeps "channels" for 1 too. One line. -->
+    <plurals name="intercom_zones_deleted_toast">
+        <item quantity="one">%1$s et %2$d canal supprimés</item>
+        <item quantity="many">%1$s et %2$d de canaux supprimés</item>
+        <item quantity="other">%1$s et %2$d canaux supprimés</item>
+    </plurals>
+    <!-- Channel tick list: name shown for an unnamed digital channel. Short. -->
+    <string name="intercom_zones_unnamed_digital">Numérique</string>
+    <!-- Channel tick list: name shown for an unnamed analog channel. Short. -->
+    <string name="intercom_zones_unnamed_analog">Analogique</string>
+    <!-- Hint of the zone name field. Short. -->
+    <string name="intercom_zones_name_hint">Nom de la zone</string>
+    <!-- Toast when the zone name is empty or reserved. One line. -->
+    <string name="intercom_zones_need_name_toast">Donnez un nom à la zone</string>
+
+    <!-- ==== Scheduled operations sheet (PKT → Scheduled operations) ==== -->
+    <!-- Day pills in the schedule editor: one-letter abbreviations, Monday to Sunday. One letter each. -->
+    <string name="intercom_schedule_day_mon_short">L</string>
+    <!-- Tuesday, one letter. -->
+    <string name="intercom_schedule_day_tue_short">M</string>
+    <!-- Wednesday, one letter. -->
+    <string name="intercom_schedule_day_wed_short">M</string>
+    <!-- Thursday, one letter. -->
+    <string name="intercom_schedule_day_thu_short">J</string>
+    <!-- Friday, one letter. -->
+    <string name="intercom_schedule_day_fri_short">V</string>
+    <!-- Saturday, one letter. -->
+    <string name="intercom_schedule_day_sat_short">S</string>
+    <!-- Sunday, one letter. -->
+    <string name="intercom_schedule_day_sun_short">D</string>
+    <!-- Day pill content description (screen reader): full day name. -->
+    <string name="intercom_schedule_day_mon">lundi</string>
+    <!-- Day pill content description. -->
+    <string name="intercom_schedule_day_tue">mardi</string>
+    <!-- Day pill content description. -->
+    <string name="intercom_schedule_day_wed">mercredi</string>
+    <!-- Day pill content description. -->
+    <string name="intercom_schedule_day_thu">jeudi</string>
+    <!-- Day pill content description. -->
+    <string name="intercom_schedule_day_fri">vendredi</string>
+    <!-- Day pill content description. -->
+    <string name="intercom_schedule_day_sat">samedi</string>
+    <!-- Day pill content description. -->
+    <string name="intercom_schedule_day_sun">dimanche</string>
+    <!-- Title of the Scheduled operations sheet. One line. -->
+    <string name="intercom_schedule_title">Opérations programmées</string>
+    <!-- Hint at the top of the Scheduled operations sheet. A few lines. -->
+    <string name="intercom_schedule_hint">Lancez une action à heure fixe, une fois ou chaque semaine : écouter un canal (et l’enregistrer), balayer la zone, écoute APRS, réception SSTV ou envoi d’une balise APRS. À la fin, la radio reprend ce qu’elle faisait. Cela fonctionne écran éteint ; un passage de satellite suivi a toujours la priorité.</string>
+    <!-- The same hint on a radio that cannot tune the APRS frequency (no "APRS monitoring" in the list). A few lines. -->
+    <string name="intercom_schedule_hint_no_aprs">Lancez une action à heure fixe, une fois ou chaque semaine : écouter un canal (et l’enregistrer), balayer la zone, réception SSTV ou envoi d’une balise APRS. À la fin, la radio reprend ce qu’elle faisait. Cela fonctionne écran éteint ; un passage de satellite suivi a toujours la priorité.</string>
+    <!-- Shown when there are no schedules. One line. -->
+    <string name="intercom_schedule_empty">Aucune programmation pour l’instant.</string>
+    <!-- Schedule row subtitle while it runs; %1$s is when it repeats (e.g. "Mon Wed 07:00 for 60 min"), %2$s the end time (HH:mm). One line. -->
+    <string name="intercom_schedule_sub_running">%1$s · en cours, jusqu’à %2$s</string>
+    <!-- Schedule row subtitle when switched off; %1$s is when it repeats. One line. -->
+    <string name="intercom_schedule_sub_off">%1$s · désactivée</string>
+    <!-- Schedule row subtitle; %1$s is when it repeats, %2$s the next start (e.g. "Tue 4 Nov, 07:00"). One line. -->
+    <string name="intercom_schedule_sub_next">%1$s · prochaine : %2$s</string>
+    <!-- Schedule row subtitle for a one-off schedule that has run; %1$s is when it was. One line. -->
+    <string name="intercom_schedule_sub_done">%1$s · terminée</string>
+    <!-- Toast when a past one-off schedule is switched on. One line. -->
+    <string name="intercom_schedule_past_toast">Cette date est passée : modifiez-la d’abord</string>
+    <!-- Schedule row title with its channel; %1$s is the schedule name or action, %2$s the channel name. One line. -->
+    <string name="intercom_schedule_row_channel">%1$s · %2$s</string>
+    <!-- Name for a channel number with no channel; %1$d is the number. Short. -->
+    <string name="intercom_schedule_channel_n">canal %1$d</string>
+    <!-- Button that opens the schedule editor for a new schedule. Short (button). -->
+    <string name="intercom_schedule_add">Ajouter une programmation</string>
+    <!-- Title of the schedule editor for a new schedule. One line. -->
+    <string name="intercom_schedule_new">Nouvelle programmation</string>
+    <!-- Title of the schedule editor for an existing schedule. One line. -->
+    <string name="intercom_schedule_edit">Modifier la programmation</string>
+    <!-- Schedule editor: section title above the action. Short, shown in caps. -->
+    <string name="intercom_schedule_what">Action</string>
+    <!-- Schedule editor: section title above the channel. Short, shown in caps. -->
+    <string name="intercom_schedule_channel">Canal</string>
+    <!-- Schedule editor: switch row title, record the listening session. Short. -->
+    <string name="intercom_schedule_record">L’enregistrer</string>
+    <!-- Schedule editor: switch row subtitle; the path is where recordings are saved. One line. -->
+    <string name="intercom_schedule_record_sub">REC pendant toute la durée (Download/DMR/Audio/&lt;canal&gt;)</string>
+    <!-- Schedule editor: tappable value line; %1$s is the value (a channel, an action, a time, a date). One line. -->
+    <string name="intercom_schedule_tap_to_change">%1$s  ·  appuyez pour modifier</string>
+    <!-- Schedule editor: channel value for the SSTV action (a fixed frequency); %1$s is the frequency (144.500). One line. -->
+    <string name="intercom_schedule_sstv_freq">%1$s MHz (la fréquence d’appel SSTV)</string>
+    <!-- Schedule editor: channel list item for the SSTV action; %1$s is the frequency (144.500). One line. -->
+    <string name="intercom_schedule_sstv_freq_item">%1$s MHz (fréquence d’appel SSTV)</string>
+    <!-- Schedule editor: channel value and list item meaning "whatever channel is selected then". One line. -->
+    <string name="intercom_schedule_current_channel">Le canal sur lequel est la radio</string>
+    <!-- Title of the action list. One line. -->
+    <string name="intercom_schedule_what_title">Que faire ?</string>
+    <!-- Title of the channel list. One line. -->
+    <string name="intercom_schedule_which_channel">Quel canal ?</string>
+    <!-- Schedule editor: section title above the day pills. Short, shown in caps. -->
+    <string name="intercom_schedule_days">Jours (aucun coché : une fois, à la date)</string>
+    <!-- Schedule editor: date value for a one-off schedule; %1$s is the date (yyyy-MM-dd). One line. -->
+    <string name="intercom_schedule_once_on">Une fois, le %1$s  ·  appuyez pour modifier</string>
+    <!-- Schedule editor: section title above the start time. Short, shown in caps. -->
+    <string name="intercom_schedule_starts">Début</string>
+    <!-- Schedule editor: section title above the length field. One line, shown in caps. -->
+    <string name="intercom_schedule_minutes">Durée en minutes (sauf balise ou relève du courrier)</string>
+    <!-- Schedule editor: section title above the name field. Short, shown in caps. -->
+    <string name="intercom_schedule_name">Nom (facultatif)</string>
+    <!-- Toast when the chosen time is in the past. One or two lines. -->
+    <string name="intercom_schedule_time_past_toast">Cette heure est déjà passée : choisissez une date plus tardive ou cochez des jours</string>
+    <!-- Toast after saving a schedule; %1$s is the next start (e.g. "Tue 4 Nov, 07:00"). One line. -->
+    <string name="intercom_schedule_next_toast">Prochaine : %1$s</string>
+    <!-- Title of the delete-schedule confirmation. One line. -->
+    <string name="intercom_schedule_delete_title">Supprimer cette programmation ?</string>
+
+    <!-- ==== Emergency sheet ==== -->
+    <!-- Title of the Emergency sheet. One line. -->
+    <string name="intercom_emergency_title">Urgence</string>
+    <!-- Hint at the top of the Emergency sheet. Safety text: keep the meaning exact. A few lines. -->
+    <string name="intercom_emergency_hint">Envoie votre position immédiatement, sur le canal en cours. Uniquement en cas d’urgence réelle : sur les bandes amateurs, ce sont de vraies personnes qui répondent à un appel d’urgence.</string>
+    <!-- Emergency sheet: no channel is selected. One line. -->
+    <string name="intercom_emergency_no_channel">Aucun canal sélectionné.</string>
+    <!-- Emergency sheet: how it goes out on a DMR channel; %1$s is the channel name. One or two lines. -->
+    <string name="intercom_emergency_how_dmr">Sur %1$s (DMR) : un message texte avec vos coordonnées, envoyé au contact ci-dessous.</string>
+    <!-- Emergency sheet: how it goes out on an analog channel; %1$s is the channel name. One or two lines. -->
+    <string name="intercom_emergency_how_analog">Sur %1$s (analogique) : une position APRS avec le symbole d’urgence.</string>
+    <!-- Emergency sheet: the same, when no callsign is set yet; "PKT → APRS settings" is the menu path. Two lines. -->
+    <string name="intercom_emergency_how_analog_no_call">Sur %1$s (analogique) : une position APRS avec le symbole d’urgence. Saisissez d’abord votre indicatif dans PKT → Paramètres APRS.</string>
+    <!-- Emergency sheet: section title above the message field. Short, shown in caps. -->
+    <string name="intercom_emergency_message">Message</string>
+    <!-- Emergency sheet: hint of the message field. Short. -->
+    <string name="intercom_emergency_message_hint">Ce qui ne va pas</string>
+    <!-- Emergency sheet: section title above the DMR recipient. Short, shown in caps. -->
+    <string name="intercom_emergency_dmr_to">Destinataire du texte DMR</string>
+    <!-- Toast when no contact exists to send the DMR emergency text to. "Contacts page" names the page. One line. -->
+    <string name="intercom_emergency_no_contacts_toast">Ajoutez d’abord un contact ou un talkgroup (page Contacts)</string>
+    <!-- Recipient list item / recipient line for a talkgroup; %1$s is its name, %2$d its number. "TG" = talkgroup. One line. -->
+    <string name="intercom_emergency_tg_item">TG %1$s  ·  %2$d</string>
+    <!-- Title of the recipient list. One line. -->
+    <string name="intercom_emergency_to_title">Texte d’urgence à</string>
+    <!-- Emergency sheet: the big send button; it must be held. Short, caps. -->
+    <string name="intercom_emergency_hold_to_send">MAINTENIR POUR ENVOYER</string>
+    <!-- Emergency sheet: the send button after a send, to send again. Short, caps. -->
+    <string name="intercom_emergency_send_again">RENVOYER (MAINTENIR)</string>
+    <!-- Emergency sheet: the send button while held; %1$d is the seconds left (2, 1). Short, caps. -->
+    <string name="intercom_emergency_keep_holding">MAINTENEZ  %1$d</string>
+    <!-- Emergency sheet: line under the send button. One line. -->
+    <string name="intercom_emergency_hold_hint">Maintenez la touche deux secondes.</string>
+    <!-- Emergency sheet: line under the send button when it was let go too early. One line. -->
+    <string name="intercom_emergency_not_sent">Non envoyé : maintenez la touche deux secondes.</string>
+    <!-- Emergency sheet: recipient line when none is chosen; › shows it opens a list. One line. -->
+    <string name="intercom_emergency_choose">Choisir un contact ou un talkgroup  ›</string>
+    <!-- Emergency sheet: recipient line for a talkgroup; %1$s is its name, %2$d its number; › shows it opens a list. One line. -->
+    <string name="intercom_emergency_recipient_tg">TG %1$s  ·  %2$d  ›</string>
+
+    <!-- ==== Activity sheet ==== -->
+    <!-- Title of the Activity sheet (busiest channels and hours). One line. -->
+    <string name="intercom_activity_title">Activité</string>
+    <!-- Activity sheet: range pill for today. Short pill (a third of the width). -->
+    <string name="intercom_activity_today">Aujourd’hui</string>
+    <!-- Activity sheet: range pill; %1$d is 7 or 30. Short pill (a third of the width). -->
+    <string name="intercom_activity_last_days">%1$d derniers jours</string>
+    <!-- Activity sheet summary; %1$d receptions, %2$d minutes of audio. English keeps "receptions" for 1. Two lines. -->
+    <string name="intercom_activity_summary">%1$d réceptions, %2$d minutes d’audio analogique. Compté d’après l’historique : réceptions analogiques et appels DMR.</string>
+    <!-- Activity sheet summary with the busiest hour; %1$d receptions, %2$d minutes of audio, %3$s the hour (two digits, e.g. "08"). Two lines. -->
+    <string name="intercom_activity_summary_peak">%1$d réceptions, %2$d minutes d’audio analogique ; pic d’activité vers %3$s h. Compté d’après l’historique : réceptions analogiques et appels DMR.</string>
+    <!-- Activity sheet: section title above the hour chart. Short, shown in caps. -->
+    <string name="intercom_activity_by_hour">Par heure de la journée</string>
+    <!-- Activity sheet: section title above the channel list; also the name of the zone the button makes. Short, shown in caps. -->
+    <string name="intercom_activity_busiest">Les plus actifs</string>
+    <!-- Activity sheet: shown when nothing was received in the range. One line. -->
+    <string name="intercom_activity_nothing">Rien de reçu sur cette période.</string>
+    <!-- Activity sheet: name for a channel number with no channel; %1$d is the number. Short. -->
+    <string name="intercom_activity_channel_n">canal %1$d</string>
+    <!-- Activity sheet channel row: receptions and when last heard; %1$d receptions, %2$s the date (MM-dd HH:mm). One line. -->
+    <plurals name="intercom_activity_row">
+        <item quantity="one">%1$d réception  ·  dernière %2$s</item>
+        <item quantity="many">%1$d de réceptions  ·  dernière %2$s</item>
+        <item quantity="other">%1$d réceptions  ·  dernière %2$s</item>
+    </plurals>
+    <!-- Activity sheet channel row with audio time in minutes; %1$d receptions, %2$d minutes, %3$s the date. One line. -->
+    <plurals name="intercom_activity_row_min">
+        <item quantity="one">%1$d réception, %2$d min  ·  dernière %3$s</item>
+        <item quantity="many">%1$d de réceptions, %2$d min  ·  dernière %3$s</item>
+        <item quantity="other">%1$d réceptions, %2$d min  ·  dernière %3$s</item>
+    </plurals>
+    <!-- Activity sheet channel row with audio time in seconds; %1$d receptions, %2$d seconds, %3$s the date. One line. -->
+    <plurals name="intercom_activity_row_s">
+        <item quantity="one">%1$d réception, %2$d s  ·  dernière %3$s</item>
+        <item quantity="many">%1$d de réceptions, %2$d s  ·  dernière %3$s</item>
+        <item quantity="other">%1$d réceptions, %2$d s  ·  dernière %3$s</item>
+    </plurals>
+    <!-- Activity sheet: button that makes a scan zone of the busiest channels. One line (button). -->
+    <string name="intercom_activity_make_zone">Créer une zone de balayage des plus actifs</string>
+    <!-- Toast after making the zone; %1$s is the zone name (Busiest channels), %2$d the channel count. SCAN is the intercom key legend (stays English). English keeps "channels" for 1. One or two lines. -->
+    <string name="intercom_activity_zone_toast">Zone « %1$s » (%2$d canaux) en cours d’utilisation : SCAN les balaie</string>
+
+    <!-- ===== Net control sheet (NetDialog) ===== -->
+    <!-- Title of the Net control sheet (start a net, past nets). One line. -->
+    <string name="intercom_net_title">Station directrice</string>
+    <!-- Hint at the top of the Net control sheet. -->
+    <string name="intercom_net_start_hint">Animez un réseau : ouvrez-le, pointez les stations au fur et à mesure de leurs appels (ou appuyez sur une station que la radio vient d’entendre), signalez le trafic, les retardataires et les départs, puis clôturez-le avec un compte rendu à partager et à ajouter au carnet de trafic.</string>
+    <!-- Label of the net name field on the Net control sheet. Short. -->
+    <string name="intercom_net_name_label">Nom du réseau</string>
+    <!-- Default net name in the Net control sheet's name field, before the user has run a net. It becomes the net's stored name. -->
+    <string name="intercom_net_name_default">Réseau hebdomadaire</string>
+    <!-- Net name used when the user leaves the name field empty. One word. -->
+    <string name="intercom_net_name_empty">Réseau</string>
+    <!-- Line on the Net control sheet when no channel is selected. One line. -->
+    <string name="intercom_net_on_none">Sur aucun canal</string>
+    <!-- Line on the Net control sheet: the channel the net will run on. %1$s channel name, %2$s frequency ("146.9400"). One line. -->
+    <string name="intercom_net_on_channel">Sur %1$s (%2$s MHz)</string>
+    <!-- Button on the Net control sheet that starts the net. Short (button). -->
+    <string name="intercom_net_start">Ouvrir le réseau</string>
+    <!-- History line (Last heard) when a net is started. %1$s net name. Keep the leading emoji. -->
+    <string name="intercom_net_history_started">📋 Réseau ouvert : %1$s</string>
+    <!-- History line (Last heard) when a net ends. %1$s net name, %2$d number of check-ins. Keep the leading emoji. The English uses "check-ins" for every count. -->
+    <plurals name="intercom_net_history_ended">
+        <item quantity="one">📋 Réseau terminé : %1$s (%2$d pointage)</item>
+        <item quantity="many">📋 Réseau terminé : %1$s (%2$d de pointages)</item>
+        <item quantity="other">📋 Réseau terminé : %1$s (%2$d pointages)</item>
+    </plurals>
+    <!-- Section title on the Net control sheet above the list of past nets. Short, shown in caps. -->
+    <string name="intercom_net_past">Réseaux passés</string>
+    <!-- Title of a past-net card. %1$s net name, %2$d number of check-ins. One line. The English uses "check-ins" for every count. -->
+    <plurals name="intercom_net_past_title">
+        <item quantity="one">%1$s  ·  %2$d pointage</item>
+        <item quantity="many">%1$s  ·  %2$d de pointages</item>
+        <item quantity="other">%1$s  ·  %2$d pointages</item>
+    </plurals>
+    <!-- Second line of a past-net card. %1$s start date and time, %2$d length in minutes, %3$s channel name. One line. -->
+    <string name="intercom_net_past_sub">%1$s  ·  %2$d min  ·  %3$s  ·  appuyez pour le compte rendu</string>
+    <!-- Title of the confirmation dialog that deletes a past net. %1$s net name. One line. -->
+    <string name="intercom_net_delete_confirm">Supprimer %1$s ?</string>
+    <!-- Title of the running-net sheet. %1$s net name. One line. -->
+    <string name="intercom_net_running_title">Réseau : %1$s</string>
+    <!-- Hint on the running-net sheet. -->
+    <string name="intercom_net_running_hint">Les pointages après 15 minutes sont marqués en retard. Appuyez sur un indicateur pour le changer ; appui long sur une station pour la retirer.</string>
+    <!-- The same hint with the net's channel in front. %1$s channel name. -->
+    <string name="intercom_net_running_hint_channel">%1$s  ·  Les pointages après 15 minutes sont marqués en retard. Appuyez sur un indicateur pour le changer ; appui long sur une station pour la retirer.</string>
+    <!-- Hint in the callsign field on the running-net sheet. One word. -->
+    <string name="intercom_net_callsign_hint">Indicatif</string>
+    <!-- Button next to the callsign field that checks the station in. Short (140 dp button). -->
+    <string name="intercom_net_check_in">Pointer</string>
+    <!-- Section title above the stations heard recently (tap one to check it in). Short, shown in caps. -->
+    <string name="intercom_net_heard_section">Entendus ces 30 dernières minutes</string>
+    <!-- Section title above the list of check-ins. Short, shown in caps. -->
+    <string name="intercom_net_checkins_section">Pointages</string>
+    <!-- Button on the running-net sheet that shows the net report. Short (half-width button). -->
+    <string name="intercom_net_report">Compte rendu</string>
+    <!-- Button on the running-net sheet that ends the net. Short (half-width button). -->
+    <string name="intercom_net_end">Clore le réseau</string>
+    <!-- Flag chip on a check-in row: the station has traffic. Very short (chip). -->
+    <string name="intercom_net_flag_traffic">Trafic</string>
+    <!-- Flag chip on a check-in row: the station checked in late. Very short (chip). -->
+    <string name="intercom_net_flag_late">En retard</string>
+    <!-- Flag chip on a check-in row: the station has checked out. Very short (chip). -->
+    <string name="intercom_net_flag_out">Parti</string>
+    <!-- Shown in a check-in list that is still empty (Net control and Nets → who has checked in). -->
+    <string name="intercom_net_no_checkins">Aucun pointage pour l’instant.</string>
+    <!-- Shown in place of the recently heard stations when there are none. -->
+    <string name="intercom_net_none_heard">Aucune station entendue récemment (appelants DMR avec indicatif RadioID, APRS, identifications Morse).</string>
+    <!-- Clock on the running-net sheet. %1$d minutes, %2$02d seconds. One line, large. -->
+    <string name="intercom_net_clock">Réseau en cours %1$d:%2$02d</string>
+    <!-- Title of the confirmation dialog that ends the net. %1$s net name. One line. -->
+    <string name="intercom_net_end_confirm">Clore %1$s ?</string>
+    <!-- Button in the end-the-net dialog. One word (dialog button). -->
+    <string name="intercom_net_end_button">Clore</string>
+    <!-- Title of the Net report sheet. One line. -->
+    <string name="intercom_net_report_title">Compte rendu du réseau</string>
+    <!-- Button on the Net report sheet that adds every check-in to the logbook. Short (half-width button). -->
+    <string name="intercom_net_add_logbook">Ajouter au carnet</string>
+    <!-- Title of Android's share chooser for the net report. One line. -->
+    <string name="intercom_net_share_chooser">Partager le compte rendu du réseau</string>
+    <!-- Toast after the check-ins were added to the logbook. %1$d number added. The English uses "check-ins" for every count. -->
+    <plurals name="intercom_net_logbook_added">
+        <item quantity="one">%1$d pointage ajouté au carnet de trafic</item>
+        <item quantity="many">%1$d de pointages ajoutés au carnet de trafic</item>
+        <item quantity="other">%1$d pointages ajoutés au carnet de trafic</item>
+    </plurals>
+
+    <!-- ===== Net report text (NetStore.report): plain text shared by e-mail or kept in a club log ===== -->
+    <!-- Net report, second line: the channel and its frequency. %1$s channel name, %2$s frequency ("146.9400"). -->
+    <string name="intercom_netstore_report_channel">%1$s (%2$s MHz)</string>
+    <!-- Net report, third line. %1$s opening time (HH:mm), %2$s closing time or the "(running)" text, %3$d length in minutes. -->
+    <string name="intercom_netstore_report_times">Ouverture %1$s, clôture %2$s, %3$d min</string>
+    <!-- Net report: stands in for the closing time while the net is still running. Short. -->
+    <string name="intercom_netstore_report_running">(en cours)</string>
+    <!-- Net report line naming net control. %1$s callsign. -->
+    <string name="intercom_netstore_report_control">Station directrice : %1$s</string>
+    <!-- Net report line: number of check-ins. %1$d count. -->
+    <string name="intercom_netstore_report_checkins">Pointages : %1$d</string>
+    <!-- Net report line: number of check-ins and how many had traffic. %1$d check-ins, %2$d with traffic. -->
+    <string name="intercom_netstore_report_checkins_traffic">Pointages : %1$d, dont %2$d avec trafic</string>
+    <!-- Net report: flag after a check-in, in brackets. One or two words, lower case. -->
+    <string name="intercom_netstore_report_flag_traffic">trafic</string>
+    <!-- Net report: flag after a check-in, in brackets. One word, lower case. -->
+    <string name="intercom_netstore_report_flag_late">en retard</string>
+    <!-- Net report: flag after a check-in, in brackets. One or two words, lower case. -->
+    <string name="intercom_netstore_report_flag_out">parti</string>
+    <!-- Net report: separator between the flags of one check-in ("late, checked out"). Comma and space. -->
+    <string name="intercom_netstore_report_flag_sep">,\u0020</string>
+
+    <!-- ===== Nets sheet (NetsDialog) ===== -->
+    <!-- Title of the Nets sheet (nets on the air, coming up, elsewhere). One word. -->
+    <string name="intercom_nets_title">Réseaux</string>
+    <!-- Hint at the top of the Nets sheet. -->
+    <string name="intercom_nets_hint">Réseaux et rendez-vous sur vos canaux et les relais à proximité : ceux actuellement ouverts sur NetLogger, celui que la radio entend, et quand ils reviennent.</string>
+    <!-- Switch row title on the Nets sheet: remind before a scheduled net. Short. -->
+    <string name="intercom_nets_remind">Me prévenir</string>
+    <!-- Switch row subtitle under "Remind me". One line. -->
+    <string name="intercom_nets_remind_sub">10 minutes avant un réseau de « À venir »</string>
+    <!-- Switch row title on the Nets sheet: alert when a net opens. Short. -->
+    <string name="intercom_nets_live">Me prévenir à l’ouverture d’un réseau</string>
+    <!-- Switch row subtitle under "Tell me when a net starts". Up to two lines. -->
+    <string name="intercom_nets_live_sub">Un réseau NetLogger qui s’ouvre sur vos canaux ou les relais à proximité (vérifié toutes les 5 minutes)</string>
+    <!-- Status line while the Nets sheet loads. One line. -->
+    <string name="intercom_nets_looking">Recherche de réseaux…</string>
+    <!-- Button on the Nets sheet that reloads the lists. Short (half-width button). -->
+    <string name="intercom_nets_refresh">Actualiser</string>
+    <!-- Button on the Nets sheet that opens Net control. Short (half-width button). -->
+    <string name="intercom_nets_run">Animer un réseau</string>
+    <!-- Button on the Nets sheet that adds a net schedule to a channel. Short (full-width button). -->
+    <string name="intercom_nets_add">Ajouter un réseau à un canal</string>
+    <!-- Status line when NetLogger could not be read. %1$s the error. One or two lines. -->
+    <string name="intercom_nets_status_error">NetLogger : %1$s</string>
+    <!-- Status line when NetLogger could not be read but an older list is shown. %1$s the error. -->
+    <string name="intercom_nets_status_error_old">NetLogger : %1$s (dernière liste affichée)</string>
+    <!-- Status line with the NetLogger count. %1$d nets in session. The English uses "nets" for every count. -->
+    <plurals name="intercom_nets_status">
+        <item quantity="one">NetLogger : %1$d réseau ouvert dans le monde · mis à jour chaque minute</item>
+        <item quantity="many">NetLogger : %1$d de réseaux ouverts dans le monde · mis à jour chaque minute</item>
+        <item quantity="other">NetLogger : %1$d réseaux ouverts dans le monde · mis à jour chaque minute</item>
+    </plurals>
+    <!-- Section title on the Nets sheet. Short, shown in caps. -->
+    <string name="intercom_nets_near_section">Actifs près de vous</string>
+    <!-- Card title for a net the radio is hearing that has no name. %1$s the channel. One line. -->
+    <string name="intercom_nets_heard_unnamed">On dirait un réseau sur %1$s</string>
+    <!-- Card title for a net the radio is hearing. %1$s net name, %2$s the channel. One line. -->
+    <string name="intercom_nets_heard_named">%1$s sur %2$s</string>
+    <!-- Card subtitle for a net the radio is hearing. %1$d transmissions, %2$d minutes. The English uses "transmissions" for every count. -->
+    <plurals name="intercom_nets_heard_sub">
+        <item quantity="one">%1$d émission en %2$d min · entendu par la radio · appuyez pour régler</item>
+        <item quantity="many">%1$d d’émissions en %2$d min · entendu par la radio · appuyez pour régler</item>
+        <item quantity="other">%1$d émissions en %2$d min · entendu par la radio · appuyez pour régler</item>
+    </plurals>
+    <!-- The same with the number of stations. %1$d transmissions, %2$d minutes, %3$d stations. The English uses plural nouns for every count. -->
+    <plurals name="intercom_nets_heard_sub_stations">
+        <item quantity="one">%1$d émission en %2$d min par %3$d stations · entendu par la radio · appuyez pour régler</item>
+        <item quantity="many">%1$d d’émissions en %2$d min par %3$d stations · entendu par la radio · appuyez pour régler</item>
+        <item quantity="other">%1$d émissions en %2$d min par %3$d stations · entendu par la radio · appuyez pour régler</item>
+    </plurals>
+    <!-- Separator between the parts of a net card's subtitle ("Ch 3 · net control W1AW · 12 following"). Space, dot, space. -->
+    <string name="intercom_nets_sep">\u0020·\u0020</string>
+    <!-- Part of a net card subtitle: a place and its distance. %1$s place (channel or repeater), %2$s miles ("12"). -->
+    <string name="intercom_nets_place_miles">%1$s (%2$s mi)</string>
+    <!-- Part of a net card subtitle. %1$s net control's callsign. -->
+    <string name="intercom_nets_net_control">station directrice %1$s</string>
+    <!-- Part of a net card subtitle: NetLogger followers. %1$d count. -->
+    <string name="intercom_nets_following">abonnés : %1$d</string>
+    <!-- Part of a net card subtitle. %1$d minutes since the net opened. -->
+    <string name="intercom_nets_started_ago">ouvert il y a %1$d min</string>
+    <!-- Part of a net card subtitle: the net matched by frequency only. -->
+    <string name="intercom_nets_place_unknown_long">lieu inconnu (même fréquence ; appui long pour l’indiquer)</string>
+    <!-- Shown under "On the air near you" when nothing is in session. -->
+    <string name="intercom_nets_none_near">Aucun réseau ouvert en ce moment sur vos canaux ou les relais à proximité. NetLogger ne liste que les réseaux dont la station directrice l’utilise ; la radio repère les autres pendant l’écoute (une longue suite d’émissions de plusieurs stations).</string>
+    <!-- Section title on the Nets sheet: scheduled nets. Short, shown in caps; also named in "Remind me". -->
+    <string name="intercom_nets_coming_section">À venir</string>
+    <!-- Shown under "Coming up" when there is no schedule yet. -->
+    <string name="intercom_nets_coming_none">Rien pour l’instant. Les horaires viennent de la dernière semaine de NetLogger sur vos canaux et les relais à proximité, et de ce que la radio entend : un réseau sur le même canal, à la même heure, le même jour de la semaine deux semaines de suite (ou trois jours d’affilée) devient une programmation.</string>
+    <!-- Part of a scheduled-net subtitle. %1$d typical length in minutes. -->
+    <string name="intercom_nets_about_min">env. %1$d min</string>
+    <!-- Part of a scheduled-net subtitle. %1$d stations heard. The English uses "stations" for every count. -->
+    <plurals name="intercom_nets_stations">
+        <item quantity="one">%1$d station</item>
+        <item quantity="many">%1$d de stations</item>
+        <item quantity="other">%1$d stations</item>
+    </plurals>
+    <!-- Part of a scheduled-net subtitle: the net matched by frequency only. -->
+    <string name="intercom_nets_place_unknown">lieu inconnu</string>
+    <!-- Section title on the Nets sheet. Short, shown in caps. -->
+    <string name="intercom_nets_maybe_section">Même fréquence, peut-être ailleurs</string>
+    <!-- Tap-to-expand line under "Same frequency, maybe elsewhere". %1$d number of nets. The English uses "nets" for every count. -->
+    <plurals name="intercom_nets_maybe_show">
+        <item quantity="one">Afficher %1$d réseau sur la fréquence d’un de vos canaux ou d’un relais proche, sans savoir s’il est près de vous : NetLogger n’a pas de localisation. Appui long pour indiquer qu’il est près de vous</item>
+        <item quantity="many">Afficher %1$d de réseaux sur la fréquence d’un de vos canaux ou d’un relais proche, sans savoir s’ils sont près de vous : NetLogger n’a pas de localisation. Appui long sur l’un d’eux pour indiquer qu’il est près de vous</item>
+        <item quantity="other">Afficher %1$d réseaux sur la fréquence d’un de vos canaux ou d’un relais proche, sans savoir s’ils sont près de vous : NetLogger n’a pas de localisation. Appui long sur l’un d’eux pour indiquer qu’il est près de vous</item>
+    </plurals>
+    <!-- The same line once expanded (tap to collapse). -->
+    <plurals name="intercom_nets_maybe_hide">
+        <item quantity="one">Masquer %1$d réseau sur la fréquence d’un de vos canaux ou d’un relais proche, sans savoir s’il est près de vous : NetLogger n’a pas de localisation. Appui long pour indiquer qu’il est près de vous</item>
+        <item quantity="many">Masquer %1$d de réseaux sur la fréquence d’un de vos canaux ou d’un relais proche, sans savoir s’ils sont près de vous : NetLogger n’a pas de localisation. Appui long sur l’un d’eux pour indiquer qu’il est près de vous</item>
+        <item quantity="other">Masquer %1$d réseaux sur la fréquence d’un de vos canaux ou d’un relais proche, sans savoir s’ils sont près de vous : NetLogger n’a pas de localisation. Appui long sur l’un d’eux pour indiquer qu’il est près de vous</item>
+    </plurals>
+    <!-- Part of a net card subtitle. %1$s the channel or repeater with that frequency. -->
+    <string name="intercom_nets_same_freq_as">même fréquence que %1$s</string>
+    <!-- Section title on the Nets sheet. Short, shown in caps. -->
+    <string name="intercom_nets_elsewhere_section">Actifs ailleurs</string>
+    <!-- Tap-to-expand line under "Elsewhere on the air". %1$d number of nets. The English uses "nets" for every count. -->
+    <plurals name="intercom_nets_elsewhere_show">
+        <item quantity="one">Afficher %1$d autre réseau en 2 m, 70 cm et talkgroups DMR (pas près de vous ; un talkgroup DMR reste accessible si vous l’ajoutez à la liste de réception d’un canal DMR)</item>
+        <item quantity="many">Afficher %1$d d’autres réseaux en 2 m, 70 cm et talkgroups DMR (pas près de vous ; un talkgroup DMR reste accessible si vous l’ajoutez à la liste de réception d’un canal DMR)</item>
+        <item quantity="other">Afficher %1$d autres réseaux en 2 m, 70 cm et talkgroups DMR (pas près de vous ; un talkgroup DMR reste accessible si vous l’ajoutez à la liste de réception d’un canal DMR)</item>
+    </plurals>
+    <!-- The same line once expanded (tap to collapse). -->
+    <plurals name="intercom_nets_elsewhere_hide">
+        <item quantity="one">Masquer %1$d autre réseau en 2 m, 70 cm et talkgroups DMR (pas près de vous ; un talkgroup DMR reste accessible si vous l’ajoutez à la liste de réception d’un canal DMR)</item>
+        <item quantity="many">Masquer %1$d d’autres réseaux en 2 m, 70 cm et talkgroups DMR (pas près de vous ; un talkgroup DMR reste accessible si vous l’ajoutez à la liste de réception d’un canal DMR)</item>
+        <item quantity="other">Masquer %1$d autres réseaux en 2 m, 70 cm et talkgroups DMR (pas près de vous ; un talkgroup DMR reste accessible si vous l’ajoutez à la liste de réception d’un canal DMR)</item>
+    </plurals>
+    <!-- Choice in the dialog for a net matched by frequency: it is near me. One line. -->
+    <string name="intercom_nets_near_yes">Il est près de moi</string>
+    <!-- Choice in the same dialog: not near me, hide it. One line. -->
+    <string name="intercom_nets_near_no">Pas près de moi (le masquer)</string>
+    <!-- Choice in the same dialog: forget my answer. One line. -->
+    <string name="intercom_nets_near_unknown">Je ne sais pas (laisser SignalDeck deviner)</string>
+    <!-- Title of the confirmation dialog that deletes a saved net. %1$s net name. One line. -->
+    <string name="intercom_nets_delete_confirm">Supprimer %1$s ?</string>
+    <!-- Choice in a scheduled net's long-press menu: save it as the user's own net. One line. -->
+    <string name="intercom_nets_add_mine">L’ajouter à mes réseaux (le nommer, choisir les jours)</string>
+    <!-- Toast when a net cannot be saved because its repeater is not a channel. -->
+    <string name="intercom_nets_not_channel_toast">Il est sur un relais qui ne fait pas partie de vos canaux : ajoutez d’abord le relais comme canal (appuyez sur le réseau)</string>
+    <!-- Weekday buttons in the net editor, Sunday first. One letter each. -->
+    <string name="intercom_netedit_day_sun">D</string>
+    <!-- Weekday button: Monday. One letter. -->
+    <string name="intercom_netedit_day_mon">L</string>
+    <!-- Weekday button: Tuesday. One letter. -->
+    <string name="intercom_netedit_day_tue">M</string>
+    <!-- Weekday button: Wednesday. One letter. -->
+    <string name="intercom_netedit_day_wed">M</string>
+    <!-- Weekday button: Thursday. One letter. -->
+    <string name="intercom_netedit_day_thu">J</string>
+    <!-- Weekday button: Friday. One letter. -->
+    <string name="intercom_netedit_day_fri">V</string>
+    <!-- Weekday button: Saturday. One letter. -->
+    <string name="intercom_netedit_day_sat">S</string>
+    <!-- Title of the net editor when adding a net. One line. -->
+    <string name="intercom_netedit_add_title">Ajouter un réseau</string>
+    <!-- Title of the net editor when editing a saved net. One line. -->
+    <string name="intercom_netedit_edit_title">Modifier le réseau</string>
+    <!-- Hint at the top of the net editor. -->
+    <string name="intercom_netedit_hint">Un réseau ou un rendez-vous que vous connaissez. Il apparaît dans Réseaux, « À venir » ; il peut vous prévenir 10 minutes avant ; appuyer dessus règle le canal.</string>
+    <!-- Section title of the name field in the net editor. One word, shown in caps. -->
+    <string name="intercom_netedit_name">Nom</string>
+    <!-- Example in the empty name field of the net editor. -->
+    <string name="intercom_netedit_name_hint">p. ex. Réseau du mardi soir</string>
+    <!-- Section title of the channel choice in the net editor. One word, shown in caps. -->
+    <string name="intercom_netedit_channel">Canal</string>
+    <!-- Net editor: no channel chosen yet; also a toast when saving without one. One line. -->
+    <string name="intercom_netedit_choose_channel">Choisir un canal</string>
+    <!-- Net editor: the chosen channel (fixed). %1$d channel number. One line. -->
+    <string name="intercom_netedit_channel_plain">Canal %1$d</string>
+    <!-- Net editor: the chosen channel (fixed). %1$d number, %2$s name, %3$s frequency ("146.9400"). One line. -->
+    <string name="intercom_netedit_channel_named">Canal %1$d  %2$s  %3$s MHz</string>
+    <!-- Net editor: the chosen channel, tap to change it. %1$d channel number. One line. -->
+    <string name="intercom_netedit_channel_plain_tap">Canal %1$d  ·  appuyez pour modifier</string>
+    <!-- Net editor: the chosen channel, tap to change it. %1$d number, %2$s name, %3$s frequency ("146.9400"). One line. -->
+    <string name="intercom_netedit_channel_named_tap">Canal %1$d  %2$s  %3$s MHz  ·  appuyez pour modifier</string>
+    <!-- Title of the channel list dialog in the net editor. One line. -->
+    <string name="intercom_netedit_which_channel">Quel canal ?</string>
+    <!-- Section title of the weekday buttons in the net editor. One word, shown in caps. -->
+    <string name="intercom_netedit_days">Jours</string>
+    <!-- Section title of the start time in the net editor. One word, shown in caps. -->
+    <string name="intercom_netedit_starts">Début</string>
+    <!-- Net editor start time, 12-hour. %1$d hour, %2$02d minutes, %3$s AM or PM. One line, large. -->
+    <string name="intercom_netedit_time">%1$d:%2$02d %3$s  ·  appuyez pour modifier</string>
+    <!-- Morning marker after a 12-hour time. Very short. -->
+    <string name="intercom_netedit_am">AM</string>
+    <!-- Afternoon marker after a 12-hour time. Very short. -->
+    <string name="intercom_netedit_pm">PM</string>
+    <!-- Section title of the length field in the net editor. Short, shown in caps. -->
+    <string name="intercom_netedit_length">Durée en minutes</string>
+    <!-- Section title of the notes field in the net editor. Short, shown in caps. -->
+    <string name="intercom_netedit_notes">Notes (facultatif)</string>
+    <!-- Example in the empty notes field of the net editor. -->
+    <string name="intercom_netedit_notes_hint">station directrice, comment se pointer</string>
+    <!-- Toast when saving a net with no name. -->
+    <string name="intercom_netedit_need_name">Donnez un nom au réseau</string>
+    <!-- Toast when saving a net with no weekday ticked. -->
+    <string name="intercom_netedit_need_day">Cochez au moins un jour</string>
+    <!-- Choice in a net's tap menu: tune to the channel it is on. %1$s channel. One line. -->
+    <string name="intercom_nets_tune_to">Régler sur %1$s</string>
+    <!-- Choice in a net's tap menu when its repeater is not a channel. One line. -->
+    <string name="intercom_nets_repeater_details">Détails du relais (l’ajouter comme canal)</string>
+    <!-- Choice in a net's tap menu: show the NetLogger check-ins. One line. -->
+    <string name="intercom_nets_who_checked_in">Qui s’est pointé</string>
+    <!-- Toast when a net cannot be tuned. -->
+    <string name="intercom_nets_not_on_channel_toast">Pas sur l’un de vos canaux</string>
+    <!-- Toast after tuning to a net's channel. %1$d channel number. -->
+    <string name="intercom_nets_tuned_toast">Réglé sur le canal %1$d</string>
+    <!-- Part of the hint on a net's check-in sheet (after the place and net control). -->
+    <string name="intercom_nets_checkins_from">d’après NetLogger, tels que la station directrice les note (▶ = la station en cours de trafic)</string>
+    <!-- Shown on a net's check-in sheet while it loads. Short. -->
+    <string name="intercom_nets_loading">Chargement…</string>
+    <!-- Shown on a net's check-in sheet when NetLogger could not be read. %1$s the error. -->
+    <string name="intercom_nets_load_failed">Chargement impossible : %1$s</string>
+    <!-- Count above a net's check-ins. %1$d stations. The English uses the same words for every count. -->
+    <plurals name="intercom_nets_checked_in">
+        <item quantity="one">%1$d pointé</item>
+        <item quantity="many">%1$d de pointés</item>
+        <item quantity="other">%1$d pointés</item>
+    </plurals>
+
+    <!-- ===== Contacts page (ContactsView) ===== -->
+    <!-- Contact type: a private (one person) DMR ID. Chip and button. Very short. -->
+    <string name="intercom_contacts_type_private">Privé</string>
+    <!-- Contact type: a DMR talkgroup. Chip and button. Very short. -->
+    <string name="intercom_contacts_type_group">Groupe</string>
+    <!-- Contact type: the DMR all-call. Chip and button. Very short. -->
+    <string name="intercom_contacts_type_all_call">Appel général</string>
+    <!-- Title of the Contacts page header. One word. -->
+    <string name="intercom_contacts_title">Contacts</string>
+    <!-- Content description of the add (+) button in the Contacts header. -->
+    <string name="intercom_contacts_add">Ajouter un contact</string>
+    <!-- Hint in the Contacts search field. One line. -->
+    <string name="intercom_contacts_search_hint">Nom, indicatif, ID DMR ou RIC</string>
+    <!-- Filter chip on the Contacts page: every contact. Very short, all caps. -->
+    <string name="intercom_contacts_filter_all">TOUS</string>
+    <!-- Filter chip on the Contacts page: private IDs only. Very short, all caps. -->
+    <string name="intercom_contacts_filter_private">PRIVÉS</string>
+    <!-- Filter chip on the Contacts page: talkgroups and all-call. Short, all caps. -->
+    <string name="intercom_contacts_filter_talkgroups">TALKGROUPS</string>
+    <!-- Contacts header subtitle (shown upper case). %1$d private contacts, %2$d talkgroups; the form follows the talkgroup count. -->
+    <plurals name="intercom_contacts_counts">
+        <item quantity="one">Privés : %1$d · talkgroup : %2$d</item>
+        <item quantity="many">Privés : %1$d · talkgroups : %2$d</item>
+        <item quantity="other">Privés : %1$d · talkgroups : %2$d</item>
+    </plurals>
+    <!-- Avatar of a talkgroup contact. Two or three letters. -->
+    <string name="intercom_contacts_avatar_tg">TG</string>
+    <!-- Avatar of the all-call contact. Two or three letters. -->
+    <string name="intercom_contacts_avatar_all">TOUS</string>
+    <!-- Content description of the message button on a contact card. One word. -->
+    <string name="intercom_contacts_message">Message</string>
+    <!-- Shown on a contact card in place of the DMR ID when it has none. Short. -->
+    <string name="intercom_contacts_no_id">pas d’ID DMR</string>
+    <!-- Chip on a contact card that has pager RICs. Very short, all caps. -->
+    <string name="intercom_contacts_pager">PAGER</string>
+    <!-- On a contact card: when it was last heard. %1$s how long ago ("5 min ago", "yesterday"). Short. -->
+    <string name="intercom_contacts_heard">entendu %1$s</string>
+
+</resources>

@@ -236,7 +236,7 @@
     <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
     <string name="channels_net_sat">Sa.</string>
     <!-- Separator between weekday names in a net's schedule ("Mon, Wed"). Keep the trailing space if your language uses one. -->
-    <string name="channels_net_day_sep">,</string>
+    <string name="channels_net_day_sep">,\u0020</string>
     <!-- A net's schedule when no weekday is ticked. Short. -->
     <string name="channels_net_no_day">Kein Tag</string>
     <!-- A net's schedule: %1$s the weekdays ("Mon, Wed"), %2$s the time ("7:30 PM"). Short. -->
@@ -347,7 +347,7 @@
     <!-- Region sheet: no licence-free services listed; %1$s is the region. One line. -->
     <string name="channels_region_free_none">Für %1$s noch keine eingetragen.</string>
     <!-- Separator between the details of a licence-free service ("446.0–446.2 MHz, 16 ch, 500 mW"). Keep the trailing space if your language uses one. -->
-    <string name="channels_region_list_sep">,</string>
+    <string name="channels_region_list_sep">,\u0020</string>
     <!-- Number of channels of a licence-free service; %1$d is the count. Very short. -->
     <string name="channels_region_service_ch">%1$d Kan.</string>
     <!-- A licence-free service on the Region sheet: %1$s its name (PMR446), %2$s its band, channels and power, %3$s its notes. Paragraph. -->
@@ -410,11 +410,11 @@
     <!-- Warning in the programming preview: %1$d the time slot (1 or 2), %2$d how many talkgroups it has, %3$d how many fit. One line. -->
     <string name="channels_rep_warn_truncated">Zeitkanal %1$d hat %2$d Sprechgruppen; nur die ersten %3$d werden programmiert</string>
     <!-- Repeater sheet status: the BrandMeister list could not be loaded. Keep the trailing space (the next status follows). Short. -->
-    <string name="channels_rep_unavailable_bm">BrandMeister nicht erreichbar.</string>
+    <string name="channels_rep_unavailable_bm">BrandMeister nicht erreichbar.\u0020</string>
     <!-- Repeater sheet status: the hearham list could not be loaded. Keep the trailing space. Short. -->
-    <string name="channels_rep_unavailable_hh">hearham nicht erreichbar.</string>
+    <string name="channels_rep_unavailable_hh">hearham nicht erreichbar.\u0020</string>
     <!-- Repeater sheet status: the RadioID list could not be loaded. Keep the trailing space. Short. -->
-    <string name="channels_rep_unavailable_rid">RadioID-Liste nicht erreichbar.</string>
+    <string name="channels_rep_unavailable_rid">RadioID-Liste nicht erreichbar.\u0020</string>
     <!-- Repeater sheet status: %1$d, %2$d, %3$d repeaters known from BrandMeister, hearham and RadioID; %4$d within %5$s (the radius, "50 km"). One or two lines. -->
     <string name="channels_rep_known">%1$d BrandMeister, %2$d hearham, %3$d RadioID bekannt; %4$d im Umkreis von %5$s</string>
     <!-- A radius in miles in the repeater status; %1$s is the number. Short. -->
@@ -490,7 +490,7 @@
         <item quantity="other">%1$s · %2$d Kanäle</item>
     </plurals>
     <!-- Separator between the details of a channel in the shared list ("146.9400 MHz, FM, tone 100.0"). Keep the trailing space if your language uses one. -->
-    <string name="channels_codeplug_sep">,</string>
+    <string name="channels_codeplug_sep">,\u0020</string>
     <!-- Detail of a channel in the shared list: it has no transmit frequency. Short. -->
     <string name="channels_codeplug_rx_only">nur Empfang</string>
     <!-- Detail of a channel in the shared list: %1$s the repeater offset in MHz with its sign ("−0.6000"), %2$s the transmit frequency in MHz. Short. -->
@@ -504,11 +504,11 @@
     <!-- Detail of a channel in the shared list: %1$s its receive tone, when it differs. Short. -->
     <string name="channels_codeplug_rx_tone">Empfangston %1$s</string>
     <!-- Line under a channel in the shared list: %1$s its notes. Keep the three leading spaces (indent). -->
-    <string name="channels_codeplug_notes">   Notizen: %1$s</string>
+    <string name="channels_codeplug_notes">\u0020\u0020\u0020Notizen: %1$s</string>
     <!-- Line under a channel in the shared list: %1$s a net's name, %2$s its schedule ("Tue 7:30 PM"), %3$d its length in minutes. Keep the three leading spaces. -->
-    <string name="channels_codeplug_net">   Runde: %1$s, %2$s, %3$d min</string>
+    <string name="channels_codeplug_net">\u0020\u0020\u0020Runde: %1$s, %2$s, %3$d min</string>
     <!-- The same with the net's notes (%4$s) in brackets. Keep the three leading spaces. -->
-    <string name="channels_codeplug_net_notes">   Runde: %1$s, %2$s, %3$d min (%4$s)</string>
+    <string name="channels_codeplug_net_notes">\u0020\u0020\u0020Runde: %1$s, %2$s, %3$d min (%4$s)</string>
     <!-- Last line of the shared channel list, above the import code. Channels → Share → Import names the app's menu. One or two lines. -->
     <string name="channels_codeplug_share_footer">Import in SignalDeck: Teile dies mit SignalDeck oder kopiere alles und nimm Kanäle → Teilen → Importieren.</string>
 
@@ -528,7 +528,7 @@
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). QuickChat is the stock app's name; %1$s is a technical folder listing. Short. -->
     <string name="channels_store_quickchat_unreadable">QuickChat-Kanäle nicht lesbar: %1$s</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). QuickChat is the stock app's name. Keep the "; " at the end (another note may follow). -->
-    <string name="channels_store_quickchat_no_contacts">keine QuickChat-Kontaktdatenbank;</string>
+    <string name="channels_store_quickchat_no_contacts">keine QuickChat-Kontaktdatenbank;\u0020</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$s is a technical folder listing. Short. -->
     <string name="channels_store_agold_unreadable">die Kanäle der Original-App sind nicht lesbar: %1$s</string>
     <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). The chosen stock area (%1$d is its number) holds no channels. Short. -->

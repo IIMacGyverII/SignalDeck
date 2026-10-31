@@ -167,7 +167,7 @@
     <!-- Web card subtitle, first line: the address(es) to open in a browser. %1$s is one or more URLs joined by device_web_url_or. -->
     <string name="device_web_open">Öffne %1$s</string>
     <!-- Separator between two web addresses in device_web_open, with two spaces on each side. Keep the spaces. -->
-    <string name="device_web_url_or">  oder</string>
+    <string name="device_web_url_or">\u0020\u0020oder\u0020\u0020</string>
     <!-- Web card subtitle, second line: the PIN to log in. Starts with a line break; two spaces after PIN. %1$s is the PIN. -->
     <string name="device_web_pin">\nPIN  %1$s</string>
     <!-- Web card subtitle, third line: the secure address for the microphone. Starts with a line break. %1$s is the https URL, %2$s the start of the certificate fingerprint. -->

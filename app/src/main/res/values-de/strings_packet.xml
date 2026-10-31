@@ -1608,7 +1608,7 @@
     <string name="packet_toggle_off">AUS</string>
     <!-- ==== Joining text. -->
     <!-- Between two whole sentences built separately (a space in English; empty for languages that write no space). -->
-    <string name="packet_sentence_sep"></string>
+    <string name="packet_sentence_sep">\u0020</string>
     <!-- Between the items of a short list ("every 15 min, telemetry every 30 min"). -->
-    <string name="packet_list_sep">,</string>
+    <string name="packet_list_sep">,\u0020</string>
 </resources>

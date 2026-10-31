@@ -536,7 +536,7 @@
     <!-- Part of the widget and notification status line: the frequency. %1$s is the frequency in MHz. Parts are joined with intercom_widget_sep. -->
     <string name="intercom_widget_freq">%1$s MHz</string>
     <!-- Separator between the parts of the widget and notification status line (a middle dot with a space each side). -->
-    <string name="intercom_widget_sep"> ·</string>
+    <string name="intercom_widget_sep">\u0020·\u0020</string>
     <!-- Part of the status line while coverage is being logged. Short. -->
     <string name="intercom_widget_mapping">Abdeckung wird erfasst</string>
     <!-- Part of the status line while transmitting. All caps on purpose, short. -->
@@ -1096,7 +1096,7 @@
     <!-- Net report: flag after a check-in, in brackets. One or two words, lower case. -->
     <string name="intercom_netstore_report_flag_out">abgemeldet</string>
     <!-- Net report: separator between the flags of one check-in ("late, checked out"). Comma and space. -->
-    <string name="intercom_netstore_report_flag_sep">,</string>
+    <string name="intercom_netstore_report_flag_sep">,\u0020</string>
     <!-- ===== Nets sheet (NetsDialog) ===== -->
     <!-- Title of the Nets sheet (nets on the air, coming up, elsewhere). One word. -->
     <string name="intercom_nets_title">Funkrunden</string>
@@ -1144,7 +1144,7 @@
         <item quantity="other">%1$d Aussendungen in %2$d min von %3$d Stationen · vom Funkgerät gehört · Tippen zum Einstellen</item>
     </plurals>
     <!-- Separator between the parts of a net card's subtitle ("Ch 3 · net control W1AW · 12 following"). Space, dot, space. -->
-    <string name="intercom_nets_sep"> ·</string>
+    <string name="intercom_nets_sep">\u0020·\u0020</string>
     <!-- Part of a net card subtitle: a place and its distance. %1$s place (channel or repeater), %2$s miles ("12"). -->
     <string name="intercom_nets_place_miles">%1$s (%2$s mi)</string>
     <!-- Part of a net card subtitle. %1$s net control's callsign. -->

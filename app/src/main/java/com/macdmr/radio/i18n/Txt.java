@@ -37,7 +37,7 @@ public final class Txt {
     private Txt() { }
 
     /** Shipped languages besides English (the Device → Language list), as BCP 47 tags; add one when it ships. */
-    public static final String[] LANGUAGES = { "en", "de" };
+    public static final String[] LANGUAGES = { "en", "de", "pt-BR" };
     /** Pseudo-locales for the layout and extraction checks; offered in debug builds only (pseudoLocalesEnabled). */
     public static final String[] PSEUDO = { "en-XA", "ar-XB" };
 

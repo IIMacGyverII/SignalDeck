@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SignalDeck Web: the phone's replies to the browser pages (WebHost, WebServer). They show in the page as a toast (a
+  short message at the bottom), an error line or a status line, unless a comment says otherwise. Toasts have room for
+  one or two lines. The pages never compare these texts, so every one can be translated. The pages' own text is in
+  assets/web/i18n/en.json.
+-->
+<resources>
+    <!-- ==== general replies ==== -->
+    <!-- Error when the browser tries to transmit but the owner has not allowed it on the phone. "Device → SignalDeck Web" names the phone's page. -->
+    <string name="web_tx_off">Transmissão pela web desativada (no celular: Dispositivo → SignalDeck Web)</string>
+    <!-- Error: the action is locked because the phone is in Restricted mode (a mode the owner sets on the phone). -->
+    <string name="web_restricted">Isso fica desativado no modo restrito</string>
+    <!-- Error: the radio module is busy while its firmware is being loaded. -->
+    <string name="web_firmware_busy">Rádio ocupado, carregando firmware</string>
+    <!-- Error: the action cannot run while the radio transmits. -->
+    <string name="web_not_while_tx">Não é possível durante a transmissão</string>
+    <!-- Error: the radio module is not connected or not ready yet. -->
+    <string name="web_radio_not_ready">O rádio não está pronto</string>
+    <!-- Error: transmitting is blocked while a satellite pass is tracked in listen-only mode. -->
+    <string name="web_sat_receive_only">Só recepção durante esta passagem do satélite</string>
+    <!-- Error: the current channel is set to receive only. -->
+    <string name="web_channel_receive_only">Este canal é só de recepção</string>
+    <!-- Reply after something was saved. Very short. -->
+    <string name="web_saved">Salvo</string>
+    <!-- Reply after something was deleted. Very short. -->
+    <string name="web_deleted">Excluído</string>
+    <!-- Reply after something was removed from a list. Very short. -->
+    <string name="web_removed">Removido</string>
+    <!-- Reply after a list was emptied. Very short. -->
+    <string name="web_cleared">Lista limpa</string>
+    <!-- Reply while a running job (a scan, a decode, a connection) stops. Very short. -->
+    <string name="web_stopping">Parando</string>
+    <!-- Reply while a message goes out. Very short. -->
+    <string name="web_sending">Enviando</string>
+    <!-- Reply after a listening job started (the packet finder). Very short. -->
+    <string name="web_listening">Escutando</string>
+    <!-- Reply after an item was saved. %1$s: its name (a contact, a channel, a recording). -->
+    <string name="web_saved_item">Salvo: %1$s</string>
+    <!-- Reply after an item was deleted. %1$s: its name (a contact, a channel, a recording). -->
+    <string name="web_deleted_item">Excluído: %1$s</string>
+    <!-- Reply after an item was removed from a list. %1$s: its name (a callsign). -->
+    <string name="web_removed_item">Removido: %1$s</string>
+    <!-- Error: a file could not be deleted. %1$s: the file name. -->
+    <string name="web_delete_failed_item">Não foi possível excluir %1$s</string>
+    <!-- Error: the request asked for an action the phone does not know. -->
+    <string name="web_unknown_action">Ação desconhecida</string>
+    <!-- Error: the request asked for an action the phone does not know. %1$s: the action's code word. -->
+    <string name="web_unknown_action_named">Ação desconhecida: %1$s</string>
+    <!-- Error: a file name in the request is not allowed (it has a folder in it). -->
+    <string name="web_bad_name">Nome inválido</string>
+    <!-- Error: the file asked for is not on the phone. -->
+    <string name="web_not_found">Não encontrado</string>
+    <!-- Error: a number in the form could not be read. -->
+    <string name="web_check_numbers">Confira os números</string>
+    <!-- Error: a number in the form could not be read. %1$s: the technical reason. -->
+    <string name="web_check_numbers_detail">Confira os números: %1$s</string>
+    <!-- Error: the phone has no GPS position yet. -->
+    <string name="web_no_fix">O celular está sem posição GPS</string>
+    <!-- Error: the phone has no GPS position yet (it may get one soon). -->
+    <string name="web_no_fix_yet">O celular ainda está sem posição GPS</string>
+    <!-- Error: a callsign field is empty. -->
+    <string name="web_enter_callsign">Informe um indicativo</string>
+    <!-- Error: a frequency is outside what this radio tunes. -->
+    <string name="web_bad_frequency">Frequência inválida</string>
+    <!-- Error: a dangerous action (restart, install) needs the confirmation dialog in the page. -->
+    <string name="web_confirm_first">Confirme primeiro na página</string>
+    <!-- Error from the phone's web server: the browser is not logged in (the PIN page appears). -->
+    <string name="web_login_required">login necessário</string>
+    <!-- Error on the PIN page: the PIN typed is wrong. One line. -->
+    <string name="web_login_wrong_pin">PIN incorreto</string>
+    <!-- Error on the PIN page after many wrong PINs. One line. -->
+    <string name="web_login_too_many">tentativas demais: aguarde um minuto</string>
+    <!-- Error: the browser asked for an API path the phone does not have. %1$s: the path. -->
+    <string name="web_no_such_api">API inexistente: %1$s</string>
+    <!-- Error: the address asked for is not allowed (it tries to leave the web folder). -->
+    <string name="web_bad_path">caminho inválido</string>
+    <!-- Error: the page or file asked for does not exist. -->
+    <string name="web_file_not_found">não encontrado</string>
+    <!-- Error: a request from another web site was refused (a security check). -->
+    <string name="web_cross_site">solicitação de outro site recusada</string>
+    <!-- Shown on the phone (Device → SignalDeck Web) when the web server could not start. %1$d: the port number; %2$s: the system's reason. -->
+    <string name="web_server_port_error">Porta %1$d: %2$s</string>
+
+    <!-- ==== talking with the browser microphone ==== -->
+    <!-- Error: another browser or the phone is already transmitting. -->
+    <string name="web_talk_busy">Alguém já está transmitindo</string>
+    <!-- History line on the phone and in the page when a browser starts talking with its microphone. %1$s: the browser's network address. -->
+    <string name="web_history_talk_mic">🌐 Falando pela web com o microfone do navegador (%1$s)</string>
+    <!-- Error: transmitting stopped. %1$s: why (web_talk_no_audio or web_talk_closed). -->
+    <string name="web_talk_stopped">Parado: %1$s</string>
+    <!-- Why transmitting stopped: the browser sent no audio for a while. Fills %1$s of web_talk_stopped; lower case. -->
+    <string name="web_talk_no_audio">sem áudio do navegador</string>
+    <!-- Why transmitting stopped: the browser's connection closed. Fills %1$s of web_talk_stopped; lower case. -->
+    <string name="web_talk_closed">a conexão foi encerrada</string>
+    <!-- History line when the web page keys the radio (PTT). %1$s: the browser's network address. -->
+    <string name="web_history_web_tx">🌐 Transmitindo pela web (%1$s)</string>
+    <!-- Reply when the web PTT button is pressed. Very short. -->
+    <string name="web_ptt_down">PTT pressionado</string>
+    <!-- Reply when the web PTT button is released. Very short. -->
+    <string name="web_ptt_up">PTT solto</string>
+
+    <!-- ==== channel editor checks ==== -->
+    <!-- Error in the channel editor: the receive frequency is empty. -->
+    <string name="web_ch_rx_needed">Informe a frequência de recepção (MHz)</string>
+    <!-- Error in the channel editor. %1$s: this radio's bands, e.g. "136–174 / 400–480 MHz". -->
+    <string name="web_ch_band">As frequências precisam estar dentro de %1$s</string>
+    <!-- Error in the channel editor: the location is out of range. -->
+    <string name="web_ch_latlon">A latitude precisa estar entre ±90 e a longitude entre ±180</string>
+    <!-- Error in the channel editor (DMR). -->
+    <string name="web_ch_call_number">O número de chamada precisa ser um ID DMR ou talkgroup (de 1 a 16777215)</string>
+    <!-- Error in the channel editor (DMR). -->
+    <string name="web_ch_groups_max">No máximo 32 talkgroups na lista de RX (incluindo o número de chamada)</string>
+    <!-- Error in the channel editor (DMR encryption). -->
+    <string name="web_ch_key_len">A chave de criptografia precisa ter exatamente 8 caracteres</string>
+    <!-- Error: a new DMR channel on a radio that only does analog (FM). -->
+    <string name="web_ch_no_dmr">Este rádio não tem DMR: adicione um canal analógico</string>
+    <!-- Error in the VFO editor (DMR). -->
+    <string name="web_vfo_call_needed">Chamada privada ou de grupo precisa de um número de chamada</string>
+    <!-- Reply after tuning the VFO. %1$s: the frequency, e.g. "145.5000". -->
+    <string name="web_vfo_tuned">VFO %1$s MHz</string>
+    <!-- Reply after leaving the VFO. -->
+    <string name="web_vfo_back">De volta ao canal</string>
+    <!-- Error: no channel with this number. %1$d: the number. -->
+    <string name="web_no_channel">Canal %1$d inexistente</string>
+    <!-- Error: the channel to delete is gone. -->
+    <string name="web_no_such_channel">Canal inexistente</string>
+    <!-- Reply after starring a channel. %1$d: its number. -->
+    <string name="web_star_on">Canal %1$d nos favoritos</string>
+    <!-- Reply after unstarring a channel. %1$d: its number. -->
+    <string name="web_star_off">O canal %1$d saiu dos favoritos</string>
+    <!-- Reply after selecting a channel. %1$d: its number. Short. -->
+    <string name="web_channel_selected">Canal %1$d</string>
+    <!-- Error: the channel's frequency is outside this radio's bands. %1$s: the channel's name; %2$s: the bands, e.g. "400–480 MHz". -->
+    <string name="web_channel_untunable">%1$s está fora de %2$s: este rádio não sintoniza esse canal</string>
+    <!-- Reply after the channel arrows. Very short, lower case. -->
+    <string name="web_channel_stepped">canal trocado</string>
+    <!-- Reply after saving a channel that has no name. %1$d: its number. -->
+    <string name="web_ch_saved_number">Canal %1$d salvo</string>
+    <!-- Reply after deleting a channel that has no name. %1$d: its number. -->
+    <string name="web_ch_deleted_number">Canal %1$d excluído</string>
+    <!-- Name for a channel that has none, in the caption list. %1$d: its number. Lower case. -->
+    <string name="web_captions_channel">canal %1$d</string>
+    <!-- Error: the stock-app import question was already answered (on the phone or in another browser). -->
+    <string name="web_stock_answered">Já respondido</string>
+    <!-- Error: the channel selection is empty. -->
+    <string name="web_bulk_none">Selecione pelo menos um canal</string>
+
+    <!-- ==== captions ==== -->
+    <!-- Error when turning captions on with the Google engine but no key. "long-press TXT" refers to the phone's TXT key. -->
+    <string name="web_captions_need_key">As legendas com o motor Google precisam de uma chave do Google Cloud: configure uma no celular ou mude para o motor no aparelho (mantenha TXT pressionado)</string>
+    <!-- Reply after turning live captions on. -->
+    <string name="web_captions_on">Legendas ativadas</string>
+    <!-- Reply after turning live captions on with the on-device engine. -->
+    <string name="web_captions_on_vosk">Legendas ativadas (o modelo no aparelho é baixado no primeiro uso)</string>
+    <!-- Reply after turning live captions off. -->
+    <string name="web_captions_off">Legendas desativadas</string>
+    <!-- Error: the speech model asked for does not exist. -->
+    <string name="web_model_unknown">Modelo desconhecido</string>
+    <!-- Error: not enough space for a speech model. %1$s: the size, e.g. "5.2 GB" or "90 MB". -->
+    <string name="web_model_no_space">Não há espaço livre suficiente no celular para este modelo (o download precisa de cerca de %1$s)</string>
+    <!-- Reply: the speech model is on the phone and is being loaded. -->
+    <string name="web_model_loading">Carregando o modelo</string>
+    <!-- Reply: the speech model is being downloaded to the phone. -->
+    <string name="web_model_downloading">Baixando o modelo no celular</string>
+    <!-- Error: the speech model to delete is in use. -->
+    <string name="web_model_in_use">Esse modelo está em uso: escolha outro primeiro</string>
+    <!-- Error: a speech model is busy. -->
+    <string name="web_model_busy">Um modelo está sendo baixado ou carregado: tente novamente quando terminar</string>
+    <!-- Error: the speech model could not be deleted. -->
+    <string name="web_model_delete_failed">Não foi possível excluí-lo</string>
+    <!-- Error: the caption engine asked for does not exist. -->
+    <string name="web_engine_unknown">Motor desconhecido</string>
+    <!-- Error: the Google engine needs an API key. Google Cloud Speech is a product name. -->
+    <string name="web_engine_need_key">Configure primeiro uma chave de API do Google Cloud Speech</string>
+    <!-- Reply after choosing the Google caption engine. Google Cloud Speech is a product name. -->
+    <string name="web_engine_google">As legendas usam o Google Cloud Speech</string>
+    <!-- Reply after choosing the on-device caption engine. -->
+    <string name="web_engine_phone">As legendas são geradas no celular</string>
+
+    <!-- ==== APRS, SSTV, decoding, satellites, scope ==== -->
+    <!-- Error: an APRS message needs a recipient and a text. -->
+    <string name="web_aprs_to_text_needed">Informe o destinatário e o texto</string>
+    <!-- Reply after queueing an APRS message. %1$s: the callsign. -->
+    <string name="web_aprs_message_queued">Mensagem para %1$s na fila</string>
+    <!-- Reply after sending an APRS position beacon. -->
+    <string name="web_aprs_beacon_sent">Beacon enviado</string>
+    <!-- Error: no SSTV picture has been received yet. -->
+    <string name="web_sstv_no_picture">Nenhuma imagem ainda</string>
+    <!-- Error: the recording to decode is gone. -->
+    <string name="web_decode_not_found">Gravação não encontrada</string>
+    <!-- Reply after starting to decode a recording. %1$s: the file name. -->
+    <string name="web_decode_started">Decodificando %1$s</string>
+    <!-- Error: the uploaded file is empty. -->
+    <string name="web_decode_empty">Arquivo vazio</string>
+    <!-- Reply after uploading a recording. %1$s: the file name. -->
+    <string name="web_decode_uploaded">%1$s enviado; decodificando</string>
+    <!-- Error: the upload worked but the decode could not start. %1$s: the file name; %2$s: the reason. -->
+    <string name="web_decode_uploaded_failed">%1$s enviado, mas: %2$s</string>
+    <!-- Error: combining SSTV pictures needs at least two. -->
+    <string name="web_sstv_select_two">Selecione duas ou mais imagens</string>
+    <!-- Error: an SSTV picture is gone. %1$s: its file name. -->
+    <string name="web_sstv_not_found_name">Não encontrada: %1$s</string>
+    <!-- Error: no pictures were given to delete. -->
+    <string name="web_sstv_none_given">Nenhuma imagem indicada</string>
+    <!-- Error: the file to send as SSTV is not a picture. -->
+    <string name="web_sstv_bad_picture">Este celular não consegue ler isso como imagem (use PNG ou JPEG)</string>
+    <!-- Reply after starting to send an SSTV picture. %1$s: the SSTV mode name (e.g. "Robot 36"), not translated. -->
+    <string name="web_sstv_sending">Enviando a imagem em %1$s</string>
+    <!-- Reply after stopping ISS tracking. -->
+    <string name="web_iss_stopped">Rastreamento parado</string>
+    <!-- Reply after starting ISS tracking. %1$s: "aprs" or "sstv". -->
+    <string name="web_iss_tracking">Rastreando a ISS (%1$s)</string>
+    <!-- Reply after the orbit download. -->
+    <string name="web_sat_updated">Órbitas e lista de satélites FM atualizadas</string>
+    <!-- Shown on a satellite's card: the orbit download has no orbit for it. -->
+    <string name="web_sat_no_orbit_it">O download não tem órbita para este satélite</string>
+    <!-- Error: no orbit for a satellite. %1$s: the satellite's name. -->
+    <string name="web_sat_no_orbit">Sem órbita para %1$s</string>
+    <!-- Reply after starting to track a satellite pass. %1$s: the satellite's name. -->
+    <string name="web_sat_tracking">Rastreando %1$s</string>
+    <!-- Error: the pass to track is already over. -->
+    <string name="web_sat_pass_gone">Essa passagem já terminou</string>
+    <!-- Error: the satellite asked for is not in the list. -->
+    <string name="web_sat_none">Satélite inexistente</string>
+    <!-- Reply after starting the band scope. Very short. -->
+    <string name="web_scope_sweeping">Varrendo</string>
+    <!-- Error: the frequency picked on the band scope is outside this radio's bands. -->
+    <string name="web_scope_untunable">Este rádio não sintoniza essa frequência</string>
+    <!-- Reply after choosing a frequency on the band scope. %1$s: the frequency, e.g. "145.5000". -->
+    <string name="web_scope_listening">Escutando em %1$s MHz (VFO)</string>
+    <!-- Status of the terrain prediction on the coverage map before it has a status of its own. Lower case, short. -->
+    <string name="web_coverage_predict_starting">iniciando…</string>
+
+    <!-- ==== schedules, recordings, logbook, POTA ==== -->
+    <!-- Error in the scheduled operation form. -->
+    <string name="web_sched_days">Escolha os dias ou uma data</string>
+    <!-- Error in the scheduled operation form: a one-off time in the past. -->
+    <string name="web_sched_past">Esse horário já passou</string>
+    <!-- Error: the recording is gone. -->
+    <string name="web_rec_none">Gravação inexistente</string>
+    <!-- Error: a logbook entry needs a callsign. -->
+    <string name="web_log_call_needed">Informe um indicativo</string>
+    <!-- Reply after logging a contact. %1$s: the callsign. -->
+    <string name="web_log_logged">QSO com %1$s registrado</string>
+    <!-- Error: not a park or summit reference. The examples stay as they are. -->
+    <string name="web_pota_bad_ref">Não é uma referência POTA (US-1234) nem SOTA (W0C/FR-001)</string>
+    <!-- Reply after starting a POTA/SOTA activation whose reference is not in the list. %1$s: the reference. -->
+    <string name="web_pota_activating_unknown">Ativando %1$s (não consta na lista do programa)</string>
+    <!-- Reply after starting a POTA/SOTA activation. %1$s: the reference; %2$s: the park or summit name. -->
+    <string name="web_pota_activating">Ativando %1$s: %2$s</string>
+    <!-- Reply after ending a POTA/SOTA activation. -->
+    <string name="web_pota_ended">Ativação encerrada</string>
+    <!-- Error: this contact is a duplicate. DUPE is the usual ham word. %1$s: the callsign; %2$s: the park or summit reference. -->
+    <string name="web_pota_dupe">DUPE: %1$s já está registrado nesta banda hoje em %2$s</string>
+    <!-- Error: no POTA/SOTA activation is running. -->
+    <string name="web_pota_none">Nenhuma ativação</string>
+
+    <!-- ==== forms, Winlink, packet finder ==== -->
+    <!-- Reply after putting a message form in the Winlink outbox. -->
+    <string name="web_form_winlink_outbox">Na caixa de saída do Winlink</string>
+    <!-- Reply after writing a Winlink e-mail. -->
+    <string name="web_wl_outbox">Na caixa de saída</string>
+    <!-- Reply after starting a Winlink connection. -->
+    <string name="web_wl_connecting">Conectando</string>
+    <!-- Reply after starting a Winlink radio connection. %1$s: the frequency, e.g. "145.0500". -->
+    <string name="web_wl_tuning">Sintonizando %1$s MHz; conexão em alguns segundos</string>
+    <!-- Error: a Maidenhead grid square. The examples stay as they are. -->
+    <string name="web_wl_grid">Locator no formato JO01 ou JO01ab</string>
+    <!-- Error: the Winlink attachment is gone. -->
+    <string name="web_wl_no_attachment">Anexo inexistente</string>
+
+    <!-- ==== settings, radio, packet tools ==== -->
+    <!-- Reply after changing a setting. %1$s: the setting's name. -->
+    <string name="web_set_saved">%1$s: salvo</string>
+    <!-- Error: the setting asked for does not exist. -->
+    <string name="web_set_none">Configuração inexistente</string>
+    <!-- Error: a DMR ID out of range. -->
+    <string name="web_set_dmrid_range">O ID DMR vai de 1 a 16776415</string>
+    <!-- A choice of the Longest transmission setting, the default one. %1$s: the time, e.g. "30 s". -->
+    <string name="web_set_txlimit_default">%1$s (padrão)</string>
+    <!-- A choice of the Longest transmission setting: a value set on the phone. %1$s: the time, e.g. "45 s". -->
+    <string name="web_set_txlimit_custom">Personalizado: %1$s</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_radio">Rádio</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_identity">Identidade</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_logbook">Logbook</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_coverage">Cobertura</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_car">Carro</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_txlimit_label">Transmissão máxima</string>
+    <!-- Setting description under its name. Two lines. -->
+    <string name="web_set_txlimit_sub">O SignalDeck encerra qualquer transmissão depois desse tempo; a proteção contra superaquecimento ainda interrompe uma transmissão longa se o celular esquentar</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_dmrid_label">Seu ID DMR</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_dmrid_sub">O que os outros rádios veem quando você fala em canais DMR</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_hwptt_label">PTT lateral</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_hwptt_sub">O botão PTT físico do celular transmite</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_volptt_label">Volume + transmite</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_volptt_sub">Enquanto a página Rádio estiver aberta no celular</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_customptt_label">Tecla PTT personalizada</string>
+    <!-- Setting description under its name. "Device → Custom PTT key" names the phone's setting. -->
+    <string name="web_set_customptt_sub">O botão aprendido no celular (Dispositivo → Tecla PTT personalizada) transmite; para aprender, é preciso estar com o celular na mão</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_scansoftsq_label">Soft SQ durante a varredura</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_scansoftsq_sub">Todos os canais analógicos, cada um com o próprio nível (5 se nunca foi definido)</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_roger_label">Roger beep</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_roger_sub">Um som curto no fim de cada transmissão</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_voice_label">Anúncios por voz</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_voice_sub">Troca de canal, nome de quem chama, alertas de palavra-chave</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_keywords_label">Alertas de palavra-chave</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_keywords_sub">Palavras nas legendas ao vivo que disparam um alerta, separadas por vírgulas</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_logheard_label">Registrar estações ouvidas</string>
+    <!-- Setting description under its name. "Heard" is how the logbook marks these entries. -->
+    <string name="web_set_logheard_sub">Quem chama em DMR e as estações APRS entram no logbook como Ouvido</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_lookup_label">Buscar nomes na internet</string>
+    <!-- Setting description under its name. RadioID is a service name. -->
+    <string name="web_set_lookup_sub">Consulta de nomes no RadioID e por indicativo para quem chama e para as estações</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_roaming_label">Roaming DMR</string>
+    <!-- Setting description under its name. Two lines. -->
+    <string name="web_set_roaming_sub">Em viagem, muda para a repetidora mais próxima desta zona com o mesmo talkgroup (precisa de canais de repetidora com localização)</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_coverage_label">Registro de cobertura</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_coverage_sub">Registra o sinal e as aberturas com GPS para os mapas de cobertura</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_covincar_label">Registrar cobertura no carro</string>
+    <!-- Setting description under its name. Android Auto is a product name. -->
+    <string name="web_set_covincar_sub">Registro de cobertura enquanto o Android Auto estiver conectado</string>
+    <!-- Setting name on the web Settings page. One line. Android Auto is a product name. -->
+    <string name="web_set_carmic_label">Microfone do carro no Android Auto</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_carmic_sub">Para falar, usa o microfone do carro pela conexão viva-voz</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_wheeltalk_label">Play/pause do volante transmite</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_wheeltalk_sub">No Android Auto: play/pause inicia e para a transmissão</string>
+    <!-- Setting name on the web Settings page. One line. "Next" is the media key. -->
+    <string name="web_set_nexttalk_label">Próxima do volante transmite</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_nexttalk_sub">Para falar, mantenha Próxima pressionada ou toque duas vezes</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_wheelmic_label">Microfone para o volante</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_wheelmic_sub">Do carro (como uma chamada) ou do celular</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_voxstop_label">Parar quando eu parar de falar</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_voxstop_sub">Para transmissões iniciadas pelo volante</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_carscreen_label">Controles do rádio em tela cheia no carro</string>
+    <!-- Setting description under its name. "Talk" is the name of the car screen's button. -->
+    <string name="web_set_carscreen_sub">Desativado: um app de mídia; ativado: uma tela grande com Falar (reconecte o carro depois de mudar)</string>
+    <!-- Reply after Take over on the web Settings page. -->
+    <string name="web_radio_takeover">Assumindo o rádio</string>
+    <!-- Reply after Hand back on the web Settings page. -->
+    <string name="web_radio_handback">Devolvendo o rádio ao app do fabricante</string>
+    <!-- Error: the packet engine has not started yet. -->
+    <string name="web_pkt_not_ready">O motor de packet não está pronto</string>
+    <!-- Error in the APRS settings: the callsign's format. -->
+    <string name="web_aprs_call_format">Indicativo: de 1 a 6 letras e dígitos; o SSID vai no campo próprio</string>
+    <!-- Error in the APRS settings. SSID is the usual ham word. -->
+    <string name="web_aprs_ssid">O SSID vai de 0 a 15</string>
+    <!-- Error in the APRS settings. -->
+    <string name="web_aprs_lead">A duração do preâmbulo precisa ser uma das opções da lista</string>
+    <!-- Error in the APRS settings. KISS is a protocol name. -->
+    <string name="web_aprs_kiss_port">A porta KISS vai de 1024 a 65535</string>
+    <!-- Reply after saving the APRS settings. -->
+    <string name="web_aprs_saved">Configurações de APRS salvas</string>
+    <!-- Reply after turning the APRS-IS internet link on. APRS-IS is a service name. -->
+    <string name="web_tool_is_start">Iniciando o APRS-IS</string>
+    <!-- Reply after turning the APRS-IS internet link off. -->
+    <string name="web_tool_is_off">APRS-IS desativado</string>
+    <!-- Reply after turning the KISS TNC on. KISS TNC is a protocol name. -->
+    <string name="web_tool_kiss_on">KISS TNC ativado</string>
+    <!-- Reply after turning the KISS TNC off. -->
+    <string name="web_tool_kiss_off">KISS TNC desativado</string>
+    <!-- Error: the DTMF digits typed are not valid. -->
+    <string name="web_dtmf_format">DTMF: de 1 a 32 caracteres entre 0-9, A-D, * e #</string>
+    <!-- Reply after sending DTMF digits. %1$s: the digits. -->
+    <string name="web_dtmf_sending">Enviando DTMF %1$s</string>
+    <!-- Reply after sending the Morse identification. -->
+    <string name="web_cwid_sending">Enviando a identificação em CW</string>
+
+    <!-- ==== nets, voice keyer, FT8, repeaters, zones, backups ==== -->
+    <!-- Error: a net is already running. -->
+    <string name="web_net_running">Já há uma roda em andamento</string>
+    <!-- Name given to a net when none is typed. Short. -->
+    <string name="web_net_default_name">Roda</string>
+    <!-- History line when a net starts. %1$s: the net's name. -->
+    <string name="web_history_net_started">📋 Roda iniciada: %1$s</string>
+    <!-- Reply when a net starts. %1$s: the net's name. -->
+    <string name="web_net_started">Roda iniciada: %1$s</string>
+    <!-- History line when a net ends. %1$s: the net's name; %2$d: the number of check-ins. The English uses "check-ins" for one too. -->
+    <plurals name="web_history_net_ended">
+        <item quantity="one">📋 Roda encerrada: %1$s (check-ins: %2$d)</item>
+        <item quantity="many">📋 Roda encerrada: %1$s (check-ins: %2$d)</item>
+        <item quantity="other">📋 Roda encerrada: %1$s (check-ins: %2$d)</item>
+    </plurals>
+    <!-- Reply when a net ends. %1$d: the number of check-ins. The English uses "check-ins" for one too. -->
+    <plurals name="web_net_ended">
+        <item quantity="one">Roda encerrada (check-ins: %1$d)</item>
+        <item quantity="many">Roda encerrada (check-ins: %1$d)</item>
+        <item quantity="other">Roda encerrada (check-ins: %1$d)</item>
+    </plurals>
+    <!-- Error: no net is running. -->
+    <string name="web_net_none">Nenhuma roda em andamento</string>
+    <!-- Error: the check-in is not a callsign. -->
+    <string name="web_net_bad_call">Isso não parece um indicativo</string>
+    <!-- Reply after a check-in. %1$s: the callsign. -->
+    <string name="web_net_checked_in">Check-in de %1$s feito</string>
+    <!-- Error: the check-in is gone. -->
+    <string name="web_net_no_checkin">Check-in inexistente</string>
+    <!-- Error: the net is gone. -->
+    <string name="web_net_no_net">Roda inexistente</string>
+    <!-- Error: a running net cannot be deleted. -->
+    <string name="web_net_end_first">Encerre a roda primeiro</string>
+    <!-- Reply after deleting a net. -->
+    <string name="web_net_deleted">Roda excluída</string>
+    <!-- Error: the voice keyer recording is too short. -->
+    <string name="web_keyer_short">Essa gravação é curta demais</string>
+    <!-- Reply after saving a voice keyer message. %1$s: the slot's name; %2$s: its length in seconds, e.g. "4.2". -->
+    <string name="web_keyer_saved">Salvo: %1$s (%2$s s)</string>
+    <!-- Error: the voice keyer slot is empty. -->
+    <string name="web_keyer_empty">Nada gravado</string>
+    <!-- Error: an FT8 grid locator. The example stays as it is. -->
+    <string name="web_ft8_grid">O locator tem duas letras de A a R e dois dígitos, como FN42</string>
+    <!-- Error: the FT8 decode clicked is gone. -->
+    <string name="web_ft8_gone">Essa decodificação não está mais na lista</string>
+    <!-- Error: the repeater list is out of date. -->
+    <string name="web_rpt_search_again">Pesquise de novo: essa repetidora não está na última lista</string>
+    <!-- Error: adding a repeater produced no channels. -->
+    <string name="web_rpt_nothing">Nada para programar</string>
+    <!-- Error in the zone editor. -->
+    <string name="web_zone_name_needed">A zona precisa de um nome</string>
+    <!-- Error in the zone editor. -->
+    <string name="web_zone_pick">Escolha pelo menos um canal para a zona</string>
+    <!-- Reply after saving a zone. %1$s: its name. -->
+    <string name="web_zone_saved">Zona %1$s salva</string>
+    <!-- Error: the zone is gone. -->
+    <string name="web_zone_none">Zona inexistente</string>
+    <!-- Reply after deleting a zone. %1$s: its name. -->
+    <string name="web_zone_deleted">Zona %1$s excluída</string>
+    <!-- Reply after a backup. %1$s: the backup folder's name. The path stays as it is. -->
+    <string name="web_backup_done">Backup salvo em Download/DMR/DMR_Backups/%1$s</string>
+    <!-- Error: the backup is gone. -->
+    <string name="web_backup_none">Backup inexistente</string>
+    <!-- Error when restoring from files. The file names stay as they are. -->
+    <string name="web_restore_need_channels">É preciso o Channels.csv (com Contacts.csv, TG_Lists.csv e Zones.csv do mesmo backup)</string>
+    <!-- Error: the restore failed. %1$s: the reason. -->
+    <string name="web_restore_failed">Falha na restauração: %1$s</string>
+
+    <!-- ==== contacts, messages, pager, device ==== -->
+    <!-- Error: the contact is gone. -->
+    <string name="web_contact_none">Contato inexistente</string>
+    <!-- Error in the contact form. SSID is the usual ham word. -->
+    <string name="web_contact_call_format">Indicativo: letras e dígitos, com -SSID opcional</string>
+    <!-- Error in the contact form: the home location. -->
+    <string name="web_contact_home">Casa: um locator ou latitude, longitude</string>
+    <!-- Error in the contact form. -->
+    <string name="web_contact_id_range">O ID DMR precisa estar entre 1 e 16777215</string>
+    <!-- Error in the contact form. RIC is a pager address. -->
+    <string name="web_contact_needs_id">O contato precisa de um ID DMR, um indicativo ou um RIC de pager</string>
+    <!-- Error: a text needs a recipient and a text. -->
+    <string name="web_msg_need">Informe o destinatário e o texto</string>
+    <!-- Error: the text is too long. -->
+    <string name="web_msg_too_long">As mensagens têm no máximo 140 caracteres</string>
+    <!-- Reply after sending a text. %1$s: the contact's name or number. -->
+    <string name="web_sending_to">Enviando para %1$s</string>
+    <!-- Reply after turning the pager monitor on. -->
+    <string name="web_pager_monitor_on">Escuta de pager ativada</string>
+    <!-- Reply after turning the pager monitor off. -->
+    <string name="web_pager_monitor_off">Escuta de pager desativada</string>
+    <!-- Error: a page needs a message. -->
+    <string name="web_pager_write">Escreva a mensagem</string>
+    <!-- Error: a page needs a pager address (RIC). -->
+    <string name="web_pager_add_ric">Adicione um RIC</string>
+    <!-- Reply after sending a page. %1$d: the number of pager addresses (RICs). -->
+    <plurals name="web_pager_sending">
+        <item quantity="one">Enviando (RICs: %1$d)</item>
+        <item quantity="many">Enviando para %1$d RICs</item>
+        <item quantity="other">Enviando para %1$d RICs</item>
+    </plurals>
+    <!-- Reply after Restart the module on the web Settings page. -->
+    <string name="web_device_restarting">Reiniciando o módulo de rádio</string>
+    <!-- Reply to Check for updates: nothing is published. -->
+    <string name="web_update_none">Ainda não há versão do SignalDeck publicada</string>
+    <!-- Reply to Check for updates. %1$s: the new version, e.g. "1.0.0-beta.14". -->
+    <string name="web_update_available">Atualização %1$s disponível</string>
+    <!-- Reply to Check for updates. %1$s: the installed version. -->
+    <string name="web_update_latest">Você já está na versão mais recente (%1$s)</string>
+    <!-- Reply while an update installs. %1$s: the version. -->
+    <string name="web_update_installing">Instalando %1$s</string>
+    <!-- Error: the update check failed. -->
+    <string name="web_update_failed">Falha ao verificar atualizações</string>
+    <!-- Error: the published update has no download link. -->
+    <string name="web_update_no_url">A atualização não tem endereço de download</string>
+    <!-- Error: the update file is too big. -->
+    <string name="web_update_too_big">A atualização tem mais de 80 MB</string>
+    <!-- Reply after a POTA/SOTA contact was logged. %1$s: the callsign. -->
+    <string name="web_pota_logged">QSO com %1$s registrado</string>
+    <!-- Reply after a net check-in was changed (traffic, late, out). %1$s: the callsign. -->
+    <string name="web_net_checkin_updated">Check-in de %1$s atualizado</string>
+    <!-- Last-heard list: a channel without a name, by its number. Lower case. %1$d: the channel number. -->
+    <string name="web_heard_channel">canal %1$d</string>
+</resources>

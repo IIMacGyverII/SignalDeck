@@ -1,0 +1,968 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Channels page: the channel list, zones, presets, contacts, codeplug, repeaters, region, backup. See strings_common.xml for the conventions. -->
+<resources>
+
+    <!-- ===== Channel lists (Add a zone): where each list applies, what it is, the licence it needs ===== -->
+    <!-- Where a channel list applies, shown with it on the Add-a-zone sheet. Short (countries). -->
+    <string name="channels_preset_where_us_canada">EUA / Canadá</string>
+    <!-- Where a channel list applies (Marine VHF). Short. -->
+    <string name="channels_preset_where_us_intl">EUA / internacional</string>
+    <!-- Where a channel list applies: everywhere. Short. -->
+    <string name="channels_preset_where_worldwide">Mundo todo</string>
+    <!-- Where a channel list applies (UHF CB). Short. -->
+    <string name="channels_preset_where_au_nz">Austrália / NZ</string>
+    <!-- Where a channel list applies (PMR446). Short. -->
+    <string name="channels_preset_where_eu_uk">Europa / Reino Unido</string>
+    <!-- Licence line of a licence-free channel list (FRS, MURS). One line. -->
+    <string name="channels_preset_licence_none">Não precisa de licença</string>
+    <!-- Licence line of a listen-only channel list (weather, marine, railroad). One line. -->
+    <string name="channels_preset_licence_rx_only">Só recepção</string>
+    <!-- Licence line of an amateur channel list. One line. -->
+    <string name="channels_preset_licence_amateur">Precisa de licença de radioamador</string>
+    <!-- Licence line of the satellite list: listening is free. One line. -->
+    <string name="channels_preset_licence_amateur_tx">Transmitir exige licença de radioamador</string>
+    <!-- Description of the FRS channel list (US Family Radio Service). Paragraph. -->
+    <string name="channels_preset_frs_about">Family Radio Service (EUA): os 22 canais dos walkie-talkies de blister. Banda estreita, potência baixa.</string>
+    <!-- Description of the GMRS channel list. Paragraph. -->
+    <string name="channels_preset_gmrs_about">General Mobile Radio Service (EUA): os mesmos 22 canais do FRS (falam com rádios FRS) mais os 8 canais de repetidora, de 15R a 22R, que escutam em 462 MHz e transmitem 5 MHz acima. Os canais 8 a 14 são de banda estreita e potência baixa.</string>
+    <!-- Licence line of the GMRS list. One or two lines. -->
+    <string name="channels_preset_gmrs_licence">Precisa de licença GMRS da FCC (sem prova; vale para a sua família)</string>
+    <!-- Description of the NOAA weather channel list. PKT is the packet page. Paragraph. -->
+    <string name="channels_preset_wx_about">Os sete canais de transmissão do NOAA Weather Radio (e do Environment Canada). Só recepção; o mais forte é a sua estação local. Com os alertas SAME ativados (PKT), o rádio decodifica os avisos.</string>
+    <!-- Description of the MURS channel list. Paragraph. -->
+    <string name="channels_preset_murs_about">Multi-Use Radio Service (EUA): cinco canais VHF sem licença, menos congestionados que o FRS e com mais alcance ao ar livre. Potência baixa (o limite é 2 W).</string>
+    <!-- Description of the Marine VHF channel list. Paragraph. -->
+    <string name="channels_preset_marine_about">Canais de VHF marítimo para escutar barcos, portos e a guarda costeira: 16 é socorro e chamada, 9 chamada de embarcações, 13 ponte a ponte, 22A a Guarda Costeira dos EUA. Só recepção: este rádio não é um rádio marítimo.</string>
+    <!-- Description of the DMR simplex channel list. Paragraph. -->
+    <string name="channels_preset_dmr_about">DMR simplex de radioamador: os canais que a maioria dos rádios DMR traz, todos com color code 1, slot 1, talkgroup 99.</string>
+    <!-- Description of the US business channel list; "dot" and "star" are the colour names of these frequencies. Paragraph. -->
+    <string name="channels_preset_biz_about">Canais itinerantes comerciais (EUA): as frequências “dot” e “star” que vêm nos rádios comerciais de aluguel e de loja, usados em eventos, lojas, fazendas e obras. Escutar é livre. Em VHF este rádio só funciona em banda larga, que esses canais não permitem mais para transmitir: fale pelos de UHF.</string>
+    <!-- Licence line of the business list. One line. -->
+    <string name="channels_preset_biz_licence">Precisa de licença comercial da FCC (Part 90)</string>
+    <!-- Description of the AAR railroad channel list. Paragraph. -->
+    <string name="channels_preset_rail_about">Os 96 canais ferroviários AAR (de 02 a 97, de 159,810 a 161,565 MHz; de 02 a 04 são usados no Canadá): despachantes, trens, pátios e os detectores de defeitos à beira da linha que anunciam a contagem de eixos. Só recepção. Faça a varredura da zona para achar os canais da ferrovia local e depois marque-os com estrela.</string>
+    <!-- Description of the ISS and satellites list. Channel names (ISS APRS, ISS SSTV, ISS Rptr, SO-50) stay as written. Long paragraph. -->
+    <string name="channels_preset_sat_about">A Estação Espacial Internacional e o satélite FM SO-50, cada um ouvido por cerca de dez minutos a cada passagem (um app como o Heavens-Above informa os horários). ISS Voice: contatos com a tripulação em 145,800 (a tripulação escuta em 144,490 nas Américas). ISS APRS: o digipeater de packet da estação, em 437,825 desde 2026 (antes usava 145,825). ISS SSTV: eventos de imagem em 437,550 (só recepção). Em 70 cm o sinal se desloca até 10 kHz por efeito Doppler, por isso os canais de APRS e SSTV vêm como + (subindo), sem sufixo (no alto) e - (descendo); PKT → ISS APRS e ISS SSTV acompanham o desvio automaticamente e são o melhor caminho. ISS Rptr e SO-50 escutam em 2 m e transmitem em 70 cm, abertos com subtom de 67 Hz; use o canal + no início da passagem, o sem sufixo no alto e o - no fim. A ARISS muda os modos da estação com frequência: confira em ariss.org. Falar por satélite com um HT é difícil: escute primeiro. Banda cruzada (transmitir em 2 m, receber em 70 cm) não foi testada neste rádio.</string>
+    <!-- Description of the Australian UHF CB channel list. Paragraph. -->
+    <string name="channels_preset_cb_about">A faixa UHF CB de 80 canais (de 476,425 a 477,4125 MHz, banda estreita, 5 W). Os canais R usam as repetidoras: escutam de 1 a 8 e de 41 a 48 e transmitem 750 kHz acima (em 31 a 38 e 71 a 78, que ficam de fora como canais simplex). O canal 5 é o de emergência (não na Nova Zelândia), o 40 o das estradas, o 18 de trailers e comboios, o 10 de clubes de 4x4, o 11 de chamada. 22 e 23 (só dados) e 61 a 63 (reservados) ficam de fora.</string>
+    <!-- Licence line of the UHF CB list. One or two lines. -->
+    <string name="channels_preset_cb_licence">Sem licença na Austrália e na NZ; não é para uso nos EUA</string>
+    <!-- Description of the PMR446 channel list. Paragraph. -->
+    <string name="channels_preset_pmr_about">PMR446, os canais de walkie-talkie sem licença da Europa e do Reino Unido: 16 canais de banda estreita. Potência baixa (o limite é 0,5 W).</string>
+    <!-- Licence line of the PMR446 list. One or two lines. -->
+    <string name="channels_preset_pmr_licence">Sem licença na Europa; não é para uso nos EUA</string>
+    <!-- Description of the ham simplex list. %1$s is the region's APRS frequency in MHz ("144.390"). Paragraph. -->
+    <string name="channels_preset_ham_about">FM simplex de radioamador: os canais de chamada de 2 m e 70 cm e o APRS (%1$s, a frequência APRS da sua região, onde o rádio decodifica relatórios de posição). Dispositivo → Região define esses valores.</string>
+    <!-- Description of the ham simplex list, with an SSTV channel. %1$s is the APRS frequency in MHz. Paragraph. -->
+    <string name="channels_preset_ham_about_sstv">FM simplex de radioamador: os canais de chamada de 2 m e 70 cm e o APRS (%1$s, a frequência APRS da sua região, onde o rádio decodifica relatórios de posição), além de SSTV em FM. Dispositivo → Região define esses valores.</string>
+    <!-- Description of the ham simplex list, with the North American simplex channels. %1$s is the APRS frequency in MHz. Paragraph. -->
+    <string name="channels_preset_ham_about_common">FM simplex de radioamador: os canais de chamada de 2 m e 70 cm, canais simplex comuns e o APRS (%1$s, a frequência APRS da sua região, onde o rádio decodifica relatórios de posição). Dispositivo → Região define esses valores.</string>
+    <!-- Description of the ham simplex list, with simplex channels and SSTV. %1$s is the APRS frequency in MHz. Paragraph. -->
+    <string name="channels_preset_ham_about_common_sstv">FM simplex de radioamador: os canais de chamada de 2 m e 70 cm, canais simplex comuns e o APRS (%1$s, a frequência APRS da sua região, onde o rádio decodifica relatórios de posição), além de SSTV em FM. Dispositivo → Região define esses valores.</string>
+    <!-- Toast after adding a channel list. %1$d channels added, %2$s the zone name. One line. -->
+    <plurals name="channels_preset_added">
+        <item quantity="one">Canais adicionados: %1$d · zona %2$s</item>
+        <item quantity="many">Canais adicionados: %1$d · zona %2$s</item>
+        <item quantity="other">Canais adicionados: %1$d · zona %2$s</item>
+    </plurals>
+    <!-- Toast after adding a channel list. %1$d added, %3$d already there, %2$s the zone name. One line. -->
+    <plurals name="channels_preset_added_reused">
+        <item quantity="one">Canais adicionados: %1$d, já existentes: %3$d · zona %2$s</item>
+        <item quantity="many">Canais adicionados: %1$d, já existentes: %3$d · zona %2$s</item>
+        <item quantity="other">Canais adicionados: %1$d, já existentes: %3$d · zona %2$s</item>
+    </plurals>
+    <!-- Toast after adding a channel list. %1$d added, %3$d left out (this radio cannot tune them), %2$s the zone name. One line. -->
+    <plurals name="channels_preset_added_skipped">
+        <item quantity="one">Canais adicionados: %1$d, ignorados por estarem fora das faixas deste rádio: %3$d · zona %2$s</item>
+        <item quantity="many">Canais adicionados: %1$d, ignorados por estarem fora das faixas deste rádio: %3$d · zona %2$s</item>
+        <item quantity="other">Canais adicionados: %1$d, ignorados por estarem fora das faixas deste rádio: %3$d · zona %2$s</item>
+    </plurals>
+    <!-- Toast after adding a channel list. %1$d added, %3$d already there, %4$d left out, %2$s the zone name. One line. -->
+    <plurals name="channels_preset_added_reused_skipped">
+        <item quantity="one">Canais adicionados: %1$d, já existentes: %3$d, ignorados por estarem fora das faixas deste rádio: %4$d · zona %2$s</item>
+        <item quantity="many">Canais adicionados: %1$d, já existentes: %3$d, ignorados por estarem fora das faixas deste rádio: %4$d · zona %2$s</item>
+        <item quantity="other">Canais adicionados: %1$d, já existentes: %3$d, ignorados por estarem fora das faixas deste rádio: %4$d · zona %2$s</item>
+    </plurals>
+    <!-- Tag after a channel in the list preview (monospace): listen only. Very short. -->
+    <string name="channels_preset_preview_rx_only">só RX</string>
+    <!-- Tag after a channel in the list preview (monospace): low power. Very short. -->
+    <string name="channels_preset_preview_low">baixa</string>
+    <!-- Tag after a channel in the list preview (monospace): this radio cannot tune it, so Add leaves it out. Short. -->
+    <string name="channels_preset_preview_not_tunable">fora da faixa</string>
+    <!-- Reason in the toast "Could not add <list>: ..." when no channel of the list is in this radio's bands. %1$s is the bands ("400-480 MHz"). One line. -->
+    <string name="channels_preset_none_tunable">nenhum dos canais está dentro do que este rádio sintoniza (%1$s)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_cw_moonbounce_eme">2 m: CW e moonbounce (EME)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_no_fm_here">Nada de FM aqui</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_weak_signal_ssb">2 m: SSB de sinal fraco (chamada em 144,200)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_do_not_transmit">Não transmita</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_aprs_north_american_packet_frequency">APRS, a frequência de packet da América do Norte</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_new_satellite_miscellaneous">2 m: novos satélites e diversos</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_keep_fm_off">Não use FM aqui</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_linear_translator_inputs">2 m: entradas de transponders lineares</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_satellites_translators_not_fm">Para satélites e transponders, não para FM</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_fm_repeater_inputs">2 m: entradas de repetidoras FM</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_weak_signal_fm">2 m: sinal fraco e FM simplex</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_linear_translator_outputs">2 m: saídas de transponders lineares</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_not_fm">Não é para FM</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_fm_repeater_outputs">2 m: saídas de repetidoras FM</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_miscellaneous_experimental">2 m: diversos e experimental</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_voice_downlink">Downlink de voz da ISS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_satellite_aprs_iss_moved_437">APRS via satélite (a ISS mudou para 437,825)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_repeater_uplink">Uplink da repetidora da ISS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_satellite_subband">2 m: subfaixa de satélites</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_satellites_only_no_terrestrial_fm">Só para satélites: nada de FM terrestre</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_national_fm_simplex">2 m: chamada nacional em FM simplex</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_fm_simplex">2 m: FM simplex</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_fm_repeater_outputs_2">2 m: saídas de repetidoras FM (offset positivo)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_amateur_television_links">70 cm: televisão amadora e links</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_moonbounce_eme">70 cm: moonbounce (EME)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_weak_signal_cw">70 cm: CW e SSB de sinal fraco (chamada em 432,100)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_weak_signal_beacons">70 cm: sinal fraco e beacons</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_auxiliary_repeater_links">70 cm: auxiliares e links de repetidoras</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_aprs_digipeater">Digipeater APRS da ISS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_sstv_downlink">Downlink de SSTV da ISS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_iss_repeater_downlink">Downlink da repetidora da ISS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_satellite_subband">70 cm: subfaixa de satélites</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_amateur_television_repeaters">70 cm: televisão amadora, repetidoras e links (planos locais variam)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_fm_repeaters_local">70 cm: repetidoras FM (planos locais variam)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_national_fm_simplex">70 cm: chamada nacional em FM simplex</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_70_cm_fm_simplex_links">70 cm: FM simplex e links</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_space_operations_aviation">Operações espaciais e aviação</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_receive_only">Só recepção</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_weather_other_satellites_downlinks">Downlinks de satélites meteorológicos e outros</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_us_government_military">Governo e forças armadas dos EUA</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_murs_licence_free_2_w">MURS (sem licença, 2 W)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_land_mobile_public_safety_business">Serviço móvel terrestre: segurança pública e empresas</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_licensed_users_only_public_safety">Só usuários licenciados; nunca interfira na segurança pública</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_marine_vhf">VHF marítimo</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_receive_only_radio">Só recepção neste rádio</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_aar_railroad_channels">Canais ferroviários AAR</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_marine_shore_stations_land_mobile">Estações costeiras marítimas e serviço móvel terrestre</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_land_mobile_business_industry_utilities">Serviço móvel terrestre: empresas, indústria, concessionárias</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_licensed_users_only">Só usuários licenciados</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_noaa_weather_radio">NOAA Weather Radio</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_us_federal_government">Governo federal dos EUA</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_weather_balloons_satellites">Balões e satélites meteorológicos</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_frs_gmrs_channels_8_14">FRS e GMRS (canais 8–14, 0,5 W)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_frs_gmrs">FRS e GMRS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_gmrs_needs_fcc_licence_frs">GMRS precisa de licença da FCC; FRS só com rádios FRS, potência baixa</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_gmrs_repeater_inputs">Entradas de repetidoras GMRS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_fcc_gmrs_licence_needed">Precisa de licença GMRS da FCC</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_land_mobile_business_public_safety">Serviço móvel terrestre: empresas, segurança pública, GMRS</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_land_mobile_some_cities_tv">Serviço móvel terrestre em algumas cidades (canais de TV 14–15 nas demais)</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_beacons">2 m: beacons</string>
+    <!-- Band-plan text under the VFO frequency fields: what this part of the band is for, or the caution after it. One line. -->
+    <string name="channels_bandplan_2_m_packet">2 m: packet</string>
+    <!-- Band-plan text: what the frequency is for (%1$s), then the caution (%2$s). One line. -->
+    <string name="channels_bandplan_use_caution">%1$s. %2$s</string>
+    <!-- Band-plan line for a frequency: %1$s is the frequency in MHz ("146.5200"), %2$s what it is for. One line. -->
+    <string name="channels_bandplan_line">%1$s MHz: %2$s</string>
+    <!-- Band-plan line for a frequency this radio cannot tune. One line. -->
+    <string name="channels_bandplan_outside">fora das faixas deste rádio</string>
+
+    <!-- ===== Nets (NetFinder): schedules and where a net came from ===== -->
+    <!-- Where a net on the Nets sheet came from: the owner added it. Short, after a " · ". -->
+    <string name="channels_net_source_mine">adicionada por você</string>
+    <!-- Where a net on the Nets sheet came from: learned from what the radio heard. Short, after a " · ". -->
+    <string name="channels_net_source_heard">Ouvida</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_sun">dom.</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_mon">seg.</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_tue">ter.</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_wed">qua.</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_thu">qui.</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_fri">sex.</string>
+    <!-- Short weekday name in a net's schedule ("Mon, Wed 7:30 PM") on the Nets sheet. Very short. -->
+    <string name="channels_net_sat">sáb.</string>
+    <!-- Separator between weekday names in a net's schedule ("Mon, Wed"). Keep the trailing space if your language uses one. -->
+    <string name="channels_net_day_sep">,\u0020</string>
+    <!-- A net's schedule when no weekday is ticked. Short. -->
+    <string name="channels_net_no_day">Sem dia</string>
+    <!-- A net's schedule: %1$s the weekdays ("Mon, Wed"), %2$s the time ("7:30 PM"). Short. -->
+    <string name="channels_net_when_days">%1$s %2$s</string>
+    <!-- A daily net's schedule; %1$s is the time ("7:00 AM"). Short. -->
+    <string name="channels_net_when_daily">Todo dia %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_sundays">Domingos %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_mondays">Segundas %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_tuesdays">Terças %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_wednesdays">Quartas %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_thursdays">Quintas %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_fridays">Sextas %1$s</string>
+    <!-- A weekly net's schedule on the Nets sheet; %1$s is the time ("7:30 PM"). Short. -->
+    <string name="channels_net_saturdays">Sábados %1$s</string>
+
+    <!-- ===== Region (Device → Region): values, labels, how it was chosen ===== -->
+    <!-- A value on the Device → Region sheet, under its label. Short. The region lists no such frequency. -->
+    <string name="channels_region_none_listed">nenhuma informada</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. Weather radio exists here. -->
+    <string name="channels_region_yes">Sim</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. No weather radio here. -->
+    <string name="channels_region_no">Não</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. Distances are shown in kilometres. -->
+    <string name="channels_region_km">Quilômetros</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. Distances are shown in miles. -->
+    <string name="channels_region_miles">Milhas</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. %1$d is minutes between station identifications. -->
+    <string name="channels_region_id_every">A cada %1$d min</string>
+    <!-- A value on the Device → Region sheet, under its label. Short. The app's own station-ID interval. -->
+    <string name="channels_region_id_default">A cada 10 min (padrão do app)</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. -->
+    <string name="channels_region_label_aprs">Frequência APRS</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. The 2 m FM calling frequency. -->
+    <string name="channels_region_label_call2">Chamada FM em 2 m</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. The 70 cm FM calling frequency. -->
+    <string name="channels_region_label_call70">Chamada FM em 70 cm</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. The FM SSTV frequency. -->
+    <string name="channels_region_label_sstv">SSTV em FM</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. Whether NOAA-style weather radio (SAME alerts) exists. -->
+    <string name="channels_region_label_weather">Rádio meteorológico (tipo NOAA, SAME)</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. Kilometres or miles. -->
+    <string name="channels_region_label_units">Distâncias</string>
+    <!-- Label of a value on the Device → Region sheet (and title of its editor). Short, one line. How often the station-ID reminder comes. -->
+    <string name="channels_region_label_station_id">Lembrete de identificação</string>
+    <!-- How the region was chosen, after its name on the Region sheet and the region bar ("Belgium (from your SIM)"). Short. -->
+    <string name="channels_region_how_sim">pelo seu chip</string>
+    <!-- How the region was chosen, after its name on the Region sheet and the region bar ("Belgium (from your SIM)"). Short. -->
+    <string name="channels_region_how_network">pela rede móvel</string>
+    <!-- How the region was chosen, after its name on the Region sheet and the region bar ("Belgium (from your SIM)"). Short. -->
+    <string name="channels_region_how_locale">pelo idioma do celular</string>
+    <!-- How the region was chosen, after its name on the Region sheet and the region bar ("Belgium (from your SIM)"). Short. -->
+    <string name="channels_region_how_user">escolhida por você</string>
+    <!-- A starting point in the region picker, and the Region sheet title for it: %1$s is an IARU default ("IARU Region 1 …"). One line. -->
+    <string name="channels_region_custom">Personalizada: %1$s</string>
+
+    <!-- ===== Region sheet (Device → Region) and the region picker ===== -->
+    <!-- Toast when the region is tapped in Restricted mode (an admin item). One line. -->
+    <string name="channels_region_locked">A região fica bloqueada no Modo restrito</string>
+    <!-- Region sheet title before any region is chosen. Short. -->
+    <string name="channels_region_not_chosen">Não escolhida</string>
+    <!-- Device → Region row before a region is chosen. One or two lines. -->
+    <string name="channels_region_summary_unchosen">Não escolhida: padrões da América do Norte (APRS 144,390). Toque para escolher</string>
+    <!-- Device → Region row: %1$s the region, %2$s its APRS frequency in MHz. One line. -->
+    <string name="channels_region_summary">%1$s · APRS %2$s</string>
+    <!-- Device → Region row when the user changed some values: %1$s the region, %2$s its APRS frequency, %3$d how many values. One line. -->
+    <plurals name="channels_region_summary_changed">
+        <item quantity="one">%1$s · APRS %2$s · alterados por você: %3$d</item>
+        <item quantity="many">%1$s · APRS %2$s · alterados por você: %3$d</item>
+        <item quantity="other">%1$s · APRS %2$s · alterados por você: %3$d</item>
+    </plurals>
+    <!-- Title of the Region sheet. One or two words. -->
+    <string name="channels_region_title">Região</string>
+    <!-- Intro paragraph of the Region sheet. -->
+    <string name="channels_region_intro">A região define os padrões do SignalDeck: a frequência APRS, as frequências de chamada e de SSTV, quais serviços sem licença aparecem primeiro, se existe rádio meteorológico, os limites das faixas de radioamador para a identificação em CW e o lembrete de identificação, e quilômetros ou milhas. Ela nunca transmite, não inicia nenhum modo e não altera seus canais. A responsabilidade pela sua licença e pelas regras do seu país continua sendo sua.</string>
+    <!-- Under the region name: %1$s how it was chosen ("from your SIM"), %2$s the country the mobile network reports. One line. -->
+    <string name="channels_region_how_roam">%1$s (a rede indica %2$s)</string>
+    <!-- Under the region name, for a country with no entry of its own: %1$s how it was chosen, %2$d the IARU region number (1 to 3). One or two lines. -->
+    <string name="channels_region_how_generic">%1$s. Ainda sem dados próprios: padrões da Região %2$d da IARU</string>
+    <!-- Under the region name: %1$s how it was chosen, %2$s the network's country, %3$d the IARU region number. Two lines. -->
+    <string name="channels_region_how_roam_generic">%1$s (a rede indica %2$s). Ainda sem dados próprios: padrões da Região %3$d da IARU</string>
+    <!-- Region sheet hint before a region is chosen. One or two lines. -->
+    <string name="channels_region_unchosen_hint">O celular não informou onde você está, então os valores da América do Norte valem até você escolher.</string>
+    <!-- Button on the Region sheet. Short. -->
+    <string name="channels_region_choose_another">Escolher outra região</string>
+    <!-- Button on the Region sheet when no region is chosen. Short. -->
+    <string name="channels_region_choose">Escolher sua região</string>
+    <!-- Section heading on the Region sheet (shown in capitals). Short. -->
+    <string name="channels_region_section_sets">O que ela define</string>
+    <!-- A Region value the user set: %1$s is the value. Keep the two spaces. Short. -->
+    <string name="channels_region_value_yours">%1$s \u0020(seu)</string>
+    <!-- A Region value not yet checked against a national source: %1$s is the value. Keep the two spaces. Short. -->
+    <string name="channels_region_value_unconfirmed">%1$s \u0020(a confirmar)</string>
+    <!-- Chip on a Region value: back to the region's own value. Very short. -->
+    <string name="channels_region_reset">Restaurar</string>
+    <!-- Chip on a Region value: set your own. Very short. -->
+    <string name="channels_region_change">Alterar</string>
+    <!-- Region sheet hint: %1$s the bands this radio tunes ("400-480 MHz"), %2$s the region's APRS frequency in MHz. Two lines. -->
+    <string name="channels_region_aprs_untunable">Este rádio sintoniza %1$s, não %2$s MHz: a escuta de APRS não é oferecida; o APRS continua sendo decodificado nos seus próprios canais.</string>
+    <!-- Section heading on the Region sheet (shown in capitals): licence-free services. Short. -->
+    <string name="channels_region_section_free">Rádio sem licença aqui</string>
+    <!-- Region sheet hint under the licence-free heading, before a region is chosen. One or two lines. -->
+    <string name="channels_region_free_unchosen">Escolha uma região para ver os serviços sem licença dela. Enquanto isso, Adicionar zona lista todos.</string>
+    <!-- Region sheet: no licence-free services listed; %1$s is the region. One line. -->
+    <string name="channels_region_free_none">Ainda nenhum informado para %1$s.</string>
+    <!-- Separator between the details of a licence-free service ("446.0–446.2 MHz, 16 ch, 500 mW"). Keep the trailing space if your language uses one. -->
+    <string name="channels_region_list_sep">,\u0020</string>
+    <!-- Number of channels of a licence-free service; %1$d is the count. Very short. -->
+    <string name="channels_region_service_ch">%1$d can.</string>
+    <!-- A licence-free service on the Region sheet: %1$s its name (PMR446), %2$s its band, channels and power, %3$s its notes. Paragraph. -->
+    <string name="channels_region_service">%1$s: %2$s. %3$s</string>
+    <!-- A licence-free service not yet checked: %1$s its name, %2$s band and power, %3$s notes, %4$s the region. Paragraph. -->
+    <string name="channels_region_service_unconfirmed">%1$s: %2$s. %3$s (A confirmar para %4$s.)</string>
+    <!-- Region sheet caution about licence-free use; %1$s is the region. Paragraph. Transmit legality: keep the meaning exact. -->
+    <string name="channels_region_free_caution">Um serviço listado aqui significa que a faixa é livre de licença em %1$s para rádios homologados para ela. Isso não significa que este celular seja um deles: o uso sem licença normalmente exige equipamento homologado, um limite de potência e antena fixa. Confira antes de transmitir.</string>
+    <!-- Region sheet footer; "not legal here" and "to be confirmed" quote labels shown elsewhere. Paragraph. -->
+    <string name="channels_region_free_footer">Adicionar zona (Canais) oferece estas listas primeiro; as outras continuam lá, marcadas como “Não permitido aqui”. Valores marcados como “a confirmar” ainda estão sendo conferidos com as páginas do próprio órgão regulador.</string>
+    <!-- Dialog title when choosing a new region after changing values. Short. -->
+    <string name="channels_region_own_title">Seus próprios valores</string>
+    <!-- Dialog message: %1$d is how many values the user changed. Two lines. -->
+    <plurals name="channels_region_own_message">
+        <item quantity="one">Você alterou valores da região anterior (%1$d). Usar os valores da nova região ou manter os seus?</item>
+        <item quantity="many">Você alterou valores da região anterior (%1$d). Usar os valores da nova região ou manter os seus?</item>
+        <item quantity="other">Você alterou valores da região anterior (%1$d). Usar os valores da nova região ou manter os seus?</item>
+    </plurals>
+    <!-- Dialog button: use the new region's values. Short. -->
+    <string name="channels_region_own_use">Usar os da região</string>
+    <!-- Dialog button: keep the user's own values. Short. -->
+    <string name="channels_region_own_keep">Manter os meus</string>
+    <!-- Choice in the Weather radio dialog. One line. -->
+    <string name="channels_region_wx_yes">Sim: oferecer os canais meteorológicos e os alertas SAME</string>
+    <!-- Choice in the Weather radio dialog; Show all is a button on the Add-a-zone sheet. One line. -->
+    <string name="channels_region_wx_no">Não: ocultá-los (continuam em Mostrar todas as listas)</string>
+    <!-- Hint of the Station-ID editor: %1$s is the region's value ("Every 10 min"). Two lines. -->
+    <string name="channels_region_edit_minutes">Minutos entre identificações (de 1 a 60): usados pelo lembrete e pela identificação em CW. O da região: %1$s.</string>
+    <!-- Hint of the APRS frequency editor; Reset is the chip on the Region sheet. Two lines. -->
+    <string name="channels_region_edit_aprs">Em MHz. Usada pela escuta de APRS, pelos beacons, pela telemetria e pelo iGate. O valor da sua região fica a um toque (Restaurar).</string>
+    <!-- Hint of a calling or SSTV frequency editor; Reset is the chip on the Region sheet. One or two lines. -->
+    <string name="channels_region_edit_mhz">Em MHz. 0 para nenhuma. O valor da sua região fica a um toque (Restaurar).</string>
+    <!-- Toast when the station-ID minutes are out of range. Short. -->
+    <string name="channels_region_err_minutes">De 1 a 60 minutos</string>
+    <!-- Toast when a frequency entered on the Region sheet is not valid. Short. -->
+    <string name="channels_region_err_mhz">Uma frequência em MHz, por exemplo 144,800</string>
+    <!-- Toast: the value was saved but this radio cannot tune it. %1$s the radio's bands, %2$s the frequency in MHz. Two lines. -->
+    <string name="channels_region_saved_untunable">Salvo. Este rádio sintoniza %1$s, então não consegue usar %2$s MHz</string>
+    <!-- Title of the region picker sheet. Short. -->
+    <string name="channels_region_picker_title">Escolha sua região</string>
+    <!-- Hint of the region picker; Custom is the name of the IARU starting points in the list. Two lines. -->
+    <string name="channels_region_picker_hint">Países com dados próprios têm valores conferidos; qualquer outro país usa os padrões da sua região IARU. Personalizada parte dos valores de uma região IARU; depois, altere o que quiser.</string>
+    <!-- Hint in the region picker's search field. One word. -->
+    <string name="channels_region_picker_search">País</string>
+    <!-- Region picker hint above the Custom entries. One line. -->
+    <string name="channels_region_picker_type">Digite para encontrar qualquer outro país.</string>
+    <!-- Region picker: the search matches no country. One line. -->
+    <string name="channels_region_picker_none">Nenhum país encontrado.</string>
+
+    <!-- ===== Nearby repeaters: status, programming plan, results ===== -->
+    <!-- Status of a repeater the hearham list marks as down, after "Status: " on the repeater sheet. Short. -->
+    <string name="channels_rep_not_operational">fora de operação</string>
+    <!-- Warning when there is no repeater to program. Short. -->
+    <string name="channels_rep_warn_none">nenhuma repetidora</string>
+    <!-- Warning when programming a DMR-only repeater on a radio without DMR (toast). One line. -->
+    <string name="channels_rep_warn_no_dmr">repetidora DMR: este rádio não tem DMR</string>
+    <!-- Warning when a repeater is neither DMR nor FM (toast). One line. -->
+    <string name="channels_rep_warn_not_dmr_fm">não é uma repetidora DMR nem FM</string>
+    <!-- Warning when a DMR repeater lists no talkgroups (toast). One line. -->
+    <string name="channels_rep_warn_no_tgs">nenhum talkgroup conhecido para esta repetidora</string>
+    <!-- Warning in the programming preview: %1$d the time slot (1 or 2), %2$d how many talkgroups it has, %3$d how many fit. One line. -->
+    <string name="channels_rep_warn_truncated">o slot %1$d tem %2$d talkgroups; só os primeiros %3$d são programados</string>
+    <!-- Repeater sheet status: the BrandMeister list could not be loaded. Keep the trailing space (the next status follows). Short. -->
+    <string name="channels_rep_unavailable_bm">BrandMeister indisponível.\u0020</string>
+    <!-- Repeater sheet status: the hearham list could not be loaded. Keep the trailing space. Short. -->
+    <string name="channels_rep_unavailable_hh">hearham indisponível.\u0020</string>
+    <!-- Repeater sheet status: the RadioID list could not be loaded. Keep the trailing space. Short. -->
+    <string name="channels_rep_unavailable_rid">Lista do RadioID indisponível.\u0020</string>
+    <!-- Repeater sheet status: %1$d, %2$d, %3$d repeaters known from BrandMeister, hearham and RadioID; %4$d within %5$s (the radius, "50 km"). One or two lines. -->
+    <string name="channels_rep_known">Conhecidas: %1$d BrandMeister, %2$d hearham, %3$d RadioID; %4$d num raio de %5$s</string>
+    <!-- A radius in miles in the repeater status; %1$s is the number. Short. -->
+    <string name="channels_rep_miles">%1$s milhas</string>
+    <!-- Line in the repeater programming preview: %1$d talkgroup contacts will be created. One line. -->
+    <plurals name="channels_rep_preview_contacts">
+        <item quantity="one">Contatos de talkgroup: %1$d</item>
+        <item quantity="many">Contatos de talkgroup: %1$d</item>
+        <item quantity="other">Contatos de talkgroup: %1$d</item>
+    </plurals>
+    <!-- Last line of the repeater programming preview: %1$s is the zone that will hold the channels. One line. -->
+    <string name="channels_rep_preview_zone">Zona “%1$s”</string>
+    <!-- Toast after programming a repeater: %1$d channels added in zone %2$s. One line. -->
+    <plurals name="channels_rep_programmed">
+        <item quantity="one">Canais adicionados na zona “%2$s”: %1$d</item>
+        <item quantity="many">Canais adicionados na zona “%2$s”: %1$d</item>
+        <item quantity="other">Canais adicionados na zona “%2$s”: %1$d</item>
+    </plurals>
+    <!-- Toast after programming a repeater: %1$d channels and %3$d contacts added in zone %2$s. One line. -->
+    <plurals name="channels_rep_programmed_contacts">
+        <item quantity="one">Adicionados na zona “%2$s”: canais %1$d, contatos %3$d</item>
+        <item quantity="many">Adicionados na zona “%2$s”: canais %1$d, contatos %3$d</item>
+        <item quantity="other">Adicionados na zona “%2$s”: canais %1$d, contatos %3$d</item>
+    </plurals>
+    <!-- Toast when programming or undoing a repeater fails; %1$s is the error. One line. -->
+    <string name="channels_rep_failed">Falhou: %1$s</string>
+    <!-- Toast when the install to undo is no longer known. Short. -->
+    <string name="channels_rep_undo_not_found">Não encontrado</string>
+    <!-- Toast after undoing a repeater install: %1$d channels removed, %2$s the repeater's callsign. One line. -->
+    <string name="channels_rep_undo_removed">Canais removidos: %1$d (%2$s)</string>
+
+    <!-- ===== RadioID database (caller names) ===== -->
+    <!-- State of the RadioID caller database before its first download. Short. -->
+    <string name="channels_radioid_not_downloaded">não baixado</string>
+    <!-- State of the RadioID caller database: %1$s the number of IDs ("312,456"), %2$s the date it was updated (yyyy-MM-dd). One line. -->
+    <string name="channels_radioid_status">%1$s IDs, atualizado em %2$s</string>
+    <!-- Progress while the RadioID database downloads; %1$d is the percentage. Short. -->
+    <string name="channels_radioid_downloading_pct">Baixando… %1$d%%</string>
+    <!-- Progress while the RadioID database downloads (size unknown); %1$s is the megabytes so far. Short. -->
+    <string name="channels_radioid_downloading_mb">Baixando… %1$s MB</string>
+    <!-- Progress while the RadioID database is imported; %1$s is the rows so far ("120,000"). Short. -->
+    <string name="channels_radioid_importing">Importando… %1$s</string>
+
+    <!-- ===== Talkgroup override (intercom list) ===== -->
+    <!-- Kind of a DMR call in the intercom's talkgroup list: an all call, before the number ("All 16777215"). Very short. -->
+    <string name="channels_tg_kind_all">Todas</string>
+    <!-- The channel's own call in the intercom's talkgroup list: %1$s is "TG 9  Local". Keep the two spaces. One line. -->
+    <string name="channels_tg_programmed">%1$s \u0020(programado)</string>
+
+    <!-- ===== Shared into SignalDeck (import, location) ===== -->
+    <!-- Toast when something shared to SignalDeck holds no channels. One line. -->
+    <string name="channels_import_nothing_shared">O que foi compartilhado não tem canais do SignalDeck nem CSV do CHIRP</string>
+    <!-- Toast when a shared file cannot be opened; %1$s is the error. One line. -->
+    <string name="channels_import_open_failed">Não foi possível abrir: %1$s</string>
+    <!-- Toast when something shared to SignalDeck holds no coordinates. One line. -->
+    <string name="channels_share_no_coords">Nenhuma coordenada encontrada no que foi compartilhado</string>
+
+    <!-- ===== Codeplug: shared channel lists (share text, import preview) ===== -->
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s is the channel name. One line. -->
+    <string name="channels_codeplug_skip_dmr">%1$s: DMR (este rádio não tem DMR)</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s the channel name, %2$s the bands this radio tunes ("400-480 MHz"). One line. -->
+    <string name="channels_codeplug_skip_outside">%1$s: fora de %2$s</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. A damaged line in the import code. One line. -->
+    <string name="channels_codeplug_skip_line">Não foi possível ler uma linha de canal</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s the channel name, %2$s its frequency in MHz as the CSV has it, %3$s the bands this radio tunes. One line. -->
+    <string name="channels_codeplug_skip_outside_mhz">%1$s (%2$s MHz): fora de %3$s</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s is the channel name. One line. -->
+    <string name="channels_codeplug_skip_tx_outside">%1$s: frequência de transmissão fora das faixas do rádio</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$s the channel name, %2$s its mode in the CSV (AM, USB, DMR…). One line. -->
+    <string name="channels_codeplug_skip_not_fm">%1$s: %2$s não é FM</string>
+    <!-- Why a channel was left out of an import, listed on the import preview. %1$d is the CSV row number. One line. -->
+    <string name="channels_codeplug_skip_row">Não foi possível ler a linha %1$d</string>
+    <!-- First line of the shared channel list (text the user sends): %1$s the list's name, %2$d how many channels. One line. -->
+    <plurals name="channels_codeplug_share_head">
+        <item quantity="one">%1$s · canais: %2$d</item>
+        <item quantity="many">%1$s · canais: %2$d</item>
+        <item quantity="other">%1$s · canais: %2$d</item>
+    </plurals>
+    <!-- Separator between the details of a channel in the shared list ("146.9400 MHz, FM, tone 100.0"). Keep the trailing space if your language uses one. -->
+    <string name="channels_codeplug_sep">,\u0020</string>
+    <!-- Detail of a channel in the shared list: it has no transmit frequency. Short. -->
+    <string name="channels_codeplug_rx_only">só recepção</string>
+    <!-- Detail of a channel in the shared list: %1$s the repeater offset in MHz with its sign ("−0.6000"), %2$s the transmit frequency in MHz. Short. -->
+    <string name="channels_codeplug_offset">offset %1$s MHz (TX %2$s)</string>
+    <!-- Detail of a DMR channel in the shared list: it calls one station; %1$d is its DMR ID. Short. -->
+    <string name="channels_codeplug_private_call">chamada privada %1$d</string>
+    <!-- Detail of an analog channel in the shared list: FM, narrow band. Short. -->
+    <string name="channels_codeplug_fm_narrow">FM estreito</string>
+    <!-- Detail of a channel in the shared list: %1$s its transmit tone ("100.0", "D023N"). Short. -->
+    <string name="channels_codeplug_tone">subtom %1$s</string>
+    <!-- Detail of a channel in the shared list: %1$s its receive tone, when it differs. Short. -->
+    <string name="channels_codeplug_rx_tone">subtom RX %1$s</string>
+    <!-- Line under a channel in the shared list: %1$s its notes. Keep the three leading spaces (indent). -->
+    <string name="channels_codeplug_notes">\u0020\u0020\u0020Notas: %1$s</string>
+    <!-- Line under a channel in the shared list: %1$s a net's name, %2$s its schedule ("Tue 7:30 PM"), %3$d its length in minutes. Keep the three leading spaces. -->
+    <string name="channels_codeplug_net">\u0020\u0020\u0020Roda: %1$s, %2$s, %3$d min</string>
+    <!-- The same with the net's notes (%4$s) in brackets. Keep the three leading spaces. -->
+    <string name="channels_codeplug_net_notes">\u0020\u0020\u0020Roda: %1$s, %2$s, %3$d min (%4$s)</string>
+    <!-- Last line of the shared channel list, above the import code. Channels → Share → Import names the app's menu. One or two lines. -->
+    <string name="channels_codeplug_share_footer">Para importar no SignalDeck: compartilhe isto com o SignalDeck, ou copie tudo e use Canais → Compartilhar → Importar.</string>
+
+    <!-- ===== Backup restore (Device → Backup, SignalDeck Web) ===== -->
+    <!-- Result after restoring a backup: %1$d channels, %2$d contacts, %3$d zones, %4$s the backup folder's name. One or two lines. -->
+    <string name="channels_backup_restored">Restaurados de %4$s: canais %1$d, contatos %2$d, zonas %3$d</string>
+    <!-- Result after restoring a backup with SignalDeck extras: %1$d channels, %2$d contacts, %3$d zones, %5$d channel notes, %6$d nets, %7$d contact identities, %4$s the backup folder's name. Two lines. -->
+    <string name="channels_backup_restored_extras">Restaurados de %4$s: canais %1$d, contatos %2$d, zonas %3$d, notas de canal %5$d, rodas %6$d, identidades de contato %7$d</string>
+    <!-- Second line of the restore result: %1$d channels left out, %2$s the bands this radio tunes, %3$s the first few of them ("Club 222.100, …"). Two lines. -->
+    <string name="channels_backup_skipped">Ignorados: %1$d, fora do que este rádio sintoniza (%2$s): %3$s</string>
+
+    <!-- ===== Channel store: importing the stock app's channels ===== -->
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). The stock app's channel database could not be read. Short. -->
+    <string name="channels_store_stock_unreadable">canais de fábrica ilegíveis</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$s is a technical folder listing for the bug report. Short. -->
+    <string name="channels_store_stock_unreadable_ls">canais de fábrica ilegíveis: %1$s</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). QuickChat is the stock app's name; %1$s is a technical folder listing. Short. -->
+    <string name="channels_store_quickchat_unreadable">canais do QuickChat ilegíveis: %1$s</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). QuickChat is the stock app's name. Keep the "; " at the end (another note may follow). -->
+    <string name="channels_store_quickchat_no_contacts">sem banco de contatos do QuickChat;\u0020</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$s is a technical folder listing. Short. -->
+    <string name="channels_store_agold_unreadable">os canais do app do fabricante estão ilegíveis: %1$s</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). The chosen stock area (%1$d is its number) holds no channels. Short. -->
+    <string name="channels_store_area_empty">a área %1$d não tem canais</string>
+    <!-- Part of the toast after importing the stock app's channels ("Imported 0 channels (…)" or "Import failed: …"). %1$d channels left out, %2$s the bands this radio tunes ("400–470 MHz"). One line. -->
+    <plurals name="channels_store_skipped">
+        <item quantity="one">canais ignorados por estarem fora do que este rádio sintoniza (%2$s): %1$d</item>
+        <item quantity="many">canais ignorados por estarem fora do que este rádio sintoniza (%2$s): %1$d</item>
+        <item quantity="other">canais ignorados por estarem fora do que este rádio sintoniza (%2$s): %1$d</item>
+    </plurals>
+    <!-- Name of a pager conversation whose RIC (pager address) could not be read. Short. -->
+    <string name="channels_store_ric_unreadable">RIC ilegível</string>
+    <!-- A stock app area in the import chooser: %1$d its number, %2$s its name, %3$d how many channels it holds. The leading number must stay first. One line. -->
+    <string name="channels_store_agold_area">%1$d %2$s (canais: %3$d)</string>
+
+    <!-- ===== Channels page: the list, its header, selection and the row menu ===== -->
+    <!-- Title of the Channels page header. One word. -->
+    <string name="channels_list_title">Canais</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_nearby">Repetidoras próximas</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_zones">Zonas</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_add">Adicionar canal</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_map">Mapa</string>
+    <!-- Content description (screen reader) of a button in the Channels page header. Short. -->
+    <string name="channels_list_cd_share">Compartilhar ou importar canais</string>
+    <!-- Hint in the Channels search field. Short. -->
+    <string name="channels_list_search_hint">Nome, frequência ou número</string>
+    <!-- Content description of the close button of the selection bar. Short. -->
+    <string name="channels_list_cd_stop_selecting">Parar seleção</string>
+    <!-- Selection bar button: tick every channel shown. Very short. -->
+    <string name="channels_list_sel_all">Todos</string>
+    <!-- Button (selection bar and channel menu): add to the Favourites zone. Very short (four buttons share a row). -->
+    <string name="channels_list_sel_star">Favoritar</string>
+    <!-- Selection bar button: add the ticked channels to a zone. Very short (four buttons share a row). -->
+    <string name="channels_list_sel_zone">Zona</string>
+    <!-- Selection bar button: take the ticked channels out of the current zone. Very short (four buttons share a row). -->
+    <string name="channels_list_sel_out">Tirar da zona</string>
+    <!-- Toast when a selection bar button is tapped with nothing ticked. Short. -->
+    <string name="channels_list_tick_first">Marque alguns canais primeiro</string>
+    <!-- Count in the selection bar; %1$d channels are ticked. Short. -->
+    <plurals name="channels_list_selected">
+        <item quantity="one">Selecionados: %1$d</item>
+        <item quantity="many">Selecionados: %1$d</item>
+        <item quantity="other">Selecionados: %1$d</item>
+    </plurals>
+    <!-- Last item of the zone list when adding ticked channels to a zone: make a new one. Short. -->
+    <string name="channels_list_new_zone_item">Nova zona…</string>
+    <!-- Dialog title above the list of zones; %1$d channels are ticked. One line. -->
+    <plurals name="channels_list_add_to_zone">
+        <item quantity="one">Adicionar à zona · canais: %1$d</item>
+        <item quantity="many">Adicionar à zona · canais: %1$d</item>
+        <item quantity="other">Adicionar à zona · canais: %1$d</item>
+    </plurals>
+    <!-- Hint in the new-zone name field. Short. -->
+    <string name="channels_list_zone_name_hint">Nome da zona</string>
+    <!-- Dialog title: name a new zone. Short. -->
+    <string name="channels_list_new_zone_title">Nova zona</string>
+    <!-- Dialog button: create the new zone. Short. -->
+    <string name="channels_list_create">Criar</string>
+    <!-- Dialog title: %1$d ticked channels, %2$s the current zone. One or two lines. -->
+    <plurals name="channels_list_take_out_title">
+        <item quantity="one">Tirar os canais selecionados (%1$d) da zona %2$s?</item>
+        <item quantity="many">Tirar os canais selecionados (%1$d) da zona %2$s?</item>
+        <item quantity="other">Tirar os canais selecionados (%1$d) da zona %2$s?</item>
+    </plurals>
+    <!-- Dialog message when taking channels out of a zone. One or two lines. -->
+    <string name="channels_list_take_out_message">Os canais em si continuam; só muda a lista desta zona.</string>
+    <!-- Dialog button: take the channels out of the zone. Short. -->
+    <string name="channels_list_take_out">Tirar</string>
+    <!-- Dialog title: delete %1$d ticked channels. One line. -->
+    <plurals name="channels_list_delete_title">
+        <item quantity="one">Excluir os canais selecionados (%1$d)?</item>
+        <item quantity="many">Excluir os canais selecionados (%1$d)?</item>
+        <item quantity="other">Excluir os canais selecionados (%1$d)?</item>
+    </plurals>
+    <!-- Dialog message when deleting ticked channels. Two or three lines. -->
+    <string name="channels_list_delete_message">Eles saem de todas as zonas, e os canais seguintes sobem de posição. Não dá para desfazer (um backup pode trazê-los de volta).</string>
+    <!-- Header subtitle (shown in capitals): %1$s is the current zone. Short. -->
+    <string name="channels_list_subtitle_zone">Zona %1$s</string>
+    <!-- Header subtitle (shown in capitals): %1$d channels in the zone. Short. -->
+    <plurals name="channels_list_subtitle_count">
+        <item quantity="one">Canais: %1$d</item>
+        <item quantity="many">Canais: %1$d</item>
+        <item quantity="other">Canais: %1$d</item>
+    </plurals>
+    <!-- Badge on a channel card (small chip, shown in capitals). Very short: the screen can be 480 px wide. A NOAA weather channel, listen only. WX stays as it is. -->
+    <string name="channels_list_badge_wx_rx_only">WX · SÓ RX</string>
+    <!-- Badge on a channel card (small chip, shown in capitals). Very short: the screen can be 480 px wide. A listen-only channel. -->
+    <string name="channels_list_badge_rx_only">SÓ RX</string>
+    <!-- Detail chip in the channel menu (capitals): wide band FM. Very short. -->
+    <string name="channels_list_badge_wide">LARGA</string>
+    <!-- Detail chip in the channel menu (capitals): narrow band FM. Very short. -->
+    <string name="channels_list_badge_narrow">ESTREITA</string>
+    <!-- Channel menu button: tune this channel. Very short (four buttons share a row). -->
+    <string name="channels_list_menu_use">Usar</string>
+    <!-- Channel menu button: take out of the Favourites zone. Very short (four buttons share a row). -->
+    <string name="channels_list_menu_unstar">Desfavoritar</string>
+    <!-- Channel menu button. One line. -->
+    <string name="channels_list_menu_prio_stop">Deixar de ser prioritário</string>
+    <!-- Channel menu button: the scanner checks this channel often. One line. -->
+    <string name="channels_list_menu_prio_make">Tornar prioritário</string>
+    <!-- Channel menu button: this channel's history, %1$d entries. Short. -->
+    <string name="channels_list_menu_history_n">Histórico (%1$d)</string>
+    <!-- Channel menu button: this channel's history. Short. -->
+    <string name="channels_list_menu_history">Histórico</string>
+    <!-- Channel menu button: start ticking several channels. Short. -->
+    <string name="channels_list_menu_select">Selecionar vários</string>
+    <!-- Toast after the scan priority is turned off. Short. -->
+    <string name="channels_list_prio_none">Nenhum canal prioritário</string>
+    <!-- Toast after a channel is made scan priority: %1$s its name, %2$d how many channels are scanned between checks. One or two lines. -->
+    <string name="channels_list_prio_set">Durante a varredura, %1$s é verificado de novo a cada %2$d canais</string>
+    <!-- Name shown for a DMR channel with no name; %1$d is its number. Short. -->
+    <string name="channels_list_unnamed_digital">Digital %1$d</string>
+    <!-- Name shown for an FM channel with no name; %1$d is its number. Short. -->
+    <string name="channels_list_unnamed_analog">Analógico %1$d</string>
+    <!-- Toast after starring a channel; %1$s is its name. ★ Favourites is the zone's name. One line. -->
+    <string name="channels_list_starred">Favoritado: %1$s está na zona ★ Favoritos</string>
+    <!-- Toast after unstarring a channel. ★ Favourites is the zone's name. Short. -->
+    <string name="channels_list_unstarred">Removido de ★ Favoritos</string>
+    <!-- Dialog title: delete channel number %1$d. One line. -->
+    <string name="channels_list_delete_one_title">Excluir o canal %1$d?</string>
+    <!-- Tag on the channel card that is tuned now (tiny, capitals). Very short. -->
+    <string name="channels_list_on_air">NO AR</string>
+    <!-- Content description of the star on a channel card. Short. -->
+    <string name="channels_list_cd_favourite">Favorito</string>
+    <!-- Badge on a channel card (small chip, shown in capitals). Very short: the screen can be 480 px wide. The scan priority channel. -->
+    <string name="channels_list_badge_priority">PRIORIDADE</string>
+    <!-- Badge on a channel card (small chip, shown in capitals). Very short: the screen can be 480 px wide. Outside this radio's bands. It was cut off on a 480 px screen at 16 characters: keep it very short. -->
+    <string name="channels_list_badge_not_tunable">FORA DA FAIXA</string>
+    <!-- Content description of the NOT TUNABLE badge. Short. -->
+    <string name="channels_list_cd_not_tunable">Este rádio não sintoniza este canal</string>
+    <!-- On a channel card: when it was last heard; %1$s is "14:02", "yesterday 09:11" or "Oct 22, 09:11". Short, one line. -->
+    <string name="channels_list_heard">ouvido %1$s</string>
+    <!-- Last-heard time on a channel card; %1$s is the time (HH:mm). Short. -->
+    <string name="channels_list_yesterday">ontem %1$s</string>
+    <!-- Dialog title on first start: import the stock app's channels? Short. -->
+    <string name="channels_list_import_title">Importar seus canais?</string>
+    <!-- Dialog message on first start. Device → Re-import names a button. Paragraph. -->
+    <string name="channels_list_import_message">O SignalDeck ainda não tem canais. Importar os canais salvos no app de rádio do fabricante?\n\nOu comece do zero e adicione os seus. Dá para importá-los depois em Dispositivo → Reimportar.</string>
+    <!-- Dialog button: do not import, start with no channels. Short. -->
+    <string name="channels_list_import_start_empty">Começar do zero</string>
+    <!-- Toast when the channel list changed (e.g. from SignalDeck Web) while channels were ticked. One line. -->
+    <string name="channels_list_changed_elsewhere">Os canais foram alterados em outro lugar: seleção desfeita</string>
+    <!-- Filter chip above the channel list (capitals): every channel. Very short. -->
+    <string name="channels_list_filter_all">TODOS</string>
+    <!-- Filter chip above the channel list (capitals): the starred channels. Keep the star. Short. -->
+    <string name="channels_list_filter_favourites">★ FAVORITOS</string>
+    <!-- Filter chip above the channel list (capitals): FM channels. Very short. -->
+    <string name="channels_list_filter_analog">ANALÓGICOS</string>
+
+    <!-- ===== Nearby repeaters sheet ===== -->
+    <!-- Title of the Nearby repeaters sheet. Short. -->
+    <string name="channels_rep_title">Repetidoras próximas</string>
+    <!-- Intro of the Nearby repeaters sheet; BrandMeister, RadioID and hearham are the list sources. Paragraph. -->
+    <string name="channels_rep_intro">Repetidoras DMR do BrandMeister e do RadioID e repetidoras FM do hearham, ordenadas pela distância até o celular; as linhas abaixo das distâncias filtram por modo e por faixa. Toque em uma para ver os detalhes e adicioná-la aos seus canais; dá para desfazer as instalações.</string>
+    <!-- Filter chip on the Nearby repeaters sheet: every mode or every band. Very short. -->
+    <string name="channels_rep_filter_all">Todas</string>
+    <!-- Status line of the Nearby repeaters sheet while it loads. Short. -->
+    <string name="channels_rep_loading">Carregando…</string>
+    <!-- Button on the Nearby repeaters sheet: remove the channels an earlier install added. Short. -->
+    <string name="channels_rep_undo_button">Desfazer instalação…</string>
+    <!-- Status line when the phone has no position yet. One or two lines. -->
+    <string name="channels_rep_no_fix">Ainda sem posição: ative a localização, abra um app de mapas uma vez e tente novamente.</string>
+    <!-- Status line while the repeater lists download. Short. -->
+    <string name="channels_rep_downloading">Baixando listas de repetidoras…</string>
+    <!-- Nearby repeaters: none found; %1$s is the radius ("30 mi"). One line. -->
+    <string name="channels_rep_nothing_within">Nada num raio de %1$s. Tente um raio maior.</string>
+    <!-- Nearby repeaters: %1$d found within %2$s (the radius), none passes the mode and band filters. One or two lines. -->
+    <plurals name="channels_rep_none_match">
+        <item quantity="one">Repetidoras num raio de %2$s: %1$d, mas nenhuma passa por estes filtros.</item>
+        <item quantity="many">Repetidoras num raio de %2$s: %1$d, mas nenhuma passa por estes filtros.</item>
+        <item quantity="other">Repetidoras num raio de %2$s: %1$d, mas nenhuma passa por estes filtros.</item>
+    </plurals>
+    <!-- Nearby repeaters: %1$d of %2$d pass the filters. Short. -->
+    <string name="channels_rep_shown">%1$d de %2$d exibidas</string>
+    <!-- After the town of a repeater whose position is approximate (in a list row). Very short. -->
+    <string name="channels_rep_approx_short">(aprox.)</string>
+    <!-- Detail of a DMR repeater; %1$d is its colour code. Short. -->
+    <string name="channels_rep_colour_code">color code %1$d</string>
+    <!-- Detail of an FM repeater: %1$s the tone to send ("100.0"). Short. -->
+    <string name="channels_rep_tx_tone">subtom TX %1$s</string>
+    <!-- Repeater details: %1$s its town and region, %2$s the distance and direction ("↘SE 12.3mi (19.8km)"). Keep the dots and spaces. One line. -->
+    <string name="channels_rep_where">%1$s \u0020· \u0020%2$s</string>
+    <!-- The same for a repeater whose position is approximate. One line. -->
+    <string name="channels_rep_where_approx">%1$s \u0020· \u0020%2$s (posição aproximada)</string>
+    <!-- Repeater details: %1$s its status from the list ("not operational"). One line. -->
+    <string name="channels_rep_status">Situação: %1$s</string>
+    <!-- Repeater details: %1$s when the network last saw it (as the list gives it). One line. -->
+    <string name="channels_rep_last_seen">Visto pela última vez: %1$s</string>
+    <!-- Repeater details while its talkgroups load. Short. -->
+    <string name="channels_rep_loading_tgs">Carregando talkgroups…</string>
+    <!-- Repeater details: BrandMeister lists no talkgroups. Two lines. -->
+    <string name="channels_rep_no_tgs">Não há lista de talkgroups para esta repetidora. Um canal de escuta por slot ainda é criado quando houver um talkgroup conhecido; adicione TGs à mão no editor de canal.</string>
+    <!-- Section heading (capitals) above the repeater's talkgroups. One line. -->
+    <string name="channels_rep_tgs_section">Talkgroups (marque os que devem ganhar um canal para falar)</string>
+    <!-- Button on the repeater details sheet. Short. -->
+    <string name="channels_rep_add_button">Adicionar aos meus canais</string>
+    <!-- Toast when the repeater gives no channel to add. Short. -->
+    <string name="channels_rep_nothing_to_program">Nada para programar</string>
+    <!-- Dialog title before adding a repeater; %1$s is its callsign. One line. -->
+    <string name="channels_rep_add_title">Adicionar %1$s?</string>
+    <!-- Button on the repeater details sheet: open it in a map app. Very short. -->
+    <string name="channels_rep_map">Mapa</string>
+    <!-- Toast when no map app is installed. Short. -->
+    <string name="channels_rep_no_map_app">Nenhum app de mapas</string>
+    <!-- Dialog title above the list of repeater installs to undo. One line. -->
+    <string name="channels_rep_undo_title">Remover qual instalação?</string>
+
+    <!-- ===== Share channels and Import channels sheets ===== -->
+    <!-- Title of the Share channels menu and sheet. Short. -->
+    <string name="channels_share_title">Compartilhar canais</string>
+    <!-- Item in the Share channels menu: open the share sheet. Short. -->
+    <string name="channels_share_menu_share">Compartilhar canais…</string>
+    <!-- Item in the Share channels menu. Short. -->
+    <string name="channels_share_menu_clipboard">Importar da área de transferência</string>
+    <!-- Item in the Share channels menu; SignalDeck and CHIRP are file formats. Short. -->
+    <string name="channels_share_menu_file">Importar arquivo (SignalDeck ou CHIRP)</string>
+    <!-- Toast when the clipboard holds no channels; SDCP1 is the import code's prefix. Two lines. -->
+    <string name="channels_share_clipboard_empty">A área de transferência não tem canais compartilhados. Copie antes a mensagem inteira (com o código SDCP1) ou um CSV do CHIRP.</string>
+    <!-- Toast when a file holds no channels; %1$s is its name. One or two lines. -->
+    <string name="channels_share_file_empty">%1$s não tem canais do SignalDeck nem CSV do CHIRP</string>
+    <!-- Toast when a file with no name holds no channels. One line. -->
+    <string name="channels_share_file_empty_unnamed">Esse arquivo não tem canais do SignalDeck nem CSV do CHIRP</string>
+    <!-- Toast when sharing with no channels. Short. -->
+    <string name="channels_share_no_channels">Ainda não há canais</string>
+    <!-- Intro of the Share channels sheet. Paragraph. -->
+    <string name="channels_share_intro">Escolha os canais e envie por qualquer app: mensagens, Facebook, WhatsApp, Discord, e-mail, Drive… A mensagem lista cada canal para que qualquer pessoa possa programá-lo à mão e termina com um código de importação que o SignalDeck lê de volta (da mensagem, de um post ou de uma cópia colada). Chaves de criptografia nunca vão junto.</string>
+    <!-- Section heading (capitals) above the name field of the shared list. One word. -->
+    <string name="channels_share_section_name">Nome</string>
+    <!-- Count on the Share channels sheet: %1$d of %2$d channels picked. Short. -->
+    <string name="channels_share_picked">%1$d de %2$d escolhidos</string>
+    <!-- Quick-pick chip on the Share channels sheet. Very short (four chips share a row). -->
+    <string name="channels_share_quick_all">Todos</string>
+    <!-- Quick-pick chip: untick everything. Very short (four chips share a row). -->
+    <string name="channels_share_quick_none">Nenhum</string>
+    <!-- Quick-pick chip: only the FM channels. Very short (four chips share a row). -->
+    <string name="channels_share_quick_analog">Analógicos</string>
+    <!-- Quick-pick chip: the channels of one zone. Very short (four chips share a row). -->
+    <string name="channels_share_quick_zone">Zona…</string>
+    <!-- Toast when there is no zone to pick from. Short. -->
+    <string name="channels_share_no_zones">Ainda não há zonas</string>
+    <!-- Dialog title above the list of zones (the sentence ends with the zone). Short. -->
+    <string name="channels_share_pick_zone_title">Escolher os canais da zona</string>
+    <!-- Section heading (capitals) above the switches of what to include. One word. -->
+    <string name="channels_share_section_include">Incluir</string>
+    <!-- Switch on the Share channels sheet. Short, one line. -->
+    <string name="channels_share_inc_nets">Horários das rodas</string>
+    <!-- Line under that switch. One or two lines. -->
+    <string name="channels_share_inc_nets_sub">As rodas que você adicionou a estes canais (nome, dias, horário, duração)</string>
+    <!-- Switch on the Share channels sheet. Short, one line. -->
+    <string name="channels_share_inc_notes">Notas dos canais</string>
+    <!-- Line under that switch. One or two lines. -->
+    <string name="channels_share_inc_notes_sub">Suas notas de cada canal (desativado até você ativar: notas podem ser pessoais)</string>
+    <!-- Switch on the Share channels sheet. Short, one line. -->
+    <string name="channels_share_inc_loc">Localizações dos canais</string>
+    <!-- Line under that switch. One or two lines. -->
+    <string name="channels_share_inc_loc_sub">As posições de repetidoras que você definiu no editor de canal</string>
+    <!-- Switch on the Share channels sheet. Short, one line. -->
+    <string name="channels_share_inc_file">Um arquivo SignalDeck</string>
+    <!-- Line under that switch. One or two lines. -->
+    <string name="channels_share_inc_file_sub">A mesma lista e o mesmo código em arquivo, para apps que enviam arquivos</string>
+    <!-- Switch on the Share channels sheet. Short, one line. CHIRP is a programming app. -->
+    <string name="channels_share_inc_chirp">Um arquivo CHIRP para outros rádios</string>
+    <!-- Line under that switch. One or two lines. The radio brands stay. -->
+    <string name="channels_share_inc_chirp_sub">Os canais analógicos como CSV do CHIRP (Baofeng, Yaesu, Kenwood, …)</string>
+    <!-- Button on the Share channels sheet: copy the text to the clipboard. Short. -->
+    <string name="channels_share_copy">Copiar texto</string>
+    <!-- Toast when sharing with nothing picked. Short. -->
+    <string name="channels_share_pick_one">Escolha pelo menos um canal</string>
+    <!-- Toast after copying the shared list. One line. -->
+    <string name="channels_share_copied">Copiado: cole num post ou numa mensagem</string>
+    <!-- Toast when sharing fails; %1$s is the error. One line. -->
+    <string name="channels_share_failed">Não foi possível compartilhar: %1$s</string>
+    <!-- Subject of the share (email apps use it): %1$s the list's name, %2$d how many channels. One line. -->
+    <plurals name="channels_share_subject">
+        <item quantity="one">%1$s · canais de rádio: %2$d</item>
+        <item quantity="many">%1$s · canais de rádio: %2$d</item>
+        <item quantity="other">%1$s · canais de rádio: %2$d</item>
+    </plurals>
+    <!-- Title of Android's share chooser; %1$s is the list's name. Short. -->
+    <string name="channels_share_chooser">Compartilhar %1$s</string>
+    <!-- Toast when channels are shared to SignalDeck before its service is up. One line. -->
+    <string name="channels_share_starting">O SignalDeck ainda está iniciando; tente de novo daqui a pouco</string>
+    <!-- Title of the Import channels sheet. Short. -->
+    <string name="channels_import_title">Importar canais</string>
+    <!-- Intro of the Import channels sheet: %1$s the list's name, %2$d how many channels, shared from SignalDeck. Paragraph. -->
+    <plurals name="channels_import_intro">
+        <item quantity="one">“%1$s”, compartilhado pelo SignalDeck (canais: %2$d). Desmarque os que não quiser; os canais que você já tem começam desmarcados. Eles entram depois dos seus canais; nada do que você tem é alterado.</item>
+        <item quantity="many">“%1$s”, compartilhado pelo SignalDeck (canais: %2$d). Desmarque os que não quiser; os canais que você já tem começam desmarcados. Eles entram depois dos seus canais; nada do que você tem é alterado.</item>
+        <item quantity="other">“%1$s”, compartilhado pelo SignalDeck (canais: %2$d). Desmarque os que não quiser; os canais que você já tem começam desmarcados. Eles entram depois dos seus canais; nada do que você tem é alterado.</item>
+    </plurals>
+    <!-- The same for a CHIRP file. Paragraph. -->
+    <plurals name="channels_import_intro_chirp">
+        <item quantity="one">“%1$s”, de um arquivo CHIRP (canais: %2$d). Desmarque os que não quiser; os canais que você já tem começam desmarcados. Eles entram depois dos seus canais; nada do que você tem é alterado.</item>
+        <item quantity="many">“%1$s”, de um arquivo CHIRP (canais: %2$d). Desmarque os que não quiser; os canais que você já tem começam desmarcados. Eles entram depois dos seus canais; nada do que você tem é alterado.</item>
+        <item quantity="other">“%1$s”, de um arquivo CHIRP (canais: %2$d). Desmarque os que não quiser; os canais que você já tem começam desmarcados. Eles entram depois dos seus canais; nada do que você tem é alterado.</item>
+    </plurals>
+    <!-- Heading of the list of channels left out of an import (each reason follows on its own line). One line. -->
+    <string name="channels_import_left_out">Ficaram de fora (este rádio não consegue usá-los):</string>
+    <!-- Count on the Import channels sheet: %1$d of %2$d channels ticked. Short. -->
+    <string name="channels_import_ticked">%1$d de %2$d marcados</string>
+    <!-- Note on an imported channel the user already has. Short. -->
+    <string name="channels_import_have_it">você já tem</string>
+    <!-- Switch on the Import channels sheet. Short. -->
+    <string name="channels_import_extras">Notas e horários de rodas</string>
+    <!-- Line under that switch; Nets near you is a sheet's name. One line. -->
+    <string name="channels_import_extras_sub">Salvos com os canais; as rodas aparecem em Rodas perto de você</string>
+    <!-- Switch on the Import channels sheet. Short. -->
+    <string name="channels_import_zone">Colocar numa zona</string>
+    <!-- Line under that switch; %1$s is the new zone's name. One or two lines. -->
+    <string name="channels_import_zone_sub">Uma nova zona “%1$s”, para facilitar encontrar, fazer varredura e remover</string>
+    <!-- Toast when importing with nothing ticked. Short. -->
+    <string name="channels_import_tick_one">Marque pelo menos um canal</string>
+    <!-- Toast after importing %1$d channels. Short. -->
+    <plurals name="channels_import_added">
+        <item quantity="one">Canais adicionados: %1$d</item>
+        <item quantity="many">Canais adicionados: %1$d</item>
+        <item quantity="other">Canais adicionados: %1$d</item>
+    </plurals>
+    <!-- Toast after importing %1$d channels into the new zone %2$s. One line. -->
+    <plurals name="channels_import_added_zone">
+        <item quantity="one">Canais adicionados na zona “%2$s”: %1$d</item>
+        <item quantity="many">Canais adicionados na zona “%2$s”: %1$d</item>
+        <item quantity="other">Canais adicionados na zona “%2$s”: %1$d</item>
+    </plurals>
+    <!-- Note on an imported channel: it carries notes. Very short. -->
+    <string name="channels_import_note_notes">notas</string>
+    <!-- Note on an imported channel: it carries %1$d net schedules. Very short. -->
+    <plurals name="channels_import_note_nets">
+        <item quantity="one">rodas: %1$d</item>
+        <item quantity="many">rodas: %1$d</item>
+        <item quantity="other">rodas: %1$d</item>
+    </plurals>
+    <!-- Note on an imported channel: %1$d net schedules and notes. Short. -->
+    <plurals name="channels_import_note_nets_notes">
+        <item quantity="one">rodas: %1$d, notas</item>
+        <item quantity="many">rodas: %1$d, notas</item>
+        <item quantity="other">rodas: %1$d, notas</item>
+    </plurals>
+
+    <!-- ===== Contacts: the identity sheet, the contact editor and the contact sheet ===== -->
+    <!-- Hint on the sheet of a caller who is not a contact. One line. -->
+    <string name="channels_contact_unknown">Ainda não está nos seus contatos.</string>
+    <!-- The same, with where they were heard: %1$s the grid square and coordinates. Keep the two spaces. One or two lines. -->
+    <string name="channels_contact_unknown_heard">Ainda não está nos seus contatos. \u0020Última escuta em %1$s.</string>
+    <!-- The same with when: %1$s the position, %2$s how long ago ("5 min ago"). Keep the two spaces. Two lines. -->
+    <string name="channels_contact_unknown_heard_ago">Ainda não está nos seus contatos. \u0020Última escuta em %1$s %2$s.</string>
+    <!-- Button on a caller's sheet: make a new contact. Short. -->
+    <string name="channels_contact_add">Adicionar aos contatos</string>
+    <!-- Button on a caller's sheet: add the callsign or RIC to a contact you have. Short. -->
+    <string name="channels_contact_merge">Adicionar a um contato existente</string>
+    <!-- Toast when there are no contacts to pick from. Short. -->
+    <string name="channels_contact_none_yet">Ainda não há contatos</string>
+    <!-- A contact with no name and no ID in the pick list. Short. -->
+    <string name="channels_contact_no_name">(sem nome)</string>
+    <!-- Dialog title above the contact list; %1$s is the callsign, "ID 3100001" or "RIC 1234567". One line. -->
+    <string name="channels_contact_merge_title">Adicionar %1$s a…</string>
+    <!-- Line added to a contact's notes when it already has another callsign; %1$s is the new one. Short. -->
+    <string name="channels_contact_also">Também %1$s</string>
+    <!-- Toast after adding a callsign or RIC to a contact; %1$s is the contact. One line. -->
+    <string name="channels_contact_added_to">Adicionado a %1$s</string>
+    <!-- Label above a field in the contact editor. One line. -->
+    <string name="channels_contact_f_name">Nome</string>
+    <!-- Label above a field in the contact editor. One line. -->
+    <string name="channels_contact_f_number">ID DMR ou talkgroup (em branco se não houver)</string>
+    <!-- Label above a field in the contact editor. One line. -SSID is the APRS suffix. -->
+    <string name="channels_contact_f_call">Indicativo (APRS, M17, etiqueta de pager; -SSID opcional)</string>
+    <!-- Hint under the callsign field when it came from the RadioID list. One line. -->
+    <string name="channels_contact_call_auto">Indicativo da lista do RadioID; altere se souber o correto.</string>
+    <!-- Label above a field in the contact editor. One line. RIC is a pager address. -->
+    <string name="channels_contact_f_rics">RICs de pager (um ou mais, por exemplo 1234567; 1234568)</string>
+    <!-- Label above a field in the contact editor. One line. -->
+    <string name="channels_contact_f_home">Localização de casa (locator ou lat, lon)</string>
+    <!-- Label above a field in the contact editor. One line. QTH is the ham word for a home station's place. -->
+    <string name="channels_contact_f_home_label">Nome do local (cidade, QTH)</string>
+    <!-- Hint in the contact editor: %1$s the last position, %2$s how long ago. Two lines. -->
+    <string name="channels_contact_last_hint">Última escuta em %1$s %2$s: preenchido pelo app, separado da localização de casa.</string>
+    <!-- The same with %3$s, how it was heard (APRS, M17…). Two lines. -->
+    <string name="channels_contact_last_hint_by">Última escuta em %1$s %2$s via %3$s: preenchido pelo app, separado da localização de casa.</string>
+    <!-- Label above a field in the contact editor. One line. -->
+    <string name="channels_contact_f_notes">Notas</string>
+    <!-- Title of the contact editor for a new contact. Short. -->
+    <string name="channels_contact_new_title">Novo contato</string>
+    <!-- Title of the contact editor. Short. -->
+    <string name="channels_contact_edit_title">Editar contato</string>
+    <!-- Why a contact was not saved (after "Not saved: "). One line. -->
+    <string name="channels_contact_err_call">Indicativo: letras e dígitos, com -SSID opcional</string>
+    <!-- Why a contact was not saved. One line. -->
+    <string name="channels_contact_err_id">O ID precisa estar entre 1 e 16776415</string>
+    <!-- Why a contact was not saved. One line. -->
+    <string name="channels_contact_err_rics">RICs são números de 0 a 2097151</string>
+    <!-- Why a contact was not saved. One line. -->
+    <string name="channels_contact_err_empty">Um contato precisa de ID DMR, indicativo ou RIC de pager</string>
+    <!-- Why a contact was not saved; EM12ab is an example grid square. One line. -->
+    <string name="channels_contact_err_home">Casa: um locator (EM12ab) ou latitude, longitude</string>
+    <!-- Toast when a contact cannot be saved; %1$s is the reason. One line. -->
+    <string name="channels_contact_not_saved">Não salvo: %1$s</string>
+    <!-- On a contact's sheet: %1$s its pager RICs. Short. -->
+    <string name="channels_contact_pager">Pager %1$s</string>
+    <!-- Label of a line on the contact's sheet: their home location. Short. -->
+    <string name="channels_contact_home">Casa</string>
+    <!-- Label of a line on the contact's sheet: where and when they were last heard. Short. -->
+    <string name="channels_contact_last_heard">Última escuta</string>
+    <!-- On the contact's sheet: %1$s how long ago, %2$s how they were heard (APRS, M17…). Short. -->
+    <string name="channels_contact_ago_by">%1$s via %2$s</string>
+    <!-- A line on the contact's sheet: %1$s its label (Home), %2$s the value. Keep the two spaces. -->
+    <string name="channels_contact_line">%1$s: \u0020%2$s</string>
+    <!-- Section heading (capitals) on the contact's sheet: %1$d history entries. Short. -->
+    <string name="channels_contact_history_n">Histórico (%1$d)</string>
+    <!-- History entry on the contact's sheet: something sent to them; %1$s is how (APRS, DMR SMS…). Keep the arrow and the two spaces. Short. -->
+    <string name="channels_contact_hist_sent">⬆ Enviado \u0020%1$s</string>
+    <!-- History entry: something heard from them; %1$s is how. Keep the arrow and the two spaces. Short. -->
+    <string name="channels_contact_hist_heard">⬇ Ouvido \u0020%1$s</string>
+    <!-- Button on the contact's sheet: open the message thread. Very short (three buttons share a row). -->
+    <string name="channels_contact_message">Mensagem</string>
+    <!-- Dialog title: delete the contact %1$s? One line. -->
+    <string name="channels_contact_delete_title">Excluir %1$s?</string>
+    <!-- How long ago a contact was heard: under a minute. Short. -->
+    <string name="channels_contact_just_now">agora há pouco</string>
+    <!-- How long ago a contact was heard; %1$d minutes. Short. -->
+    <string name="channels_contact_min_ago">há %1$d min</string>
+    <!-- How long ago a contact was heard; %1$d hours. Short. -->
+    <string name="channels_contact_h_ago">há %1$d h</string>
+</resources>

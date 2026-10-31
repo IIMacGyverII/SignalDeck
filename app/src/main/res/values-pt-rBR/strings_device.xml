@@ -1,0 +1,1539 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Device page: settings rows, sheets and dialogs. See strings_common.xml for the conventions. -->
+<resources>
+    <!-- Device → Radio settings row and its dialog title: the language SignalDeck's screens use. One or two words. -->
+    <string name="device_language">Idioma</string>
+    <!-- First choice in the Language list: follow the phone. %1$s is the phone's language in its own name ("English", "Deutsch"). -->
+    <string name="device_language_phone">Idioma do celular (%1$s)</string>
+
+    <!-- ==== Device page (DeviceView): the link card at the top ==== -->
+    <!-- Title in the Device page header (the tab's page). One or two words. -->
+    <string name="device_title">Dispositivo</string>
+    <!-- SAFETY: toast when the owner taps the module-firmware line on a phone where the firmware loader is not certified. Long toast. -->
+    <string name="device_link_fw_not_certified">O carregamento do firmware do módulo ainda não é certificado neste celular: o processo de gravação dele não foi testado. Ele só é oferecido nos celulares em que já foi testado.</string>
+    <!-- Button on the link card, tile in Tools and title of the Contribute sheet: ways to help the project. One or two words. -->
+    <string name="device_contribute">Contribuir</string>
+    <!-- Button on the link card (and in the untested-profile dialog): SignalDeck takes the radio from the stock app. Short, half-width button. -->
+    <string name="device_link_take_over">Assumir</string>
+    <!-- Button on the link card: give the radio back to the stock app. Short, half-width button. -->
+    <string name="device_link_hand_back">Devolver</string>
+    <!-- SAFETY: title of the dialog before taking over a phone whose profile has never run on it. One line. -->
+    <string name="device_link_untested_title">Perfil não testado</string>
+    <!-- SAFETY: take-over warning for an untested profile. %1$s is the phone model, %2$s the stock app's package name. "Hand back", "Device report", "Generate device report" and "Radio probe (root)" are button names on the Device page. -->
+    <string name="device_link_untested_msg">O SignalDeck tem um perfil para o %1$s, feito a partir do app do fabricante e dos relatórios de quem tem o aparelho, mas ele nunca rodou neste celular. Ao assumir, o %2$s é pausado e as portas seriais do rádio são abertas. Se algo falhar, o app do fabricante é reativado; Devolver ou reiniciar o celular também devolve o rádio a ele.\n\nAntes, rode Relatório do dispositivo → Gerar relatório do dispositivo e Sondar o rádio (root) e compartilhe os resultados: é isso que transforma este perfil em um perfil testado.</string>
+    <!-- Button on the link card and title of the exit sheet: stop SignalDeck properly. Short. -->
+    <string name="device_exit">Sair do SignalDeck</string>
+    <!-- Button on the link card: install the Magisk boot module so SignalDeck keeps root access to the radio after a reboot. One line. -->
+    <string name="device_link_keep_access">Manter acesso após reiniciar</string>
+    <!-- Message of the Boot persistence dialog when the radio service has not started. Short. -->
+    <string name="device_link_boot_not_ready">serviço não está pronto</string>
+    <!-- Title of the dialog with the result of installing the boot module. One line. -->
+    <string name="device_link_boot_title">Persistência na inicialização</string>
+    <!-- Button on the link card (unsupported or untested phone) and title of its menu: the guided steps that help make this phone supported. One line. -->
+    <string name="device_support">Ajude a dar suporte a este celular</string>
+    <!-- SAFETY: note under the link card buttons: what taking over and handing back do to the stock app. A paragraph. -->
+    <string name="device_link_note">Requer root (Magisk). Enquanto este app controla o rádio, o app de walkie-talkie do fabricante fica pausado e com o ícone oculto; Devolver o restaura. O módulo Magisk mantém as regras do SELinux após reiniciar, para que o rádio possa ser assumido já na inicialização.</string>
+
+    <!-- ==== Device page: Radio settings card ==== -->
+    <!-- Heading of the Radio settings card (shown in capitals). Short. -->
+    <string name="device_set_title">Configurações do rádio</string>
+    <!-- Settings row title: the region (its APRS frequency, presets and units). One word. -->
+    <string name="device_set_region">Região</string>
+    <!-- Settings switch title. One line. -->
+    <string name="device_set_own_boot">Assumir o módulo ao iniciar</string>
+    <!-- Subtitle of "Own the radio at boot". One line, may wrap. -->
+    <string name="device_set_own_boot_sub">Se desativado, o app do fabricante volta após reiniciar</string>
+    <!-- Settings switch title: the phone's side push-to-talk key transmits. One line. -->
+    <string name="device_set_side_ptt">PTT lateral</string>
+    <!-- Subtitle of "Side PTT key". May wrap. -->
+    <string name="device_set_side_ptt_sub">A tecla PTT física do celular transmite</string>
+    <!-- Settings switch title: the volume-up key transmits. One line. -->
+    <string name="device_set_vol_ptt">Volume + transmite</string>
+    <!-- Subtitle of "Volume-up transmits". One line. -->
+    <string name="device_set_vol_ptt_sub">Enquanto a página Rádio estiver aberta</string>
+    <!-- Settings switch title: a learned button transmits. One line. -->
+    <string name="device_set_custom_ptt">Tecla PTT personalizada</string>
+    <!-- Subtitle of "Custom PTT key" when no key is learned yet. May wrap. -->
+    <string name="device_set_custom_ptt_sub">Não definida. Toque para ensinar uma tecla: pressione a que você quer usar</string>
+    <!-- Settings switch title: soft squelch while scanning. One line. -->
+    <string name="device_set_scan_sq">Soft SQ durante a varredura</string>
+    <!-- Subtitle of "Soft SQ while scanning". May wrap. -->
+    <string name="device_set_scan_sq_sub">Em todo canal analógico, cada um com seu próprio nível (5 se nunca definido)</string>
+    <!-- Settings switch title: spoken announcements on the phone. One line. -->
+    <string name="device_set_voice">Anúncios por voz</string>
+    <!-- Subtitle of "Voice announcements". May wrap. -->
+    <string name="device_set_voice_sub">Troca de canal, nomes de quem chama, alertas de palavra-chave</string>
+    <!-- Settings switch title: the new intercom page design. One line. -->
+    <string name="device_set_new_look">Novo visual da página Rádio</string>
+    <!-- Subtitle of "New intercom look". One line. -->
+    <string name="device_set_new_look_sub">Desativado: a página Rádio clássica</string>
+    <!-- Settings switch title: the animated panel on an idle channel. One line. -->
+    <string name="device_set_anim">Painel animado em silêncio</string>
+    <!-- Subtitle of "Animated panel when quiet". May wrap. -->
+    <string name="device_set_anim_sub">Linhas caindo quando o canal está parado (gasta um pouco de bateria)</string>
+    <!-- Settings switch title: record signal reports for the coverage map. One line. -->
+    <string name="device_set_coverage">Registro de cobertura</string>
+    <!-- Subtitle of "Coverage logging" on a radio that reports signal strength. May wrap. -->
+    <string name="device_set_coverage_sub_rssi">Registra sinal e aberturas com GPS para os mapas de cobertura (Mapa → Cobertura)</string>
+    <!-- Subtitle of "Coverage logging" on a radio with no signal readings. May wrap. -->
+    <string name="device_set_coverage_sub_no_rssi">Registra suas aberturas com GPS para o mapa de cobertura (Mapa → Cobertura); este rádio não informa o sinal, então nada é registrado como ouvido</string>
+    <!-- Settings switch title: DMR repeater roaming. One line. -->
+    <string name="device_set_roaming">Roaming DMR</string>
+    <!-- Subtitle of "DMR roaming". May wrap. -->
+    <string name="device_set_roaming_sub">Em viagem, muda para a repetidora mais próxima desta zona com o mesmo talkgroup</string>
+    <!-- Toast when DMR roaming is switched on. -->
+    <string name="device_set_roaming_on">Roaming DMR ativado: verifica a cada 30 s enquanto você se desloca</string>
+    <!-- Toast when DMR roaming is switched off. -->
+    <string name="device_set_roaming_off">Roaming DMR desativado</string>
+    <!-- Settings switch title: use the car's microphone in Android Auto. One line. -->
+    <string name="device_set_car_mic">Microfone do carro no Android Auto</string>
+    <!-- Subtitle of "Car microphone in Android Auto". May wrap. -->
+    <string name="device_set_car_mic_sub">Para falar, usa o microfone do carro pela conexão viva-voz</string>
+    <!-- Warning row title: Android Auto does not list SignalDeck. One line. -->
+    <string name="device_set_auto_hidden">O Android Auto está ocultando este app</string>
+    <!-- Subtitle of the Android Auto warning row. May wrap. -->
+    <string name="device_set_auto_hidden_sub">“Fontes desconhecidas” está desativado, então o carro não lista o SignalDeck. Toque para ver a solução</string>
+    <!-- Settings switch title: coverage logging while in the car. One line. -->
+    <string name="device_set_car_cov">Registrar cobertura no carro</string>
+    <!-- Subtitle of "Log coverage in the car". One line. -->
+    <string name="device_set_car_cov_sub">Registro de cobertura com o Android Auto conectado</string>
+    <!-- Settings switch title: the steering wheel's play/pause key transmits. One line. -->
+    <string name="device_set_wheel">Play/pause do volante transmite</string>
+    <!-- Subtitle of "Steering-wheel play/pause talks". May wrap. -->
+    <string name="device_set_wheel_sub">No Android Auto: o play/pause do volante inicia e encerra a transmissão</string>
+    <!-- Settings row title: the steering wheel's Next key transmits. One line. -->
+    <string name="device_set_wheel_next">Próxima do volante transmite</string>
+    <!-- Subtitle of "Steering-wheel Next talks": the two modes. May wrap to three lines. -->
+    <string name="device_set_wheel_next_sub">Segurar: segure Próxima para falar; pressione de novo se continuar transmitindo. Duplo toque: pressione duas vezes para falar e uma para parar. Toque para mudar</string>
+    <!-- Settings row title: which microphone a wheel transmission uses. One line. -->
+    <string name="device_set_wheel_mic">Microfone para o volante</string>
+    <!-- Subtitle of "Steering-wheel microphone". May wrap to three lines. -->
+    <string name="device_set_wheel_mic_sub">Carro (como uma chamada): o microfone do carro; pare com o botão de desligar do volante ou Encerrar. Celular: o microfone do celular; pare pelo volante. Toque para mudar</string>
+    <!-- Settings row title: unkey a wheel transmission after silence. One line. -->
+    <string name="device_set_vox">Parar quando eu parar de falar</string>
+    <!-- Subtitle of "Stop when I stop talking". May wrap. -->
+    <string name="device_set_vox_sub">Para transmissões iniciadas pelo volante: para de transmitir após este tempo de silêncio. Toque para mudar</string>
+    <!-- Settings switch title: the full-screen Talk screen in Android Auto. One line. -->
+    <string name="device_set_car_screen">Controles do rádio em tela cheia no carro</string>
+    <!-- Subtitle of "Full-screen Radio controls in the car". May wrap. -->
+    <string name="device_set_car_screen_sub">Desativado: um app de mídia (funciona em qualquer carro). Ativado: uma tela grande de Falar no lugar; reconecte o carro depois de mudar</string>
+    <!-- Toast when coverage logging is switched on. -->
+    <string name="device_set_coverage_on">Registro de cobertura ativado</string>
+    <!-- Toast when coverage logging is switched off. -->
+    <string name="device_set_coverage_off">Registro de cobertura desativado</string>
+    <!-- Settings row title: a short tone when the talk key is released. One line. -->
+    <string name="device_roger">Roger beep</string>
+    <!-- Subtitle of "Roger beep". May wrap. -->
+    <string name="device_roger_sub">Um tom curto quando você solta a tecla de transmissão. Toque para mudar e ouvir</string>
+
+    <!-- ==== Device page: Longest transmission (transmit limit) ==== -->
+    <!-- SAFETY: settings row title and dialog title: the transmit time limit. One line. -->
+    <string name="device_txlimit">Transmissão máxima</string>
+    <!-- SAFETY: subtitle of "Longest transmission" (transmit limit and heat guard). May wrap. -->
+    <string name="device_txlimit_sub">O SignalDeck encerra qualquer transmissão após este tempo; a proteção contra superaquecimento ainda corta uma transmissão longa se o celular esquentar. Toque para mudar</string>
+    <!-- SAFETY: toast when the transmit limit cannot be changed in Restricted mode. -->
+    <string name="device_txlimit_locked">No Modo restrito, o limite de tempo de transmissão está bloqueado</string>
+    <!-- SAFETY: the default preset in the transmit-limit list. %1$s is the time ("2 min"). -->
+    <string name="device_txlimit_default">%1$s (padrão)</string>
+    <!-- SAFETY: last item of the transmit-limit list when a custom limit is set. %1$s is the time. -->
+    <string name="device_txlimit_custom_value">Personalizado: %1$s</string>
+    <!-- SAFETY: last item of the transmit-limit list: enter your own limit. Short. -->
+    <string name="device_txlimit_custom">Personalizado…</string>
+    <!-- SAFETY: title of the dialog to type a custom transmit limit. One line. -->
+    <string name="device_txlimit_custom_title">Limite personalizado</string>
+    <!-- SAFETY: message of the custom-limit dialog. %1$d is the minimum in seconds. -->
+    <string name="device_txlimit_custom_msg">Segundos inteiros, no mínimo %1$d.</string>
+    <!-- SAFETY: toast when the custom limit is not a whole number of seconds at or above the minimum (%1$d). -->
+    <string name="device_txlimit_custom_bad">Informe no mínimo %1$d segundos</string>
+    <!-- SAFETY: title of the heat warning before switching the transmit limit off. One line. -->
+    <string name="device_txlimit_none_title">Sem limite de tempo</string>
+    <!-- SAFETY: title of the heat warning before a limit over 2 minutes. %1$s is the time ("5 min"). One line. -->
+    <string name="device_txlimit_long_title">Transmissões de %1$s</string>
+
+    <!-- ==== Device page: SignalDeck Web card ==== -->
+    <!-- Switch title on the SignalDeck Web card: run the web server. One line. -->
+    <string name="device_web_access">Acesso pela web</string>
+    <!-- Subtitle of "Web access" while it is off. One line, may wrap. -->
+    <string name="device_web_access_sub">Use o SignalDeck em um navegador na mesma rede Wi-Fi</string>
+    <!-- SAFETY: switch title: a browser may key the radio. One line. -->
+    <string name="device_web_allow_tx">Permitir transmissão pela web</string>
+    <!-- SAFETY: subtitle of "Allow transmit from the web". May wrap. -->
+    <string name="device_web_allow_tx_sub">Desativado: o navegador pode ouvir e trocar de canal, mas nunca transmite pelo rádio</string>
+    <!-- Row title on the web card: make a new PIN. Short. -->
+    <string name="device_web_new_pin">Novo PIN</string>
+    <!-- Subtitle of "New PIN". One line. -->
+    <string name="device_web_new_pin_sub">Gera um novo PIN e desconecta todos os navegadores</string>
+    <!-- Web card subtitle: the server is switched on but not running. Short. -->
+    <string name="device_web_not_running">Parado</string>
+    <!-- Web card subtitle: the server is not running, with the reason (%1$s, from the server). -->
+    <string name="device_web_not_running_err">Parado: %1$s</string>
+    <!-- Web card subtitle, first line: the phone has no Wi-Fi address. One line. -->
+    <string name="device_web_no_address">Conecte-se ao Wi-Fi para obter um endereço</string>
+    <!-- Web card subtitle, first line: the address(es) to open in a browser. %1$s is one or more URLs joined by device_web_url_or. -->
+    <string name="device_web_open">Abra %1$s</string>
+    <!-- Separator between two web addresses in device_web_open, with two spaces on each side. Keep the spaces. -->
+    <string name="device_web_url_or">\u0020\u0020ou \u0020</string>
+    <!-- Web card subtitle, second line: the PIN to log in. Starts with a line break; two spaces after PIN. %1$s is the PIN. -->
+    <string name="device_web_pin">\nPIN \u0020%1$s</string>
+    <!-- Web card subtitle, third line: the secure address for the microphone. Starts with a line break. %1$s is the https URL, %2$s the start of the certificate fingerprint. -->
+    <string name="device_web_tls">\nPara falar pelo microfone de um computador: %1$s (aceite o aviso do certificado uma vez; impressão digital %2$s…)</string>
+    <!-- Web card subtitle, last line: how many browsers are connected (%1$d). Starts with a line break. -->
+    <plurals name="device_web_clients">
+        <item quantity="one">\nNavegadores conectados: %1$d</item>
+        <item quantity="many">\n%1$d navegadores conectados</item>
+        <item quantity="other">\n%1$d navegadores conectados</item>
+    </plurals>
+
+    <!-- ==== Device page: Your DMR ID card ==== -->
+    <!-- Heading of the DMR ID card and title of its dialog. Short. -->
+    <string name="device_id_title">Seu ID DMR</string>
+    <!-- Button on the DMR ID card: edit the ID. Short button. -->
+    <string name="device_id_change">Alterar</string>
+    <!-- Message of the DMR ID dialog. -->
+    <string name="device_id_msg">O rádio envia este número como ID de quem chama nos canais digitais.</string>
+    <!-- Toast when the DMR ID typed is not valid. -->
+    <string name="device_id_bad">Informe um ID entre 1 e 16776415</string>
+    <!-- The DMR ID on its card, large monospaced. %1$s is the number. Very short. -->
+    <string name="device_id_value">ID %1$s</string>
+
+    <!-- ==== Device page: Mission Statement ==== -->
+    <!-- Button above the tools and title of its sheet. Short. -->
+    <string name="device_mission">Missão</string>
+    <!-- The project's mission statement on its sheet, in quotation marks (use your language's quotation marks). Large text, a paragraph. -->
+    <string name="device_mission_text">“Este projeto é uma vitrine do que um rádio amador com Android é capaz de fazer. Ele foi feito para inovar e se apoia na inovação, nas descobertas e no trabalho duro de quem veio antes de mim. Espero que ele inspire outras pessoas a criar e a buscar o próximo passo.”</string>
+    <!-- Section heading on the Mission Statement sheet (shown in capitals). Short. -->
+    <string name="device_mission_legal">Sobre e licença</string>
+
+    <!-- ==== Device page: Tools tiles and the footer ==== -->
+    <!-- Heading above the tool tiles (shown in capitals). One word. -->
+    <string name="device_tools">Ferramentas</string>
+    <!-- Tool tile title: back up channels and contacts. Short (half-width tile). -->
+    <string name="device_tool_backup">Backup</string>
+    <!-- Subtitle of the Back up tile. Short (half-width tile). -->
+    <string name="device_tool_backup_sub">Cinco CSVs, prontos para o CPS</string>
+    <!-- Tool tile title and the confirmation button: restore a backup. Short. -->
+    <string name="device_restore">Restaurar</string>
+    <!-- Subtitle of the Restore tile. Short (half-width tile). -->
+    <string name="device_tool_restore_sub">De uma pasta de backup</string>
+    <!-- Tool tile title: import the channels again from the stock app. Short (half-width tile). -->
+    <string name="device_tool_reimport">Reimportar</string>
+    <!-- Subtitle of the Re-import tile. Short (half-width tile). -->
+    <string name="device_tool_reimport_sub">Canais do app do fabricante</string>
+    <!-- Tool tile title and dialog title: the radioid.net list of DMR ID names. Short (half-width tile). -->
+    <string name="device_radioid">Lista RadioID</string>
+    <!-- Tool tile title and title of its menu and dialogs: the device report. Short (half-width tile). -->
+    <string name="device_report">Relatório do dispositivo</string>
+    <!-- Subtitle of the Device report tile. Short (half-width tile). -->
+    <string name="device_tool_report_sub">Relatórios de suporte e testes</string>
+    <!-- Tool tile title and title of its sheet: notes about this phone's radio. Short (half-width tile). -->
+    <string name="device_about_radio">Sobre este rádio</string>
+    <!-- Subtitle of the About this radio tile. Short (half-width tile). -->
+    <string name="device_tool_about_sub">Especificações e peculiaridades</string>
+    <!-- Tool tile title: app updates. One word (half-width tile). -->
+    <string name="device_tool_updates">Atualizações</string>
+    <!-- Subtitle of the Updates tile. Short (half-width tile). -->
+    <string name="device_tool_updates_sub">Versões estáveis e beta</string>
+    <!-- Tool tile title: the in-app guide. Short (half-width tile). -->
+    <string name="device_tool_help">Ajuda e guia</string>
+    <!-- Subtitle of the Help tile. Short (half-width tile). -->
+    <string name="device_tool_help_sub">Todas as telas explicadas</string>
+    <!-- Tool tile title: the live protocol log. One word (half-width tile). -->
+    <string name="device_tool_diag">Diagnóstico</string>
+    <!-- Subtitle of the Diagnostics tile. Short (half-width tile). -->
+    <string name="device_tool_diag_sub">Registro do protocolo ao vivo</string>
+    <!-- Tool tile title and title of its sheet: the home-screen widget. Short (half-width tile). -->
+    <string name="device_widget">Widget da tela inicial</string>
+    <!-- Subtitle of the Home widget tile. Short (half-width tile). -->
+    <string name="device_tool_widget_sub">Canal, varredura e Falar</string>
+    <!-- Tool tile title: send an emergency message with your position. One word (half-width tile). -->
+    <string name="device_tool_sos">Emergência</string>
+    <!-- Subtitle of the Emergency tile. Short (half-width tile). -->
+    <string name="device_tool_sos_sub">Envie sua posição</string>
+    <!-- Subtitle of the Contribute tile. Short (half-width tile). -->
+    <string name="device_tool_contribute_sub">Doar, testar, incluir um celular</string>
+    <!-- Small print at the bottom of the Device page on a DMR phone. The CSV file names are file names (keep them). %1$s is the app version. -->
+    <string name="device_foot_dmr">Os backups são os cinco arquivos CSV (Contacts, TG_Lists, Channels, Zones, DTMF) usados pelo módulo DMRModHooks e pelo fork do CPS do OpenGD77, em Download/DMR/DMR_Backups.\n\nSignalDeck %1$s, a edição independente do DMRModHooks.</string>
+    <!-- Small print at the bottom of the Device page on an analog-only phone. %1$s is the app version. -->
+    <string name="device_foot_analog">Os backups são arquivos CSV (Channels, Zones, DTMF e os demais, no formato que o fork do CPS do OpenGD77 lê) em Download/DMR/DMR_Backups.\n\nSignalDeck %1$s, a edição independente do DMRModHooks.</string>
+
+    <!-- ==== About this radio sheet (the notes come from assets/radios/radios.json and are data) ==== -->
+    <!-- Hint on the About this radio sheet when there are no notes for the phone. -->
+    <string name="device_notes_none">Não há notas disponíveis para este rádio.</string>
+    <!-- Section heading on the About this radio sheet (capitals). Short. -->
+    <string name="device_notes_radio">O rádio</string>
+    <!-- Label in the spec table: the radio module. Short (38 percent of the width). -->
+    <string name="device_notes_module">Módulo</string>
+    <!-- Label in the spec table: the modes (FM, DMR…). Short. -->
+    <string name="device_notes_modes">Modos</string>
+    <!-- Label in the spec table: the frequency bands. Short. -->
+    <string name="device_notes_bands">Bandas</string>
+    <!-- Label in the spec table: transmit power. Short. -->
+    <string name="device_notes_power">Potência</string>
+    <!-- Value in the spec table when the transmit power has not been measured. Short. -->
+    <string name="device_notes_power_unknown">Ainda não medida</string>
+    <!-- Label in the spec table: how the phone talks to the module (serial port…). Short. -->
+    <string name="device_notes_link">Conexão</string>
+    <!-- Label in the spec table: the firmware the phone ships with. Short. -->
+    <string name="device_notes_fw_stock">Firmware de fábrica</string>
+    <!-- Label in the spec table: modified firmware available. Short. -->
+    <string name="device_notes_fw_mod">Firmware modificado</string>
+    <!-- Section heading on the About this radio sheet (capitals): the feature list. Short. -->
+    <string name="device_notes_works">O que funciona</string>
+    <!-- Feature state in the What works list: works. One word. -->
+    <string name="device_notes_yes">Funciona</string>
+    <!-- Feature state in the What works list: partly works. One word. -->
+    <string name="device_notes_partly">Em parte</string>
+    <!-- Feature state in the What works list: does not work. One word. -->
+    <string name="device_notes_no">Não</string>
+    <!-- Feature state in the What works list: not tested. Short. -->
+    <string name="device_notes_untested">Não testado</string>
+    <!-- Section heading on the About this radio sheet (capitals). Short. -->
+    <string name="device_notes_quirks">Peculiaridades conhecidas</string>
+    <!-- Section heading on the About this radio sheet (capitals): bench measurements. One line. -->
+    <string name="device_notes_measured">Medido na nossa unidade de teste</string>
+    <!-- Hint under "Measured on our test unit". -->
+    <string name="device_notes_measured_hint">Medido em uma única unidade de teste; seu rádio pode ser diferente.</string>
+    <!-- Last hint on the About this radio sheet. %1$s is the notes entry id. -->
+    <string name="device_notes_source">Estas notas vêm embutidas no SignalDeck (%1$s) e também estão no repositório do projeto, em docs/radios.</string>
+
+    <!-- ==== Contribute sheet ==== -->
+    <!-- First paragraph of the Contribute sheet. -->
+    <string name="device_contrib_intro">O SignalDeck é um projeto livre e de código aberto (GPL-3.0): livre para usar, estudar e melhorar, e vai continuar assim. Se você gosta dele, há três formas de ajudar o projeto a crescer.</string>
+    <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. Short. -->
+    <string name="device_contrib_donate">1 \u0020Doar</string>
+    <!-- Paragraph under "1 Donate". -->
+    <string name="device_contrib_donate_text">Se o SignalDeck é útil para você, considere fazer uma doação. Desenvolver e manter o app custa caro: as doações compram mais celulares para desenvolver e tornar compatíveis, e mantêm os novos recursos chegando. Qualquer valor ajuda. Muito obrigado.</string>
+    <!-- Button: open the Ko-fi donation page. Ko-fi is a site name. One line. -->
+    <string name="device_contrib_kofi">Doar pelo Ko-fi</string>
+    <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. One line. -->
+    <string name="device_contrib_develop">2 \u0020Participe do desenvolvimento</string>
+    <!-- Paragraph under "2 Take part in the development". -->
+    <string name="device_contrib_develop_text">Teste em busca de bugs, dê ideias de recursos e converse com outros usuários do SignalDeck. Relate um bug ou sugira um recurso no GitHub, ou junte-se à comunidade no site.</string>
+    <!-- Button: open the GitHub issues page. One line. -->
+    <string name="device_contrib_issue">Relatar um bug ou uma ideia</string>
+    <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. One line. -->
+    <string name="device_contrib_phone">3 \u0020Torne seu celular compatível</string>
+    <!-- Paragraph under "3 Make your own phone compatible". "Help support this phone" and "Device report" are button names. -->
+    <string name="device_contrib_phone_text">Faça um fork do projeto e faça seu celular funcionar com ele. Quando achar que seu celular está totalmente compatível, avise a gente: o trabalho é revisado e incorporado, e todo mundo que tem esse celular sai ganhando. Ajude a dar suporte a este celular (em Relatório do dispositivo) reúne as informações de que um celular novo precisa.</string>
+    <!-- Button: open the SignalDeck repository on GitHub. One line. -->
+    <string name="device_contrib_repo">SignalDeck no GitHub</string>
+    <!-- Toast when no browser can open a link. %1$s is the web address. -->
+    <string name="device_no_browser">Nenhum navegador para abrir %1$s</string>
+
+    <!-- ==== Home widget sheet ==== -->
+    <!-- Hint on the Home widget sheet. "Longest transmission" is the settings row name. -->
+    <string name="device_widget_hint">O canal, o que o rádio está fazendo e os botões anterior / varredura / próximo / Falar na sua tela inicial. Em Falar, toque para começar e toque para parar; a transmissão também termina sozinha no limite de tempo de transmissão (Transmissão máxima: 2 minutos, a menos que você mude). A notificação tem os mesmos botões de canal e de varredura.</string>
+    <!-- Hint on the Home widget sheet when the preview cannot be drawn. %1$s is the error. -->
+    <string name="device_widget_no_preview">Prévia indisponível: %1$s</string>
+    <!-- Button on the Home widget sheet: ask the launcher to add the widget. One line. -->
+    <string name="device_widget_add">Adicionar à tela inicial</string>
+    <!-- Toast when the launcher cannot add the widget itself. -->
+    <string name="device_widget_manual">Toque e mantenha pressionada a tela inicial, escolha Widgets e arraste o SignalDeck</string>
+
+    <!-- ==== Back up, Restore, Re-import, RadioID list ==== -->
+    <!-- Toast after a backup. %1$s is the new folder's name. -->
+    <string name="device_backup_done">Backup salvo em Download/DMR/DMR_Backups/%1$s</string>
+    <!-- Toast when the backup fails. %1$s is the error. -->
+    <string name="device_backup_failed">Falha no backup: %1$s</string>
+    <!-- Last item of the restore list: pick a folder. One line. -->
+    <string name="device_restore_browse">Procurar uma pasta de backup…</string>
+    <!-- Title of the list of backups to restore. One line. -->
+    <string name="device_restore_which">Qual backup restaurar?</string>
+    <!-- Toast when a restore fails. %1$s is the error. -->
+    <string name="device_restore_failed">Falha ao restaurar: %1$s</string>
+    <!-- Title of the restore confirmation. %1$s is the backup folder name. One line. -->
+    <string name="device_restore_confirm">Restaurar %1$s?</string>
+    <!-- Message of the restore confirmation. -->
+    <string name="device_restore_msg">Substitui todos os canais, contatos e zonas deste app pelos do backup (exportações do CPS do OpenGD77 também servem). Histórico, mensagens e configurações são mantidos.</string>
+    <!-- Title of the re-import confirmation on a phone whose stock app has one channel list. One line. -->
+    <string name="device_reimport_title">Reimportar os canais do app do fabricante?</string>
+    <!-- Message of the re-import confirmation (one channel list). -->
+    <string name="device_reimport_msg">Substitui todos os canais do SignalDeck pelos que estão salvos no app de rádio do fabricante do celular.</string>
+    <!-- Title of the list of the stock app's areas to import. One line. -->
+    <string name="device_reimport_which">Importar qual área do fabricante?</string>
+    <!-- Title of the re-import confirmation. %1$s is the stock area's name. One line. -->
+    <string name="device_reimport_confirm">Reimportar %1$s?</string>
+    <!-- Message of the re-import confirmation when only channels are imported. -->
+    <string name="device_reimport_msg_channels">Substitui todos os canais do SignalDeck pelos canais dessa área no app do fabricante.</string>
+    <!-- Message of the re-import confirmation when channels, contacts, history and messages are imported. -->
+    <string name="device_reimport_msg_all">Substitui todos os canais, contatos, histórico e mensagens deste app pelos dados atuais dessa área no app do fabricante.</string>
+    <!-- Message of the RadioID list dialog. %1$s is the list's status (how many IDs, when downloaded). -->
+    <string name="device_radioid_msg">Nomes para os IDs DMR ouvidos no ar, baixados do radioid.net e guardados no celular.\n\nAgora: %1$s</string>
+    <!-- Button in the RadioID list dialog. Short. -->
+    <string name="device_radioid_download">Baixar / atualizar</string>
+    <!-- Progress message while the RadioID list downloads. -->
+    <string name="device_radioid_connecting">Conectando ao radioid.net…</string>
+    <!-- Toast after the RadioID list is loaded. %1$s is the number of IDs, with thousands separators. -->
+    <plurals name="device_radioid_loaded">
+        <item quantity="one">IDs DMR carregados: %1$s</item>
+        <item quantity="many">%1$s IDs DMR carregados</item>
+        <item quantity="other">%1$s IDs DMR carregados</item>
+    </plurals>
+    <!-- Toast when the RadioID download fails. %1$s is the error. -->
+    <string name="device_radioid_failed">Falha no download: %1$s</string>
+
+    <!-- ==== Device report menu and Help support this phone ==== -->
+    <!-- Item in the Device report menu: the guided support steps. One line. -->
+    <string name="device_report_support">Ajude a dar suporte a este celular (passo a passo)</string>
+    <!-- Item in the Device report menu. One line. -->
+    <string name="device_report_generate">Gerar relatório do dispositivo</string>
+    <!-- Item in the Device report menu. One line. -->
+    <string name="device_report_share_last">Compartilhar último relatório</string>
+    <!-- Item in the Device report menu: record what the PTT key sends for 10 seconds. One line. -->
+    <string name="device_report_capture">Capturar a tecla PTT (10 s)</string>
+    <!-- Item in the Device report menu: the root radio probe. One line. -->
+    <string name="device_report_probe">Sondar o rádio (root)</string>
+    <!-- Item in the Device report menu. One line, may wrap. -->
+    <string name="device_report_issue">Abrir uma issue no GitHub com os dados preenchidos</string>
+    <!-- Item in the Device report menu: explains the report. One line. -->
+    <string name="device_report_what">O que tem nele?</string>
+    <!-- Toast when "Open a GitHub issue" finds no browser to open the page in. The report itself stays English. One line. -->
+    <string name="device_report_no_browser">Nenhum navegador disponível</string>
+    <!-- Title of the Android share chooser for the device report zip (the report and its message stay English). One line. -->
+    <string name="device_report_share_title">Compartilhar o relatório do dispositivo</string>
+    <!-- Item in the Device report menu: the audio check. One line, may wrap. -->
+    <string name="device_report_audio">Teste de áudio do rádio (sem som, DMR ou analógico)</string>
+    <!-- Item in the Device report menu: the test with a second radio. One line. -->
+    <string name="device_report_second">Teste com um segundo rádio (guiado)</string>
+    <!-- Item in the Device report menu: list the phone's radio firmware files. One line. -->
+    <string name="device_report_fwfiles">Arquivos de firmware do rádio (root, você escolhe)</string>
+    <!-- SAFETY: item in the Device report menu: the transmit test session, which keys the radio. One line. -->
+    <string name="device_report_txtest">Sessão de teste de transmissão (transmite)</string>
+    <!-- Message explaining what the device report gathers. A paragraph. -->
+    <string name="device_report_what_msg">Para um celular que ainda não tem perfil, ou para ajudar a depurar um: reúne as informações de que um perfil precisa (portas seriais, nós do módulo de rádio, o app de walkie-talkie do fabricante e seu APK, bibliotecas do fabricante, jars do framework, serviços; com root, também os rótulos do SELinux e os broadcasts da tecla PTT), salva tudo em Download/DMR/DeviceReport e oferece compartilhar o zip em uma issue do GitHub. Nada é alterado no celular.</string>
+    <!-- Row 1 of the Help support this phone list: title line, then a line break and the details. Two spaces after the number. May be prefixed with a tick. -->
+    <string name="device_support_step1">1 \u0020Executar todas as verificações\nCerca de dois minutos, só escuta; requer root com Magisk</string>
+    <!-- Row 2 of the Help support this phone list: title line, line break, details. Two spaces after the number. May be prefixed with a tick or a lock. -->
+    <string name="device_support_step2">2 \u0020Teste com um segundo rádio (o melhor)\nQualquer outro rádio FM: transmita com ele quando for pedido; o SignalDeck mede sozinho a recepção, o squelch, o MON e o squelch por subtom</string>
+    <!-- Row 2b of the Help support this phone list: title line, line break, details. May be prefixed with a tick or a lock. -->
+    <string name="device_support_step2b">2b Teste de escuta (sem outro rádio)\nAssuma o rádio, escolha um canal em que se ouçam estações; depois vêm o chiado (10 s) e a estação (50 s)</string>
+    <!-- Row 3 of the Help support this phone list: title line, line break, details. Two spaces after the number. May be prefixed with a lock. -->
+    <string name="device_support_step3">3 \u0020Enviar os resultados\nCompartilhe o zip do relatório (ele começa com um resumo) ou abra uma issue no GitHub</string>
+    <!-- Last row of the Help support this phone list: explains it. Short. -->
+    <string name="device_support_what">O que é isto?</string>
+    <!-- Title of the Help support this phone list. %1$s is the phone model. One line. -->
+    <string name="device_support_title">Ajude a dar suporte a este celular – %1$s</string>
+    <!-- Toast when a locked step is tapped before the checks have run. -->
+    <string name="device_support_locked">Execute todas as verificações primeiro.</string>
+    <!-- Toast when Send the results is tapped before any test has run. -->
+    <string name="device_support_locked_send">Execute todas as verificações primeiro e depois um teste.</string>
+    <!-- Message explaining the Help support this phone steps. "Device → Updates" is a menu path. -->
+    <string name="device_support_what_msg">Cada etapa nos conta algo sobre como funciona o rádio deste celular. Depois de cada uma, envie os resultados (etapa 3): com eles escrevemos ou corrigimos o perfil deste celular, e você recebe uma nova versão por Dispositivo → Atualizações. As etapas só escutam: nada é transmitido.</string>
+
+    <!-- ==== Exit SignalDeck sheet ==== -->
+    <!-- SAFETY: first hint on the Exit sheet: closing the app keeps the radio running; Exit stops it properly. A paragraph. -->
+    <string name="device_exit_hint">Fechar o app ou deslizá-lo para fora deixa o rádio funcionando em segundo plano (é assim que ele continua recebendo com a tela apagada). Sair encerra tudo corretamente: termina qualquer transmissão e tudo o que estiver rodando (varredura, APRS, FT8, M17, rastreamento de satélites, o papagaio), para o áudio e fecha a porta serial do rádio.</string>
+    <!-- Button on the Exit sheet: switch the radio module off and exit. One line, full width. -->
+    <string name="device_exit_off">Desligar o rádio e sair</string>
+    <!-- SAFETY: hint under "Turn the radio off and exit". -->
+    <string name="device_exit_off_hint">Corta a alimentação do módulo de rádio: ele deixa de receber e não gasta mais bateria. Abrir o SignalDeck liga o módulo de novo (alguns segundos).</string>
+    <!-- Button on the Exit sheet: give the radio back to the stock app and exit. One line, full width. -->
+    <string name="device_exit_handback">Devolver ao app do fabricante e sair</string>
+    <!-- SAFETY: hand-back hint on the Exit sheet. -->
+    <string name="device_exit_handback_hint">Reativa o app de rádio do próprio celular e deixa o rádio com ele. As operações agendadas continuam abrindo o SignalDeck no horário marcado.</string>
+    <!-- SAFETY: hand-back hint on the Exit sheet when SignalDeck owns the radio at boot. "Keep access after reboot" is a button name. -->
+    <string name="device_exit_handback_hint_boot">Reativa o app de rádio do próprio celular e deixa o rádio com ele. Mesmo assim, o SignalDeck assume o rádio de novo na próxima reinicialização (Manter acesso após reiniciar). As operações agendadas continuam abrindo o SignalDeck no horário marcado.</string>
+
+    <!-- ==== Phone profile dialog and advisories (advisory titles and reasons are data from the signed profile list) ==== -->
+    <!-- Phone profile dialog: a paragraph (starts with two line breaks). %1$s is the date and time, or device_profsheet_never. -->
+    <string name="device_profsheet_last_checked">\n\nÚltima verificação da lista de perfis: %1$s</string>
+    <!-- In "Profile list last checked": the list was never checked. One word. -->
+    <string name="device_profsheet_never">nunca</string>
+    <!-- Phone profile dialog: a line (starts with a line break) when updated profiles are switched off. -->
+    <string name="device_profsheet_builtin">\nPerfis atualizados desativados: é usado o perfil embutido.</string>
+    <!-- SAFETY: one advisory in the Phone profile dialog (starts with two line breaks). %1$s is the advisory title, %2$s what it restricts, %3$s why (all from the signed list). -->
+    <string name="device_advisory_line">\n\n⚠ %1$s\n%2$s.\n%3$s</string>
+    <!-- SAFETY: one advisory the owner overrode, in the Phone profile dialog (starts with two line breaks). %1$s title, %2$s what it restricts, %3$s why. -->
+    <string name="device_advisory_line_kept">\n\n⚠ %1$s – você decidiu continuar usando\n%2$s.\n%3$s</string>
+    <!-- SAFETY: after an advisory with an end date (starts with a line break). %1$s is the date as written in the list. -->
+    <string name="device_advisory_until">\n(até %1$s, se não for renovado)</string>
+    <!-- Last paragraph of the Phone profile dialog (starts with two line breaks). -->
+    <string name="device_profsheet_note">\n\nOs perfis testados fazem parte de cada versão do SignalDeck e funcionam sem internet. Uma revisão mais nova, ou um aviso sobre algum problema, pode vir da lista de perfis assinada do projeto. As mudanças que não envolvem a transmissão valem a partir da próxima vez que o SignalDeck iniciar.</string>
+    <!-- Title of the Phone profile dialog. One line. -->
+    <string name="device_profsheet_title">Perfil do celular</string>
+    <!-- Button in the Phone profile dialog: fetch the profile list now. Short. -->
+    <string name="device_profsheet_check">Verificar agora</string>
+    <!-- Button in the Phone profile dialog: use profiles from the signed list again. Short. -->
+    <string name="device_profsheet_allow">Permitir perfis atualizados</string>
+    <!-- Button in the Phone profile dialog: ignore the signed list. Short. -->
+    <string name="device_profsheet_use_builtin">Usar o perfil embutido</string>
+    <!-- Button in the Phone profile dialog: list the advisories. One word. -->
+    <string name="device_advisory_list">Avisos</string>
+    <!-- SAFETY: a row in the advisory list: the owner overrode it. %1$s is the advisory title. -->
+    <string name="device_advisory_row_overridden">Ignorado por você · %1$s</string>
+    <!-- SAFETY: a row in the advisory list: the advisory applies. %1$s is the advisory title. -->
+    <string name="device_advisory_row_active">Em vigor · %1$s</string>
+    <!-- Title of the advisory list. One line. -->
+    <string name="device_advisory_list_title">Avisos para este celular</string>
+    <!-- SAFETY: one advisory's text. %1$s what it restricts, %2$s why, %3$s the date it was issued (all from the signed list). -->
+    <string name="device_advisory_body">%1$s.\n\nMotivo: %2$s\n\nEmitido em %3$s.</string>
+    <!-- SAFETY: one advisory's text with an end date. %1$s what it restricts, %2$s why, %3$s issued, %4$s the end date. -->
+    <string name="device_advisory_body_lapses">%1$s.\n\nMotivo: %2$s\n\nEmitido em %3$s; expira em %4$s, se não for renovado.</string>
+    <!-- SAFETY: an overridden advisory's text. %1$s is device_advisory_body. -->
+    <string name="device_advisory_body_kept">%1$s\n\nVocê decidiu continuar usando mesmo assim.</string>
+    <!-- SAFETY: button: apply an overridden advisory again. One line. -->
+    <string name="device_advisory_reapply">Aplicar o aviso de novo</string>
+    <!-- SAFETY: button: keep the advisory's restriction. Short. -->
+    <string name="device_advisory_keep">Manter a restrição</string>
+    <!-- SAFETY: button: start overriding the advisory (two confirmations follow). Short. -->
+    <string name="device_advisory_override">Usar mesmo assim…</string>
+    <!-- SAFETY: title of the first override confirmation. One line. -->
+    <string name="device_advisory_confirm1">Usar mesmo assim? (1 de 2)</string>
+    <!-- SAFETY: first override confirmation. %1$s is what the advisory restricts (lower case), %2$s why. -->
+    <string name="device_advisory_confirm1_msg">Este aviso diz: %1$s, porque:\n\n%2$s\n\nSe você continuar, o SignalDeck vai funcionar neste celular como se o aviso não existisse.</string>
+    <!-- SAFETY: title of the second override confirmation. One line. -->
+    <string name="device_advisory_confirm2">A decisão é sua (2 de 2)</string>
+    <!-- SAFETY: second override confirmation: the owner takes responsibility. -->
+    <string name="device_advisory_confirm2_msg">O celular é seu e a decisão é sua. Você assume a responsabilidade por usar isto apesar do aviso. Isso vale só para este aviso; você pode aplicá-lo de novo a qualquer momento na página Dispositivo.</string>
+    <!-- SAFETY: button that overrides the advisory. One line. -->
+    <string name="device_advisory_confirm2_ok">Entendi, usar mesmo assim</string>
+    <!-- SAFETY: toast after an advisory is overridden. -->
+    <string name="device_advisory_overridden">Aviso ignorado: vale agora para a transmissão e, para o resto, no próximo início</string>
+
+    <!-- ==== Learn a PTT key sheet ==== -->
+    <!-- Subtitle of "Custom PTT key" when a key is learned. %1$s is the key's name. -->
+    <string name="device_learn_learned">%1$s · toque para ensinar outra</string>
+    <!-- Title of the sheet that learns a custom PTT key. One line. -->
+    <string name="device_learn_title">Ensinar uma tecla PTT</string>
+    <!-- Hint on the Learn a PTT key sheet. Two paragraphs. -->
+    <string name="device_learn_hint">Para um botão que não é a tecla PTT do próprio celular: outra tecla lateral, o botão de um fone com fio, um botão PTT Bluetooth, uma tecla de volume. Toque em Iniciar, depois pressione e segure o botão por cerca de dois segundos e solte. Nada é transmitido durante o aprendizado.\n\nEm seguida, o SignalDeck verifica o botão: se ele informa que está sendo segurado, se não é a tecla liga/desliga, início ou voltar, a tela de toque ou o leitor de digital, e se pressioná-lo também abriu outro app ou faz outra coisa no celular.</string>
+    <!-- After the Learn a PTT key hint: the key learned now (starts with two line breaks). %1$s is the key's name. -->
+    <string name="device_learn_now">\n\nAgora: %1$s.</string>
+    <!-- Button on the Learn a PTT key sheet: keep the learned key. One line. -->
+    <string name="device_learn_use">Usar esta tecla</string>
+    <!-- Button on the Learn a PTT key sheet. One line. -->
+    <string name="device_learn_forget">Esquecer a tecla aprendida</string>
+    <!-- Toast after a key is learned. %1$s is the key's name. -->
+    <string name="device_learn_saved">%1$s agora transmite</string>
+    <!-- Toast after a key is learned on a phone with an untested profile. %1$s is the key's name. -->
+    <string name="device_learn_saved_untested">%1$s agora transmite (assim que o perfil deste celular for testado)</string>
+    <!-- Progress message when a check or test starts. Short. -->
+    <string name="device_starting">Iniciando…</string>
+    <!-- Button on the Learn a PTT key sheet after a try. Short. -->
+    <string name="device_learn_again">Tentar novamente</string>
+    <!-- Result on the Learn a PTT key sheet: the key cannot be used. %1$s is the key's name. One line. -->
+    <string name="device_learn_blocked">%1$s: não pode ser usada</string>
+    <!-- Result on the Learn a PTT key sheet: no conflicts. %1$s is the key's name. One line. -->
+    <string name="device_learn_clean">%1$s: nenhum conflito encontrado</string>
+    <!-- Result on the Learn a PTT key sheet: usable, the notes follow. %1$s is the key's name. One line. -->
+    <string name="device_learn_note">%1$s: pode ser usada, mas atenção</string>
+    <!-- Button on the Learn a PTT key sheet when the key has warnings. One line. -->
+    <string name="device_learn_anyway">Usar mesmo assim</string>
+
+    <!-- ==== Radio audio check (the report itself stays English) ==== -->
+    <!-- Title of the radio audio check dialogs. One line. -->
+    <string name="device_audio">Teste de áudio do rádio</string>
+    <!-- Instructions before the radio audio check. Several paragraphs; "Start" is the button name, MON the monitor key. -->
+    <string name="device_audio_intro">Para o caso de “o rádio não dá som”, em DMR ou analógico. O SignalDeck verifica se o sistema do celular tem o serviço de áudio do fabricante (ROMs personalizadas podem não ter), depois escuta no canal atual e registra o que o rádio informa, se chegou áudio do serviço de áudio do rádio do celular e em que volume, e como o celular o reproduz.\n\nCanal analógico (o mais fácil: um canal meteorológico NOAA, que sempre tem estação no ar): primeiro 10 segundos com o squelch aberto (MON), para que o ruído do receptor chegue mesmo sem ninguém no ar; depois um minuto com o squelch normal.\nCanal DMR: um minuto; peça para alguém falar no talkgroup nesse meio-tempo.\n\n1. Na página Rádio, escolha o canal.\n2. Toque em Iniciar.\n\nNada é transmitido. O áudio é só medido, nunca guardado, e os IDs de quem chama aparecem encurtados no relatório. No final, você pode compartilhar o relatório.</string>
+    <!-- Added to the audio check instructions when SignalDeck does not own the radio (starts with two line breaks). "Take over" is the button name. -->
+    <string name="device_audio_need_radio">\n\nO SignalDeck ainda não está com o rádio: toque em Assumir primeiro (as verificações do sistema rodam mesmo assim).</string>
+    <!-- Result of the audio check. %1$s is the verdict (English, from the report). -->
+    <string name="device_audio_result">%1$s\n\nTodos os detalhes estão no relatório do dispositivo (Download/DMR/DeviceReport).</string>
+    <!-- Button after a check: share the device report. Short. -->
+    <string name="device_share_report">Compartilhar relatório</string>
+
+    <!-- ==== Second radio test (the report itself stays English) ==== -->
+    <!-- Toast when a test needs SignalDeck to own the radio. -->
+    <string name="device_take_over_first">Assuma o rádio primeiro (página Dispositivo).</string>
+    <!-- Title of the second radio test dialogs. One line. -->
+    <string name="device_second">Teste com um segundo rádio</string>
+    <!-- SAFETY: instructions for the second radio test, with the licence note. %1$s is the phone's tuning range ("400–480 MHz"). Keep the frequencies and service names as they are. -->
+    <string name="device_second_intro">Você precisa de qualquer outro rádio FM (um HT barato serve) e de uns cinco minutos.\n\n1. Na página Rádio, escolha um canal analógico (FM) que ninguém esteja usando, numa frequência em que o outro rádio consiga transmitir: VHF ou UHF, tanto faz (este celular sintoniza %1$s). Exemplos que dispensam licença: PMR446 canal 1, 446,00625 MHz (Europa); FRS canal 1, 462,5625 MHz (EUA); ou uma frequência simplex de radioamador, se você for licenciado.\n2. Ajuste o outro rádio para a mesma frequência, sem subtom, em potência baixa, a alguns metros deste celular.\n3. Toque em Iniciar e faça o que cada etapa pedir: o SignalDeck mede tudo sozinho.\n\nEste celular só escuta: nada é transmitido por ele. A parte do squelch por subtom usa uma cópia temporária do canal; seu canal não é alterado.</string>
+    <!-- Button in a second radio test step: the owner is ready. Short. -->
+    <string name="device_second_ready">Pronto</string>
+    <!-- Button in a second radio test step. Short. -->
+    <string name="device_second_cancel">Cancelar o teste</string>
+    <!-- Result of the second radio test. %1$s is the step verdicts (English, from the report). -->
+    <string name="device_second_result">%1$s\n\nOs resultados completos estão no relatório do dispositivo; Compartilhar envia o relatório (com um resumo no início).</string>
+
+    <!-- ==== Listen check (the report itself stays English; the answers go into it in English) ==== -->
+    <!-- Added to the listen check instructions when SignalDeck does not own the radio (starts with two line breaks). -->
+    <string name="device_listen_need_radio">\n\nO SignalDeck ainda não está com o rádio: toque primeiro em Assumir na página Dispositivo.</string>
+    <!-- Title of the listen check instructions. One line. -->
+    <string name="device_listen">Teste de escuta</string>
+    <!-- Instructions for the listen check. Numbered steps; "Start" is the button name. -->
+    <string name="device_listen_intro">1. Na página Rádio, escolha um canal em que você esteja ouvindo estações agora (uma repetidora movimentada, um canal meteorológico, alguém chamando de outro rádio).\n2. Volte aqui e toque em Iniciar.\n3. Parte 1, 10 segundos: o SignalDeck mantém o squelch aberto (MON), então o alto-falante deve tocar alguma coisa – chiado, ou a estação, se ela estiver falando; depois ele pergunta o que você ouviu. (Pulada em canal DMR, que não tem chiado.)\n4. Parte 2, 50 segundos com o squelch normal: ele abre sozinho quando a estação fala. O SignalDeck registra a intensidade do sinal e o áudio; depois diga se você ouviu a estação com clareza.\n\nAumente o volume de mídia antes.</string>
+    <!-- Title of the listen check, part 1. One line. -->
+    <string name="device_listen_part1">Teste de escuta · parte 1 de 2: chiado</string>
+    <!-- Progress of the listen check, part 1. %1$s is the live status (English, from the check). -->
+    <string name="device_listen_part1_msg">Escute o alto-falante: com o squelch aberto, você deve ouvir alguma coisa – chiado, ou a estação, se houver uma no ar.\n\n%1$s</string>
+    <!-- Answer to "Did you hear anything from the speaker?". One line. -->
+    <string name="device_listen_ans_static">Sim: chiado</string>
+    <!-- Answer to "Did you hear anything from the speaker?". One line. -->
+    <string name="device_listen_ans_talking">Sim: uma estação falando</string>
+    <!-- Answer to both listen check questions: nothing was heard. One line. -->
+    <string name="device_listen_ans_none">Nenhum som</string>
+    <!-- Answer to "Did you hear anything from the speaker?". One line. -->
+    <string name="device_listen_ans_unsure">Não tenho certeza</string>
+    <!-- Question after part 1 of the listen check. One line, may wrap. -->
+    <string name="device_listen_q1">Você ouviu alguma coisa no alto-falante?</string>
+    <!-- Title of the listen check, part 2 instructions. One line. -->
+    <string name="device_listen_part2">Teste de escuta · parte 2 de 2: uma estação</string>
+    <!-- Instructions for part 2 of the listen check. -->
+    <string name="device_listen_part2_msg">Agora são 50 segundos neste canal com o squelch normal. Ele abre sozinho quando há uma estação no ar: preste atenção e depois diga se você a ouviu com clareza.</string>
+    <!-- Button that starts part 2 of the listen check. Short. -->
+    <string name="device_listen_part2_start">Iniciar parte 2</string>
+    <!-- Title of the listen check progress, part 2. One line. -->
+    <string name="device_listen_part2_progress">Teste de escuta · parte 2 de 2</string>
+    <!-- Answer to "Did you hear the station?". One line. -->
+    <string name="device_listen_ans_clear">Sim, com clareza</string>
+    <!-- Answer to "Did you hear the station?". One line, may wrap. -->
+    <string name="device_listen_ans_distorted">Sim, mas distorcida, picotada ou baixa demais</string>
+    <!-- Answer to "Did you hear the station?". One line. -->
+    <string name="device_listen_ans_nobody">Ninguém estava falando</string>
+    <!-- Question after part 2 of the listen check. One line. -->
+    <string name="device_listen_q2">Você ouviu a estação?</string>
+    <!-- Title after the listen check is saved. One line. -->
+    <string name="device_listen_saved">Teste de escuta salvo</string>
+    <!-- After the listen check. %1$s is the check's result (English, from the report), %2$s the owner's answer. "Help support this phone → 3 Send the results" names the menu and its step. -->
+    <string name="device_listen_saved_msg">%1$s\nSua resposta: %2$s\n\nPróximo passo: Ajude a dar suporte a este celular → 3 Enviar os resultados.</string>
+    <!-- Button after the listen check: share the report now. Short. -->
+    <string name="device_listen_send">Enviar agora</string>
+    <!-- Title after the device report is generated. One line. -->
+    <string name="device_report_ready">Relatório pronto</string>
+    <!-- Message after the device report is generated. "Capture the PTT key" and "Share last report" are menu items. -->
+    <string name="device_report_ready_msg">Salvo em Download/DMR/DeviceReport. Se o celular tiver tecla PTT lateral, rode “Capturar a tecla PTT” e, com root, a sondagem do rádio; depois use Compartilhar último relatório, que explica o que ele contém.</string>
+    <!-- Toast when the device report fails. %1$s is the error. -->
+    <string name="device_report_failed">Falha no relatório: %1$s</string>
+
+    <!-- ==== Intercom layout row ==== -->
+    <!-- Intercom layout choice (and the row's value): automatic, which is compact on this phone. %1$d is the screen height in dp. One line. -->
+    <string name="device_layout_auto_compact">Automático (compacto neste celular, %1$d dp de altura)</string>
+    <!-- Intercom layout choice (and the row's value): automatic, which is regular on this phone. %1$d is the screen height in dp. One line. -->
+    <string name="device_layout_auto_regular">Automático (normal neste celular, %1$d dp de altura)</string>
+    <!-- Intercom layout choice: the regular layout. One word. -->
+    <string name="device_layout_regular">Normal</string>
+    <!-- Intercom layout choice: the compact layout for short screens. One word. -->
+    <string name="device_layout_compact">Compacto</string>
+    <!-- Settings row title and dialog title: the intercom page layout. One line. -->
+    <string name="device_layout">Layout da página Rádio</string>
+
+    <!-- ==== Run all checks (the first-run checks) ==== -->
+    <!-- First paragraph of the checks dialog at first launch, on a phone with an untested profile. Ends with two line breaks. -->
+    <string name="device_checks_intro_known">O SignalDeck tem um perfil para este celular que ainda não foi testado nele. Uma rodada das verificações nos mostra o que precisamos para fazê-lo funcionar. Leva cerca de dois minutos.\n\n</string>
+    <!-- First paragraph of the checks dialog at first launch, on a phone with no profile. Ends with two line breaks. -->
+    <string name="device_checks_intro_unknown">O SignalDeck ainda não conhece este celular. Uma rodada das verificações nos mostra o que precisamos para fazê-lo funcionar. Leva cerca de dois minutos.\n\n</string>
+    <!-- The checks dialog: what happens, as bullet lines (each ends with a line break). -->
+    <string name="device_checks_steps">O que acontece:\n• um relatório do dispositivo (celular, portas, módulo de rádio, o app de walkie-talkie do fabricante; só leitura)\n• 10 s para você pressionar algumas vezes a tecla PTT lateral\n• com root, o app de walkie-talkie do fabricante é fechado, aberto por 15 s para vermos como ele liga o rádio e o que envia para ele (não pressione o PTT nesse momento) e fechado de novo\n</string>
+    <!-- Bullet line in the checks dialog: the radio probe. SA818 AT is a protocol name. Ends with a line break. -->
+    <string name="device_checks_probe">• com root do Magisk, a sondagem do rádio (pergunta ao módulo quem ele é, nas portas seriais que o app de walkie-talkie usa: a consulta de versão DMR e o handshake SA818 AT; liga o módulo se ele não responder)\n</string>
+    <!-- Bullet line in the checks dialog on a phone with no profile: the radio probe. Ends with a line break. -->
+    <string name="device_checks_probe_no_profile">• com root do Magisk, a sondagem do rádio (pergunta ao módulo quem ele é, nas portas seriais que o app de walkie-talkie usa: a consulta de versão DMR e o handshake SA818 AT; liga o módulo se ele não responder, só em celulares com perfil)\n</string>
+    <!-- Bullet line in the checks dialog: the receive-only trial. %1$s is the stock app's package name. Ends with a line break. -->
+    <string name="device_checks_trial">• opcionalmente, um teste prático (30 segundos, cerca de um minuto e meio num celular não testado): o SignalDeck assume o rádio (só recepção, nada é transmitido), registra o que o módulo e o áudio fazem e depois o devolve ao %1$s\n</string>
+    <!-- Bullet line in the checks dialog on an untested phone: the receive-only trial. %1$s is the stock app's package name. Ends with a line break. -->
+    <string name="device_checks_trial_untested">• opcionalmente, um teste prático (30 segundos, cerca de um minuto e meio num celular não testado): o SignalDeck assume o rádio (só recepção, nada é transmitido), registra o que o módulo e o áudio fazem, como se comportam o squelch, o nível de recepção e a leitura de sinal e quais frequências ele sintoniza nas bordas das bandas, e depois o devolve ao %1$s\n</string>
+    <!-- Line in the checks dialog (starts and ends with a line break). %1$s is the stock app's package name. -->
+    <string name="device_checks_stock_closed">\nO %1$s fica fechado durante as verificações; depois, abra-o normalmente.\n</string>
+    <!-- Last line of the checks dialog (starts with a line break). -->
+    <string name="device_checks_end">\nNo final, você recebe um único zip para nos enviar.</string>
+    <!-- Title of the checks dialog at first launch. One line. -->
+    <string name="device_checks_first_title">Ajude a gente a dar suporte a este celular</string>
+    <!-- Title of the checks dialog. One line. -->
+    <string name="device_checks">Executar todas as verificações</string>
+    <!-- Button in the checks dialog: checks and the receive-only trial. Short. -->
+    <string name="device_checks_with_trial">Verificações + teste</string>
+    <!-- Button in the checks dialog. Short. -->
+    <string name="device_checks_run">Executar</string>
+    <!-- Button in the checks dialog: checks without the trial. Short. -->
+    <string name="device_checks_only">Só verificações</string>
+    <!-- Progress while SignalDeck looks for the stock walkie-talkie app. -->
+    <string name="device_checks_finding_app">Procurando o app de walkie-talkie…</string>
+    <!-- Row in the app list: the profile's stock app. %1$s is the app's name, %2$s its package, %3$s the phone model. Two lines. -->
+    <string name="device_checks_app_stock">%1$s\n%2$s · o app do fabricante para o %3$s</string>
+    <!-- Row in the app list: choose any app. Two lines. -->
+    <string name="device_checks_app_other">Escolher outro app…\nSe o app de walkie-talkie não estiver na lista</string>
+    <!-- Row in the app list: open no app. One line. -->
+    <string name="device_checks_app_none">Nenhum – pular esta etapa</string>
+    <!-- Title of the app list: which app to open for 15 seconds. One line, may wrap. -->
+    <string name="device_checks_app_title">Qual app de walkie-talkie abrir por 15 s?</string>
+    <!-- Row in the list of all apps: a system app. %1$s is the app's name, %2$s its package. Two lines. -->
+    <string name="device_checks_app_system">%1$s\n%2$s · app do sistema</string>
+    <!-- Title of the list of all apps. One line. -->
+    <string name="device_checks_any_title">Qual é o app de walkie-talkie?</string>
+    <!-- Title of the confirmation before opening an app. %1$s is the app's name. One line. -->
+    <string name="device_checks_open_app">Abrir %1$s por 15 s?</string>
+    <!-- Message of the confirmation before opening an app. -->
+    <string name="device_checks_open_app_msg">As verificações abrem o app do mesmo jeito que o ícone dele, registram como ele liga o rádio e o fecham de novo. Não pressione o PTT enquanto ele estiver aberto.</string>
+    <!-- Title of the progress dialog while the checks run. One line. -->
+    <string name="device_checks_running">Verificando este celular</string>
+    <!-- Title after the checks. One line. -->
+    <string name="device_checks_done">Verificações concluídas</string>
+    <!-- After the checks (after the English summary). %1$s is the zip size in kB, %2$s the report folder name. "Send" is the button name; keep the adb command. -->
+    <string name="device_checks_done_msg">Está tudo em um único zip (%1$s kB). Toque em Enviar para compartilhá-lo por e-mail, mensageiro ou nuvem, ou abra uma issue no GitHub e arraste o zip para dentro dela.\n\nA pasta também fica no celular: Download/DMR/DeviceReport/%2$s (com um computador: adb pull /sdcard/Download/DMR/DeviceReport).</string>
+    <!-- Button after the checks: open a GitHub issue. Short. -->
+    <string name="device_checks_issue">Issue no GitHub</string>
+    <!-- Toast when the checks fail. %1$s is the error. -->
+    <string name="device_checks_failed">Falha nas verificações: %1$s</string>
+
+    <!-- ==== Sharing the device report ==== -->
+    <!-- Title of the dialog before sharing the device report. One line. -->
+    <string name="device_share_title">Compartilhar o relatório do dispositivo</string>
+    <!-- What the device report holds, before sharing it. Two paragraphs. File names (stock_serial.txt, rx_audio_raw.bin) stay. -->
+    <string name="device_share_msg">O relatório contém dados do modelo e da build do celular, nomes das portas seriais e dos nós do módulo de rádio, detalhes do pacote do app de walkie-talkie, nomes de arquivos de bibliotecas e do framework, processos de rádio em execução e (com root) rótulos do SELinux e trechos curtos de logs relacionados ao rádio, sem o texto das mensagens e com os números longos mascarados. Depois de Executar todas as verificações, ele também contém o próprio registro do SignalDeck (sem as linhas de packet, posição, mensagens e de quem chama; indicativos e IDs mascarados), os bytes que o app do fabricante trocou com o módulo de rádio ao iniciar (stock_serial.txt: comandos, frequências dos canais e as respostas do módulo; IDs de rádio apagados) e, após o teste prático, uma cópia bruta de 5 segundos do que o rádio recebeu (rx_audio_raw.bin: o que estiver passando no canal). Nada de contas, contatos, mensagens, localização ou identificadores como o IMEI.\n\nO APK copiado do app de walkie-talkie do fabricante é software do fabricante: inclua-o se você não se importar em publicá-lo, ou compartilhe sem ele (podemos pedir em particular).</string>
+    <!-- Button: share the report with the stock APK. Short. -->
+    <string name="device_share_all">Compartilhar tudo</string>
+    <!-- Button: share the report without the stock APK. Short. -->
+    <string name="device_share_no_apk">Sem o APK</string>
+    <!-- Title: include the listen check's station recording? One line. -->
+    <string name="device_share_station_q">Incluir a gravação da estação?</string>
+    <!-- Choice: leave the station recording out. One line. -->
+    <string name="device_share_station_no">Deixar de fora</string>
+    <!-- Choice: include the station recording. May wrap. -->
+    <string name="device_share_station_yes">Incluir (até 20 s do que a estação transmitiu; pode conter a voz de outras pessoas)</string>
+    <!-- Toast when there is no report to share. -->
+    <string name="device_share_none">Ainda não há relatório: gere um primeiro</string>
+    <!-- Title while the PTT key is captured. One line. -->
+    <string name="device_capture_title">Pressione a tecla PTT agora</string>
+    <!-- Message while the PTT key is captured. -->
+    <string name="device_capture_msg">Pressione e solte algumas vezes o botão PTT lateral do celular nos próximos 10 segundos. Tudo o que o celular informar sobre ele é registrado.</string>
+    <!-- Toast after the PTT capture when there is no report to save it in. -->
+    <string name="device_capture_no_report">Capturado, mas gere um relatório primeiro para poder salvar</string>
+    <!-- Toast after the PTT capture was saved. -->
+    <string name="device_capture_saved">Salvo no relatório</string>
+
+    <!-- ==== Radio firmware files (list, copy on request) ==== -->
+    <!-- Title of the radio firmware files dialogs. One line. -->
+    <string name="device_fwfiles">Arquivos de firmware do rádio</string>
+    <!-- What the radio firmware files search does, before it runs. A paragraph. -->
+    <string name="device_fwfiles_intro">Requer root do Magisk. Procura nas pastas onde os celulares-rádio guardam as imagens do chip de rádio e no app de walkie-talkie do fabricante, e lista o que encontrar: nome, tamanho, uma impressão digital (SHA-256) e a versão do módulo gravada no arquivo. Os arquivos do próprio SignalDeck (capturas seriais, gravações, relatórios) ficam de fora; em /sdcard/DMR só conta uma imagem de módulo. Um arquivo que o SignalDeck ou o catálogo de firmware dele já tem é marcado como já conhecido, então ninguém precisa de uma cópia dele. A lista vai para o relatório do dispositivo. Nada é copiado a menos que você marque arquivos, e mesmo assim só para Download/DMR/FoundFirmware neste celular; nada é enviado para lugar nenhum. Esses arquivos pertencem ao fabricante do celular: compartilhe-os só em particular, e só se o mantenedor do SignalDeck pedir.</string>
+    <!-- Button: start the firmware file search. Short. -->
+    <string name="device_fwfiles_look">Procurar</string>
+    <!-- Result when no readable firmware file was found. -->
+    <string name="device_fwfiles_none">Nenhum arquivo legível encontrado.</string>
+    <!-- Result when no readable firmware file was found, and the search was saved in the report. -->
+    <string name="device_fwfiles_none_in_report">Nenhum arquivo legível encontrado. A busca está no relatório do dispositivo.</string>
+    <!-- Line in a found firmware file's row (starts with a line break). %1$s says where it is known from. -->
+    <string name="device_fwfiles_known">\nJá conhecido: %1$s</string>
+    <!-- Title of the list of found firmware files. %1$d is how many. One line. -->
+    <plurals name="device_fwfiles_found">
+        <item quantity="one">Encontrados: %1$d (listados no relatório)</item>
+        <item quantity="many">%1$d encontrados (listados no relatório)</item>
+        <item quantity="other">%1$d encontrados (listados no relatório)</item>
+    </plurals>
+    <!-- Button: copy the ticked files. Short. -->
+    <string name="device_fwfiles_copy">Copiar marcados</string>
+    <!-- After copying firmware files. %1$d is how many, %2$s the new folder's name. SOURCES.txt is a file name. -->
+    <plurals name="device_fwfiles_copied">
+        <item quantity="one">Arquivos copiados: %1$d, para Download/DMR/FoundFirmware/%2$s, com um SOURCES.txt. Nada foi enviado para lugar nenhum; compartilhe a pasta em particular, se for pedido.</item>
+        <item quantity="many">%1$d arquivos copiados para Download/DMR/FoundFirmware/%2$s, com um SOURCES.txt. Nada foi enviado para lugar nenhum; compartilhe a pasta em particular, se for pedido.</item>
+        <item quantity="other">%1$d arquivos copiados para Download/DMR/FoundFirmware/%2$s, com um SOURCES.txt. Nada foi enviado para lugar nenhum; compartilhe a pasta em particular, se for pedido.</item>
+    </plurals>
+    <!-- When copying firmware files fails. %1$s is the error. -->
+    <string name="device_fwfiles_copy_failed">Falha ao copiar: %1$s</string>
+    <!-- Button: copy no files. Short. -->
+    <string name="device_fwfiles_copy_none">Não copiar nada</string>
+
+    <!-- ==== Radio probe ==== -->
+    <!-- Title of the radio probe dialogs. One line. -->
+    <string name="device_probe">Sondagem do rádio</string>
+    <!-- What the radio probe does, before it runs; ends with a question about the power pulse. -->
+    <string name="device_probe_msg">Requer root do Magisk. Lê os rótulos do SELinux das portas seriais, deduz e aplica as regras para esta sessão, envia a consulta de versão do módulo em cada porta em várias velocidades, lê o nó de alimentação e procura um fluxo PCM. O app de walkie-talkie do fabricante deve estar fechado. Dar também um pulso no nó de alimentação?</string>
+    <!-- Button: run the probe. Short. -->
+    <string name="device_probe_run">Sondar</string>
+    <!-- Button: run the probe and pulse the module's power. Short. -->
+    <string name="device_probe_pulse">Sondar + pulso de energia</string>
+    <!-- Before the probe's output when there is no report to save it in. %1$s is the output (English). -->
+    <string name="device_probe_not_saved">(gere um relatório primeiro para que isto seja salvo)\n\n%1$s</string>
+
+    <!-- ==== Show the radio in the car (Android Auto trust) ==== -->
+    <!-- Title of the sheet that explains how to make Android Auto list SignalDeck. One line. -->
+    <string name="device_auto_title">Mostrar o rádio no carro</string>
+    <!-- First hint on the Android Auto sheet. -->
+    <string name="device_auto_hint">O Android Auto só confia em apps instalados pela Play Store. Com o SignalDeck, o som toca e os botões do volante funcionam, mas o app não aparece na lista de apps do carro, e tocar no card dele abre o app no celular.</string>
+    <!-- Button: open Android Auto's settings. One line. -->
+    <string name="device_auto_open">Abrir configurações do Android Auto</string>
+    <!-- Button: check again whether Android Auto hides the app. Short. -->
+    <string name="device_auto_again">Verificar de novo</string>
+
+    <!-- ==== New firmware variant (submit to the catalogue) ==== -->
+    <!-- Title of the dialog offering to submit an unknown firmware variant. One line. -->
+    <string name="device_variant">Nova variante de firmware</string>
+    <!-- First paragraphs of the firmware variant dialog (ends with two line breaks). %1$s is why the firmware is new (from the check). "Submit" is GitHub's button. -->
+    <string name="device_variant_msg">O firmware de rádio deste celular ainda não está no catálogo de firmware do SignalDeck: %1$s.\n\nEnviá-lo permite que o projeto de firmware o catalogue, para que o SignalDeck o reconheça e o trabalho de firmware possa abrangê-lo mais tarde. O GitHub abre no seu navegador com o modelo do celular, a versão do módulo, a versão do app do fabricante e a impressão digital do arquivo de firmware já preenchidos. Confira os dados e pressione Submit lá (é preciso ter uma conta no GitHub). Nada é enviado se você não enviar, e nada ali identifica você.\n\n</string>
+    <!-- Paragraph of the firmware variant dialog when the firmware file is new too (ends with two line breaks). -->
+    <string name="device_variant_attach">O próprio arquivo de firmware também é novo: o SignalDeck o copia para Download/DMR/FoundFirmware neste celular, e a issue diz onde ele está. Anexá-lo é decisão sua: um anexo na issue é público, qualquer pessoa pode baixá-lo, e o arquivo pertence ao fabricante do celular.\n\n</string>
+    <!-- Paragraph of the firmware variant dialog when the file is known (ends with two line breaks). -->
+    <string name="device_variant_stays">O próprio arquivo de firmware fica neste celular.\n\n</string>
+    <!-- Last paragraph of the firmware variant dialog. -->
+    <string name="device_variant_notice">O aviso fica na página Dispositivo até o catálogo listar este firmware.</string>
+    <!-- Button: open the GitHub issue form. Short. -->
+    <string name="device_variant_open">Abrir o GitHub</string>
+    <!-- Toast after the firmware file is copied for the issue. -->
+    <string name="device_variant_copied">Arquivo de firmware copiado para Download/DMR/FoundFirmware: anexe-o à issue, se quiser</string>
+    <!-- Toast when no browser can open GitHub. -->
+    <string name="device_variant_no_browser">Nenhum navegador para abrir o GitHub</string>
+
+
+    <!-- ==== Radio module firmware sheet ==== -->
+    <!-- Title of the sheet about the radio module's firmware version. One line. -->
+    <string name="device_modfw_title">Firmware do módulo de rádio</string>
+    <!-- Two lines on the module firmware sheet. %1$s is the stock version (or device_modfw_stock_unknown), %2$s the version now (or device_modfw_no_answer). -->
+    <string name="device_modfw_versions">De fábrica: %1$s\nAgora: %2$s</string>
+    <!-- In "Stock: …": the stock version is not known. Short. -->
+    <string name="device_modfw_stock_unknown">ainda desconhecida</string>
+    <!-- In "Now: …": the module has not answered. Short. -->
+    <string name="device_modfw_no_answer">o módulo ainda não respondeu</string>
+    <!-- Hint on the module firmware sheet when the module runs its stock firmware. -->
+    <string name="device_modfw_hint_stock">A versão de fábrica é a primeira que o módulo de rádio deste celular informou ao SignalDeck. Ela fica guardada para sempre, para você sempre saber com qual firmware o celular veio. O módulo está rodando o firmware de fábrica.</string>
+    <!-- Hint on the module firmware sheet when other firmware is loaded. -->
+    <string name="device_modfw_hint_differs">A versão de fábrica é a primeira que o módulo de rádio deste celular informou ao SignalDeck. Ela fica guardada para sempre, para você sempre saber com qual firmware o celular veio. Agora o módulo informa outra versão, ou seja, há outro firmware carregado. Se o celular já tinha outro firmware quando o SignalDeck o viu pela primeira vez, você pode adotar a versão atual como de fábrica.</string>
+    <!-- Button on the module firmware sheet. One line. -->
+    <string name="device_modfw_reset">Adotar a versão atual como de fábrica</string>
+    <!-- Title of the confirmation. %1$s is the module's version now. One line. -->
+    <string name="device_modfw_reset_title">Adotar %1$s como de fábrica?</string>
+    <!-- Message of the confirmation. %1$s is the stock version. -->
+    <string name="device_modfw_reset_msg">O SignalDeck deixará de lembrar %1$s como o firmware com que este celular veio.</string>
+    <!-- Button that takes the current version as stock. Short. -->
+    <string name="device_modfw_reset_ok">Adotar</string>
+
+    <!-- ==== Link card status lines ==== -->
+    <!-- Item in the profile line on the link card (items are joined with " · "): the audio path. Very short. -->
+    <string name="device_status_audio_vendor">áudio do fabricante</string>
+    <!-- Item in the profile line: the audio path. Very short. -->
+    <string name="device_status_audio_camcorder">entrada camcorder</string>
+    <!-- Item in the profile line: the audio path. Very short. -->
+    <string name="device_status_audio_ext">soquete de áudio extmodule</string>
+    <!-- Item in the profile line: the audio path (audio over the serial port). Very short. -->
+    <string name="device_status_audio_uart">PCM por UART</string>
+    <!-- Item in the profile line: the radio module is an analog AT-command module. Very short. -->
+    <string name="device_status_analog_at">módulo AT analógico</string>
+    <!-- Item in the profile line: the profile revision (r%1$s), updated from the signed list. Very short. -->
+    <string name="device_status_rev_updated">r%1$s atualizado</string>
+    <!-- SAFETY: item in the profile line: an advisory applies. Very short. -->
+    <string name="device_status_advisory">⚠ aviso</string>
+    <!-- Item in the profile line: the profile has not been tested on this phone. One word. -->
+    <string name="device_status_untested">não testado</string>
+    <!-- The firmware line on the link card before the stock version is known (tap opens the firmware screen). Short. -->
+    <string name="device_status_module_fw">Firmware do módulo</string>
+    <!-- Notice line on the link card: the firmware is not in the catalogue; tap to submit it. One line, may wrap. -->
+    <string name="device_status_variant_new">⚠ Firmware ainda fora do catálogo · toque para enviar</string>
+    <!-- Notice line on the link card after the firmware was submitted. One line, may wrap. -->
+    <string name="device_status_variant_sent">⚠ Firmware ainda fora do catálogo · enviado ao GitHub, aguardando o catálogo</string>
+    <!-- Link state on the link card (large): SignalDeck owns the radio. One line. -->
+    <string name="device_status_ready">Este app controla o rádio</string>
+    <!-- Link state on the link card: root was not granted. One line. -->
+    <string name="device_status_no_root">Root não concedido (Magisk → Superusuário)</string>
+    <!-- Link state on the link card: the stock app has the radio. One line. -->
+    <string name="device_status_stopped">O app do fabricante controla o rádio</string>
+    <!-- Link state on the link card: no profile for this phone. One line. -->
+    <string name="device_status_unsupported">Ainda não há perfil para este celular</string>
+    <!-- Link state on the link card while it starts. %1$s is the current step (English, from the service). -->
+    <string name="device_status_starting">Iniciando: %1$s</string>
+    <!-- ===== About (legal notices) ===== -->
+    <!-- The legal notices on the Mission Statement sheet and in SignalDeck Web (GPL "Appropriate Legal Notices"). Keep the
+         meaning exact: copyright, the GPL terms, the section 7 terms and the credits. Names, licence names and "NO WARRANTY"
+         wording follow the licence. %1$s is the app version, %2$s the source URL. Long text, scrolls. -->
+    <string name="device_about_legal">SignalDeck %1$s\nCopyright (C) 2026 IIMacGyverII\n\nSoftware livre: você pode usar, estudar, compartilhar e modificar este software nos termos da GNU General Public License, versão 3 ou posterior. Ele é fornecido SEM NENHUMA GARANTIA.\n\nTermos adicionais (seção 7 da GPL): mantenha o aviso de copyright e este crédito ao autor; identifique uma versão modificada como modificada e não a apresente como o SignalDeck original nem como obra do autor; a licença não dá nenhum direito sobre o nome “SignalDeck” nem sobre o seu ícone, portanto uma versão modificada precisa de nome e ícone próprios.\n\nCódigo-fonte, builds oficiais assinados e a licença completa (LICENSE, COPYRIGHT): %2$s\n\nFeito com: robot36 SSTV de Ahmet Inan (GPL v3); ft8_lib FT8 de Karlis Goba (MIT); Codec 2 de David Rowe VK5DGR (LGPL 2.1) para o M17; reconhecimento de voz e modelos Vosk, JNA, AndroidX e HiddenApiBypass (Apache 2.0); fontes Orbitron, Rajdhani e Share Tech Mono (SIL OFL 1.1); bancos de questões da prova dos EUA (NCVEC, domínio público). Dados: blocos de mapa © colaboradores do OpenStreetMap (ODbL), Terrain Tiles no AWS Open Data, RadioID.net, BrandMeister, hearham.com, NetLogger, CelesTrak e AMSAT, ARISS.</string>
+
+    <!-- ===== Root setup (Magisk boot module) ===== -->
+    <!-- Message after Device → install the boot module, when the app has no root. One sentence. -->
+    <string name="device_root_not_granted">O root não foi concedido.</string>
+    <!-- Message after the Magisk boot module installed. "SignalDeck access" is the module's name as Magisk lists it (stays as is). A few lines. -->
+    <string name="device_root_module_installed">Instalado. Reinicie uma vez; a partir daí as regras são carregadas a cada inicialização (Magisk → Módulos mostra \"SignalDeck access\").</string>
+    <!-- Message when Magisk refused the module. %1$s is Magisk's own output (English, several lines). -->
+    <string name="device_root_module_failed">Não foi possível instalar o módulo:\n%1$s</string>
+    <!-- Message when the module zip could not be written. %1$s is the Java error. One line. -->
+    <string name="device_root_module_zip_failed">Não foi possível gerar o zip do módulo: %1$s</string>
+
+    <!-- ===== Update paths ===== -->
+    <!-- Under a version in the update sheet's "What changed" list, when that release has no notes. Short. -->
+    <string name="device_paths_no_notes">(sem notas)</string>
+
+    <!-- ===== Module firmware line (Device page) ===== -->
+    <!-- Device page firmware line when the module now runs other firmware than it shipped with. %1$s the current version, %2$s the stock one (codes like DMR003.TEST.V001). Two short lines. -->
+    <string name="device_firmware_line_changed">firmware %1$s\nde fábrica %2$s</string>
+    <!-- Device page firmware line when the module still runs its stock firmware. %1$s is the version code. One short line. -->
+    <string name="device_firmware_line_stock">firmware %1$s (de fábrica)</string>
+
+    <!-- ===== Radio notes (About this radio) ===== -->
+    <!-- Status chip on the About this radio sheet: SignalDeck is tested on this radio. One or two words. -->
+    <string name="device_notes_status_tested">Testado</string>
+    <!-- Status chip: support for this radio is in beta testing. Two or three words. -->
+    <string name="device_notes_status_testing">Em teste</string>
+    <!-- Status chip: support for this radio is still being developed. A few words. -->
+    <string name="device_notes_status_bringup">Em desenvolvimento</string>
+    <!-- Status chip: this radio is no longer supported or sold. One or two words. -->
+    <string name="device_notes_status_discontinued">Descontinuado</string>
+    <!-- Status chip: SignalDeck has not been tried on this radio. One or two words. -->
+    <string name="device_notes_status_untested">Não testado</string>
+
+    <!-- ===== Walkie-talkie app finder (why an app is a candidate) ===== -->
+    <!-- Evidence that an installed app is the phone's own walkie-talkie app; shown after the app's name in a picker, several joined by device_radioapp_why_separator. Lower case, short phrase. -->
+    <string name="device_radioapp_why_serial_open">está com uma porta serial aberta agora</string>
+    <!-- Evidence (see device_radioapp_why_serial_open). PTT is the push-to-talk key. Short phrase. -->
+    <string name="device_radioapp_why_ptt">escuta a tecla PTT</string>
+    <!-- Evidence (see device_radioapp_why_serial_open): the package name contains radio-like words. Short phrase. -->
+    <string name="device_radioapp_why_name">o nome parece de app de rádio</string>
+    <!-- Evidence (see device_radioapp_why_serial_open): the app shows in the launcher. Short phrase. -->
+    <string name="device_radioapp_why_launcher">tem ícone no launcher</string>
+    <!-- Evidence (see device_radioapp_why_serial_open): the app bundles a native serial-port library. Short phrase. -->
+    <string name="device_radioapp_why_serial_lib">traz uma biblioteca de porta serial</string>
+    <!-- Evidence (see device_radioapp_why_serial_open). /dev/tty… is a file path; keep it. Short phrase. -->
+    <string name="device_radioapp_why_tty">o código abre portas /dev/tty…</string>
+    <!-- Evidence (see device_radioapp_why_serial_open). /sys/devices/platform is a path; keep it. Short phrase. -->
+    <string name="device_radioapp_why_sys">o código usa linhas de /sys/devices/platform</string>
+    <!-- Separator between the evidence phrases above in one line. A comma and a space in English. -->
+    <string name="device_radioapp_why_separator">, </string>
+
+    <!-- ===== Heat guard (long transmissions) ===== -->
+    <!-- SAFETY: why a long transmission may not start: the phone's radio area is already hot. Shown and stored in the history. %1$s is the temperature now, %2$s the stop temperature, %3$s the start limit (numbers like 65.0 and 70). Keep °C. A few lines. -->
+    <string name="device_thermal_zone_hot">A zona do rádio do celular está a %1$s °C; uma transmissão longa a levaria além do limite de parada de %2$s °C. Espere esfriar abaixo de %3$s °C antes; uma transmissão curta pode ir agora.</string>
+    <!-- SAFETY: why a long transmission may not start: the battery is already hot. %1$s the battery temperature, %2$s the stop temperature, %3$s the start limit. A few lines. -->
+    <string name="device_thermal_battery_hot">A bateria está a %1$s °C; uma transmissão longa a levaria perto do limite de parada de %2$s °C. Espere esfriar abaixo de %3$s °C antes; uma transmissão curta pode ir agora.</string>
+    <!-- SAFETY: reason a running transmission was stopped for heat, inside a longer history line ("… ended early: <this>. Let the phone cool …"). Lower case start. %1$s the stop temperature, %2$s the reading. -->
+    <string name="device_thermal_stop_zone">a zona do rádio do celular passou de %1$s °C (%2$s)</string>
+    <!-- SAFETY: heat-stop reason (see device_thermal_stop_zone): the battery. %1$s the stop temperature, %2$s the reading. -->
+    <string name="device_thermal_stop_battery">a bateria passou de %1$s °C (%2$s)</string>
+    <!-- SAFETY: heat-stop reason (see device_thermal_stop_zone): the radio area warmed too fast. %1$s the rise in °C. -->
+    <string name="device_thermal_stop_zone_rise">a zona do rádio subiu %1$s °C em 10 s</string>
+    <!-- SAFETY: heat-stop reason (see device_thermal_stop_zone): the battery warmed too fast. %1$s the rise in °C. -->
+    <string name="device_thermal_stop_battery_rise">a bateria subiu %1$s °C em 10 s</string>
+    <!-- SAFETY: why a long transmission waits: cool-down after the last long one. %1$d its length in seconds, %2$s how far the radio area is above where it started, %3$s the temperature now. A few lines. -->
+    <string name="device_thermal_cooling_zone">Esfriando após a última transmissão de %1$d s: a zona do rádio do celular ainda está %2$s °C acima de onde estava (%3$s °C agora). Transmissões longas esperam até a diferença ficar dentro de 1 °C; uma curta pode ir agora.</string>
+    <!-- SAFETY: why a long transmission waits when the temperature cannot be read: a fixed 17-minute cool-down. %1$d the last transmission in seconds, %2$d minutes left. A few lines. -->
+    <string name="device_thermal_cooling_timer">Esfriando após a última transmissão de %1$d s: aqui não é possível ler a temperatura do celular, por isso transmissões longas esperam 17 minutos (faltam cerca de %2$d min). Uma curta pode ir agora.</string>
+
+    <!-- ===== Longest transmission (transmit limit) ===== -->
+    <!-- SAFETY: heat warning shown once when a transmit limit over 2 minutes (or none) is picked, on the phone and on the Web page. Keep the numbers. A few lines. -->
+    <string name="device_txlimit_heat_warning">Transmissões longas esquentam o celular. Em bancada, 2 minutos de transmissão em potência alta aqueceram a zona do rádio em cerca de 11 °C. O SignalDeck continua interrompendo qualquer transmissão se o celular ficar quente demais (zona do rádio 70 °C, bateria 48 °C).</string>
+    <!-- SAFETY: the transmit limit setting's value when SignalDeck sets no time limit. Chip on the Device page and in history lines. Short. -->
+    <string name="device_txlimit_none">Sem limite</string>
+    <!-- The transmit limit in seconds ("30 s"), on a chip and inside history lines. %1$d is the number. Very short. -->
+    <string name="device_txlimit_seconds">%1$d s</string>
+    <!-- The transmit limit in whole minutes ("2 min"). %1$d is the number. Very short. -->
+    <string name="device_txlimit_minutes">%1$d min</string>
+    <!-- The transmit limit in minutes and seconds ("1 min 30 s"). %1$d minutes, %2$d seconds. Very short. -->
+    <string name="device_txlimit_minutes_seconds">%1$d min %2$d s</string>
+
+    <!-- ===== Run all checks (progress lines in the checks dialog; the report itself stays English) ===== -->
+    <!-- Progress line while the checks start. %1$s is the stock walkie-talkie app's package name (com.…). One line. -->
+    <string name="device_firstrun_closing_stock">Fechando %1$s para liberar as portas</string>
+    <!-- Progress line while the device report is written. %1$s is the report's own step, in English (developer text). One line. -->
+    <string name="device_firstrun_step_report">Relatório: %1$s</string>
+    <!-- Progress line: reading the chosen app's code for clues. %1$s is its package name. One line. -->
+    <string name="device_firstrun_reading_code">Lendo o código de %1$s</string>
+    <!-- Progress line asking the owner to press the phone's side PTT key (the key press is recorded, nothing is transmitted). One or two lines. -->
+    <string name="device_firstrun_press_ptt">Aperte e solte o PTT lateral algumas vezes agora (10 s)</string>
+    <!-- Progress line on phones whose radio sits behind a USB bridge: the probe turns USB to a computer off meanwhile. One or two lines. -->
+    <string name="device_firstrun_probe_bridge">Sondagem: consultando o rádio pela ponte USB (o USB para o computador fica desligado por cerca de 10 s)</string>
+    <!-- Progress line during the radio probe. %1$s is the probe's own step, in English (developer text). One line. -->
+    <string name="device_firstrun_step_probe">Sondagem: %1$s</string>
+    <!-- Progress line during the second probe, with the module's power switched on. %1$s is the probe's step (English). One line. -->
+    <string name="device_firstrun_step_probe_power">Sondagem com energia ligada: %1$s</string>
+    <!-- Progress line: the report folder is being zipped. One word. -->
+    <string name="device_firstrun_zipping">Compactando</string>
+    <!-- Progress line of the Listen check. %1$d seconds done, %2$d seconds in all, %3$d seconds with a signal. One line. -->
+    <string name="device_firstrun_listening">Escutando: %1$d de %2$d s, algo ouvido em %3$d s</string>
+    <!-- SAFETY: progress line while the stock walkie-talkie app runs for 15 s; the owner must not transmit. One or two lines. -->
+    <string name="device_firstrun_watch_open">O app de rádio do fabricante fica aberto por 15 s – não aperte o PTT</string>
+    <!-- SAFETY: the same, on phones whose radio uses the USB port (USB to a computer is off). Two lines. -->
+    <string name="device_firstrun_watch_open_bridged">O app de rádio do fabricante fica aberto por 15 s – não aperte o PTT (enquanto isso, o USB para o computador fica desligado)</string>
+    <!-- Progress line of the trial take-over (receive only): squelch check with squelch level 0. One line. -->
+    <string name="device_firstrun_trial_squelch_alone">Ensaio: teste de squelch, só squelch 0</string>
+    <!-- Progress line of the trial: squelch check with squelch 0 and the monitor (MON) on. One line. -->
+    <string name="device_firstrun_trial_squelch_monitor">Ensaio: teste de squelch, squelch 0 e MON</string>
+    <!-- Progress line of the trial: receive level at a module volume step. %1$d is the step (1–8). One line. -->
+    <string name="device_firstrun_trial_level">Ensaio: nível de recepção no volume %1$d</string>
+    <!-- Progress line of the trial: timing the signal reading after a retune. %1$d is the run (1 to 5). One line. -->
+    <string name="device_firstrun_trial_retune">Ensaio: leitura do sinal após ressintonizar, %1$d de 5</string>
+    <!-- Progress line of the trial: testing a band edge (nothing transmitted). %1$s is the frequency (446.000). One line. -->
+    <string name="device_firstrun_trial_band_edges">Ensaio: limites da banda, %1$s MHz</string>
+    <!-- Progress line of the trial on the Armor 3WT: the extmodule daemon's receive stream for 5 s. "extmodule" is the daemon's name. One line. -->
+    <string name="device_firstrun_trial_extmodule">Ensaio: fluxo de recepção do extmodule, 5 s</string>
+    <!-- Progress line of the trial: a query command to the module. %1$s is its code (0x2F). One line. -->
+    <string name="device_firstrun_trial_command">Ensaio: comando %1$s ao módulo (consulta)</string>
+    <!-- SAFETY: progress line: SignalDeck takes the radio over from the stock app for the trial; it only receives. One line. -->
+    <string name="device_firstrun_trial_take_over">Ensaio: assumindo o rádio (só recepção)</string>
+    <!-- Progress line during the trial take-over. %1$s is the radio link state as the service reports it (English: "opening port", "ready"…). One line. -->
+    <string name="device_firstrun_trial_link">Ensaio: %1$s</string>
+    <!-- Progress line of the trial: listening with the squelch held open. %1$s is the frequency (446.00625). One line. -->
+    <string name="device_firstrun_trial_listening">Ensaio: escutando em %1$s MHz com o squelch aberto</string>
+    <!-- Progress line of the trial: reading the signal strength and the audio stream. One line. -->
+    <string name="device_firstrun_trial_reading">Ensaio: lendo a intensidade do sinal e o áudio</string>
+    <!-- SAFETY: progress line: the trial ends and the radio goes back to the stock app. One line. -->
+    <string name="device_firstrun_trial_hand_back">Ensaio: devolvendo o rádio</string>
+    <!-- Name of the temporary receive-only channel the trial tunes (shown on the Intercom meanwhile). %1$s is its frequency in MHz (446.00625). Keep short (a channel name). -->
+    <string name="device_firstrun_listen_channel">Teste de escuta %1$s</string>
+
+    <!-- ===== Custom PTT key (Device → PTT key: learning a button) ===== -->
+    <!-- Name of the learned PTT key when none is chosen. Short (a value on a settings row). -->
+    <string name="device_ptt_no_key">Nenhuma tecla</string>
+    <!-- Name of a learned PTT key: the volume-up key of a wired headset. Short. -->
+    <string name="device_ptt_headset_volume_up">Volume + do fone</string>
+    <!-- Name of a learned PTT key: the phone's volume-up key. Short. -->
+    <string name="device_ptt_volume_up">Volume +</string>
+    <!-- Name of a learned PTT key: a wired headset's volume-down key. Short. -->
+    <string name="device_ptt_headset_volume_down">Volume − do fone</string>
+    <!-- Name of a learned PTT key: the phone's volume-down key. Short. -->
+    <string name="device_ptt_volume_down">Volume −</string>
+    <!-- Name of a learned PTT key: a wired headset's button. Short. -->
+    <string name="device_ptt_headset_button">Botão do fone</string>
+    <!-- Name of a learned PTT key: a media play/pause button (Bluetooth remote, steering wheel). Short. -->
+    <string name="device_ptt_play_pause">Botão play/pause</string>
+    <!-- Name of a learned PTT key: a wired headset's button held down (it sends the voice-command key). Short. -->
+    <string name="device_ptt_headset_button_hold">Botão do fone (pressionado)</string>
+    <!-- Name of a learned PTT key: a voice-command button. Short. -->
+    <string name="device_ptt_voice_command">Botão de comando de voz</string>
+    <!-- Name of a learned PTT key: the camera button. Short. -->
+    <string name="device_ptt_camera_button">Botão da câmera</string>
+    <!-- Name of a learned PTT key the app has no word for: a "BTN_" input code. %1$s is the kernel's name for it (A, TRIGGER). Short. -->
+    <string name="device_ptt_button_named">Botão %1$s</string>
+    <!-- Name of a learned PTT key the app has no word for: a "KEY_" input code. %1$s is the kernel's name for it (CD, F9). Short. -->
+    <string name="device_ptt_key_named">Tecla %1$s</string>
+    <!-- As device_ptt_button_named, with the input device's name (%2$s, e.g. "mtk-kpd"). Short. -->
+    <string name="device_ptt_button_named_on">Botão %1$s (%2$s)</string>
+    <!-- As device_ptt_key_named, with the input device's name (%2$s, e.g. "mtk-kpd"). Short. -->
+    <string name="device_ptt_key_named_on">Tecla %1$s (%2$s)</string>
+    <!-- Finding (blocks the key) after learning: it is already the phone's PTT key. "Side PTT key" is the name of the Device setting. One or two sentences. -->
+    <string name="device_ptt_check_own_ptt">Esta é a própria tecla PTT do celular. Ela já transmite enquanto PTT lateral estiver ativado, então não precisa ser aprendida.</string>
+    <!-- Finding (blocks the key): the power key. One sentence. -->
+    <string name="device_ptt_check_power">A tecla liga/desliga apaga a tela, e mantê-la pressionada abre o menu de energia.</string>
+    <!-- Finding (blocks the key): a navigation key. One sentence. -->
+    <string name="device_ptt_check_nav">Uma tecla de navegação (início, voltar, menu): o celular reagiria a ela toda vez que você falasse.</string>
+    <!-- Finding (blocks the key): the event came from the touch screen. One sentence. -->
+    <string name="device_ptt_check_touch">Isso veio da tela sensível ao toque (um gesto), não de um botão.</string>
+    <!-- Finding (blocks the key): the event came from the fingerprint sensor. One sentence. -->
+    <string name="device_ptt_check_fingerprint">Isso veio do sensor de impressão digital, que informa deslizes, não um botão mantido pressionado.</string>
+    <!-- SAFETY: finding (blocks the key): no release was seen, so the key could leave the radio transmitting. Two sentences. -->
+    <string name="device_ptt_check_no_release">O botão nunca informou que foi solto. Mantenha-o pressionado por uns dois segundos e depois solte.</string>
+    <!-- Finding (blocks the key): the button cannot report being held. %1$s is the milliseconds it reported. Two sentences. -->
+    <string name="device_ptt_check_no_hold">Ele informou que foi solto após %1$s ms, embora estivesse pressionado. Este botão não informa quando fica pressionado, então não serve como PTT.</string>
+    <!-- Finding (warning): pressing the button also opened an app. %1$s is the app's package name. Two sentences. -->
+    <string name="device_ptt_check_opens_app">Ao apertá-lo, %1$s também veio para a frente. Isso vai acontecer toda vez que você falar; mude a configuração desse botão nas Configurações do celular ou escolha outro botão.</string>
+    <!-- Finding (warning) for a volume key. Two sentences. -->
+    <string name="device_ptt_check_volume">Fora do SignalDeck, o celular continua mudando o volume enquanto você a mantém pressionada. O SignalDeck restaura o volume quando você solta.</string>
+    <!-- Finding (warning): "Volume-up transmits" is the name of an Intercom setting, switched off by this key. Two sentences. -->
+    <string name="device_ptt_check_vol_ptt">Volume + transmite usa a mesma tecla na página Rádio. Essa opção será desativada, já que esta a substitui.</string>
+    <!-- Finding (warning) for a media button. One sentence. -->
+    <string name="device_ptt_check_media">Um botão de mídia: ele continua tocando ou pausando música, e mantê-lo pressionado pode abrir o assistente de voz.</string>
+    <!-- Finding (warning): "Steering-wheel play/pause talks" is the name of a car setting. Two sentences. -->
+    <string name="device_ptt_check_wheel">Play/pause do volante transmite está ativado. No carro, essa opção já usa o play/pause; as duas juntas funcionam, mas fazem a mesma coisa.</string>
+    <!-- Finding (warning) for the camera button. One sentence. -->
+    <string name="device_ptt_check_camera">O botão da câmera pode abrir a câmera.</string>
+    <!-- SAFETY: finding (warning) for a Bluetooth button: a lost release is caught by the transmit limit. "Device → Longest transmission" is a menu path. A few lines. -->
+    <string name="device_ptt_check_bluetooth">Um botão Bluetooth: funciona enquanto estiver conectado, e o SignalDeck o encontra de novo quando ele reconecta. A bateria e o alcance dele decidem se o aviso de soltar chega; o limite de tempo de transmissão (Dispositivo → Transmissão máxima) interrompe uma transmissão travada.</string>
+    <!-- Error when learning a PTT key: the input devices could not be read (needs root). Two sentences. -->
+    <string name="device_ptt_learn_no_devices">Não foi possível ler os dispositivos de entrada do celular. Aprender uma tecla exige root (Magisk).</string>
+    <!-- Learning a PTT key, first step in the dialog. One sentence. -->
+    <string name="device_ptt_learn_press">Mantenha pressionado por uns dois segundos o botão com que você quer falar e depois solte.</string>
+    <!-- Learning a PTT key: the button is down. %1$s is its name ("Volume up"). One line. -->
+    <string name="device_ptt_learn_held">Pressionando %1$s… agora solte.</string>
+    <!-- Learning a PTT key: the button was released; checking for side effects. One line. -->
+    <string name="device_ptt_learn_got_it">Pronto. Verificando se esse botão também faz outra coisa…</string>
+    <!-- Learning a PTT key: nothing was pressed in time. %1$d is the seconds waited. One sentence. -->
+    <string name="device_ptt_learn_none">Nenhum botão foi pressionado em %1$d segundos.</string>
+    <!-- Learning a PTT key failed. %1$s is the error (English). One line. -->
+    <string name="device_ptt_learn_failed">Falha ao aprender: %1$s</string>
+
+    <!-- ===== Main screen (tabs, bars, sheets, toasts) ===== -->
+    <!-- Bottom tab: the radio's main page. Shown in capitals, ≤ 9 characters (five tabs share a phone's width). -->
+    <string name="device_main_tab_intercom">Rádio</string>
+    <!-- Bottom tab: the channel list. Capitals, ≤ 9 characters. -->
+    <string name="device_main_tab_channels">Canais</string>
+    <!-- Bottom tab: the contact list. Capitals, ≤ 9 characters. -->
+    <string name="device_main_tab_contacts">Contatos</string>
+    <!-- Bottom tab: text messages. Capitals, ≤ 9 characters. -->
+    <string name="device_main_tab_messages">Mensagens</string>
+    <!-- Bottom tab: the Device page (settings, reports). Capitals, ≤ 9 characters. -->
+    <string name="device_main_tab_device">Dispositivo</string>
+    <!-- Placeholder page for a tab not built yet. %1$s is the tab name. -->
+    <string name="device_main_coming_next">%1$s\n\nem breve</string>
+    <!-- Title of the one-time sheet announcing the coverage maps feature. One line. -->
+    <string name="device_main_coverage_title">Mapas de cobertura</string>
+    <!-- Small label in capitals on the coverage maps sheet. Two words. -->
+    <string name="device_main_coverage_new">Novo recurso</string>
+    <!-- Text of the coverage maps sheet. A few lines. -->
+    <string name="device_main_coverage_hint">Veja até onde cada uma das suas repetidoras chega até você e de onde você consegue abri-la. Ative o registro de cobertura e o app mede enquanto você dirige ou caminha, depois desenha tudo no mapa. Exporte para o Google Earth quando quiser.</string>
+    <!-- Button on the coverage maps sheet that opens the map. Short (button, about 60 % of the width). -->
+    <string name="device_main_coverage_open">Abrir o mapa</string>
+    <!-- Toast when shared channels contained nothing to import. Short. -->
+    <string name="device_main_nothing_to_import">Nada para importar</string>
+    <!-- Title of the channel list after a place was shared from a maps app. %1$s latitude, %2$s longitude (decimal degrees); the channel picked follows. One line. -->
+    <string name="device_main_location_title">Definir %1$s, %2$s como localização de</string>
+    <!-- Toast after a shared place was stored on a channel. %1$s is the channel name. Short. -->
+    <string name="device_main_location_set">%1$s: localização definida</string>
+    <!-- Name of the running band scope in the mode picker. Short. -->
+    <string name="device_main_mode_band_scope">Band scope</string>
+    <!-- A satellite mode in the mode picker while it waits for the pass. %1$s is the mode name ("ISS SSTV", "ISS APRS"). Short. -->
+    <string name="device_main_mode_waiting_pass">%1$s (aguardando a passagem)</string>
+    <!-- SSTV picture receive in the mode picker. SSTV is a mode name. Short. -->
+    <string name="device_main_mode_sstv_rx">Recepção SSTV</string>
+    <!-- APRS monitoring in the mode picker. APRS is a mode name. Short. -->
+    <string name="device_main_mode_aprs_monitoring">Escuta de APRS</string>
+    <!-- The parrot (repeats what it hears) in the mode picker. Short. -->
+    <string name="device_main_mode_parrot">Papagaio</string>
+    <!-- M17 receive in the mode picker. M17 is a mode name. Short. -->
+    <string name="device_main_mode_m17_rx">Recepção M17</string>
+    <!-- Green bar over the Intercom while the band scope runs. One line (single line, cut off if long). -->
+    <string name="device_main_bar_scope">Band scope varrendo</string>
+    <!-- The same, with the frequency being swept (%1$s, MHz). Keep the two spaces around the dot. One line. -->
+    <string name="device_main_bar_scope_at">Band scope varrendo  ·  %1$s MHz</string>
+    <!-- Mode bar for a satellite mode waiting for its pass. %1$s is the mode with its emoji ("📺  ISS SSTV"), %2$s the pass time (HH:mm). One line. -->
+    <string name="device_main_bar_sat_next">%1$s  ·  próxima passagem %2$s</string>
+    <!-- Mode bar for a satellite mode during the pass. %1$s is the mode with its emoji. One line. -->
+    <string name="device_main_bar_sat_now">%1$s  ·  passagem em andamento</string>
+    <!-- Mode bar: SSTV picture receive. Keep the emoji and the two spaces. One line. -->
+    <string name="device_main_bar_sstv_rx">📺  Recepção SSTV</string>
+    <!-- Mode bar: APRS monitoring. %1$s is the frequency (MHz). Keep the emoji and the spacing. One line. -->
+    <string name="device_main_bar_aprs">📡  Escuta de APRS  ·  %1$s</string>
+    <!-- Mode bar: the parrot is on. Keep the emoji and the two spaces. One line. -->
+    <string name="device_main_bar_parrot">🦜  Papagaio</string>
+    <!-- Mode bar: M17 receive, nothing heard. Keep the emoji and spacing. One line. -->
+    <string name="device_main_bar_m17_listening">📻  M17  ·  escutando</string>
+    <!-- Mode bar: M17, a station is being received (no callsign yet). One line. -->
+    <string name="device_main_bar_m17_receiving">📻  M17  ·  recebendo</string>
+    <!-- Mode bar: M17, a station is heard. %1$s the sender's callsign, %2$s the destination. One line. -->
+    <string name="device_main_bar_m17_heard">📻  M17  ·  %1$s → %2$s</string>
+    <!-- Mode bar: FT8 running and transmitting in its time slot. One line. -->
+    <string name="device_main_bar_ft8_tx">〰  FT8  ·  transmitindo no seu período</string>
+    <!-- Mode bar: FT8 running, listening only. One line. -->
+    <string name="device_main_bar_ft8_listening">〰  FT8  ·  escutando</string>
+    <!-- Link at the right of the mode bar that opens the mode's page. Capitals, very short, keep "  ›". -->
+    <string name="device_main_bar_open">ABRIR  ›</string>
+    <!-- Screen-reader description of the mode bar. -->
+    <string name="device_main_bar_open_desc">Abrir a página do modo em execução</string>
+    <!-- Link on the one-time region bar that opens the region sheet. Capitals, very short, keep "  ›". -->
+    <string name="device_main_region_change">MUDAR  ›</string>
+    <!-- Screen-reader description of the region bar's close button. -->
+    <string name="device_main_region_dismiss">Dispensar</string>
+    <!-- Region bar on the Intercom: the region in use. %1$s region name, %2$s how it was chosen ("from the network"…), %3$s the APRS frequency (MHz). One or two lines. -->
+    <string name="device_main_region_set">Região: %1$s (%2$s). APRS %3$s</string>
+    <!-- The same while roaming. %1$s region, %2$s how chosen, %3$s the country of the mobile network, %4$s the APRS frequency. One or two lines. -->
+    <string name="device_main_region_roaming">Região: %1$s (%2$s; rede: %3$s). APRS %4$s</string>
+    <!-- Region bar when no region is chosen yet. One or two lines. -->
+    <string name="device_main_region_choose">Escolha sua região para usar a frequência APRS e as listas de canais dela</string>
+    <!-- Toast: no app on the phone can pick a picture. Short. -->
+    <string name="device_main_no_picture_app">Nenhum app de imagens disponível</string>
+    <!-- Toast: no app on the phone can pick a file or folder. Short. -->
+    <string name="device_main_no_file_picker">Nenhum seletor de arquivos disponível</string>
+    <!-- SAFETY: toast after Exit when the radio went back to the phone's own walkie-talkie app. One line. -->
+    <string name="device_main_exit_handed_back">Rádio devolvido ao app do fabricante</string>
+    <!-- Toast after Exit when the radio was switched off. One or two lines. -->
+    <string name="device_main_exit_switched_off">Rádio desligado. Abra o SignalDeck para ligá-lo de novo</string>
+    <!-- ==== Device → Module firmware page (ui/FirmwareScreen) ==== -->
+    <!-- Module firmware page: label under one of eight segments of the progress bar (checks before the load). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_prepare">Preparo</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the module enters update mode). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_update">Atualiz.</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the handshake with the bootloader). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_hello">Contato</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the module erases its flash). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_erasing">Apagando</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the image is sent). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_transfer">Envio</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the transfer is closed). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_finish">Fim</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the module restarts). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_restart">Reinício</string>
+    <!-- Module firmware page: label under one of eight segments of the progress bar (the version string is read back). Tiny text under a narrow segment: one short word, at most 8 characters. -->
+    <string name="device_fw_phase_verify">Conferir</string>
+    <!-- SAFETY: Module firmware page, progress figures while the module erases its flash. Line 1 is the phase, line 2 the seconds left (%1$d). Two short lines. -->
+    <string name="device_fw_erasing_left">Apagando\nfaltam %1$d s nesta fase</string>
+    <!-- Title of the Module firmware page (header; the phone name is under it). Short. -->
+    <string name="device_fw_title">Firmware do módulo</string>
+    <!-- SAFETY: Module firmware page, heading above the disclaimer (shown in capitals). Short. -->
+    <string name="device_fw_risk_heading">Por sua conta e risco</string>
+    <!-- SAFETY: Module firmware page, the owner's disclaimer for loading module firmware (legal wording: translate faithfully, keep every point). A paragraph. -->
+    <string name="device_fw_disclaimer">Carregar firmware no módulo é por sua conta e risco. As imagens publicadas são testadas em bancada, a página verifica o celular, o módulo e o arquivo antes de gravar qualquer coisa, e você sempre pode carregar o firmware de fábrica de novo. Mesmo assim, o SignalDeck e seus colaboradores não dão nenhuma garantia e não se responsabilizam por um módulo de rádio que pare de funcionar nem pelo que ele transmitir.</string>
+    <!-- Module firmware page, heading of the section that shows the firmware now in the module (capitals). Short. -->
+    <string name="device_fw_installed">Instalado</string>
+    <!-- Module firmware page, heading of the section about the image picked to load (capitals). Short. -->
+    <string name="device_fw_chosen">Imagem escolhida</string>
+    <!-- Module firmware page, heading of the factory-backup section, and the name of a pre-flight check (the verified copy of the firmware the phone shipped with). Short. -->
+    <string name="device_fw_factory_backup">Backup de fábrica</string>
+    <!-- Module firmware page, heading above the list of firmware images to choose from (capitals). One word. -->
+    <string name="device_fw_images">Imagens</string>
+    <!-- SAFETY: Module firmware page, heading above the checks that must pass before a load (capitals). One or two words. -->
+    <string name="device_fw_preflight">Verificações prévias</string>
+    <!-- Module firmware page, heading of the advanced section (unlisted images) (capitals). One word. -->
+    <string name="device_fw_advanced">Avançado</string>
+    <!-- Module firmware page, progress figures before a load starts. One word. -->
+    <string name="device_fw_waiting">Aguardando</string>
+    <!-- Module firmware page, button that shows or hides the technical log of the load (the log itself stays English). Short button. -->
+    <string name="device_fw_handshake_log">Registro do handshake</string>
+    <!-- Module firmware page, button that loads the chosen image into the radio module (one of three buttons in a row; also the confirm button). Very short. -->
+    <string name="device_fw_load">Carregar</string>
+    <!-- Module firmware page, button that loads the factory image back (one of three buttons in a row). Short. -->
+    <string name="device_fw_restore_factory">De fábrica</string>
+    <!-- Module firmware page, button that downloads the verified factory image from the catalogue. Full-width button. -->
+    <string name="device_fw_download_factory">Baixar o firmware de fábrica</string>
+    <!-- Module firmware page, button that downloads the chosen catalogue image. %1$s is the image's version string (DMR003.FW57.V022). Full-width button. -->
+    <string name="device_fw_download_tag">Baixar %1$s</string>
+    <!-- Module firmware page, button that fetches the signed firmware catalogue again. Full-width button. -->
+    <string name="device_fw_check_new">Procurar firmware novo</string>
+    <!-- SAFETY: Module firmware page, switch button for loading files that are not in the catalogue; now off. Full-width button. -->
+    <string name="device_fw_unlisted_off">Permitir imagens não listadas · desativado</string>
+    <!-- SAFETY: Module firmware page, switch button for loading files that are not in the catalogue; now on. Full-width button. -->
+    <string name="device_fw_unlisted_on">Permitir imagens não listadas · ativado</string>
+    <!-- SAFETY: Module firmware page, hint in the field where the user types the start of an unlisted file's hash to confirm it. One line. -->
+    <string name="device_fw_hash_hint">Primeiros 8 caracteres do hash</string>
+    <!-- Module firmware page, result line while the signed catalogue is fetched. One line. -->
+    <string name="device_fw_checking_catalogue">Consultando o catálogo de firmware</string>
+    <!-- Module firmware page, result line while an image downloads. %1$s is the version string. One line. -->
+    <string name="device_fw_downloading">Baixando %1$s</string>
+    <!-- Module firmware page, result line after a download that matched its catalogue entry. %1$s is the version string. One line. -->
+    <string name="device_fw_downloaded_checked">%1$s baixado e verificado</string>
+    <!-- SAFETY: Module firmware page, result line when a download did not arrive or did not match its signed catalogue entry. One or two lines. -->
+    <string name="device_fw_download_failed">Falha no download: o arquivo não chegou ou não confere com o registro no catálogo</string>
+    <!-- Module firmware page, result line after the factory image was downloaded. One line. -->
+    <string name="device_fw_factory_downloaded">Firmware de fábrica baixado</string>
+    <!-- SAFETY: Title of the first of two dialogs before unlisted firmware files are allowed. One line. -->
+    <string name="device_fw_unlisted_q1_title">Permitir imagens não listadas? (1 de 2)</string>
+    <!-- SAFETY: Message of the first dialog before unlisted firmware files are allowed: what the user takes on. A paragraph. -->
+    <string name="device_fw_unlisted_q1">Um arquivo não listado não vem do catálogo. Depois de carregado, não é possível verificá-lo além da string de versão. Este projeto não se responsabiliza por ele, e você é responsável pelo que o rádio transmitir.</string>
+    <!-- SAFETY: Title of the second of two dialogs before unlisted firmware files are allowed. One line. -->
+    <string name="device_fw_unlisted_q2_title">Decisão sua (2 de 2)</string>
+    <!-- SAFETY: Message of the second dialog before unlisted firmware files are allowed. A short paragraph. -->
+    <string name="device_fw_unlisted_q2">O rádio é seu e a decisão é sua. A chave se desativa sozinha depois de um carregamento. Você pode ativá-la de novo mais tarde.</string>
+    <!-- SAFETY: Confirm button of the second dialog: allows unlisted firmware files. Dialog button, keep short. -->
+    <string name="device_fw_unlisted_allow">Entendi, permitir</string>
+    <!-- SAFETY: Module firmware page, result line when the typed hash start is missing or wrong for an unlisted file. One line. -->
+    <string name="device_fw_type_hash">Digite os primeiros 8 caracteres do hash</string>
+    <!-- SAFETY: Module firmware page, the confirmation card before a load. %1$s is the image's version string. "Talk" is the push-to-talk button's name on the Intercom screen. A paragraph. -->
+    <string name="device_fw_confirm">Carregar %1$s? O módulo mantém essa imagem até você carregar outra, inclusive depois de reiniciar. Durante o carregamento, o rádio aparece como ocupado e Falar não faz nada. Por sua conta e risco: sem garantia.</string>
+    <!-- Module firmware page, a line in the handshake log when the image is fetched before the load. %1$s is the version string. One line. -->
+    <string name="device_fw_log_downloading">Baixando %1$s do catálogo de firmware</string>
+    <!-- Module firmware page, a line in the handshake log after the image was fetched and checked. %1$s is the version string. One line. -->
+    <string name="device_fw_log_downloaded">%1$s baixado; tamanho, hash e versão conferem</string>
+    <!-- SAFETY: Module firmware page, result line: the factory image could not be loaded because its copy is not on the phone. One line. -->
+    <string name="device_fw_no_factory_copy">A cópia de fábrica não está neste celular</string>
+    <!-- Module firmware page, result line: the chosen unlisted file is no longer in the folder. "Download/DMR/Firmware" is a folder path: keep it. One line. -->
+    <string name="device_fw_not_in_folder">Essa imagem não está em Download/DMR/Firmware</string>
+    <!-- Module firmware page, Installed section when the module has not reported its version. One or two lines. -->
+    <string name="device_fw_not_answered">O módulo ainda não respondeu. A recuperação pode carregar o firmware de fábrica.</string>
+    <!-- Module firmware page, Installed section: %1$s is the module's version string, and the second line says it is not a known image. Two lines. -->
+    <string name="device_fw_unknown_version">%1$s\nEsta versão não está na lista conhecida.</string>
+    <!-- Module firmware page, Factory backup section when the backup is verified. %1$s is where it came from ("stock app" or "saved copy"); the second line is the file path (keep it: %2$s is the version string, %3$s the start of its hash). Two lines. -->
+    <string name="device_fw_backup_verified">Verificado · %1$s\nDownload/DMR/Firmware/factory-%2$s-%3$s.bin</string>
+    <!-- SAFETY: Module firmware page, Factory backup section: no verified backup, the stock app's copy could not be read. One or two lines. -->
+    <string name="device_fw_backup_unread">Ainda não verificado. Não foi possível ler a cópia do app do fabricante.</string>
+    <!-- SAFETY: Module firmware page, Factory backup section: no verified backup, the stock app's copy is not the known factory image. One or two lines. -->
+    <string name="device_fw_backup_mismatch">Ainda não verificado. A cópia do app do fabricante não confere com o firmware de fábrica conhecido.</string>
+    <!-- Module firmware page, Chosen image section, the line after the image's name and description: %1$s is its size in bytes (already formatted), %2$s its hash; the file is on the phone. One line (it wraps). -->
+    <string name="device_fw_chosen_here">%1$s bytes · hash %2$s · arquivo neste celular</string>
+    <!-- Module firmware page, Chosen image section, the line after the image's name and description: %1$s is its size in bytes (already formatted), %2$s its hash; the file is not on the phone yet. One line (it wraps). -->
+    <string name="device_fw_chosen_missing">%1$s bytes · hash %2$s · arquivo ainda não está neste celular</string>
+    <!-- Module firmware page, progress figures during the transfer, monospace, three lines: blocks sent of total (%1$d, %2$d); bytes sent (%3$s, formatted) and speed (%4$s bytes per second); time elapsed (%5$d:%6$02d) and left (%7$d:%8$02d) in minutes:seconds, and retries (%9$d). Keep each line short. -->
+    <string name="device_fw_progress">%1$d / %2$d blocos\n%3$s bytes\u0020\u0020·\u0020\u0020%4$s B/s\n%5$d:%6$02d decorrido\u0020\u0020·\u0020\u0020faltam %7$d:%8$02d\u0020\u0020·\u0020\u0020%9$d repetições</string>
+
+    <!-- ==== Module firmware: the signed catalogue (fw/FirmwareCatalog) ==== -->
+    <!-- SAFETY: Module firmware pre-flight, the "This phone" check fails: the catalogue knows this phone, and no variant of it is a supported base. One line. -->
+    <string name="device_fw_variant_unsupported">A variante de módulo deste celular ainda não tem suporte</string>
+    <!-- Module firmware page, result line after a catalogue check: the server could not be reached. One line. -->
+    <string name="device_fw_catalogue_unreachable">Catálogo de firmware inacessível</string>
+    <!-- Module firmware page, result line after a catalogue check: the downloaded list failed its signature or is older than the one on the phone, so it was not used. One line. -->
+    <string name="device_fw_catalogue_ignored">Catálogo de firmware ignorado</string>
+    <!-- Module firmware page, result line after a catalogue check: nothing new. %1$d is the catalogue's serial number. One line. -->
+    <string name="device_fw_catalogue_current">Catálogo de firmware atualizado (%1$d)</string>
+    <!-- Module firmware page, result line after a new catalogue was stored. %1$d is its serial number, %2$d the number of images in it. One line. -->
+    <plurals name="device_fw_catalogue_loaded">
+        <item quantity="one">Catálogo de firmware %1$d carregado, imagens: %2$d</item>
+        <item quantity="many">Catálogo de firmware %1$d carregado: %2$d imagens</item>
+        <item quantity="other">Catálogo de firmware %1$d carregado: %2$d imagens</item>
+    </plurals>
+    <!-- Module firmware page, result line after a catalogue check that failed. One line. -->
+    <string name="device_fw_catalogue_failed">Falha ao consultar o catálogo de firmware</string>
+
+    <!-- ==== Module firmware: pre-flight checks and load results (fw/FirmwareSession) ==== -->
+    <!-- SAFETY: Module firmware pre-flight, a check fails: the image file is not the known image (size, hash or version string). One line. -->
+    <string name="device_fw_file_mismatch">O arquivo não confere com a imagem conhecida</string>
+    <!-- Module firmware pre-flight, name of the check that the radio module reports its version. Shown as "● name — detail". Short. -->
+    <string name="device_fw_check_module">Módulo responde</string>
+    <!-- Module firmware pre-flight, detail of the module check: no version reported yet. Short. -->
+    <string name="device_fw_check_module_none">Ainda sem versão</string>
+    <!-- Module firmware pre-flight, name of the check that nothing is using the radio. Short. -->
+    <string name="device_fw_check_idle">Rádio livre</string>
+    <!-- SAFETY: Module firmware pre-flight, detail when the radio is busy: what to stop before a load. One line. -->
+    <string name="device_fw_check_idle_busy">Pare antes a transmissão, a varredura ou o modo de dados</string>
+    <!-- Module firmware pre-flight, detail when the radio is idle. One word. -->
+    <string name="device_fw_check_idle_ok">Livre</string>
+    <!-- Module firmware pre-flight, name of the check that the phone's own radio app is paused (SignalDeck has taken over the radio). Short. -->
+    <string name="device_fw_check_stock">App do fabricante pausado</string>
+    <!-- SAFETY: Module firmware pre-flight, detail when the stock radio app still runs: take over first ("Take over" is the Device page's button). One line. -->
+    <string name="device_fw_check_stock_on">Assuma o rádio primeiro</string>
+    <!-- Module firmware pre-flight, detail when the stock app is paused. One word. -->
+    <string name="device_fw_check_stock_ok">Pausado</string>
+    <!-- Module firmware pre-flight, name of the battery check (over 60 %, or over 40 % while charging). One word. -->
+    <string name="device_fw_check_battery">Bateria</string>
+    <!-- Module firmware pre-flight, battery detail: %1$d is the charge in percent, and the phone is charging. Short. -->
+    <string name="device_fw_check_battery_charging">%1$d%% carregando</string>
+    <!-- Module firmware pre-flight, battery detail: %1$d is the charge in percent, and the phone is not charging. Short. -->
+    <string name="device_fw_check_battery_on">%1$d%% na bateria</string>
+    <!-- Module firmware pre-flight, name of the check that the image file is the known one (its hash is the detail). Short. -->
+    <string name="device_fw_check_hash">Hash da imagem</string>
+    <!-- SAFETY: Module firmware pre-flight, detail of the factory-backup check when there is no verified backup. Short. -->
+    <string name="device_fw_check_backup_missing">Ausente ou não confere</string>
+    <!-- Module firmware pre-flight, name of the check that this phone, its stock app and its module may take the image (the reason is the detail). Short. -->
+    <string name="device_fw_check_phone">Este celular</string>
+    <!-- SAFETY: Last heard / activity history line: after a load the module reported a different version string, so the factory image is loaded back. %1$s is the wanted version string, %2$s what the module said. One or two lines. -->
+    <string name="device_fw_hist_mismatch">Firmware carregado não confere: esperado %1$s, o módulo informou %2$s. Restaurando o firmware de fábrica.</string>
+    <!-- SAFETY: Module firmware page, result line: after the load the module reported the wrong version string (%1$s), and the factory copy to restore is not on the phone. One or two lines. -->
+    <string name="device_fw_answered_no_copy">O módulo respondeu %1$s e a cópia de fábrica não está aqui</string>
+    <!-- SAFETY: Module firmware page, result line: after the load the module reported no version string, and the factory copy to restore is not on the phone. One or two lines. -->
+    <string name="device_fw_answered_nothing_no_copy">O módulo não respondeu nada e a cópia de fábrica não está aqui</string>
+    <!-- SAFETY: Module firmware page, result line (shown green): the version string did not match after a load, so the factory image (%1$s) was loaded back. One or two lines. -->
+    <string name="device_fw_restored_tag">Firmware de fábrica (%1$s) restaurado porque a versão não conferia</string>
+    <!-- SAFETY: Module firmware page, result line: loading the factory image back failed. %1$s is the result code or version string the module gave. One line. -->
+    <string name="device_fw_restore_failed">Falha ao restaurar o firmware de fábrica (%1$s)</string>
+    <!-- SAFETY: Last heard / activity history line: the flash sample read back after a load did not match, so the factory image is loaded back. %1$s is the version string. One line. -->
+    <string name="device_fw_hist_readback">Falha na releitura do firmware %1$s. Restaurando o firmware de fábrica.</string>
+    <!-- SAFETY: Module firmware page, result line: %1$s is the read-back failure (a sentence such as "Flash sample differs at byte 12"), then the factory image was loaded back. One or two lines. -->
+    <string name="device_fw_sample_restored">%1$s Firmware de fábrica restaurado.</string>
+    <!-- SAFETY: Module firmware page, result line: %1$s is the read-back failure (a sentence), then loading the factory image back failed too. One or two lines. -->
+    <string name="device_fw_sample_restore_failed">%1$s Falha ao restaurar o firmware de fábrica.</string>
+    <!-- Last heard / activity history line after a firmware load. %1$s is the version string now in the module. One line. -->
+    <string name="device_fw_hist_loaded">Firmware carregado: %1$s</string>
+    <!-- Module firmware page, result line (green) after a load whose flash sample was read back and matched. %1$s is the version string and must stay first. One line. -->
+    <string name="device_fw_loaded_sample">%1$s · amostra da flash confere</string>
+    <!-- SAFETY: Module firmware page, start of a result line: reading the flash back failed at byte offset %1$d (the factory restore result follows). One sentence. -->
+    <string name="device_fw_flash_read_at">Falha na leitura da flash em %1$d</string>
+    <!-- SAFETY: Module firmware page, start of a result line: the flash read back differs from the image at byte %1$d (the factory restore result follows). One sentence. -->
+    <string name="device_fw_flash_differs">A amostra da flash difere no byte %1$d</string>
+    <!-- SAFETY: Module firmware page, start of a result line: reading the flash back failed with an error (%1$s, technical, English). One sentence. -->
+    <string name="device_fw_flash_read_error">Falha na leitura da flash: %1$s</string>
+
+    <!-- ==== Module firmware: the built-in images and why one may not be loaded (fw/ImageTable) ==== -->
+    <!-- Module firmware page, description of the factory image (the firmware the phone shipped with). Two or three lines. -->
+    <string name="device_fw_factory_summary">O firmware com que este celular veio. Carregá-lo deixa o módulo como era antes. A imagem fica até outra ser carregada, inclusive depois de reiniciar.</string>
+    <!-- SAFETY: Module firmware page, description of the bench image FW22 (it has its own 120 s transmit limit). A short paragraph. -->
+    <string name="device_fw_fw22_summary">Imagem de bancada. Um tom continua tocando quando não há mais nada na fila, e o módulo consegue ler a própria flash. Com esta imagem, o limite de transmissão do próprio rádio é de 120 segundos. Ela fica até outra imagem ser carregada, inclusive depois de reiniciar. Ela não muda bandas nem potência.</string>
+    <!-- SAFETY: Module firmware pre-flight, why the file may not be loaded: it is not a known module image. One line. -->
+    <string name="device_fw_not_known_image">Esse arquivo não é uma imagem de módulo conhecida</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the module is silent, and recovery loads only the factory image. One line. -->
+    <string name="device_fw_recovery_factory_only">O módulo não respondeu. A recuperação só carrega o firmware de fábrica</string>
+    <!-- SAFETY: Module firmware pre-flight, why recovery cannot start: no verified factory backup; the stock app's copy is needed. One or two lines. -->
+    <string name="device_fw_backup_needed_recovery">O backup de fábrica está ausente ou não confere. Disponibilize a cópia do app do fabricante antes da recuperação</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the stock radio app is uninstalled and there is no verified factory copy. One or two lines. -->
+    <string name="device_fw_stock_gone">O app do fabricante não está mais instalado e não há cópia de fábrica verificada neste celular</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the module runs a firmware this build does not know. %1$s is its version string. One line. -->
+    <string name="device_fw_variant_tag">Variante de firmware ainda sem suporte (%1$s)</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: it was built for another phone model. One line. -->
+    <string name="device_fw_wrong_model">Essa imagem não foi feita para este modelo de celular</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the phone's stock radio app is not the one the image belongs to. One or two lines. -->
+    <string name="device_fw_wrong_stock_app">O app de rádio do fabricante neste celular não é aquele a que esta imagem pertence</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the stock app's firmware file is not the known factory image and there is no verified backup. One or two lines. -->
+    <string name="device_fw_stock_mismatch">O firmware do app do fabricante não confere com o firmware de fábrica conhecido, e não há backup verificado</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded yet: the factory backup must be on the phone first. One line. -->
+    <string name="device_fw_backup_first">Coloque o backup de fábrica neste celular antes de qualquer outra imagem</string>
+    <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: it was not built from this phone's factory firmware. One line. -->
+    <string name="device_fw_wrong_base">Essa imagem não foi feita a partir do firmware de fábrica deste celular</string>
+    <!-- Module firmware pre-flight, warning (amber) on the "This phone" check: the stock app's version differs from the recorded one (%1$s found, %2$s expected), but its firmware file matches. One or two lines. -->
+    <string name="device_fw_stock_version_note">O app do fabricante é a versão %1$s, não %2$s. O arquivo de firmware confere, então o carregamento pode continuar</string>
+
+    <!-- ==== Module firmware: where the factory backup came from (fw/FirmwareVault) ==== -->
+    <!-- Module firmware page, where the verified factory backup came from: read out of the stock radio app (after "Verified · "). A few words, lower case. -->
+    <string name="device_fw_source_stock">app do fabricante</string>
+    <!-- Module firmware page, where the verified factory backup came from: the copy SignalDeck saved earlier (after "Verified · "). A few words, lower case. -->
+    <string name="device_fw_source_saved">cópia salva</string>
+    <!-- SAFETY: Module firmware page, description of an unlisted firmware file (not from the catalogue). %1$s is the version string read from the file. Two lines. -->
+    <string name="device_fw_unlisted_summary">Fora do catálogo. Este projeto não se responsabiliza pelo que ele carrega. A string de versão no arquivo é %1$s.</string>
+
+
+    <!-- ==== Device → Device report → Transmit test session sheets (ui/TxTestScreen). The steps, questions and results come from the session and stay English (bench text). ==== -->
+    <!-- SAFETY: Title of the transmit test session sheets, and the Device report menu item that opens them (a guided series of transmit tests for the certification guide). Sheet title, one line. -->
+    <string name="device_txtest_title">Sessão de teste de transmissão</string>
+    <!-- SAFETY: Transmit test session: SignalDeck does not control the radio yet. "Take over" is the Device page's button. One line. -->
+    <string name="device_txtest_take_over">Assuma o rádio primeiro (página Dispositivo).</string>
+    <!-- SAFETY: Transmit test session, first sheet: what the session does (it transmits; it has its own 28 s transmit limit). "tx-report.json" is a file name: keep it. A paragraph. -->
+    <string name="device_txtest_intro">Conduz os testes de transmissão do guia de certificação (seção 3.3): uma transmissão em FM, o teste de soltar, o teste de limite (a sessão usa o próprio limite de 28 s), frequência e desvio, uma chamada de grupo DMR nos celulares DMR, e aquecimento. O SignalDeck aciona o rádio sozinho e registra cada transmissão; você informa o que o rádio receptor ouviu. O resultado, tx-report.json, vai para o relatório do dispositivo. Seu indicativo e seu ID DMR são removidos dele.</string>
+    <!-- Transmit test session, first sheet, under the build details: this app was not built by the project. A short paragraph. -->
+    <string name="device_txtest_fork">Este não é um build oficial: o relatório informa isso, com o commit e o repositório acima, para que o mantenedor possa recompilar exatamente o que você testou.</string>
+    <!-- SAFETY: Transmit test session, section heading above the safety rules the tester switches on before anything transmits (capitals). Short. -->
+    <string name="device_txtest_before">Antes da primeira transmissão</string>
+    <!-- SAFETY: Transmit test session, button that starts the session (it will transmit). Full-width button. -->
+    <string name="device_txtest_start">Iniciar a sessão</string>
+    <!-- SAFETY: Toast when Start is tapped before every safety rule is switched on. Short. -->
+    <string name="device_txtest_confirm_rules">Confirme todas as regras primeiro</string>
+    <!-- Transmit test results sheet, part of the problem line: saving the results failed. %1$s is the error (technical, English). Short. -->
+    <string name="device_txtest_saving">ao salvar: %1$s</string>
+    <!-- Title of the sheet that shows the transmit test session's results. One line. -->
+    <string name="device_txtest_results">Resultados do teste de transmissão</string>
+    <!-- Transmit test results sheet, line under the results when something went wrong. %1$s is the error (technical, English). One line. -->
+    <string name="device_txtest_problem">Problema: %1$s</string>
+    <!-- Transmit test results sheet: where the results were saved. %1$s is the file name (tx-report.json), %2$s the report folder's name; the paths and file names stay as they are. A paragraph. -->
+    <string name="device_txtest_saved">Salvo como %1$s no relatório do dispositivo (Download/DMR/DeviceReport/%2$s), com uma seção legível em report.txt e 00_SUMMARY.txt. Anexe o zip do relatório à sua issue ou pull request de resultados do teste de transmissão.</string>
+    <!-- Transmit test results sheet, when the results could not be written. One line. -->
+    <string name="device_txtest_not_saved">Não foi possível salvar os resultados.</string>
+    <!-- Transmit test results sheet, button that shares the whole device report as a zip. Full-width button. -->
+    <string name="device_txtest_share_zip">Compartilhar o zip do relatório</string>
+    <!-- Transmit test results sheet, button that shares only the results file. %1$s is its file name (tx-report.json). Full-width button. -->
+    <string name="device_txtest_share_json">Compartilhar só o %1$s</string>
+    <!-- Title of Android's share chooser for the transmit test results file. %1$s is its file name (tx-report.json). One line. -->
+    <string name="device_txtest_share_file">Compartilhar %1$s</string>
+    <!-- Toast when sharing the results file failed. %1$s is the error (technical, English). One line. -->
+    <string name="device_txtest_share_failed">Falha ao compartilhar: %1$s</string>
+    <!-- Transmit test session, button under a question form: go on without answering. Full-width button. -->
+    <string name="device_txtest_leave_empty">Deixar em branco</string>
+    <!-- Transmit test session, title of the sheet shown while the tester picks the recording of the received signal. One word. -->
+    <string name="device_txtest_recording">Gravação</string>
+    <!-- Transmit test session, recording sheet: the file picker is open. A short paragraph. -->
+    <string name="device_txtest_pick">Escolha o arquivo no seletor. O SignalDeck o lê uma vez para calcular o SHA-256; o arquivo em si não é copiado.</string>
+    <!-- Transmit test session, recording sheet, button: go on without a recording. Full-width button. -->
+    <string name="device_txtest_no_file">Sem arquivo, afinal</string>
+    <!-- Transmit test session, recording sheet, while the picked file is read. One line. -->
+    <string name="device_txtest_hashing">Calculando o SHA-256…</string>
+    <!-- Toast when the picked recording could not be read. %1$s is the error (technical, English). One line. -->
+    <string name="device_txtest_read_failed">Não foi possível ler o arquivo: %1$s</string>
+    <!-- SAFETY: Transmit test session, title of the sheet shown while the radio transmits. One word. -->
+    <string name="device_txtest_transmitting">Transmitindo</string>
+    <!-- SAFETY: Transmit test session, the button that stops the transmission at once. Big full-width button, short. -->
+    <string name="device_txtest_release">Soltar agora</string>
+
+    <!-- ==== Settings → Diagnostics page (ui/DiagnosticsView). The engine log itself stays English. ==== -->
+    <!-- SAFETY: Diagnostics page, pill button that takes over the radio (powers the module up for SignalDeck). One of four buttons in a row: very short. -->
+    <string name="device_diag_bring_up">Ligar rádio</string>
+    <!-- SAFETY: Diagnostics page, pill button that hands the radio back to the phone's own radio app. One of four buttons in a row: short. -->
+    <string name="device_diag_release">Devolver (app do fabricante)</string>
+    <!-- Diagnostics page, pill button that asks the radio module for its firmware version (into the log). One of three in a row: short. -->
+    <string name="device_diag_version">Versão do módulo</string>
+    <!-- Diagnostics page, pill button that switches the radio module off and on. One of three in a row: short. -->
+    <string name="device_diag_power_cycle">Reiniciar módulo</string>
+    <!-- SAFETY: Diagnostics page, pill button that transmits a 1 kHz test tone for 3 seconds. One of three in a row: short. -->
+    <string name="device_diag_tone">Tom de teste 1 kHz (3 s)</string>
+    <!-- Title of the dialog before the radio module is power-cycled. One line. -->
+    <string name="device_diag_power_cycle_q">Desligar e religar o módulo de rádio?</string>
+    <!-- Message of the power-cycle dialog: what it does. A short paragraph. -->
+    <string name="device_diag_power_cycle_msg">Corta e restabelece a alimentação do módulo, espera a mensagem de inicialização e reaplica o canal. Use se o rádio parar de responder.</string>
+    <!-- Confirm button of the power-cycle dialog. Dialog button, short. -->
+    <string name="device_diag_power_cycle_go">Reiniciar</string>
+    <!-- SAFETY: Title of the dialog before the 3-second test tone is transmitted. One line. -->
+    <string name="device_diag_tone_q">Transmitir um tom de teste de 3 s?</string>
+    <!-- SAFETY: Message of the test tone dialog: it transmits on the current channel. One or two lines. -->
+    <string name="device_diag_tone_msg">Coloca o rádio para transmitir no canal atual com um tom de 1 kHz, para um receptor de bancada ou SDR.</string>
+    <!-- SAFETY: Confirm button of the test tone dialog: transmits. Dialog button, short. -->
+    <string name="device_diag_tone_go">Transmitir</string>
+    <!-- Diagnostics page, full-width pill button: exports a backup and restores it into a scratch database to check it. Short. -->
+    <string name="device_diag_backup_check">Testar ida e volta do backup</string>
+    <!-- Title of the dialog with the result of the backup round-trip check (the result itself is a technical English report). One line. -->
+    <string name="device_diag_backup_title">Ida e volta do backup</string>
+    <!-- Diagnostics page, full-width pill button that posts a test message notification for Android Auto. Short. -->
+    <string name="device_diag_car_message">Enviar mensagem de teste ao carro</string>
+
+    <!-- ==== Device → Updates sheet, update check and install (Updater) ==== -->
+    <!-- Title of the Device → Updates sheet, and the Device page row that opens it. One word. -->
+    <string name="device_update_title">Atualizações</string>
+    <!-- Updates sheet, intro when the installed build is a beta. %1$s is the installed version (1.0.0-beta.24). "Release", "Beta" and "Update" are the names of the sections and button below. A paragraph. -->
+    <string name="device_update_intro_beta">Você tem a %1$s (uma beta). Há dois caminhos: Estável, as versões finalizadas, e Beta, as versões de teste. As betas muitas vezes são feitas para um celular em teste, então leia o que mudou antes de atualizar; nada é instalado até você tocar em Atualizar.</string>
+    <!-- Updates sheet, intro when the installed build is a release. %1$s is the installed version (1.0.0). "Release", "Beta" and "Update" are the names of the sections and button below. A paragraph. -->
+    <string name="device_update_intro_release">Você tem a %1$s (uma versão estável). Há dois caminhos: Estável, as versões finalizadas, e Beta, as versões de teste. As betas muitas vezes são feitas para um celular em teste, então leia o que mudou antes de atualizar; nada é instalado até você tocar em Atualizar.</string>
+    <!-- Updates sheet, status line while the releases are fetched from GitHub. One line. -->
+    <string name="device_update_checking_github">Consultando o GitHub…</string>
+    <!-- Updates sheet status line, or toast, when the update check failed. %1$s is the error (technical, English). One line. -->
+    <string name="device_update_failed">Falha ao procurar atualizações: %1$s</string>
+    <!-- Updates sheet, section heading for the finished builds (capitals). One word. -->
+    <string name="device_update_path_release">Estável</string>
+    <!-- Updates sheet, section heading for the test builds (capitals). One word. -->
+    <string name="device_update_path_beta">Beta</string>
+    <!-- Updates sheet, Beta section: no test build has been published. One line. -->
+    <string name="device_update_no_beta">Nenhuma beta publicada.</string>
+    <!-- Updates sheet, Release section: no finished build yet. One line. -->
+    <string name="device_update_no_release">Ainda não há versão estável: o SignalDeck ainda está em beta.</string>
+    <!-- Updates sheet, Beta section: nothing newer than the installed build. %1$s is the newest beta's version. One line. -->
+    <string name="device_update_newest_beta">Nada mais novo: a beta mais recente é a %1$s.</string>
+    <!-- Updates sheet, Beta section: the newest beta (%1$s) is the one installed. One line. -->
+    <string name="device_update_newest_beta_yours">Nada mais novo: a beta mais recente é a %1$s (a sua).</string>
+    <!-- Updates sheet, Release section: nothing newer than the installed build. %1$s is the newest release's version. One line. -->
+    <string name="device_update_newest_release">Nada mais novo: a versão estável mais recente é a %1$s.</string>
+    <!-- Updates sheet, Release section: the newest release (%1$s) is the one installed. One line. -->
+    <string name="device_update_newest_release_yours">Nada mais novo: a versão estável mais recente é a %1$s (a sua).</string>
+    <!-- Updates sheet, a section's headline when one newer build is available. %1$s is its version. One line. -->
+    <string name="device_update_available">%1$s disponível.</string>
+    <!-- Updates sheet, Beta section headline when several newer betas exist (shown only for 2 or more). %1$s is the newest version, %2$d how many betas came out since the installed one. One line. -->
+    <plurals name="device_update_available_betas">
+        <item quantity="one">%1$s disponível (betas desde a sua: %2$d).</item>
+        <item quantity="many">%1$s disponível (%2$d betas desde a sua).</item>
+        <item quantity="other">%1$s disponível (%2$d betas desde a sua).</item>
+    </plurals>
+    <!-- Updates sheet, Release section headline when several newer releases exist (shown only for 2 or more). %1$s is the newest version, %2$d how many releases came out since the installed one. One line. -->
+    <plurals name="device_update_available_releases">
+        <item quantity="one">%1$s disponível (versões estáveis desde a sua: %2$d).</item>
+        <item quantity="many">%1$s disponível (%2$d versões estáveis desde a sua).</item>
+        <item quantity="other">%1$s disponível (%2$d versões estáveis desde a sua).</item>
+    </plurals>
+    <!-- Updates sheet, Release section when the installed beta is newer than the newest release (%1$s). Two lines. -->
+    <string name="device_update_downgrade_head">Você está numa beta mais nova que a versão estável mais recente (%1$s). Você pode voltar para ela.</string>
+    <!-- Updates sheet: heading line over the release notes of every newer build. %1$s is the installed version; %2$s the notes (from GitHub, English). Heading, then the notes. -->
+    <string name="device_update_changes">O que mudou desde a %1$s:\n\n%2$s</string>
+    <!-- Updates sheet, button that downloads and installs the newest build. %1$s is its version, %2$s its size in MB. Full-width button. -->
+    <string name="device_update_to">Atualizar para %1$s (%2$s MB)</string>
+    <!-- Updates sheet, going back from a beta: heading over the release's notes. %1$s is the release's version, %2$s its notes (from GitHub, English). -->
+    <string name="device_update_release_notes">Versão estável %1$s:\n\n%2$s</string>
+    <!-- Updates sheet, going back from a beta: heading over the release's notes. %1$s is the release's version, %2$s its date (2026-10-30), %3$s its notes (from GitHub, English). -->
+    <string name="device_update_release_notes_dated">Versão estável %1$s (%2$s):\n\n%3$s</string>
+    <!-- Updates sheet, in place of a release's notes when it has none. Short. -->
+    <string name="device_update_no_notes">(sem notas)</string>
+    <!-- Updates sheet, button that installs the newest release over a newer beta. %1$s is the release's version, %2$s its size in MB. Full-width button. -->
+    <string name="device_update_back_button">Voltar para a versão estável %1$s (%2$s MB)</string>
+    <!-- Title of the dialog before going back from a beta to a release. %1$s is the release's version. One line. -->
+    <string name="device_update_back_q">Voltar para a versão estável %1$s?</string>
+    <!-- Message of the go-back dialog. %1$s is the installed beta, %2$s the release that replaces it. Two paragraphs. -->
+    <string name="device_update_back_msg">Isso substitui a %1$s pela versão estável %2$s. Seus canais, configurações, gravações e o acesso root são mantidos; o que foi adicionado nas betas depois da %2$s some até a próxima versão estável.\n\nO Android só instala uma versão mais antiga com root, que o SignalDeck já tem. O SignalDeck fecha e reinicia como %2$s; se o rádio estava em uso, ele volta quando você abrir o app.</string>
+    <!-- Confirm button of the go-back dialog. Dialog button, short. -->
+    <string name="device_update_back_go">Voltar</string>
+    <!-- Toast when the release download starts for going back from a beta. %1$s is the release's version. One or two lines. -->
+    <string name="device_update_back_downloading">Baixando %1$s… o SignalDeck reinicia como versão estável quando a instalação terminar</string>
+    <!-- Toast when the update download did not finish. Short. -->
+    <string name="device_update_download_failed">Falha no download</string>
+    <!-- Toast while the downloaded release is installed with root. %1$s is its version. One line. -->
+    <string name="device_update_installing">Instalando %1$s com root…</string>
+    <!-- Toast when installing with root failed. %1$s is the shell output (technical, English). One or two lines. -->
+    <string name="device_update_root_failed">Não foi possível instalar com root: %1$s</string>
+    <!-- Toast when the download could not be started. %1$s is the error (technical, English). One line. -->
+    <string name="device_update_start_failed">Não foi possível iniciar o download: %1$s</string>
+    <!-- Toast when a quick update check starts. Short. -->
+    <string name="device_update_checking">Procurando atualizações…</string>
+    <!-- Toast after the update check when no build is published. %1$s is the installed version. One line. -->
+    <string name="device_update_none_published">Nenhuma versão do SignalDeck publicada ainda (você tem a %1$s)</string>
+    <!-- Toast after the update check when nothing newer exists. %1$s is the installed version. One line. -->
+    <string name="device_update_latest">Você está na versão mais recente (%1$s)</string>
+    <!-- Title of the dialog that offers a newer build. %1$s is its version. One line. -->
+    <string name="device_update_offer_title">Atualização disponível: %1$s</string>
+    <!-- Message of the update offer when the build has no notes. %1$s is the installed version, %2$s the APK file name, %3$s its size in MB. Two paragraphs. -->
+    <string name="device_update_offer">Você tem a %1$s.\n\nBaixar %2$s (%3$s MB) e instalar? O Android pede para você confirmar a instalação; seus canais e configurações são mantidos.</string>
+    <!-- Message of the update offer. %1$s is the installed version, %2$s the release notes (from GitHub, English), %3$s the APK file name, %4$s its size in MB. Several paragraphs. -->
+    <string name="device_update_offer_notes">Você tem a %1$s.\n\nNovidades:\n%2$s\n\nBaixar %3$s (%4$s MB) e instalar? O Android pede para você confirmar a instalação; seus canais e configurações são mantidos.</string>
+    <!-- Confirm button of the update offer: downloads the APK. Dialog button, short. -->
+    <string name="device_update_download">Baixar</string>
+    <!-- Toast when the update download starts. One line. -->
+    <string name="device_update_downloading">Baixando… o instalador abre quando terminar</string>
+    <!-- Toast when the installer could not be opened after the download. One line. -->
+    <string name="device_update_open_apk">Abra o APK baixado na pasta Downloads para instalá-lo</string>
+
+    <!-- ==== Device report → Find radio firmware: progress (FirmwareFinder). The findings are device report text and stay English. ==== -->
+    <!-- Progress dialog while the phone is searched for radio firmware files. %1$s is a folder path or an APK file name. One line (… is added after it). -->
+    <string name="device_fw_finder_looking">Procurando em %1$s</string>
+
+
+    <!-- ==== Device → Profile: the signed profile list and its advisories (ProfileRegistry). Advisory titles and reasons are data from the list. ==== -->
+    <!-- SAFETY: What an advisory from the signed profile list does on this phone: the phone's profile is not used, the stock radio app keeps the radio. Starts with a capital; shown as a sentence, and also lower-cased inside "This advisory says: …". One line. -->
+    <string name="device_profile_restrict_profile">O SignalDeck não usa o perfil deste celular (o rádio fica com o app do fabricante)</string>
+    <!-- SAFETY: What an advisory does on this phone: SignalDeck no longer takes over the radio by itself and does not transmit. Shown as a sentence, and also lower-cased inside "This advisory says: …". One line. -->
+    <string name="device_profile_restrict_takeover">O SignalDeck não assume mais o rádio sozinho (e não transmite)</string>
+    <!-- SAFETY: What an advisory does on this phone: transmitting is switched off. Lower case at the start (it is used inside sentences too). Short. -->
+    <string name="device_profile_restrict_transmit">a transmissão está desativada</string>
+    <!-- Toast after Device → Profile → Check now: the list could not be fetched. %1$d and %2$d are the HTTP status codes of the list and its signature. One or two lines. -->
+    <string name="device_profile_unreachable">Lista de perfis inacessível (HTTP %1$d/%2$d); os perfis deste celular continuam em uso</string>
+    <!-- SAFETY: Toast after a profile check: the downloaded list was not used because its signature is not valid. One line. -->
+    <string name="device_profile_bad_signature">Lista de perfis ignorada: a assinatura não é válida</string>
+    <!-- Toast after a profile check: the downloaded list is older than the one on the phone, so it was not used. One line. -->
+    <string name="device_profile_older">Lista de perfis ignorada: é mais antiga que a deste celular</string>
+    <!-- Toast after a profile check: nothing new. %1$d is the list's serial number. One line. -->
+    <string name="device_profile_current">Perfis atualizados (lista %1$d)</string>
+    <!-- Toast after a new profile list was stored. %1$d is its serial number, %2$s the profile this phone now uses (e.g. "Armor 26 Ultra profile r3 (built in)"). One or two lines. -->
+    <string name="device_profile_loaded">Lista de perfis %1$d carregada: este celular usa %2$s</string>
+    <!-- Toast after a profile check that failed. %1$s is the error (technical, English). One or two lines. -->
+    <string name="device_profile_failed">Falha ao verificar os perfis: %1$s; os perfis deste celular continuam em uso</string>
+    <!-- SAFETY: Notification title when a new advisory from the signed profile list applies to this phone. %1$s is the advisory's title (from the list). One line. -->
+    <string name="device_profile_advisory_title">Aviso do SignalDeck: %1$s</string>
+    <!-- SAFETY: Notification text of a new advisory. %1$s is what it does on this phone (a sentence such as "transmitting is switched off"), %2$s its reason (from the list). "Device page → Profile" is where to read it. A few lines. -->
+    <string name="device_profile_advisory_text">%1$s. %2$s – Página Dispositivo → Perfil para ler o aviso ou continuar usando mesmo assim.</string>
+    <!-- Device → Profile and the profile-check toast: the profile this phone uses, taken from the downloaded list. %1$s is the profile's name (a phone model), %2$s its revision number. One line. -->
+    <string name="device_profile_describe_updated">%1$s, perfil r%2$s (atualizado pela lista de perfis)</string>
+    <!-- Device → Profile and the profile-check toast: the profile this phone uses, built into the app. %1$s is the profile's name (a phone model), %2$s its revision number. One line. -->
+    <string name="device_profile_describe_builtin">%1$s, perfil r%2$s (integrado)</string>
+
+    <!-- ==== Phone profiles: the band list used in many messages (DeviceProfile). Profile names and hardware values are data. ==== -->
+    <!-- The word before the last band in a list of the bands a radio tunes ("136–174 and 400–480 MHz"; the others are joined with ", "). Keep the spaces around it. -->
+    <string name="device_profile_bands_and">\u0020e\u0020</string>
+</resources>

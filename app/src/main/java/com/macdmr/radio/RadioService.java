@@ -3006,11 +3006,16 @@ public class RadioService extends Service implements RadioEngine.Events {
      * 2026-10-28). On a digital channel that is a reception like 1 / 2: the receive gate, the history and the caller query all
      * follow it. With the flag off the module never posts 10 / 11.
      */
+    /** With the flag on, every call is posted as 10 / 11 (F62E bench, in-list TG 9 included); a raw 1 / 2 then only comes from the module's speaker switch (0x37F4). */
+    static boolean promiscuousEdge(int code, boolean promiscuousOn, boolean digital) { return promiscuousOn && digital && (code == 1 || code == 2); }
+
     static int rxStatusFor(int code, boolean digital) { return digital && (code == 10 || code == 11) ? code - 9 : code; }
 
     @Override public void status(int code, String name) {
         java.util.function.BiConsumer<Integer, String> tap = statusTap; if (tap != null) try { tap.accept(code, name); } catch (Throwable ignored) { }
-        code = rxStatusFor(code, current != null && current.isDigital());
+        boolean digital = current != null && current.isDigital();
+        if (promiscuousEdge(code, promiscuousOn(), digital)) { log("speaker edge " + code + " with the promiscuous flag on: not a reception"); return; }   // i18n: log line
+        code = rxStatusFor(code, digital);
         if ((code == 1 || code == 2) && audio instanceof ExtModuleAudio) ((ExtModuleAudio) audio).reception(code == 1);   // the 3WT: extmodule streams receive audio only between these
         switch (code) {
             case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); if (!captureRunning()) bridgeCapture(true); } break; }   // a capture closed for silence reopens   // already open: an edge after a signal-started reception

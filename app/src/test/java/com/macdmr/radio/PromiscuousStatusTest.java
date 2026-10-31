@@ -22,4 +22,13 @@ public class PromiscuousStatusTest {
         assertEquals(11, RadioService.rxStatusFor(11, false));
         for (int c : new int[] { 1, 2, 3, 4, 6, 8, 9 }) { assertEquals(c, RadioService.rxStatusFor(c, true)); assertEquals(c, RadioService.rxStatusFor(c, false)); }
     }
+
+    @Test public void rawOneAndTwoAreSpeakerEdgesWhileTheFlagIsOn() {
+        assertTrue(RadioService.promiscuousEdge(1, true, true));
+        assertTrue(RadioService.promiscuousEdge(2, true, true));
+        assertFalse(RadioService.promiscuousEdge(10, true, true));
+        assertFalse(RadioService.promiscuousEdge(11, true, true));
+        assertFalse(RadioService.promiscuousEdge(1, false, true));   // flag off: 1 / 2 are calls
+        assertFalse(RadioService.promiscuousEdge(1, true, false));   // analog: untouched
+    }
 }

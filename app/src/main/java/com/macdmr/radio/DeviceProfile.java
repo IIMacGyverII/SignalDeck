@@ -486,7 +486,7 @@ public final class DeviceProfile {
      * AgoldLegacyCodec}, {@link ExtModuleAudio}). Written from the intercom app, the daemon and one device report
      * (phonedmrapp docs/armor3wt/stock-app-review.md); never run by us, so unverified: no transmit. No signal reading
      * (the module has no known RSSI command). Bands: what the intercom app accepts, 100–470 MHz, without 174–400 MHz;
-     * below 136 MHz is the tester's airband listening and unconfirmed for the module.
+     * the module's own range is not measured.
      */
     public static final DeviceProfile ARMOR_3WT = new DeviceProfile(
             "Ulefone Armor 3WT", ExtModuleLink.CONTROL_PORT, 0, Audio.EXTMODULE, null, 0,

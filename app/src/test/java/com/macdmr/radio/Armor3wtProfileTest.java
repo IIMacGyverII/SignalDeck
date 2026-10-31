@@ -37,7 +37,8 @@ public class Armor3wtProfileTest {
         assertEquals(DeviceProfile.Audio.EXTMODULE, p.audio);
         assertTrue(ExtModuleLink.isSocket(p.controlPort));
         assertArrayEquals(new String[] { "mtk-kpd", "00f9" }, p.pttKey);
-        assertTrue("the tester's airband listening", p.tunable(133_850_000L));
+        assertTrue("the intercom app's floor", p.tunable(100_000_000L));
+        assertTrue(p.tunable(130_000_000L));
         assertTrue(p.tunable(470_000_000L));
         assertFalse(p.tunable(470_000_001L));
         assertFalse(p.tunable(300_000_000L));

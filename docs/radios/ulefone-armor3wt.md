@@ -47,7 +47,7 @@ The module has no known signal-strength command, so the S-meter, band scope and 
 
 ### Bands from the intercom app
 
-The bands are what the phone's intercom app accepts, 100 to 470 MHz without the 174 to 400 MHz gap. Below 136 MHz (an owner listens near 133.85 MHz) is not confirmed for the module; Run all checks records its answer at the edges, receive only.
+The bands are what the phone's intercom app accepts, 100 to 470 MHz without the 174 to 400 MHz gap. The module's own range is not measured; Run all checks records its answer at the edges, receive only.
 
 ### Side key
 

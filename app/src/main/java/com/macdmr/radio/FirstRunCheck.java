@@ -483,8 +483,8 @@ public final class FirstRunCheck {
         return r.toString();
     }
 
-    /** The Armor 3WT's edges: the intercom app's 100 MHz floor, the tester's airband listening, the usual VHF/UHF edges, the module's "470M". */
-    static final int[] EDGES_3WT_HZ = { 100_000_000, 133_850_000, 135_995_000, 136_000_000, 174_000_000, 174_005_000, 399_995_000, 400_000_000, 470_000_000, 470_005_000, 480_000_000 };
+    /** The Armor 3WT's edges: the intercom app's 100 MHz floor, generic points below 136 MHz, the usual VHF/UHF edges, the module's "470M". */
+    static final int[] EDGES_3WT_HZ = { 100_000_000, 120_000_000, 130_000_000, 135_995_000, 136_000_000, 174_000_000, 174_005_000, 399_995_000, 400_000_000, 470_000_000, 470_005_000, 480_000_000 };
     /** Armor commands probed raw on the 3WT's module (receive-only queries on the Armor set; their meaning on the legacy set is what the report finds out). */
     static final int[] PROBES_3WT = { 0x32, 0x34 };
     /** Whether a socket listens on {@code port}, from /proc/net/tcp(6) text (local address :PORT in hex, state 0A). */

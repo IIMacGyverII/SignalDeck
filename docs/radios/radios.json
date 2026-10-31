@@ -237,7 +237,7 @@
         {"title": "Needs the radio daemon", "text": "SignalDeck talks to the phone's radio daemon (extmodule), as the intercom app does; on a custom ROM the daemon comes from the owner's own Magisk module and must be running. SignalDeck recognises the phone by its model or its board, and only when the daemon is installed."},
         {"title": "No time slot", "text": "The module's digital channel has no time slot setting, so SignalDeck does not offer TS1 or TS2 on this phone: the module chooses. Simplex DMR with other radios is the safe use; repeater channels may not work."},
         {"title": "No signal meter", "text": "The module has no known signal-strength command, so the S-meter, band scope and fox hunt readings are off on this phone. Run all checks asks the module once to find out."},
-        {"title": "Bands from the intercom app", "text": "The bands are what the phone's intercom app accepts, 100 to 470 MHz without the 174 to 400 MHz gap. Below 136 MHz (an owner listens near 133.85 MHz) is not confirmed for the module; Run all checks records its answer at the edges, receive only."},
+        {"title": "Bands from the intercom app", "text": "The bands are what the phone's intercom app accepts, 100 to 470 MHz without the 174 to 400 MHz gap. The module's own range is not measured; Run all checks records its answer at the edges, receive only."},
         {"title": "Side key", "text": "The side key reaches only the kernel, not apps, on the custom ROM in the report. SignalDeck reads it with root as its default custom PTT key; it does nothing until transmit is unlocked."}
       ],
       "measured": [],

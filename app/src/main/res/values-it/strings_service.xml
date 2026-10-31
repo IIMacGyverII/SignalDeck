@@ -1,0 +1,834 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The radio service: history lines, toasts, notifications, refusals and status text from the service and its helpers. See strings_common.xml for the conventions. -->
+<resources>
+    <!-- History line (Last heard) when SignalDeck ends a voice transmission at the transmit limit. %1$s is the limit ("2 min"). Starts with an emoji; keep it. -->
+    <string name="service_tx_limit_ended">⏱ Trasmissione chiusa al limite di %1$s</string>
+    <!-- Toast when a voice keyer slot is sent but holds no recording. %1$s is the slot's name. One line. -->
+    <string name="service_keyer_nothing_recorded">Niente di registrato in %1$s</string>
+    <!-- SAFETY: transmit refusal (toast) when the voice keyer is used on a digital channel. One line. -->
+    <string name="service_keyer_needs_fm">La memoria vocale funziona solo su un canale FM analogico</string>
+    <!-- SAFETY: transmit refusal (toast) on a receive-only channel (voice keyer, fox beacon, parrot, key-up test). One line. -->
+    <string name="service_tx_receive_only">Questo canale è solo in ricezione</string>
+    <!-- History line after a recorded voice keyer message was transmitted. %1$s is the message's name. Starts with an emoji; keep it. -->
+    <string name="service_keyer_sent">🎙 Memoria vocale trasmessa: %1$s</string>
+    <!-- History line after a recorded voice keyer message was transmitted with the Morse callsign ID after it. %1$s is the message's name. Starts with an emoji; keep it. -->
+    <string name="service_keyer_sent_id">🎙 Memoria vocale trasmessa: %1$s + identificativo in CW</string>
+    <!-- Long toast: the station identification is due. %1$d is the interval in minutes (10). One or two lines. -->
+    <string name="service_id_due_toast">Dai il nominativo: sono passati %1$d minuti dall’ultima identificazione</string>
+    <!-- History line: the station identification is due. %1$d is the interval in minutes. Starts with an emoji; keep it. -->
+    <string name="service_id_due_history">⏰ È ora di identificarti: %1$d minuti dall’ultimo identificativo</string>
+    <!-- SAFETY: refusal (toast) when the transmit limit is changed in Restricted mode. One line. -->
+    <string name="service_txlimit_locked">In modalità protetta il limite di trasmissione è bloccato</string>
+    <!-- SAFETY: refusal (toast) when a custom transmit limit is too short. %1$d is the minimum in seconds (10). One line. -->
+    <string name="service_txlimit_minimum">Il limite non può essere inferiore a %1$d secondi</string>
+    <!-- History line when a satellite pass recording is finished. %1$s is the file name. Starts with an emoji; keep it. -->
+    <string name="service_sat_pass_recorded">🎧 Passaggio registrato: %1$s</string>
+    <!-- Refusal (toast) when a satellite or ISS feature needs the phone's position and there is none. One line. -->
+    <string name="service_no_fix_location">Nessuna posizione: attiva la localizzazione</string>
+    <!-- SAFETY: refusal (toast) when a satellite sends outside the radio's bands. %1$s is the radio's bands ("UHF 400–480 MHz"), %2$s the satellite's name, %3$s its frequency in MHz. -->
+    <string name="service_sat_out_of_band">Questa radio sintonizza %1$s: %2$s trasmette su %3$s MHz</string>
+    <!-- History line: the band scope was stopped because a satellite pass is being tracked. Starts with an emoji; keep it. -->
+    <string name="service_scope_stopped_pass">✂ Band scope interrotto per il passaggio del satellite</string>
+    <!-- History line when a satellite pass starts being tracked. %1$s is the satellite's name. Starts with an emoji; keep it. -->
+    <string name="service_sat_tracking">🛰 Inseguimento di %1$s: sintonia per il passaggio</string>
+    <!-- History line when the recording of a satellite pass starts. %1$s is the file name. Starts with an emoji; keep it. -->
+    <string name="service_sat_recording">🛰 Registrazione del passaggio (%1$s)</string>
+    <!-- History line at the end of a satellite pass. %1$s is the satellite's name. Starts with an emoji; keep it. -->
+    <string name="service_sat_pass_over">🛰 Passaggio di %1$s terminato</string>
+    <!-- History line when the fox-hunt beacon is switched off. Starts with an emoji; keep it. -->
+    <string name="service_fox_off_history">🦊 Trasmettitore volpe spento</string>
+    <!-- Toast when the fox-hunt beacon is switched off. Short. -->
+    <string name="service_fox_off">Trasmettitore volpe spento</string>
+    <!-- SAFETY: transmit refusal (toast) when the fox beacon is started on a digital channel. One line. -->
+    <string name="service_fox_needs_fm">Il trasmettitore volpe funziona solo su un canale FM analogico</string>
+    <!-- History line: the fox beacon stopped because the user changed channel. Starts with an emoji; keep it. -->
+    <string name="service_fox_stopped_channel">🦊 Trasmettitore volpe interrotto: il canale è cambiato</string>
+    <!-- History line when the fox-hunt beacon starts. %1$s is the channel name. Starts with an emoji; keep it. -->
+    <string name="service_fox_on_history">🦊 Trasmettitore volpe su %1$s (ogni minuto)</string>
+    <!-- Toast when the fox-hunt beacon starts. %1$s is the channel name. One line. -->
+    <string name="service_fox_on">Trasmettitore volpe su %1$s: 5 s di beep ogni minuto</string>
+    <!-- Refusal (toast) when a feature that tunes an offset from the channel is used on a digital channel. Short. -->
+    <string name="service_needs_analog">Serve un canale analogico</string>
+    <!-- SAFETY: refusal (toast) when a frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
+    <string name="service_freq_outside">Questa radio sintonizza %1$s: %2$s MHz è fuori gamma</string>
+    <!-- History line when the parrot (simplex repeater) is switched off. %1$d is how many transmissions it repeated. Starts with an emoji; keep it. -->
+    <string name="service_parrot_off_history">🦜 Pappagallo spento (%1$d ripetute)</string>
+    <!-- Toast when the parrot (simplex repeater) is switched off. Short. -->
+    <string name="service_parrot_off">Pappagallo spento</string>
+    <!-- SAFETY: transmit refusal (toast) when the parrot is switched on on a digital channel. One line. -->
+    <string name="service_parrot_needs_fm">Il pappagallo funziona solo su un canale FM analogico</string>
+    <!-- Refusal (toast) when the parrot is switched on with the squelch open. Soft SQ is SignalDeck's software squelch. Two lines. -->
+    <string name="service_parrot_needs_squelch">Prima alza lo squelch del canale (o attiva Soft SQ): con squelch 0 il pappagallo ripeterebbe il rumore</string>
+    <!-- History line when the parrot (simplex repeater) is switched on. %1$s is the channel name. Starts with an emoji; keep it. -->
+    <string name="service_parrot_on_history">🦜 Pappagallo attivo: ripete quello che si sente su %1$s</string>
+    <!-- Toast when the parrot (simplex repeater) is switched on. %1$s is the channel name. One or two lines. -->
+    <string name="service_parrot_on">Pappagallo su %1$s: le trasmissioni vengono ripetute un secondo dopo la fine</string>
+    <!-- A DMR talkgroup without a name, as a number (history, Last heard, notifications). %1$d is the talkgroup number. TG is the usual abbreviation for talkgroup. -->
+    <string name="service_tg_number">TG %1$d</string>
+    <!-- History line when a caption keyword alert fires. %1$s is the keyword. Starts with an emoji; keep it. -->
+    <string name="service_keyword_heard">🔔 Ascoltata la parola chiave “%1$s”</string>
+    <!-- Notification title when a caption keyword alert fires. %1$s is the keyword, %2$s the channel name. One line. -->
+    <string name="service_keyword_notify_title">Parola chiave “%1$s” ascoltata su %2$s</string>
+    <!-- Notification title when a caption keyword alert fires and no channel is known. %1$s is the keyword. One line. -->
+    <string name="service_keyword_notify_title_radio">Parola chiave “%1$s” ascoltata alla radio</string>
+    <!-- Refusal (toast) when SSTV receive on 144.500 MHz is asked on a radio that cannot tune it. %1$s is the radio's bands. "Receive here" is the name of the other button. -->
+    <string name="service_sstv_out_of_band">Questa radio sintonizza %1$s, non 144,500 MHz: usa Ricevi qui</string>
+    <!-- Toast when SSTV picture receive starts on the 144.500 MHz calling frequency. One line. -->
+    <string name="service_sstv_on_park">Ricezione SSTV su 144,500 MHz</string>
+    <!-- Toast when SSTV picture receive starts on the current channel. One line. -->
+    <string name="service_sstv_on_channel">Ricezione SSTV su questo canale</string>
+    <!-- Toast when SSTV picture receive is switched off. Short. -->
+    <string name="service_sstv_off">Ricezione SSTV disattivata</string>
+    <!-- History line when a beacon asked by DTMF remote control could not be sent. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_remote_beacon_failed">⛔ Beacon remoto non inviato: %1$s</string>
+    <!-- History line after a spoken reply to a DTMF remote-control request was transmitted. %1$s is what was said (English speech). Starts with an emoji; keep it. -->
+    <string name="service_remote_reply_sent">🗣 Risposta remota trasmessa: %1$s</string>
+    <!-- Refusal (toast) when an ISS beacon is asked before the callsign is set. PKT → Settings is where it is set. One line. -->
+    <string name="service_iss_need_callsign">Prima imposta il tuo nominativo (PKT → Impostazioni)</string>
+    <!-- SAFETY: refusal (toast) when the ISS APRS frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
+    <string name="service_iss_out_of_band">Questa radio sintonizza %1$s: la frequenza APRS della ISS (%2$s MHz) è fuori gamma</string>
+    <!-- Refusal (toast) when the ISS beacon needs the phone's position and there is none yet. Short. -->
+    <string name="service_no_fix_yet">Posizione non ancora disponibile</string>
+    <!-- Refusal (toast) when an ISS beacon is asked while the ISS is not in view. Short. -->
+    <string name="service_iss_below_horizon">La ISS è sotto l’orizzonte</string>
+    <!-- History line when an APRS beacon through the ISS could not be sent. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_iss_beacon_failed">⛔ Beacon via ISS non inviato: %1$s</string>
+    <!-- Toast when an APRS beacon through the ISS digipeater is being sent. ARISS is the programme's name. One line. -->
+    <string name="service_iss_beaconing">Beacon via ISS (ARISS)</string>
+    <!-- Refusal (toast) when the ISS is not in view now. Short. -->
+    <string name="service_iss_not_in_view">La ISS non è in vista</string>
+    <!-- Refusal (toast) when the ISS is not in view now. %1$s is the next pass ("Tue 14:05 (highest 42°)"). One line. -->
+    <string name="service_iss_not_in_view_next">La ISS non è in vista: prossimo passaggio %1$s</string>
+    <!-- SAFETY: refusal (toast) when the ISS APRS downlink or uplink (Doppler-corrected) is outside the radio's bands. %1$s is the radio's bands. -->
+    <string name="service_iss_link_out_of_band">Questa radio sintonizza %1$s: né il downlink né l’uplink APRS della ISS</string>
+    <!-- SAFETY: history line when the ISS beacon was not sent because the radio refused the frequency. Starts with an emoji; keep it. -->
+    <string name="service_iss_beacon_not_tuned">⛔ Beacon via ISS non inviato: la radio non si è sintonizzata sulla frequenza APRS della ISS</string>
+    <!-- Toast when an APRS beacon is sent through the ISS. %1$s is the ISS's elevation in degrees, %2$s the uplink frequency in MHz. ARISS is the programme's name. -->
+    <string name="service_iss_beaconing_at">ISS a %1$s°: beacon su %2$s MHz (corretto per l’effetto Doppler) via ARISS</string>
+    <!-- The next ISS pass, inside other messages. %1$s is the day and time ("Tue 14:05"), %2$s the highest elevation in degrees. Short. -->
+    <string name="service_iss_pass_when">%1$s (massimo %2$s°)</string>
+    <!-- Refusal (toast) when the ISS orbit has not been downloaded yet. "Satellite passes" is the name of a screen. One line. -->
+    <string name="service_iss_no_orbit">Orbita della ISS non ancora disponibile: apri una volta Passaggi dei satelliti per scaricarla</string>
+    <!-- Message when no ISS pass high enough comes within a day. One line. -->
+    <string name="service_iss_no_pass">Nessun passaggio della ISS sopra 10° nelle prossime 24 ore</string>
+    <!-- History line when ISS tracking resumes after the app restarted. %1$s is the mode (SSTV or APRS). Starts with an emoji; keep it. -->
+    <string name="service_iss_resumed">🛰 Di nuovo sulla ISS dopo un riavvio (%1$s)</string>
+    <!-- History line when ISS tracking could not resume after the app restarted. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_iss_resume_failed">🛰 Impossibile riprendere l’inseguimento della ISS: %1$s</string>
+    <!-- SAFETY: history line when SignalDeck refused to transmit a data or tone transmission on a receive-only channel. Starts with an emoji; keep it. -->
+    <string name="service_tx_blocked_receive_only">⛔ TX bloccata su un canale solo in ricezione</string>
+    <!-- SAFETY: history line when a transmission was refused because it is longer than the transmit limit. %1$s is what was to be sent (an English label such as "APRS beacon"), %2$d its length in seconds, %3$s the limit ("2 min"). Device → Longest transmission is the setting. Starts with an emoji; keep it. -->
+    <string name="service_tx_too_long_limit">⛔ Troppo lungo da inviare (%1$s, %2$d s; il limite di trasmissione è %3$s, Dispositivo → Trasmissione più lunga)</string>
+    <!-- SAFETY: history line when a transmission was refused because it is longer than its sender allows. %1$s is what was to be sent (an English label), %2$d its length in seconds, %3$d the sender's maximum in seconds. Starts with an emoji; keep it. -->
+    <string name="service_tx_too_long_sender">⛔ Troppo lungo da inviare (%1$s, %2$d s; questa funzione consente al massimo %3$d s)</string>
+    <!-- History line when a data transmission was not sent because the radio never reported that it transmits. %1$s is what was to be sent (an English label). Starts with an emoji; keep it. -->
+    <string name="service_tx_not_reported">⚠️ Non inviato (%1$s): la radio non ha segnalato la trasmissione</string>
+    <!-- History line after a transmission longer than 30 s. %1$d is its length in seconds, %2$s what was sent (an English label, or "voice"), %3$s the heat guard's state. Starts with an emoji; keep it. -->
+    <string name="service_tx_long">📻 Trasmissione lunga %1$d s (%2$s); %3$s</string>
+    <!-- Name of the notification channel for weather and keyword alerts (Android's notification settings). Short. -->
+    <string name="service_channel_alerts">Allerte meteo</string>
+    <!-- Name of the notification channel for APRS messages and other packet notifications (Android's notification settings). Short. -->
+    <string name="service_channel_packet">Messaggi APRS</string>
+    <!-- SAFETY: refusal (toast) when the APRS frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
+    <string name="service_aprs_out_of_band">Questa radio sintonizza %1$s, non %2$s MHz</string>
+    <!-- Toast when APRS monitoring starts. %1$s is the frequency in MHz. One line. -->
+    <string name="service_aprs_monitor_on">Ascolto APRS su %1$s MHz</string>
+    <!-- Toast when APRS monitoring stops. Short. -->
+    <string name="service_aprs_monitor_off">Ascolto APRS disattivato</string>
+    <!-- History warning on Agold phones whose App block setting would stop SignalDeck with the screen off. %1$s lists the blocking switches that are on. Settings → App block → SignalDeck is the path in the phone's own settings. Starts with an emoji; keep it. -->
+    <string name="service_agold_app_block">⚠ Il blocco app di Agold fermerà SignalDeck a schermo spento (%1$s attivi): disattivali in Impostazioni → App block → SignalDeck</string>
+    <!-- History warning after Hand back when the radio's USB bridge did not answer. Starts with an emoji; keep it. -->
+    <string name="service_bridge_no_answer_handback">⚠ Il bridge USB della radio non ha risposto: riavvia il telefono prima di aprire l’app radio originale</string>
+    <!-- History warning after Hand back when the phone holds radio firmware files the stock app would load. %1$s is the folder. Starts with an emoji; keep it. -->
+    <string name="service_stock_firmware_files">⚠ In %1$s ci sono file di firmware radio: l’app originale li carica nel modulo all’avvio. Rimuovili, a meno che non sia proprio quello che vuoi.</string>
+    <!-- History line: the parrot stopped because the user changed channel. Starts with an emoji; keep it. -->
+    <string name="service_parrot_stopped_channel">🦜 Pappagallo interrotto: il canale è cambiato</string>
+    <!-- History line (Last heard box) when a CTCSS tone is detected on a channel without one. %1$s is the tone in Hz ("100.0"). Tapping the box applies it. Starts with an emoji; keep it. -->
+    <string name="service_tone_heard">🎵 Ascoltato CTCSS %1$s Hz — tocca questo riquadro per usarlo</string>
+    <!-- Toast when the heard tone is to be applied but none is pending. Short. -->
+    <string name="service_tone_nothing">Niente da applicare</string>
+    <!-- Toast after the heard CTCSS tone was set on the channel. %1$s is the tone in Hz, %2$s the channel name. One line. -->
+    <string name="service_tone_applied">CTCSS %1$s Hz impostato su %2$s</string>
+    <!-- History line when a recording of the received audio is finished. %1$s is the file name. Starts with an emoji; keep it. -->
+    <string name="service_recorded">🎧 Registrato %1$s</string>
+    <!-- Toast when a packet mode (APRS, SSTV, ISS beacon) is asked before the packet engine has started. Very short. -->
+    <string name="service_packet_not_ready">non pronto</string>
+    <!-- History warning when the radio module did not take the "promiscuous" flag (hear every DMR call). MON is the monitor button. Starts with an emoji; keep it. -->
+    <string name="service_mon_flag_refused">⚠ Il modulo non ha accettato il flag di ascolto di tutto (MON resta solo il monitor della radio)</string>
+    <!-- History warning when the radio did not answer the MON (monitor) switch. Starts with an emoji; keep it. -->
+    <string name="service_mon_no_answer">⚠ La radio non ha risposto a MON: riprova tra qualche secondo</string>
+    <!-- Live caption line while Google Cloud transcribes what was heard. Starts with an emoji; keep it. Short. -->
+    <string name="service_caption_transcribing">☁ trascrizione…</string>
+    <!-- Live caption line when the Google Cloud transcription failed. Starts with an emoji; keep it. Short. -->
+    <string name="service_caption_cloud_failed">⚠ trascrizione cloud non riuscita</string>
+    <!-- Prefix of a caption line on DMR: who spoke. %1$s is the caller's name or "ID 1234567". Keep the colon and the space. -->
+    <string name="service_caption_speaker">%1$s:\u0020</string>
+    <!-- A DMR caller without a name, shown by their DMR ID (captions, notification, Android Auto). %1$d is the DMR ID number. Short. -->
+    <string name="service_caller_id">ID %1$d</string>
+    <!-- Toast when the scan is stopped. Short. -->
+    <string name="service_scan_stopped">Scansione interrotta</string>
+    <!-- Toast when a scan is asked while the VFO (free frequency entry) is on. One line. -->
+    <string name="service_scan_vfo_on">Disattiva il VFO per scansionare i canali</string>
+    <!-- Toast when the scan starts. %1$s is the zone's name ("All channels" or a zone). One line. -->
+    <string name="service_scanning_zone">Scansione di %1$s</string>
+    <!-- SAFETY: refusal (toast) when a zone holds only channels outside this radio's bands. %1$s is the zone's name, %2$s the radio's bands. -->
+    <string name="service_zone_untunable">La zona %1$s non ha nessun canale che questa radio possa sintonizzare (%2$s)</string>
+    <!-- SAFETY: history warning when a zone holds only channels outside this radio's bands. %1$s is the zone's name, %2$s the radio's bands. Starts with an emoji; keep it. -->
+    <string name="service_zone_untunable_history">⚠ La zona %1$s non ha nessun canale che questa radio possa sintonizzare (%2$s)</string>
+    <!-- Refusal (toast) when a talkgroup is picked while not on a saved DMR channel. One line. -->
+    <string name="service_tg_needs_dmr">Scegli un talkgroup su un canale DMR salvato</string>
+    <!-- Refusal (toast) for an action that cannot run while transmitting. Short. -->
+    <string name="service_not_while_tx">Non durante la trasmissione</string>
+    <!-- History line when a talkgroup is picked for the current DMR channel for now. %1$d is the talkgroup, %2$s the channel name, %3$d the channel's own talkgroup. -->
+    <string name="service_tg_override">Talkgroup %1$d su %2$s finché non cambi canale (il canale mantiene %3$d)</string>
+    <!-- History line when the DMR channel goes back to its own talkgroup. %1$s is the channel name, %2$d its talkgroup. -->
+    <string name="service_tg_back">%1$s torna al suo numero di chiamata %2$d</string>
+    <!-- SAFETY: history warning when the channel arrows find no channel this radio can tune. %1$s is the radio's bands. Starts with an emoji; keep it. -->
+    <string name="service_no_tunable_channel">⚠ Qui non c’è nessun canale che questa radio possa sintonizzare (%1$s)</string>
+    <!-- Refusal (toast) when a channel number that does not exist is picked. %1$d is the number. Short. -->
+    <string name="service_no_channel_number">Il canale %1$d non esiste</string>
+    <!-- SAFETY: refusal (toast) when a channel outside this radio's bands is picked. %1$s is the channel name, %2$s its frequency in MHz, %3$s the radio's bands. -->
+    <string name="service_channel_untunable">%1$s (%2$s MHz) è fuori da %3$s: questa radio non può sintonizzarlo</string>
+    <!-- SAFETY: history warning when a channel outside this radio's bands was refused. %1$s is the channel name, %2$s its frequency (or "RX / TX") in MHz, %3$s the radio's bands. Starts with an emoji; keep it. -->
+    <string name="service_channel_outside">⚠ %1$s (%2$s MHz) è fuori da quello che questa radio può sintonizzare (%3$s)</string>
+    <!-- SAFETY: history warning when a channel outside this radio's bands was refused and the radio stays on another. %1$s is the channel name, %2$s its frequency in MHz, %3$s the radio's bands, %4$s the channel still in use, %5$s its frequency in MHz. Starts with an emoji; keep it. -->
+    <string name="service_channel_outside_still">⚠ %1$s (%2$s MHz) è fuori da quello che questa radio può sintonizzare (%3$s); resta su %4$s, %5$s MHz</string>
+    <!-- Refusal (toast or history line) while the radio module's firmware is being loaded. Short. -->
+    <string name="service_fw_busy">Radio occupata, caricamento firmware</string>
+    <!-- Toast after deleting channels when none was deleted. Short. -->
+    <string name="service_channels_none_deleted">Nessun canale eliminato</string>
+    <!-- Toast after deleting several channels. %1$d is how many. Short. -->
+    <plurals name="service_channels_deleted">
+        <item quantity="one">%1$d canale eliminato</item>
+        <item quantity="many">%1$d canali eliminati</item>
+        <item quantity="other">%1$d canali eliminati</item>
+    </plurals>
+    <!-- Refusal (toast) when the zone picked no longer exists. Short. -->
+    <string name="service_zone_missing">Zona inesistente</string>
+    <!-- Refusal (toast) when a new zone is made without a name. Short. -->
+    <string name="service_zone_needs_name">Una nuova zona deve avere un nome</string>
+    <!-- Refusal (toast) when no channel is selected for a zone. Short. -->
+    <string name="service_channels_none_selected">Nessun canale selezionato</string>
+    <!-- Toast after adding channels to a zone. %1$d is how many, %2$s the zone's name. One line. -->
+    <plurals name="service_zone_added">
+        <item quantity="one">%1$d canale aggiunto alla zona %2$s</item>
+        <item quantity="many">%1$d canali aggiunti alla zona %2$s</item>
+        <item quantity="other">%1$d canali aggiunti alla zona %2$s</item>
+    </plurals>
+    <!-- Toast after making a new zone from selected channels. %1$s is the zone's name, %2$d how many channels it holds. One line. -->
+    <plurals name="service_zone_new">
+        <item quantity="one">Nuova zona %1$s con %2$d canale</item>
+        <item quantity="many">Nuova zona %1$s con %2$d canali</item>
+        <item quantity="other">Nuova zona %1$s con %2$d canali</item>
+    </plurals>
+    <!-- Refusal (toast) when taking channels out would leave a zone empty. %1$s is the zone's name. "Zones" is the name of the zone list. One line. -->
+    <string name="service_zone_would_empty">La zona %1$s resterebbe vuota: elimina invece la zona (Zone)</string>
+    <!-- Toast after taking channels out of a zone. %1$d is how many, %2$s the zone's name. One line. -->
+    <plurals name="service_zone_removed">
+        <item quantity="one">%1$d canale tolto dalla zona %2$s</item>
+        <item quantity="many">%1$d canali tolti dalla zona %2$s</item>
+        <item quantity="other">%1$d canali tolti dalla zona %2$s</item>
+    </plurals>
+    <!-- Toast after adding channels to the Favourites (starred) zone. %1$d is how many. Short. -->
+    <plurals name="service_channels_starred">
+        <item quantity="one">%1$d canale aggiunto ai preferiti</item>
+        <item quantity="many">%1$d canali aggiunti ai preferiti</item>
+        <item quantity="other">%1$d canali aggiunti ai preferiti</item>
+    </plurals>
+    <!-- Toast after taking channels out of the Favourites (starred) zone. %1$d is how many. Short. -->
+    <plurals name="service_channels_unstarred">
+        <item quantity="one">%1$d canale tolto dai preferiti</item>
+        <item quantity="many">%1$d canali tolti dai preferiti</item>
+        <item quantity="other">%1$d canali tolti dai preferiti</item>
+    </plurals>
+    <!-- History warning after an import, holding the note on receive tones. %1$s is that note (service_tone_note_*). Starts with an emoji; keep it. -->
+    <string name="service_tone_note_history">🎵 %1$s</string>
+    <!-- Toast when importing the stock app's channels failed. %1$s is the reason. -->
+    <string name="service_import_failed">Importazione non riuscita: %1$s</string>
+    <!-- Toast after importing the stock app's channels. %1$d is how many. English uses "channels" for one too. -->
+    <plurals name="service_imported">
+        <item quantity="one">%1$d canale importato</item>
+        <item quantity="many">%1$d canali importati</item>
+        <item quantity="other">%1$d canali importati</item>
+    </plurals>
+    <!-- Toast after importing the stock app's channels with a problem. %1$d is how many, %2$s the problem. -->
+    <plurals name="service_imported_err">
+        <item quantity="one">%1$d canale importato (%2$s)</item>
+        <item quantity="many">%1$d canali importati (%2$s)</item>
+        <item quantity="other">%1$d canali importati (%2$s)</item>
+    </plurals>
+    <!-- Toast after importing the stock app's channels. %1$d is how many, %2$s the note on receive tones (service_tone_note_*). -->
+    <plurals name="service_imported_tones">
+        <item quantity="one">%1$d canale importato. %2$s</item>
+        <item quantity="many">%1$d canali importati. %2$s</item>
+        <item quantity="other">%1$d canali importati. %2$s</item>
+    </plurals>
+    <!-- Toast after importing the stock app's channels with a problem. %1$d is how many, %2$s the problem, %3$s the note on receive tones. -->
+    <plurals name="service_imported_err_tones">
+        <item quantity="one">%1$d canale importato (%2$s). %3$s</item>
+        <item quantity="many">%1$d canali importati (%2$s). %3$s</item>
+        <item quantity="other">%1$d canali importati (%2$s). %3$s</item>
+    </plurals>
+    <!-- Note after importing the stock app's channels when every analog channel opens only for a receive tone. %1$d is how many. "RX tone type" and "None" are the names of a field and its choice in the channel editor. -->
+    <string name="service_tone_note_all">Tutti i %1$d canali analogici importati si aprono solo con un tono in ricezione, come nell’app originale: una radio che non invia il tono lì non si sente. Se serve, nell’editor del canale imposta Tipo tono RX su Nessuno</string>
+    <!-- As service_tone_note_all, when all use the same tone. %1$d is how many, %2$s the tone ("CTCSS 62.5"). -->
+    <string name="service_tone_note_all_kind">Tutti i %1$d canali analogici importati si aprono solo con un tono in ricezione (%2$s), come nell’app originale: una radio che non invia il tono lì non si sente. Se serve, nell’editor del canale imposta Tipo tono RX su Nessuno</string>
+    <!-- Note after importing the stock app's channels when some analog channels open only for a receive tone. %1$d is how many do, %2$d how many analog channels there are. -->
+    <string name="service_tone_note_some">%1$d dei %2$d canali analogici importati si aprono solo con un tono in ricezione, come nell’app originale: una radio che non invia il tono lì non si sente. Se serve, nell’editor del canale imposta Tipo tono RX su Nessuno</string>
+    <!-- As service_tone_note_some, when they all use the same tone. %1$d is how many do, %2$d how many analog channels there are, %3$s the tone ("CTCSS 62.5"). -->
+    <string name="service_tone_note_some_kind">%1$d dei %2$d canali analogici importati si aprono solo con un tono in ricezione (%3$s), come nell’app originale: una radio che non invia il tono lì non si sente. Se serve, nell’editor del canale imposta Tipo tono RX su Nessuno</string>
+    <!-- Toast after the user chose not to import the stock app's channels. Short. -->
+    <string name="service_import_declined">Si parte senza canali</string>
+    <!-- SAFETY: history warning when PTT is pressed on an M17 channel and the module firmware cannot send M17. "Symbol engine" is the firmware feature. Starts with an emoji; keep it. -->
+    <string name="service_m17_receive_only">⚠️ L’M17 è solo in ricezione finché il firmware del modulo non ha il motore dei simboli</string>
+    <!-- SAFETY: history line when PTT is pressed on a phone whose device profile has not been transmit-tested. Starts with an emoji; keep it. -->
+    <string name="service_tx_untested_profile">⛔ Su questo telefono la trasmissione è disattivata finché il suo profilo non è stato provato</string>
+    <!-- History warning when the radio never reported that it transmits after the key, so no audio was sent. Starts with an emoji; keep it. -->
+    <string name="service_tx_no_send_start">⚠️ La radio non ha segnalato la trasmissione; nessun audio inviato</string>
+    <!-- History line after the Morse callsign ID was sent at the end of a transmission. %1$s is the callsign. Starts with an emoji; keep it. -->
+    <string name="service_morse_id">🔤 Identificativo in CW %1$s</string>
+    <!-- History line after a voice transmission longer than 30 s. %1$d is its length in seconds, %2$s the heat guard's state. Starts with an emoji; keep it. -->
+    <string name="service_tx_long_voice">📻 Trasmissione lunga %1$d s (voce); %2$s</string>
+    <!-- Refusal (toast) when a pager message has no recipient. RIC is the pager's address number. Short. -->
+    <string name="service_page_need_ric">Aggiungi almeno un RIC</string>
+    <!-- Refusal (toast) when a message to send is empty. Short. -->
+    <string name="service_write_message">Scrivi il messaggio</string>
+    <!-- SAFETY: refusal (toast) when the pager frequency is outside the radio's bands. %1$s is the radio's bands. -->
+    <string name="service_page_out_of_band">La frequenza deve essere entro %1$s</string>
+    <!-- Refusal (toast) when the radio is not up yet. Short. -->
+    <string name="service_radio_not_ready">Radio non pronta</string>
+    <!-- SAFETY: transmit refusal (toast) on a receive-only channel. Short. -->
+    <string name="service_tx_off_channel">Su questo canale la trasmissione è disattivata</string>
+    <!-- Refusal (toast) when pages are sent on a module firmware without the symbol engine. FW21 is a firmware version. One or two lines. -->
+    <string name="service_page_needs_fw">I messaggi pager partono solo se il firmware del modulo ha il motore dei simboli (FW21 o successivo)</string>
+    <!-- Refusal (toast) when the module's symbol engine is already sending. Short. -->
+    <string name="service_symbol_engine_busy">Il motore dei simboli è occupato</string>
+    <!-- SAFETY: refusal (toast) when a pager message would take longer than 25 s to send. One line. -->
+    <string name="service_page_too_long">Quel messaggio pager dura più di 25 secondi</string>
+    <!-- SAFETY: refusal (toast) when a pager message is longer than the transmit limit. %1$s is the limit ("2 min"); Device → Longest transmission is the setting. -->
+    <string name="service_page_over_limit">Quel messaggio pager supera il limite di trasmissione (%1$s, Dispositivo → Trasmissione più lunga)</string>
+    <!-- Name of the temporary frequency (VFO) used to send or receive pages, shown as the channel name. One word. -->
+    <string name="service_vfo_pager">Pager</string>
+    <!-- History warning when the module firmware refused the pager waveform. Starts with an emoji; keep it. -->
+    <string name="service_page_waveform_refused">⚠️ Questo firmware non ha accettato la forma d’onda pager</string>
+    <!-- History line after a pager message was sent. %1$d is how many RICs (pager addresses), %2$d the speed in baud. Starts with an emoji; keep it. -->
+    <plurals name="service_page_sent">
+        <item quantity="one">📟 Messaggio pager inviato a %1$d RIC a %2$d baud</item>
+        <item quantity="many">📟 Messaggio pager inviato a %1$d RIC a %2$d baud</item>
+        <item quantity="other">📟 Messaggio pager inviato a %1$d RIC a %2$d baud</item>
+    </plurals>
+    <!-- History warning when sending a pager message failed. %1$s is the error. Starts with an emoji; keep it. -->
+    <string name="service_page_failed">⚠️ Messaggio pager non riuscito: %1$s</string>
+    <!-- Message on the firmware page when a load is asked while one is running. Short. -->
+    <string name="service_fw_load_running">È già in corso un caricamento</string>
+    <!-- Message on the firmware page on a phone whose radio module SignalDeck cannot load firmware into. One line. -->
+    <string name="service_fw_no_loader">Il modulo radio di questo telefono non si può caricare da SignalDeck</string>
+    <!-- SAFETY: history warning when M17 transmit is asked and the module firmware cannot send it. "Symbol engine" is the firmware feature. Starts with an emoji; keep it. -->
+    <string name="service_m17_needs_fw_history">⚠️ Per trasmettere in M17 serve il firmware del modulo con il motore dei simboli</string>
+    <!-- SAFETY: history warning when M17 transmit is asked on a digital (DMR) channel. Starts with an emoji; keep it. -->
+    <string name="service_m17_needs_analog_history">⚠️ Per trasmettere in M17 serve un canale analogico</string>
+    <!-- SAFETY: refusal (toast) when an M17 text is sent and the module firmware cannot send M17. One line. -->
+    <string name="service_m17_needs_fw">Per trasmettere in M17 serve il firmware del modulo con il motore dei simboli</string>
+    <!-- SAFETY: refusal (toast) when an M17 text is sent on a digital (DMR) channel. One line. -->
+    <string name="service_m17_needs_analog">Per trasmettere in M17 serve un canale analogico</string>
+    <!-- Refusal (toast) when an M17 text is sent while M17 is already sending. Short. -->
+    <string name="service_m17_busy">L’M17 sta già trasmettendo</string>
+    <!-- History line after an M17 text was sent. %1$s is the sender's callsign, %2$s the destination, %3$s the text. Starts with an emoji; keep it. -->
+    <string name="service_m17_text_sent">✉ %1$s → %2$s: %3$s</string>
+    <!-- Refusal (toast) when an M17 text could not be prepared. Short. -->
+    <string name="service_m17_text_failed">Impossibile inviare il testo</string>
+    <!-- History warning when the module firmware refused to start M17 sending. Starts with an emoji; keep it. -->
+    <string name="service_m17_reset_refused">⚠️ Questo firmware non ha accettato un reset dei simboli M17</string>
+    <!-- History line after an M17 transmission longer than 30 s. %1$d is its length in seconds, %2$s the heat guard's state. Starts with an emoji; keep it. -->
+    <string name="service_tx_long_m17">📻 Trasmissione lunga %1$d s (M17); %2$s</string>
+    <!-- Refusal (toast) when tones are sent and the module firmware has no tone generator. FW22 is a firmware version. One or two lines. -->
+    <string name="service_tones_need_fw">Il generatore di toni del modulo richiede il firmware di laboratorio (FW22 o successivo)</string>
+    <!-- SAFETY: transmit refusal (toast) on a receive-only channel. Short. -->
+    <string name="service_receive_only_channel">Canale solo in ricezione</string>
+    <!-- Refusal (toast) when something is to be sent while the radio already transmits. Short. -->
+    <string name="service_already_tx">Trasmissione già in corso</string>
+    <!-- Refusal (toast) when there is nothing to send. Short. -->
+    <string name="service_nothing_to_send">Niente da inviare</string>
+    <!-- SAFETY: refusal (toast) when tones would last longer than the transmit limit. %1$d is their length in seconds, %2$s the limit ("2 min"). Device → Longest transmission is the setting. -->
+    <string name="service_tones_over_limit">Supera il limite di trasmissione (%1$d s; Dispositivo → Trasmissione più lunga è %2$s)</string>
+    <!-- History warning when the module firmware refused to start the tone queue. Starts with an emoji; keep it. -->
+    <string name="service_tones_reset_refused">⚠️ Questo firmware non ha accettato un reset della coda dei toni</string>
+    <!-- History warning when the module refused the tones. %1$s is what was to be sent (an English label). Starts with an emoji; keep it. -->
+    <string name="service_tones_refused">⚠️ Il modulo ha rifiutato la coda dei toni (%1$s)</string>
+    <!-- History line after tones were sent through the module's tone generator. %1$s is what was sent (an English label), %2$d its length in seconds. Starts with an emoji; keep it. -->
+    <string name="service_tones_sent">🔉 %1$s tramite il generatore di toni del modulo (%2$d s)</string>
+    <!-- SAFETY: history line when the heat guard ended a long transmission. %1$s is what was sent (an English label), %2$s the reason (temperatures). Starts with an emoji; keep it. -->
+    <string name="service_heat_stop">⛔ Interruzione anticipata (%1$s): %2$s. Lascia raffreddare il telefono prima della prossima trasmissione lunga.</string>
+    <!-- SAFETY: history line when the heat guard ended a transmission at 30 s. %1$s is what was sent (an English label), %2$s the reason. Starts with an emoji; keep it. -->
+    <string name="service_heat_cap">⛔ Interruzione a 30 s (%1$s): %2$s</string>
+    <!-- History line after an FM reception. %1$d is its length in seconds. Starts with an emoji; keep it. -->
+    <string name="service_rx_received">📻 Ricevuto %1$d s</string>
+    <!-- History line after an M17 transmission ended. Starts with an emoji; keep it. Short. -->
+    <string name="service_tx_m17_done">📻 TX M17</string>
+    <!-- History line after a transmission SignalDeck played itself (APRS, FT8, SSTV…). %1$s is what was sent (an English label). Starts with an emoji; keep it. Short. -->
+    <string name="service_tx_label_done">📻 TX: %1$s</string>
+    <!-- History line after a voice transmission ended. Starts with an emoji; keep it. Short. -->
+    <string name="service_tx_voice_done">📻 TX voce</string>
+    <!-- SAFETY: history warning when the radio module ended a transmission at its own time-out. %1$d is the time-out in seconds. Starts with an emoji; keep it. -->
+    <string name="service_tx_module_timeout">⏱ La radio ha chiuso da sola la trasmissione: il suo time-out di %1$d s</string>
+    <!-- SAFETY: history line when the radio refused to transmit because the channel is busy. Starts with an emoji; keep it. Short. -->
+    <string name="service_channel_busy">⚠ Canale occupato</string>
+    <!-- History warning when the radio's reception line does not work, so receptions are found from the signal strength. Starts with an emoji; keep it. -->
+    <string name="service_rx_line_dead">⚠ Il segnale di ricezione della radio non funziona: SignalDeck riconosce le chiamate dall’intensità del segnale (con un po’ di ritardo) e l’audio può interrompersi. Riavvia il telefono per risolvere</string>
+    <!-- History warning when the radio's reception line is stuck, so receptions are found from the signal strength. Starts with an emoji; keep it. -->
+    <string name="service_rx_line_stuck">⚠ Il segnale di ricezione della radio è bloccato: SignalDeck riconosce le chiamate dall’intensità del segnale (con un po’ di ritardo). Riavvia il telefono per risolvere</string>
+    <!-- History warning when the radio's USB bridge did not come back after a restart. Take over is the button that starts SignalDeck's control of the radio. Starts with an emoji; keep it. -->
+    <string name="service_bridge_lost">⚠ Il bridge USB della radio non è tornato dopo un riavvio: la radio è spenta ed è tornata all’app originale. Prendi di nuovo il controllo, o riavvia il telefono se continua a succedere</string>
+    <!-- History warning when the radio module did not answer at start-up and was restarted successfully. Starts with an emoji; keep it. -->
+    <string name="service_module_restarted_startup">⚠ Il modulo radio non rispondeva all’avvio ed è stato riavviato: ora funziona</string>
+    <!-- History warning when the radio module does not answer commands. MON is the monitor button. Starts with an emoji; keep it. -->
+    <string name="service_module_no_commands">⚠ Il modulo radio non risponde ai comandi (canale, MON, squelch). Di solito si risolve riavviando il telefono; invia un rapporto dispositivo</string>
+    <!-- History warning when SignalDeck restarts a radio module that stopped answering. Starts with an emoji; keep it. -->
+    <string name="service_module_restarting">⚠ Il modulo radio ha smesso di rispondere ai comandi: riavvio in corso (qualche secondo senza ricezione)</string>
+    <!-- History line when the restarted radio module answers again. Starts with an emoji; keep it. -->
+    <string name="service_module_restart_ok">✔ Il modulo radio è stato riavviato e risponde di nuovo</string>
+    <!-- History warning when the radio module still does not answer after a restart. Starts with an emoji; keep it. -->
+    <string name="service_module_restart_failed">⚠ Il modulo radio non risponde ancora dopo un riavvio. Di solito si risolve riavviando il telefono; invia un rapporto dispositivo</string>
+    <!-- What a DMR call went to: an all call (everyone). Short. -->
+    <string name="service_dmr_all_call">Chiamata generale</string>
+    <!-- What a DMR call went to: a private call to this radio. Short. -->
+    <string name="service_dmr_private">Privata</string>
+    <!-- History line when a DMR voice call is heard. %1$s is what it went to ("TG 91", "All call", "Private"), %2$s who called (name and ID, or the ID), %3$s the colour code and timeslot ("  CC 1 TS 2") or nothing. Starts with an emoji; keep it. -->
+    <string name="service_dmr_voice_rx">📻 RX voce %1$s da %2$s%3$s</string>
+    <!-- A DMR caller with a name, inside other lines. %1$s is the name, %2$d the DMR ID. -->
+    <string name="service_dmr_who">%1$s (%2$d)</string>
+    <!-- History warning when the radio refused the MON (monitor) switch. Starts with an emoji; keep it. -->
+    <string name="service_mon_refused">⚠ La radio ha rifiutato MON (occupata dopo i cambi di canale?): attendi qualche secondo e riprova</string>
+    <!-- History warning when the radio refused a channel. %1$s is the channel name, %2$s its frequency in MHz. Starts with an emoji; keep it. -->
+    <string name="service_channel_refused">⚠ La radio ha rifiutato %1$s (%2$s MHz)</string>
+    <!-- History warning when the radio refused a DMR channel that has no call number. %1$s is the channel name, %2$s its frequency in MHz. Starts with an emoji; keep it. -->
+    <string name="service_channel_refused_call">⚠ La radio ha rifiutato %1$s (%2$s MHz) (un canale DMR richiede un numero di chiamata)</string>
+    <!-- History warning when the radio refused a channel and stays on the previous one. %1$s is the channel name, %2$s its frequency in MHz, %3$s the channel still in use, %4$s its frequency. Starts with an emoji; keep it. -->
+    <string name="service_channel_refused_still">⚠ La radio ha rifiutato %1$s (%2$s MHz); resta su %3$s, %4$s MHz</string>
+    <!-- History warning when the radio refused a DMR channel without a call number and stays on the previous one. %1$s is the channel name, %2$s its frequency in MHz, %3$s the channel still in use, %4$s its frequency. Starts with an emoji; keep it. -->
+    <string name="service_channel_refused_call_still">⚠ La radio ha rifiutato %1$s (%2$s MHz) (un canale DMR richiede un numero di chiamata); resta su %3$s, %4$s MHz</string>
+    <!-- History line when a DMR text arrives. %1$s is the sender, %2$s the start of the text. Starts with an emoji; keep it. -->
+    <string name="service_sms_from">✉ Messaggio da %1$s: %2$s</string>
+    <!-- History line when a DMR group text arrives. %1$s is the sender, %2$s the talkgroup, %3$s the start of the text. Starts with an emoji; keep it. -->
+    <string name="service_sms_from_on">✉ Messaggio da %1$s su %2$s: %3$s</string>
+    <!-- SAFETY: history line when a DMR text was not sent because transmitting is off on this phone or channel. Starts with an emoji; keep it. -->
+    <string name="service_sms_tx_off">⛔ Messaggio non inviato: la trasmissione è disattivata su questo telefono o su questo canale</string>
+    <!-- Name of the notification channel for the ongoing radio notification (Android's notification settings). One word. -->
+    <string name="service_channel_radio">Radio</string>
+    <!-- Title of the ongoing radio notification. %1$d is the channel number, %2$s its name. One line. Ch is short for channel. -->
+    <string name="service_notif_title">Can. %1$d · %2$s</string>
+    <!-- Button on the radio notification: previous channel. Very short (media button). -->
+    <string name="service_notif_prev">Can −</string>
+    <!-- Button on the radio notification while scanning. Very short (media button). -->
+    <string name="service_notif_stop_scan">Ferma scansione</string>
+    <!-- Button on the radio notification: start scanning. Very short (media button). -->
+    <string name="service_notif_scan">Scansione</string>
+    <!-- Button on the radio notification: next channel. Very short (media button). -->
+    <string name="service_notif_next">Can +</string>
+    <!-- Button on the radio notification (expanded): radio off and leave SignalDeck. Very short. -->
+    <string name="service_notif_exit">Esci</string>
+    <!-- Notification text and Android Auto status while the radio is not up. %1$s is the radio's state, an English code ("booting", "no root", "error: …"). -->
+    <string name="service_radio_link">Radio %1$s</string>
+    <!-- History line when coverage logging starts by itself for a drive. Starts with an emoji; keep it. -->
+    <string name="service_cov_car_on">📶 Registrazione copertura attiva mentre Android Auto è connesso</string>
+    <!-- Choice of the steering-wheel Next talk setting: hold Next to talk. One word (chip). -->
+    <string name="service_next_talk_hold">Tieni premuto</string>
+    <!-- Choice of the steering-wheel Next talk setting: press Next twice to talk. One or two words (chip). -->
+    <string name="service_next_talk_double">Doppia pressione</string>
+    <!-- Choice of the steering-wheel microphone setting: the phone's own microphone. One word (chip). -->
+    <string name="service_wheel_mic_phone">Telefono</string>
+    <!-- Choice of the steering-wheel microphone setting: the car's microphone through a phone call. Short (chip). -->
+    <string name="service_wheel_mic_car">Auto (come chiamata)</string>
+    <!-- Choice of "Stop when I stop talking": the quiet gap before the transmission stops. %1$s is the number of seconds ("1.5"). Very short (chip). -->
+    <string name="service_vox_seconds">%1$s s</string>
+    <!-- History warning when the car did not open its microphone for a talk call, so the phone's microphone is used. Starts with an emoji; keep it. -->
+    <string name="service_car_no_mic">⚠️ L’auto non ha aperto il microfono per la chiamata: questa trasmissione usa il microfono del telefono</string>
+    <!-- History line when the talk call was hung up in the car, which stops the transmission. Starts with an emoji; keep it. -->
+    <string name="service_car_hung_up">📞 Chiamata chiusa in auto: trasmissione interrotta</string>
+    <!-- History line (first wheel presses of a drive): a steering-wheel button was pressed. %1$s is the key's Android name ("MEDIA_NEXT"). Starts with an emoji; keep it. -->
+    <string name="service_wheel_pressed">🎛 Volante: %1$s premuto</string>
+    <!-- History line: a steering-wheel button is held and repeats. %1$s is the key's Android name, %2$d the repeat count. Starts with an emoji; keep it. -->
+    <string name="service_wheel_repeat">🎛 Volante: %1$s premuto (ripetizione %2$d)</string>
+    <!-- History line: a steering-wheel button was released. %1$s is the key's Android name. Starts with an emoji; keep it. -->
+    <string name="service_wheel_released">🎛 Volante: %1$s rilasciato</string>
+    <!-- History warning: this car sends the wheel's Next as a command, so holding Next to talk cannot work. Starts with an emoji; keep it. -->
+    <string name="service_car_next_command">⚠️ Android Auto invia il tasto Avanti del volante come comando, non come pressione del tasto: in questa auto “tieni premuto Avanti per parlare” non può funzionare</string>
+    <!-- History warning: Android Auto disconnected while transmitting. %1$s is the channel name, %2$s its frequency ("446.000 MHz"). Starts with an emoji; keep it. -->
+    <string name="service_car_dropped_tx">⚠️ Android Auto si è disconnesso durante la trasmissione su %1$s (%2$s): la trasmissione disturba il cavo USB</string>
+    <!-- History warning: the USB cable stopped charging while transmitting. %1$s is the channel name, %2$s its frequency ("446.000 MHz"). Starts with an emoji; keep it. -->
+    <string name="service_usb_dropped_tx">⚠️ Il cavo USB si è disconnesso (ricarica interrotta) durante la trasmissione su %1$s (%2$s): la trasmissione disturba il cavo USB</string>
+    <!-- History warning: Android Auto did not load SignalDeck on this connection. Starts with an emoji; keep it. -->
+    <string name="service_car_not_loaded">⚠️ Android Auto non ha caricato SignalDeck con questa connessione: scollega il cavo e ricollegalo</string>
+    <!-- History line: Android Auto connected and shows SignalDeck's Radio controls screen. Starts with an emoji; keep it. -->
+    <string name="service_car_connected_controls">🚗 Android Auto connesso (schermata Comandi radio)</string>
+    <!-- History line: Android Auto connected and shows SignalDeck as a media app. Starts with an emoji; keep it. -->
+    <string name="service_car_connected_media">🚗 Android Auto connesso (app multimediale)</string>
+    <!-- History line: Android Auto disconnected. Starts with an emoji; keep it. -->
+    <string name="service_car_disconnected">🚗 Android Auto disconnesso</string>
+    <!-- History warning: Android Auto hides SignalDeck because its Unknown sources setting is off. Starts with an emoji; keep it. -->
+    <string name="service_car_unknown_sources">⚠️ Android Auto nasconde SignalDeck: Origini sconosciute è disattivato (la pagina Dispositivo spiega come risolvere)</string>
+    <!-- History line when the radio sound is paused from the media controls. Starts with an emoji; keep it. -->
+    <string name="service_media_paused">🔇 Audio radio in pausa (controlli multimediali); la ricezione continua</string>
+    <!-- History line when the radio sound plays again from the media controls. Starts with an emoji; keep it. -->
+    <string name="service_media_playing">🔊 Audio radio in riproduzione</string>
+    <!-- History line: Android Auto gave the sound to another source. Starts with an emoji; keep it. -->
+    <string name="service_car_sound_taken">🚗 Android Auto ha passato l’audio a un’altra sorgente</string>
+    <!-- A DMR talkgroup with its name (car screen, notification). %1$d is the number, %2$s the name. -->
+    <string name="service_tg_named">TG %1$d %2$s</string>
+    <!-- What a DMR call goes to: a private call (car screen). Short. -->
+    <string name="service_dmr_private_call">Chiamata privata</string>
+    <!-- Refusal (toast) when the radio is off. Short. -->
+    <string name="service_radio_not_on">La radio non è accesa</string>
+    <!-- Refusal (toast) of the repeater key-up test while coverage logging is off. One or two lines. -->
+    <string name="service_keyup_needs_coverage">Prima attiva la registrazione copertura: il risultato viene salvato con la tua posizione</string>
+    <!-- Refusal (toast) of the repeater key-up test on DMR. 9990 is BrandMeister's echo (parrot) number. Two lines. -->
+    <string name="service_keyup_dmr">In DMR usa invece il Parrot: una chiamata privata al 9990 su BrandMeister ti fa riascoltare la tua trasmissione</string>
+    <!-- Refusal (toast) of the repeater key-up test on a simplex channel or one without a location. One line. -->
+    <string name="service_keyup_needs_repeater">Scegli un canale di un ponte FM che abbia una posizione</string>
+    <!-- Refusal (toast) of the repeater key-up test before the callsign is set. PKT → APRS settings is where it is set. Two lines. -->
+    <string name="service_keyup_needs_callsign">Prima imposta il tuo nominativo (PKT → Impostazioni APRS): la prova lo trasmette come identificativo</string>
+    <!-- Text of the ongoing radio notification before the radio is up. Short. -->
+    <string name="service_notif_idle">Radio inattiva</string>
+    <!-- Choice of the roger beep setting: a short beep at the end of each transmission. One word (chip). -->
+    <string name="service_roger_beep">Beep</string>
+    <!-- Choice of the roger beep setting: two tones. One word (chip). -->
+    <string name="service_roger_two_tone">Bitonale</string>
+    <!-- Choice of the roger beep setting: the letter K in Morse. Short (chip). -->
+    <string name="service_roger_morse_k">K in CW</string>
+    <!-- History line after an emergency DMR text was sent. %1$s is the recipient, %2$s the text sent (English, as sent on air). Starts with an emoji; keep it. -->
+    <string name="service_sos_history">🆘 Messaggio di emergenza a %1$s: %2$s</string>
+    <!-- Refusal (toast) when pager receive is switched on on a digital channel. Short. -->
+    <string name="service_pages_need_analog">I messaggi pager richiedono un canale analogico</string>
+    <!-- Refusal (toast) when pager receive is switched on with a module firmware that cannot decode pages. One line. -->
+    <string name="service_pages_need_fw">La ricezione pager richiede il firmware di laboratorio</string>
+    <!-- Who a page came from when its pager address (RIC) could not be read. Short. -->
+    <string name="service_ric_unreadable">RIC illeggibile</string>
+    <!-- Who a page came from: its pager address (RIC). %1$d is the RIC. Short. -->
+    <string name="service_ric_number">RIC %1$d</string>
+    <!-- A received page (history line and message list). %1$s is the sender (or "RIC 1234"), %2$s the text. Starts with an emoji; keep it. -->
+    <string name="service_page_line">📟 %1$s: %2$s</string>
+    <!-- A received M17 text in the pager list. %1$s is the sender, %2$s the text. Starts with an emoji; keep it. -->
+    <string name="service_page_line_m17">✉ %1$s: %2$s</string>
+    <!-- Notification title when a page to one of your RICs arrives. Short. -->
+    <string name="service_page_for_you">Messaggio pager per te</string>
+    <!-- Caller line on an M17 channel while a station is heard. %1$s is its callsign, %2$s the destination, %3$s how many frames were received. One line. -->
+    <string name="service_m17_heard_line">%1$s → %2$s\u0020\u0020%3$s frame</string>
+    <!-- Caller line on an M17 channel while nothing is heard. %1$s is the destination, %2$s the channel access number (CAN). One line. -->
+    <string name="service_m17_idle_line">M17 %1$s\u0020\u0020CAN %2$s</string>
+    <!-- Caller line on an M17 channel while nothing is heard and the firmware can only receive M17. %1$s is the destination, %2$s the channel access number (CAN). One line. -->
+    <string name="service_m17_idle_line_rx">M17 solo RX %1$s\u0020\u0020CAN %2$s</string>
+    <!-- Refusal (toast) when M17 receive is switched on on a DMR channel. One line. -->
+    <string name="service_m17_needs_fm">L’M17 richiede un canale analogico (FM) o il VFO</string>
+    <!-- The subject of a received message form that has only a number (radiogram). %1$s is the number. Short. -->
+    <string name="service_form_number">numero %1$s</string>
+    <!-- History line when a message form (ICS-213, radiogram) arrives. %1$s is the form's kind, %2$s the sender. Starts with an emoji; keep it. -->
+    <string name="service_form_from">📋 %1$s da %2$s</string>
+    <!-- History line when a message form arrives. %1$s is the form's kind, %2$s the sender, %3$s its subject. Starts with an emoji; keep it. -->
+    <string name="service_form_from_subject">📋 %1$s da %2$s: %3$s</string>
+    <!-- Notification title when a message form arrives. %1$s is the form's kind ("ICS-213"), %2$s the sender. One line. -->
+    <string name="service_form_notify_title">%1$s da %2$s</string>
+    <!-- Notification text when a message form without a subject arrives: where to read it. Short. -->
+    <string name="service_form_open">Apri PKT → Moduli messaggio</string>
+    <!-- Refusal (toast) when a packet feature is used while the packet engine is not running. Short. -->
+    <string name="service_packet_not_running">Il motore packet non è attivo</string>
+    <!-- Refusal (toast) when a form is sent by APRS without a callsign. Short. -->
+    <string name="service_form_need_callsign">Inserisci il nominativo del destinatario</string>
+    <!-- Refusal (toast) when a form is sent by DMR without a recipient. Short. -->
+    <string name="service_form_need_contact">Scegli il contatto o il talkgroup</string>
+    <!-- Refusal (toast) when a form is sent by DMR while not on a DMR channel. Short. -->
+    <string name="service_form_needs_dmr">I messaggi DMR richiedono un canale DMR</string>
+    <!-- Refusal (toast) when a form is sent by Winlink without an address. One line. -->
+    <string name="service_form_need_address">Inserisci il nominativo o l’indirizzo e-mail del destinatario</string>
+    <!-- DMR roaming status (Device page): waiting because the radio is not on a DMR repeater channel. One line. -->
+    <string name="service_roam_not_dmr">in attesa: la radio non è su un canale di un ponte DMR</string>
+    <!-- DMR roaming status: waiting because the channel has no location. %1$s is the channel name. "Nearby Repeaters" is a screen. One line. -->
+    <string name="service_roam_no_location">in attesa: %1$s non ha una posizione (Ponti vicini la aggiunge)</string>
+    <!-- DMR roaming status: waiting for the phone's position. Short. -->
+    <string name="service_roam_no_fix">in attesa della posizione GPS</string>
+    <!-- DMR roaming status: already on the nearest repeater. %1$s is the channel name, %2$s its distance in km. One line. -->
+    <string name="service_roam_nearest">sul ponte più vicino per questo talkgroup (%1$s, %2$s km)</string>
+    <!-- DMR roaming status after switching repeater. %1$s is the new channel, %2$s its distance in km, %3$s the old channel, %4$s its distance in km. One line. -->
+    <string name="service_roam_switched">passato a %1$s (%2$s km; %3$s era a %4$s km)</string>
+    <!-- History line after DMR roaming switched repeater. %1$s is service_roam_switched. Starts with an emoji; keep it. -->
+    <string name="service_roam_history">🚗 Roaming: %1$s</string>
+    <!-- Refusal (toast) when the radio is not up yet. Short. -->
+    <string name="service_radio_not_ready_long">La radio non è pronta</string>
+    <!-- Refusal (toast) of a band scope sweep around a tracked satellite pass. Two lines. -->
+    <string name="service_scope_sat_busy">È in corso l’inseguimento di un passaggio satellitare (o inizia entro 15 minuti): il band scope sposterebbe la radio dalla sua frequenza</string>
+    <!-- SAFETY: result of a scheduled operation skipped because its channel is outside the radio's bands. %1$d is the channel number, %2$s the radio's bands. -->
+    <string name="service_sched_skip_band">saltata: il canale %1$d è fuori da %2$s (questa radio non può sintonizzarlo)</string>
+    <!-- Start of the history lines of a scheduled operation. %1$s is the operation ("Scan the zone"). Starts with an emoji; keep it. -->
+    <string name="service_sched_what">⏰ Pianificata: %1$s</string>
+    <!-- Start of the history lines of a scheduled operation with a label. %1$s is the operation, %2$s the user's label. Starts with an emoji; keep it. -->
+    <string name="service_sched_what_label">⏰ Pianificata: %1$s (%2$s)</string>
+    <!-- History line: a scheduled operation was skipped for a satellite pass. %1$s is service_sched_what. -->
+    <string name="service_sched_skipped_sat">%1$s saltata: si sovrappone al passaggio del satellite in corso</string>
+    <!-- History line: a scheduled operation was skipped because the radio was transmitting. %1$s is service_sched_what. -->
+    <string name="service_sched_skipped_tx">%1$s saltata: la radio stava trasmettendo</string>
+    <!-- History line: the band scope was stopped for a scheduled operation. Starts with an emoji; keep it. -->
+    <string name="service_scope_stopped_sched">✂ Band scope interrotto per un’operazione pianificata</string>
+    <!-- History line: a scheduled operation was skipped because its channel was deleted. %1$s is service_sched_what, %2$d the channel number. -->
+    <string name="service_sched_skipped_missing">%1$s saltata: il canale %2$d non esiste più</string>
+    <!-- SAFETY: history line: a scheduled operation was skipped because its channel is outside the radio's bands. %1$s is service_sched_what, %2$d the channel number, %3$s the radio's bands. -->
+    <string name="service_sched_skipped_band">%1$s saltata: il canale %2$d è fuori da %3$s (questa radio non può sintonizzarlo)</string>
+    <!-- Result of a scheduled Listen: the channel it listens to. %1$d is the channel number. Short. -->
+    <string name="service_sched_r_channel">canale %1$d</string>
+    <!-- Result of a scheduled Listen that records. %1$d is the channel number. Short. -->
+    <string name="service_sched_r_channel_rec">canale %1$d, in registrazione</string>
+    <!-- Result of a scheduled Listen on the current channel. Short. -->
+    <string name="service_sched_r_this">questo canale</string>
+    <!-- Result of a scheduled Listen on the current channel that records. Short. -->
+    <string name="service_sched_r_this_rec">questo canale, in registrazione</string>
+    <!-- Result of a scheduled scan when a scan was already running. Short. -->
+    <string name="service_sched_r_scanning">scansione già in corso</string>
+    <!-- Result of scheduled APRS monitoring when it was already on. Short. -->
+    <string name="service_sched_r_monitoring">ascolto già in corso</string>
+    <!-- Result of a scheduled SSTV receive when it was already on. Short. -->
+    <string name="service_sched_r_receiving">ricezione già in corso</string>
+    <!-- Result of a scheduled SSTV receive on a channel. %1$d is the channel number. Short. -->
+    <string name="service_sched_r_on_channel">sul canale %1$d</string>
+    <!-- Result of a scheduled beacon when the packet engine is not running. Short. -->
+    <string name="service_sched_r_no_packet">il motore packet non è attivo</string>
+    <!-- Result of a scheduled beacon that was sent. One word. -->
+    <string name="service_sched_r_sent">inviato</string>
+    <!-- Result of a scheduled packet finder that started. One word. -->
+    <string name="service_sched_r_listening">in ascolto</string>
+    <!-- Result of a scheduled Winlink check over the internet: connecting to the Winlink server (CMS). Short. -->
+    <string name="service_sched_r_cms">connessione al CMS</string>
+    <!-- History line with the result of a scheduled Winlink check. %1$s is the result. Starts with an emoji; keep it. -->
+    <string name="service_sched_winlink">⏰ Controllo Winlink pianificato: %1$s</string>
+    <!-- Result of a scheduled Winlink check by radio before a gateway was ever used. "Winlink → Connect: radio" is the button path. One line. -->
+    <string name="service_sched_r_no_gateway">saltato: ancora nessun gateway (connettiti una volta con Winlink → Connetti: radio)</string>
+    <!-- Result of a scheduled Winlink check while a session runs. Short. -->
+    <string name="service_sched_r_winlink_busy">saltato: una sessione Winlink è già in corso</string>
+    <!-- Result of a scheduled Winlink check whose channel was deleted. %1$d is the channel number. Short. -->
+    <string name="service_sched_r_missing">saltato: il canale %1$d non esiste più</string>
+    <!-- SAFETY: history line: a scheduled Winlink check was not sent because the radio did not move to its channel. %1$d is the channel number. Starts with an emoji; keep it. -->
+    <string name="service_sched_winlink_not_moved">⏰ Controllo Winlink pianificato: non inviato, la radio non è passata al canale %1$d</string>
+    <!-- History line with the result of a scheduled Winlink check, after which the radio went back to its channel. %1$s is the result, %2$d the channel number. Starts with an emoji; keep it. -->
+    <string name="service_sched_winlink_back">⏰ Controllo Winlink pianificato: %1$s, di nuovo sul canale %2$d</string>
+    <!-- Result of a scheduled Winlink check by radio: calling the gateway. %1$s is its callsign. Short. -->
+    <string name="service_sched_r_calling">chiamata a %1$s</string>
+    <!-- Result of a scheduled Winlink check by radio: calling the gateway on another channel. %1$s is its callsign, %2$d the channel number. Short. -->
+    <string name="service_sched_r_calling_on">chiamata a %1$s sul canale %2$d</string>
+    <!-- History line when a scheduled operation with a duration started. %1$s is service_sched_what, %2$d the minutes. -->
+    <string name="service_sched_started_for">%1$s per %2$d min</string>
+    <!-- History line when a scheduled operation started. %1$s is service_sched_what, %2$s its result. -->
+    <string name="service_sched_result">%1$s: %2$s</string>
+    <!-- History line when a scheduled operation with a duration started. %1$s is service_sched_what, %2$s its result, %3$d the minutes. -->
+    <string name="service_sched_result_for">%1$s: %2$s per %3$d min</string>
+    <!-- The name of a scheduled operation that no longer exists, in service_sched_ended. One word. -->
+    <string name="service_sched_operation">operazione</string>
+    <!-- History line when a scheduled operation ended. %1$s is the operation ("Scan the zone"). Starts with an emoji; keep it. -->
+    <string name="service_sched_ended">⏰ Pianificata: %1$s terminata</string>
+    <!-- History line when a scheduled operation ended and the radio went back to its channel. %1$s is the operation, %2$d the channel number. Starts with an emoji; keep it. -->
+    <string name="service_sched_ended_back">⏰ Pianificata: %1$s terminata: di nuovo sul canale %2$d</string>
+    <!-- Scheduled operation (Schedules list and history): listen to a channel. One line. -->
+    <string name="service_sched_listen">Ascolta un canale</string>
+    <!-- Scheduled operation: scan the zone. One line. -->
+    <string name="service_sched_scan">Scansiona la zona</string>
+    <!-- Scheduled operation: APRS monitoring. One line. -->
+    <string name="service_sched_aprs">Ascolto APRS</string>
+    <!-- Scheduled operation in the choice list: APRS monitoring on the region's frequency. %1$s is the frequency in MHz ("144.800"). One line. -->
+    <string name="service_sched_aprs_freq">Ascolto APRS (%1$s)</string>
+    <!-- Scheduled operation: SSTV picture receive. One line. -->
+    <string name="service_sched_sstv">Ricezione SSTV</string>
+    <!-- Scheduled operation: send an APRS position beacon. One line. -->
+    <string name="service_sched_beacon">Invia un beacon APRS</string>
+    <!-- Scheduled operation: check Winlink e-mail through a radio gateway. One line. -->
+    <string name="service_sched_winlink_radio">Controlla posta Winlink (gateway radio)</string>
+    <!-- Scheduled operation: check Winlink e-mail over the internet. One line. -->
+    <string name="service_sched_winlink_net">Controlla posta Winlink (internet)</string>
+    <!-- Scheduled operation: the packet finder (listen for packet stations). BBSs, nodes and gateways are kinds of packet station. One line. -->
+    <string name="service_sched_finder">Ricerca packet (ascolta BBS, nodi, gateway)</string>
+    <!-- SAFETY: refusal (toast) when APRS monitoring is scheduled on a radio that cannot tune the APRS frequency. %1$s is the radio's bands, %2$s the APRS frequency in MHz. -->
+    <string name="service_sched_no_aprs">Questa radio sintonizza %1$s, non %2$s MHz: niente ascolto APRS</string>
+    <!-- SAFETY: refusal (toast) when a schedule's channel is outside the radio's bands. %1$s is the channel name, %2$s the radio's bands. -->
+    <string name="service_sched_channel_outside">%1$s è fuori da %2$s: questa radio non può sintonizzarlo</string>
+    <!-- When a schedule runs: once (no date set). One word. -->
+    <string name="service_sched_once">una volta</string>
+    <!-- When a schedule runs: every day. Short. -->
+    <string name="service_sched_every_day">Ogni giorno</string>
+    <!-- When a schedule runs: Monday to Friday. One word. -->
+    <string name="service_sched_weekdays">Feriali</string>
+    <!-- When a schedule runs: Saturday and Sunday. One word. -->
+    <string name="service_sched_weekends">Weekend</string>
+    <!-- Monday, abbreviated, in a schedule's days ("Tue, Thu 19:00"). Three letters or so. -->
+    <string name="service_sched_mon">lun</string>
+    <!-- Tuesday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_tue">mar</string>
+    <!-- Wednesday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_wed">mer</string>
+    <!-- Thursday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_thu">gio</string>
+    <!-- Friday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_fri">ven</string>
+    <!-- Saturday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_sat">sab</string>
+    <!-- Sunday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_sun">dom</string>
+    <!-- Separator between the abbreviated days of a schedule ("Tue, Thu"). Keep the space. -->
+    <string name="service_sched_day_sep">,\u0020</string>
+    <!-- When a schedule runs. %1$s is the days ("Weekdays", "Tue, Thu") or the date, %2$s the time ("19:00"). One line. -->
+    <string name="service_sched_when">%1$s %2$s</string>
+    <!-- When a schedule runs and for how long. %1$s is the days or the date, %2$s the time ("19:00"), %3$d the minutes. One line. -->
+    <string name="service_sched_when_for">%1$s %2$s per %3$d min</string>
+    <!-- Where a net is (Nets page, reminders): one of your channels. %1$d is the channel number, %2$s its name. "ch" is short for channel. -->
+    <string name="service_net_channel">can. %1$d %2$s</string>
+    <!-- Where a net is: a nearby repeater. %1$s is its callsign. Short. -->
+    <string name="service_net_repeater">ponte %1$s</string>
+    <!-- Where a net is: a nearby repeater without a callsign. Short. -->
+    <string name="service_net_repeater_unnamed">Ponte senza nominativo</string>
+    <!-- Where a net is heard: a channel number without a name. %1$d is the number. "ch" is short for channel. -->
+    <string name="service_net_channel_number">can. %1$d</string>
+    <!-- Nets page: where a net in the schedule comes from: you added it, and NetLogger lists it too. Short. -->
+    <string name="service_net_source_added_netlogger">aggiunta da te · su NetLogger</string>
+    <!-- Nets page: where a net comes from, and how often the radio heard it. %1$s is the first source, %2$d the times heard. -->
+    <string name="service_net_source_and_heard">%1$s · ascoltata %2$d×</string>
+    <!-- Nets page: the name of activity the radio heard every day at the same time. %1$s is the channel. -->
+    <string name="service_net_daily_on">Attività quotidiana su %1$s</string>
+    <!-- Nets page: the name of a net the radio heard each week at the same time. %1$s is the channel. -->
+    <string name="service_net_weekly_on">Ruota settimanale su %1$s</string>
+    <!-- Nets page: where a net comes from: the radio heard it. %1$d is how many times. Short. -->
+    <string name="service_net_source_heard">ascoltata %1$d×</string>
+    <!-- Notification title: a net starts soon. %1$d is the minutes, %2$s the net's name. One line. -->
+    <string name="service_net_reminder_title">Ruota tra %1$d min: %2$s</string>
+    <!-- Notification text of a net reminder. %1$s is when ("Tue 19:30"), %2$s where (channel or repeater). Tapping opens the Nets page. -->
+    <string name="service_net_reminder_text">%1$s · %2$s · tocca per aprire Ruote</string>
+    <!-- Notification title: a net near you is on the air now (NetLogger). %1$s is its name. One line. -->
+    <string name="service_net_live_title">Ruota in aria: %1$s</string>
+    <!-- Notification text of a live net. %1$s is the frequency or talkgroup, %2$s where (channel or repeater). -->
+    <string name="service_net_live_text">%1$s · %2$s</string>
+    <!-- Notification text of a live net. %1$s is the frequency or talkgroup, %2$s where, %3$s the net control station's callsign. -->
+    <string name="service_net_live_text_ncs">%1$s · %2$s · conduce %3$s</string>
+    <!-- Name of the notification channel for net reminders (Android's notification settings). One word. -->
+    <string name="service_channel_nets">Ruote</string>
+    <!-- History line of a net reminder or live-net alert. %1$s is the notification title. Starts with an emoji; keep it. -->
+    <string name="service_net_history">📋 %1$s</string>
+    <!-- Nets page: when a net is: on the air now. Short. -->
+    <string name="service_net_on_now">in corso</string>
+    <!-- Nets page: when a net starts. %1$d is the minutes. Short. -->
+    <string name="service_net_in_min">tra %1$d min</string>
+    <!-- Nets page: when a net starts. %1$d is the hours, %2$d the minutes. Short. -->
+    <string name="service_net_in_h_min">tra %1$d h %2$d min</string>
+    <!-- Nets page: when a net starts: tomorrow. One word. -->
+    <string name="service_net_tomorrow">domani</string>
+    <!-- Nets page: when a net starts, in days (2 or more). %1$d is the days. Short. -->
+    <plurals name="service_net_in_days">
+        <item quantity="one">tra %1$d giorni</item>
+        <item quantity="many">tra %1$d giorni</item>
+        <item quantity="other">tra %1$d giorni</item>
+    </plurals>
+    <!-- Toast when a scan is started while one runs. Short. -->
+    <string name="service_scan_already">Scansione già in corso</string>
+    <!-- Toast when the zone has fewer than two channels to scan. One line. -->
+    <string name="service_scan_too_few">Niente da scansionare: servono almeno due canali nella zona</string>
+    <!-- Toast when "skip this channel" is asked while not scanning. Short. -->
+    <string name="service_scan_not_scanning">Nessuna scansione in corso</string>
+    <!-- Toast explaining how to skip a channel during a scan. One or two lines. -->
+    <string name="service_scan_skip_how">Per saltare un canale, tieni premuto mentre la scansione è ferma su di esso</string>
+    <!-- Toast when the priority channel is to be skipped. "Channels" is the channel list. One or two lines. -->
+    <string name="service_scan_skip_priority">È il canale prioritario: toglilo in Canali per non controllarlo più</string>
+    <!-- Toast after skipping a channel left nothing to scan. Short. -->
+    <string name="service_scan_skip_last">Saltato: non resta niente da scansionare</string>
+    <!-- Toast after a channel was skipped for this scan. %1$d is the channel number. Short. -->
+    <string name="service_scan_skipping">Salto il canale %1$d in questa scansione</string>
+    <!-- M17 screen, in brackets after "rebuilds them on receive": the receive equaliser in use is the one shipped for this phone. Short. -->
+    <string name="service_m17cal_shipped">coefficienti di fabbrica per questo telefono</string>
+    <!-- M17 screen: still the shipped equaliser; the last call had too few frames to fit one. %1$d is the usable frames. Short. -->
+    <string name="service_m17cal_shipped_frames">coefficienti di fabbrica, %1$d frame utilizzabili</string>
+    <!-- M17 screen: an equaliser was fitted from a call and waits for a second call to check it. %1$d is the frames, %2$d the signal level in dBm. -->
+    <string name="service_m17cal_fit_waiting">calibrazione in attesa di una seconda chiamata (%1$d frame a %2$d dBm)</string>
+    <!-- M17 screen: the equaliser was fitted on this phone and checked. %1$d is the frames, %2$d the level of the fitting call in dBm, %3$d the level of the checking call. -->
+    <string name="service_m17cal_fitted">calibrato su questo telefono, %1$d frame a %2$d dBm, verificato a %3$d dBm</string>
+    <!-- M17 screen: a fitted equaliser was not kept; it decoded no better. %1$d and %2$d are the clean frames with the new and the old one. "locked" means the link setup was decoded. -->
+    <string name="service_m17cal_not_kept_locked">calibrazione scartata (%1$d puliti contro %2$d, agganciato)</string>
+    <!-- M17 screen: a fitted equaliser was not kept and decoded no link setup. %1$d and %2$d are the clean frames with the new and the old one. -->
+    <string name="service_m17cal_not_kept_nolock">calibrazione scartata (%1$d puliti contro %2$d, non agganciato)</string>
+    <!-- M17 screen: the receive equaliser did not change; the call had too few confirmed frames. %1$d is the frames, %2$d how many a fit needs. -->
+    <string name="service_m17eq_unchanged">tabella invariata, %1$d frame confermati (per calibrare ne servono %2$d)</string>
+    <!-- M17 screen: an equaliser was fitted and waits for a second call to check it. %1$d is the frames. -->
+    <string name="service_m17eq_waiting">calibrazione da %1$d frame in attesa di una seconda chiamata</string>
+    <!-- M17 screen: the equaliser was fitted on this phone and checked. %1$d is the frames it was fitted from, %2$d and %3$d the confirmed frames with the new and the old one. -->
+    <string name="service_m17eq_fitted">calibrato su questo telefono da %1$d frame; verificato su un’altra chiamata: %2$d frame confermati contro %3$d</string>
+    <!-- M17 screen: a fitted equaliser was not kept: no link setup was decoded. %1$d and %2$d are the confirmed frames with the new and the old one. -->
+    <string name="service_m17eq_not_kept_nolink">calibrazione scartata (%1$d frame confermati contro %2$d, nessun link setup)</string>
+    <!-- M17 screen: a fitted equaliser was not kept: fewer confirmed frames. %1$d and %2$d are the confirmed frames with the new and the old one. -->
+    <string name="service_m17eq_not_kept_fewer">calibrazione scartata (%1$d frame confermati contro %2$d, meno)</string>
+    <!-- M17 screen: a fitted equaliser was not kept: the checking call was the same station and not 6 dB weaker. %1$d and %2$d are the confirmed frames with the new and the old one. -->
+    <string name="service_m17eq_not_kept_same">calibrazione scartata (%1$d frame confermati contro %2$d, stessa stazione, non 6 dB più debole)</string>
+    <!-- A channel's tone setting: no CTCSS or DCS tone. One word. -->
+    <string name="service_tone_none">Nessuno</string>
+    <!-- A channel's tone setting: a CTCSS tone. %1$s is the tone in Hz ("67.0"). Short. -->
+    <string name="service_tone_ctcss">CTCSS %1$s Hz</string>
+    <!-- A channel's tone setting: a CTCSS tone that is not in the table. Short. -->
+    <string name="service_tone_ctcss_invalid">CTCSS (non valido)</string>
+    <!-- A channel's tone setting: a DCS code. %1$s is the code ("023N"). Short. -->
+    <string name="service_tone_dcs">DCS %1$s</string>
+    <!-- A channel's tone setting: a DCS code that is not in the table. Short. -->
+    <string name="service_tone_dcs_invalid">DCS (non valido)</string>
+    <!-- A channel's tone setting of an unknown kind. One word. -->
+    <string name="service_tone_unknown">Sconosciuto</string>
+    <!-- Choice in the live-caption model list: the small speech model. One line. -->
+    <string name="service_vosk_small">Piccolo — 40 MB, il più veloce</string>
+    <!-- Choice in the live-caption model list: the medium speech model. One line. -->
+    <string name="service_vosk_better">Buono — 125 MB, buon compromesso</string>
+    <!-- Choice in the live-caption model list: the large speech model. One line. -->
+    <string name="service_vosk_best">Ottimo — 1,8 GB, inglese completo</string>
+    <!-- Choice in the live-caption model list: the largest speech model. GigaSpeech is the model's name. One line. -->
+    <string name="service_vosk_max">Massimo — 2,3 GB, GigaSpeech, il più preciso</string>
+    <!-- Live-caption status while the speech model loads. Short. -->
+    <string name="service_vosk_loading">caricamento modello</string>
+    <!-- Live-caption status when the speech model is ready. One word. -->
+    <string name="service_vosk_ready">pronto</string>
+    <!-- Live-caption status when the speech model could not be loaded or downloaded. %1$s is the error. -->
+    <string name="service_vosk_error">errore del modello: %1$s</string>
+    <!-- Live-caption status while the speech model downloads. %1$s is the model's name, %2$d its size in MB, %3$d the percentage done. -->
+    <string name="service_vosk_downloading">download di %1$s (%2$d MB) %3$d%%</string>
+    <!-- Live-caption status while the downloaded speech model is unpacked. Short. -->
+    <string name="service_vosk_unpacking">estrazione modello</string>
+    <!-- Live-caption status when a reception starts before the speech model is ready. Short. -->
+    <string name="service_vosk_preparing">preparazione del modello vocale…</string>
+    <!-- Caption line when Google Cloud transcription has no API key. TXT is the captions button. In square brackets. -->
+    <string name="service_stt_no_key">[Chiave API non configurata - tocca TXT per configurarla]</string>
+    <!-- Caption line when the Google Cloud transcription had a network error. %1$s is the error. In square brackets. -->
+    <string name="service_stt_network">[Errore di rete: %1$s]</string>
+    <!-- Caption line when the Google Cloud transcription failed. %1$s is the error. In square brackets. -->
+    <string name="service_stt_error">[Errore: %1$s]</string>
+    <!-- Caption line when Google Cloud refuses the transcription because billing is off. In square brackets. -->
+    <string name="service_stt_billing">[Trascrizione: attiva la fatturazione nel tuo progetto Google Cloud]</string>
+    <!-- Caption line when the Cloud Speech-to-Text API is not enabled. In square brackets. -->
+    <string name="service_stt_api_off">[Trascrizione: attiva l’API Cloud Speech-to-Text in Google Cloud]</string>
+    <!-- Caption line when the Google Cloud API key is refused. In square brackets. -->
+    <string name="service_stt_bad_key">[Trascrizione: chiave API non valida o non autorizzata per Speech-to-Text]</string>
+    <!-- Caption line when the Google Cloud quota is used up. In square brackets. -->
+    <string name="service_stt_quota">[Trascrizione: quota Google superata - riprova più tardi]</string>
+    <!-- Caption line when Google Cloud calls the transcription request bad. %1$s is Google's message. In square brackets. -->
+    <string name="service_stt_bad_request">[Trascrizione: richiesta non valida (%1$s)]</string>
+    <!-- Caption line for another Google Cloud transcription error. %1$d is the HTTP code. In square brackets. -->
+    <string name="service_stt_api_error">[Errore API di trascrizione %1$d]</string>
+    <!-- Caption line for another Google Cloud transcription error. %1$d is the HTTP code, %2$s Google's status word. In square brackets. -->
+    <string name="service_stt_api_error_status">[Errore API di trascrizione %1$d %2$s]</string>
+    <!-- Error inside "model error: …" when the speech model download failed. %1$d is the HTTP status code. -->
+    <string name="service_vosk_http">HTTP %1$d durante il download del modello</string>
+    <!-- SAFETY: History line (Last heard → Alerts): a long transmission was held back by the heat guard. %1$s the reason (heat guard text: too hot, cooling down…). Keep the ⏳ first. -->
+    <string name="service_tx_held">⏳ %1$s</string>
+    <!-- SAFETY: Emergency sheet result: nothing was sent because the radio is not running. -->
+    <string name="service_sos_radio_off">Non inviato: la radio non è accesa</string>
+    <!-- SAFETY: Emergency sheet result: nothing was sent because this channel is receive-only (weather, marine, railroad). -->
+    <string name="service_sos_receive_only">Non inviato: questo canale è solo in ricezione</string>
+    <!-- SAFETY: Emergency sheet result on a DMR channel: pick the contact or talkgroup that gets the emergency text first. -->
+    <string name="service_sos_choose_recipient">Non inviato: scegli chi riceve il messaggio di emergenza</string>
+    <!-- SAFETY: Emergency sheet result: the DMR emergency text went out. %1$s who it went to (name or number). -->
+    <string name="service_sos_text_sent">Messaggio di emergenza inviato a %1$s</string>
+    <!-- SAFETY: As service_sos_text_sent, when the phone had no GPS position to include. -->
+    <string name="service_sos_text_sent_no_fix">Messaggio di emergenza inviato a %1$s (senza posizione)</string>
+    <!-- SAFETY: Emergency sheet result on an FM channel: APRS (packet radio) is not running, so nothing was sent. -->
+    <string name="service_sos_no_packet">Non inviato: il packet radio non è disponibile</string>
+    <!-- SAFETY: Emergency sheet result: not sent; %1$s the reason the packet engine gave. -->
+    <string name="service_sos_not_sent">Non inviato: %1$s</string>
+    <!-- SAFETY: Emergency sheet result: an APRS emergency position report went out on channel %1$s (its name). -->
+    <string name="service_sos_aprs_position_sent">Posizione APRS di emergenza inviata su %1$s</string>
+    <!-- SAFETY: As service_sos_aprs_position_sent, but only a status (the phone had no GPS position). -->
+    <string name="service_sos_aprs_status_sent">Stato APRS di emergenza (senza posizione) inviato su %1$s</string>
+</resources>

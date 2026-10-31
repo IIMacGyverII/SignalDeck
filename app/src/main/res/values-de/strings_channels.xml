@@ -339,7 +339,7 @@
     <!-- Chip on a Region value: set your own. Very short. -->
     <string name="channels_region_change">Ändern</string>
     <!-- Region sheet hint: %1$s the bands this radio tunes ("400-480 MHz"), %2$s the region's APRS frequency in MHz. Two lines. -->
-    <string name="channels_region_aprs_untunable">Dieses Funkgerät deckt %1$s ab, nicht %2$s MHz: Die APRS-Überwachung wird nicht angeboten; auf deinen eigenen Kanälen wird APRS weiterhin dekodiert.</string>
+    <string name="channels_region_aprs_untunable">Dieses Funkgerät deckt %1$s ab, nicht %2$s MHz: Das APRS-Mithören wird nicht angeboten; auf deinen eigenen Kanälen wird APRS weiterhin dekodiert.</string>
     <!-- Section heading on the Region sheet (shown in capitals): licence-free services. Short. -->
     <string name="channels_region_section_free">Lizenzfreier Funk hier</string>
     <!-- Region sheet hint under the licence-free heading, before a region is chosen. One or two lines. -->
@@ -376,7 +376,7 @@
     <!-- Hint of the Station-ID editor: %1$s is the region's value ("Every 10 min"). Two lines. -->
     <string name="channels_region_edit_minutes">Minuten zwischen zwei Kennungen (1 bis 60): Erinnerung und Morsekennung richten sich danach. Wert der Region: %1$s.</string>
     <!-- Hint of the APRS frequency editor; Reset is the chip on the Region sheet. Two lines. -->
-    <string name="channels_region_edit_aprs">In MHz. APRS-Überwachung, Baken, Telemetrie und das iGate nutzen sie. Der Wert deiner Region ist nur einen Tipp entfernt (Zurücksetzen).</string>
+    <string name="channels_region_edit_aprs">In MHz. APRS-Mithören, Baken, Telemetrie und das iGate nutzen sie. Der Wert deiner Region ist nur einen Tipp entfernt (Zurücksetzen).</string>
     <!-- Hint of a calling or SSTV frequency editor; Reset is the chip on the Region sheet. One or two lines. -->
     <string name="channels_region_edit_mhz">In MHz, 0 für keine. Der Wert deiner Region ist nur einen Tipp entfernt (Zurücksetzen).</string>
     <!-- Toast when the station-ID minutes are out of range. Short. -->
@@ -539,7 +539,7 @@
         <item quantity="other">%1$d Kanäle übersprungen: außerhalb dessen, was dieses Funkgerät abdeckt (%2$s)</item>
     </plurals>
     <!-- Name of a pager conversation whose RIC (pager address) could not be read. Short. -->
-    <string name="channels_store_ric_unreadable">RIC nicht lesbar</string>
+    <string name="channels_store_ric_unreadable">RIC unlesbar</string>
     <!-- A stock app area in the import chooser: %1$d its number, %2$s its name, %3$d how many channels it holds. The leading number must stay first. One line. -->
     <string name="channels_store_agold_area">%1$d %2$s (%3$d Kanäle)</string>
 
@@ -583,7 +583,7 @@
         <item quantity="other">%1$d Kanäle hinzufügen zu</item>
     </plurals>
     <!-- Hint in the new-zone name field. Short. -->
-    <string name="channels_list_zone_name_hint">Name der Zone</string>
+    <string name="channels_list_zone_name_hint">Zonenname</string>
     <!-- Dialog title: name a new zone. Short. -->
     <string name="channels_list_new_zone_title">Neue Zone</string>
     <!-- Dialog button: create the new zone. Short. -->
@@ -918,7 +918,7 @@
     <!-- On a contact's sheet: %1$s its pager RICs. Short. -->
     <string name="channels_contact_pager">Pager %1$s</string>
     <!-- Label of a line on the contact's sheet: their home location. Short. -->
-    <string name="channels_contact_home">Heimat</string>
+    <string name="channels_contact_home">Zuhause</string>
     <!-- Label of a line on the contact's sheet: where and when they were last heard. Short. -->
     <string name="channels_contact_last_heard">Zuletzt gehört</string>
     <!-- On the contact's sheet: %1$s how long ago, %2$s how they were heard (APRS, M17…). Short. -->

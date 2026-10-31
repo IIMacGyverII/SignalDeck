@@ -28,7 +28,7 @@
     <!-- SAFETY: refusal (toast) when a satellite sends outside the radio's bands. %1$s is the radio's bands ("UHF 400–480 MHz"), %2$s the satellite's name, %3$s its frequency in MHz. -->
     <string name="service_sat_out_of_band">Dieses Funkgerät deckt %1$s ab: %2$s sendet auf %3$s MHz</string>
     <!-- History line: the band scope was stopped because a satellite pass is being tracked. Starts with an emoji; keep it. -->
-    <string name="service_scope_stopped_pass">✂ Bandscope für den Satelliten-Überflug gestoppt</string>
+    <string name="service_scope_stopped_pass">✂ Bandscope für den Satellitenüberflug gestoppt</string>
     <!-- History line when a satellite pass starts being tracked. %1$s is the satellite's name. Starts with an emoji; keep it. -->
     <string name="service_sat_tracking">🛰 Verfolge %1$s: Abstimmung für den Überflug</string>
     <!-- History line when the recording of a satellite pass starts. %1$s is the file name. Starts with an emoji; keep it. -->
@@ -84,7 +84,7 @@
     <!-- History line after a spoken reply to a DTMF remote-control request was transmitted. %1$s is what was said (English speech). Starts with an emoji; keep it. -->
     <string name="service_remote_reply_sent">🗣 Antwort auf Fernsteuerung gesendet: %1$s</string>
     <!-- Refusal (toast) when an ISS beacon is asked before the callsign is set. PKT → Settings is where it is set. One line. -->
-    <string name="service_iss_need_callsign">Trag zuerst dein Rufzeichen ein (PKT → Einstellungen)</string>
+    <string name="service_iss_need_callsign">Trage zuerst dein Rufzeichen ein (PKT → Einstellungen)</string>
     <!-- SAFETY: refusal (toast) when the ISS APRS frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
     <string name="service_iss_out_of_band">Dieses Funkgerät deckt %1$s ab: Die ISS-APRS-Frequenz (%2$s MHz) liegt außerhalb</string>
     <!-- Refusal (toast) when the ISS beacon needs the phone's position and there is none yet. Short. -->
@@ -132,9 +132,9 @@
     <!-- SAFETY: refusal (toast) when the APRS frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
     <string name="service_aprs_out_of_band">Dieses Funkgerät deckt %1$s ab, nicht %2$s MHz</string>
     <!-- Toast when APRS monitoring starts. %1$s is the frequency in MHz. One line. -->
-    <string name="service_aprs_monitor_on">APRS-Überwachung auf %1$s MHz</string>
+    <string name="service_aprs_monitor_on">APRS-Mithören auf %1$s MHz</string>
     <!-- Toast when APRS monitoring stops. Short. -->
-    <string name="service_aprs_monitor_off">APRS-Überwachung aus</string>
+    <string name="service_aprs_monitor_off">APRS-Mithören aus</string>
     <!-- History warning on Agold phones whose App block setting would stop SignalDeck with the screen off. %1$s lists the blocking switches that are on. Settings → App block → SignalDeck is the path in the phone's own settings. Starts with an emoji; keep it. -->
     <string name="service_agold_app_block">⚠ Agold App block stoppt SignalDeck bei ausgeschaltetem Bildschirm (%1$s ein): Schalte sie aus unter Einstellungen → App block → SignalDeck</string>
     <!-- History warning after Hand back when the radio's USB bridge did not answer. Starts with an emoji; keep it. -->
@@ -194,7 +194,7 @@
     <!-- SAFETY: history warning when a channel outside this radio's bands was refused and the radio stays on another. %1$s is the channel name, %2$s its frequency in MHz, %3$s the radio's bands, %4$s the channel still in use, %5$s its frequency in MHz. Starts with an emoji; keep it. -->
     <string name="service_channel_outside_still">⚠ %1$s (%2$s MHz) liegt außerhalb dessen, was dieses Funkgerät einstellen kann (%3$s); weiter auf %4$s, %5$s MHz</string>
     <!-- Refusal (toast or history line) while the radio module's firmware is being loaded. Short. -->
-    <string name="service_fw_busy">Funkgerät belegt: Firmware wird geladen</string>
+    <string name="service_fw_busy">Funkgerät belegt, Firmware wird geladen</string>
     <!-- Toast after deleting channels when none was deleted. Short. -->
     <string name="service_channels_none_deleted">Keine Kanäle gelöscht</string>
     <!-- Toast after deleting several channels. %1$d is how many. Short. -->
@@ -260,13 +260,13 @@
         <item quantity="other">%1$d Kanäle importiert (%2$s). %3$s</item>
     </plurals>
     <!-- Note after importing the stock app's channels when every analog channel opens only for a receive tone. %1$d is how many. "RX tone type" and "None" are the names of a field and its choice in the channel editor. -->
-    <string name="service_tone_note_all">Alle %1$d importierten Analogkanäle öffnen nur bei einem Empfangston, wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „RX-Tontyp“ auf „Keiner“</string>
+    <string name="service_tone_note_all">Alle %1$d importierten Analogkanäle öffnen nur bei einem Empfangston, wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
     <!-- As service_tone_note_all, when all use the same tone. %1$d is how many, %2$s the tone ("CTCSS 62.5"). -->
-    <string name="service_tone_note_all_kind">Alle %1$d importierten Analogkanäle öffnen nur bei einem Empfangston (%2$s), wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „RX-Tontyp“ auf „Keiner“</string>
+    <string name="service_tone_note_all_kind">Alle %1$d importierten Analogkanäle öffnen nur bei einem Empfangston (%2$s), wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
     <!-- Note after importing the stock app's channels when some analog channels open only for a receive tone. %1$d is how many do, %2$d how many analog channels there are. -->
-    <string name="service_tone_note_some">%1$d von %2$d importierten Analogkanälen öffnen nur bei einem Empfangston, wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „RX-Tontyp“ auf „Keiner“</string>
+    <string name="service_tone_note_some">%1$d von %2$d importierten Analogkanälen öffnen nur bei einem Empfangston, wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
     <!-- As service_tone_note_some, when they all use the same tone. %1$d is how many do, %2$d how many analog channels there are, %3$s the tone ("CTCSS 62.5"). -->
-    <string name="service_tone_note_some_kind">%1$d von %2$d importierten Analogkanälen öffnen nur bei einem Empfangston (%3$s), wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „RX-Tontyp“ auf „Keiner“</string>
+    <string name="service_tone_note_some_kind">%1$d von %2$d importierten Analogkanälen öffnen nur bei einem Empfangston (%3$s), wie in der Hersteller-App: Ein Funkgerät, das keinen Ton sendet, ist dort nicht zu hören. Stelle bei Bedarf im Kanaleditor „Empfangston-Art“ auf „Kein“</string>
     <!-- Toast after the user chose not to import the stock app's channels. Short. -->
     <string name="service_import_declined">Start ohne Kanäle</string>
     <!-- SAFETY: history warning when PTT is pressed on an M17 channel and the module firmware cannot send M17. "Symbol engine" is the firmware feature. Starts with an emoji; keep it. -->
@@ -331,7 +331,7 @@
     <!-- History line after an M17 transmission longer than 30 s. %1$d is its length in seconds, %2$s the heat guard's state. Starts with an emoji; keep it. -->
     <string name="service_tx_long_m17">📻 Lange Aussendung %1$d s (M17); %2$s</string>
     <!-- Refusal (toast) when tones are sent and the module firmware has no tone generator. FW22 is a firmware version. One or two lines. -->
-    <string name="service_tones_need_fw">Der Tongenerator des Moduls braucht die Bench-Firmware (FW22 oder neuer)</string>
+    <string name="service_tones_need_fw">Der Tongenerator des Moduls braucht die Labor-Firmware (FW22 oder neuer)</string>
     <!-- SAFETY: transmit refusal (toast) on a receive-only channel. Short. -->
     <string name="service_receive_only_channel">Kanal nur für Empfang</string>
     <!-- Refusal (toast) when something is to be sent while the radio already transmits. Short. -->
@@ -409,7 +409,7 @@
     <!-- Button on the radio notification: previous channel. Very short (media button). -->
     <string name="service_notif_prev">Kan. −</string>
     <!-- Button on the radio notification while scanning. Very short (media button). -->
-    <string name="service_notif_stop_scan">Suchlauf aus</string>
+    <string name="service_notif_stop_scan">Suchlauf stoppen</string>
     <!-- Button on the radio notification: start scanning. Very short (media button). -->
     <string name="service_notif_scan">Suchlauf</string>
     <!-- Button on the radio notification: next channel. Very short (media button). -->
@@ -449,7 +449,7 @@
     <!-- History warning: Android Auto did not load SignalDeck on this connection. Starts with an emoji; keep it. -->
     <string name="service_car_not_loaded">⚠️ Android Auto hat SignalDeck bei dieser Verbindung nicht geladen: Kabel abziehen und wieder einstecken</string>
     <!-- History line: Android Auto connected and shows SignalDeck's Radio controls screen. Starts with an emoji; keep it. -->
-    <string name="service_car_connected_controls">🚗 Android Auto verbunden (Bildschirm Funksteuerung)</string>
+    <string name="service_car_connected_controls">🚗 Android Auto verbunden (Bildschirm Funkbedienung)</string>
     <!-- History line: Android Auto connected and shows SignalDeck as a media app. Starts with an emoji; keep it. -->
     <string name="service_car_connected_media">🚗 Android Auto verbunden (Medien-App)</string>
     <!-- History line: Android Auto disconnected. Starts with an emoji; keep it. -->
@@ -475,7 +475,7 @@
     <!-- Refusal (toast) of the repeater key-up test on a simplex channel or one without a location. One line. -->
     <string name="service_keyup_needs_repeater">Wähle einen FM-Relaiskanal mit Standort</string>
     <!-- Refusal (toast) of the repeater key-up test before the callsign is set. PKT → APRS settings is where it is set. Two lines. -->
-    <string name="service_keyup_needs_callsign">Trag zuerst dein Rufzeichen ein (PKT → APRS-Einstellungen): Der Test sendet es als Kennung</string>
+    <string name="service_keyup_needs_callsign">Trage zuerst dein Rufzeichen ein (PKT → APRS-Einstellungen): Der Test sendet es als Kennung</string>
     <!-- Text of the ongoing radio notification before the radio is up. Short. -->
     <string name="service_notif_idle">Funkgerät inaktiv</string>
     <!-- Choice of the roger beep setting: a short beep at the end of each transmission. One word (chip). -->
@@ -489,7 +489,7 @@
     <!-- Refusal (toast) when pager receive is switched on on a digital channel. Short. -->
     <string name="service_pages_need_analog">Funkrufe brauchen einen Analogkanal</string>
     <!-- Refusal (toast) when pager receive is switched on with a module firmware that cannot decode pages. One line. -->
-    <string name="service_pages_need_fw">Funkruf-Empfang braucht die Bench-Firmware</string>
+    <string name="service_pages_need_fw">Funkruf-Empfang braucht die Labor-Firmware</string>
     <!-- Who a page came from when its pager address (RIC) could not be read. Short. -->
     <string name="service_ric_unreadable">RIC unlesbar</string>
     <!-- Who a page came from: its pager address (RIC). %1$d is the RIC. Short. -->
@@ -543,7 +543,7 @@
     <!-- Refusal (toast) when the radio is not up yet. Short. -->
     <string name="service_radio_not_ready_long">Das Funkgerät ist nicht bereit</string>
     <!-- Refusal (toast) of a band scope sweep around a tracked satellite pass. Two lines. -->
-    <string name="service_scope_sat_busy">Ein Satelliten-Überflug wird verfolgt (oder beginnt innerhalb von 15 Minuten): Das Bandscope würde das Funkgerät davon wegstimmen</string>
+    <string name="service_scope_sat_busy">Ein Satellitenüberflug wird verfolgt (oder beginnt innerhalb von 15 Minuten): Das Bandscope würde das Funkgerät davon wegstimmen</string>
     <!-- SAFETY: result of a scheduled operation skipped because its channel is outside the radio's bands. %1$d is the channel number, %2$s the radio's bands. -->
     <string name="service_sched_skip_band">übersprungen: Kanal %1$d liegt außerhalb von %2$s (dieses Funkgerät kann ihn nicht einstellen)</string>
     <!-- Start of the history lines of a scheduled operation. %1$s is the operation ("Scan the zone"). Starts with an emoji; keep it. -->
@@ -551,11 +551,11 @@
     <!-- Start of the history lines of a scheduled operation with a label. %1$s is the operation, %2$s the user's label. Starts with an emoji; keep it. -->
     <string name="service_sched_what_label">⏰ Geplant: %1$s (%2$s)</string>
     <!-- History line: a scheduled operation was skipped for a satellite pass. %1$s is service_sched_what. -->
-    <string name="service_sched_skipped_sat">%1$s übersprungen: überschneidet sich mit dem verfolgten Satelliten-Überflug</string>
+    <string name="service_sched_skipped_sat">%1$s übersprungen: überschneidet sich mit dem verfolgten Satellitenüberflug</string>
     <!-- History line: a scheduled operation was skipped because the radio was transmitting. %1$s is service_sched_what. -->
     <string name="service_sched_skipped_tx">%1$s übersprungen: Das Funkgerät sendete gerade</string>
     <!-- History line: the band scope was stopped for a scheduled operation. Starts with an emoji; keep it. -->
-    <string name="service_scope_stopped_sched">✂ Bandscope für einen geplanten Vorgang gestoppt</string>
+    <string name="service_scope_stopped_sched">✂ Bandscope für eine geplante Aktion gestoppt</string>
     <!-- History line: a scheduled operation was skipped because its channel was deleted. %1$s is service_sched_what, %2$d the channel number. -->
     <string name="service_sched_skipped_missing">%1$s übersprungen: Kanal %2$d gibt es nicht mehr</string>
     <!-- SAFETY: history line: a scheduled operation was skipped because its channel is outside the radio's bands. %1$s is service_sched_what, %2$d the channel number, %3$s the radio's bands. -->
@@ -571,7 +571,7 @@
     <!-- Result of a scheduled scan when a scan was already running. Short. -->
     <string name="service_sched_r_scanning">Suchlauf läuft bereits</string>
     <!-- Result of scheduled APRS monitoring when it was already on. Short. -->
-    <string name="service_sched_r_monitoring">Überwachung läuft bereits</string>
+    <string name="service_sched_r_monitoring">Mithören läuft bereits</string>
     <!-- Result of a scheduled SSTV receive when it was already on. Short. -->
     <string name="service_sched_r_receiving">Empfang läuft bereits</string>
     <!-- Result of a scheduled SSTV receive on a channel. %1$d is the channel number. Short. -->
@@ -617,9 +617,9 @@
     <!-- Scheduled operation: scan the zone. One line. -->
     <string name="service_sched_scan">Zone absuchen</string>
     <!-- Scheduled operation: APRS monitoring. One line. -->
-    <string name="service_sched_aprs">APRS-Überwachung</string>
+    <string name="service_sched_aprs">APRS-Mithören</string>
     <!-- Scheduled operation in the choice list: APRS monitoring on the region's frequency. %1$s is the frequency in MHz ("144.800"). One line. -->
-    <string name="service_sched_aprs_freq">APRS-Überwachung (%1$s)</string>
+    <string name="service_sched_aprs_freq">APRS-Mithören (%1$s)</string>
     <!-- Scheduled operation: SSTV picture receive. One line. -->
     <string name="service_sched_sstv">SSTV-Empfang</string>
     <!-- Scheduled operation: send an APRS position beacon. One line. -->
@@ -629,9 +629,9 @@
     <!-- Scheduled operation: check Winlink e-mail over the internet. One line. -->
     <string name="service_sched_winlink_net">Winlink-Mail abrufen (Internet)</string>
     <!-- Scheduled operation: the packet finder (listen for packet stations). BBSs, nodes and gateways are kinds of packet station. One line. -->
-    <string name="service_sched_finder">Packet-Finder (horcht nach BBS, Nodes, Gateways)</string>
+    <string name="service_sched_finder">Packet-Suche (horcht nach BBS, Nodes, Gateways)</string>
     <!-- SAFETY: refusal (toast) when APRS monitoring is scheduled on a radio that cannot tune the APRS frequency. %1$s is the radio's bands, %2$s the APRS frequency in MHz. -->
-    <string name="service_sched_no_aprs">Dieses Funkgerät deckt %1$s ab, nicht %2$s MHz: keine APRS-Überwachung</string>
+    <string name="service_sched_no_aprs">Dieses Funkgerät deckt %1$s ab, nicht %2$s MHz: kein APRS-Mithören</string>
     <!-- SAFETY: refusal (toast) when a schedule's channel is outside the radio's bands. %1$s is the channel name, %2$s the radio's bands. -->
     <string name="service_sched_channel_outside">%1$s liegt außerhalb von %2$s: Dieses Funkgerät kann ihn nicht einstellen</string>
     <!-- When a schedule runs: once (no date set). One word. -->

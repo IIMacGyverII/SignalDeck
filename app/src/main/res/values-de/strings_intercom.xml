@@ -40,19 +40,19 @@
     <!-- Classic intercom page, activity box headline: the radio is up and idle. Keep the emoji. One line. -->
     <string name="intercom_main_classic_ready">📻 Bereit</string>
     <!-- Classic intercom page, headline: the module is busy loading firmware. One line. -->
-    <string name="intercom_main_classic_loading">Funkmodul belegt, Firmware wird geladen</string>
+    <string name="intercom_main_classic_loading">Funkgerät belegt, Firmware wird geladen</string>
     <!-- Classic intercom page, headline: transmitting. Keep the emoji. One line. -->
     <string name="intercom_main_classic_transmitting">🔴 Senden</string>
     <!-- Classic intercom page, headline: receiving. Keep the emoji. One line. -->
     <string name="intercom_main_classic_receiving">📻 Empfang...</string>
     <!-- Classic intercom page, headline: no root access yet. "Device → Bring radio up" names the Device page and its button. One line (ellipsised). -->
-    <string name="intercom_main_classic_root_needed">🔒 Root nötig – in Magisk zulassen, dann Gerät → Funkmodul starten</string>
+    <string name="intercom_main_classic_root_needed">🔒 Root nötig – in Magisk zulassen, dann Gerät → Funk starten</string>
     <!-- Classic intercom page, headline: this phone model is not supported. "Device → Device report" names the Device page and its row. One line (ellipsised). -->
     <string name="intercom_main_classic_unsupported">📱 Dieses Telefon wird noch nicht unterstützt – Gerät → Gerätebericht</string>
     <!-- Classic intercom page, headline: who is calling. %1$s the caller (name, callsign or DMR ID). Keep the emoji. One line. -->
     <string name="intercom_main_classic_caller">📻 %1$s</string>
     <!-- New-look intercom headline, all caps: the module is busy loading firmware. One line. -->
-    <string name="intercom_main_neo_loading">FUNKMODUL BELEGT, FIRMWARE WIRD GELADEN</string>
+    <string name="intercom_main_neo_loading">Funkgerät belegt, Firmware wird geladen</string>
     <!-- New-look intercom headline, all caps: transmitting. One line. -->
     <string name="intercom_main_neo_transmitting">SENDEN</string>
     <!-- New-look intercom headline, all caps: receiving. One line. -->
@@ -226,7 +226,7 @@
     <!-- State line of a mode page (all caps): the radio is transmitting. Short. -->
     <string name="intercom_mode_state_transmitting">SENDEN</string>
     <!-- State line of a mode page (all caps): the module is busy loading firmware. One line. -->
-    <string name="intercom_mode_state_loading">FUNKMODUL BELEGT, FIRMWARE WIRD GELADEN</string>
+    <string name="intercom_mode_state_loading">Funkgerät belegt, Firmware wird geladen</string>
     <!-- State line of a mode page (all caps): waiting for a satellite pass to begin. One line. -->
     <string name="intercom_mode_state_waiting_pass">WARTE AUF DEN ÜBERFLUG</string>
     <!-- Signal text on a mode page: nothing received (RSSI at the floor). Lower case, very short. -->
@@ -317,7 +317,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_connected_title">Android Auto verbunden</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_connected_text">Das Telefon hat sich mit dem Auto verbunden. In Klammern steht, was das Auto für das Funkgerät anzeigt: die Medien-App (SignalDeck) oder die Vollbild-Funksteuerung (Gerät → Vollbild-Funksteuerung im Auto).</string>
+    <string name="intercom_lastheard_ex_connected_text">Das Telefon hat sich mit dem Auto verbunden. In Klammern steht, was das Auto für das Funkgerät anzeigt: die Medien-App (SignalDeck) oder die Vollbild-Funkbedienung (Gerät → Vollbild-Funkbedienung im Auto).</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_disconnected_title">Android Auto getrennt</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -325,7 +325,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_opened_title">Das Auto hat das Funkgerät geöffnet</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_opened_text">Android Auto hat den Bildschirm des Funkgeräts im Auto geöffnet (die Kanalliste der Medien-App oder die Funksteuerung).</string>
+    <string name="intercom_lastheard_ex_opened_text">Android Auto hat den Bildschirm des Funkgeräts im Auto geöffnet (die Kanalliste der Medien-App oder die Funkbedienung).</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_noreply_title">Keine Antwort vom Relais</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -423,7 +423,7 @@
     <string name="intercom_chhistory_kind_channel">Kanal</string>
     <!-- ===== Android Auto screens (car templates: rows are short) ===== -->
     <!-- History line (Last heard) when Android Auto opens the Radio controls screen. Stored in English; Last heard explains lines starting "🚗 Android Auto opened". Keep the leading emoji. One line. -->
-    <string name="intercom_car_history_opened_controls">🚗 Android Auto hat die Funksteuerung geöffnet</string>
+    <string name="intercom_car_history_opened_controls">🚗 Android Auto hat die Funkbedienung geöffnet</string>
     <!-- History line (Last heard) when Android Auto opens the media app. Stored in English, as above. Keep the leading emoji. One line. -->
     <string name="intercom_car_history_opened_media">🚗 Android Auto hat die Medien-App geöffnet</string>
     <!-- Car screen row title and media app folder: the Last heard list. Short. -->
@@ -469,15 +469,15 @@
     <!-- Car screen button and media app button that stops the scan. Two words. -->
     <string name="intercom_car_stop_scan">Suchlauf stoppen</string>
     <!-- Title of the car's own Radio controls screen. Short. -->
-    <string name="intercom_car_controls">Funksteuerung</string>
+    <string name="intercom_car_controls">Funkbedienung</string>
     <!-- Car screen row title when Radio controls could not be built; the error follows. Car screen row: short. -->
-    <string name="intercom_car_controls_unavailable">Funksteuerung nicht verfügbar</string>
+    <string name="intercom_car_controls_unavailable">Funkbedienung nicht verfügbar</string>
     <!-- Car screen row subtitle on Radio controls when the radio is off. Car screen row: short. -->
     <string name="intercom_car_open_phone_start">SignalDeck auf dem Telefon öffnen, um es zu starten</string>
     <!-- Status on the widget, the notification and the car while the module firmware is loaded. Short. -->
-    <string name="intercom_car_firmware_loading">Funkmodul belegt, Firmware wird geladen</string>
+    <string name="intercom_car_firmware_loading">Funkgerät belegt, Firmware wird geladen</string>
     <!-- Status while the radio is not ready. %1$s is the link state word (in English, from the radio service). Short. -->
-    <string name="intercom_car_radio_link">Funkmodul %1$s</string>
+    <string name="intercom_car_radio_link">Funkgerät: %1$s</string>
     <!-- Car screen row title on Radio controls when no channel is tuned. Short. -->
     <string name="intercom_car_no_channel">Kein Kanal</string>
     <!-- Car screen row title on Radio controls: the tuned channel. %1$d its number, %2$s its name. Car screen row: short. -->
@@ -878,7 +878,7 @@
     <!-- Name for a channel number with no channel; %1$d is the number. Short. -->
     <string name="intercom_schedule_channel_n">Kanal %1$d</string>
     <!-- Button that opens the schedule editor for a new schedule. Short (button). -->
-    <string name="intercom_schedule_add">Plan hinzufügen</string>
+    <string name="intercom_schedule_add">Zeitplan hinzufügen</string>
     <!-- Title of the schedule editor for a new schedule. One line. -->
     <string name="intercom_schedule_new">Neuer Plan</string>
     <!-- Title of the schedule editor for an existing schedule. One line. -->
@@ -931,7 +931,7 @@
     <!-- Emergency sheet: how it goes out on an analog channel; %1$s is the channel name. One or two lines. -->
     <string name="intercom_emergency_how_analog">Auf %1$s (analog): eine APRS-Position mit dem Notfallsymbol.</string>
     <!-- Emergency sheet: the same, when no callsign is set yet; "PKT → APRS settings" is the menu path. Two lines. -->
-    <string name="intercom_emergency_how_analog_no_call">Auf %1$s (analog): eine APRS-Position mit dem Notfallsymbol. Trag zuerst dein Rufzeichen unter PKT → APRS-Einstellungen ein.</string>
+    <string name="intercom_emergency_how_analog_no_call">Auf %1$s (analog): eine APRS-Position mit dem Notfallsymbol. Trage zuerst dein Rufzeichen unter PKT → APRS-Einstellungen ein.</string>
     <!-- Emergency sheet: section title above the message field. Short, shown in caps. -->
     <string name="intercom_emergency_message">Nachricht</string>
     <!-- Emergency sheet: hint of the message field. Short. -->
@@ -1000,7 +1000,7 @@
     <!-- Title of the Net control sheet (start a net, past nets). One line. -->
     <string name="intercom_net_title">Rundenleitung</string>
     <!-- Hint at the top of the Net control sheet. -->
-    <string name="intercom_net_start_hint">Leite eine Funkrunde: Starte sie, melde Stationen an, sobald sie sich melden (oder tippe auf eine, die das Funkgerät gerade gehört hat), markiere Nachrichten, Verspätete und Abgemeldete, und beende sie mit einem Bericht, den du teilen und ins Logbuch übernehmen kannst.</string>
+    <string name="intercom_net_start_hint">Leite eine Funkrunde: Starte sie, checke Stationen ein, sobald sie sich melden (oder tippe auf eine, die das Funkgerät gerade gehört hat), markiere Verkehr, Verspätete und Abgemeldete, und beende sie mit einem Bericht, den du teilen und ins Logbuch übernehmen kannst.</string>
     <!-- Label of the net name field on the Net control sheet. Short. -->
     <string name="intercom_net_name_label">Name der Runde</string>
     <!-- Default net name in the Net control sheet's name field, before the user has run a net. It becomes the net's stored name. -->
@@ -1017,15 +1017,15 @@
     <string name="intercom_net_history_started">📋 Runde gestartet: %1$s</string>
     <!-- History line (Last heard) when a net ends. %1$s net name, %2$d number of check-ins. Keep the leading emoji. The English uses "check-ins" for every count. -->
     <plurals name="intercom_net_history_ended">
-        <item quantity="one">📋 Runde beendet: %1$s (%2$d Anmeldung)</item>
-        <item quantity="other">📋 Runde beendet: %1$s (%2$d Anmeldungen)</item>
+        <item quantity="one">📋 Runde beendet: %1$s (%2$d Check-in)</item>
+        <item quantity="other">📋 Runde beendet: %1$s (%2$d Check-ins)</item>
     </plurals>
     <!-- Section title on the Net control sheet above the list of past nets. Short, shown in caps. -->
     <string name="intercom_net_past">Frühere Runden</string>
     <!-- Title of a past-net card. %1$s net name, %2$d number of check-ins. One line. The English uses "check-ins" for every count. -->
     <plurals name="intercom_net_past_title">
-        <item quantity="one">%1$s  ·  %2$d Anmeldung</item>
-        <item quantity="other">%1$s  ·  %2$d Anmeldungen</item>
+        <item quantity="one">%1$s  ·  %2$d Check-in</item>
+        <item quantity="other">%1$s  ·  %2$d Check-ins</item>
     </plurals>
     <!-- Second line of a past-net card. %1$s start date and time, %2$d length in minutes, %3$s channel name. One line. -->
     <string name="intercom_net_past_sub">%1$s  ·  %2$d min  ·  %3$s  ·  Tippen für den Bericht</string>
@@ -1034,29 +1034,29 @@
     <!-- Title of the running-net sheet. %1$s net name. One line. -->
     <string name="intercom_net_running_title">Runde: %1$s</string>
     <!-- Hint on the running-net sheet. -->
-    <string name="intercom_net_running_hint">Anmeldungen nach 15 Minuten werden als verspätet markiert. Tippe auf eine Markierung, um sie zu ändern; drücke lange auf eine Station, um sie zu entfernen.</string>
+    <string name="intercom_net_running_hint">Check-ins nach 15 Minuten werden als verspätet markiert. Tippe auf eine Markierung, um sie zu ändern; drücke lange auf eine Station, um sie zu entfernen.</string>
     <!-- The same hint with the net's channel in front. %1$s channel name. -->
-    <string name="intercom_net_running_hint_channel">%1$s  ·  Anmeldungen nach 15 Minuten werden als verspätet markiert. Tippe auf eine Markierung, um sie zu ändern; drücke lange auf eine Station, um sie zu entfernen.</string>
+    <string name="intercom_net_running_hint_channel">%1$s  ·  Check-ins nach 15 Minuten werden als verspätet markiert. Tippe auf eine Markierung, um sie zu ändern; drücke lange auf eine Station, um sie zu entfernen.</string>
     <!-- Hint in the callsign field on the running-net sheet. One word. -->
     <string name="intercom_net_callsign_hint">Rufzeichen</string>
     <!-- Button next to the callsign field that checks the station in. Short (140 dp button). -->
-    <string name="intercom_net_check_in">Anmelden</string>
+    <string name="intercom_net_check_in">Einchecken</string>
     <!-- Section title above the stations heard recently (tap one to check it in). Short, shown in caps. -->
     <string name="intercom_net_heard_section">In den letzten 30 Minuten gehört</string>
     <!-- Section title above the list of check-ins. Short, shown in caps. -->
-    <string name="intercom_net_checkins_section">Anmeldungen</string>
+    <string name="intercom_net_checkins_section">Check-ins</string>
     <!-- Button on the running-net sheet that shows the net report. Short (half-width button). -->
     <string name="intercom_net_report">Bericht</string>
     <!-- Button on the running-net sheet that ends the net. Short (half-width button). -->
     <string name="intercom_net_end">Runde beenden</string>
     <!-- Flag chip on a check-in row: the station has traffic. Very short (chip). -->
-    <string name="intercom_net_flag_traffic">Nachricht</string>
+    <string name="intercom_net_flag_traffic">Verkehr</string>
     <!-- Flag chip on a check-in row: the station checked in late. Very short (chip). -->
     <string name="intercom_net_flag_late">Verspätet</string>
     <!-- Flag chip on a check-in row: the station has checked out. Very short (chip). -->
     <string name="intercom_net_flag_out">Abgemeldet</string>
     <!-- Shown in a check-in list that is still empty (Net control and Nets → who has checked in). -->
-    <string name="intercom_net_no_checkins">Noch keine Anmeldungen.</string>
+    <string name="intercom_net_no_checkins">Noch keine Check-ins.</string>
     <!-- Shown in place of the recently heard stations when there are none. -->
     <string name="intercom_net_none_heard">In letzter Zeit keine Stationen gehört (DMR-Anrufer mit RadioID-Rufzeichen, APRS, Morse-Kennungen).</string>
     <!-- Clock on the running-net sheet. %1$d minutes, %2$02d seconds. One line, large. -->
@@ -1073,8 +1073,8 @@
     <string name="intercom_net_share_chooser">Rundenbericht teilen</string>
     <!-- Toast after the check-ins were added to the logbook. %1$d number added. The English uses "check-ins" for every count. -->
     <plurals name="intercom_net_logbook_added">
-        <item quantity="one">%1$d Anmeldung ins Logbuch übernommen</item>
-        <item quantity="other">%1$d Anmeldungen ins Logbuch übernommen</item>
+        <item quantity="one">%1$d Check-in ins Logbuch übernommen</item>
+        <item quantity="other">%1$d Check-ins ins Logbuch übernommen</item>
     </plurals>
     <!-- ===== Net report text (NetStore.report): plain text shared by e-mail or kept in a club log ===== -->
     <!-- Net report, second line: the channel and its frequency. %1$s channel name, %2$s frequency ("146.9400"). -->
@@ -1086,11 +1086,11 @@
     <!-- Net report line naming net control. %1$s callsign. -->
     <string name="intercom_netstore_report_control">Rundenleitung: %1$s</string>
     <!-- Net report line: number of check-ins. %1$d count. -->
-    <string name="intercom_netstore_report_checkins">Anmeldungen: %1$d</string>
+    <string name="intercom_netstore_report_checkins">Check-ins: %1$d</string>
     <!-- Net report line: number of check-ins and how many had traffic. %1$d check-ins, %2$d with traffic. -->
-    <string name="intercom_netstore_report_checkins_traffic">Anmeldungen: %1$d, davon %2$d mit Nachricht</string>
+    <string name="intercom_netstore_report_checkins_traffic">Check-ins: %1$d, davon %2$d mit Verkehr</string>
     <!-- Net report: flag after a check-in, in brackets. One or two words, lower case. -->
-    <string name="intercom_netstore_report_flag_traffic">Nachricht</string>
+    <string name="intercom_netstore_report_flag_traffic">Verkehr</string>
     <!-- Net report: flag after a check-in, in brackets. One word, lower case. -->
     <string name="intercom_netstore_report_flag_late">verspätet</string>
     <!-- Net report: flag after a check-in, in brackets. One or two words, lower case. -->
@@ -1130,7 +1130,7 @@
     <!-- Section title on the Nets sheet. Short, shown in caps. -->
     <string name="intercom_nets_near_section">In deiner Nähe auf Sendung</string>
     <!-- Card title for a net the radio is hearing that has no name. %1$s the channel. One line. -->
-    <string name="intercom_nets_heard_unnamed">Klingt nach einer Runde auf %1$s</string>
+    <string name="intercom_nets_heard_unnamed">Klingt nach einer Funkrunde auf %1$s</string>
     <!-- Card title for a net the radio is hearing. %1$s net name, %2$s the channel. One line. -->
     <string name="intercom_nets_heard_named">%1$s auf %2$s</string>
     <!-- Card subtitle for a net the radio is hearing. %1$d transmissions, %2$d minutes. The English uses "transmissions" for every count. -->
@@ -1223,7 +1223,7 @@
     <!-- Weekday button: Saturday. One letter. -->
     <string name="intercom_netedit_day_sat">S</string>
     <!-- Title of the net editor when adding a net. One line. -->
-    <string name="intercom_netedit_add_title">Runde hinzufügen</string>
+    <string name="intercom_netedit_add_title">Funkrunde hinzufügen</string>
     <!-- Title of the net editor when editing a saved net. One line. -->
     <string name="intercom_netedit_edit_title">Runde bearbeiten</string>
     <!-- Hint at the top of the net editor. -->

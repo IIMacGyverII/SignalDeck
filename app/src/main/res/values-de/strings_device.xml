@@ -10,7 +10,7 @@
     <!-- SAFETY: toast when the owner taps the module-firmware line on a phone where the firmware loader is not certified. Long toast. -->
     <string name="device_link_fw_not_certified">Modul-Firmware laden ist auf diesem Telefon noch nicht zertifiziert: Der Flash-Vorgang wurde hier nicht getestet. Angeboten wird es nur auf Telefonen, auf denen er getestet ist.</string>
     <!-- Button on the link card, tile in Tools and title of the Contribute sheet: ways to help the project. One or two words. -->
-    <string name="device_contribute">Mitmachen</string>
+    <string name="device_contribute">Mitwirken</string>
     <!-- Button on the link card (and in the untested-profile dialog): SignalDeck takes the radio from the stock app. Short, half-width button. -->
     <string name="device_link_take_over">Übernehmen</string>
     <!-- Button on the link card: give the radio back to the stock app. Short, half-width button. -->
@@ -28,7 +28,7 @@
     <!-- Title of the dialog with the result of installing the boot module. One line. -->
     <string name="device_link_boot_title">Boot-Persistenz</string>
     <!-- Button on the link card (unsupported or untested phone) and title of its menu: the guided steps that help make this phone supported. One line. -->
-    <string name="device_support">Unterstützung für dieses Telefon</string>
+    <string name="device_support">Hilf mit, dieses Telefon zu unterstützen</string>
     <!-- SAFETY: note under the link card buttons: what taking over and handing back do to the stock app. A paragraph. -->
     <string name="device_link_note">Benötigt Root (Magisk). Solange diese App das Funkmodul belegt, ist die Walkie-Talkie-App des Herstellers angehalten und ihr Symbol ausgeblendet; „Zurückgeben“ stellt sie wieder her. Das Magisk-Modul erhält die SELinux-Regeln über Neustarts hinweg, sodass das Funkmodul direkt ab dem Start übernommen werden kann.</string>
     <!-- ==== Device page: Radio settings card ==== -->
@@ -47,7 +47,7 @@
     <!-- Settings switch title: the volume-up key transmits. One line. -->
     <string name="device_set_vol_ptt">Lauter-Taste sendet</string>
     <!-- Subtitle of "Volume-up transmits". One line. -->
-    <string name="device_set_vol_ptt_sub">Solange die Funk-Seite offen ist</string>
+    <string name="device_set_vol_ptt_sub">Solange die Funkseite offen ist</string>
     <!-- Settings switch title: a learned button transmits. One line. -->
     <string name="device_set_custom_ptt">Eigene PTT-Taste</string>
     <!-- Subtitle of "Custom PTT key" when no key is learned yet. May wrap. -->
@@ -63,7 +63,7 @@
     <!-- Settings switch title: the new intercom page design. One line. -->
     <string name="device_set_new_look">Neue Funk-Ansicht</string>
     <!-- Subtitle of "New intercom look". One line. -->
-    <string name="device_set_new_look_sub">Aus: die klassische Funk-Seite</string>
+    <string name="device_set_new_look_sub">Aus: die klassische Funkseite</string>
     <!-- Settings switch title: the animated panel on an idle channel. One line. -->
     <string name="device_set_anim">Animation bei Stille</string>
     <!-- Subtitle of "Animated panel when quiet". May wrap. -->
@@ -107,11 +107,11 @@
     <!-- Subtitle of "Steering-wheel microphone". May wrap to three lines. -->
     <string name="device_set_wheel_mic_sub">Auto (als Anruf): das Mikrofon des Autos; beenden mit Auflegen am Lenkrad oder Beenden. Telefon: das Mikrofon des Telefons; beenden über das Lenkrad. Tippen zum Ändern</string>
     <!-- Settings row title: unkey a wheel transmission after silence. One line. -->
-    <string name="device_set_vox">Stopp, wenn ich nicht mehr spreche</string>
+    <string name="device_set_vox">Stoppen, wenn ich nicht mehr spreche</string>
     <!-- Subtitle of "Stop when I stop talking". May wrap. -->
     <string name="device_set_vox_sub">Für Aussendungen, die am Lenkrad gestartet wurden: Senden nach so langer Stille beenden. Tippen zum Ändern</string>
     <!-- Settings switch title: the full-screen Talk screen in Android Auto. One line. -->
-    <string name="device_set_car_screen">Vollbild-Funksteuerung im Auto</string>
+    <string name="device_set_car_screen">Vollbild-Funkbedienung im Auto</string>
     <!-- Subtitle of "Full-screen Radio controls in the car". May wrap. -->
     <string name="device_set_car_screen_sub">Aus: eine Medien-App (läuft in jedem Auto). Ein: stattdessen ein großer Sprechbildschirm; nach dem Ändern das Auto neu verbinden</string>
     <!-- Toast when coverage logging is switched on. -->
@@ -303,7 +303,7 @@
     <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. One line. -->
     <string name="device_contrib_phone">3  Dein eigenes Telefon kompatibel machen</string>
     <!-- Paragraph under "3 Make your own phone compatible". "Help support this phone" and "Device report" are button names. -->
-    <string name="device_contrib_phone_text">Forke das Projekt und bring dein Telefon damit zum Laufen. Wenn du meinst, dass dein Telefon vollständig kompatibel ist, sag uns Bescheid: Die Arbeit wird geprüft und übernommen, und alle mit diesem Telefon profitieren. „Unterstützung für dieses Telefon“ (unter Gerätebericht) sammelt die Angaben, die ein neues Telefon braucht.</string>
+    <string name="device_contrib_phone_text">Forke das Projekt und bring dein Telefon damit zum Laufen. Wenn du meinst, dass dein Telefon vollständig kompatibel ist, sag uns Bescheid: Die Arbeit wird geprüft und übernommen, und alle mit diesem Telefon profitieren. „Hilf mit, dieses Telefon zu unterstützen“ (unter Gerätebericht) sammelt die Angaben, die ein neues Telefon braucht.</string>
     <!-- Button: open the SignalDeck repository on GitHub. One line. -->
     <string name="device_contrib_repo">SignalDeck auf GitHub</string>
     <!-- Toast when no browser can open a link. %1$s is the web address. -->
@@ -359,7 +359,7 @@
     <string name="device_radioid_failed">Download fehlgeschlagen: %1$s</string>
     <!-- ==== Device report menu and Help support this phone ==== -->
     <!-- Item in the Device report menu: the guided support steps. One line. -->
-    <string name="device_report_support">Unterstützung für dieses Telefon (Schritt für Schritt)</string>
+    <string name="device_report_support">Hilf mit, dieses Telefon zu unterstützen (Schritt für Schritt)</string>
     <!-- Item in the Device report menu. One line. -->
     <string name="device_report_generate">Gerätebericht erstellen</string>
     <!-- Item in the Device report menu. One line. -->
@@ -377,7 +377,7 @@
     <!-- Title of the Android share chooser for the device report zip (the report and its message stay English). One line. -->
     <string name="device_report_share_title">Gerätebericht teilen</string>
     <!-- Item in the Device report menu: the audio check. One line, may wrap. -->
-    <string name="device_report_audio">Audioprüfung (kein Ton, DMR oder analog)</string>
+    <string name="device_report_audio">Funkaudio-Prüfung (kein Ton, DMR oder analog)</string>
     <!-- Item in the Device report menu: the test with a second radio. One line. -->
     <string name="device_report_second">Test mit zweitem Funkgerät (geführt)</string>
     <!-- Item in the Device report menu: list the phone's radio firmware files. One line. -->
@@ -397,7 +397,7 @@
     <!-- Last row of the Help support this phone list: explains it. Short. -->
     <string name="device_support_what">Was ist das?</string>
     <!-- Title of the Help support this phone list. %1$s is the phone model. One line. -->
-    <string name="device_support_title">Unterstützung für dieses Telefon – %1$s</string>
+    <string name="device_support_title">Hilf mit, dieses Telefon zu unterstützen – %1$s</string>
     <!-- Toast when a locked step is tapped before the checks have run. -->
     <string name="device_support_locked">Führe zuerst alle Prüfungen aus.</string>
     <!-- Toast when Send the results is tapped before any test has run. -->
@@ -414,9 +414,9 @@
     <!-- Button on the Exit sheet: give the radio back to the stock app and exit. One line, full width. -->
     <string name="device_exit_handback">An die Hersteller-App zurückgeben und beenden</string>
     <!-- SAFETY: hand-back hint on the Exit sheet. -->
-    <string name="device_exit_handback_hint">Schaltet die Funk-App des Telefons wieder ein und überlässt ihr das Funkmodul. Geplante Vorgänge starten SignalDeck trotzdem zu ihrer Zeit.</string>
+    <string name="device_exit_handback_hint">Schaltet die Funk-App des Telefons wieder ein und überlässt ihr das Funkmodul. Geplante Aktionen starten SignalDeck trotzdem zu ihrer Zeit.</string>
     <!-- SAFETY: hand-back hint on the Exit sheet when SignalDeck owns the radio at boot. "Keep access after reboot" is a button name. -->
-    <string name="device_exit_handback_hint_boot">Schaltet die Funk-App des Telefons wieder ein und überlässt ihr das Funkmodul. Beim nächsten Neustart holt sich SignalDeck das Funkmodul dennoch zurück („Zugriff nach Neustart behalten“). Geplante Vorgänge starten SignalDeck trotzdem zu ihrer Zeit.</string>
+    <string name="device_exit_handback_hint_boot">Schaltet die Funk-App des Telefons wieder ein und überlässt ihr das Funkmodul. Beim nächsten Neustart holt sich SignalDeck das Funkmodul dennoch zurück („Zugriff nach Neustart behalten“). Geplante Aktionen starten SignalDeck trotzdem zu ihrer Zeit.</string>
     <!-- ==== Phone profile dialog and advisories (advisory titles and reasons are data from the signed profile list) ==== -->
     <!-- Phone profile dialog: a paragraph (starts with two line breaks). %1$s is the date and time, or device_profsheet_never. -->
     <string name="device_profsheet_last_checked">\n\nProfilliste zuletzt geprüft: %1$s</string>
@@ -503,9 +503,9 @@
     <string name="device_learn_anyway">Trotzdem verwenden</string>
     <!-- ==== Radio audio check (the report itself stays English) ==== -->
     <!-- Title of the radio audio check dialogs. One line. -->
-    <string name="device_audio">Audioprüfung</string>
+    <string name="device_audio">Funkaudio-Prüfung</string>
     <!-- Instructions before the radio audio check. Several paragraphs; "Start" is the button name, MON the monitor key. -->
-    <string name="device_audio_intro">Für „kein Ton vom Funkgerät“, bei DMR oder analog. SignalDeck prüft im System des Telefons, ob der Audiodienst des Herstellers da ist (bei Custom-ROMs fehlt er unter Umständen), hört dann auf dem aktuellen Kanal mit und zeichnet auf, was das Funkmodul meldet, ob Ton vom Funk-Audiodienst des Telefons ankam und wie laut, und wie das Telefon ihn abspielt.\n\nAnalogkanal (am einfachsten: ein NOAA-Wetterkanal, dort sendet immer eine Station): zuerst 10 Sekunden mit offen gehaltener Rauschsperre (MON), dann muss Empfängerrauschen ankommen, auch wenn niemand sendet; danach eine Minute mit normaler Rauschsperre.\nDMR-Kanal: eine Minute; lass währenddessen jemanden auf der Sprechgruppe sprechen.\n\n1. Wähle auf der Funk-Seite den Kanal.\n2. Tippe auf „Starten“.\n\nEs wird nichts gesendet. Der Ton wird nur gemessen, nie gespeichert, und Anrufer-IDs werden im Bericht gekürzt. Am Ende kannst du den Bericht teilen.</string>
+    <string name="device_audio_intro">Für „kein Ton vom Funkgerät“, bei DMR oder analog. SignalDeck prüft im System des Telefons, ob der Audiodienst des Herstellers da ist (bei Custom-ROMs fehlt er unter Umständen), hört dann auf dem aktuellen Kanal mit und zeichnet auf, was das Funkmodul meldet, ob Ton vom Funk-Audiodienst des Telefons ankam und wie laut, und wie das Telefon ihn abspielt.\n\nAnalogkanal (am einfachsten: ein NOAA-Wetterkanal, dort sendet immer eine Station): zuerst 10 Sekunden mit offen gehaltener Rauschsperre (MON), dann muss Empfängerrauschen ankommen, auch wenn niemand sendet; danach eine Minute mit normaler Rauschsperre.\nDMR-Kanal: eine Minute; lass währenddessen jemanden auf der Sprechgruppe sprechen.\n\n1. Wähle auf der Funkseite den Kanal.\n2. Tippe auf „Starten“.\n\nEs wird nichts gesendet. Der Ton wird nur gemessen, nie gespeichert, und Anrufer-IDs werden im Bericht gekürzt. Am Ende kannst du den Bericht teilen.</string>
     <!-- Added to the audio check instructions when SignalDeck does not own the radio (starts with two line breaks). "Take over" is the button name. -->
     <string name="device_audio_need_radio">\n\nSignalDeck hat das Funkmodul noch nicht: Zuerst „Übernehmen“ (die Systemprüfungen laufen trotzdem).</string>
     <!-- Result of the audio check. %1$s is the verdict (English, from the report). -->
@@ -518,7 +518,7 @@
     <!-- Title of the second radio test dialogs. One line. -->
     <string name="device_second">Test mit zweitem Funkgerät</string>
     <!-- SAFETY: instructions for the second radio test, with the licence note. %1$s is the phone's tuning range ("400–480 MHz"). Keep the frequencies and service names as they are. -->
-    <string name="device_second_intro">Du brauchst irgendein anderes FM-Funkgerät (ein billiges Handfunkgerät reicht) und etwa fünf Minuten.\n\n1. Wähle auf der Funk-Seite einen analogen (FM-)Kanal, den niemand nutzt, auf einer Frequenz, auf der das andere Funkgerät senden kann: VHF und UHF gehen beide (dieses Telefon deckt %1$s ab). Anmeldefreie Beispiele: PMR446 Kanal 1, 446,00625 MHz (Europa); FRS Kanal 1, 462,5625 MHz (USA); oder eine Amateurfunk-Simplexfrequenz, wenn du eine Amateurfunkzulassung hast.\n2. Stell das andere Funkgerät auf dieselbe Frequenz, ohne Ton, niedrige Leistung, ein paar Meter von diesem Telefon entfernt.\n3. Tippe auf „Starten“ und mach, was jeder Schritt verlangt: SignalDeck misst alles selbst.\n\nDieses Telefon hört nur zu: Es sendet nichts. Der Tonsquelch-Teil nutzt eine vorübergehende Kopie des Kanals; dein Kanal wird nicht verändert.</string>
+    <string name="device_second_intro">Du brauchst irgendein anderes FM-Funkgerät (ein billiges Handfunkgerät reicht) und etwa fünf Minuten.\n\n1. Wähle auf der Funkseite einen analogen (FM-)Kanal, den niemand nutzt, auf einer Frequenz, auf der das andere Funkgerät senden kann: VHF und UHF gehen beide (dieses Telefon deckt %1$s ab). Anmeldefreie Beispiele: PMR446 Kanal 1, 446,00625 MHz (Europa); FRS Kanal 1, 462,5625 MHz (USA); oder eine Amateurfunk-Simplexfrequenz, wenn du eine Amateurfunkzulassung hast.\n2. Stell das andere Funkgerät auf dieselbe Frequenz, ohne Ton, niedrige Leistung, ein paar Meter von diesem Telefon entfernt.\n3. Tippe auf „Starten“ und mach, was jeder Schritt verlangt: SignalDeck misst alles selbst.\n\nDieses Telefon hört nur zu: Es sendet nichts. Der Tonsquelch-Teil nutzt eine vorübergehende Kopie des Kanals; dein Kanal wird nicht verändert.</string>
     <!-- Button in a second radio test step: the owner is ready. Short. -->
     <string name="device_second_ready">Bereit</string>
     <!-- Button in a second radio test step. Short. -->
@@ -531,7 +531,7 @@
     <!-- Title of the listen check instructions. One line. -->
     <string name="device_listen">Hörprüfung</string>
     <!-- Instructions for the listen check. Numbered steps; "Start" is the button name. -->
-    <string name="device_listen_intro">1. Wähle auf der Funk-Seite einen Kanal, auf dem du gerade Stationen hörst (ein belebtes Relais, ein Wetterkanal, ein Freund, der mit einem anderen Funkgerät ruft).\n2. Komm hierher zurück und tippe auf „Starten“.\n3. Teil 1, 10 Sekunden: SignalDeck hält die Rauschsperre offen (MON), der Lautsprecher sollte also etwas wiedergeben – Rauschen oder die Station, wenn sie gerade spricht; danach fragt es, was du gehört hast. (Entfällt auf einem DMR-Kanal, der kein Rauschen hat.)\n4. Teil 2, 50 Sekunden mit normaler Rauschsperre: Sie öffnet von selbst, wenn die Station spricht. SignalDeck zeichnet Signalstärke und Ton auf; danach sagst du, ob du die Station deutlich gehört hast.\n\nDreh vorher die Medienlautstärke auf.</string>
+    <string name="device_listen_intro">1. Wähle auf der Funkseite einen Kanal, auf dem du gerade Stationen hörst (ein belebtes Relais, ein Wetterkanal, ein Freund, der mit einem anderen Funkgerät ruft).\n2. Komm hierher zurück und tippe auf „Starten“.\n3. Teil 1, 10 Sekunden: SignalDeck hält die Rauschsperre offen (MON), der Lautsprecher sollte also etwas wiedergeben – Rauschen oder die Station, wenn sie gerade spricht; danach fragt es, was du gehört hast. (Entfällt auf einem DMR-Kanal, der kein Rauschen hat.)\n4. Teil 2, 50 Sekunden mit normaler Rauschsperre: Sie öffnet von selbst, wenn die Station spricht. SignalDeck zeichnet Signalstärke und Ton auf; danach sagst du, ob du die Station deutlich gehört hast.\n\nDreh vorher die Medienlautstärke auf.</string>
     <!-- Title of the listen check, part 1. One line. -->
     <string name="device_listen_part1">Hörprüfung · Teil 1 von 2: Rauschen</string>
     <!-- Progress of the listen check, part 1. %1$s is the live status (English, from the check). -->
@@ -565,7 +565,7 @@
     <!-- Title after the listen check is saved. One line. -->
     <string name="device_listen_saved">Hörprüfung gespeichert</string>
     <!-- After the listen check. %1$s is the check's result (English, from the report), %2$s the owner's answer. "Help support this phone → 3 Send the results" names the menu and its step. -->
-    <string name="device_listen_saved_msg">%1$s\nDeine Antwort: %2$s\n\nAls Nächstes: Unterstützung für dieses Telefon → 3 Ergebnisse schicken.</string>
+    <string name="device_listen_saved_msg">%1$s\nDeine Antwort: %2$s\n\nAls Nächstes: „Hilf mit, dieses Telefon zu unterstützen“ → 3 Ergebnisse schicken.</string>
     <!-- Button after the listen check: share the report now. Short. -->
     <string name="device_listen_send">Jetzt schicken</string>
     <!-- Title after the device report is generated. One line. -->
@@ -962,7 +962,7 @@
     <!-- Finding (warning) for a volume key. Two sentences. -->
     <string name="device_ptt_check_volume">Außerhalb von SignalDeck ändert das Telefon beim Gedrückthalten weiterhin die Lautstärke. SignalDeck stellt die Lautstärke beim Loslassen wieder zurück.</string>
     <!-- Finding (warning): "Volume-up transmits" is the name of an Intercom setting, switched off by this key. Two sentences. -->
-    <string name="device_ptt_check_vol_ptt">„Lauter-Taste sendet“ nutzt auf der Funk-Seite dieselbe Taste. Es wird ausgeschaltet, da diese Taste es ersetzt.</string>
+    <string name="device_ptt_check_vol_ptt">„Lauter-Taste sendet“ nutzt auf der Funkseite dieselbe Taste. Es wird ausgeschaltet, da diese Taste es ersetzt.</string>
     <!-- Finding (warning) for a media button. One sentence. -->
     <string name="device_ptt_check_media">Eine Medientaste: Sie startet oder pausiert weiterhin Musik, und langes Halten kann den Sprachassistenten starten.</string>
     <!-- Finding (warning): "Steering-wheel play/pause talks" is the name of a car setting. Two sentences. -->
@@ -1250,7 +1250,7 @@
     <!-- Module firmware page, description of the factory image (the firmware the phone shipped with). Two or three lines. -->
     <string name="device_fw_factory_summary">Die Firmware, mit der dieses Telefon ausgeliefert wurde. Laden versetzt das Modul in den ursprünglichen Zustand. Das Image bleibt, bis ein anderes geladen wird, auch über einen Neustart hinweg.</string>
     <!-- SAFETY: Module firmware page, description of the bench image FW22 (it has its own 120 s transmit limit). A short paragraph. -->
-    <string name="device_fw_fw22_summary">Test-Image. Ein Ton läuft weiter, wenn sonst nichts ansteht, und das Modul kann seinen eigenen Flash lesen. Die eigene Sendezeitbegrenzung des Funkmoduls liegt bei diesem Image bei 120 Sekunden. Es bleibt, bis ein anderes Image geladen wird, auch über einen Neustart hinweg. Bänder und Leistung ändert es nicht.</string>
+    <string name="device_fw_fw22_summary">Labor-Image. Ein Ton läuft weiter, wenn sonst nichts ansteht, und das Modul kann seinen eigenen Flash lesen. Die eigene Sendezeitbegrenzung des Funkmoduls liegt bei diesem Image bei 120 Sekunden. Es bleibt, bis ein anderes Image geladen wird, auch über einen Neustart hinweg. Bänder und Leistung ändert es nicht.</string>
     <!-- SAFETY: Module firmware pre-flight, why the file may not be loaded: it is not a known module image. One line. -->
     <string name="device_fw_not_known_image">Diese Datei ist kein bekanntes Modul-Image</string>
     <!-- SAFETY: Module firmware pre-flight, why the image may not be loaded: the module is silent, and recovery loads only the factory image. One line. -->

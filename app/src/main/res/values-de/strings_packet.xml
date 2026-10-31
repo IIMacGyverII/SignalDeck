@@ -78,7 +78,7 @@
     <!-- Toast: a weather report needs the phone's air-pressure sensor. -->
     <string name="packet_err_no_barometer">Dieses Telefon hat kein Barometer</string>
     <!-- Toast: no GPS position yet. -->
-    <string name="packet_err_no_fix">Noch keine GPS-Position</string>
+    <string name="packet_err_no_fix">Noch keine Position</string>
     <!-- Toast: no GPS position yet for a beacon, with a hint. -->
     <string name="packet_err_no_fix_maps">Noch keine GPS-Position (Standort einschalten und einmal Maps öffnen)</string>
     <!-- Toast: an APRS object needs a name. -->
@@ -455,7 +455,7 @@
     <!-- APRS screen subtitle: the KISS TNC runs on the current channel. Short. -->
     <string name="packet_aprs_sub_kiss_here">KISS-TNC auf diesem Kanal</string>
     <!-- APRS screen subtitle: monitoring %1$s (the frequency). Short. -->
-    <string name="packet_aprs_sub_monitoring">Höre %1$s</string>
+    <string name="packet_aprs_sub_monitoring">Hört %1$s mit</string>
     <!-- APRS screen subtitle, added part: the KISS TNC's TCP port %1$d. Very short. -->
     <string name="packet_aprs_sub_kiss_port">KISS-TNC :%1$d</string>
     <!-- APRS screen subtitle, added part: the KISS TNC's TCP port %1$d. Very short. -->
@@ -525,7 +525,7 @@
     <string name="packet_aprs_kind_packet">Paket</string>
 
     <!-- Map status line while it loads. Short. -->
-    <string name="packet_map_loading">Lädt …</string>
+    <string name="packet_map_loading">Wird geladen…</string>
     <!-- Title of the map, and of its help sheet. One word. -->
     <string name="packet_map_title">Karte</string>
     <!-- Screen reader label of the map's close button. -->
@@ -711,7 +711,7 @@
     <!-- Button on the coverage introduction. Short. -->
     <string name="packet_cov_turn_on">Reichweiten-Protokoll einschalten</string>
     <!-- Toast after coverage logging is turned on. One line. -->
-    <string name="packet_cov_on">Reichweiten-Protokoll ist ein</string>
+    <string name="packet_cov_on">Reichweiten-Protokoll ist an</string>
     <!-- Toast after coverage logging is turned off. One line. -->
     <string name="packet_cov_off">Reichweiten-Protokoll ist aus</string>
     <!-- Explanation on the coverage maps sheet. A few lines. -->
@@ -812,7 +812,7 @@
     <!-- Subtitle of the Messages page when there are no conversations (shown in capitals). Short. -->
     <string name="packet_msg_sub">DMR-Text</string>
     <!-- Screen reader label of the header button that starts or stops the pager monitor (long press edits its frequencies). -->
-    <string name="packet_msg_cd_monitor">Pager-Monitor</string>
+    <string name="packet_msg_cd_monitor">Pager-Mithören</string>
     <!-- Button (and screen reader label of the + button) that starts a new DMR text. Short. -->
     <string name="packet_msg_new">Neue Nachricht</string>
     <!-- Heading of the empty Messages page. One line. -->
@@ -827,11 +827,11 @@
     <!-- Banner in a page thread when a page for another thread arrives. %1$s that page (sender and text). -->
     <string name="packet_msg_also_heard">Ebenfalls gehört: %1$s</string>
     <!-- Toast after the pager monitor stops. One line. -->
-    <string name="packet_msg_monitor_off">Pager-Monitor aus</string>
+    <string name="packet_msg_monitor_off">Pager-Mithören aus</string>
     <!-- Title of the dialog that edits the pager monitor's frequencies. One line. -->
     <string name="packet_msg_scan_title">Pager-Frequenzen</string>
     <!-- Text of that dialog. Two lines. -->
-    <string name="packet_msg_scan_body">Hertz, durch Kommas getrennt. Der Monitor wartet auf jeder einen vollen Batch ab und bleibt, solange eine Präambel zu hören ist.</string>
+    <string name="packet_msg_scan_body">Hertz, durch Kommas getrennt. Das Mithören wartet auf jeder einen vollen Batch ab und bleibt, solange eine Präambel zu hören ist.</string>
     <!-- Subtitle of a page thread (and its title when the sender has no name). One word. -->
     <string name="packet_msg_kind_pager">Pager</string>
     <!-- Hint in the text field of a page thread. One word. -->
@@ -879,7 +879,7 @@
     <!-- Delivery mark: sent, but no acknowledgement came back. Lower case, short. -->
     <string name="packet_msg_st_no_ack">✓ gesendet, keine Bestätigung</string>
     <!-- Delivery mark while the text goes out. Lower case, short. -->
-    <string name="packet_msg_st_sending">wird gesendet …</string>
+    <string name="packet_msg_st_sending">wird gesendet…</string>
     <!-- Conversation card name for a page thread: PAGE and the sender. Note the two spaces. Capitals. -->
     <string name="packet_msg_chip_page">PAGER  %1$s</string>
     <!-- Conversation card: the last text was yours. %1$s the text. -->
@@ -1015,7 +1015,7 @@
     <!-- Button on the PKT sheet while the M17 receiver runs. Short (two buttons share a row). -->
     <string name="packet_pkt_m17_listening">M17 (Empfang läuft)</string>
     <!-- Button on the PKT sheet that starts the M17 receiver. Short (two buttons share a row). -->
-    <string name="packet_pkt_m17_receive">M17 empfangen</string>
+    <string name="packet_pkt_m17_receive">M17-Empfang</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
     <string name="packet_pkt_m17_hint">M17 empfangen: Hör M17-Digitalsprachstationen auf diesem Kanal oder dem VFO, mit Rufzeichen und Nachricht des Anrufers (nur Empfang: Dieses Funkgerät kann kein M17 senden).</string>
     <!-- Button on the PKT sheet that stops APRS monitoring. Short (two buttons share a row). -->
@@ -1191,7 +1191,7 @@
     <!-- Button on the PKT sheet that opens the fox hunt. Short (two buttons share a row). -->
     <string name="packet_pkt_fox">Fuchsjagd</string>
     <!-- Start of the fox hunt hint while the fox beacon transmits. -->
-    <string name="packet_pkt_fox_on">🦊 Die Fuchsbake ist an.</string>
+    <string name="packet_pkt_fox_on">🦊 Die Fuchssender ist an.</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
     <string name="packet_pkt_fox_hint">Finde einen versteckten Sender: Signalstärke live, Kompasspeilungen und eine Schätzung, wo der Fuchs ist. Oder sei selbst der Fuchs.</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
@@ -1205,13 +1205,13 @@
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
     <string name="packet_pkt_nets_section">Funkrunden</string>
     <!-- Button on the PKT sheet that lists nets nearby. Short (two buttons share a row). -->
-    <string name="packet_pkt_nets_near">Runden in der Nähe</string>
+    <string name="packet_pkt_nets_near">Funkrunden in der Nähe</string>
     <!-- Button on the PKT sheet while you run a net; %1$s its name. Short (two buttons share a row). -->
     <string name="packet_pkt_net_running">Runde läuft: %1$s</string>
     <!-- Button on the PKT sheet that opens net control. Short (two buttons share a row). -->
     <string name="packet_pkt_net_control">Rundenleitung</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
-    <string name="packet_pkt_nets_hint">Runden in der Nähe: gerade aktiv (NetLogger und was das Funkgerät hört), wann sie wiederkommen, Erinnerungen. Rundenleitung: Leite eine Runde mit Check-ins, Verkehr, Markierungen für „verspätet“ und „abgemeldet“ und einem Bericht am Ende.</string>
+    <string name="packet_pkt_nets_hint">Funkrunden in der Nähe: gerade aktiv (NetLogger und was das Funkgerät hört), wann sie wiederkommen, Erinnerungen. Rundenleitung: Leite eine Runde mit Check-ins, Verkehr, Markierungen für „Verspätet“ und „Abgemeldet“ und einem Bericht am Ende.</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
     <string name="packet_pkt_keyer_section">Sprachspeicher und Kennungs-Timer</string>
     <!-- Button on the PKT sheet that opens the voice keyer. Short (two buttons share a row). -->
@@ -1241,7 +1241,7 @@
     <!-- Morse hint, second sentence: the Morse ID is off. -->
     <string name="packet_pkt_morse_id_off">In den Einstellungen lässt sich dein Rufzeichen alle zehn Minuten nach dem Sprechen auf Amateurfunkkanälen in Morse anhängen.</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
-    <string name="packet_pkt_schedules_section">Geplante Vorgänge</string>
+    <string name="packet_pkt_schedules_section">Geplante Aktionen</string>
     <!-- Button on the PKT sheet that opens the scheduled operations. Short (two buttons share a row). -->
     <string name="packet_pkt_schedules">Zeitpläne …</string>
     <!-- Button on the PKT sheet that opens the scheduled operations; %1$d schedules. Short (two buttons share a row). -->
@@ -1337,7 +1337,7 @@
     <!-- Button on the PKT sheet (APRS message sheet) that sends an email through EMAIL-2. Short (two buttons share a row). -->
     <string name="packet_pkt_gw_email">E-Mail senden</string>
     <!-- Explanation under a group of buttons on the APRS message sheet. A few lines. -->
-    <string name="packet_pkt_gw_hint">Internet-Gateways, die über APRS erreichbar sind: eine SMS an ein Telefon (SMSGTE, Nummern in den USA und Kanada) oder eine E-Mail (EMAIL-2) – praktisch, wo es kein Handynetz gibt, aber ein APRS-iGate dich hört.</string>
+    <string name="packet_pkt_gw_hint">Internet-Gateways, die über APRS erreichbar sind: eine SMS an ein Telefon (SMSGTE, Nummern in den USA und Kanada) oder eine E-Mail (EMAIL-2) – praktisch, wo es kein Mobilfunknetz gibt, aber ein APRS-iGate dich hört.</string>
     <!-- ==== Gateway sheets (text a phone, send an email through APRS). -->
     <!-- Title of the text-a-phone sheet. SMSGTE is the gateway's callsign: keep it. One line. -->
     <string name="packet_pkt_gw_sms_title">SMS an ein Telefon (SMSGTE)</string>

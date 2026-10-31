@@ -12,13 +12,13 @@
     <!-- Error: the action is locked because the phone is in Restricted mode (a mode the owner sets on the phone). -->
     <string name="web_restricted">Im Sperrmodus ist das ausgeschaltet</string>
     <!-- Error: the radio module is busy while its firmware is being loaded. -->
-    <string name="web_firmware_busy">Funkgerät belegt: Firmware wird geladen</string>
+    <string name="web_firmware_busy">Funkgerät belegt, Firmware wird geladen</string>
     <!-- Error: the action cannot run while the radio transmits. -->
     <string name="web_not_while_tx">Nicht während des Sendens</string>
     <!-- Error: the radio module is not connected or not ready yet. -->
     <string name="web_radio_not_ready">Das Funkgerät ist nicht bereit</string>
     <!-- Error: transmitting is blocked while a satellite pass is tracked in listen-only mode. -->
-    <string name="web_sat_receive_only">Während dieses Satelliten-Überflugs nur Empfang</string>
+    <string name="web_sat_receive_only">Während dieses Satellitenüberflugs nur Empfang</string>
     <!-- Error: the current channel is set to receive only. -->
     <string name="web_channel_receive_only">Dieser Kanal ist nur für den Empfang</string>
     <!-- Reply after something was saved. Very short. -->
@@ -104,7 +104,7 @@
     <!-- Error in the channel editor: the receive frequency is empty. -->
     <string name="web_ch_rx_needed">Gib die Empfangsfrequenz ein (MHz)</string>
     <!-- Error in the channel editor. %1$s: this radio's bands, e.g. "136–174 / 400–480 MHz". -->
-    <string name="web_ch_band">Die Frequenzen müssen innerhalb von %1$s liegen</string>
+    <string name="web_ch_band">Frequenzen müssen innerhalb von %1$s liegen</string>
     <!-- Error in the channel editor: the location is out of range. -->
     <string name="web_ch_latlon">Die Breite muss innerhalb von ±90 liegen, die Länge innerhalb von ±180</string>
     <!-- Error in the channel editor (DMR). -->
@@ -112,7 +112,7 @@
     <!-- Error in the channel editor (DMR). -->
     <string name="web_ch_groups_max">Höchstens 32 Sprechgruppen in der RX-Liste (einschließlich der Rufnummer)</string>
     <!-- Error in the channel editor (DMR encryption). -->
-    <string name="web_ch_key_len">Der Schlüssel für die Verschlüsselung muss genau 8 Zeichen lang sein</string>
+    <string name="web_ch_key_len">Der Schlüssel muss genau 8 Zeichen lang sein</string>
     <!-- Error: a new DMR channel on a radio that only does analog (FM). -->
     <string name="web_ch_no_dmr">Dieses Funkgerät kann kein DMR: Lege einen Analogkanal an</string>
     <!-- Error in the VFO editor (DMR). -->
@@ -172,7 +172,7 @@
     <!-- Error: the caption engine asked for does not exist. -->
     <string name="web_engine_unknown">Unbekannte Engine</string>
     <!-- Error: the Google engine needs an API key. Google Cloud Speech is a product name. -->
-    <string name="web_engine_need_key">Trag zuerst einen API-Schlüssel für Google Cloud Speech ein</string>
+    <string name="web_engine_need_key">Trage zuerst einen API-Schlüssel für Google Cloud Speech ein</string>
     <!-- Reply after choosing the Google caption engine. Google Cloud Speech is a product name. -->
     <string name="web_engine_google">Untertitel kommen von Google Cloud Speech</string>
     <!-- Reply after choosing the on-device caption engine. -->
@@ -264,7 +264,7 @@
     <!-- Reply after starting a Winlink connection. -->
     <string name="web_wl_connecting">Verbinde</string>
     <!-- Reply after starting a Winlink radio connection. %1$s: the frequency, e.g. "145.0500". -->
-    <string name="web_wl_tuning">Stelle %1$s MHz ein, Verbindung in ein paar Sekunden</string>
+    <string name="web_wl_tuning">Stelle %1$s MHz ein, Verbindung in wenigen Sekunden</string>
     <!-- Error: a Maidenhead grid square. The examples stay as they are. -->
     <string name="web_wl_grid">Locator wie JO01 oder JO01ab</string>
     <!-- Error: the Winlink attachment is gone. -->
@@ -322,7 +322,7 @@
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_voice_label">Sprachansagen</string>
     <!-- Setting description under its name. -->
-    <string name="web_set_voice_sub">Kanalwechsel, Namen der Anrufer, Stichwort-Alarme</string>
+    <string name="web_set_voice_sub">Kanalwechsel, Anrufernamen, Stichwort-Alarme</string>
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_keywords_label">Stichwort-Alarme</string>
     <!-- Setting description under its name. -->
@@ -356,11 +356,11 @@
     <!-- Setting description under its name. -->
     <string name="web_set_wheeltalk_sub">In Android Auto: Play/Pause startet und stoppt das Senden</string>
     <!-- Setting name on the web Settings page. One line. "Next" is the media key. -->
-    <string name="web_set_nexttalk_label">„Weiter“ am Lenkrad sendet</string>
+    <string name="web_set_nexttalk_label">Weiter-Taste am Lenkrad sendet</string>
     <!-- Setting description under its name. -->
     <string name="web_set_nexttalk_sub">Zum Sprechen „Weiter“ halten oder zweimal drücken</string>
     <!-- Setting name on the web Settings page. One line. -->
-    <string name="web_set_wheelmic_label">Mikrofon fürs Lenkrad</string>
+    <string name="web_set_wheelmic_label">Mikrofon beim Lenkrad-Senden</string>
     <!-- Setting description under its name. -->
     <string name="web_set_wheelmic_sub">Auto (als Anruf) oder das Mikrofon des Telefons</string>
     <!-- Setting name on the web Settings page. One line. -->
@@ -368,7 +368,7 @@
     <!-- Setting description under its name. -->
     <string name="web_set_voxstop_sub">Für Aussendungen, die am Lenkrad gestartet wurden</string>
     <!-- Setting name on the web Settings page. One line. -->
-    <string name="web_set_carscreen_label">Vollbild-Funksteuerung im Auto</string>
+    <string name="web_set_carscreen_label">Vollbild-Funkbedienung im Auto</string>
     <!-- Setting description under its name. "Talk" is the name of the car screen's button. -->
     <string name="web_set_carscreen_sub">Aus: eine Medien-App; ein: ein großer Sprechen-Bildschirm (danach das Auto neu verbinden)</string>
     <!-- Reply after Take over on the web Settings page. -->
@@ -460,7 +460,7 @@
     <!-- Reply after deleting a zone. %1$s: its name. -->
     <string name="web_zone_deleted">Zone %1$s gelöscht</string>
     <!-- Reply after a backup. %1$s: the backup folder's name. The path stays as it is. -->
-    <string name="web_backup_done">Gesichert nach Download/DMR/DMR_Backups/%1$s</string>
+    <string name="web_backup_done">Gesichert in Download/DMR/DMR_Backups/%1$s</string>
     <!-- Error: the backup is gone. -->
     <string name="web_backup_none">Diese Sicherung gibt es nicht</string>
     <!-- Error when restoring from files. The file names stay as they are. -->
@@ -486,9 +486,9 @@
     <!-- Reply after sending a text. %1$s: the contact's name or number. -->
     <string name="web_sending_to">Sende an %1$s</string>
     <!-- Reply after turning the pager monitor on. -->
-    <string name="web_pager_monitor_on">Pager-Überwachung ein</string>
+    <string name="web_pager_monitor_on">Pager-Mithören ein</string>
     <!-- Reply after turning the pager monitor off. -->
-    <string name="web_pager_monitor_off">Pager-Überwachung aus</string>
+    <string name="web_pager_monitor_off">Pager-Mithören aus</string>
     <!-- Error: a page needs a message. -->
     <string name="web_pager_write">Schreib die Nachricht</string>
     <!-- Error: a page needs a pager address (RIC). -->

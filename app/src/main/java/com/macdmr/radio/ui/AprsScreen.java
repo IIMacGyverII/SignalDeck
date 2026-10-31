@@ -13,6 +13,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.macdmr.radio.PacketEngine;
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.RadioService;
 import com.macdmr.radio.pkt.PacketStore;
 
@@ -46,7 +48,7 @@ public final class AprsScreen extends ModeScreen {
         passCard = new PassCard(c); body.addView(passCard);
         // counters
         LinearLayout stats = new LinearLayout(c);
-        statPackets = stat(stats, "PACKETS"); statStations = stat(stats, "STATIONS"); statMsgs = stat(stats, "FOR YOU"); statLast = stat(stats, "LAST HEARD");
+        statPackets = stat(stats, Txt.s(R.string.packet_aprs_stat_packets)); statStations = stat(stats, Txt.s(R.string.packet_aprs_stat_stations)); statMsgs = stat(stats, Txt.s(R.string.packet_aprs_stat_for_you)); statLast = stat(stats, Txt.s(R.string.packet_aprs_stat_last));
         body.addView(stats);
         // switches that matter while monitoring
         LinearLayout chips = new LinearLayout(c); chips.setGravity(Gravity.CENTER_VERTICAL); chips.setPadding(0, dp(8), 0, dp(4));
@@ -59,7 +61,7 @@ public final class AprsScreen extends ModeScreen {
         body.addView(hs);
         // tabs
         LinearLayout tb = new LinearLayout(c); tb.setPadding(0, dp(6), 0, dp(6));
-        String[] names = { "LIVE", "STATIONS", "MESSAGES" };
+        String[] names = { Txt.s(R.string.packet_aprs_tab_live), Txt.s(R.string.packet_aprs_tab_stations), Txt.s(R.string.packet_aprs_tab_messages) };
         for (int i = 0; i < 3; i++) {
             final int k = i;
             TextView t = Neo.text(c, names[i], Neo.MUTED, 14, Neo.ui(c)); t.setGravity(Gravity.CENTER); t.setLetterSpacing(0.1f); t.setPadding(0, dp(8), 0, dp(8));
@@ -74,21 +76,21 @@ public final class AprsScreen extends ModeScreen {
         content.addView(body);
 
         LinearLayout r1 = buttonRow();
-        button(r1, "Message", "send", Neo.AMBER, v -> PktDialog.sheet(c, svc, "message"));
-        button(r1, "Beacon", "locate", Neo.AMBER, v -> {
+        button(r1, Txt.s(R.string.packet_aprs_message), "send", Neo.AMBER, v -> PktDialog.sheet(c, svc, "message"));
+        button(r1, Txt.s(R.string.packet_aprs_beacon), "locate", Neo.AMBER, v -> {
             if (svc.satMode() == com.macdmr.radio.ham.Satellites.APRS) { toast(svc.issBeacon()); return; }          // through the ISS (path ARISS), Doppler-corrected
-            String e = pe.sendBeacon(); toast(e == null ? "Beacon queued" : e);
+            String e = pe.sendBeacon(); toast(e == null ? Txt.s(R.string.packet_pkt_beacon_queued) : e);
         });
-        button(r1, "Map", "map", Neo.CYAN, v -> MapDialog.show(c, svc));
+        button(r1, Txt.s(R.string.packet_aprs_map), "map", Neo.CYAN, v -> MapDialog.show(c, svc));
         LinearLayout r2 = buttonRow();
-        button(r2, "Settings", "menu", Neo.CYAN, v -> PktDialog.sheet(c, svc, "settings"));
-        button(r2, "Stop", "stop", Neo.RED, v -> {
+        button(r2, Txt.s(R.string.packet_pkt_settings), "menu", Neo.CYAN, v -> PktDialog.sheet(c, svc, "settings"));
+        button(r2, Txt.s(R.string.common_stop), "stop", Neo.RED, v -> {
             if (pe.kiss().isActive()) pe.kissStop();
-            if (svc.satMode() == com.macdmr.radio.ham.Satellites.APRS) { svc.endSatTracking(); toast("ISS APRS stopped"); close(); return; }
+            if (svc.satMode() == com.macdmr.radio.ham.Satellites.APRS) { svc.endSatTracking(); toast(Txt.s(R.string.packet_pkt_iss_aprs_stopped)); close(); return; }
             toast(svc.aprsMonitor(false)); close();
         });
         LinearLayout r3 = buttonRow();
-        button(r3, "Decode a recording", "rec", Neo.CYAN, v -> RecordingsDialog.show(c, svc, com.macdmr.radio.RecordingDecodeJob.APRS));
+        button(r3, Txt.s(R.string.packet_pkt_decode_recording), "rec", Neo.CYAN, v -> RecordingsDialog.show(c, svc, com.macdmr.radio.RecordingDecodeJob.APRS));
     }
 
     private TextView stat(LinearLayout row, String label) {
@@ -121,10 +123,12 @@ public final class AprsScreen extends ModeScreen {
 
     @Override protected void refresh() {
         boolean iss = svc.satMode() == com.macdmr.radio.ham.Satellites.APRS;
-        String what = iss ? "ISS APRS " + String.format(Locale.US, "%.3f", svc.satState().nominalHz / 1e6) + " \u00B7 Doppler-tracked" : !pe.monitoring() ? "KISS TNC on this channel" : "Monitoring " + String.format(Locale.US, "%.3f", svc.aprsMonitorHz() / 1e6);
+        List<String> what = new java.util.ArrayList<>();
+        what.add(iss ? Txt.s(R.string.packet_aprs_sub_iss, String.format(Locale.US, "%.3f", svc.satState().nominalHz / 1e6)) : !pe.monitoring() ? Txt.s(R.string.packet_aprs_sub_kiss_here) : Txt.s(R.string.packet_aprs_sub_monitoring, String.format(Locale.US, "%.3f", svc.aprsMonitorHz() / 1e6)));
         passCard.update(svc);
-        if (pe.kiss().isActive()) what += pe.monitoring() ? " · KISS TNC :" + pe.kissPort() : " · port " + pe.kissPort();
-        setSubtitle(what + (pe.callsignSet() ? "" : " · set your callsign in Settings"));
+        if (pe.kiss().isActive()) what.add(pe.monitoring() ? Txt.s(R.string.packet_aprs_sub_kiss_port, pe.kissPort()) : Txt.s(R.string.packet_aprs_sub_port, pe.kissPort()));
+        if (!pe.callsignSet()) what.add(Txt.s(R.string.packet_aprs_sub_no_call));
+        setSubtitle(String.join(" · ", what));
 
         long since = since();
         List<PacketStore.LogEntry> log = pe.store().aprsLog(300);
@@ -138,13 +142,13 @@ public final class AprsScreen extends ModeScreen {
         set(statPackets, String.valueOf(packets));
         set(statStations, String.valueOf(pe.store().stationCount()));
         set(statMsgs, String.valueOf(forYou)); color(statMsgs, forYou > 0 ? Neo.AMBER : Neo.TEXT);
-        set(statLast, last == 0 ? "—" : ago(last).replace(" ago", ""));
+        set(statLast, last == 0 ? "—" : ago(last).replace(" ago", ""));   // i18n: reads ModeScreen.ago()'s English
 
-        String[] beacon = { "Beacon off", "Beacon " + pe.beaconMin() + " min", "SmartBeacon" };
-        chipState(ackChip, pe.autoAckAllowed() ? "Auto-ack" : "No auto-ack (UHF)", pe.autoAck());
-        chipState(digiChip, "Digipeater", pe.digipeat());
+        String[] beacon = { Txt.s(R.string.packet_aprs_chip_beacon_off), Txt.s(R.string.packet_aprs_chip_beacon_min, pe.beaconMin()), Txt.s(R.string.packet_aprs_chip_smart) };
+        chipState(ackChip, Txt.s(pe.autoAckAllowed() ? R.string.packet_aprs_chip_autoack : R.string.packet_aprs_chip_no_autoack), pe.autoAck());
+        chipState(digiChip, Txt.s(R.string.packet_aprs_chip_digi), pe.digipeat());
         chipState(beaconChip, beacon[Math.max(0, Math.min(2, pe.autoBeacon()))], pe.autoBeacon() != 0);
-        chipState(isChip, pe.isEnabled() ? "APRS-IS: " + pe.isStatus() : "APRS-IS off", pe.isEnabled());
+        chipState(isChip, pe.isEnabled() ? Txt.s(R.string.packet_aprs_chip_is, pe.isStatus()) : Txt.s(R.string.packet_pkt_is_off), pe.isEnabled());
         if (tabShown != tab) for (int i = 0; i < 3; i++) { tabShown = tab; tabs[i].setTextColor(i == tab ? Neo.GREEN_LIGHT : Neo.MUTED); tabs[i].setBackground(i == tab ? Neo.outline(c, Neo.GREEN, 0x18, 10, 1) : null); }
 
         long ch = pe.store().changes();
@@ -158,12 +162,12 @@ public final class AprsScreen extends ModeScreen {
         int n = 0; long since = since(); boolean divided = false;
         for (PacketStore.LogEntry e : log) {
             if (n++ >= 120) break;
-            if (!divided && e.ts < since) { divided = true; TextView t = Neo.caps(c, n == 1 ? "EARLIER  ·  nothing yet since monitoring started" : "EARLIER"); t.setPadding(dp(4), dp(10), 0, dp(6)); list.addView(t); }
+            if (!divided && e.ts < since) { divided = true; TextView t = Neo.caps(c, Txt.s(n == 1 ? R.string.packet_aprs_earlier_nothing : R.string.packet_aprs_earlier)); t.setPadding(dp(4), dp(10), 0, dp(6)); list.addView(t); }
             row(icon(e) + "  " + e.from + (e.to == null || e.to.isEmpty() ? "" : " → " + e.to),
                     (DateUtilsToday(e.ts) ? hm : dhm).format(new Date(e.ts)) + "   " + kindName(e) + (e.text == null || e.text.isEmpty() ? "" : "\n" + e.text),
                     e.mine ? Neo.AMBER : e.kind.endsWith("-tx") || e.kind.equals("beacon") ? Neo.VIOLET_LIGHT : Neo.CYAN, null);
         }
-        if (n == 0) empty("Listening. Every packet the radio decodes appears here as it arrives: positions, messages, status, weather, objects, and what you send.");
+        if (n == 0) empty(Txt.s(R.string.packet_aprs_live_empty));
     }
 
     private void showStations() {
@@ -172,14 +176,18 @@ public final class AprsScreen extends ModeScreen {
         for (PacketStore.Station s : st) {
             String dist = "";
             if (me != null) { float[] r = new float[2]; android.location.Location.distanceBetween(me.getLatitude(), me.getLongitude(), s.lat, s.lon, r); dist = "   " + com.macdmr.radio.repeaters.GeoUtil.dist(r[0]) + " " + compass(r[1]); }
-            String extra = (s.speedKmh >= 0 ? " · " + com.macdmr.radio.repeaters.GeoUtil.speed(s.speedKmh) : "") + (s.alt != 0 ? " · " + com.macdmr.radio.repeaters.GeoUtil.alt(s.alt) : "");
+            List<String> info = new java.util.ArrayList<>(); info.add(ago(s.lastTs));
+            if (s.count > 1) info.add(Txt.s(R.string.packet_aprs_heard_n, s.count));
+            if (s.speedKmh >= 0) info.add(com.macdmr.radio.repeaters.GeoUtil.speed(s.speedKmh));
+            if (s.alt != 0) info.add(com.macdmr.radio.repeaters.GeoUtil.alt(s.alt));
+            if (!s.via.isEmpty()) info.add(Txt.s(R.string.packet_pkt_station_via, s.via));
             final PacketStore.Station fs = s;
-            row("📍  " + s.call + dist, ago(s.lastTs) + (s.count > 1 ? " · heard " + s.count + "×" : "") + extra + (s.via.isEmpty() ? "" : " · via " + s.via) + (s.comment.isEmpty() ? "" : "\n" + s.comment),
+            row("📍  " + s.call + dist, String.join(" · ", info) + (s.comment.isEmpty() ? "" : "\n" + s.comment),
                     Neo.CYAN, () -> ContactEditor.open(c, svc, ContactEditor.Identity.call(fs.call).at(fs.lat, fs.lon, fs.lastTs, "APRS"), null), () -> {
-                        try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(String.format(Locale.US, "geo:%f,%f?q=%f,%f(%s)", fs.lat, fs.lon, fs.lat, fs.lon, android.net.Uri.encode(fs.call))))); } catch (Throwable t) { toast("No map app"); }
+                        try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(String.format(Locale.US, "geo:%f,%f?q=%f,%f(%s)", fs.lat, fs.lon, fs.lat, fs.lon, android.net.Uri.encode(fs.call))))); } catch (Throwable t) { toast(Txt.s(R.string.packet_pkt_no_map_app)); }   // i18n: geo URI
                     });
         }
-        if (st.isEmpty()) empty("No positions yet. Stations appear with their distance and direction from you, newest first; tap the callsign for the contact, the rest of the card to open it in your maps app.");
+        if (st.isEmpty()) empty(Txt.s(R.string.packet_aprs_stations_empty));
     }
 
     private void showMessages(List<PacketStore.LogEntry> log) {
@@ -190,13 +198,14 @@ public final class AprsScreen extends ModeScreen {
             n++;
             final String reply = e.kind.equals("msg") && e.mine ? e.from.replace(" (IS)", "") : null;
             final String fromCall = e.kind.equals("msg-tx") || e.kind.equals("ack-tx") ? e.to : e.from.replace(" (IS)", "");
-            row(icon(e) + "  " + e.from + " → " + e.to + (e.mine && e.kind.equals("msg") ? "   (for you)" : ""),
-                    (DateUtilsToday(e.ts) ? hm : dhm).format(new Date(e.ts)) + "   " + kindName(e) + (e.text == null || e.text.isEmpty() ? "" : "\n" + e.text) + (reply != null ? "\nTap to reply" : ""),
+            String who = icon(e) + "  " + e.from + " → " + e.to;
+            row(e.mine && e.kind.equals("msg") ? Txt.s(R.string.packet_aprs_for_you, who) : who,
+                    (DateUtilsToday(e.ts) ? hm : dhm).format(new Date(e.ts)) + "   " + kindName(e) + (e.text == null || e.text.isEmpty() ? "" : "\n" + e.text) + (reply != null ? "\n" + Txt.s(R.string.packet_aprs_tap_reply) : ""),
                     e.mine ? Neo.AMBER : e.kind.equals("msg-tx") ? Neo.VIOLET_LIGHT : Neo.CYAN,
                     fromCall == null || fromCall.isEmpty() ? null : () -> ContactEditor.open(c, svc, ContactEditor.Identity.call(fromCall), null),
                     reply == null ? null : () -> PktDialog.sheet(c, svc, "message:" + reply));
         }
-        if (n == 0) empty("No messages yet. Messages to your callsign" + (pe.autoAck() ? " (acknowledged automatically)" : "") + ", the groups you follow, bulletins and the messages you send are listed here.");
+        if (n == 0) empty(Txt.s(pe.autoAck() ? R.string.packet_aprs_msgs_empty_ack : R.string.packet_aprs_msgs_empty));
     }
 
     private void row(String title, String sub, int color, Runnable tap) { row(title, sub, color, null, tap); }
@@ -230,19 +239,19 @@ public final class AprsScreen extends ModeScreen {
     }
     private static String kindName(PacketStore.LogEntry e) {
         switch (e.kind) {
-            case "msg": return e.mine ? "message for you" : "message";
-            case "msg-tx": return "message sent";
-            case "ack": return "acknowledged";
-            case "ack-tx": return "you acknowledged";
-            case "rej": return "rejected";
-            case "pos": return "position";
-            case "beacon": return "you beaconed";
-            case "is-beacon": return "internet beacon";
-            case "digi": return "you digipeated";
-            case "status": return "status";
-            case "object": return "object";
-            case "igate-rf": return "gated from the internet";
-            default: return "packet";
+            case "msg": return Txt.s(e.mine ? R.string.packet_aprs_kind_msg_mine : R.string.packet_aprs_kind_msg);
+            case "msg-tx": return Txt.s(R.string.packet_aprs_kind_msg_tx);
+            case "ack": return Txt.s(R.string.packet_aprs_kind_ack);
+            case "ack-tx": return Txt.s(R.string.packet_aprs_kind_ack_tx);
+            case "rej": return Txt.s(R.string.packet_aprs_kind_rej);
+            case "pos": return Txt.s(R.string.packet_aprs_kind_pos);
+            case "beacon": return Txt.s(R.string.packet_aprs_kind_beacon);
+            case "is-beacon": return Txt.s(R.string.packet_aprs_kind_is_beacon);
+            case "digi": return Txt.s(R.string.packet_aprs_kind_digi);
+            case "status": return Txt.s(R.string.packet_aprs_kind_status);
+            case "object": return Txt.s(R.string.packet_aprs_kind_object);
+            case "igate-rf": return Txt.s(R.string.packet_aprs_kind_igate);
+            default: return Txt.s(R.string.packet_aprs_kind_packet);
         }
     }
     private static String compass(float bearing) { float b = (bearing + 360) % 360; String[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" }; return dirs[(int) Math.round(b / 45.0) % 8]; }

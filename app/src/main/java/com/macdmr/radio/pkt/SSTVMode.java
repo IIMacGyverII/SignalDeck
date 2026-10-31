@@ -81,27 +81,27 @@ public class SSTVMode {
     // PD:      20ms sync + 2.08ms porch + 3*channelMs
     private static final Mode[] MODES = {
         // Robot modes (YUV) — fullLine = sync(9) + porch(3) + Y(88) + sep(3) + Cb(44) + sep(3) + Cr(44) ≈ 150ms
-        new Mode(MODE_ROBOT_36, "Robot 36",  320, 240, false, 36000,  88.0f,  150.0f,  3, SYNC_FAMILY_NINE_MS),
-        new Mode(MODE_ROBOT_72, "Robot 72",  320, 240, false, 72000, 138.0f,  300.0f,  3, SYNC_FAMILY_NINE_MS),
+        new Mode(MODE_ROBOT_36, "Robot 36",  320, 240, false, 36000,  88.0f,  150.0f,  3, SYNC_FAMILY_NINE_MS),   // i18n: mode name
+        new Mode(MODE_ROBOT_72, "Robot 72",  320, 240, false, 72000, 138.0f,  300.0f,  3, SYNC_FAMILY_NINE_MS),   // i18n: mode name
 
         // Martin modes (RGB) — fullLine = 4.862 + 0.572 + 3*ch + 2*0.572
-        new Mode(MODE_MARTIN_M1, "Martin M1", 320, 256, true, 114000, 146.432f, 446.446f, 3, SYNC_FAMILY_FIVE_MS),
-        new Mode(MODE_MARTIN_M2, "Martin M2", 320, 256, true,  58000,  73.216f, 226.798f, 3, SYNC_FAMILY_FIVE_MS),
+        new Mode(MODE_MARTIN_M1, "Martin M1", 320, 256, true, 114000, 146.432f, 446.446f, 3, SYNC_FAMILY_FIVE_MS),   // i18n: mode name
+        new Mode(MODE_MARTIN_M2, "Martin M2", 320, 256, true,  58000,  73.216f, 226.798f, 3, SYNC_FAMILY_FIVE_MS),   // i18n: mode name
 
         // Scottie modes (RGB) — fullLine = 9 + 3*1.5 + 3*ch
-        new Mode(MODE_SCOTTIE_S1, "Scottie S1", 320, 256, true, 110000, 138.240f, 428.220f,  3, SYNC_FAMILY_NINE_MS),
-        new Mode(MODE_SCOTTIE_S2, "Scottie S2", 320, 256, true,  71000,  88.064f, 277.692f,  3, SYNC_FAMILY_NINE_MS),
-        new Mode(MODE_SCOTTIE_DX, "Scottie DX", 320, 256, true, 316000, 345.600f, 1050.300f, 3, SYNC_FAMILY_NINE_MS),
+        new Mode(MODE_SCOTTIE_S1, "Scottie S1", 320, 256, true, 110000, 138.240f, 428.220f,  3, SYNC_FAMILY_NINE_MS),   // i18n: mode name
+        new Mode(MODE_SCOTTIE_S2, "Scottie S2", 320, 256, true,  71000,  88.064f, 277.692f,  3, SYNC_FAMILY_NINE_MS),   // i18n: mode name
+        new Mode(MODE_SCOTTIE_DX, "Scottie DX", 320, 256, true, 316000, 345.600f, 1050.300f, 3, SYNC_FAMILY_NINE_MS),   // i18n: mode name
 
         // PD modes (RGB) — fullLine = 20 + 2.08 + 3*ch (approximate)
-        new Mode(MODE_PD_90,  "PD 90",  320, 256, true,  90000, 170.24f, 703.04f, 3, SYNC_FAMILY_TWENTY_MS),
-        new Mode(MODE_PD_120, "PD 120", 640, 496, true, 126000, 121.9f, 369.78f, 3, SYNC_FAMILY_TWENTY_MS),
-        new Mode(MODE_PD_180, "PD 180", 640, 496, true, 188000, 183.04f, 573.2f,  3, SYNC_FAMILY_TWENTY_MS),
+        new Mode(MODE_PD_90,  "PD 90",  320, 256, true,  90000, 170.24f, 703.04f, 3, SYNC_FAMILY_TWENTY_MS),   // i18n: mode name
+        new Mode(MODE_PD_120, "PD 120", 640, 496, true, 126000, 121.9f, 369.78f, 3, SYNC_FAMILY_TWENTY_MS),   // i18n: mode name
+        new Mode(MODE_PD_180, "PD 180", 640, 496, true, 188000, 183.04f, 573.2f,  3, SYNC_FAMILY_TWENTY_MS),   // i18n: mode name
 
         // Robot BW / Color modes (FIVE_MS sync)
-        new Mode(MODE_ROBOT_8_BW,  "Robot 8 BW",     160, 120, false,   8000,   56.0f,   66.0f, 1, SYNC_FAMILY_FIVE_MS),
-        new Mode(MODE_ROBOT_12_BW, "Robot 12 BW",    160, 120, false,  12000,   90.0f,  100.0f, 1, SYNC_FAMILY_FIVE_MS),
-        new Mode(MODE_ROBOT_24_C,  "Robot 24 Color", 320, 240, false,  24000,   88.0f,  198.0f, 3, SYNC_FAMILY_FIVE_MS),
+        new Mode(MODE_ROBOT_8_BW,  "Robot 8 BW",     160, 120, false,   8000,   56.0f,   66.0f, 1, SYNC_FAMILY_FIVE_MS),   // i18n: mode name
+        new Mode(MODE_ROBOT_12_BW, "Robot 12 BW",    160, 120, false,  12000,   90.0f,  100.0f, 1, SYNC_FAMILY_FIVE_MS),   // i18n: mode name
+        new Mode(MODE_ROBOT_24_C,  "Robot 24 Color", 320, 240, false,  24000,   88.0f,  198.0f, 3, SYNC_FAMILY_FIVE_MS),   // i18n: mode name
     };
     
     /**
@@ -121,7 +121,7 @@ public class SSTVMode {
      */
     public static String getModeName(int visCode) {
         Mode mode = getModeByVIS(visCode);
-        return mode != null ? mode.name : "Unknown";
+        return mode != null ? mode.name : "Unknown";   // i18n: log only (SSTVVISDetector)
     }
     
     /**

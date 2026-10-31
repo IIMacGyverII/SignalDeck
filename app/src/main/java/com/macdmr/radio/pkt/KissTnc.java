@@ -8,6 +8,9 @@ package com.macdmr.radio.pkt;
 
 import android.util.Log;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,7 +26,7 @@ import java.util.Arrays;
  */
 public final class KissTnc {
     public interface Listener { void onFrameFromClient(byte[] ax25NoFcs); }
-    private static final String TAG = "KissTnc";
+    private static final String TAG = "KissTnc";   // i18n: log tag
 
     private volatile boolean active;
     private ServerSocket server;
@@ -38,7 +41,7 @@ public final class KissTnc {
     public int txFrames() { return txFrames; }
 
     public synchronized String start(final int port, final Listener l) {
-        if (active) return "already running on port " + this.port;
+        if (active) return Txt.s(R.string.packet_kiss_err_running, this.port);
         this.port = port; active = true; rxFrames = txFrames = 0;
         Thread t = new Thread(() -> {
             try {

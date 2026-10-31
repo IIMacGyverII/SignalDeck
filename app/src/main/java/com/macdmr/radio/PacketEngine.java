@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.pkt.AFSKDecoder;
 import com.macdmr.radio.pkt.AprsIsClient;
 import com.macdmr.radio.pkt.AFSKGenerator;
@@ -68,9 +70,11 @@ public final class PacketEngine {
         /** True when the module's tone generator is there (bench firmware FW22 or later): Morse and RTTY go out through it. */
         default boolean tonePath() { return false; }
         /** Plays a pair list through the module's tone generator; the reason it cannot, or null when it is on its way. */
-        default String transmitTones(java.util.List<com.macdmr.radio.ham.ToneQueue.Pair> pairs, int amplitude, String label, Runnable done) { return "no tone path"; }
+        default String transmitTones(java.util.List<com.macdmr.radio.ham.ToneQueue.Pair> pairs, int amplitude, String label, Runnable done) { return "no tone path"; }   // i18n: stub (RadioService gives the real reason)
         Location location();
         void event(String line);                 // a history line / toast on the intercom
+        /** The same as a message, so it can be shown in the app's language; by default its English text. */
+        default void event(Msg m) { event(m.english()); }
         void notifyUser(String title, String text, boolean alert);
         int rssiDbm();                           // last signal reading, -999 = none
         /** Keep GPS updates coming to {@link #onLocation} (SmartBeaconing) or stop them. */
@@ -90,11 +94,14 @@ public final class PacketEngine {
     public static final int TX_LEAD_MS = 1600, TX_REPS = 2, TX_GAP_MS = 250;
     /** Packet lead-in choices (APRS settings, for testing): the measured 1.6 s by default. SSTV and DTMF keep TX_LEAD_MS. */
     public static final int[] LEAD_CHOICES = { 1600, 1000, 500, 0 };
-    public static final String[] LEAD_NAMES = { "1.6 s (default)", "1.0 s", "0.5 s", "None" };
+    /** The names of {@link #LEAD_CHOICES}, for the APRS settings. */
+    public static String[] leadNames() { return new String[] { Txt.s(R.string.packet_lead_default), "1.0 s", "0.5 s", Txt.s(R.string.packet_lead_none) }; }
     /** Power on the frequencies the app tunes itself (APRS monitoring, ISS, SSTV 144.500): 1 high (default), 0 low. */
     public int dataTxPower() { return prefs.getInt("txPower", 1) == 0 ? 0 : 1; }
     /** What the lead-in is made of: 0 steady 1200 Hz tone, 1 HDLC flags (the standard TXDELAY), 2 silence. */
-    public static final String[] LEAD_KINDS = { "Tone", "Flags (standard)", "Silence" };
+    public static final String[] LEAD_KINDS = { "Tone", "Flags (standard)", "Silence" };   // i18n: sent on air (bench lead test) and SignalDeck Web's list; screens use leadKindNames()
+    /** {@link #LEAD_KINDS} in the app's language, for the APRS settings. */
+    public static String[] leadKindNames() { return new String[] { Txt.s(R.string.packet_lead_kind_tone), Txt.s(R.string.packet_lead_kind_flags), Txt.s(R.string.packet_lead_kind_silence) }; }
     /** Flags by default: bench 2026-10-20 (252 single-copy packets over both apps) found the three kinds equal at 1.6 s, silence
      *  weakest at short leads; flags are the standard AX.25 TXDELAY. */
     public int packetLeadKind() { int k = prefs.getInt("txLeadKind", 1); return k >= 0 && k < LEAD_KINDS.length ? k : 1; }
@@ -120,18 +127,18 @@ public final class PacketEngine {
 
     /** Bench (DIAG leadtest): one status packet with a given lead-in, for comparing tone / flags / silence on the air. */
     public String diagLeadTest(int kind, int ms, int reps, String tag) {
-        if (!host.analogRx()) return "needs an analog channel";
-        if (!callsignSet()) return "no callsign";
-        byte[] frame = Ax25.buildUiFrame("APZDMR", 0, callsign(), ssid(), new String[0], (">lead " + LEAD_KINDS[kind].split(" ")[0].toLowerCase(Locale.US) + " " + ms + " " + tag).getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+        if (!host.analogRx()) return "needs an analog channel";   // i18n: bench (DIAG)
+        if (!callsignSet()) return "no callsign";   // i18n: bench (DIAG)
+        byte[] frame = Ax25.buildUiFrame("APZDMR", 0, callsign(), ssid(), new String[0], (">lead " + LEAD_KINDS[kind].split(" ")[0].toLowerCase(Locale.US) + " " + ms + " " + tag).getBytes(java.nio.charset.StandardCharsets.US_ASCII));   // i18n: sent on air
         java.util.List<byte[]> l = new java.util.ArrayList<>(); for (int r = 0; r < Math.max(1, reps); r++) l.add(frame);
-        host.transmitPcm(packetAudio(l, ms, kind), "lead test " + kind + "/" + ms + " " + tag, null);
+        host.transmitPcm(packetAudio(l, ms, kind), "lead test " + kind + "/" + ms + " " + tag, null);   // i18n: transmit label (logs)
         return null;
     }
 
     public int packetLeadMs() { return Math.max(0, Math.min(3000, prefs.getInt("txLeadMs", TX_LEAD_MS))); }
     /** The North American APRS frequency: the default before a region is chosen (Device → Region sets the one in use). */
     public static final int APRS_FREQ_HZ = 144_390_000;
-    private static final String TAG = "PacketEngine";
+    private static final String TAG = "PacketEngine";   // i18n: log tag
     private static final int SR = 8000, WINDOW = SR * 2, OVERLAP = SR;
 
     private final Host host;
@@ -156,17 +163,21 @@ public final class PacketEngine {
     private volatile boolean sstvRx;
     private SSTVReceiver sstv;
     private volatile SstvListener sstvListener;
-    private volatile String sstvStatus = "idle";
+    private volatile Msg sstvStatus = Msg.of(R.string.packet_sstv_idle);
     private volatile android.graphics.Bitmap sstvLast;
     private byte[] sstvBytes = new byte[8192];
     public static final int SSTV_FREQ_HZ = 144_500_000;
 
     public boolean sstvRx() { return sstvRx; }
-    public String sstvStatus() { return sstvStatus; }
+    /** The SSTV status in English ("receiving …", "listening …"): RadioService and the SSTV screen read it. */
+    public String sstvStatus() { return sstvStatus.english(); }
+    /** The same in the app's language, for display. */
+    public String sstvStatusText() { return sstvStatus.text(); }
     public android.graphics.Bitmap sstvLast() { return sstvLast; }
     public void setSstvListener(SstvListener l) { sstvListener = l; }
-    private void sstvPost(String st, android.graphics.Bitmap b, int lines, int total, boolean done) {
-        sstvStatus = st; if (b != null) sstvLast = b;
+    /** The listener gets the English status (the SSTV screen reads it); {@link #sstvStatusText} has it for display. */
+    private void sstvPost(Msg m, android.graphics.Bitmap b, int lines, int total, boolean done) {
+        sstvStatus = m; if (b != null) sstvLast = b; String st = m.english();
         SstvListener l = sstvListener; if (l != null) new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> l.onSstv(st, b, lines, total, done));
     }
 
@@ -190,14 +201,15 @@ public final class PacketEngine {
                 if (!locked && now - contLastLive < 450) return;           // static: a few frames a second is enough
                 contLastLive = now;
                 android.graphics.Bitmap b = android.graphics.Bitmap.createBitmap(argb, w, h, android.graphics.Bitmap.Config.ARGB_8888);
-                sstvPost(locked ? "receiving Robot 36, line " + lines + " of " + h : "listening (continuous Robot 36)", b, locked ? lines : 0, locked ? h : 0, false);
+                sstvPost(locked ? Msg.of(R.string.packet_sstv_receiving_line, lines, h) : Msg.of(R.string.packet_sstv_listening_continuous), b, locked ? lines : 0, locked ? h : 0, false);
             }
             @Override public void onPicture(int[] argb, int w, int h, int lines, boolean complete) {
                 android.graphics.Bitmap b = android.graphics.Bitmap.createBitmap(argb, w, h, android.graphics.Bitmap.Config.ARGB_8888);
                 String name = saveSstv(b, complete);
-                host.event("\uD83D\uDCFA SSTV picture received (Robot 36" + (complete ? "" : ", partial: " + lines + " of " + h + " lines") + ") \u2192 Download/DMR/SSTV");
-                host.notifyUser("SSTV picture received", "Robot 36" + (complete ? "" : " (partial)"), false);
-                sstvPost("picture received" + (complete ? "" : " (partial, " + lines + " lines)") + (name != null ? "" : ", could not save"), b, lines, h, true);
+                host.event(complete ? Msg.of(R.string.packet_sstv_event_received, "Robot 36") : Msg.of(R.string.packet_sstv_event_received_partial, lines, h));   // i18n: mode name
+                host.notifyUser(Txt.s(R.string.packet_sstv_notify_received), complete ? "Robot 36" : Txt.s(R.string.packet_sstv_notify_partial), false);   // i18n: mode name
+                sstvPost(complete ? Msg.of(name != null ? R.string.packet_sstv_picture_received : R.string.packet_sstv_picture_received_unsaved)
+                                  : Msg.of(name != null ? R.string.packet_sstv_picture_partial : R.string.packet_sstv_picture_partial_unsaved, lines), b, lines, h, true);
             }
         };
     }
@@ -212,18 +224,18 @@ public final class PacketEngine {
 
     public void setSstvRx(boolean on) {
         sstvRx = on;
-        if (!on) { com.macdmr.radio.pkt.SstvContinuous c = sstvCont; if (c != null) c.flush(); sstvCont = null; sstvContinuous = false; sstvPost("idle", null, 0, 0, false); return; }
+        if (!on) { com.macdmr.radio.pkt.SstvContinuous c = sstvCont; if (c != null) c.flush(); sstvCont = null; sstvContinuous = false; sstvPost(Msg.of(R.string.packet_sstv_idle), null, 0, 0, false); return; }
         sstvContinuous = sstvForceContinuous || sstvContinuousMode();
-        if (sstvContinuous) { sstvCont = new com.macdmr.radio.pkt.SstvContinuous(SR, contListener()); sstvPost("listening (continuous Robot 36)", null, 0, 0, false); return; }
+        if (sstvContinuous) { sstvCont = new com.macdmr.radio.pkt.SstvContinuous(SR, contListener()); sstvPost(Msg.of(R.string.packet_sstv_listening_continuous), null, 0, 0, false); return; }
         if (sstv == null) {
             sstv = SSTVReceiver.getInstance(host.context());
-            sstv.setVISDetectedCallback(m -> { host.event("\uD83D\uDCFA SSTV " + m.name + " detected"); sstvPost("receiving " + m.name, null, 0, m.height, false); });
-            sstv.setLineDecodeCallback((lines, total, snap) -> sstvPost("receiving " + lines + "/" + total, snap, lines, total, false));
-            sstv.setModeChangeCallback((o, n, k) -> sstvPost("mode changed to " + n.name, null, 0, n.height, false));
-            sstv.setImageDecodeCallback((img, m) -> { host.event("\uD83D\uDCFA SSTV picture received (" + m.name + ") \u2192 Download/DMR/SSTV"); host.notifyUser("SSTV picture received", m.name, false); sstvPost("picture complete (" + m.name + ")", img, m.height, m.height, true); });
+            sstv.setVISDetectedCallback(m -> { host.event(Msg.of(R.string.packet_sstv_event_detected, m.name)); sstvPost(Msg.of(R.string.packet_sstv_receiving_mode, m.name), null, 0, m.height, false); });
+            sstv.setLineDecodeCallback((lines, total, snap) -> sstvPost(Msg.of(R.string.packet_sstv_receiving_lines, lines, total), snap, lines, total, false));
+            sstv.setModeChangeCallback((o, n, k) -> sstvPost(Msg.of(R.string.packet_sstv_mode_changed, n.name), null, 0, n.height, false));
+            sstv.setImageDecodeCallback((img, m) -> { host.event(Msg.of(R.string.packet_sstv_event_received, m.name)); host.notifyUser(Txt.s(R.string.packet_sstv_notify_received), m.name, false); sstvPost(Msg.of(R.string.packet_sstv_picture_complete, m.name), img, m.height, m.height, true); });
         }
         sstv.reset();
-        sstvPost("listening for a VIS header", null, 0, 0, false);
+        sstvPost(Msg.of(R.string.packet_sstv_listening_vis), null, 0, 0, false);
     }
 
     /**
@@ -232,19 +244,19 @@ public final class PacketEngine {
      * wait, or null when the picture is on its way.
      */
     public String sendSstv(android.graphics.Bitmap bmp, int mode) {
-        if (bmp == null) return "No picture";
-        if (!SSTVEncoder.isSupported(mode)) return "Unsupported mode";
-        if (!host.analogRx()) return "SSTV needs an analog channel";
+        if (bmp == null) return Txt.s(R.string.packet_sstv_err_no_picture);
+        if (!SSTVEncoder.isSupported(mode)) return Txt.s(R.string.packet_sstv_err_unsupported);
+        if (!host.analogRx()) return Txt.s(R.string.packet_sstv_err_analog);
         final int total = SSTVEncoder.durationMs(mode) + TX_LEAD_MS;
-        if (total > host.txCapMs()) return SSTVEncoder.name(mode) + " runs " + Math.round(total / 1000.0) + " s, past the transmit limit (" + host.txLimitName() + "; Device \u2192 Longest transmission)";
-        if (total > 30_000) { String wait = host.longTxWait(total); if (wait != null) { host.event("\u23F3 " + SSTVEncoder.name(mode) + " not sent: " + wait); return wait; } }
+        if (total > host.txCapMs()) return Txt.s(R.string.packet_sstv_err_too_long, SSTVEncoder.name(mode), Math.round(total / 1000.0), host.txLimitName());
+        if (total > 30_000) { String wait = host.longTxWait(total); if (wait != null) { host.event(Msg.of(R.string.packet_sstv_event_held, SSTVEncoder.name(mode), wait)); return wait; } }
         new Thread(() -> {
             short[] pcm = SSTVEncoder.encode(bmp, mode);
             int lead = SR * TX_LEAD_MS / 1000;
             short[] src = new short[lead + pcm.length];
             for (int i = 0; i < lead; i++) src[i] = (short) (30000 * Math.sin(2.0 * Math.PI * 1900 * i / SR));   // leader tone while the TX path settles
             System.arraycopy(pcm, 0, src, lead, pcm.length);
-            host.transmitPcmLong(src, "SSTV " + SSTVEncoder.name(mode), Integer.MAX_VALUE, () -> host.event("\uD83D\uDCFA Sent SSTV " + SSTVEncoder.name(mode)));   // the transmit limit is the cap
+            host.transmitPcmLong(src, "SSTV " + SSTVEncoder.name(mode), Integer.MAX_VALUE, () -> host.event(Msg.of(R.string.packet_sstv_event_sent, SSTVEncoder.name(mode))));   // i18n: transmit label (logs and RadioService's history); the transmit limit is the cap
         }, "sstv-encode").start();
         return null;
     }
@@ -261,7 +273,7 @@ public final class PacketEngine {
                     if (f == null || !kiss.isActive()) continue;
                     int guard = 0; while (host.txBusy() && guard++ < 100) Thread.sleep(100);
                     final Object lock = new Object();
-                    synchronized (lock) { txRaw(f, "KISS " + f.length + " B", TX_REPS, () -> { synchronized (lock) { lock.notifyAll(); } }); lock.wait(35000); }
+                    synchronized (lock) { txRaw(f, "KISS " + f.length + " B", TX_REPS, () -> { synchronized (lock) { lock.notifyAll(); } }); lock.wait(35000); }   // i18n: transmit label (logs and RadioService's history)
                     Thread.sleep(800);
                 } catch (InterruptedException e) { break; } catch (Throwable t) { Log.w(TAG, "kiss tx: " + t); }
             }
@@ -346,8 +358,8 @@ public final class PacketEngine {
     private int telSeq = -1;
     /** Battery, voltage, temperature, pressure and signal as APRS telemetry; the first report (and every tenth) carries the definitions. */
     public String sendTelemetry() {
-        if (!callsignSet()) return "Set your callsign first (PKT \u2192 Settings)";
-        if (!host.analogRx()) return "Packet needs an analog channel";
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign_settings);
+        if (!host.analogRx()) return Txt.s(R.string.packet_err_analog);
         if (pressureHpa <= 0 && hasBarometer()) { new Thread(() -> { readPressureOnce(3000); sendTelemetryNow(); }, "baro-once").start(); return null; }
         return sendTelemetryNow();
     }
@@ -362,46 +374,50 @@ public final class PacketEngine {
         final String info = com.macdmr.radio.pkt.AprsExtras.telemetryInfo(telSeq, com.macdmr.radio.pkt.AprsExtras.telemetryValues(level, volts, temp, hpa, host.rssiDbm()));
         java.util.List<String> infos = new java.util.ArrayList<>(); infos.add(info);
         if (telSeq % 10 == 1) for (String def : new String[] { com.macdmr.radio.pkt.AprsExtras.PARM, com.macdmr.radio.pkt.AprsExtras.UNIT, com.macdmr.radio.pkt.AprsExtras.EQNS }) infos.add(Ax25.messageInfo(myCall(), def, 0));
-        txInfos(infos, "telemetry #" + telSeq, () -> { store.log("beacon", myCall(), "APZDMR", info, null, false); host.event("\uD83D\uDCCA Telemetry sent: battery " + level + " %, " + String.format(Locale.US, "%.2f V, %.0f \u00B0C", volts, temp) + (hpa > 0 ? String.format(Locale.US, ", %.1f hPa", hpa) : "")); });
+        txInfos(infos, "telemetry #" + telSeq, () -> {   // i18n: transmit label (logs and RadioService's history)
+            store.log("beacon", myCall(), "APZDMR", info, null, false);
+            String v = String.format(Locale.US, "%.2f", volts), c = String.format(Locale.US, "%.0f", temp);
+            host.event(hpa > 0 ? Msg.of(R.string.packet_telemetry_sent_hpa, level, v, c, String.format(Locale.US, "%.1f", hpa)) : Msg.of(R.string.packet_telemetry_sent, level, v, c));
+        });
         return null;
     }
 
     /** A weather report with the phone's air pressure (converted to sea level) at your position. */
     public String sendWeather() {
-        if (!callsignSet()) return "Set your callsign first (PKT \u2192 Settings)";
-        if (!hasBarometer()) return "This phone has no barometer";
-        Location l = host.location(); if (l == null) return "No position fix yet";
-        if (!host.analogRx()) return "Packet needs an analog channel";
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign_settings);
+        if (!hasBarometer()) return Txt.s(R.string.packet_err_no_barometer);
+        Location l = host.location(); if (l == null) return Txt.s(R.string.packet_err_no_fix);
+        if (!host.analogRx()) return Txt.s(R.string.packet_err_analog);
         if (pressureHpa <= 0) {                                              // not running: take one reading, then send
-            new Thread(() -> { readPressureOnce(3000); if (pressureHpa > 0) sendWeather(); else host.event("\u26D4 Weather report not sent: no barometer reading"); }, "baro-once").start();
+            new Thread(() -> { readPressureOnce(3000); if (pressureHpa > 0) sendWeather(); else host.event(Msg.of(R.string.packet_weather_not_sent)); }, "baro-once").start();
             return null;
         }
         double hpa = com.macdmr.radio.pkt.AprsExtras.seaLevel(pressureHpa, l.hasAltitude() ? l.getAltitude() : 0);
         final String info = com.macdmr.radio.pkt.AprsExtras.weatherInfo(l.getLatitude(), l.getLongitude(), hpa, "");
-        txInfo(info, path(), "weather report", TX_REPS, () -> { store.log("beacon", myCall(), "APZDMR", info, null, false); host.event(String.format(Locale.US, "\u26C5 Weather report sent: %.1f hPa", hpa)); });
+        txInfo(info, path(), "weather report", TX_REPS, () -> { store.log("beacon", myCall(), "APZDMR", info, null, false); host.event(Msg.of(R.string.packet_weather_sent, String.format(Locale.US, "%.1f", hpa))); });   // i18n: transmit label (logs and RadioService's history)
         return null;
     }
 
     /** Place (or with {@code live} false, remove) an APRS object at a position. Error text or null. */
     public String sendObject(String name, boolean live, double lat, double lon, String symbol, String comment) {
-        if (!callsignSet()) return "Set your callsign first (PKT \u2192 Settings)";
-        if (name == null || name.trim().isEmpty()) return "Give the object a name (up to 9 characters)";
-        if (!host.analogRx()) return "Packet needs an analog channel";
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign_settings);
+        if (name == null || name.trim().isEmpty()) return Txt.s(R.string.packet_err_object_name);
+        if (!host.analogRx()) return Txt.s(R.string.packet_err_analog);
         char t = symbol != null && symbol.length() >= 1 ? symbol.charAt(0) : '/', cd = symbol != null && symbol.length() >= 2 ? symbol.charAt(1) : '.';
         final String info = com.macdmr.radio.pkt.AprsExtras.objectInfo(name.trim().toUpperCase(Locale.US), live, lat, lon, t, cd, comment == null ? "" : comment.trim(), System.currentTimeMillis());
         final String nm = name.trim().toUpperCase(Locale.US);
-        txInfo(info, path(), (live ? "object " : "remove object ") + nm, TX_REPS, () -> { store.log("object", myCall(), nm, info, null, false); host.event("\uD83D\uDCCC " + (live ? "Object placed: " : "Object removed: ") + nm); });
+        txInfo(info, path(), (live ? "object " : "remove object ") + nm, TX_REPS, () -> { store.log("object", myCall(), nm, info, null, false); host.event(Msg.of(live ? R.string.packet_object_placed : R.string.packet_object_removed, nm)); });   // i18n: transmit label (logs and RadioService's history)
         return null;
     }
 
     /** A bulletin (BLN0 to BLN9) for everyone in range. */
     public String sendBulletin(int n, String text) {
-        if (!callsignSet()) return "Set your callsign first (PKT \u2192 Settings)";
-        if (text == null || text.trim().isEmpty()) return "Write the bulletin first";
-        if (text.length() > 67) return "Bulletins are at most 67 characters";
-        if (!host.analogRx()) return "Packet needs an analog channel";
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign_settings);
+        if (text == null || text.trim().isEmpty()) return Txt.s(R.string.packet_err_bulletin_empty);
+        if (text.length() > 67) return Txt.s(R.string.packet_err_bulletin_long);
+        if (!host.analogRx()) return Txt.s(R.string.packet_err_analog);
         final String to = "BLN" + Math.max(0, Math.min(9, n)), tx = text.trim();
-        txInfo(Ax25.messageInfo(to, tx, 0), path(), "bulletin " + to, TX_REPS, () -> { store.log("msg-tx", myCall(), to, tx, null, false); host.event("\uD83D\uDCE2 Bulletin " + to + " sent: " + tx); });
+        txInfo(Ax25.messageInfo(to, tx, 0), path(), "bulletin " + to, TX_REPS, () -> { store.log("msg-tx", myCall(), to, tx, null, false); host.event(Msg.of(R.string.packet_bulletin_sent, to, tx)); });   // i18n: transmit label (logs and RadioService's history)
         return null;
     }
 
@@ -413,7 +429,9 @@ public final class PacketEngine {
     }
 
     // ---- keyboard text modes: RTTY and PSK31 ---------------------------------------------------------
-    public static final String[] TEXT_MODES = { "Off", "RTTY 45", "PSK31" };
+    public static final String[] TEXT_MODES = { "Off", "RTTY 45", "PSK31" };   // i18n: mode names (TextModesDialog and SignalDeck Web list them); screens use textModeNames()
+    /** {@link #TEXT_MODES} for display: "Off" in the app's language, the mode names as they are. */
+    public static String[] textModeNames() { return new String[] { Txt.s(R.string.common_off), TEXT_MODES[1], TEXT_MODES[2] }; }
     public interface TextListener { void update(String text, String status); }
     private volatile int textMode;                                        // 0 off (not listening), 1 RTTY, 2 PSK31
     private int textTxMode = 2;
@@ -434,9 +452,9 @@ public final class PacketEngine {
     /** Everything received (and sent) in the text modes so far, for SignalDeck Web. */
     public synchronized String textReceived() { return textRx.toString(); }
     public String textStatus() {
-        if (textMode == 1 && rtty != null) return rtty.locked() ? String.format(Locale.US, "RTTY: listening, mark %.0f Hz", rtty.markHz()) : "RTTY: looking for a signal";
-        if (textMode == 2 && psk != null) return psk.locked() ? String.format(Locale.US, "PSK31: listening on %.1f Hz", psk.freq()) : "PSK31: looking for a signal";
-        return "Not listening";
+        if (textMode == 1 && rtty != null) return rtty.locked() ? Txt.s(R.string.packet_text_rtty_listening, String.format(Locale.US, "%.0f", rtty.markHz())) : Txt.s(R.string.packet_text_rtty_looking);
+        if (textMode == 2 && psk != null) return psk.locked() ? Txt.s(R.string.packet_text_psk_listening, String.format(Locale.US, "%.1f", psk.freq())) : Txt.s(R.string.packet_text_psk_looking);
+        return Txt.s(R.string.packet_text_not_listening);
     }
     private synchronized void textChar(char ch) { textRx.append(ch); if (textRx.length() > 20000) textRx.delete(0, 4000); textPost(); }
     private volatile boolean textPostPending;
@@ -452,8 +470,8 @@ public final class PacketEngine {
     }
     /** Send text in the chosen mode, on the frequency being received if one is locked; long text goes out in several transmissions. */
     public String textSend(String text) {
-        if (text == null || text.trim().isEmpty()) return "Nothing to send";
-        if (!host.analogRx()) return "Text modes need an analog channel";
+        if (text == null || text.trim().isEmpty()) return Txt.s(R.string.packet_err_nothing_to_send);
+        if (!host.analogRx()) return Txt.s(R.string.packet_text_err_analog);
         final int m = textTxMode == 1 ? 1 : 2;
         final double hz = m == 1 ? (rtty != null && rtty.locked() ? rtty.markHz() : 2125) : (psk != null && psk.locked() ? psk.freq() : 1000);
         final java.util.List<String> parts = new java.util.ArrayList<>();
@@ -471,17 +489,17 @@ public final class PacketEngine {
         if (m == 1 && host.tonePath()) {                                     // RTTY through the module's tone generator; PSK31 keeps the audio path (phase reversals are not tones)
             Runnable next = () -> {
                 if (i + 1 < parts.size()) { try { Thread.sleep(2000); } catch (InterruptedException ignored) { } sendPart(parts, i + 1, m, hz); }
-                else host.event("\u2328 RTTY sent (tone generator): " + String.join(" ", parts));
+                else host.event(Msg.of(R.string.packet_text_rtty_sent_tones, String.join(" ", parts)));
             };
-            String e = host.transmitTones(com.macdmr.radio.ham.ToneQueue.rtty(p, hz, 1000), com.macdmr.radio.ham.ToneQueue.AMPLITUDE, "RTTY " + (i + 1) + "/" + parts.size(), next);
+            String e = host.transmitTones(com.macdmr.radio.ham.ToneQueue.rtty(p, hz, 1000), com.macdmr.radio.ham.ToneQueue.AMPLITUDE, "RTTY " + (i + 1) + "/" + parts.size(), next);   // i18n: transmit label (logs and RadioService's history)
             if (e == null) return;
-            host.event("\u26A0\uFE0F Tone generator not used for RTTY: " + e + "; sent through the audio path");
+            host.event(Msg.of(R.string.packet_text_rtty_no_tones, e));
         }
         short[] pcm = m == 1 ? com.macdmr.radio.ham.Rtty.encode(p, hz, 1000) : com.macdmr.radio.ham.Psk31.encode(p, hz);
         if (pcm.length > SR * 28) { short[] cut = new short[SR * 28]; System.arraycopy(pcm, 0, cut, 0, cut.length); pcm = cut; }
-        host.transmitPcm(pcm, (m == 1 ? "RTTY " : "PSK31 ") + (i + 1) + "/" + parts.size(), () -> {
+        host.transmitPcm(pcm, (m == 1 ? "RTTY " : "PSK31 ") + (i + 1) + "/" + parts.size(), () -> {   // i18n: transmit label (logs and RadioService's history)
             if (i + 1 < parts.size()) { try { Thread.sleep(2000); } catch (InterruptedException ignored) { } sendPart(parts, i + 1, m, hz); }
-            else host.event((m == 1 ? "\u2328 RTTY sent: " : "\u2328 PSK31 sent: ") + String.join(" ", parts));
+            else host.event(Msg.of(m == 1 ? R.string.packet_text_rtty_sent : R.string.packet_text_psk_sent, String.join(" ", parts)));
         });
     }
 
@@ -489,7 +507,7 @@ public final class PacketEngine {
     public interface TerminalListener { void update(String transcript, String state); }
     private volatile com.macdmr.radio.pkt.Ax25Session terminal;
     private final StringBuilder transcript = new StringBuilder();
-    private volatile String termState = "disconnected";
+    private volatile String termState = Txt.s(R.string.packet_ax25_disconnected);   // shown as it is (the terminal, SignalDeck Web, Winlink errors)
     private volatile TerminalListener termListener;
     public void setTerminalListener(TerminalListener l) { termListener = l; if (l != null) l.update(transcriptText(), termState); }
     public synchronized String transcriptText() { return transcript.toString(); }
@@ -508,15 +526,17 @@ public final class PacketEngine {
         if (terminal == null) {
             terminal = new com.macdmr.radio.pkt.Ax25Session(callsign(), ssid(), new com.macdmr.radio.pkt.Ax25Session.Link() {
                 @Override public void send(java.util.List<byte[]> frames) {
-                    java.util.function.Consumer<String> fl = frameLog; if (fl != null) for (byte[] f : frames) fl.accept("TX " + com.macdmr.radio.pkt.Ax25Session.describe(f));
-                    txFramesRaw(frames, "AX.25 " + frames.size() + (frames.size() == 1 ? " frame" : " frames"));
+                    java.util.function.Consumer<String> fl = frameLog; if (fl != null) for (byte[] f : frames) fl.accept("TX " + com.macdmr.radio.pkt.Ax25Session.describe(f));   // i18n: diagnostic log
+                    txFramesRaw(frames, "AX.25 " + frames.size() + (frames.size() == 1 ? " frame" : " frames"));   // i18n: transmit label (logs and RadioService's history)
                 }
                 @Override public void received(String text) { if (wlRx == null) termAppend(text); }
                 @Override public void receivedBytes(byte[] info) { java.util.concurrent.LinkedBlockingQueue<Integer> q = wlRx; if (q != null) for (byte b : info) q.offer(b & 0xFF); }
-                @Override public void state(String state) {
-                    java.util.concurrent.LinkedBlockingQueue<Integer> q = wlRx; if (q != null && state.startsWith("disconnected")) q.offer(-1);
-                    termState = state; termAppend("\n*** " + state + " ***\n"); host.event("\uD83D\uDCBB Packet terminal: " + state);
-                    if (state.endsWith("(they called)")) host.notifyUser("Packet connection", state, false);
+                @Override public void state(String state) { }   // the session reports through state(Msg)
+                @Override public void state(Msg m) {
+                    java.util.concurrent.LinkedBlockingQueue<Integer> q = wlRx; if (q != null && m.key().startsWith("packet_ax25_disconnected")) q.offer(-1);
+                    String state = m.text();
+                    termState = state; termAppend("\n*** " + state + " ***\n"); host.event(Msg.of(R.string.packet_term_event_state, m));
+                    if (m.key().equals("packet_ax25_connected_they_called")) host.notifyUser(Txt.s(R.string.packet_term_notify_connection), state, false);
                 }
             });
             terminal.setAcceptIncoming(acceptConnections());
@@ -527,13 +547,14 @@ public final class PacketEngine {
     }
     public String terminalConnect(String call, String via) {
         com.macdmr.radio.pkt.Ax25Session t = terminal();
-        if (t == null) return "Set your callsign first (PKT \u2192 Settings)";
-        if (call == null || !call.trim().toUpperCase(Locale.US).matches("[A-Z0-9]{1,6}(-[0-9]{1,2})?")) return "Callsign like N0ABC or N0ABC-1";
-        if (!host.analogRx()) return "Packet needs an analog channel: tune the BBS or node's frequency";
+        if (t == null) return Txt.s(R.string.packet_err_callsign_settings);
+        if (call == null || !call.trim().toUpperCase(Locale.US).matches("[A-Z0-9]{1,6}(-[0-9]{1,2})?")) return Txt.s(R.string.packet_term_err_callsign);
+        if (!host.analogRx()) return Txt.s(R.string.packet_err_analog_bbs);
         java.util.List<String> path = new java.util.ArrayList<>();
         for (String v : (via == null ? "" : via).toUpperCase(Locale.US).split(",")) { v = v.trim(); if (!v.isEmpty()) path.add(v); }
-        if (path.size() > 2) return "At most two digipeaters";
-        termAppend("\n> connecting to " + call.trim().toUpperCase(Locale.US) + (path.isEmpty() ? "" : " via " + String.join(",", path)) + "\n");
+        if (path.size() > 2) return Txt.s(R.string.packet_term_err_digis);
+        String to = call.trim().toUpperCase(Locale.US);
+        termAppend("\n" + (path.isEmpty() ? Txt.s(R.string.packet_term_connecting, to) : Txt.s(R.string.packet_term_connecting_via, to, String.join(",", path))) + "\n");
         t.connect(call, path.toArray(new String[0]), System.currentTimeMillis());
         return null;
     }
@@ -592,7 +613,7 @@ public final class PacketEngine {
     public void terminalDisconnect() { com.macdmr.radio.pkt.Ax25Session t = terminal; if (t != null) t.disconnect(System.currentTimeMillis()); }
     public String terminalSend(String line) {
         com.macdmr.radio.pkt.Ax25Session t = terminal;
-        if (t == null || t.state() != com.macdmr.radio.pkt.Ax25Session.State.CONNECTED) return "Not connected";
+        if (t == null || t.state() != com.macdmr.radio.pkt.Ax25Session.State.CONNECTED) return Txt.s(R.string.packet_term_err_not_connected);
         termAppend(line + "\n");
         t.sendText(line + "\r", System.currentTimeMillis());
         return null;
@@ -600,7 +621,7 @@ public final class PacketEngine {
 
     /** Frames of our own (no FCS yet) in one key-up: one settling lead, each frame once. */
     private void txFramesRaw(java.util.List<byte[]> frames, String label) {
-        if (!host.analogRx()) { host.event("\u26D4 Not sent (" + label + "): packet needs an analog channel"); return; }
+        if (!host.analogRx()) { host.event(Msg.of(R.string.packet_event_not_sent_analog, label)); return; }
         java.util.List<byte[]> l = new java.util.ArrayList<>(); for (byte[] f : frames) l.add(Ax25.appendFcs(f));
         host.transmitPcm(packetAudio(l, packetLeadMs(), packetLeadKind()), label, null);
     }
@@ -619,18 +640,18 @@ public final class PacketEngine {
 
     /** Bench: send one packet of each kind on the current channel. */
     public String diagSend(String what) {
-        if (what == null) return "what?";
+        if (what == null) return "what?";   // i18n: bench (DIAG)
         Location l = host.location();
         switch (what) {
-            case "object": return String.valueOf(l == null ? "no fix" : sendObject("BENCH", true, l.getLatitude(), l.getLongitude(), "/E", "bench test object"));
-            case "bulletin": return String.valueOf(sendBulletin(1, "Bench test bulletin"));
+            case "object": return String.valueOf(l == null ? "no fix" : sendObject("BENCH", true, l.getLatitude(), l.getLongitude(), "/E", "bench test object"));   // i18n: bench (DIAG), sent on air
+            case "bulletin": return String.valueOf(sendBulletin(1, "Bench test bulletin"));   // i18n: bench (DIAG), sent on air
             case "telemetry": return String.valueOf(sendTelemetry());
             case "weather": return String.valueOf(sendWeather());
             case "cwid": return String.valueOf(sendCwId());
             case "beacon": return String.valueOf(sendBeacon());
             case "connect": return String.valueOf(terminalConnect("N0BBS-1", ""));
             case "disconnect": terminalDisconnect(); return "ok";
-            default: return "unknown " + what;
+            default: return "unknown " + what;   // i18n: bench (DIAG)
         }
     }
 
@@ -642,11 +663,11 @@ public final class PacketEngine {
         String key = from + ">" + p.messageTo.trim() + ":" + p.messageText + "{" + p.messageId;
         long now = System.currentTimeMillis();
         synchronized (gatedToRf) { Long t = gatedToRf.get(key); if (t != null && now - t < 30 * 60_000L) return; gatedToRf.put(key, now); if (gatedToRf.size() > 500) gatedToRf.clear(); }
-        if (!onAprsFrequency() && !benchIgate) { host.event("\uD83C\uDF10 Not gated to the radio (not on " + aprsMhz() + "): " + from + " \u2192 " + p.messageTo.trim()); return; }
+        if (!onAprsFrequency() && !benchIgate) { host.event(Msg.of(R.string.packet_igate_not_gated, aprsMhz(), from, p.messageTo.trim())); return; }
         final String tp = com.macdmr.radio.pkt.AprsExtras.thirdParty(line, myCall());
         if (tp == null) return;
         final String to = p.messageTo.trim(), text = p.messageText;
-        txInfo(tp, new String[] { "WIDE1-1" }, "iGate " + from + " to " + to, 1, () -> { gatedToRfCount++; store.log("igate-rf", from + " (IS)", to, text, p.messageId, false); host.event("\uD83C\uDF10\u2192\uD83D\uDCE1 Gated to the radio: " + from + " \u2192 " + to + ": " + text); });
+        txInfo(tp, new String[] { "WIDE1-1" }, "iGate " + from + " to " + to, 1, () -> { gatedToRfCount++; store.log("igate-rf", from + " (IS)", to, text, p.messageId, false); host.event(Msg.of(R.string.packet_igate_gated, from, to, text)); });   // i18n: transmit label (logs and RadioService's history)
     }
 
     // ---- settings -------------------------------------------------------------------------------
@@ -686,17 +707,17 @@ public final class PacketEngine {
     }
     /** Transmit the callsign in Morse now on the current channel. Error text or null. */
     public String sendCwId() {
-        if (!callsignSet()) return "Set your callsign first (PKT \u2192 Settings)";
-        if (!host.analogRx()) return "Morse needs an analog channel";
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign_settings);
+        if (!host.analogRx()) return Txt.s(R.string.packet_morse_err_analog);
         lastCwIdMs = System.currentTimeMillis(); host.identified();
         if (host.tonePath()) {                                              // bench firmware: the module's tone generator, no audio path, no 1.5 s of lead
-            String e = host.transmitTones(com.macdmr.radio.ham.ToneQueue.morse(callsign(), 20, 800), com.macdmr.radio.ham.ToneQueue.AMPLITUDE, "Morse ID", () -> host.event("\uD83D\uDD24 Sent Morse ID " + callsign() + " (tone generator)"));
+            String e = host.transmitTones(com.macdmr.radio.ham.ToneQueue.morse(callsign(), 20, 800), com.macdmr.radio.ham.ToneQueue.AMPLITUDE, "Morse ID", () -> host.event(Msg.of(R.string.packet_morse_sent_tones, callsign())));   // i18n: transmit label (logs and RadioService's history)
             if (e == null) return null;
-            host.event("\u26A0\uFE0F Tone generator not used for the Morse ID: " + e + "; sent through the audio path");
+            host.event(Msg.of(R.string.packet_morse_no_tones, e));
         }
         short[] m = com.macdmr.radio.coverage.Morse.pcm(callsign(), 20, 800), pcm = new short[SR * 13 / 10 + m.length];   // the TX path needs ~1.5 s after key-up: silence first, or the first letters are lost
         System.arraycopy(m, 0, pcm, SR * 13 / 10, m.length);
-        host.transmitPcm(pcm, "Morse ID", () -> host.event("\uD83D\uDD24 Sent Morse ID " + callsign()));
+        host.transmitPcm(pcm, "Morse ID", () -> host.event(Msg.of(R.string.packet_morse_sent, callsign())));   // i18n: transmit label (logs and RadioService's history)
         return null;
     }
     private volatile com.macdmr.radio.pkt.CwGate cw;                          // the Morse decoder, paused while packet audio is heard
@@ -722,19 +743,19 @@ public final class PacketEngine {
 
     // ---- APRS-IS (internet): RX-only iGate of what the radio hears, internet position beacon, messages for us ----
     private volatile AprsIsClient is;
-    private volatile String isStatus = "off";
+    private volatile String isStatus = Txt.s(R.string.packet_is_off);
     private volatile long isLastBeacon;
     public boolean isEnabled() { return prefs.getBoolean("isEnabled", false); }
-    public String isStatus() { AprsIsClient c = is; return c == null ? (isEnabled() ? isStatus : "off") : (c.isConnected() ? (c.isVerified() ? "connected" : "connected, receive-only") + " \u00B7 " + c.gatedCount + " gated" : isStatus); }
+    public String isStatus() { AprsIsClient c = is; return c == null ? (isEnabled() ? isStatus : Txt.s(R.string.packet_is_off)) : (c.isConnected() ? Txt.s(c.isVerified() ? R.string.packet_is_connected : R.string.packet_is_connected_rx_only, c.gatedCount) : isStatus); }
     public String isServer() { return prefs.getString("isServer", "rotate.aprs2.net"); }
     public int isPort() { return prefs.getInt("isPort", 14580); }
     public int isBeaconMin() { return prefs.getInt("isBeaconMin", 10); }
 
     public synchronized String isStart() {
         isStop();
-        if (!callsignSet()) return "Set your callsign first";
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign);
         String pass = prefs.getString("isPasscode", "-1").trim(); if (pass.isEmpty()) pass = "-1";
-        AprsIsClient c = new AprsIsClient(isServer(), isPort(), myCall(), pass, "SignalDeck 1.0", null, new AprsIsClient.Listener() {
+        AprsIsClient c = new AprsIsClient(isServer(), isPort(), myCall(), pass, "SignalDeck 1.0", null, new AprsIsClient.Listener() {   // i18n: APRS-IS protocol (login version)
             @Override public void onStatus(String status, boolean connected) { isStatus = status; if (connected && isBeaconMin() > 0) new Thread(() -> { try { Thread.sleep(5000); } catch (InterruptedException ignored) { } isBeacon(); }, "aprs-is-beacon").start(); }
             @Override public void onServerLine(String line) { isServerLine(line); }
         });
@@ -750,7 +771,7 @@ public final class PacketEngine {
         return null;
     }
 
-    public synchronized void isStop() { AprsIsClient c = is; is = null; if (c != null) c.stop(); isStatus = "off"; prefs.edit().putBoolean("isEnabled", false).apply(); }
+    public synchronized void isStop() { AprsIsClient c = is; is = null; if (c != null) c.stop(); isStatus = Txt.s(R.string.packet_is_off); prefs.edit().putBoolean("isEnabled", false).apply(); }
 
     /** One position report straight to the internet (no RF). */
     public void isBeacon() {
@@ -778,7 +799,7 @@ public final class PacketEngine {
             String from = p.sourceCallsign + (p.sourceSSID != 0 ? "-" + p.sourceSSID : "");
             store.log(p.isAck ? "ack" : p.isRej ? "rej" : "msg", from + " (IS)", p.messageTo, p.messageText, p.messageId, true);
             if (p.isAck || p.isRej) return;
-            host.notifyUser("APRS-IS message from " + from, p.messageText, false);
+            host.notifyUser(Txt.s(R.string.packet_is_notify_message, from), p.messageText, false);
             host.event("\uD83C\uDF10 " + from + ": " + p.messageText);
             AprsIsClient c = is;
             if (p.messageId != null && c != null && c.isVerified()) c.send(c.getLogin() + ">APDR16,TCPIP*:" + Ax25.messageInfo(from, "ack" + p.messageId, 0));
@@ -793,7 +814,7 @@ public final class PacketEngine {
     public KissTnc kiss() { return kiss; }
 
     public String kissStart() {
-        if (kiss.isActive()) return "KISS TNC already running on 127.0.0.1:" + kiss.port();
+        if (kiss.isActive()) return Txt.s(R.string.packet_kiss_running, kiss.port());
         String err = kiss.start(kissPort(), f -> { if (!kissTxQueue.offer(f)) Log.w(TAG, "kiss queue full"); });
         return err != null ? err : null;
     }
@@ -830,8 +851,8 @@ public final class PacketEngine {
                 if (cw == null) cw = new com.macdmr.radio.pkt.CwGate(new com.macdmr.radio.ham.CwDecoder((text, hz, wpm) -> {
                     String id = null;                                                      // the channel's own callsign (repeater channels are named after it)
                     for (String w : host.channelName().toUpperCase(Locale.US).replace(",", " ").split(" ")) { String b = com.macdmr.radio.ham.Logbook.baseCall(w.startsWith("\u00BB") ? w.substring(1) : w); if (b != null && text.contains(b)) id = b; }
-                    host.event(id != null ? "\uD83D\uDD24 Repeater ID " + id + " in Morse (matches this channel): " + text + String.format(Locale.US, "  (%.0f Hz, %d WPM)", hz, wpm)
-                                          : "\uD83D\uDD24 Morse: " + text + String.format(Locale.US, "  (%.0f Hz, %d WPM)", hz, wpm));
+                    String hzS = String.format(Locale.US, "%.0f", hz);
+                    host.event(id != null ? Msg.of(R.string.packet_morse_heard_repeater, id, text, hzS, wpm) : Msg.of(R.string.packet_morse_heard, text, hzS, wpm));
                     for (String w : text.split(" ")) if (com.macdmr.radio.ham.Logbook.baseCall(w) != null) host.logHeard(w, "CW", "Morse ID");
                 }));
                 cw.process(mono, n, System.currentTimeMillis());
@@ -921,7 +942,7 @@ public final class PacketEngine {
                 java.util.function.Consumer<byte[]> ft = finderTap; if (ft != null) try { ft.accept(frame); } catch (Throwable x) { Log.w(TAG, "finder: " + x); }
                 com.macdmr.radio.pkt.Ax25Session ts = terminal;
                 if (ts != null && com.macdmr.radio.pkt.Ax25Session.addressedTo(frame, callsign(), ssid())) {   // connected-mode traffic for our terminal
-                    java.util.function.Consumer<String> fl = frameLog; if (fl != null) fl.accept("RX " + com.macdmr.radio.pkt.Ax25Session.describe(frame) + (duplicateSeen(frame) ? " (repeat)" : ""));
+                    java.util.function.Consumer<String> fl = frameLog; if (fl != null) fl.accept("RX " + com.macdmr.radio.pkt.Ax25Session.describe(frame) + (duplicateSeen(frame) ? " (repeat)" : ""));   // i18n: diagnostic log
                     if (duplicate(frame)) continue;
                     if (ts.receive(frame, System.currentTimeMillis())) continue;
                 }
@@ -967,10 +988,10 @@ public final class PacketEngine {
         boolean mine = addressedToMe(p.messageTo);
         boolean bulletin = p.messageTo != null && (p.messageTo.startsWith("BLN") || p.messageTo.startsWith("NWS"));
         String group = null; if (p.messageTo != null) for (String g : groups()) if (p.messageTo.trim().equalsIgnoreCase(g)) group = g;
-        if (group != null && !p.isAck && !p.isRej) { store.log("msg", from, p.messageTo, p.messageText, p.messageId, true); host.notifyUser("APRS group " + group + ": " + from, p.messageText, false); return; }
+        if (group != null && !p.isAck && !p.isRej) { store.log("msg", from, p.messageTo, p.messageText, p.messageId, true); host.notifyUser(Txt.s(R.string.packet_aprs_notify_group, group, from), p.messageText, false); return; }
         store.log(p.isAck ? "ack" : p.isRej ? "rej" : "msg", from, p.messageTo, p.messageText, p.messageId, mine);
         if (mine && !p.isAck && !p.isRej && p.messageId != null) maybeAutoAck(from, p.messageId);
-        if ((mine || bulletin) && !p.isAck && !p.isRej) host.notifyUser((mine ? "APRS message from " : "APRS bulletin from ") + from, p.messageText, false);
+        if ((mine || bulletin) && !p.isAck && !p.isRej) host.notifyUser(Txt.s(mine ? R.string.packet_aprs_notify_message : R.string.packet_aprs_notify_bulletin, from), p.messageText, false);
         if (mine && !p.isAck && !p.isRej) { RadioService r = RadioService.running; if (r != null) r.onFormText(from, p.messageText, "APRS"); }   // ICS-213 / radiogram parts
     }
 
@@ -1009,7 +1030,7 @@ public final class PacketEngine {
             String call = (c + "      ").substring(0, 6);
             for (int i = 0; i < 6; i++) out[hop + i] = (byte) ((call.charAt(i) << 1) & 0xFF);
             out[hop + 6] = (byte) ((frame[hop + 6] & 0x01) | 0x60 | ((s & 0x0F) << 1) | 0x80);
-            final String label = "digi " + src + ">" + dst;
+            final String label = "digi " + src + ">" + dst;   // i18n: transmit label (logs and RadioService's history)
             new Thread(() -> {
                 try { Thread.sleep(500 + rnd.nextInt(1000)); } catch (InterruptedException ignored) { }
                 if (!monitor || kiss.isActive()) return;
@@ -1028,9 +1049,9 @@ public final class PacketEngine {
         }
         @Override public void onSequence(String digits, long startMs, long endMs) {
             boolean remote = remoteOn() && remotePin().length() >= 4 && digits.replace("*", "").replace("#", "").startsWith(remotePin());
-            String shown = remote ? "remote command" : digits;                       // the PIN is never written to the log or the history
+            String shown = remote ? Txt.en(R.string.packet_dtmf_remote_command) : digits;   // the PIN is never written to the log or the history; stored in English
             store.dtmf(shown, host.channelNumber(), host.channelName());
-            host.event("📟 DTMF " + shown);
+            host.event(Msg.of(R.string.packet_dtmf_heard, remote ? Msg.of(R.string.packet_dtmf_remote_command) : digits));
             host.dtmfSequence(digits);
         }
     };
@@ -1038,17 +1059,17 @@ public final class PacketEngine {
     private final SAMEDecoder.Listener sameListener = new SAMEDecoder.Listener() {
         @Override public void onMessage(SAMEDecoder.Message m) {
             store.alert(m.event, m.summary(), m.raw, m.eom);
-            if (!m.eom) host.notifyUser("⛈️ " + (m.eventName.isEmpty() ? m.event : m.eventName), m.summary(), true);
-            host.event(m.eom ? "⛈️ Weather alert: end of message" : "⛈️ " + m.summary());
+            if (!m.eom) host.notifyUser("⛈️ " + SAMEDecoder.eventTitle(m.event), m.summaryMsg().text(), true);   // the ⛈ tells the service it is an alert
+            host.event(m.eom ? Msg.of(R.string.packet_same_event_eom) : Msg.of(R.string.packet_same_event_alert, m.summaryMsg()));
         }
-        @Override public void onAttentionTone(boolean on) { if (on) host.event("⛈️ Weather alert attention tone"); }
+        @Override public void onAttentionTone(boolean on) { if (on) host.event(Msg.of(R.string.packet_same_event_attention)); }
     };
 
     // ---- TX ---------------------------------------------------------------------------------------
 
     /** AFSK-modulate a complete frame (with FCS), prefix the settling lead, repeat, and transmit. */
     private void txFrame(byte[] frame, String label, int reps, Runnable onDone) {
-        if (!host.analogRx()) { host.event("⛔ Not sent (" + label + "): packet needs an analog channel, the current one is DMR"); return; }
+        if (!host.analogRx()) { host.event(Msg.of(R.string.packet_event_not_sent_dmr, label)); return; }
         java.util.List<byte[]> l = new java.util.ArrayList<>(); for (int r = 0; r < Math.max(1, reps); r++) l.add(frame);
         host.transmitPcm(packetAudio(l, packetLeadMs(), packetLeadKind()), label, onDone);
     }
@@ -1057,7 +1078,7 @@ public final class PacketEngine {
 
     /** Several frames in one transmission (one settling lead): telemetry with its definitions. */
     private void txInfos(java.util.List<String> infos, String label, Runnable onDone) {
-        if (!host.analogRx()) { host.event("⛔ Not sent (" + label + "): packet needs an analog channel, the current one is DMR"); return; }
+        if (!host.analogRx()) { host.event(Msg.of(R.string.packet_event_not_sent_dmr, label)); return; }
         java.util.List<byte[]> l = new java.util.ArrayList<>();
         for (String info : infos) l.add(Ax25.buildUiFrame("APZDMR", 0, callsign(), ssid(), path(), info.getBytes(java.nio.charset.StandardCharsets.US_ASCII)));
         host.transmitPcm(packetAudio(l, packetLeadMs(), packetLeadKind()), label, onDone);
@@ -1071,26 +1092,27 @@ public final class PacketEngine {
     /** Send an APRS message over APRS-IS (the login must be verified); error text or null. */
     public String isSendMessage(String to, String text) {
         AprsIsClient c = is;
-        if (c == null || !c.isVerified()) return "APRS-IS is not connected with a verified login";
-        if (to == null || to.trim().isEmpty() || text == null || text.trim().isEmpty()) return "Addressee and text are needed";
+        if (c == null || !c.isVerified()) return Txt.s(R.string.packet_is_err_not_verified);
+        if (to == null || to.trim().isEmpty() || text == null || text.trim().isEmpty()) return Txt.s(R.string.packet_err_addressee_text);
         final int id = prefs.getInt("msgId", 0) % 999 + 1; prefs.edit().putInt("msgId", id).apply();
         String addressee = to.trim().toUpperCase(Locale.US);
-        if (!c.send(c.getLogin() + ">APDR16,TCPIP*:" + Ax25.messageInfo(addressee, text.trim(), id))) return "APRS-IS send failed";
+        if (!c.send(c.getLogin() + ">APDR16,TCPIP*:" + Ax25.messageInfo(addressee, text.trim(), id))) return Txt.s(R.string.packet_is_err_send_failed);
         store.log("msg-tx", c.getLogin() + " (IS)", addressee, text.trim(), String.valueOf(id), false);
-        host.event("\uD83C\uDF10 Sent to " + addressee + ": " + text.trim());
+        host.event(Msg.of(R.string.packet_is_event_sent, addressee, text.trim()));
         return null;
     }
 
     /** Send an APRS message (numbered so the other side acks it). Returns an error text or null. */
     public String sendMessage(final String to, final String text) {
-        if (!callsignSet()) return "Set your callsign first (PKT → APRS settings)";
-        if (to == null || to.trim().isEmpty() || text == null || text.trim().isEmpty()) return "Addressee and text are needed";
-        if (text.length() > 67) return "APRS messages are at most 67 characters";
-        if (!host.analogRx()) return "Packet needs an analog channel: tune the APRS channel (" + aprsMhz() + " MHz in your region)";
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign_aprs);
+        if (to == null || to.trim().isEmpty() || text == null || text.trim().isEmpty()) return Txt.s(R.string.packet_err_addressee_text);
+        if (text.length() > 67) return Txt.s(R.string.packet_err_message_long);
+        if (!host.analogRx()) return Txt.s(R.string.packet_err_analog_aprs, aprsMhz());
         final int id = prefs.getInt("msgId", 0) % 999 + 1; prefs.edit().putInt("msgId", id).apply();
         final String addressee = to.trim().toUpperCase(Locale.US);
-        txInfo(Ax25.messageInfo(addressee, text.trim(), id), path(), "APRS message to " + addressee, TX_REPS,
-                () -> { store.log("msg-tx", myCall(), addressee, text.trim(), String.valueOf(id), false); host.event("📡 Sent to " + addressee + ": " + text.trim()); try { host.sentTo(addressee, "APRS message", text.trim()); } catch (Throwable t) { } });
+        txInfo(Ax25.messageInfo(addressee, text.trim(), id), path(), "APRS message to " + addressee, TX_REPS,   // i18n: transmit label (logs and RadioService's history)
+                () -> { store.log("msg-tx", myCall(), addressee, text.trim(), String.valueOf(id), false); host.event(Msg.of(R.string.packet_aprs_event_sent, addressee, text.trim()));
+                        try { host.sentTo(addressee, "APRS message", text.trim()); } catch (Throwable t) { } });   // i18n: contact history source (stored)
         return null;
     }
 
@@ -1099,13 +1121,13 @@ public final class PacketEngine {
      * comment, or an "EMERGENCY" status report when there is no fix. Sent on the current channel. Error text or null.
      */
     public String sendEmergency(String text) {
-        if (!callsignSet()) return "Set your callsign first (PKT → APRS settings)";
-        String c = ("EMERGENCY " + (text == null ? "" : text.trim())).trim();
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign_aprs);
+        String c = ("EMERGENCY " + (text == null ? "" : text.trim())).trim();   // i18n: sent on air
         final Location l = host.location();
         final String info;
         if (l != null) { if (c.length() > 43) c = c.substring(0, 43); info = Ax25.positionInfo(l.getLatitude(), l.getLongitude(), (char) 92, '!', c); }
         else { if (c.length() > 62) c = c.substring(0, 62); info = ">" + c; }
-        txInfo(info, path(), "EMERGENCY " + (l != null ? "position" : "status"), TX_REPS, () -> { store.log("beacon", myCall(), "APZDMR", info, null, false); host.event("🆘 Emergency " + (l != null ? "position" : "status (no fix)") + " sent"); });
+        txInfo(info, path(), "EMERGENCY " + (l != null ? "position" : "status"), TX_REPS, () -> { store.log("beacon", myCall(), "APZDMR", info, null, false); host.event(Msg.of(l != null ? R.string.packet_emergency_sent_position : R.string.packet_emergency_sent_status)); });   // i18n: transmit label (logs and RadioService's history)
         return null;
     }
 
@@ -1114,23 +1136,23 @@ public final class PacketEngine {
 
     /** A position report through a given path (ARISS for the space station's digipeater). */
     public String sendBeaconVia(String[] via) {
-        if (!callsignSet()) return "Set your callsign first (PKT → APRS settings)";
+        if (!callsignSet()) return Txt.s(R.string.packet_err_callsign_aprs);
         Location l = host.location();
-        if (l == null) return "No position fix yet (turn on location and open Maps once)";
-        if (!host.analogRx()) return "Packet needs an analog channel: tune the APRS channel (" + aprsMhz() + " MHz in your region)";
+        if (l == null) return Txt.s(R.string.packet_err_no_fix_maps);
+        if (!host.analogRx()) return Txt.s(R.string.packet_err_analog_aprs, aprsMhz());
         final String info = Ax25.positionInfo(l.getLatitude(), l.getLongitude(), symTable(), symCode(), comment());
-        txInfo(info, via, "position beacon", TX_REPS, () -> { store.log("beacon", myCall(), "APZDMR", info, null, false); host.event("📡 Beacon sent" + (via.length > 0 ? " via " + String.join(",", via) : "")); });
+        txInfo(info, via, "position beacon", TX_REPS, () -> { store.log("beacon", myCall(), "APZDMR", info, null, false); host.event(via.length > 0 ? Msg.of(R.string.packet_beacon_sent_via, String.join(",", via)) : Msg.of(R.string.packet_beacon_sent)); });   // i18n: transmit label (logs and RadioService's history)
         return null;
     }
 
     /** Key the radio and send a DTMF sequence (100 ms tones, 60 ms gaps) after a short silent lead. */
     public String sendDtmf(String seq) {
-        if (seq == null) return "Nothing to send";
+        if (seq == null) return Txt.s(R.string.packet_err_nothing_to_send);
         String s = seq.toUpperCase(Locale.US).replaceAll("[^0-9A-D*#]", "");
-        if (s.isEmpty()) return "Only 0-9, A-D, * and # can be sent";
-        if (!host.analogRx()) return "DTMF needs an analog channel";
+        if (s.isEmpty()) return Txt.s(R.string.packet_dtmf_err_chars);
+        if (!host.analogRx()) return Txt.s(R.string.packet_dtmf_err_analog);
         final String fs = s;
-        host.transmitPcm(dtmfPcm(s, 100, 60), "DTMF " + s, () -> host.event("📟 Sent DTMF " + fs));
+        host.transmitPcm(dtmfPcm(s, 100, 60), "DTMF " + s, () -> host.event(Msg.of(R.string.packet_dtmf_sent, fs)));   // i18n: transmit label (logs and RadioService's history)
         return null;
     }
 

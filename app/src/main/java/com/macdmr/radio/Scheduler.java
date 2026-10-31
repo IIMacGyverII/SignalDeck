@@ -47,7 +47,7 @@ public final class Scheduler {
     /** Why the radio of {@code dp} cannot run the entry ({@code ch}: its channel, null for none or the current one), or null when it can. */
     public static String bandProblem(DeviceProfile dp, Entry e, ChannelStore.Channel ch) { return bandProblem(dp, e, ch, PacketEngine.APRS_FREQ_HZ); }
     public static String bandProblem(DeviceProfile dp, Entry e, ChannelStore.Channel ch, int aprsHz) {
-        if (!available(dp, e.action, aprsHz)) return Txt.s(R.string.service_sched_no_aprs, dp.bandsText(), com.macdmr.radio.region.Region.mhz(aprsHz));
+        if (!available(dp, e.action, aprsHz)) return Txt.s(R.string.service_sched_no_aprs, dp.bandsText(), com.macdmr.radio.region.Region.mhzShown(aprsHz));
         if (usesChannel(e.action) && ch != null && !ChannelStore.tunable(dp, ch)) return Txt.s(R.string.service_sched_channel_outside, ch.name, dp.bandsText());
         return null;
     }
@@ -62,7 +62,7 @@ public final class Scheduler {
         public boolean oneShot() { return days == 0; }
         public boolean hasDuration() { return !BEACON.equals(action) && !WINLINK.equals(action) && !WINLINK_NET.equals(action); }
         /** The names with the APRS frequency in use, e.g. "APRS monitoring (144.800)". */
-        public static String[] actionNames(int aprsHz) { String[] n = names(); n[2] = Txt.s(R.string.service_sched_aprs_freq, com.macdmr.radio.region.Region.mhz(aprsHz)); return n; }
+        public static String[] actionNames(int aprsHz) { String[] n = names(); n[2] = Txt.s(R.string.service_sched_aprs_freq, com.macdmr.radio.region.Region.mhzShown(aprsHz)); return n; }
         public String actionName() { for (int i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].equals(action)) return Txt.s(ACTION_NAME_IDS[i]); return action; }
         /** The action's name as a message (history lines keep it in English and show it in the app's language); an unknown action as it is. */
         public Object actionMsg() { for (int i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].equals(action)) return Msg.of(ACTION_NAME_IDS[i]); return action; }

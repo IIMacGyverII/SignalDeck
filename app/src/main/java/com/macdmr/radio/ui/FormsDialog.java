@@ -42,7 +42,7 @@ public final class FormsDialog {
         btn(c, r, Txt.s(R.string.modes_forms_new_radiogram), "plus", Neo.AMBER, v -> { if (self[0] != null) self[0].dismiss(); edit(c, svc, blank(Forms.RADIOGRAM)); });
         List<FormStore.Row> rows = svc.forms().list(100);
         body.addView(Neo.sheetSection(c, rows.isEmpty() ? Txt.s(R.string.modes_forms_none) : Txt.s(R.string.modes_forms_list)));
-        SimpleDateFormat f = new SimpleDateFormat("EEE d MMM, HH:mm", Locale.getDefault());
+        SimpleDateFormat f = Txt.dates("EEE d MMM, HH:mm", "EEEdMMMHHmm", false);
         for (FormStore.Row row : rows) {
             String subj = row.form.f.containsKey("SU") ? row.form.f.get("SU") : row.form.f.containsKey("NR") ? Txt.s(R.string.modes_forms_number, row.form.f.get("NR")) : Forms.title(row.form.kind);
             String peer = row.peer.isEmpty() ? "—" : row.peer, when = f.format(new Date(row.ts));
@@ -66,7 +66,7 @@ public final class FormsDialog {
     private static void view(Context c, RadioService svc, FormStore.Row row) {
         float d = Theme.dp(c);
         LinearLayout body = Neo.sheetBody(c, Forms.title(row.form.kind));
-        body.addView(Neo.sheetHint(c, Txt.s(row.outgoing ? R.string.modes_forms_view_sent : R.string.modes_forms_view_received, row.peer.isEmpty() ? "—" : row.peer, row.via, new SimpleDateFormat("EEE d MMM yyyy, HH:mm", Locale.getDefault()).format(new Date(row.ts)))));
+        body.addView(Neo.sheetHint(c, Txt.s(row.outgoing ? R.string.modes_forms_view_sent : R.string.modes_forms_view_received, row.peer.isEmpty() ? "—" : row.peer, row.via, Txt.dates("EEE d MMM yyyy, HH:mm", "EEEdMMMyyyyHHmm", false).format(new Date(row.ts)))));
         String[][] fields = Forms.fields(row.form.kind);
         for (int i = 0; i < fields.length; i++) {
             String[] k = fields[i];

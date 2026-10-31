@@ -160,7 +160,7 @@ public final class Ft8Screen extends ModeScreen {
         b.addView(Neo.sheetSection(c, Txt.s(R.string.modes_ft8_clock_section)));
         b.addView(Neo.sheetHint(c, clockHint()));
         LinearLayout r = new LinearLayout(c);
-        TextView save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN), clear = Neo.button(c, Txt.s(R.string.modes_ft8_clear_list), "close", Neo.RED);
+        TextView save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN), clear = Neo.button(c, Txt.s(R.string.modes_ft8_clear_list), "close", Neo.RED); Neo.fit(save, true); Neo.fit(clear, true);
         final android.app.AlertDialog[] dlg = new android.app.AlertDialog[1];
         save.setOnClickListener(v -> {
             String s = g.getText().toString().trim().toUpperCase(Locale.US);
@@ -198,7 +198,7 @@ public final class Ft8Screen extends ModeScreen {
             cv.drawRoundRect(0, 0, (float) (w * s / 15.0), h, r, r, p);
             p.setColor(Neo.alpha(Neo.TEXT, 0x50)); float sig = (float) (w * (0.5 + 12.64) / 15.0); cv.drawRect(sig, dp(4), sig + dp(1), h - dp(4), p);
             t.setColor(Neo.TEXT);
-            String secs = String.format(Locale.US, "%4.1f", s);
+            String secs = Txt.decimalf("%4.1f", s);
             String label = Txt.s(parity == 0 ? (ours ? R.string.modes_ft8_clock_first_tx : R.string.modes_ft8_clock_first) : (ours ? R.string.modes_ft8_clock_second_tx : R.string.modes_ft8_clock_second), secs);
             cv.drawText(label, dp(10), h / 2 + t.getTextSize() / 3, t);
         }

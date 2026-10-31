@@ -45,7 +45,7 @@ public final class LogbookDialog {
         final AlertDialog[] self = new AlertDialog[1];
         LinearLayout r1 = new LinearLayout(c); r1.setBaselineAligned(false);
         TextView add = Neo.button(c, Txt.s(R.string.modes_log_add), "plus", Neo.GREEN), exp = Neo.button(c, Txt.s(R.string.modes_log_export), "backup", Neo.CYAN);
-        for (TextView b : new TextView[] { add, exp }) { b.setTextSize(14); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (4 * d), (int) (3 * d), 0); r1.addView(b, lp); }
+        for (TextView b : new TextView[] { add, exp }) { b.setTextSize(14); Neo.fit(b, true); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (4 * d), (int) (3 * d), 0); r1.addView(b, lp); }
         body.addView(r1);
         LinearLayout r2 = new LinearLayout(c); r2.setBaselineAligned(false);
         TextView filter = Neo.button(c, Txt.s(qsoOnly ? R.string.modes_log_showing_contacts : R.string.modes_log_showing_all), "search", Neo.CYAN), auto = Neo.button(c, Txt.s(svc.logHeard() ? R.string.modes_log_heard_on : R.string.modes_log_heard_off), "signal", Neo.VIOLET),
@@ -56,7 +56,7 @@ public final class LogbookDialog {
 
         List<Logbook.Entry> list = lb.list(300, qsoOnly);
         if (list.isEmpty()) body.addView(Neo.sheetHint(c, Txt.s(qsoOnly ? R.string.modes_log_no_contacts : R.string.modes_log_nothing)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm", "MMddHHmm");
         for (Logbook.Entry e : list) {
             LinearLayout row = new LinearLayout(c); row.setOrientation(LinearLayout.VERTICAL);
             row.setBackground(e.qso ? Neo.tint(c, Neo.GREEN, 12, 1) : Neo.rowCard(c)); row.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d));
@@ -65,7 +65,7 @@ public final class LogbookDialog {
             top.addView(Neo.chip(c, e.qso ? "QSO" : Txt.s(R.string.modes_log_chip_heard), e.qso ? Neo.GREEN : 0xFF9FB4C8));
             row.addView(top);
             String rst = (e.rstSent == null || e.rstSent.isEmpty() ? "" : "  ·  " + Txt.s(R.string.modes_log_rst_sent, e.rstSent)) + (e.rstRcvd == null || e.rstRcvd.isEmpty() ? "" : " " + Txt.s(R.string.modes_log_rst_rcvd, e.rstRcvd));
-            row.addView(Neo.label(c, f.format(new Date(e.ts)) + "  ·  " + (e.freqHz > 0 ? String.format(Locale.US, "%.4f", e.freqHz / 1e6) + " MHz  ·  " : "") + e.mode + rst + (e.source == null || e.source.isEmpty() ? "" : "  ·  " + e.source), 0xFFBFC8D0, 12, false));   // i18n: units and separators only
+            row.addView(Neo.label(c, f.format(new Date(e.ts)) + "  ·  " + (e.freqHz > 0 ? Txt.freqMhz(e.freqHz, 4) + " MHz  ·  " : "") + e.mode + rst + (e.source == null || e.source.isEmpty() ? "" : "  ·  " + e.source), 0xFFBFC8D0, 12, false));   // i18n: units and separators only
             String where = (e.qth == null || e.qth.isEmpty() ? "" : e.qth) + (e.grid == null || e.grid.isEmpty() ? "" : ((e.qth == null || e.qth.isEmpty()) ? "" : "  \u00B7  ") + e.grid);
             double[] at = e.grid == null ? null : com.macdmr.radio.ham.Maidenhead.centre(e.grid);
             if (at != null && me != null) { double km = com.macdmr.radio.ham.Maidenhead.km(me.getLatitude(), me.getLongitude(), at[0], at[1]); where += String.format(Locale.US, "  \u00B7  %s %s", com.macdmr.radio.region.Region.km() ? String.format(Locale.US, "%.0f km", km) : String.format(Locale.US, "%.0f mi", km / 1.609344), com.macdmr.radio.ham.Maidenhead.compass(com.macdmr.radio.ham.Maidenhead.bearing(me.getLatitude(), me.getLongitude(), at[0], at[1]))); }
@@ -91,7 +91,7 @@ public final class LogbookDialog {
     private static void edit(Context c, RadioService svc, Logbook.Entry e, Runnable after) {
         float d = Theme.dp(c);
         LinearLayout body = Neo.sheetBody(c, Txt.s(e.id > 0 ? R.string.modes_log_entry_title : R.string.modes_log_new_title), e.id > 0 ? "diag" : "radio");
-        body.addView(Neo.sheetHint(c, new SimpleDateFormat("EEE MMM d yyyy, HH:mm", Locale.US).format(new Date(e.ts)) + (e.source == null || e.source.isEmpty() ? "" : "  ·  " + e.source)));
+        body.addView(Neo.sheetHint(c, Txt.dates("EEE MMM d yyyy, HH:mm", "EEEMMMdyyyyHHmm").format(new Date(e.ts)) + (e.source == null || e.source.isEmpty() ? "" : "  ·  " + e.source)));
         final EditText call = field(c, body, Txt.s(R.string.modes_log_f_call), e.call, InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         final EditText freq = field(c, body, Txt.s(R.string.modes_log_f_freq), e.freqHz > 0 ? String.format(Locale.US, "%.4f", e.freqHz / 1e6) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         final int[] mode = { 0 }; for (int i = 0; i < MODES.length; i++) if (MODES[i].equals(e.mode)) mode[0] = i;
@@ -124,7 +124,7 @@ public final class LogbookDialog {
         qb.setOnClickListener(v -> { qso[0] = !qso[0]; qb.setText(Txt.s(qso[0] ? R.string.modes_log_was_qso : R.string.modes_log_only_heard)); });
         LinearLayout r = new LinearLayout(c); r.setBaselineAligned(false);
         TextView save = Neo.button(c, Txt.s(R.string.common_save), null, Neo.GREEN), del = Neo.button(c, Txt.s(R.string.common_delete), null, Neo.RED);
-        for (TextView b : new TextView[] { save, del }) { LinearLayout.LayoutParams l = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); l.setMargins((int) (3 * d), (int) (10 * d), (int) (3 * d), 0); r.addView(b, l); }
+        for (TextView b : new TextView[] { save, del }) { Neo.fit(b, true); LinearLayout.LayoutParams l = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); l.setMargins((int) (3 * d), (int) (10 * d), (int) (3 * d), 0); r.addView(b, l); }
         body.addView(r);
         final AlertDialog[] self = new AlertDialog[1];
         save.setOnClickListener(v -> {
@@ -133,7 +133,7 @@ public final class LogbookDialog {
             e.call = cs; e.mode = MODES[mode[0]]; e.rstSent = sent.getText().toString().trim(); e.rstRcvd = rcvd.getText().toString().trim();
             e.name = name.getText().toString().trim(); e.notes = notes.getText().toString().trim(); e.qso = qso[0];
             e.qth = qth.getText().toString().trim(); e.grid = grid.getText().toString().trim();
-            try { String fs = freq.getText().toString().trim(); e.freqHz = fs.isEmpty() ? 0 : Math.round(Double.parseDouble(fs) * 1e6); } catch (NumberFormatException x) { Toast.makeText(c, Txt.s(R.string.modes_log_freq_invalid), Toast.LENGTH_SHORT).show(); return; }
+            try { String fs = freq.getText().toString().trim(); e.freqHz = fs.isEmpty() ? 0 : Math.round(Txt.parseDecimal(fs) * 1e6); } catch (NumberFormatException x) { Toast.makeText(c, Txt.s(R.string.modes_log_freq_invalid), Toast.LENGTH_SHORT).show(); return; }
             svc.logbook().save(e);
             if (self[0] != null) self[0].dismiss(); after.run();
         });

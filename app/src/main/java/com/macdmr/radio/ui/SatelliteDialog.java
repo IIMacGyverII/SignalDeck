@@ -107,7 +107,7 @@ public final class SatelliteDialog {
         stop.setOnClickListener(v -> { svc.endSatTracking(); Toast.makeText(c, Txt.s(R.string.modes_satd_tracking_stopped), Toast.LENGTH_SHORT).show(); if (self[0] != null) self[0].dismiss(); });
         if (me == null) body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_satd_no_fix)));
         Map<Integer, Sgp4> el = sats.elements();
-        SimpleDateFormat f = new SimpleDateFormat("EEE HH:mm", Locale.US);
+        SimpleDateFormat f = Txt.dates("EEE HH:mm", "EEEHHmm");
         long now = System.currentTimeMillis();
         final Map<TextView, String> statusViews = new java.util.LinkedHashMap<>();
         List<Satellites.Sat> order = new java.util.ArrayList<>(java.util.Arrays.asList(Satellites.all(c)));
@@ -129,9 +129,9 @@ public final class SatelliteDialog {
             body.addView(Neo.sheetSection(c, s.name));
             String an = com.macdmr.radio.ham.FmSats.amsatName(s);
             if (an != null && !(s.catalog == Satellites.ISS_CATALOG && s.mode == Satellites.APRS)) { TextView st = Neo.label(c, Txt.s(R.string.modes_satd_amsat_loading), Neo.DIM, 12.5f, false); body.addView(st); statusViews.put(st, an); }
-            String dn = String.format(Locale.US, "%.3f", s.downHz / 1e6), upf = String.format(Locale.US, "%.3f", s.upHz / 1e6);
+            String dn = Txt.freqMhz(s.downHz, 3), upf = Txt.freqMhz(s.upHz, 3);
             body.addView(Neo.sheetHint(c, s.listenOnly() ? Txt.s(R.string.modes_satd_listen, dn, s.about)
-                    : s.toneHz > 0 ? Txt.s(R.string.modes_satd_listen_talk_tone, dn, upf, String.format(Locale.US, "%.1f", s.toneHz), s.about) : Txt.s(R.string.modes_satd_listen_talk, dn, upf, s.about)));
+                    : s.toneHz > 0 ? Txt.s(R.string.modes_satd_listen_talk_tone, dn, upf, Txt.decimal(s.toneHz, 1), s.about) : Txt.s(R.string.modes_satd_listen_talk, dn, upf, s.about)));
             Sgp4 e = el.get(s.catalog);
             if (e == null || me == null) { body.addView(Neo.sheetHint(c, e == null ? Txt.s(R.string.modes_satd_no_orbit) : "")); continue; }
             List<SatTrack.Pass> ps = SatTrack.passes(e, now - 15 * 60_000L, 24, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0, 10);
@@ -169,7 +169,7 @@ public final class SatelliteDialog {
             stop.setVisibility(st == null ? android.view.View.GONE : android.view.View.VISIBLE);
             if (st == null) live.setText("");
             else if (st.waiting || st.look == null) live.setText(Txt.s(R.string.modes_satd_live_waiting, st.name, new SimpleDateFormat("HH:mm", Locale.US).format(new Date(st.aos))));
-            else live.setText(Txt.s(st.look.rangeRateKmS < 0 ? R.string.modes_satd_live_approaching : R.string.modes_satd_live_receding, st.name, String.format(Locale.US, "%.0f", st.look.az), Maidenhead.compass(st.look.az), String.format(Locale.US, "%.0f", st.look.el), String.format(Locale.US, "%.4f", st.rxHz / 1e6), String.format(Locale.US, "%.4f", st.txHz / 1e6)));
+            else live.setText(Txt.s(st.look.rangeRateKmS < 0 ? R.string.modes_satd_live_approaching : R.string.modes_satd_live_receding, st.name, String.format(Locale.US, "%.0f", st.look.az), Maidenhead.compass(st.look.az), String.format(Locale.US, "%.0f", st.look.el), Txt.freqMhz(st.rxHz, 4), Txt.freqMhz(st.txHz, 4)));
             h.postDelayed(this, 1000);
         } };
         h.post(tick);

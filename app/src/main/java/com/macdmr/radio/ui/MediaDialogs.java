@@ -47,7 +47,7 @@ public final class MediaDialogs {
         } catch (Throwable ignored) { }
         files.sort((a, b) -> Long.compare(b.lastModified(), a.lastModified()));
         body.addView(hint(c, files.isEmpty() ? Txt.s(R.string.modes_media_recordings_none) : Txt.s(R.string.modes_media_recordings_hint)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm:ss", "MMddHHmmss");
         int n = 0;
         for (final File file : files) {
             if (n++ >= 150) break;
@@ -83,7 +83,7 @@ public final class MediaDialogs {
         final LinearLayout body = page(c, Txt.s(R.string.modes_media_captions_title), "txt");
         List<Object[]> rows = svc.store().captions(300);
         body.addView(hint(c, rows.isEmpty() ? Txt.s(R.string.modes_media_captions_none) : Txt.s(R.string.modes_media_captions_hint)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm:ss", "MMddHHmmss");
         for (Object[] r : rows) {
             ChannelStore.Channel ch = svc.store().byNumber((Integer) r[1]);
             LinearLayout row = shell(c);

@@ -226,7 +226,7 @@ public final class MapDialog {
                 List<Repeater> reps = new RepeaterService(c, svc.store()).nearby(me.getLatitude(), me.getLongitude(), GeoUtil.radiusKm(mi), false, new StringBuilder());
                 for (Repeater r : reps) {
                     if (!r.hasCoords) continue;
-                    ms.add(new MapView.Marker(r.lat, r.lon, r.dmr ? MapView.REPEATER_DMR : MapView.REPEATER_FM, (r.callsign == null ? "?" : r.callsign) + " " + String.format(Locale.US, "%.3f", r.rxHz / 1e6), r)); rp++;
+                    ms.add(new MapView.Marker(r.lat, r.lon, r.dmr ? MapView.REPEATER_DMR : MapView.REPEATER_FM, (r.callsign == null ? "?" : r.callsign) + " " + Txt.freqMhz(r.rxHz, 3), r)); rp++;
                 }
             } catch (Throwable ignored) { }
             final int frp = rp;
@@ -246,7 +246,7 @@ public final class MapDialog {
             try {
                 for (Repeater r : new RepeaterService(c, svc.store()).nearby(lat, lon, GeoUtil.radiusKm(mi), false, new StringBuilder())) {
                     if (!r.hasCoords) continue;
-                    reps.add(new MapView.Marker(r.lat, r.lon, r.dmr ? MapView.REPEATER_DMR : MapView.REPEATER_FM, (r.callsign == null ? "?" : r.callsign) + " " + String.format(Locale.US, "%.3f", r.rxHz / 1e6), r));
+                    reps.add(new MapView.Marker(r.lat, r.lon, r.dmr ? MapView.REPEATER_DMR : MapView.REPEATER_FM, (r.callsign == null ? "?" : r.callsign) + " " + Txt.freqMhz(r.rxHz, 3), r));
                 }
             } catch (Throwable ignored) { }
             ui.post(() -> {
@@ -276,7 +276,7 @@ public final class MapDialog {
         String u = com.macdmr.radio.region.Region.km() ? " km" : " mi";   // i18n: unit symbols
         double brg = GeoUtil.bearingDegrees(me.getLatitude(), me.getLongitude(), lat, lon);
         String[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
-        return (mi < 10 ? String.format(Locale.US, "%.1f", mi) : String.format(Locale.US, "%.0f", mi)) + u + " " + dirs[(int) Math.round(brg / 45) % 8];
+        return (mi < 10 ? Txt.decimal(mi, 1) : String.format(Locale.US, "%.0f", mi)) + u + " " + dirs[(int) Math.round(brg / 45) % 8];
     }
 
     private static String ago(long ts) {
@@ -304,14 +304,14 @@ public final class MapDialog {
             int col = r.dmr ? Neo.VIOLET : Neo.CYAN;
             cardTitle.setText(r.callsign == null ? Txt.s(R.string.packet_map_repeater) : r.callsign); cardTitle.setTextColor(col);
             cardSub.setText(Txt.s(R.string.packet_map_repeater_sub, r.dmr ? "DMR" + (r.cc >= 0 ? " CC" + r.cc : "") : "FM" + (hasTone(r.toneUp) ? " " + r.toneUp : ""), dist(r.lat, r.lon))); cardSub.setTextColor(col);
-            cardBody.setText(Txt.s(R.string.packet_map_repeater_freqs, String.format(Locale.US, "%.4f", r.rxHz / 1e6), String.format(Locale.US, "%.4f", r.txHz / 1e6)) + (r.city != null ? "\n" + r.city + (r.region != null ? ", " + r.region : "") : "") + (r.approx ? "\n" + Txt.s(R.string.packet_map_repeater_approx) : ""));
+            cardBody.setText(Txt.s(R.string.packet_map_repeater_freqs, Txt.freqMhz(r.rxHz, 4), Txt.freqMhz(r.txHz, 4)) + (r.city != null ? "\n" + r.city + (r.region != null ? ", " + r.region : "") : "") + (r.approx ? "\n" + Txt.s(R.string.packet_map_repeater_approx) : ""));
             action(Txt.s(R.string.packet_map_details), "repeaters", col, v -> RepeatersDialog.showDetails(c, svc, r, me != null ? me.getLatitude() : r.lat, me != null ? me.getLongitude() : r.lon));
             action(Txt.s(R.string.packet_map_pill_coverage), "signal", Neo.VIOLET, v -> { focus(com.macdmr.radio.coverage.CoverageMath.repeaterKey((int) r.rxHz, r.lat, r.lon), r.callsign == null ? Txt.s(R.string.packet_map_repeater) : r.callsign, r.lat, r.lon, r.rxHz); setLayer(layer == MapView.LAYER_NONE ? MapView.LAYER_RX : layer); card.setVisibility(View.GONE); });
         } else if (m.data instanceof ChannelStore.Channel) {
             final ChannelStore.Channel x = (ChannelStore.Channel) m.data;
             cardTitle.setText(x.name); cardTitle.setTextColor(Neo.AMBER);
             cardSub.setText(Txt.s(R.string.packet_map_channel_sub, x.number, x.isDigital() ? "DMR" : Txt.s(R.string.packet_map_analog), dist(x.lat, x.lon))); cardSub.setTextColor(Neo.AMBER);
-            cardBody.setText(Txt.s(R.string.packet_map_channel_freqs, String.format(Locale.US, "%.4f", x.rxFreq / 1e6), String.format(Locale.US, "%.4f", x.txFreq / 1e6)));
+            cardBody.setText(Txt.s(R.string.packet_map_channel_freqs, Txt.freqMhz(x.rxFreq, 4), Txt.freqMhz(x.txFreq, 4)));
             action(Txt.s(R.string.packet_map_use_channel), "channels", Neo.AMBER, v -> { String e = svc.trySelectChannel(x.number); Toast.makeText(c, e != null ? e : Txt.s(R.string.packet_map_channel_toast, x.number, x.name), e != null ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show(); });
             action(Txt.s(R.string.packet_map_pill_coverage), "signal", Neo.VIOLET, v -> { focus(com.macdmr.radio.coverage.CoverageMath.repeaterKey(x.rxFreq, x.lat, x.lon), x.name, x.lat, x.lon, x.rxFreq); setLayer(layer == MapView.LAYER_NONE ? MapView.LAYER_RX : layer); card.setVisibility(View.GONE); });
         }
@@ -325,7 +325,7 @@ public final class MapDialog {
     }
 
     private void action(String label, String icon, int accent, View.OnClickListener l) {
-        TextView b = Neo.button(c, label, icon, accent); b.setTextSize(14);
+        TextView b = Neo.button(c, label, icon, accent); b.setTextSize(14); Neo.fit(b, true);
         LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
         bl.setMargins(cardActions.getChildCount() == 0 ? 0 : (int) (4 * d), (int) (8 * d), cardActions.getChildCount() == 0 ? (int) (4 * d) : 0, 0);
         b.setOnClickListener(l); cardActions.addView(b, bl);
@@ -521,7 +521,7 @@ public final class MapDialog {
             f.key = focusKey; f.name = focusName; f.rxHz = (int) focusHz; f.lat = focusLat; f.lon = focusLon; reps.add(0, f);
         }
         for (final com.macdmr.radio.coverage.CoverageStore.Repeater r : reps) {
-            TextView t = repRow(r.name + String.format(Locale.US, "  %.4f", r.rxHz / 1e6), r.txCount > 0 ? Txt.s(R.string.packet_cov_rep_sub_keyed, r.rxCount, r.txCount, r.keyed) : Txt.s(R.string.packet_cov_rep_sub, r.rxCount, r.txCount), r.key.equals(focusKey));
+            TextView t = repRow(r.name + "  " + Txt.freqMhz(r.rxHz, 4), r.txCount > 0 ? Txt.s(R.string.packet_cov_rep_sub_keyed, r.rxCount, r.txCount, r.keyed) : Txt.s(R.string.packet_cov_rep_sub, r.rxCount, r.txCount), r.key.equals(focusKey));
             box.addView(t); rows.add(t);
             t.setOnClickListener(v -> {
                 focus(r.key, r.name, r.lat, r.lon, r.rxHz); for (TextView x : rows) Neo.pillStyle(x, x == v, Neo.VIOLET);
@@ -552,7 +552,7 @@ public final class MapDialog {
 
         LinearLayout btns = new LinearLayout(c); btns.setBaselineAligned(false);
         TextView exp = Neo.button(c, Txt.s(R.string.packet_cov_export), "backup", Neo.GREEN), clr = Neo.button(c, Txt.s(R.string.common_clear), "close", Neo.RED);
-        exp.setTextSize(14); clr.setTextSize(14);
+        exp.setTextSize(14); clr.setTextSize(14); Neo.fit(exp, true); Neo.fit(clr, true);
         LinearLayout.LayoutParams b1 = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f); b1.setMargins(0, (int) (14 * d), (int) (4 * d), 0);
         LinearLayout.LayoutParams b2 = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f); b2.setMargins((int) (4 * d), (int) (14 * d), 0, 0);
         btns.addView(exp, b1); btns.addView(clr, b2);

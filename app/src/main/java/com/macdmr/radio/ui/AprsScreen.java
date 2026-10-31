@@ -38,7 +38,7 @@ public final class AprsScreen extends ModeScreen {
     private final ScrollView scroll;
     private int tab;
     private long shownChanges = -1;
-    private final SimpleDateFormat hm = new SimpleDateFormat("HH:mm:ss", Locale.US), dhm = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+    private final SimpleDateFormat hm = new SimpleDateFormat("HH:mm:ss", Locale.US), dhm = Txt.dates("MM-dd HH:mm", "MMddHHmm");
 
     public AprsScreen(Context c, RadioService svc, Runnable onClose) {
         super(c, svc, "APRS", "pkt", Neo.GREEN, onClose);
@@ -124,7 +124,7 @@ public final class AprsScreen extends ModeScreen {
     @Override protected void refresh() {
         boolean iss = svc.satMode() == com.macdmr.radio.ham.Satellites.APRS;
         List<String> what = new java.util.ArrayList<>();
-        what.add(iss ? Txt.s(R.string.packet_aprs_sub_iss, String.format(Locale.US, "%.3f", svc.satState().nominalHz / 1e6)) : !pe.monitoring() ? Txt.s(R.string.packet_aprs_sub_kiss_here) : Txt.s(R.string.packet_aprs_sub_monitoring, String.format(Locale.US, "%.3f", svc.aprsMonitorHz() / 1e6)));
+        what.add(iss ? Txt.s(R.string.packet_aprs_sub_iss, Txt.freqMhz(svc.satState().nominalHz, 3)) : !pe.monitoring() ? Txt.s(R.string.packet_aprs_sub_kiss_here) : Txt.s(R.string.packet_aprs_sub_monitoring, Txt.freqMhz(svc.aprsMonitorHz(), 3)));
         passCard.update(svc);
         if (pe.kiss().isActive()) what.add(pe.monitoring() ? Txt.s(R.string.packet_aprs_sub_kiss_port, pe.kissPort()) : Txt.s(R.string.packet_aprs_sub_port, pe.kissPort()));
         if (!pe.callsignSet()) what.add(Txt.s(R.string.packet_aprs_sub_no_call));

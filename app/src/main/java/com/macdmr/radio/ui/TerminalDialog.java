@@ -35,7 +35,7 @@ public final class TerminalDialog {
         final EditText via = field(c, body, Txt.s(R.string.modes_term_via), c.getSharedPreferences("packet", Context.MODE_PRIVATE).getString("termVia", ""), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
         LinearLayout r1 = new LinearLayout(c); r1.setBaselineAligned(false);
         final TextView conn = Neo.button(c, Txt.s(R.string.modes_term_connect), "send", Neo.GREEN), acc = Neo.button(c, Txt.s(pe.acceptConnections() ? R.string.modes_term_accept : R.string.modes_term_refuse), "contacts", Neo.VIOLET);
-        for (TextView b : new TextView[] { conn, acc }) { b.setTextSize(14); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), (int) (6 * d)); r1.addView(b, lp); }
+        for (TextView b : new TextView[] { conn, acc }) { b.setTextSize(14); Neo.fit(b, true); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), (int) (6 * d)); r1.addView(b, lp); }
         body.addView(r1);
         final TextView screen = Neo.text(c, "", 0xFFCFE8D8, 13, Neo.mono(c));
         screen.setBackground(Neo.rowCard(c)); screen.setPadding((int) (10 * d), (int) (8 * d), (int) (10 * d), (int) (8 * d)); screen.setMinHeight((int) (220 * d)); screen.setTextIsSelectable(true);

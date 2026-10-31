@@ -38,7 +38,7 @@ public final class LastHeardDialog {
         LinearLayout tools = new LinearLayout(c); tools.setGravity(Gravity.CENTER);
         tools.setBaselineAligned(false);
         for (String[] t : new String[][] { { Txt.s(R.string.intercom_lastheard_recordings), "rec" }, { Txt.s(R.string.intercom_lastheard_captions), "txt" }, { Txt.s(R.string.intercom_lastheard_activity), "signal" } }) {
-            TextView b = Neo.button(c, t[0], t[1], t[1].equals("rec") ? Neo.RED : t[1].equals("txt") ? Neo.VIOLET : Neo.CYAN); b.setTextSize(14);
+            TextView b = Neo.button(c, t[0], t[1], t[1].equals("rec") ? Neo.RED : t[1].equals("txt") ? Neo.VIOLET : Neo.CYAN); b.setTextSize(14); Neo.fit(b, true);   // three in a row: never a break inside a word
             final String which = t[1];
             b.setOnClickListener(v -> { if (which.equals("rec")) MediaDialogs.recordings(c, svc); else if (which.equals("txt")) MediaDialogs.captions(c, svc); else ActivityDialog.show(c, svc); });
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), (int) (10 * d)); tools.addView(b, lp);
@@ -57,7 +57,7 @@ public final class LastHeardDialog {
             Row e = rows.get(key);
             if (e == null) { r.count = 1; rows.put(key, r); } else e.count++;
         }
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm:ss", "MMddHHmmss");
         if (rows.isEmpty()) body.addView(Neo.label(c, Txt.s(R.string.intercom_lastheard_empty), 0xFFBFC8D0, 14, false));
         List<Row> list = new ArrayList<>(rows.values());
         for (Row r : list) {
@@ -99,7 +99,7 @@ public final class LastHeardDialog {
             if (prev != null && prev.text.equals(r.text) && prev.channel == r.channel) { prev.count++; continue; }   // a run of the same line: one row, n×
             if (alert) { if (alerts.size() < 10) alerts.add(r); prevA = r; } else { if (events.size() < 15) events.add(r); prevE = r; }
         }
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm:ss", "MMddHHmmss");
         if (!alerts.isEmpty()) body.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_lastheard_section_alerts)));
         for (Row r : alerts) body.addView(eventRow(c, svc, r, f, true, sheet), rowLp(d));
         if (!events.isEmpty()) body.addView(Neo.sheetSection(c, Txt.s(R.string.intercom_lastheard_section_events)));
@@ -131,10 +131,10 @@ public final class LastHeardDialog {
         LinearLayout box = Neo.sheetBody(c, ex[0], ex[2]);
         box.addView(Neo.label(c, r.shown, isAlert(r.text) ? Theme.AMBER : Theme.CYAN, 14.5f, true));
         ChannelStore.Channel ch = svc.store().byNumber(r.channel);
-        String at = new SimpleDateFormat("EEE MMM d, HH:mm:ss", Locale.US).format(new Date(r.ts));
+        String at = Txt.dates("EEE MMM d, HH:mm:ss", "EEEMMMdHHmmss").format(new Date(r.ts));
         String when = r.count > 1 ? Txt.s(R.string.intercom_lastheard_when_n, at, r.count) : at;
         String where = ch == null ? chName(svc, r.channel) : Txt.s(ch.power == 1 ? R.string.intercom_lastheard_where_high : R.string.intercom_lastheard_where_low, ch.name,
-                String.format(Locale.US, "%.4f", ch.txFreq / 1e6), String.format(Locale.US, "%.4f", ch.rxFreq / 1e6), ch.isDigital() ? "DMR" : "FM");
+                Txt.freqMhz(ch.txFreq, 4), Txt.freqMhz(ch.rxFreq, 4), ch.isDigital() ? "DMR" : "FM");
         box.addView(Neo.sheetHint(c, when + "\n" + where));
         if (!ex[1].isEmpty()) { TextView t = Neo.label(c, ex[1], 0xFFD6DEE6, 13.5f, false); t.setLineSpacing(0, 1.12f); t.setPadding(0, (int) (6 * d), 0, (int) (4 * d)); box.addView(t); }
         List<Object[]> near = svc.store().around(r.ts, 20_000);

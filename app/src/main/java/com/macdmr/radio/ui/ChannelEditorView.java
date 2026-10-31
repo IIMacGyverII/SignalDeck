@@ -186,7 +186,7 @@ public class ChannelEditorView extends LinearLayout {
         lon = textInto(form, Txt.s(R.string.channel_editor_l_lon), H_POS(), ch.lat != 0 || ch.lon != 0 ? String.format(Locale.US, "%.5f", ch.lon) : "", InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
         LinearLayout locRow = new LinearLayout(c); locRow.setBaselineAligned(false);
         TextView here = Neo.button(c, Txt.s(R.string.channel_editor_my_position), "radio", Neo.CYAN), maps = Neo.button(c, Txt.s(R.string.channel_editor_open_maps), "globe", Neo.GREEN), paste = Neo.button(c, Txt.s(R.string.channel_editor_paste), "import", Neo.AMBER);
-        for (TextView b : new TextView[] { here, maps, paste }) { b.setTextSize(13.5f); b.setPadding((int) (6 * d), (int) (8 * d), (int) (6 * d), (int) (8 * d)); b.setCompoundDrawablePadding((int) (4 * d)); b.setSingleLine(true); }
+        for (TextView b : new TextView[] { here, maps, paste }) { b.setTextSize(13.5f); b.setPadding((int) (6 * d), (int) (8 * d), (int) (6 * d), (int) (8 * d)); b.setCompoundDrawablePadding((int) (4 * d)); b.setSingleLine(true); Neo.fit(b, true); }
         LayoutParams b1 = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1.15f); b1.rightMargin = (int) (3 * d);
         LayoutParams b2 = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1.15f); b2.leftMargin = (int) (3 * d); b2.rightMargin = (int) (3 * d);
         LayoutParams b3 = new LayoutParams(0, LayoutParams.MATCH_PARENT, 0.9f); b3.leftMargin = (int) (3 * d);
@@ -261,7 +261,7 @@ public class ChannelEditorView extends LinearLayout {
     private void openMaps() {
         Context c = getContext();
         double la = 0, lo = 0;
-        try { la = Double.parseDouble(lat.getText().toString().trim()); lo = Double.parseDouble(lon.getText().toString().trim()); } catch (Throwable ignored) { }
+        try { la = Txt.parseDecimal(lat.getText().toString()); lo = Txt.parseDecimal(lon.getText().toString()); } catch (Throwable ignored) { }
         String label = android.net.Uri.encode(ch.name == null || ch.name.isEmpty() ? Txt.s(R.string.channel_editor_maps_label) : ch.name);
         android.net.Uri u = la != 0 || lo != 0 ? android.net.Uri.parse("geo:" + la + "," + lo + "?q=" + la + "," + lo + "(" + label + ")") : android.net.Uri.parse("geo:0,0?q=");
         try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, u)); android.widget.Toast.makeText(c, Txt.s(R.string.channel_editor_maps_how), android.widget.Toast.LENGTH_LONG).show(); }
@@ -496,7 +496,7 @@ public class ChannelEditorView extends LinearLayout {
     static double number(String text, String what) {
         String t = text == null ? "" : text.trim();
         if (t.isEmpty()) throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_enter, what));
-        try { return Double.parseDouble(t); } catch (NumberFormatException e) { throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_not_number, t, what)); }
+        try { return Txt.parseDecimal(t); } catch (NumberFormatException e) { throw new IllegalArgumentException(Txt.s(R.string.channel_editor_err_not_number, t, what)); }   // a point or a decimal comma
     }
     private boolean apply() {
         try {

@@ -138,7 +138,7 @@ public final class CodeplugDialog {
         body.addView(Neo.switchRow(c, "radio", Neo.AMBER, Txt.s(R.string.channels_share_inc_chirp), Txt.s(R.string.channels_share_inc_chirp_sub), chirp));
 
         LinearLayout btns = new LinearLayout(c);
-        TextView copy = Neo.button(c, Txt.s(R.string.channels_share_copy), "import", Neo.CYAN), send = Neo.button(c, Txt.s(R.string.common_share), "send", Neo.GREEN);
+        TextView copy = Neo.button(c, Txt.s(R.string.channels_share_copy), "import", Neo.CYAN), send = Neo.button(c, Txt.s(R.string.common_share), "send", Neo.GREEN); Neo.fit(copy, true); Neo.fit(send, true);
         LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); bl.setMargins((int) (3 * d), (int) (14 * d), (int) (3 * d), 0);
         btns.addView(copy, bl); btns.addView(send, new LinearLayout.LayoutParams(bl));
         body.addView(btns);
@@ -269,7 +269,7 @@ public final class CodeplugDialog {
             LinearLayout col = new LinearLayout(c); col.setOrientation(VERTICAL); col.setPadding((int) (8 * d), 0, 0, 0);
             col.addView(Neo.text(c, (ch.number > 0 ? ch.number + "  " : "") + ch.name, Neo.TEXT, 15, Neo.ui(c)));
             String t = Codeplug.tone(ch.isDigital() ? 0 : ch.txType, ch.txSubCode);
-            sub = Neo.text(c, String.format(Locale.US, "%.4f MHz", ch.rxFreq / 1e6) + (ch.isDigital() ? " · DMR" + (ch.txContact > 0 ? " TG " + ch.txContact : "") : " · FM" + (t.isEmpty() ? "" : " · " + t)), Neo.MUTED, 12.5f, Neo.uiMedium(c));   // i18n: protocol words (DMR, TG, FM) and units
+            sub = Neo.text(c, Txt.freqMhz(ch.rxFreq, 4) + " MHz" + (ch.isDigital() ? " · DMR" + (ch.txContact > 0 ? " TG " + ch.txContact : "") : " · FM" + (t.isEmpty() ? "" : " · " + t)), Neo.MUTED, 12.5f, Neo.uiMedium(c));   // i18n: protocol words (DMR, TG, FM) and units
             col.addView(sub);
             addView(col, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             setClickable(true);

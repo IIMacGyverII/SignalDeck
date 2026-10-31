@@ -76,7 +76,7 @@ public final class KeyerDialog {
             for (int s = 0; s < VoiceKeyer.SLOTS; s++) {
                 boolean recording = k.recordingSlot() == s;
                 recB[s].setText(Txt.s(recording ? R.string.common_stop : R.string.modes_keyer_record));
-                info[s].setText(recording ? Txt.s(R.string.modes_keyer_recording) : k.has(s) ? Txt.s(R.string.modes_keyer_length, String.format(Locale.US, "%.1f", k.lengthMs(s) / 1000.0)) : Txt.s(R.string.modes_keyer_empty));
+                info[s].setText(recording ? Txt.s(R.string.modes_keyer_recording) : k.has(s) ? Txt.s(R.string.modes_keyer_length, Txt.decimal(k.lengthMs(s) / 1000.0, 1)) : Txt.s(R.string.modes_keyer_empty));
                 idB[s].setText(Txt.s(k.addId(s) ? R.string.modes_keyer_id_on : R.string.modes_keyer_id_off));
             }
             long due = svc.idDueInMs();

@@ -75,7 +75,7 @@ public final class SstvScreen extends ModeScreen {
         sComb.setOnClickListener(v -> combine(selectedFiles()));
         LinearLayout selRow = new LinearLayout(c); selBar.addView(selRow, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         TextView[] acts = { sComb, sShare, sDel, sDone };
-        for (int k = 0; k < acts.length; k++) { TextView t = acts[k]; t.setTextSize(14); t.setPadding(dp(4), 0, dp(4), 0); LayoutParams l = new LayoutParams(0, dp(42), 1f); if (k > 0) l.leftMargin = dp(6); selRow.addView(t, l); }
+        for (int k = 0; k < acts.length; k++) { TextView t = acts[k]; t.setTextSize(14); t.setPadding(dp(4), 0, dp(4), 0); Neo.fit(t, true); LayoutParams l = new LayoutParams(0, dp(42), 1f); if (k > 0) l.leftMargin = dp(6); selRow.addView(t, l); }
         sShare.setOnClickListener(v -> { java.util.List<File> fs = selectedFiles(); if (fs.isEmpty()) toast(Txt.s(R.string.modes_sstv_tap_to_select)); else share(fs); });
         sDel.setOnClickListener(v -> { java.util.List<File> fs = selectedFiles(); if (fs.isEmpty()) toast(Txt.s(R.string.modes_sstv_tap_to_select)); else delete(fs, null); });
         sDone.setOnClickListener(v -> endSelect());
@@ -143,7 +143,7 @@ public final class SstvScreen extends ModeScreen {
         if (!dec.contentEquals(decoderBtn.getText())) { decoderBtn.setText(dec); Neo.fit(decoderBtn); }
         if (waitingHz() > 0) { set(status, Txt.s(R.string.modes_sstv_starts_with_pass)); set(progressText, ""); }
         if (iss()) {
-            setSubtitle(Txt.s(R.string.modes_sstv_iss_subtitle, String.format(Locale.US, "%.3f", svc.satState().nominalHz / 1e6)));
+            setSubtitle(Txt.s(R.string.modes_sstv_iss_subtitle, Txt.freqMhz(svc.satState().nominalHz, 3)));
             if (switchBtn.getVisibility() != GONE) { switchBtn.setVisibility(GONE); sendBtn.setVisibility(GONE); }    // an ISS downlink: receive only
         } else {
             setSubtitle(Txt.s(parked() ? R.string.modes_sstv_on_144 : R.string.modes_sstv_on_channel));
@@ -236,7 +236,7 @@ public final class SstvScreen extends ModeScreen {
         final TextView note = Neo.sheetHint(c, ""); body.addView(note);
         final int[] cur = { pl.ref == 0 ? 1 : 0 }; final boolean[] manual = { false };
         final TextView pick = Neo.button(c, "", null, Neo.CYAN), use = Neo.button(c, "", null, Neo.MUTED);
-        pick.setTextSize(13);
+        pick.setTextSize(13); Neo.fit(use, true);
         LinearLayout r1 = new LinearLayout(c); r1.setOrientation(HORIZONTAL);
         r1.addView(pick, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)); LayoutParams ul = new LayoutParams(dp(104), LayoutParams.MATCH_PARENT); ul.leftMargin = dp(6); r1.addView(use, ul);
         LayoutParams r1l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); r1l.topMargin = dp(6); body.addView(r1, r1l);
@@ -245,7 +245,7 @@ public final class SstvScreen extends ModeScreen {
         final int[][] step = { { -1, 0 }, { 1, 0 }, { 0, 1 }, { 0, -1 } };      // rows, and the sideways shift (positive moves the picture left)
         for (int k = 0; k < 4; k++) { LayoutParams l = new LayoutParams(0, dp(46), 1f); if (k > 0) l.leftMargin = dp(6); r2.addView(arrows[k], l); }
         LayoutParams r2l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); r2l.topMargin = dp(6); body.addView(r2, r2l);
-        final TextView auto = Neo.button(c, Txt.s(R.string.modes_sstv_automatic), null, Neo.MUTED), save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN);
+        final TextView auto = Neo.button(c, Txt.s(R.string.modes_sstv_automatic), null, Neo.MUTED), save = Neo.button(c, Txt.s(R.string.common_save), "check", Neo.GREEN); Neo.fit(auto, true); Neo.fit(save, true);
         LinearLayout r3 = new LinearLayout(c); r3.setOrientation(HORIZONTAL);
         r3.addView(auto, new LayoutParams(0, dp(48), 1f)); LayoutParams sl = new LayoutParams(0, dp(48), 1f); sl.leftMargin = dp(6); r3.addView(save, sl);
         LayoutParams r3l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); r3l.topMargin = dp(8); body.addView(r3, r3l);

@@ -457,7 +457,7 @@ public final class PacketEngine {
     public synchronized String textReceived() { return textRx.toString(); }
     public String textStatus() {
         if (textMode == 1 && rtty != null) return rtty.locked() ? Txt.s(R.string.packet_text_rtty_listening, String.format(Locale.US, "%.0f", rtty.markHz())) : Txt.s(R.string.packet_text_rtty_looking);
-        if (textMode == 2 && psk != null) return psk.locked() ? Txt.s(R.string.packet_text_psk_listening, String.format(Locale.US, "%.1f", psk.freq())) : Txt.s(R.string.packet_text_psk_looking);
+        if (textMode == 2 && psk != null) return psk.locked() ? Txt.s(R.string.packet_text_psk_listening, Txt.decimal(psk.freq(), 1)) : Txt.s(R.string.packet_text_psk_looking);
         return Txt.s(R.string.packet_text_not_listening);
     }
     private synchronized void textChar(char ch) { textRx.append(ch); if (textRx.length() > 20000) textRx.delete(0, 4000); textPost(); }

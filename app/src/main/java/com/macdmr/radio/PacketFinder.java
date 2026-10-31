@@ -201,7 +201,7 @@ public final class PacketFinder {
                         if (!running || System.currentTimeMillis() >= until) break outer;
                         ChannelStore.Channel c = new ChannelStore.Channel(); c.type = 1; c.rxFreq = c.txFreq = hz; c.band = 1; c.power = 0; c.sq = 0; c.softSq = false; c.name = Txt.s(R.string.packet_pkt_finder);
                         currentHz = hz; svc.applyVfo(c, false);
-                        status = Txt.s(R.string.packet_finder_status_listening, String.format(Locale.US, "%.3f", hz / 1e6));
+                        status = Txt.s(R.string.packet_finder_status_listening, Txt.freqMhz(hz, 3));
                         long stop = Math.min(until, System.currentTimeMillis() + dwell);
                         Thread.sleep(RadioService.RETUNE_SETTLE_MS);
                         while (running && System.currentTimeMillis() < stop) {

@@ -133,7 +133,7 @@ public final class ChannelPresets {
         boolean na2 = region.call2mHz == 146_520_000, na70 = region.call70Hz == 446_000_000;
         String where = !region.chosen || region.id.equals("US") ? "US" : region.name;
         boolean common = na2 || na70, sstv = region.sstvHz > 0;
-        String aprs = com.macdmr.radio.region.Region.mhz(region.aprsHz);
+        String aprs = com.macdmr.radio.region.Region.mhzShown(region.aprsHz);
         String about = common ? Txt.s(sstv ? R.string.channels_preset_ham_about_common_sstv : R.string.channels_preset_ham_about_common, aprs)
                 : Txt.s(sstv ? R.string.channels_preset_ham_about_sstv : R.string.channels_preset_ham_about, aprs);
         Preset ham = new Preset("Ham simplex", where, about, Txt.s(R.string.channels_preset_licence_amateur));   // i18n: list (zone) name

@@ -77,7 +77,7 @@ public final class PktDialog {
         body.addView(status());
         LinearLayout r1 = row();
         final boolean aprsHere = svc.aprsTunable();          // the region's APRS frequency (Device → Region); the W6 tunes UHF only
-        final String aprsMhz = pe.aprsMhz();
+        final String aprsMhz = com.macdmr.radio.region.Region.mhzShown(svc.aprsHz());
         if (aprsHere || pe.monitoring()) button(r1, pe.monitoring() ? Txt.s(R.string.packet_pkt_stop_monitoring) : Txt.s(R.string.packet_pkt_monitor, aprsMhz), Theme.PKT, x -> { boolean start = !pe.monitoring(); toast(svc.aprsMonitor(start)); if (start) openScreen(); else dlg.dismiss(); });
         button(r1, Txt.s(pe.kiss().isActive() ? R.string.packet_pkt_kiss_stop : R.string.packet_pkt_kiss), Theme.PKT, x -> {
             if (pe.kiss().isActive()) { pe.kissStop(); toast(Txt.s(R.string.packet_pkt_kiss_stopped)); }
@@ -110,7 +110,7 @@ public final class PktDialog {
         LinearLayout rIss = row();
         final boolean issMon = svc.satMode() == com.macdmr.radio.ham.Satellites.APRS;
         final long issAprsHz = com.macdmr.radio.ham.Satellites.issHz(c, "issAprs", com.macdmr.radio.ham.Satellites.ISS_APRS_HZ);
-        final String issAprs = String.format(java.util.Locale.US, "%.3f", issAprsHz / 1e6);
+        final String issAprs = Txt.freqMhz(issAprsHz, 3);
         final boolean issTunable = com.macdmr.radio.DeviceProfile.inBands(issAprsHz);   // 145.825 on a UHF-only radio (the W6): neither listen nor beacon
         button(rIss, issMon ? Txt.s(R.string.packet_pkt_iss_aprs_stop) : Txt.s(R.string.packet_pkt_iss_aprs, issAprs), Theme.PKT, x -> {
             if (issMon) { svc.endSatTracking(); toast(Txt.s(R.string.packet_pkt_iss_aprs_stopped)); dlg.dismiss(); return; }
@@ -250,7 +250,7 @@ public final class PktDialog {
         body.addView(s1);
         if (svc.satMode() != com.macdmr.radio.ham.Satellites.SSTV && !pe.sstvRx() && com.macdmr.radio.DeviceProfile.inBands(com.macdmr.radio.ham.Satellites.issHz(c, "issSstv", com.macdmr.radio.ham.Satellites.ISS_SSTV_HZ))) {
             LinearLayout s1b = row();
-            button(s1b, Txt.s(R.string.packet_pkt_iss_sstv, String.format(java.util.Locale.US, "%.3f", com.macdmr.radio.ham.Satellites.issHz(c, "issSstv", com.macdmr.radio.ham.Satellites.ISS_SSTV_HZ) / 1e6)), Theme.PKT, x -> {
+            button(s1b, Txt.s(R.string.packet_pkt_iss_sstv, Txt.freqMhz(com.macdmr.radio.ham.Satellites.issHz(c, "issSstv", com.macdmr.radio.ham.Satellites.ISS_SSTV_HZ), 3)), Theme.PKT, x -> {
                 String e = svc.startIssMode(com.macdmr.radio.ham.Satellites.SSTV);
                 if (e != null) { toast(e); return; }
                 svc.setIssRepeat(com.macdmr.radio.ham.Satellites.SSTV); openScreen();
@@ -294,7 +294,7 @@ public final class PktDialog {
 
     private TextView status() {
         String call = pe.callsignSet() ? pe.myCall() : Txt.s(R.string.packet_pkt_status_no_call);
-        String mode = pe.monitoring() ? Txt.s(R.string.packet_pkt_status_monitoring, com.macdmr.radio.region.Region.mhz(svc.aprsMonitorHz())) : Txt.s(R.string.packet_pkt_status_passive);
+        String mode = pe.monitoring() ? Txt.s(R.string.packet_pkt_status_monitoring, com.macdmr.radio.region.Region.mhzShown(svc.aprsMonitorHz())) : Txt.s(R.string.packet_pkt_status_passive);
         String st = pe.kiss().isActive() ? Txt.s(R.string.packet_pkt_status_kiss, mode, Txt.s(pe.kiss().clientConnected() ? R.string.packet_pkt_status_kiss_client : R.string.packet_pkt_status_kiss_waiting), pe.kiss().rxFrames(), pe.kiss().txFrames()) : mode;
         return hint("🔸 " + call + "  ·  " + st);
     }
@@ -413,7 +413,7 @@ public final class PktDialog {
         LinearLayout body = page(Txt.s(R.string.packet_pkt_blnheard_title), "radio");
         List<PacketStore.LogEntry> list = pe.bulletins(100);
         if (list.isEmpty()) body.addView(hint(Txt.s(R.string.packet_pkt_blnheard_empty)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm", "MMddHHmm");
         for (PacketStore.LogEntry e : list) {
             LinearLayout rowv = shell();
             rowv.addView(Neo.label(c, Txt.s(R.string.packet_pkt_blnheard_row, e.to, e.from), Theme.AMBER, 14, true));
@@ -485,10 +485,10 @@ public final class PktDialog {
         List<PacketStore.Station> list = pe.store().stations(200);
         android.location.Location me = svc.lastKnownLocation();
         if (list.isEmpty()) body.addView(hint(Txt.s(R.string.packet_pkt_stations_empty)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm", "MMddHHmm");
         for (PacketStore.Station s : list) {
             String head = s.call;
-            if (me != null) { float[] r = new float[2]; android.location.Location.distanceBetween(me.getLatitude(), me.getLongitude(), s.lat, s.lon, r); head = Txt.s(R.string.packet_pkt_station_dist, s.call, String.format(Locale.US, "%.1f", r[0] / 1609.344), compass(r[1])); }
+            if (me != null) { float[] r = new float[2]; android.location.Location.distanceBetween(me.getLatitude(), me.getLongitude(), s.lat, s.lon, r); head = Txt.s(R.string.packet_pkt_station_dist, s.call, Txt.decimal(r[0] / 1609.344, 1), compass(r[1])); }
             List<String> info = new java.util.ArrayList<>();
             info.add(f.format(new Date(s.lastTs))); info.add(String.format(Locale.US, "%.4f, %.4f", s.lat, s.lon));
             if (s.speedKmh >= 0) info.add(Txt.s(R.string.packet_pkt_station_mph, String.format(Locale.US, "%.0f", s.speedKmh * 0.621371)));
@@ -533,7 +533,7 @@ public final class PktDialog {
         LinearLayout body = page(Txt.s(R.string.packet_pkt_log_title), "diag");
         List<PacketStore.LogEntry> list = pe.store().aprsLog(150);
         if (list.isEmpty()) body.addView(hint(Txt.s(R.string.packet_pkt_log_empty)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm:ss", "MMddHHmmss");
         for (PacketStore.LogEntry e : list) {
             String icon = e.kind.startsWith("msg") ? (e.kind.equals("msg-tx") ? "⬆️" : (e.mine ? "✉️" : "💬")) : e.kind.startsWith("ack") ? "✅" : e.kind.equals("beacon") ? "📍" : e.kind.equals("digi") ? "🔁" : e.kind.equals("pos") ? "📍" : "ℹ️";
             LinearLayout rowv = shell();
@@ -549,7 +549,7 @@ public final class PktDialog {
         LinearLayout body = page(Txt.s(R.string.packet_pkt_dtmflog_title), "channels");
         List<PacketStore.Dtmf> list = pe.store().dtmfLog(100);
         if (list.isEmpty()) body.addView(hint(Txt.s(R.string.packet_pkt_dtmflog_empty)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm:ss", "MMddHHmmss");
         for (PacketStore.Dtmf e : list) {
             LinearLayout rowv = shell();
             rowv.addView(Neo.label(c, e.digits, Theme.CYAN, 18, true));
@@ -563,7 +563,7 @@ public final class PktDialog {
         LinearLayout body = page(Txt.s(R.string.packet_pkt_wxlog_title), "alert");
         List<PacketStore.Alert> list = pe.store().alerts(100);
         if (list.isEmpty()) body.addView(hint(Txt.s(R.string.packet_pkt_wxlog_empty)));
-        SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+        SimpleDateFormat f = Txt.dates("MM-dd HH:mm", "MMddHHmm");
         for (PacketStore.Alert a : list) {
             LinearLayout rowv = shell();
             rowv.addView(Neo.label(c, (a.eom ? Txt.s(R.string.packet_same_end_of_message) : a.summary), a.eom ? 0xFF8A98A6 : Theme.AMBER, 14, true));
@@ -591,7 +591,7 @@ public final class PktDialog {
         final EditText isPass = field(body, Txt.s(R.string.packet_set_is_passcode), p.getString("isPasscode", "-1"), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         final EditText isMin = field(body, Txt.s(R.string.packet_set_is_beacon_min), String.valueOf(pe.isBeaconMin()), InputType.TYPE_CLASS_NUMBER);
         final EditText isComment = field(body, Txt.s(R.string.packet_set_is_comment), p.getString("isComment", pe.comment()), InputType.TYPE_CLASS_TEXT);
-        body.addView(section(Txt.s(R.string.packet_set_auto_section, pe.aprsMhz())));
+        body.addView(section(Txt.s(R.string.packet_set_auto_section, com.macdmr.radio.region.Region.mhzShown(svc.aprsHz()))));
         final String[] autoModes = { Txt.s(R.string.common_off), Txt.s(R.string.packet_set_auto_every), Txt.s(R.string.packet_pkt_auto_smart) };
         final int[] auto = { Math.max(0, Math.min(2, pe.autoBeacon())) };
         cycle(body, Txt.s(R.string.packet_set_beacon), autoModes, auto[0], v -> auto[0] = v);
@@ -608,7 +608,7 @@ public final class PktDialog {
         body.addView(section(Txt.s(R.string.packet_set_power_section)));
         final int[] power = { pe.dataTxPower() == 0 ? 1 : 0 };
         cycle(body, Txt.s(R.string.packet_set_power), new String[] { Txt.s(R.string.packet_set_power_high), Txt.s(R.string.packet_set_power_low) }, power[0], v -> power[0] = v);
-        body.addView(hint(Txt.s(R.string.packet_set_power_hint, pe.aprsMhz())));
+        body.addView(hint(Txt.s(R.string.packet_set_power_hint, com.macdmr.radio.region.Region.mhzShown(svc.aprsHz()))));
         body.addView(section(Txt.s(R.string.packet_set_lead_section)));
         final int[] lead = { 0 };
         for (int k = 0; k < PacketEngine.LEAD_CHOICES.length; k++) if (PacketEngine.LEAD_CHOICES[k] == pe.packetLeadMs()) lead[0] = k;

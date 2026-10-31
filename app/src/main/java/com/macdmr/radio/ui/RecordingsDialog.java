@@ -53,7 +53,7 @@ public final class RecordingsDialog {
             if (self[0] != null) self[0].dismiss();
             ((com.macdmr.radio.MainActivity) c).pickDocument(uri -> copyAndBegin(c, svc, mode, uri));
         });
-        SimpleDateFormat when = new SimpleDateFormat("EEE d MMM, HH:mm", Locale.getDefault());
+        SimpleDateFormat when = Txt.dates("EEE d MMM, HH:mm", "EEEdMMMHHmm", false);
         for (File f : recs) {
             long sec = Math.max(0, (f.length() - 44) / 16000);
             boolean pass = f.getName().contains("_pass"), uploaded = RecordingDecodeJob.UPLOADED.equals(f.getParentFile().getName());

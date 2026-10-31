@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         box.addView(com.macdmr.radio.ui.Neo.sheetHint(c, Txt.s(R.string.device_main_coverage_hint)));
         android.widget.TextView open = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.device_main_coverage_open), "map", com.macdmr.radio.ui.Neo.VIOLET);
         android.widget.TextView later = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.common_later), "close", com.macdmr.radio.ui.Neo.CYAN);
+        com.macdmr.radio.ui.Neo.fit(open, true); com.macdmr.radio.ui.Neo.fit(later, true);
         android.widget.LinearLayout row = new android.widget.LinearLayout(c); row.setBaselineAligned(false);
         android.widget.LinearLayout.LayoutParams l1 = new android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1.4f); l1.setMargins(0, (int) (14 * d), (int) (4 * d), 0);
         android.widget.LinearLayout.LayoutParams l2 = new android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f); l2.setMargins((int) (4 * d), (int) (14 * d), 0, 0);
@@ -345,14 +346,14 @@ public class MainActivity extends AppCompatActivity {
     private String modeLabel() {
         RadioService s = svc; if (s == null || s.packet() == null) return null;
         com.macdmr.radio.PacketEngine pe = s.packet();
-        if (s.scope().running()) { int hz = s.scope().currentHz(); return hz > 0 ? Txt.s(R.string.device_main_bar_scope_at, String.format(java.util.Locale.US, "%.4f", hz / 1e6)) : Txt.s(R.string.device_main_bar_scope); }
+        if (s.scope().running()) { int hz = s.scope().currentHz(); return hz > 0 ? Txt.s(R.string.device_main_bar_scope_at, Txt.freqMhz(hz, 4)) : Txt.s(R.string.device_main_bar_scope); }
         RadioService.SatState ss = s.satState();
         if (ss != null && ss.mode != com.macdmr.radio.ham.Satellites.VOICE) {
             String mode = ss.mode == com.macdmr.radio.ham.Satellites.SSTV ? "\uD83D\uDCFA  ISS SSTV" : "\uD83D\uDCE1  ISS APRS";   // i18n: mode name
             return ss.waiting ? Txt.s(R.string.device_main_bar_sat_next, mode, new java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(new java.util.Date(ss.aos))) : Txt.s(R.string.device_main_bar_sat_now, mode);
         }
         if (pe.sstvRx()) return Txt.s(R.string.device_main_bar_sstv_rx);
-        if (pe.monitoring()) return Txt.s(R.string.device_main_bar_aprs, String.format(java.util.Locale.US, "%.3f", s.aprsMonitorHz() / 1e6));
+        if (pe.monitoring()) return Txt.s(R.string.device_main_bar_aprs, Txt.freqMhz(s.aprsMonitorHz(), 3));
         if (pe.kiss().isActive()) return "📡  KISS TNC";   // i18n: mode name
         if (s.parrot().enabled()) return Txt.s(R.string.device_main_bar_parrot);
         if (s.m17Running()) { com.macdmr.radio.M17Station.Heard h = s.m17().current(); return h == null ? Txt.s(R.string.device_main_bar_m17_listening) : h.src.isEmpty() ? Txt.s(R.string.device_main_bar_m17_receiving) : Txt.s(R.string.device_main_bar_m17_heard, h.src, h.dst); }

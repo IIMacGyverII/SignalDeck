@@ -148,6 +148,49 @@ public final class Neo {
         return t;
     }
 
+    /**
+     * {@link #fit(TextView)} for a row of buttons that share the width (weights), changing nothing while the label fits:
+     * a one-word label stays on one line and a longer one wraps between words onto at most two lines. Only when a word
+     * would break inside (a long German word), or the label is taller than a fixed-height button, the icon goes first, and if the word still does not fit the text shrinks,
+     * down to 10 sp. So a row whose labels fit (English) keeps its icons, size and line breaks. Follows label changes.
+     */
+    public static TextView fit(final TextView t, boolean keepIcon) {
+        if (!keepIcon) return fit(t);
+        final float base = t.getTextSize();
+        final int minPx = Math.round(10 * t.getResources().getDisplayMetrics().scaledDensity);
+        final boolean[] shrinking = { false };
+        t.setSingleLine(false);                                            // a single-line view scrolls sideways and never shrinks
+        t.setMaxLines(fitLines(t.getText()));
+        t.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);
+        final Runnable check = () -> {
+            int lines = fitLines(t.getText());
+            if (t.getMaxLines() != lines) { t.setMaxLines(lines); return; }   // a new label: measure again after the layout
+            int room = t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight();
+            if (room <= 0 || shrinking[0]) return;
+            Paint p = new Paint(t.getPaint()); p.setTextSize(base);
+            boolean tooWide = false;
+            for (String w : String.valueOf(t.getText()).trim().split(" +")) if (p.measureText(w) > room) { tooWide = true; break; }
+            android.text.Layout lay = t.getLayout();
+            boolean tooLong = lay != null && (lay.getLineCount() > lines || lay.getHeight() > t.getHeight() - t.getTotalPaddingTop() - t.getTotalPaddingBottom());   // more lines than words allow, or taller than a fixed-height button
+            if (!tooWide && !tooLong) return;
+            if (t.getCompoundDrawables()[0] != null) { t.setCompoundDrawables(null, null, null, null); return; }   // the word needs the icon's room
+            if ((int) base <= minPx) return;
+            shrinking[0] = true;                                           // the last resort: from here the size follows the room
+            t.setAutoSizeTextTypeUniformWithConfiguration(minPx, (int) base, 1, android.util.TypedValue.COMPLEX_UNIT_PX);
+        };
+        t.addOnLayoutChangeListener((v, l, tp, r, b, ol, ot, or, ob) -> t.post(check));
+        t.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int n) { }
+            @Override public void onTextChanged(CharSequence s, int a, int b, int n) { }
+            @Override public void afterTextChanged(android.text.Editable s) { t.post(check); }
+        });
+        return t;
+    }
+    private static int fitLines(CharSequence text) {
+        String s = text == null ? "" : text.toString().trim();
+        return Math.min(2, s.isEmpty() ? 1 : s.split(" +").length);
+    }
+
     /** Square icon button (header actions). */
     public static ImageView iconButton(Context c, String icon, int accent, String description) {
         ImageView v = new ImageView(c); v.setImageDrawable(new IconDrawable(icon, accent)); v.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
@@ -186,13 +229,37 @@ public final class Neo {
         GradientDrawable bg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[] { 0xF20A1420, 0x99060B12 });
         bar.setBackground(new android.graphics.drawable.LayerDrawable(new Drawable[] { bg, bottomLine() }));
         LinearLayout col = new LinearLayout(c); col.setOrientation(LinearLayout.VERTICAL);
-        TextView t = title(c, title); t.setTag("title"); col.addView(t);
+        TextView t = title(c, title); t.setTag("title"); col.addView(t); shrinkToFit(t, 11);   // a long title (German) shrinks before "…"
         TextView s = caps(c, subtitle == null ? "" : subtitle); s.setTag("subtitle"); s.setPadding(0, Theme.dp(c, 5), 0, 0); s.setMaxLines(2); s.setEllipsize(android.text.TextUtils.TruncateAt.END);   // two lines when a page splits it (see fitSubtitle)
         col.addView(s);
         bar.addView(col, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         LinearLayout actions = new LinearLayout(c); actions.setTag("actions"); actions.setGravity(Gravity.CENTER_VERTICAL);
         bar.addView(actions);
         return bar;
+    }
+    /**
+     * A one-line title shrinks to fit (down to {@code minSp}) before it is cut off with "…" (a long German title next
+     * to the header's buttons). A title that fits keeps its size, also one the page set itself (the intercom's).
+     */
+    static void shrinkToFit(final TextView t, final float minSp) {
+        final float[] want = { t.getTextSize() }, mine = { -1 };
+        final Runnable fit = () -> {
+            float cur = t.getTextSize();
+            if (cur != mine[0]) want[0] = cur;                             // a size the page set: the most this title may have
+            int room = t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight();
+            if (room <= 0) return;
+            float min = minSp * t.getResources().getDisplayMetrics().scaledDensity, size = want[0];
+            String s = String.valueOf(t.getText());
+            Paint p = new Paint(t.getPaint()); p.setTextSize(size);
+            while (size > min && p.measureText(s) > room) { size = Math.max(min, size - 1); p.setTextSize(size); }
+            if (size != cur) { mine[0] = size; t.setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX, size); }
+        };
+        t.addOnLayoutChangeListener((v, l, tp, r, b, ol, ot, or, ob) -> t.post(fit));
+        t.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int n) { }
+            @Override public void onTextChanged(CharSequence s, int a, int b, int n) { }
+            @Override public void afterTextChanged(android.text.Editable s) { t.post(fit); }
+        });
     }
     public static TextView headerTitle(LinearLayout bar) { return (TextView) bar.findViewWithTag("title"); }
     public static TextView headerSubtitle(LinearLayout bar) { return (TextView) bar.findViewWithTag("subtitle"); }

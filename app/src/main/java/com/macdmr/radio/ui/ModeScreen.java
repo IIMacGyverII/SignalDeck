@@ -182,7 +182,7 @@ public abstract class ModeScreen extends LinearLayout implements RadioService.Li
         waiting = w;
     }
     private static android.text.SpannableString freqSpan(long hz) {
-        android.text.SpannableString f = new android.text.SpannableString(String.format(java.util.Locale.US, "%.4f", hz / 1e6) + " MHz");   // i18n: unit (the last 4 characters are styled)
+        android.text.SpannableString f = new android.text.SpannableString(Txt.freqMhz(hz, 4) + " MHz");   // i18n: unit (the last 4 characters are styled)
         f.setSpan(new android.text.style.RelativeSizeSpan(0.5f), f.length() - 4, f.length(), 0);
         f.setSpan(new android.text.style.ForegroundColorSpan(Neo.MUTED), f.length() - 4, f.length(), 0);
         return f;

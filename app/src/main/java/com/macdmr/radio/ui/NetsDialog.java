@@ -48,7 +48,7 @@ public final class NetsDialog {
         body.addView(status);
         list = new LinearLayout(c); list.setOrientation(LinearLayout.VERTICAL); body.addView(list);
         LinearLayout row = new LinearLayout(c);
-        TextView again = Neo.button(c, Txt.s(R.string.intercom_nets_refresh), "update", Neo.CYAN), run = Neo.button(c, Txt.s(R.string.intercom_nets_run), "contacts", Neo.VIOLET);
+        TextView again = Neo.button(c, Txt.s(R.string.intercom_nets_refresh), "update", Neo.CYAN), run = Neo.button(c, Txt.s(R.string.intercom_nets_run), "contacts", Neo.VIOLET); Neo.fit(again, true); Neo.fit(run, true);
         LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); bl.setMargins((int) (3 * d), (int) (12 * d), (int) (3 * d), 0);
         row.addView(again, bl); row.addView(run, new LinearLayout.LayoutParams(bl));
         body.addView(row);
@@ -202,7 +202,7 @@ public final class NetsDialog {
             if (channels != null) for (com.macdmr.radio.ChannelStore.Channel x : channels) if (x.number == m.channel) f = x;
             if (m.channel == 0) chV.setText(Txt.s(R.string.intercom_netedit_choose_channel));
             else if (f == null) chV.setText(Txt.s(channels != null ? R.string.intercom_netedit_channel_plain_tap : R.string.intercom_netedit_channel_plain, m.channel));
-            else chV.setText(Txt.s(channels != null ? R.string.intercom_netedit_channel_named_tap : R.string.intercom_netedit_channel_named, m.channel, f.name, String.format(Locale.US, "%.4f", f.rxFreq / 1e6)));
+            else chV.setText(Txt.s(channels != null ? R.string.intercom_netedit_channel_named_tap : R.string.intercom_netedit_channel_named, m.channel, f.name, Txt.freqMhz(f.rxFreq, 4)));
         };
         showCh.run();
         if (channels != null) chV.setOnClickListener(v -> {

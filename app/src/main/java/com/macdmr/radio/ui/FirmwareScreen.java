@@ -101,6 +101,7 @@ public final class FirmwareScreen extends LinearLayout {
         restore = Neo.button(c, Txt.s(R.string.device_fw_restore_factory), "restore", Neo.AMBER);
         stop = Neo.button(c, Txt.s(R.string.common_stop), "stop", Neo.RED);
         stop.setEnabled(false);
+        for (TextView b : new TextView[] { load, restore, stop }) Neo.fit(b, true);   // three in a row: never a break inside a word
         row.addView(load, weight()); row.addView(restore, weight()); row.addView(stop, weight());
         body.addView(row);
         confirm = new LinearLayout(c); confirm.setOrientation(VERTICAL); confirm.setVisibility(GONE);
@@ -195,6 +196,7 @@ public final class FirmwareScreen extends LinearLayout {
         LinearLayout r = new LinearLayout(getContext());
         TextView go = Neo.button(getContext(), Txt.s(R.string.device_fw_load), "update", Neo.GREEN);
         TextView no = Neo.button(getContext(), Txt.s(R.string.common_cancel), "close", Neo.CYAN);
+        Neo.fit(go, true); Neo.fit(no, true);
         r.addView(go, weight()); r.addView(no, weight());
         confirm.addView(r);
         confirm.setVisibility(VISIBLE);

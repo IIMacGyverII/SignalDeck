@@ -90,7 +90,7 @@ public final class WinlinkDialog {
         lists.removeAllViews();
         WinlinkStore st = svc.winlink().store();
         float d = Theme.dp(c);
-        SimpleDateFormat f = new SimpleDateFormat("EEE d MMM, HH:mm", Locale.getDefault());
+        SimpleDateFormat f = Txt.dates("EEE d MMM, HH:mm", "EEEdMMMHHmm", false);
         String[][] folders = { { WinlinkStore.INBOX, Txt.s(R.string.modes_wl_inbox), "inbox" }, { WinlinkStore.OUTBOX, Txt.s(R.string.modes_wl_outbox), "send" }, { WinlinkStore.SENT, Txt.s(R.string.modes_wl_sent), "check" } };
         for (String[] fo : folders) {
             List<WinlinkStore.Item> items = st.list(fo[0]);
@@ -137,7 +137,7 @@ public final class WinlinkDialog {
         });
         java.util.List<com.macdmr.radio.winlink.RmsList.Gateway> l = w.gateways();
         long at = w.gatewaysImportedAt();
-        body.addView(Neo.sheetSection(c, l.isEmpty() ? Txt.s(R.string.modes_wl_gw_none) : Txt.p(R.plurals.modes_wl_gw_count, l.size(), l.size(), new SimpleDateFormat("d MMM", Locale.getDefault()).format(new Date(at)))));
+        body.addView(Neo.sheetSection(c, l.isEmpty() ? Txt.s(R.string.modes_wl_gw_none) : Txt.p(R.plurals.modes_wl_gw_count, l.size(), l.size(), Txt.dates("d MMM", "dMMM", false).format(new Date(at)))));
         final AlertDialog[] self = { null };
         if (!l.isEmpty()) {
             TextView pf = Neo.button(c, Txt.s(R.string.modes_wl_gw_finder), "search", Neo.VIOLET); pf.setTextSize(14);
@@ -156,16 +156,16 @@ public final class WinlinkDialog {
         for (com.macdmr.radio.winlink.RmsList.Gateway g : l) {
             if (++shown > 60) { body.addView(Neo.sheetHint(c, Txt.p(R.plurals.modes_wl_gw_farther, l.size() - 60, l.size() - 60))); break; }
             String dist = g.km < 0 ? "" : (Locale.getDefault().getCountry().equals("US") || Locale.getDefault().getCountry().equals("GB") ? Math.round(g.km * 0.621371) + " mi " : Math.round(g.km) + " km ") + com.macdmr.radio.ham.Maidenhead.compass(g.bearing) + " \u00B7 ";   // i18n: distance units
-            String where = dist + String.format(Locale.US, "%.4f MHz", g.hz / 1e6);   // i18n: distance, bearing and frequency, units only
+            String where = dist + Txt.freqMhz(g.hz, 4) + " MHz";   // i18n: distance, bearing and frequency, units only
             if (!(g.hours.isEmpty() || g.hours.equals("00-23"))) where = Txt.s(R.string.modes_wl_gw_hours, where, g.hours);
             LinearLayout t = Neo.tile(c, "mail", Neo.GREEN, g.call, where + (g.qth.isEmpty() ? "" : "\n" + g.qth));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d);
             body.addView(t, lp);
-            t.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle(g.call).setItems(new String[] { Txt.s(R.string.modes_wl_gw_tune_connect, String.format(Locale.US, "%.4f", g.hz / 1e6)), Txt.s(R.string.modes_wl_gw_tune_listen), Txt.s(R.string.modes_wl_gw_use) }, (dd, which) -> {
+            t.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle(g.call).setItems(new String[] { Txt.s(R.string.modes_wl_gw_tune_connect, Txt.freqMhz(g.hz, 4)), Txt.s(R.string.modes_wl_gw_tune_listen), Txt.s(R.string.modes_wl_gw_use) }, (dd, which) -> {
                 w.setGateway(g.call, "");
                 if (which <= 1) { ChannelStore.Channel ch = new ChannelStore.Channel(); ch.type = 1; ch.rxFreq = ch.txFreq = g.hz; ch.band = 1; ch.power = 1; ch.sq = 2; ch.name = g.call; svc.applyVfo(ch, true); }
                 if (self[0] != null) self[0].dismiss();
-                if (which == 0) { new Handler(Looper.getMainLooper()).postDelayed(() -> { String e = w.connectRadio(g.call, ""); if (e != null) toast(c, e); }, 4500); toast(c, Txt.s(R.string.modes_wl_gw_tuning, String.format(Locale.US, "%.4f", g.hz / 1e6))); }
+                if (which == 0) { new Handler(Looper.getMainLooper()).postDelayed(() -> { String e = w.connectRadio(g.call, ""); if (e != null) toast(c, e); }, 4500); toast(c, Txt.s(R.string.modes_wl_gw_tuning, Txt.freqMhz(g.hz, 4))); }
                 show(c, svc);
             }).show());
         }
@@ -280,7 +280,7 @@ public final class WinlinkDialog {
         List<String> head = new java.util.ArrayList<>();
         head.add(Txt.s(R.string.modes_wl_from, B2Message.shown(m.from))); head.add(Txt.s(R.string.modes_wl_to, shownList(m.to)));
         if (!m.cc.isEmpty()) head.add(Txt.s(R.string.modes_wl_cc, shownList(m.cc)));
-        if (t > 0) head.add(new SimpleDateFormat("EEE d MMM yyyy, HH:mm", Locale.getDefault()).format(new Date(t)));
+        if (t > 0) head.add(Txt.dates("EEE d MMM yyyy, HH:mm", "EEEdMMMyyyyHHmm", false).format(new Date(t)));
         head.add(Txt.s(R.string.modes_wl_mid, m.mid));
         body.addView(Neo.sheetHint(c, String.join("\n", head)));
         TextView tv = Neo.text(c, m.bodyText().replace("\r\n", "\n"), Neo.TEXT, 15, Neo.uiMedium(c)); tv.setTextIsSelectable(true);

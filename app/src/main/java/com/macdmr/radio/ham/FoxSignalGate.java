@@ -42,7 +42,7 @@ public final class FoxSignalGate {
             if (digital) return id > 0 ? (cc >= 0 ? Txt.s(R.string.modes_fox_dmr_id_cc, String.valueOf(id), String.valueOf(cc)) : Txt.s(R.string.modes_fox_dmr_id, String.valueOf(id)))
                 : (cc >= 0 ? Txt.s(R.string.modes_fox_dmr_any_cc, String.valueOf(cc)) : Txt.s(R.string.modes_fox_dmr_any));
             if (dcs) return Txt.s(R.string.modes_fox_dcs);
-            return toneHz > 0 ? Txt.s(R.string.modes_fox_ctcss, String.format(java.util.Locale.US, "%.1f", toneHz)) : Txt.s(R.string.modes_fox_no_tone);
+            return toneHz > 0 ? Txt.s(R.string.modes_fox_ctcss, Txt.decimal(toneHz, 1)) : Txt.s(R.string.modes_fox_no_tone);
         }
     }
 

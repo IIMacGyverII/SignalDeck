@@ -122,7 +122,7 @@ public final class ContactEditor {
         final TextView[] tb = new TextView[3];
         for (int i = 0; i < 3; i++) {
             final int k = i;
-            tb[i] = Neo.button(c, ContactsView.type(i), null, ContactsView.typeColor(i)); tb[i].setTextSize(14);
+            tb[i] = Neo.button(c, ContactsView.type(i), null, ContactsView.typeColor(i)); tb[i].setTextSize(14); Neo.fit(tb[i], true);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins(i == 0 ? 0 : (int) (3 * d), (int) (10 * d), i == 2 ? 0 : (int) (3 * d), (int) (4 * d));
             types.addView(tb[i], lp);
             tb[i].setOnClickListener(v -> { t[0] = k; for (int j = 0; j < 3; j++) tb[j].setAlpha(j == k ? 1f : 0.45f); });
@@ -189,7 +189,7 @@ public final class ContactEditor {
         List<ChannelStore.Heard> hist = svc.store().contactHeard(ct.id, 40);
         if (!hist.isEmpty()) {
             box.addView(Neo.sheetSection(c, Txt.s(R.string.channels_contact_history_n, svc.store().contactHeardCount(ct.id))));
-            SimpleDateFormat f = new SimpleDateFormat("MM-dd HH:mm", Locale.US);
+            SimpleDateFormat f = Txt.dates("MM-dd HH:mm", "MMddHHmm");
             for (ChannelStore.Heard h : hist) {
                 LinearLayout row = new LinearLayout(c); row.setOrientation(LinearLayout.VERTICAL); row.setBackground(Neo.rowCard(c)); row.setPadding((int) (10 * d), (int) (6 * d), (int) (10 * d), (int) (6 * d));
                 row.addView(Neo.label(c, Txt.s(h.sent ? R.string.channels_contact_hist_sent : R.string.channels_contact_hist_heard, h.source) + (h.detail.isEmpty() ? "" : "  ·  " + h.detail), h.sent ? Neo.AMBER_LIGHT : Neo.CYAN, 13, true));
@@ -204,7 +204,7 @@ public final class ContactEditor {
         for (int i = 0; i < 3; i++) {
             final int k = i;
             if (k == 0 && ct.number <= 0) continue;
-            TextView b = Neo.button(c, names[i], null, accents[i]); b.setTextSize(14);
+            TextView b = Neo.button(c, names[i], null, accents[i]); b.setTextSize(14); Neo.fit(b, true);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (16 * d), (int) (3 * d), 0);
             btns.addView(b, lp);
             b.setOnClickListener(v -> {
@@ -253,6 +253,6 @@ public final class ContactEditor {
         long s = (System.currentTimeMillis() - ts) / 1000;
         if (s < 60) return Txt.s(R.string.channels_contact_just_now); if (s < 3600) return Txt.s(R.string.channels_contact_min_ago, s / 60); if (s < 86400) return Txt.s(R.string.channels_contact_h_ago, s / 3600);
 
-        return new SimpleDateFormat("MMM d, HH:mm", Locale.US).format(new Date(ts));
+        return Txt.dates("MMM d, HH:mm", "MMMdHHmm").format(new Date(ts));
     }
 }

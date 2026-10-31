@@ -92,8 +92,8 @@ public final class RegionSheet {
         else if (r.licenseFree.isEmpty()) body.addView(Neo.sheetHint(c, Txt.s(R.string.channels_region_free_none, r.name)));
         else for (Region.Service s : r.licenseFree) {
             String sep = Txt.s(R.string.channels_region_list_sep);
-            String what = String.format(Locale.US, "%.4f–%.4f MHz", s.lowHz / 1e6, s.highHz / 1e6) + (s.channels > 0 ? sep + Txt.s(R.string.channels_region_service_ch, s.channels) : "")
-                    + (s.maxPowerW > 0 ? sep + (s.maxPowerW < 1 ? Math.round(s.maxPowerW * 1000) + " mW" : trim(s.maxPowerW) + " W") : "");
+            String what = Txt.freqMhz(s.lowHz, 4) + "–" + Txt.freqMhz(s.highHz, 4) + " MHz" + (s.channels > 0 ? sep + Txt.s(R.string.channels_region_service_ch, s.channels) : "")
+                    + (s.maxPowerW > 0 ? sep + (s.maxPowerW < 1 ? Math.round(s.maxPowerW * 1000) + " mW" : Txt.decimalText(trim(s.maxPowerW)) + " W") : "");
             body.addView(Neo.sheetHint(c, r.unconfirmed("licenseFree", s.name) ? Txt.s(R.string.channels_region_service_unconfirmed, s.name, what, s.notes, r.name)
                     : Txt.s(R.string.channels_region_service, s.name, what, s.notes)));
         }

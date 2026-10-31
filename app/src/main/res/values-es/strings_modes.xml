@@ -834,7 +834,7 @@
     <!-- Title of the Morse trainer sheet. One line. -->
     <string name="modes_morse_title">Entrenador de Morse</string>
     <!-- Explanation of the Koch method and Farnsworth spacing. A paragraph. -->
-    <string name="modes_morse_hint">El método Koch: empieza con dos caracteres a velocidad completa y añade uno cada vez que copies una lección con un 90 %. El espaciado Farnsworth deja pausas más largas entre caracteres mientras aprendes; redúcelas a medida que mejores. El sonido suena en el teléfono, no en el aire.</string>
+    <string name="modes_morse_hint" formatted="false">El método Koch: empieza con dos caracteres a velocidad completa y añade uno cada vez que copies una lección con un 90 %. El espaciado Farnsworth deja pausas más largas entre caracteres mientras aprendes; redúcelas a medida que mejores. El sonido suena en el teléfono, no en el aire.</string>
     <!-- Lesson line. %1$d lesson, %2$d lessons in all, %3$s its characters (spaced), %4$s the new character. One line beside two buttons. -->
     <string name="modes_morse_lesson">Lección %1$d de %2$d:\u0020 %3$s\u0020\u0020 (nuevo: %4$s)</string>
     <!-- Speed line. %1$d character speed, %2$d the spacing (Farnsworth) speed, both in words per minute. One line beside two buttons. -->
@@ -1902,7 +1902,7 @@
     <!-- Prediction note with no marks. One line. -->
     <string name="modes_fox_mark_to_start">Guarda una marca para empezar.</string>
     <!-- Prediction note: the map legend. One line. -->
-    <string name="modes_fox_shaded">Sombreado: donde probablemente está el zorro; contorno brillante 50 %, fino y tenue 90 %.</string>
+    <string name="modes_fox_shaded" formatted="false">Sombreado: donde probablemente está el zorro; contorno brillante 50 %, fino y tenue 90 %.</string>
     <!-- Prediction note: why a layer is not used. %1$s the reasons (lower case, joined with "; "). Ends with a space. Two lines. -->
     <string name="modes_fox_not_used">Aún no se usa: %1$s.\u0020</string>
     <!-- The same followed by the map legend. %1$s the reasons. Two lines. -->

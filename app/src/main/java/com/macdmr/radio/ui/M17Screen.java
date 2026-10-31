@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.view.Gravity;
 import android.widget.LinearLayout;
@@ -39,11 +41,11 @@ public final class M17Screen extends ModeScreen {
         meta = Neo.text(c, "", Neo.AMBER_LIGHT, 15, Neo.uiMedium(c)); meta.setGravity(Gravity.CENTER); meta.setPadding(0, dp(4), 0, 0); body.addView(meta);
         stats = Neo.text(c, "", Neo.MUTED, 13, Neo.mono(c)); stats.setGravity(Gravity.CENTER); stats.setPadding(0, dp(6), 0, dp(10)); body.addView(stats);
         if (svc.m17CanSend()) {
-            body.addView(Neo.sheetSection(c, "Text"));
+            body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_m17_text)));
             android.widget.EditText box = new android.widget.EditText(c);
-            box.setHint("Message"); box.setTextColor(Neo.TEXT); box.setHintTextColor(Neo.MUTED); box.setTypeface(Neo.ui(c)); box.setSingleLine(true);
+            box.setHint(Txt.s(R.string.modes_m17_message_hint)); box.setTextColor(Neo.TEXT); box.setHintTextColor(Neo.MUTED); box.setTypeface(Neo.ui(c)); box.setSingleLine(true);
             body.addView(box);
-            android.widget.TextView send = Neo.text(c, "Send", Neo.VIOLET_LIGHT, 16, Neo.uiMedium(c));
+            android.widget.TextView send = Neo.text(c, Txt.s(R.string.common_send), Neo.VIOLET_LIGHT, 16, Neo.uiMedium(c));
             send.setPadding(0, dp(8), 0, dp(8));
             send.setOnClickListener(v -> {
                 String err = svc.sendM17Sms(null, box.getText().toString());
@@ -52,15 +54,15 @@ public final class M17Screen extends ModeScreen {
             });
             body.addView(send);
         }
-        body.addView(Neo.sheetSection(c, "Texts"));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_m17_texts)));
         texts = new LinearLayout(c); texts.setOrientation(VERTICAL); body.addView(texts);
-        body.addView(Neo.sheetSection(c, "Heard"));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_m17_heard)));
         list = new LinearLayout(c); list.setOrientation(VERTICAL); body.addView(list);
         note = Neo.sheetHint(c, ""); note.setOnLongClickListener(v -> { st.resetCalibration(); refresh(); return true; }); body.addView(note);
         content.addView(sv);
         LinearLayout r = buttonRow();
         if (svc.m17CanSend()) {
-            android.widget.TextView talk = button(r, "Hold to talk", "voice", Neo.RED, null);
+            android.widget.TextView talk = button(r, Txt.s(R.string.modes_m17_hold_to_talk), "voice", Neo.RED, null);
             talk.setOnTouchListener((v, e) -> {
                 int a = e.getAction();
                 if (a == android.view.MotionEvent.ACTION_DOWN) { svc.m17Voice(true); return true; }
@@ -68,7 +70,7 @@ public final class M17Screen extends ModeScreen {
                 return false;
             });
         }
-        button(r, "Stop M17", "stop", Neo.RED, v -> { svc.setM17(false); close(); });
+        button(r, Txt.s(R.string.modes_m17_stop), "stop", Neo.RED, v -> { svc.setM17(false); close(); });
         refresh();
     }
 
@@ -76,15 +78,15 @@ public final class M17Screen extends ModeScreen {
 
     @Override protected void refresh() {
         com.macdmr.radio.ChannelStore.Channel ch = svc.current();
-        setSubtitle("Receiving M17 on " + (ch != null ? "Ch " + ch.number + " · " + ch.name : "this channel"));
+        setSubtitle(ch != null ? Txt.s(R.string.modes_m17_on_channel, String.valueOf(ch.number), ch.name) : Txt.s(R.string.modes_m17_on_this));
         M17Station.Heard h = st.current();
         if (h != null) {
-            set(now, "RECEIVING"); color(now, Neo.GREEN_LIGHT);
+            set(now, Txt.s(R.string.modes_m17_receiving)); color(now, Neo.GREEN_LIGHT);
             set(who, (h.src.isEmpty() ? "…" : h.src) + "  →  " + (h.dst.isEmpty() ? "…" : h.dst));
-            set(meta, h.encrypted ? "Encrypted: not played" : h.data ? "Data, not voice" : h.meta != null ? "“" + h.meta + "”" : "");
-            set(stats, String.format(Locale.US, "%.1f s  ·  %d frames  ·  signal %d %%", (h.end - h.start) / 1000.0, h.frames, Math.round(st.quality() * 100)));
+            set(meta, h.encrypted ? Txt.s(R.string.modes_m17_encrypted) : h.data ? Txt.s(R.string.modes_m17_data) : h.meta != null ? "“" + h.meta + "”" : "");
+            set(stats, Txt.s(R.string.modes_m17_stats, String.format(Locale.US, "%.1f", (h.end - h.start) / 1000.0), h.frames, (int) Math.round(st.quality() * 100)));
         } else {
-            set(now, "LISTENING FOR M17"); color(now, Neo.VIOLET_LIGHT);
+            set(now, Txt.s(R.string.modes_m17_listening)); color(now, Neo.VIOLET_LIGHT);
             set(who, ""); set(meta, ""); set(stats, "");
         }
         if (texts != null) {
@@ -93,7 +95,7 @@ public final class M17Screen extends ModeScreen {
             java.text.SimpleDateFormat tf = new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US);
             for (int i = tl.size() - 1; i >= 0 && i >= tl.size() - 30; i--) {
                 M17Station.Text e = tl.get(i);
-                String line = tf.format(new java.util.Date(e.ts)) + (e.sent ? "  sent  " : "  ") + e.src + " → " + e.dst + "  " + e.body;
+                String line = Txt.s(e.sent ? R.string.modes_m17_text_sent : R.string.modes_m17_text_received, tf.format(new java.util.Date(e.ts)), e.src, e.dst, e.body);
                 texts.addView(Neo.text(getContext(), line, e.sent ? Neo.VIOLET_LIGHT : Neo.TEXT, 14, Neo.ui(getContext())));
             }
         }
@@ -110,14 +112,13 @@ public final class M17Screen extends ModeScreen {
                 if (!src.isEmpty() && !src.startsWith("@") && !src.startsWith("#")) { t.setClickable(true); t.setOnClickListener(v -> ContactEditor.open(c, svc, ContactEditor.Identity.call(src), null)); }
                 list.addView(t);
             }
-            if (hl.isEmpty()) list.addView(Neo.sheetHint(c, "Nothing yet. Tune the M17 frequency (the channel or the VFO). A transmission is found from its sync and played on the phone's speaker."));
+            if (hl.isEmpty()) list.addView(Neo.sheetHint(c, Txt.s(R.string.modes_m17_nothing)));
         }
-        set(note.getText().length() == 0 ? note : note, (svc.m17CanSend()
-            ? "Hold to talk sends your voice as M17, to everyone (@ALL), up to the transmit limit (Device \u2192 Longest transmission). A short tail follows the last word so the ending is not cut off. Your callsign is the one in APRS settings. "
-            : svc.profile().symbolEngine() ? "Receive only on this firmware: transmitting M17 needs the module firmware with the symbol engine. "
-            : "Receive only: this radio's module cannot send M17. ")
-            + "The radio's audio path removes the low tones M17 needs, so SignalDeck rebuilds them on receive (" + st.calibration() + ")."
-            + (svc.canHoldRawAudio() ? "" : " On this phone the radio plays its own sound through the speaker, so you hear its buzz under the decoded voice while a transmission plays.")
-            + (st.held() ? " The module's voice filter is held open, so a transmission already in progress can still lock." : " It needs a fairly strong signal and the start of each transmission (its preamble)."));
+        List<String> sentences = new java.util.ArrayList<>();
+        sentences.add(Txt.s(svc.m17CanSend() ? R.string.modes_m17_note_send : svc.profile().symbolEngine() ? R.string.modes_m17_note_firmware : R.string.modes_m17_note_rx_only));
+        sentences.add(Txt.s(R.string.modes_m17_note_rebuild, st.calibration()));
+        if (!svc.canHoldRawAudio()) sentences.add(Txt.s(R.string.modes_m17_note_buzz));
+        sentences.add(Txt.s(st.held() ? R.string.modes_m17_note_held : R.string.modes_m17_note_strong));
+        set(note, String.join(Txt.s(R.string.modes_sentence_separator), sentences));
     }
 }

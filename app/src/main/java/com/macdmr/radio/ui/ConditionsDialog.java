@@ -13,11 +13,13 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
 import com.macdmr.radio.ham.Conditions;
 import com.macdmr.radio.ham.SatTrack;
 import com.macdmr.radio.ham.Satellites;
 import com.macdmr.radio.ham.Sgp4;
+import com.macdmr.radio.i18n.Txt;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,9 +35,9 @@ public final class ConditionsDialog {
 
     public static void show(Context c, RadioService svc) {
         float d = Theme.dp(c);
-        LinearLayout body = Neo.sheetBody(c, "VHF/UHF conditions");
-        body.addView(Neo.sheetHint(c, "Is it worth getting on the air beyond the usual range? Tropospheric ducting is the main source of long VHF/UHF contacts; aurora and meteor showers open short paths (mostly for SSB and digital modes, sometimes FM)."));
-        final TextView loading = Neo.label(c, "Checking the forecasts…", Neo.MUTED, 14, false); body.addView(loading);
+        LinearLayout body = Neo.sheetBody(c, Txt.s(R.string.modes_cond_title), "radio");
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_cond_hint)));
+        final TextView loading = Neo.label(c, Txt.s(R.string.modes_cond_loading), Neo.MUTED, 14, false); body.addView(loading);
         final LinearLayout cards = new LinearLayout(c); cards.setOrientation(LinearLayout.VERTICAL); body.addView(cards);
         Neo.showSheet(c, body);
         final android.location.Location me = svc.lastKnownLocation();
@@ -64,11 +66,11 @@ public final class ConditionsDialog {
         float d = Theme.dp(c);
         SimpleDateFormat day = new SimpleDateFormat("EEE HH:mm", Locale.getDefault()), hh = new SimpleDateFormat("HH", Locale.getDefault()), date = new SimpleDateFormat("EEE d MMM", Locale.getDefault());
         // tropo
-        LinearLayout t = card(c, cards, "Tropo (next 48 hours)", "signal", Neo.GREEN);
-        if (r.tropo.isEmpty()) t.addView(small(c, me == null ? "Needs a position fix." : "The forecast could not be loaded."));
+        LinearLayout t = card(c, cards, Txt.s(R.string.modes_cond_tropo_title), "signal", Neo.GREEN);
+        if (r.tropo.isEmpty()) t.addView(small(c, me == null ? Txt.s(R.string.modes_cond_needs_fix) : Txt.s(R.string.modes_cond_tropo_failed)));
         else {
             long[] w = r.bestWindow();
-            t.addView(big(c, w == null ? "Normal: no enhancement expected" : Conditions.CLASS_NAMES[(int) w[2]] + ", " + day.format(new Date(w[0])) + "–" + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(w[1])), w == null ? Neo.TEXT : CLASS_COLOR[(int) w[2]]));
+            t.addView(big(c, w == null ? Txt.s(R.string.modes_cond_tropo_normal) : Txt.s(R.string.modes_cond_tropo_window, Conditions.className((int) w[2]), day.format(new Date(w[0])), new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(w[1]))), w == null ? Neo.TEXT : CLASS_COLOR[(int) w[2]]));
             LinearLayout strip = new LinearLayout(c); strip.setPadding(0, (int) (8 * d), 0, (int) (2 * d));
             LinearLayout labels = new LinearLayout(c);
             for (int i = 0; i < r.tropo.size(); i++) {
@@ -79,45 +81,47 @@ public final class ConditionsDialog {
                 labels.addView(lb, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
             }
             t.addView(strip); t.addView(labels);
-            t.addView(small(c, "Grey normal · cyan slightly enhanced · green super-refraction (longer range) · amber ducting likely (hundreds of km). From the weather forecast's temperature and humidity layers near the ground (Open-Meteo, position rounded to about 50 km); thin ducts near the ground are underestimated, so a calm, clear night after a warm day can be better than shown."));
+            t.addView(small(c, Txt.s(R.string.modes_cond_tropo_legend)));
         }
         // aurora
-        LinearLayout a = card(c, cards, "Aurora", "weather", Neo.VIOLET);
-        a.addView(big(c, r.kpNow < 0 ? "Kp unavailable" : String.format(Locale.US, "Kp %.1f · %s", r.kpNow, Conditions.kpWords(r.kpNow)), r.kpNow >= 5 ? Neo.AMBER : Neo.TEXT));
+        LinearLayout a = card(c, cards, Txt.s(R.string.modes_cond_aurora_title), "weather", Neo.VIOLET);
+        a.addView(big(c, r.kpNow < 0 ? Txt.s(R.string.modes_cond_kp_unavailable) : Txt.s(R.string.modes_cond_kp_now, String.format(Locale.US, "%.1f", r.kpNow), Conditions.kpWords(r.kpNow)), r.kpNow >= 5 ? Neo.AMBER : Neo.TEXT));
         List<String> al = new ArrayList<>();
-        if (r.kpMax >= 0) al.add(String.format(Locale.US, "Forecast up to Kp %.1f (%s, %s)", r.kpMax, Conditions.kpWords(r.kpMax), day.format(new Date(r.kpMaxAt))));
-        if (r.aurora >= 0) al.add("Aurora chance overhead now: " + r.aurora + " % (NOAA OVATION)");
-        al.add("VHF aurora signals bounce off the auroral oval to the north: point the antenna north, expect a rough, buzzing sound (it suits CW and SSB better than FM). It needs Kp 5 or more at mid latitudes.");
+        if (r.kpMax >= 0) al.add(Txt.s(R.string.modes_cond_kp_forecast, String.format(Locale.US, "%.1f", r.kpMax), Conditions.kpWords(r.kpMax), day.format(new Date(r.kpMaxAt))));
+        if (r.aurora >= 0) al.add(Txt.s(R.string.modes_cond_aurora_chance, String.valueOf(r.aurora)));
+        al.add(Txt.s(R.string.modes_cond_aurora_advice));
         a.addView(small(c, android.text.TextUtils.join("\n", al)));
         // meteors
-        LinearLayout m = card(c, cards, "Meteor showers", "star", Neo.AMBER);
-        if (r.showers.isEmpty()) m.addView(small(c, "No major shower in the next six weeks."));
+        LinearLayout m = card(c, cards, Txt.s(R.string.modes_cond_meteor_title), "star", Neo.AMBER);
+        if (r.showers.isEmpty()) m.addView(small(c, Txt.s(R.string.modes_cond_meteor_none)));
         for (Conditions.Shower s : r.showers) {
             long days = Math.round((s.peak - System.currentTimeMillis()) / 86_400_000.0);
-            m.addView(big(c, s.name + " · " + (days <= 0 ? "active now" : "peak " + date.format(new Date(s.peak)) + " (in " + days + " day" + (days == 1 ? "" : "s") + ")"), days <= 1 ? Neo.AMBER : Neo.TEXT));
-            m.addView(small(c, "Up to " + s.zhr + " meteors an hour" + (s.note.isEmpty() ? "" : ", " + s.note) + "."));
+            m.addView(big(c, days <= 0 ? Txt.s(R.string.modes_cond_shower_active, s.name) : Txt.p(R.plurals.modes_cond_shower_peak, (int) days, s.name, date.format(new Date(s.peak)), String.valueOf(days)), days <= 1 ? Neo.AMBER : Neo.TEXT));
+            String note = s.note();
+            m.addView(small(c, note.isEmpty() ? Txt.s(R.string.modes_cond_shower_rate, String.valueOf(s.zhr)) : Txt.s(R.string.modes_cond_shower_rate_note, String.valueOf(s.zhr), note)));
         }
-        m.addView(small(c, "Each meteor trail reflects 2 m signals for a fraction of a second up to a few seconds (“pings”), from about 800 to 2000 km away; the best hours are before dawn."));
+        m.addView(small(c, Txt.s(R.string.modes_cond_meteor_advice)));
         // satellites
-        LinearLayout sp = card(c, cards, "Next satellite passes", "sstv", Neo.CYAN);
-        if (me == null) sp.addView(small(c, "Needs a position fix."));
+        LinearLayout sp = card(c, cards, Txt.s(R.string.modes_cond_sat_title), "sstv", Neo.CYAN);
+        if (me == null) sp.addView(small(c, Txt.s(R.string.modes_cond_needs_fix)));
         else {
             Map<Integer, Sgp4> el = svc.satellites().elements(); long now = System.currentTimeMillis();
             List<Object[]> passes = new ArrayList<>(); java.util.Set<Integer> seen = new java.util.HashSet<>();
             for (Satellites.Sat s : Satellites.all(c)) {
                 if (!seen.add(s.catalog)) continue;                           // the ISS once, not per mode
                 Sgp4 e = el.get(s.catalog); if (e == null) continue;
-                for (SatTrack.Pass p : SatTrack.passes(e, now, 12, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0, 20)) if (p.los > now) { passes.add(new Object[] { s.catalog == Satellites.ISS_CATALOG ? "ISS" : s.name, p }); break; }
+                for (SatTrack.Pass p : SatTrack.passes(e, now, 12, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0, 20)) if (p.los > now) { passes.add(new Object[] { s.catalog == Satellites.ISS_CATALOG ? "ISS" : s.name, p }); break; }   // i18n: proper name
             }
             passes.sort((x, y) -> Long.compare(((SatTrack.Pass) x[1]).aos, ((SatTrack.Pass) y[1]).aos));
-            if (passes.isEmpty()) sp.addView(small(c, "No pass above 20° in the next 12 hours."));
+            if (passes.isEmpty()) sp.addView(small(c, Txt.s(R.string.modes_cond_sat_none)));
             for (int i = 0; i < Math.min(5, passes.size()); i++) {
                 SatTrack.Pass p = (SatTrack.Pass) passes.get(i)[1];
-                sp.addView(big(c, passes.get(i)[0] + " · " + (p.aos <= now ? "up now" : day.format(new Date(p.aos))) + String.format(Locale.US, " · %.0f°", p.maxEl), Neo.TEXT));
+                String el0 = String.format(Locale.US, "%.0f", p.maxEl);
+                sp.addView(big(c, p.aos <= now ? Txt.s(R.string.modes_cond_sat_up_now, String.valueOf(passes.get(i)[0]), el0) : Txt.s(R.string.modes_cond_sat_pass, String.valueOf(passes.get(i)[0]), day.format(new Date(p.aos)), el0), Neo.TEXT));
             }
-            sp.addView(small(c, "Passes above 20° in the next 12 hours; PKT → Satellite passes tracks them with Doppler."));
+            sp.addView(small(c, Txt.s(R.string.modes_cond_sat_footer)));
         }
         if (!r.problems.isEmpty()) cards.addView(Neo.sheetHint(c, android.text.TextUtils.join(" · ", r.problems)));
-        cards.addView(Neo.sheetHint(c, "Sources: NOAA SWPC (Kp, OVATION aurora), Open-Meteo (tropo), AMSAT/SatNOGS orbits. Updated " + new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(r.fetched)) + "; refreshed after 20 minutes."));
+        cards.addView(Neo.sheetHint(c, Txt.s(R.string.modes_cond_sources, new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date(r.fetched)))));
     }
 }

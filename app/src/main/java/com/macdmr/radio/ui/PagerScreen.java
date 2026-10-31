@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.text.InputType;
 import android.widget.EditText;
@@ -30,14 +32,14 @@ public final class PagerScreen extends ModeScreen {
     private boolean sign = true;
 
     public PagerScreen(Context c, RadioService svc, Runnable onClose) {
-        super(c, svc, "Pager", "messages", Neo.VIOLET, onClose);
+        super(c, svc, Txt.s(R.string.modes_pager_title), "messages", Neo.VIOLET, onClose);
         ScrollView sv = new ScrollView(c); sv.setVerticalScrollBarEnabled(false);
         LinearLayout body = new LinearLayout(c); body.setOrientation(VERTICAL); body.setPadding(dp(14), dp(8), dp(14), dp(16));
         sv.addView(body);
         ChannelStore.Channel ch = svc.current();
         double mhz = ch != null && ch.rxFreq > 0 ? ch.rxFreq / 1e6 : 467.625;
-        freq = field(body, "Frequency (MHz)", String.format(Locale.US, "%.5f", mhz));
-        body.addView(Neo.sheetHint(c, "The page goes out on this frequency, low power. If it is not the channel you are on, the radio tunes there first and waits for the retune to settle."));
+        freq = field(body, Txt.s(R.string.modes_pager_freq), String.format(Locale.US, "%.5f", mhz));
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_pager_freq_hint)));
         TextView speed = Neo.text(c, "", Neo.TEXT, 15, Neo.ui(c));
         body.addView(speed);
         LinearLayout speeds = new LinearLayout(c); speeds.setOrientation(HORIZONTAL);
@@ -51,38 +53,38 @@ public final class PagerScreen extends ModeScreen {
         body.addView(speeds);
         speed.setText(speedLine());
         String mine = Station.ricText(c);
-        body.addView(Neo.sheetHint(c, mine.isEmpty() ? "Your pager RICs are set in PKT → APRS settings. Pages to those RICs are yours." : "Your RICs: " + mine));
-        to = field(body, "To (RICs, or a contact name)", "");
-        msg = field(body, "Message", "");
+        body.addView(Neo.sheetHint(c, mine.isEmpty() ? Txt.s(R.string.modes_pager_rics_none) : Txt.s(R.string.modes_pager_rics, mine)));
+        to = field(body, Txt.s(R.string.modes_pager_to), "");
+        msg = field(body, Txt.s(R.string.modes_pager_message), "");
         msg.setSingleLine(false); msg.setMinLines(3);
         count = Neo.text(c, "", Neo.MUTED, 13, Neo.uiMedium(c));
         body.addView(count);
         msg.addTextChangedListener(new android.text.TextWatcher() {
             public void beforeTextChanged(CharSequence s, int a, int b, int n) { }
-            public void onTextChanged(CharSequence s, int a, int b, int n) { count.setText(s.length() + " characters"); }
+            public void onTextChanged(CharSequence s, int a, int b, int n) { count.setText(Txt.p(R.plurals.modes_pager_chars, s.length(), s.length())); }
             public void afterTextChanged(android.text.Editable s) { }
         });
-        count.setText("0 characters");
+        count.setText(Txt.p(R.plurals.modes_pager_chars, 0, 0));
         TextView signBtn = Neo.text(c, "", Neo.AMBER_LIGHT, 15, Neo.ui(c));
         signBtn.setPadding(0, dp(8), 0, dp(4));
         signBtn.setOnClickListener(v -> { sign = !sign; signBtn.setText(signLine()); });
         signBtn.setText(signLine());
         body.addView(signBtn);
-        body.addView(Neo.sheetHint(c, "Alphanumeric pagers, function 3. A numeric-only pager is not sent yet. Signing puts your callsign and a colon at the start of the text, which is how a reply finds you. A pager that is not SignalDeck shows that as part of the message. On the firmware the phone shipped with, Send explains that pages need the symbol engine."));
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_pager_sign_hint)));
         status = Neo.text(c, "", Neo.MUTED, 14, Neo.uiMedium(c));
         status.setPadding(0, dp(8), 0, 0);
         body.addView(status);
         content.addView(sv);
         LinearLayout row = buttonRow();
-        button(row, "Send", "send", Neo.GREEN, v -> send());
-        button(row, "Close", "left", Neo.CYAN, v -> close());
+        button(row, Txt.s(R.string.common_send), "send", Neo.GREEN, v -> send());
+        button(row, Txt.s(R.string.common_close), "left", Neo.CYAN, v -> close());
     }
 
     @Override protected boolean stillRunning() { return true; }
     @Override protected void refresh() { }
 
-    private String speedLine() { return baud + " baud  ·  function " + func + " (alphanumeric)"; }
-    private String signLine() { return sign ? "Sign with my callsign: on" : "Sign with my callsign: off"; }
+    private String speedLine() { return Txt.s(R.string.modes_pager_speed, baud, func); }
+    private String signLine() { return Txt.s(sign ? R.string.modes_pager_sign_on : R.string.modes_pager_sign_off); }
 
     private EditText field(LinearLayout body, String label, String value) {
         body.addView(Neo.sheetSection(c, label));
@@ -103,19 +105,19 @@ public final class PagerScreen extends ModeScreen {
     private void send() {
         double mhz;
         try { mhz = Double.parseDouble(freq.getText().toString().trim()); }
-        catch (NumberFormatException e) { status.setText("Enter the frequency in MHz"); return; }
+        catch (NumberFormatException e) { status.setText(Txt.s(R.string.modes_pager_err_freq)); return; }
         int hz = (int) Math.round(mhz * 1e6);
         int[] rics;
         try { rics = resolve(to.getText().toString()); }
         catch (IllegalArgumentException e) { status.setText(e.getMessage()); return; }
         String err = svc.sendPage(baud, hz, rics, func, msg.getText().toString(), sign);
-        status.setText(err == null ? "Sending to " + rics.length + (rics.length == 1 ? " RIC" : " RICs") : err);
+        status.setText(err == null ? Txt.p(R.plurals.modes_pager_sending, rics.length, rics.length) : err);
     }
 
     /** Digits are RICs. Any other word is a contact name or callsign, and every RIC on that contact is included. */
     private int[] resolve(String raw) {
         List<Integer> out = new ArrayList<>();
-        if (raw == null || raw.trim().isEmpty()) throw new IllegalArgumentException("Add a RIC or a contact");
+        if (raw == null || raw.trim().isEmpty()) throw new IllegalArgumentException(Txt.s(R.string.modes_pager_err_empty));
         List<ChannelStore.Contact> all = svc.store().contacts();
         for (String tok : raw.trim().split("[,;\\s]+")) {
             if (tok.isEmpty()) continue;
@@ -123,7 +125,7 @@ public final class PagerScreen extends ModeScreen {
             for (int i = 0; i < tok.length(); i++) if (!Character.isDigit(tok.charAt(i))) digits = false;
             if (digits) {
                 int r = Integer.parseInt(tok);
-                if (r < 0 || r > 0x1FFFFF) throw new IllegalArgumentException(tok + " is not a RIC (0 to 2097151)");
+                if (r < 0 || r > 0x1FFFFF) throw new IllegalArgumentException(Txt.s(R.string.modes_pager_err_ric, tok));
                 if (!out.contains(r)) out.add(r);
                 continue;
             }
@@ -132,11 +134,11 @@ public final class PagerScreen extends ModeScreen {
             for (ChannelStore.Contact ct : all) {
                 if (key.equals(ct.name.toUpperCase(Locale.US)) || key.equals(ct.baseCall())) { hit = ct; break; }
             }
-            if (hit == null) throw new IllegalArgumentException("No contact named " + tok);
-            if (hit.ricList().length == 0) throw new IllegalArgumentException(hit.name + " has no pager RIC");
+            if (hit == null) throw new IllegalArgumentException(Txt.s(R.string.modes_pager_err_contact, tok));
+            if (hit.ricList().length == 0) throw new IllegalArgumentException(Txt.s(R.string.modes_pager_err_no_ric, hit.name));
             for (int r : hit.ricList()) if (!out.contains(r)) out.add(r);
         }
-        if (out.isEmpty()) throw new IllegalArgumentException("Add a RIC or a contact");
+        if (out.isEmpty()) throw new IllegalArgumentException(Txt.s(R.string.modes_pager_err_empty));
         int[] a = new int[out.size()];
         for (int i = 0; i < a.length; i++) a[i] = out.get(i);
         return a;

@@ -31,9 +31,9 @@ public final class ExamPool {
         Element(String key, String name, String asset, int questions, int pass) { this.key = key; this.name = name; this.asset = asset; this.questions = questions; this.pass = pass; }
     }
     public static final Element[] ELEMENTS = {
-        new Element("tech", "Technician (Element 2, 2026–2030)", "exam/technician-2026-2030.json", 35, 26),
-        new Element("general", "General (Element 3, 2023–2027)", "exam/general-2023-2027.json", 35, 26),
-        new Element("extra", "Amateur Extra (Element 4, 2024–2028)", "exam/extra-2024-2028.json", 50, 37),
+        new Element("tech", "Technician (Element 2, 2026–2030)", "exam/technician-2026-2030.json", 35, 26),   // i18n: US licence class and exam element (proper name)
+        new Element("general", "General (Element 3, 2023–2027)", "exam/general-2023-2027.json", 35, 26),   // i18n: US licence class and exam element (proper name)
+        new Element("extra", "Amateur Extra (Element 4, 2024–2028)", "exam/extra-2024-2028.json", 50, 37),   // i18n: US licence class and exam element (proper name)
     };
 
     public final List<Question> all = new ArrayList<>();

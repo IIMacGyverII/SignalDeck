@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -42,18 +44,20 @@ final class PassCard extends LinearLayout {
         if ((getVisibility() == VISIBLE) != show) setVisibility(show ? VISIBLE : GONE);
         if (!show) return;
         long now = System.currentTimeMillis();
-        String follow = svc.issRepeat() == st.mode ? "Following every pass until you stop" : "This pass only";
+        String follow = Txt.s(svc.issRepeat() == st.mode ? R.string.modes_pass_follow_all : R.string.modes_pass_follow_one);
         String t, dt;
         if (st.waiting || st.look == null) {
             long in = Math.max(0, st.aos - now) / 1000;
-            t = "🛰  Next ISS pass " + new SimpleDateFormat("EEE HH:mm", Locale.US).format(new Date(st.aos)) + "  ·  in " + (in >= 3600 ? in / 3600 + " h " + in % 3600 / 60 + " min" : in / 60 + " min " + in % 60 + " s");
-            dt = String.format(Locale.US, "Highest %.0f°, about %d min. The radio tunes a minute before it rises and follows the Doppler shift. ", st.maxEl, (st.los - st.aos + 30_000) / 60_000) + follow + ".";
+            String when = in >= 3600 ? Txt.s(R.string.modes_pass_in_hours, (int) (in / 3600), (int) (in % 3600 / 60)) : Txt.s(R.string.modes_pass_in_minutes, (int) (in / 60), (int) (in % 60));
+            t = Txt.s(R.string.modes_pass_next, new SimpleDateFormat("EEE HH:mm", Locale.US).format(new Date(st.aos)), when);
+            dt = Txt.s(R.string.modes_pass_next_detail, String.format(Locale.US, "%.0f", st.maxEl), String.valueOf((st.los - st.aos + 30_000) / 60_000), follow);
         } else {
             long left = Math.max(0, st.los - now) / 1000;
             boolean up = st.look.el >= 0;
-            t = up ? String.format(Locale.US, "🛰  ISS up  ·  %.0f° high, %s", st.look.el, Maidenhead.compass(st.look.az)) : "🛰  ISS about to rise";
-            dt = String.format(Locale.US, "Listening %.4f MHz (%+.1f kHz Doppler)  ·  %s %d:%02d  ·  %.0f km away", st.rxHz / 1e6, (st.rxHz - st.nominalHz) / 1000.0, up ? "sets in" : "pass ends in", left / 60, left % 60, st.look.rangeKm)
-                    + (st.mode == Satellites.APRS && !st.listenOnly ? String.format(Locale.US, "\nTalk %.4f MHz", st.txHz / 1e6) : "") + "\n" + follow + ".";
+            t = up ? Txt.s(R.string.modes_pass_up, String.format(Locale.US, "%.0f", st.look.el), Maidenhead.compass(st.look.az)) : Txt.s(R.string.modes_pass_rising);
+            String rx = String.format(Locale.US, "%.4f", st.rxHz / 1e6), shift = String.format(Locale.US, "%+.1f", (st.rxHz - st.nominalHz) / 1000.0), clock = String.format(Locale.US, "%d:%02d", left / 60, left % 60), km = String.format(Locale.US, "%.0f", st.look.rangeKm);
+            dt = Txt.s(up ? R.string.modes_pass_listening_sets : R.string.modes_pass_listening_ends, rx, shift, clock, km)
+                    + (st.mode == Satellites.APRS && !st.listenOnly ? "\n" + Txt.s(R.string.modes_pass_talk, String.format(Locale.US, "%.4f", st.txHz / 1e6)) : "") + "\n" + follow;
         }
         ModeScreen.set(title, t); ModeScreen.set(detail, dt);
     }

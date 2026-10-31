@@ -1,0 +1,1988 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Radio modes and ham tools: Fox hunt, Winlink, forms, SSTV, FT8, M17, band scope, satellites, POTA, logbook, conditions,
+     exam practice, recordings, Morse trainer, voice keyer, pager, terminal, text modes, parrot. See strings_common.xml for
+     the conventions. Text sent on the air or over Winlink (FT8, RTTY, CW, M17 data, B2F, form messages) stays in code. -->
+<resources>
+
+    <!-- ===== VHF/UHF conditions (PKT → Conditions; also SignalDeck Web) ===== -->
+    <!-- Tropo class 0: ordinary propagation. Shown in the tropo strip's tooltip on the web page. A few words. -->
+    <string name="modes_cond_class_normal">Normal</string>
+    <!-- Tropo class 1: propagation slightly better than usual. A few words. -->
+    <string name="modes_cond_class_enhanced">Slightly enhanced</string>
+    <!-- Tropo class 2: signals bend back to the ground and go further. Shown as the best window's headline. One line. -->
+    <string name="modes_cond_class_super">Super-refraction: longer range</string>
+    <!-- Tropo class 3: a duct is likely, contacts of hundreds of km. Shown as the best window's headline. One line. -->
+    <string name="modes_cond_class_duct">Ducting likely: long range</string>
+    <!-- NOAA geomagnetic activity in words, Kp 7 and more. Lower case, shown after "Kp 7.3 · ". One or two words. -->
+    <string name="modes_cond_kp_severe">severe storm</string>
+    <!-- NOAA geomagnetic activity in words, Kp 6. Lower case. One or two words. -->
+    <string name="modes_cond_kp_strong">strong storm</string>
+    <!-- NOAA geomagnetic activity in words, Kp 5. Lower case. One word. -->
+    <string name="modes_cond_kp_storm">storm</string>
+    <!-- NOAA geomagnetic activity in words, Kp 4. Lower case. One word. -->
+    <string name="modes_cond_kp_active">active</string>
+    <!-- NOAA geomagnetic activity in words, Kp 3. Lower case. One word. -->
+    <string name="modes_cond_kp_unsettled">unsettled</string>
+    <!-- NOAA geomagnetic activity in words, below Kp 3. Lower case. One word. -->
+    <string name="modes_cond_kp_quiet">quiet</string>
+    <!-- Note on the Quadrantids meteor shower, after "Up to 110 meteors an hour, ". Lower case, a few words. -->
+    <string name="modes_cond_shower_quadrantids">short, sharp peak</string>
+    <!-- Note on the Eta Aquariids meteor shower. Lower case, a few words. -->
+    <string name="modes_cond_shower_eta_aquariids">best before dawn</string>
+    <!-- Note on the Arietids meteor shower: it peaks in daylight, so only radio notices it. Lower case, a few words. -->
+    <string name="modes_cond_shower_arietids">daytime shower: radio only</string>
+    <!-- Note on the Perseids meteor shower. Lower case, a few words. -->
+    <string name="modes_cond_shower_perseids">the summer favourite</string>
+    <!-- Note on the Geminids meteor shower. Lower case, a few words. -->
+    <string name="modes_cond_shower_geminids">the strongest of the year</string>
+    <!-- Problem line under the conditions cards: the Kp feed did not answer. Joined with " · ". One line. -->
+    <string name="modes_cond_problem_kp">Kp (NOAA SWPC) unreachable</string>
+    <!-- Problem line: the aurora map did not download. One line. -->
+    <string name="modes_cond_problem_aurora">Aurora map (NOAA SWPC) unreachable</string>
+    <!-- Problem line: the weather forecast used for tropo did not download. One line. -->
+    <string name="modes_cond_problem_tropo">Tropo forecast (Open-Meteo) unreachable</string>
+    <!-- Problem line: the phone has no location, so tropo and aurora cannot be worked out. One line. -->
+    <string name="modes_cond_problem_nofix">No position fix: tropo and aurora need one</string>
+    <!-- Title of the VHF/UHF conditions sheet. One line. -->
+    <string name="modes_cond_title">VHF/UHF conditions</string>
+    <!-- Explanation under the conditions sheet's title. A few lines. -->
+    <string name="modes_cond_hint">Is it worth getting on the air beyond the usual range? Tropospheric ducting is the main source of long VHF/UHF contacts; aurora and meteor showers open short paths (mostly for SSB and digital modes, sometimes FM).</string>
+    <!-- Shown while the forecasts download. One line. -->
+    <string name="modes_cond_loading">Checking the forecasts…</string>
+    <!-- Card title (shown in capitals): the tropospheric forecast. Short. -->
+    <string name="modes_cond_tropo_title">Tropo (next 48 hours)</string>
+    <!-- Card text when the phone has no location (tropo and satellite cards). One line. -->
+    <string name="modes_cond_needs_fix">Needs a position fix.</string>
+    <!-- Tropo card text when the forecast download failed. One line. -->
+    <string name="modes_cond_tropo_failed">The forecast could not be loaded.</string>
+    <!-- Tropo card headline when nothing beats normal. One line, large text. -->
+    <string name="modes_cond_tropo_normal">Normal: no enhancement expected</string>
+    <!-- Tropo card headline: the best window. %1$s the class ("Ducting likely: long range"), %2$s its start (weekday and time), %3$s its end (time). Large text, may wrap. -->
+    <string name="modes_cond_tropo_window">%1$s, %2$s–%3$s</string>
+    <!-- Legend and caveats under the tropo colour strip. A paragraph. -->
+    <string name="modes_cond_tropo_legend">Grey normal · cyan slightly enhanced · green super-refraction (longer range) · amber ducting likely (hundreds of km). From the weather forecast\'s temperature and humidity layers near the ground (Open-Meteo, position rounded to about 50 km); thin ducts near the ground are underestimated, so a calm, clear night after a warm day can be better than shown.</string>
+    <!-- Card title (shown in capitals): aurora. Short. -->
+    <string name="modes_cond_aurora_title">Aurora</string>
+    <!-- Aurora card headline when the Kp index could not be read. Short, large text. -->
+    <string name="modes_cond_kp_unavailable">Kp unavailable</string>
+    <!-- Aurora card headline. %1$s the Kp index ("4.3"), %2$s its words ("active"). Short, large text. -->
+    <string name="modes_cond_kp_now">Kp %1$s · %2$s</string>
+    <!-- Aurora card line: the highest Kp forecast. %1$s the Kp index, %2$s its words, %3$s when (weekday and time). One line. -->
+    <string name="modes_cond_kp_forecast">Forecast up to Kp %1$s (%2$s, %3$s)</string>
+    <!-- Aurora card line: the chance of aurora above the user. %1$s a whole number of percent. One line. -->
+    <string name="modes_cond_aurora_chance">Aurora chance overhead now: %1$s %% (NOAA OVATION)</string>
+    <!-- Aurora card advice. A short paragraph. -->
+    <string name="modes_cond_aurora_advice">VHF aurora signals bounce off the auroral oval to the north: point the antenna north, expect a rough, buzzing sound (it suits CW and SSB better than FM). It needs Kp 5 or more at mid latitudes.</string>
+    <!-- Card title (shown in capitals): meteor showers. Short. -->
+    <string name="modes_cond_meteor_title">Meteor showers</string>
+    <!-- Meteor card text when no shower peaks in the next 45 days. One line. -->
+    <string name="modes_cond_meteor_none">No major shower in the next six weeks.</string>
+    <!-- Meteor card headline: a shower happening now. %1$s the shower's name ("Perseids"). Large text, one line. -->
+    <string name="modes_cond_shower_active">%1$s · active now</string>
+    <!-- Meteor card headline: a coming shower. %1$s its name, %2$s the peak date ("Sat 12 Aug"), %3$s the number of days until it. Large text. -->
+    <plurals name="modes_cond_shower_peak">
+        <item quantity="one">%1$s · peak %2$s (in %3$s day)</item>
+        <item quantity="other">%1$s · peak %2$s (in %3$s days)</item>
+    </plurals>
+    <!-- Meteor card line under a shower. %1$s the zenithal hourly rate (a whole number). One line. -->
+    <string name="modes_cond_shower_rate">Up to %1$s meteors an hour.</string>
+    <!-- The same with the shower's note. %1$s the hourly rate, %2$s the note ("best before dawn"). One line. -->
+    <string name="modes_cond_shower_rate_note">Up to %1$s meteors an hour, %2$s.</string>
+    <!-- Meteor card advice. A short paragraph. -->
+    <string name="modes_cond_meteor_advice">Each meteor trail reflects 2 m signals for a fraction of a second up to a few seconds (“pings”), from about 800 to 2000 km away; the best hours are before dawn.</string>
+    <!-- Card title (shown in capitals): the next satellite passes. Short. -->
+    <string name="modes_cond_sat_title">Next satellite passes</string>
+    <!-- Satellite card text when no pass is coming. One line. -->
+    <string name="modes_cond_sat_none">No pass above 20° in the next 12 hours.</string>
+    <!-- Satellite card line: a satellite in view now. %1$s its name, %2$s its highest elevation in whole degrees. One line. -->
+    <string name="modes_cond_sat_up_now">%1$s · up now · %2$s°</string>
+    <!-- Satellite card line: a coming pass. %1$s the satellite, %2$s when (weekday and time), %3$s its highest elevation in whole degrees. One line. -->
+    <string name="modes_cond_sat_pass">%1$s · %2$s · %3$s°</string>
+    <!-- Satellite card footnote. One or two lines. -->
+    <string name="modes_cond_sat_footer">Passes above 20° in the next 12 hours; PKT → Satellite passes tracks them with Doppler.</string>
+    <!-- Footnote of the conditions sheet. %1$s the time the data was fetched (HH:mm). Two lines. -->
+    <string name="modes_cond_sources">Sources: NOAA SWPC (Kp, OVATION aurora), Open-Meteo (tropo), AMSAT/SatNOGS orbits. Updated %1$s; refreshed after 20 minutes.</string>
+
+    <!-- ===== DTMF remote control (PKT → DTMF remote, history lines) ===== -->
+    <!-- DTMF remote command 1: the phone speaks its position on the channel. Short, in a list "1   Position by voice". -->
+    <string name="modes_dtmf_cmd_position">Position by voice</string>
+    <!-- DTMF remote command 2: the phone speaks battery, channel and signal. Short. -->
+    <string name="modes_dtmf_cmd_status">Status by voice</string>
+    <!-- DTMF remote command 3: send an APRS position beacon. Short. -->
+    <string name="modes_dtmf_cmd_beacon">APRS position beacon</string>
+    <!-- DTMF remote command 4: turn the parrot (repeat what it hears) on. Short. -->
+    <string name="modes_dtmf_cmd_parrot_on">Parrot on</string>
+    <!-- DTMF remote command 5: turn the parrot off. Short. -->
+    <string name="modes_dtmf_cmd_parrot_off">Parrot off</string>
+    <!-- DTMF remote command 6: send the Morse ID. Short. -->
+    <string name="modes_dtmf_cmd_morse_id">Morse ID</string>
+    <!-- History line: three wrong PINs, the remote is locked. One line. -->
+    <string name="modes_dtmf_event_locked">🔒 DTMF remote locked for 10 minutes after 3 wrong PINs</string>
+    <!-- History line: a DTMF sequence had the wrong PIN. One line. -->
+    <string name="modes_dtmf_event_wrong_pin">🔒 DTMF remote: wrong PIN</string>
+    <!-- History line: the PIN was right but the command digit is not one of 1–6. %1$s the digit received. One line. -->
+    <string name="modes_dtmf_event_unknown">📟 DTMF remote: unknown command %1$s</string>
+    <!-- History line: a remote command was run. %1$s the command's name ("Status by voice"). One line. -->
+    <string name="modes_dtmf_event_command">📟 DTMF remote: %1$s</string>
+
+    <!-- ===== FM satellites and their AMSAT status (Satellite passes sheet, SignalDeck Web) ===== -->
+    <!-- Separator between the items of a short list ("heard 3×, not heard 1×"). Comma and a space. -->
+    <string name="modes_list_separator">,\u0020</string>
+    <!-- Error after updating the satellites: SatNOGS did not answer. One line. -->
+    <string name="modes_fmsat_unreachable">Could not reach SatNOGS for the FM satellites</string>
+    <!-- Error after updating the satellites. %1$s the technical reason (English, from the system). One line. -->
+    <string name="modes_fmsat_failed">FM satellites: %1$s</string>
+    <!-- Satellite list line: AMSAT's status page could not be read. One line. -->
+    <string name="modes_fmsat_status_offline">AMSAT status: offline</string>
+    <!-- Satellite list line: nobody reported on this satellite to AMSAT recently. One line. -->
+    <string name="modes_fmsat_status_none">AMSAT: no reports in the last 4 days</string>
+    <!-- Part of the AMSAT status line: how many people heard the satellite. %1$d a count. "×" means times. Very short. -->
+    <string name="modes_fmsat_status_heard">heard %1$d×</string>
+    <!-- Part of the AMSAT status line: reports of telemetry only (no voice). %1$d a count. Very short. -->
+    <string name="modes_fmsat_status_telemetry">telemetry only %1$d×</string>
+    <!-- Part of the AMSAT status line: reports that it was not heard. %1$d a count. Very short. -->
+    <string name="modes_fmsat_status_not_heard">not heard %1$d×</string>
+    <!-- Satellite list line: AMSAT's reports of the last 4 days. %1$s the parts ("heard 3×, not heard 1×"). One line. -->
+    <string name="modes_fmsat_status">AMSAT, 4 days: %1$s</string>
+    <!-- The same with when it was last heard. %1$s the parts, %2$s when ("3 h ago"). One line. -->
+    <string name="modes_fmsat_status_last">AMSAT, 4 days: %1$s · last heard %2$s</string>
+    <!-- When the satellite was last heard: less than an hour ago. Very short. -->
+    <string name="modes_fmsat_last_hour">within the hour</string>
+    <!-- When the satellite was last heard. %1$d hours (1 to 47); "h" is the hour abbreviation. Very short. -->
+    <string name="modes_fmsat_last_hours">%1$d h ago</string>
+    <!-- When the satellite was last heard. %1$d days (2 or more). Very short. -->
+    <plurals name="modes_fmsat_last_days">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+
+    <!-- ===== M17 packet protocols, POTA/SOTA spots, voice keyer, parrot ===== -->
+    <!-- Name of an M17 packet with no protocol (raw data), as in "raw, 12 bytes". Very short, lower case. -->
+    <string name="modes_m17_proto_raw">raw</string>
+    <!-- Name of an M17 packet protocol SignalDeck does not know. %1$d its number. Very short, lower case. -->
+    <string name="modes_m17_proto_other">protocol %1$d</string>
+    <!-- Problem line on the POTA sheet: the POTA spot list did not download. Joined with " · ". One line. -->
+    <string name="modes_pota_unreachable">POTA spots unreachable</string>
+    <!-- Problem line on the POTA sheet: the SOTA spot list did not download. One line. -->
+    <string name="modes_sota_unreachable">SOTA spots unreachable</string>
+    <!-- Voice keyer error: a recording is already running. One line (toast). -->
+    <string name="modes_keyer_err_recording">Already recording</string>
+    <!-- Voice keyer error: SignalDeck may not use the microphone. One line (toast). -->
+    <string name="modes_keyer_err_permission">The microphone permission is needed</string>
+    <!-- Voice keyer error: another app holds the microphone. One line (toast). -->
+    <string name="modes_keyer_err_busy">The microphone is busy</string>
+    <!-- History line: the parrot recorded a call but could not transmit it. %1$d the recording's length in seconds. One line. -->
+    <string name="modes_parrot_event_failed">🦜 Parrot could not transmit the %1$d s recording</string>
+    <!-- History line: the parrot played a call back. %1$d its length in seconds. One line. -->
+    <string name="modes_parrot_event_repeated">🦜 Parrot repeated %1$d s</string>
+    <!-- History line: the parrot played a call back, shortened to the radio's 26 s limit. %1$d its length in seconds. One line. -->
+    <string name="modes_parrot_event_repeated_cut">🦜 Parrot repeated %1$d s (cut at 26 s, the radio\'s limit)</string>
+    <!-- History line: the parrot played a call back followed by the Morse ID ("ID"). %1$d its length in seconds. One line. -->
+    <string name="modes_parrot_event_repeated_id">🦜 Parrot repeated %1$d s + ID</string>
+    <!-- History line: the parrot played a shortened call back followed by the Morse ID. %1$d its length in seconds. One line. -->
+    <string name="modes_parrot_event_repeated_cut_id">🦜 Parrot repeated %1$d s (cut at 26 s, the radio\'s limit) + ID</string>
+
+    <!-- ===== Message forms (PKT → Message forms): ICS-213 and ARRL Radiogram =====
+         Field labels are shown in the form editor; in the read-only view the part in brackets is dropped, so keep
+         explanations in " (…)". The form text that is sent or read on the air keeps the English labels. -->
+    <!-- Radiogram field NR: the message number. Label above a text field. Short. -->
+    <string name="modes_forms_rg_nr">Number</string>
+    <!-- Radiogram field PR: precedence, with its codes (R, P, O and the word EMERGENCY are typed as is). Label, may wrap. -->
+    <string name="modes_forms_rg_pr">Precedence (R routine, P priority, O immediate, EMERGENCY)</string>
+    <!-- Radiogram field HX: handling instructions (codes HXA…HXG). Label. -->
+    <string name="modes_forms_rg_hx">Handling (HX…, optional)</string>
+    <!-- Radiogram field SO: the station that first sent the message. Label. -->
+    <string name="modes_forms_rg_so">Station of origin</string>
+    <!-- Radiogram field CK: the check, the number of words in the text. Label. -->
+    <string name="modes_forms_rg_ck">Check (word count of the text)</string>
+    <!-- Radiogram field PL: where the message was written. Label. -->
+    <string name="modes_forms_rg_pl">Place of origin</string>
+    <!-- Radiogram field TF: the time it was handed in. Label. -->
+    <string name="modes_forms_rg_tf">Time filed</string>
+    <!-- Radiogram field DT: the date. Label. -->
+    <string name="modes_forms_rg_dt">Date</string>
+    <!-- Radiogram field TO: the addressee. Label. -->
+    <string name="modes_forms_rg_to">To: name and address</string>
+    <!-- Radiogram field PH: the addressee's phone number. Label. -->
+    <string name="modes_forms_rg_ph">Phone</string>
+    <!-- Radiogram field MS: the message text. Label. -->
+    <string name="modes_forms_rg_ms">Text</string>
+    <!-- Radiogram field SG: the signature. Label. -->
+    <string name="modes_forms_rg_sg">Signature</string>
+    <!-- ICS-213 field TO: the addressee. Label. -->
+    <string name="modes_forms_ics_to">To (name and position)</string>
+    <!-- ICS-213 field FR: the sender. Label. -->
+    <string name="modes_forms_ics_fr">From (name and position)</string>
+    <!-- ICS-213 field SU: the subject. Label. -->
+    <string name="modes_forms_ics_su">Subject</string>
+    <!-- ICS-213 field DT: the date. Label. -->
+    <string name="modes_forms_ics_dt">Date</string>
+    <!-- ICS-213 field TM: the time. Label. -->
+    <string name="modes_forms_ics_tm">Time</string>
+    <!-- ICS-213 field MS: the message. Label. -->
+    <string name="modes_forms_ics_ms">Message</string>
+    <!-- ICS-213 field AP: who approved the message. Label. -->
+    <string name="modes_forms_ics_ap">Approved by (name and position)</string>
+    <!-- Title of the Message forms sheet. One line. -->
+    <string name="modes_forms_title">Message forms</string>
+    <!-- Explanation on the Message forms sheet (radio without DMR). A few lines. -->
+    <string name="modes_forms_hint">The ICS-213 General Message and the ARRL Radiogram, for emergency and traffic nets: fill one in and read it on the air, or send it as APRS messages to another SignalDeck, which puts the parts back together into the form.</string>
+    <!-- The same on a radio with DMR texts. A few lines. -->
+    <string name="modes_forms_hint_dmr">The ICS-213 General Message and the ARRL Radiogram, for emergency and traffic nets: fill one in and read it on the air, or send it as APRS messages or DMR texts to another SignalDeck, which puts the parts back together into the form.</string>
+    <!-- Button: start a new ICS-213 form. Short (half-width button). -->
+    <string name="modes_forms_new_ics">New ICS-213</string>
+    <!-- Button: start a new radiogram. Short (half-width button). -->
+    <string name="modes_forms_new_radiogram">New radiogram</string>
+    <!-- Section heading (capitals) when there are no forms. Short. -->
+    <string name="modes_forms_none">No forms yet</string>
+    <!-- Section heading (capitals) above the list of forms. Short. -->
+    <string name="modes_forms_list">Sent and received</string>
+    <!-- Form list: a radiogram without subject, named by its number. %1$s the number. Short. -->
+    <string name="modes_forms_number">Number %1$s</string>
+    <!-- Form list line under a sent form. %1$s the callsign it went to, %2$s how (APRS, DMR, Winlink), %3$s date and time. One line. -->
+    <string name="modes_forms_row_to">To %1$s · %2$s · %3$s</string>
+    <!-- Form list line under a received form. %1$s the sender, %2$s how, %3$s date and time. One line. -->
+    <string name="modes_forms_row_from">From %1$s · %2$s · %3$s</string>
+    <!-- The same as modes_forms_row_to with its status. %4$s the status ("sending 2/3"). One line. -->
+    <string name="modes_forms_row_to_status">To %1$s · %2$s · %3$s · %4$s</string>
+    <!-- The same as modes_forms_row_from with its status. %4$s the status. One line. -->
+    <string name="modes_forms_row_from_status">From %1$s · %2$s · %3$s · %4$s</string>
+    <!-- Form list title of a radiogram. %1$s its subject or number. One line. -->
+    <string name="modes_forms_row_radiogram">Radiogram: %1$s</string>
+    <!-- Form list title of an ICS-213. %1$s its subject. One line. -->
+    <string name="modes_forms_row_ics">ICS-213: %1$s</string>
+    <!-- Hint on a sent form. %1$s the callsign, %2$s how (APRS, DMR, Winlink), %3$s date and time. One line. -->
+    <string name="modes_forms_view_sent">Sent to %1$s by %2$s · %3$s</string>
+    <!-- Hint on a received form. %1$s the sender, %2$s how, %3$s date and time. One line. -->
+    <string name="modes_forms_view_received">Received from %1$s by %2$s · %3$s</string>
+    <!-- Button and sheet title: show the form in large text to read it over the air. Short. -->
+    <string name="modes_forms_read_on_air">Read on air</string>
+    <!-- Title of Android's share chooser for a form. One line. -->
+    <string name="modes_forms_share_title">Share the form</string>
+    <!-- Button: answer the form with a new one. Short. -->
+    <string name="modes_forms_reply">Reply</string>
+    <!-- Confirmation dialog title before deleting a form. One line. -->
+    <string name="modes_forms_delete_confirm">Delete this form?</string>
+    <!-- Hint under the large form text. Two lines. -->
+    <string name="modes_forms_read_hint">Read slowly, field by field; spell unusual words phonetically and give numbers figure by figure.</string>
+    <!-- Hint in the radiogram editor: the check field is computed. One line. -->
+    <string name="modes_forms_check_hint">The check is filled in from the text\'s word count when you send.</string>
+    <!-- Button and dialog title: send the form as APRS messages. Half-width button. -->
+    <string name="modes_forms_send_aprs">Send by APRS</string>
+    <!-- Button: send the form as DMR texts. Half-width button. -->
+    <string name="modes_forms_send_dmr">Send by DMR text</string>
+    <!-- Button and dialog title: put the form in the Winlink outbox. Full-width button. -->
+    <string name="modes_forms_send_winlink">Send by Winlink</string>
+    <!-- Toast after saving a form. Very short. -->
+    <string name="modes_forms_saved">Saved</string>
+    <!-- Hint in the Winlink address field. One line. -->
+    <string name="modes_forms_winlink_to_hint">Callsign or e-mail address (commas for several)</string>
+    <!-- Message of the Send by Winlink dialog. A few lines. -->
+    <string name="modes_forms_winlink_message">The form goes to the Winlink outbox as an e-mail anyone can read (SignalDeck puts it back together as a form). It is sent at your next Winlink connection.</string>
+    <!-- Dialog button: queue the form in the Winlink outbox. Short. -->
+    <string name="modes_forms_winlink_put">Put in the outbox</string>
+    <!-- Toast after queuing the form for Winlink. One line. -->
+    <string name="modes_forms_winlink_done">In the Winlink outbox</string>
+    <!-- Hint in the APRS callsign field. N0CALL-7 is an example callsign. One line. -->
+    <string name="modes_forms_aprs_to_hint">Callsign, e.g. N0CALL-7</string>
+    <!-- Message of the Send by APRS dialog. %1$d the number of APRS messages the form needs. Two lines. -->
+    <plurals name="modes_forms_aprs_message">
+        <item quantity="one">%1$d message, one every 12 seconds, on the APRS channel (the radio must be on an analog channel).</item>
+        <item quantity="other">%1$d messages, one every 12 seconds, on the APRS channel (the radio must be on an analog channel).</item>
+    </plurals>
+    <!-- Toast while the form goes out by APRS. %1$d the number of messages. One line. -->
+    <plurals name="modes_forms_aprs_sending">
+        <item quantity="one">Sending %1$d APRS message</item>
+        <item quantity="other">Sending %1$d APRS messages</item>
+    </plurals>
+    <!-- Toast: DMR needs a contact to send to, and there are none. One line. -->
+    <string name="modes_forms_no_contacts">No contacts yet (Contact tab)</string>
+    <!-- Contact list item: a talkgroup. %1$s its name, %2$s its number. Two spaces before the bracket. One line. -->
+    <string name="modes_forms_contact_tg">%1$s\u0020 (talkgroup %2$s)</string>
+    <!-- Contact list item: a private DMR ID. %1$s its name, %2$s the ID. Two spaces before the bracket. One line. -->
+    <string name="modes_forms_contact_id">%1$s\u0020 (ID %2$s)</string>
+    <!-- Title of the DMR contact picker. %1$d the number of texts the form needs. One line. -->
+    <plurals name="modes_forms_dmr_title">
+        <item quantity="one">Send by DMR text (%1$d text)</item>
+        <item quantity="other">Send by DMR text (%1$d texts)</item>
+    </plurals>
+    <!-- Toast while the form goes out. Very short. -->
+    <string name="modes_forms_sending">Sending</string>
+
+    <!-- ===== Fox hunt engine: prediction, fox identity, spin bearing ===== -->
+    <!-- How sure the fox estimate is: its 50 % area is small. Lower case, after "Fox estimate (bearings, ". One word. -->
+    <string name="modes_fox_conf_good">good</string>
+    <!-- How sure the fox estimate is: medium. Lower case. One word. -->
+    <string name="modes_fox_conf_fair">fair</string>
+    <!-- How sure the fox estimate is: its area is large. Lower case. One word. -->
+    <string name="modes_fox_conf_rough">rough</string>
+    <!-- Name of a fox-estimate layer: the compass bearings of the marks. Lower case, in "bearings + heat map". Short. -->
+    <string name="modes_fox_layer_bearings">bearings</string>
+    <!-- Name of a fox-estimate layer: the heat map from signal strength. Lower case. Short. -->
+    <string name="modes_fox_layer_heat">heat map</string>
+    <!-- Name of a fox-estimate layer: the terrain shadowing. Lower case. Short. -->
+    <string name="modes_fox_layer_terrain">terrain</string>
+    <!-- What the estimate is when no layer runs: the strongest mark alone. Lower case. Short. -->
+    <string name="modes_fox_layer_strongest">strongest mark</string>
+    <!-- Joins the layer names ("bearings + heat map"). A plus with spaces. -->
+    <string name="modes_fox_layer_separator">\u0020+\u0020</string>
+    <!-- Why the heat map is not used yet: fewer than 3 marks. Lower case, after "Not used yet: ". Short. -->
+    <string name="modes_fox_block_marks">the heat map needs 3 marks</string>
+    <!-- Why the heat map is not used yet: the marks are too weak. Lower case. Short. -->
+    <string name="modes_fox_block_floor">the heat map needs 2 marks above the noise floor</string>
+    <!-- Why the heat map is not used yet: the marks are too close together. Lower case. Short. -->
+    <string name="modes_fox_block_spread">the heat map needs marks at least 100 m apart</string>
+    <!-- Why bearings are not used: no compass in this phone. Lower case, after "Not used yet: ". One line. -->
+    <string name="modes_fox_note_no_compass">this phone has no compass, so its marks carry no bearing: the heat map works from their strength</string>
+    <!-- Why bearings are not used yet: no mark has a bearing. Lower case. Short. -->
+    <string name="modes_fox_note_no_bearing">no marks with a bearing yet</string>
+    <!-- Why terrain is not used: it needs the heat map, which is switched off. Lower case. Short. -->
+    <string name="modes_fox_note_terrain_off">terrain refines the heat map, which is off</string>
+    <!-- Why terrain is not used yet: the elevation data for this area has not downloaded. Lower case. Short. -->
+    <string name="modes_fox_note_no_terrain">no terrain for this area yet</string>
+    <!-- Which signals count as the fox: every reception. After "Fox: ". Short. -->
+    <string name="modes_fox_any_signal">Any signal</string>
+    <!-- The fox is one DMR ID. %1$s the ID. After "Fox: ". Short. -->
+    <string name="modes_fox_dmr_id">DMR ID %1$s</string>
+    <!-- The fox is one DMR ID with a colour code. %1$s the ID, %2$s the colour code. Short. -->
+    <string name="modes_fox_dmr_id_cc">DMR ID %1$s, CC %2$s</string>
+    <!-- The fox is any DMR caller. Lower case. Short. -->
+    <string name="modes_fox_dmr_any">any DMR caller</string>
+    <!-- The fox is any DMR caller on one colour code. %1$s the colour code. Short. -->
+    <string name="modes_fox_dmr_any_cc">any DMR caller, CC %1$s</string>
+    <!-- The fox is picked by the channel's DCS code. Lower case. Short. -->
+    <string name="modes_fox_dcs">the channel\'s DCS</string>
+    <!-- The fox is picked by a CTCSS tone. %1$s the tone in Hz ("88.5"). Short. -->
+    <string name="modes_fox_ctcss">CTCSS %1$s Hz</string>
+    <!-- No tone is set, so every reception counts. Lower case. Short. -->
+    <string name="modes_fox_no_tone">no tone set (any reception)</string>
+    <!-- Spin bearing result from the signal peak. %1$s bearing (3 digits), %2$s ± degrees, %3$s depth in dB. One line. -->
+    <string name="modes_spin_result_peak">%1$s° ±%2$s° from the peak, %3$s dB deep</string>
+    <!-- Spin bearing result from the null (the body blocks the signal from behind). %1$s bearing, %2$s ± degrees, %3$s depth in dB. One line. -->
+    <string name="modes_spin_result_null">%1$s° ±%2$s° from the null behind you, %3$s dB deep</string>
+    <!-- Guidance while turning on the spot: the circle is complete. Large text, short. -->
+    <string name="modes_spin_done">Full circle: done</string>
+    <!-- Guidance while turning: turning too fast. Large text, one word. -->
+    <string name="modes_spin_slower">Slower</string>
+    <!-- Guidance while turning: stopped or too slow. Large text, short. -->
+    <string name="modes_spin_keep_turning">Keep turning</string>
+    <!-- Guidance while turning: going well. Large text, short. -->
+    <string name="modes_spin_keep_going">Keep going</string>
+    <!-- Spin failed: too few signal readings. One line. -->
+    <string name="modes_spin_few">Too few readings: turn more slowly, all the way round</string>
+    <!-- Spin failed: part of the circle has no readings. %1$s the gap in degrees. One line. -->
+    <string name="modes_spin_gap">Not a full circle (a %1$s° gap): turn all the way round</string>
+    <!-- Spin failed: the signal hardly changed while turning. %1$s the difference in dB. Two lines. -->
+    <string name="modes_spin_flat">Too little difference (%1$s dB): hold the phone flat against your chest, step into the open and turn again</string>
+
+    <!-- ===== Satellites ===== -->
+    <!-- About the ISS APRS digipeater, on the satellite list. One or two lines. -->
+    <string name="modes_sat_about_iss_aprs">Packet digipeater: the pass is monitored on the APRS page; PKT → Beacon via ISS sends your position through it</string>
+    <!-- About the ISS SSTV events. Robot 36 is an SSTV mode. One or two lines. -->
+    <string name="modes_sat_about_iss_sstv">Picture events (Robot 36): pictures are decoded on the SSTV page. Only during announced events</string>
+    <!-- About the ISS cross-band repeater. One or two lines. -->
+    <string name="modes_sat_about_iss_rptr">Cross-band FM repeater, on at times: listen on 70 cm, talk on 2 m with the tone</string>
+    <!-- About the ISS crew voice channel. One line. -->
+    <string name="modes_sat_about_iss_voice">Crew contacts and school contacts; mostly listen</string>
+    <!-- About the SO-50 satellite. One or two lines. -->
+    <string name="modes_sat_about_so50">FM repeater; a 74.4 Hz tone for 2 s arms its 10-minute timer</string>
+    <!-- About the PO-101 satellite (Diwata-2 is its other name). One or two lines. -->
+    <string name="modes_sat_about_po101">FM repeater on a schedule (Diwata-2); talk on 70 cm with 141.3 Hz</string>
+    <!-- Error: the orbit download failed from both sources. One line. -->
+    <string name="modes_sat_download_failed">Could not download satellite orbits (AMSAT and CelesTrak unreachable)</string>
+    <!-- Error: the orbits could not be written. %1$s the technical reason. One line. -->
+    <string name="modes_sat_save_failed">Could not save: %1$s</string>
+
+    <!-- ===== FT8 station (FT8 page status line, errors, history lines). The FT8 messages themselves stay as sent. ===== -->
+    <!-- FT8 status: the decoder is off. Status line, short. -->
+    <string name="modes_ft8_status_off">Not listening</string>
+    <!-- FT8 status: decoding. Status line, short. -->
+    <string name="modes_ft8_status_listening">Listening</string>
+    <!-- FT8 status after a 15 s slot with no decode. Status line, one line. -->
+    <string name="modes_ft8_status_nothing">Listening, nothing decoded in the last slot</string>
+    <!-- FT8 status after a slot. %1$d the number of messages decoded (1 or more). Status line, one line. -->
+    <plurals name="modes_ft8_status_decoded">
+        <item quantity="one">Listening, %1$d decoded in the last slot</item>
+        <item quantity="other">Listening, %1$d decoded in the last slot</item>
+    </plurals>
+    <!-- FT8 status: the next message cannot be encoded. %1$s the message. Status line. -->
+    <string name="modes_ft8_status_cannot_encode">Cannot encode: %1$s</string>
+    <!-- FT8 status: the sequence gave up. %1$d the number of tries. Status line. -->
+    <plurals name="modes_ft8_status_no_answer">
+        <item quantity="one">Stopped: no answer after %1$d try</item>
+        <item quantity="other">Stopped: no answer after %1$d tries</item>
+    </plurals>
+    <!-- FT8 status while sending. %1$s the FT8 message ("CQ K1ABC FN42"). Status line. -->
+    <string name="modes_ft8_status_transmitting">Transmitting: %1$s</string>
+    <!-- FT8 error: the clicked decode has no callsign to answer. Toast. -->
+    <string name="modes_ft8_err_no_call">No callsign in that message</string>
+    <!-- FT8 error: a typed message is too long or has characters FT8 cannot carry. Toast, two lines. -->
+    <string name="modes_ft8_err_no_fit">That message does not fit FT8 (13 characters of A-Z 0-9 + - . / ? as free text)</string>
+    <!-- FT8 error: no callsign is set (it is set in the APRS settings). Toast. -->
+    <string name="modes_ft8_err_callsign">Set your callsign first (APRS settings)</string>
+    <!-- FT8 error: the callsign cannot be encoded in FT8. Toast. -->
+    <string name="modes_ft8_err_call_unsendable">Your callsign cannot be sent in FT8</string>
+    <!-- History line: the callsign is non-standard, so CQ goes out without the grid. WSJT-X is a program's name. Two lines. -->
+    <string name="modes_ft8_event_nonstandard">⚠️ Your callsign is non-standard for FT8 (more than three suffix letters or an unusual prefix), so CQ goes out without your grid, as WSJT-X would send it</string>
+    <!-- History line: an FT8 contact finished. %1$s the other station's callsign. One line. -->
+    <string name="modes_ft8_event_complete">📡 FT8 QSO with %1$s complete</string>
+    <!-- History line: an FT8 contact was logged. %1$s callsign (and grid), %2$s the report sent, %3$s the report received ("-" if none). One line. -->
+    <string name="modes_ft8_event_logged">📒 FT8 QSO logged: %1$s, sent %2$s, received %3$s</string>
+    <!-- History line: the sequence stopped. %1$s the FT8 message that got no answer. One line. -->
+    <string name="modes_ft8_event_no_answer">⏹ FT8: no answer to \"%1$s\", stopped</string>
+    <!-- History line: the closing 73 went out. One line. -->
+    <string name="modes_ft8_event_sent_73">📡 FT8: sent 73</string>
+
+    <!-- ===== Winlink (PKT → Winlink e-mail): states, errors, import summary. The messages and the B2F protocol stay English. ===== -->
+    <!-- Joins clauses of one sentence ("12 packet gateways …; 3 HF; 2 on other bands"). A semicolon and a space. -->
+    <string name="modes_clause_separator">;\u0020</string>
+    <!-- Winlink state when no session runs. Status line, short. -->
+    <string name="modes_winlink_state_idle">Not connected</string>
+    <!-- Winlink state: opening the internet connection to the Winlink server (CMS). Status line. -->
+    <string name="modes_winlink_state_connecting_cms">Connecting to the Winlink CMS…</string>
+    <!-- Winlink state: logged in to the server, mail is going both ways. Status line. -->
+    <string name="modes_winlink_state_cms">Connected to the CMS: exchanging mail</string>
+    <!-- Winlink state: calling a packet gateway on the radio. %1$s its callsign. Status line. -->
+    <string name="modes_winlink_state_calling">Calling %1$s…</string>
+    <!-- Winlink state: connected to a gateway. %1$s its callsign. Status line. -->
+    <string name="modes_winlink_state_gateway">Connected to %1$s: exchanging mail</string>
+    <!-- Winlink session result: the user stopped it. Status line, also in the history. Short. -->
+    <string name="modes_winlink_stopped">Stopped</string>
+    <!-- Winlink session result: it failed. %1$s the reason (English technical text, or modes_winlink_timeout). Status line. -->
+    <string name="modes_winlink_failed">Failed: %1$s</string>
+    <!-- Reason after "Failed: ": the other side did not answer in time. Lower case, short. -->
+    <string name="modes_winlink_timeout">no answer in time</string>
+    <!-- Winlink session result. %1$d messages sent, %2$d received. Status line, also in the history. -->
+    <string name="modes_winlink_done">Done: %1$d sent, %2$d received</string>
+    <!-- Notification text after a session that brought mail. %1$d the number of new messages. One line. -->
+    <plurals name="modes_winlink_new_mail">
+        <item quantity="one">%1$d new message</item>
+        <item quantity="other">%1$d new messages</item>
+    </plurals>
+    <!-- Transfer progress line. %1$s what (modes_winlink_sending / receiving), %2$d bytes done, %3$d bytes in all. One line. -->
+    <string name="modes_winlink_progress">%1$s · %2$d of %3$d bytes</string>
+    <!-- What is moving: a message going out. %1$s its message ID. Lower case, short. -->
+    <string name="modes_winlink_sending">sending %1$s</string>
+    <!-- What is moving: a message coming in. %1$s its message ID. Lower case, short. -->
+    <string name="modes_winlink_receiving">receiving %1$s</string>
+    <!-- Gateway list import: how many gateways this radio can use. %1$d usable, %2$d rows in the file. One or two lines. -->
+    <plurals name="modes_winlink_import_usable">
+        <item quantity="one">%1$d packet gateway this radio can use (1200 baud, 136–174 or 400–480 MHz), of %2$d in the file</item>
+        <item quantity="other">%1$d packet gateways this radio can use (1200 baud, 136–174 or 400–480 MHz), of %2$d in the file</item>
+    </plurals>
+    <!-- Gateway list import, added clause: gateways on HF. %1$d a count. Very short. -->
+    <string name="modes_winlink_import_hf">%1$d HF</string>
+    <!-- Gateway list import, added clause: gateways at other speeds or modes. %1$d a count. Short. -->
+    <plurals name="modes_winlink_import_other_baud">
+        <item quantity="one">%1$d other speeds or modes</item>
+        <item quantity="other">%1$d other speeds or modes</item>
+    </plurals>
+    <!-- Gateway list import, added clause: gateways outside this radio's bands. %1$d a count. Short. -->
+    <plurals name="modes_winlink_import_other_bands">
+        <item quantity="one">%1$d on other bands</item>
+        <item quantity="other">%1$d on other bands</item>
+    </plurals>
+    <!-- Winlink error: no callsign set (it is set in PKT → Settings). Toast. -->
+    <string name="modes_winlink_err_callsign">Set your callsign first (PKT → Settings)</string>
+    <!-- Winlink error: the new message has no recipient. Toast. -->
+    <string name="modes_winlink_err_no_to">Add at least one recipient (a callsign or an e-mail address)</string>
+    <!-- Winlink error: the subject is longer than Winlink allows. Toast. -->
+    <string name="modes_winlink_err_subject">The subject is too long (128 characters at most)</string>
+    <!-- Winlink error: the message is empty. Toast. -->
+    <string name="modes_winlink_err_empty">Write something first</string>
+    <!-- Winlink error: a session is already running. Toast. -->
+    <string name="modes_winlink_err_busy">A Winlink session is already running</string>
+    <!-- Winlink error: the gateway callsign is not valid; N0ABC-10 is an example. Toast. -->
+    <string name="modes_winlink_err_gateway">Gateway callsign like N0ABC-10</string>
+
+    <!-- ===== M17 station (M17 page, history lines) ===== -->
+    <!-- M17 error: the receiver's calibration file is missing from the app. Toast. -->
+    <string name="modes_m17_err_calibration">M17 calibration missing</string>
+    <!-- M17 error: the Codec 2 voice codec did not load. %1$s the technical reason. Toast. -->
+    <string name="modes_m17_err_codec">Codec 2 not available: %1$s</string>
+    <!-- M17 calibration line: the receiver learnt its table from this phone's receptions. Lower case, one line. -->
+    <string name="modes_m17_cal_fitted">fitted on this phone from its own receptions</string>
+    <!-- M17 calibration line: the fixed-tap receiver is in use. Lower case, one line. -->
+    <string name="modes_m17_cal_held">fixed taps for this phone; the module\'s voice filter is held open</string>
+    <!-- M17 calibration line: no table for this phone, the one from the Ulefone Armor 26 Ultra is used. Lower case, one line. -->
+    <string name="modes_m17_cal_armor">calibrated on the Ulefone Armor 26 Ultra (not on this phone: it may not decode)</string>
+    <!-- M17 calibration line: the table was made on this phone model. Lower case, one line. -->
+    <string name="modes_m17_cal_model">calibrated on this phone model</string>
+    <!-- M17 calibration line: the table was made for this phone. Lower case, one line. -->
+    <string name="modes_m17_cal_phone">calibrated for this phone</string>
+    <!-- History line: an M17 call. %1$s the caller, %2$s the destination. One line. -->
+    <string name="modes_m17_event_call">📻 M17: %1$s → %2$s</string>
+    <!-- History line: an M17 call with its text. %1$s caller, %2$s destination, %3$s the text the caller sends with the call. Two spaces before the quote. One line. -->
+    <string name="modes_m17_event_call_meta">📻 M17: %1$s → %2$s\u0020 “%3$s”</string>
+    <!-- History line: an encrypted M17 call (SignalDeck does not play it). %1$s caller, %2$s destination. One line. -->
+    <string name="modes_m17_event_call_enc">📻 M17: %1$s → %2$s\u0020 (encrypted: not played)</string>
+    <!-- History line: an encrypted M17 call with its text. %1$s caller, %2$s destination, %3$s the caller's text. One line. -->
+    <string name="modes_m17_event_call_meta_enc">📻 M17: %1$s → %2$s\u0020 “%3$s”\u0020 (encrypted: not played)</string>
+    <!-- History line: an M17 call whose header could not be read. One line. -->
+    <string name="modes_m17_event_damaged">📻 M17: a transmission (its header was damaged; the caller follows from the frames)</string>
+    <!-- History line: an M17 call ended, caller unknown. %1$s seconds ("4.2"), %2$d frames. One line. -->
+    <string name="modes_m17_event_ended">📻 M17 transmission ended: %1$s s, %2$d frames</string>
+    <!-- The same with some frames lost. %3$d the percentage received cleanly. One line. -->
+    <string name="modes_m17_event_ended_lossy">📻 M17 transmission ended: %1$s s, %2$d frames (%3$d %% clean)</string>
+    <!-- History line: an M17 call ended. %1$s the caller, %2$s seconds, %3$d frames. One line. -->
+    <string name="modes_m17_event_ended_from">📻 M17 from %1$s ended: %2$s s, %3$d frames</string>
+    <!-- The same with some frames lost. %4$d the percentage received cleanly. One line. -->
+    <string name="modes_m17_event_ended_from_lossy">📻 M17 from %1$s ended: %2$s s, %3$d frames (%4$d %% clean)</string>
+    <!-- An M17 data packet that is not a text. %1$s its protocol ("APRS", "raw"), %2$d its size in bytes. One line. -->
+    <plurals name="modes_m17_packet">
+        <item quantity="one">%1$s, %2$d bytes</item>
+        <item quantity="other">%1$s, %2$d bytes</item>
+    </plurals>
+    <!-- M17 texts line: part of a packet was lost. One line. -->
+    <string name="modes_m17_frames_lost">✉ M17: frames lost</string>
+
+    <!-- ===== SSTV picture combining ===== -->
+    <!-- Combine error: fewer than two pictures picked. Toast. -->
+    <string name="modes_sstv_combine_two">Select at least two receptions of the same picture</string>
+    <!-- Combine error: a picture file could not be read. %1$s the file name. Toast. -->
+    <string name="modes_sstv_combine_unreadable">Could not read %1$s</string>
+    <!-- Combine error: the pictures have different sizes. Toast, two lines. -->
+    <string name="modes_sstv_combine_sizes">The pictures are different sizes (different SSTV modes): they cannot be combined</string>
+    <!-- Combine error: only one picture is still selected. Toast. -->
+    <string name="modes_sstv_combine_one">Only one picture is in: nothing to combine</string>
+    <!-- After combining. %1$d pictures combined (2 or more), %2$s the new file's name. Toast. -->
+    <plurals name="modes_sstv_combine_done">
+        <item quantity="one">Combined %1$d pictures → %2$s</item>
+        <item quantity="other">Combined %1$d pictures → %2$s</item>
+    </plurals>
+
+    <!-- ===== Band scope engine ===== -->
+    <!-- Band scope preset: the FM simplex part of the 2 m band. Short (list item). -->
+    <string name="modes_scope_preset_2m_simplex">2 m FM simplex</string>
+    <!-- Band scope preset: the marine VHF band. Short. -->
+    <string name="modes_scope_preset_marine">Marine VHF</string>
+    <!-- Band scope preset: the NOAA weather radio channels. Short. -->
+    <string name="modes_scope_preset_noaa">NOAA weather</string>
+    <!-- Band scope error: a field is empty. Toast. -->
+    <string name="modes_scope_err_enter">Enter the frequencies in MHz and the step in kHz</string>
+    <!-- Band scope error: the step is too small. Toast. -->
+    <string name="modes_scope_err_step">Use a step of at least 2.5 kHz</string>
+    <!-- Band scope error: the end frequency is below the start. Toast. -->
+    <string name="modes_scope_err_order">The end must be above the start</string>
+    <!-- Band scope error: the range leaves the radio's bands. %1$s the bands ("136–174 and 400–480 MHz"). Toast. -->
+    <string name="modes_scope_err_band">The radio tunes %1$s: keep the range inside one of them</string>
+    <!-- Band scope error: the range has fewer than two steps. Toast. -->
+    <string name="modes_scope_err_few">Choose a range with at least two steps</string>
+    <!-- Band scope error: too many steps. %1$d the steps asked for, %2$d the most allowed. Toast. -->
+    <string name="modes_scope_err_many">%1$d steps is too many (up to %2$d): use a larger step</string>
+    <!-- Band scope state: the sweep stopped on an error. %1$s the technical reason. Lower case, status line. -->
+    <string name="modes_scope_state_failed">stopped: %1$s</string>
+
+    <!-- ===== Decoding a recording (SSTV / APRS from a recording) ===== -->
+    <!-- Error: another recording is being decoded. %1$s its file name. Toast. -->
+    <string name="modes_rec_err_busy">A recording is already being decoded (%1$s)</string>
+    <!-- Error: the recording file is gone. Toast. -->
+    <string name="modes_rec_err_missing">Recording not found</string>
+    <!-- Error: the decode mode asked for is neither SSTV nor APRS. Toast. -->
+    <string name="modes_rec_err_mode">Unknown mode</string>
+    <!-- Decode stage: loading the audio. Lower case, status line. -->
+    <string name="modes_rec_stage_reading">reading the recording</string>
+    <!-- Decode stage: searching for APRS packets. Lower case, status line. -->
+    <string name="modes_rec_stage_aprs">looking for APRS packets</string>
+    <!-- Decode stage: searching for SSTV headers of any mode. Lower case, status line. -->
+    <string name="modes_rec_stage_sstv">looking for SSTV headers (every mode)</string>
+    <!-- Decode stage: searching for Robot 36 pictures whose header was not heard. Lower case, status line. -->
+    <string name="modes_rec_stage_robot">looking for Robot 36 pictures without a header</string>
+    <!-- Decode result: the user stopped it. Short. -->
+    <string name="modes_rec_stopped">Stopped</string>
+    <!-- Decode result: no APRS packet. %1$s the recording's length ("12:30"). One line. -->
+    <string name="modes_rec_aprs_none">No packets in %1$s of audio</string>
+    <!-- Decode result: APRS packets found. %1$d packets, %2$s the recording's length. One line. -->
+    <plurals name="modes_rec_aprs_found">
+        <item quantity="one">%1$d packet in %2$s of audio</item>
+        <item quantity="other">%1$d packets in %2$s of audio</item>
+    </plurals>
+    <!-- Decode result: no SSTV picture. %1$s the recording's length. One line. -->
+    <string name="modes_rec_sstv_none">No SSTV picture in %1$s of audio</string>
+    <!-- Decode result: SSTV pictures found. %1$d pictures, %2$d of them complete, %3$s the recording's length. Two lines. -->
+    <plurals name="modes_rec_sstv_found">
+        <item quantity="one">%1$d picture (%2$d complete) in %3$s of audio, saved to Download/DMR/SSTV</item>
+        <item quantity="other">%1$d pictures (%2$d complete) in %3$s of audio, saved to Download/DMR/SSTV</item>
+    </plurals>
+    <!-- History line after decoding a recording. %1$s the file name, %2$s the result (one of the lines above). One line. -->
+    <string name="modes_rec_event_decoded">📼 Decoded %1$s: %2$s</string>
+
+    <!-- ===== Pager station ===== -->
+    <!-- Pager error: scanning needs two frequencies or more. Toast. -->
+    <string name="modes_pager_err_two">Add at least two pager frequencies</string>
+    <!-- Name of the message thread for pages whose address (RIC) could not be read. Short (list title). -->
+    <string name="modes_pager_ric_unreadable">RIC unreadable</string>
+
+    <!-- ===== RTTY and PSK31 keyboard chat ===== -->
+    <!-- Title of the RTTY/PSK31 sheet (mode names stay as they are). One line. -->
+    <string name="modes_text_title">RTTY and PSK31</string>
+    <!-- Explanation on the RTTY/PSK31 sheet. A paragraph. -->
+    <string name="modes_text_hint">Pick the mode and Listen: the decoder finds the signal by itself anywhere in the audio (RTTY mark 600 to 2700 Hz, PSK31 300 to 2700 Hz). You answer on the frequency being received, or on 2125 Hz (RTTY) and 1000 Hz (PSK31) when nothing is. Long text goes out in several transmissions, because this radio stops each one at 30 seconds.</string>
+    <!-- Hint in the text field for what to transmit. Short. -->
+    <string name="modes_text_input_hint">Type to send</string>
+    <!-- Button: stop the decoder. Short (third of a row). -->
+    <string name="modes_text_stop_listening">Stop listening</string>
+    <!-- Button: start the decoder. Short (third of a row). -->
+    <string name="modes_text_listen">Listen</string>
+    <!-- Text area before anything was decoded. One line. -->
+    <string name="modes_text_nothing">Nothing received yet.</string>
+
+    <!-- ===== Parrot (simplex repeater) screen ===== -->
+    <!-- Title of the parrot screen: it repeats what it hears. One or two words. -->
+    <string name="modes_parrot_title">Parrot</string>
+    <!-- Label under the count of replays (capitals, small, half-width tile). One or two words. -->
+    <string name="modes_parrot_stat_repeated">REPEATED</string>
+    <!-- Label under the time since the last reception (capitals, small, half-width tile). One or two words. -->
+    <string name="modes_parrot_stat_last">LAST HEARD</string>
+    <!-- Parrot explanation. %1$s the longest recording in seconds, %2$s the minutes between Morse IDs. A paragraph. -->
+    <string name="modes_parrot_hint">Everything the radio hears on this channel (up to %1$s s) is recorded and sent back a second after the other station stops, so they can check how they sound through you. With a callsign set, it adds your callsign in Morse to a replay at most every %2$s minutes. The radio\'s 30-second transmit limit caps each replay.</string>
+    <!-- Button: turn the parrot off and close. Short. -->
+    <string name="modes_parrot_stop">Stop the parrot</string>
+    <!-- Subtitle. %1$s the channel number, %2$s its name. One line. -->
+    <string name="modes_parrot_on_channel">Repeating on Ch %1$s · %2$s</string>
+    <!-- Subtitle when no channel is known. One line. -->
+    <string name="modes_parrot_on_this">Repeating on this channel</string>
+    <!-- Big state word (capitals): playing a recording back. One word, large text. -->
+    <string name="modes_parrot_replaying">REPLAYING</string>
+    <!-- Big state word (capitals): recording a reception. One word, large text. -->
+    <string name="modes_parrot_recording">RECORDING</string>
+    <!-- Big state word (capitals): waiting for a reception. One word, large text. -->
+    <string name="modes_parrot_waiting">WAITING</string>
+
+    <!-- ===== Recordings and captions lists ===== -->
+    <!-- Title of the recordings sheet. One line. -->
+    <string name="modes_media_recordings_title">Recordings</string>
+    <!-- Recordings sheet with none. REC is the name of the record button; keep the path. Two lines. -->
+    <string name="modes_media_recordings_none">No recordings yet. Turn REC on; every reception on the channel is saved under Download/DMR/Audio/&lt;channel&gt;/.</string>
+    <!-- Recordings sheet hint. Keep the path. Two lines. -->
+    <string name="modes_media_recordings_hint">Tap to play or stop, long-press to delete. Files live in Download/DMR/Audio/&lt;channel&gt;/.</string>
+    <!-- Confirmation dialog title before deleting a recording. One line. -->
+    <string name="modes_media_delete_confirm">Delete recording?</string>
+    <!-- Toast after deleting a recording. One word. -->
+    <string name="modes_media_deleted">Deleted</string>
+    <!-- Toast: the recording would not play. %1$s the technical reason. One line. -->
+    <string name="modes_media_cannot_play">Cannot play: %1$s</string>
+    <!-- Title of the captions sheet: the speech-to-text sentences heard. One line. -->
+    <string name="modes_media_captions_title">Captions heard</string>
+    <!-- Captions sheet with none. TXT is the name of the captions button. Two lines. -->
+    <string name="modes_media_captions_none">No captions yet. Turn TXT on; every finished sentence is kept here with its channel and time.</string>
+    <!-- Captions sheet hint. One line. -->
+    <string name="modes_media_captions_hint">Every finished caption sentence, newest first.</string>
+    <!-- A caption's channel when the channel no longer exists. %1$s its number. Lower case, short. -->
+    <string name="modes_media_channel">channel %1$s</string>
+
+    <!-- ===== ISS pass card (APRS and SSTV pages) ===== -->
+    <!-- The pass tracking repeats for every pass. A sentence. -->
+    <string name="modes_pass_follow_all">Following every pass until you stop.</string>
+    <!-- The pass tracking is for this pass only. A sentence. -->
+    <string name="modes_pass_follow_one">This pass only.</string>
+    <!-- Time until the pass, an hour or more. %1$d hours, %2$d minutes. Very short. -->
+    <string name="modes_pass_in_hours">%1$d h %2$d min</string>
+    <!-- Time until the pass, under an hour. %1$d minutes, %2$d seconds. Very short. -->
+    <string name="modes_pass_in_minutes">%1$d min %2$d s</string>
+    <!-- Card title: the next ISS pass. %1$s weekday and time, %2$s the countdown ("1 h 12 min"). One line. -->
+    <string name="modes_pass_next">🛰\u0020 Next ISS pass %1$s\u0020 ·\u0020 in %2$s</string>
+    <!-- Card text before the pass. %1$s highest elevation in degrees, %2$s its length in minutes, %3$s one of the follow sentences. Two lines. -->
+    <string name="modes_pass_next_detail">Highest %1$s°, about %2$s min. The radio tunes a minute before it rises and follows the Doppler shift. %3$s</string>
+    <!-- Card title during the pass. %1$s elevation in degrees, %2$s compass direction ("NE"). One line. -->
+    <string name="modes_pass_up">🛰\u0020 ISS up\u0020 ·\u0020 %1$s° high, %2$s</string>
+    <!-- Card title just before the ISS rises. One line. -->
+    <string name="modes_pass_rising">🛰\u0020 ISS about to rise</string>
+    <!-- Card text while the ISS is up. %1$s receive frequency (MHz), %2$s Doppler shift (kHz, signed), %3$s time until it sets (m:ss), %4$s distance in km. Two lines. -->
+    <string name="modes_pass_listening_sets">Listening %1$s MHz (%2$s kHz Doppler)\u0020 ·\u0020 sets in %3$s\u0020 ·\u0020 %4$s km away</string>
+    <!-- The same before it rises: the time until the pass window ends. Two lines. -->
+    <string name="modes_pass_listening_ends">Listening %1$s MHz (%2$s kHz Doppler)\u0020 ·\u0020 pass ends in %3$s\u0020 ·\u0020 %4$s km away</string>
+    <!-- Card line: the transmit frequency for the ISS digipeater. %1$s MHz. One line. -->
+    <string name="modes_pass_talk">Talk %1$s MHz</string>
+
+    <!-- ===== Packet terminal ===== -->
+    <!-- Title of the packet terminal sheet. One line. -->
+    <string name="modes_term_title">Packet terminal</string>
+    <!-- Explanation on the terminal sheet. BBS = bulletin board; B and BYE are commands typed as is. A paragraph. -->
+    <string name="modes_term_hint">Tune the BBS or node\'s channel, then connect. Each exchange takes a few seconds: every transmission starts with a 1.6-second tone and lost frames are sent again. Type a line and Send; most BBSs answer with a prompt, and B or BYE ends the session.</string>
+    <!-- Label above the callsign field. One line. -->
+    <string name="modes_term_call">Connect to (callsign-SSID)</string>
+    <!-- Label above the digipeater field; RELAY is an example alias. One line. -->
+    <string name="modes_term_via">Via digipeaters (optional, e.g. RELAY)</string>
+    <!-- Button: connect. Half-width. -->
+    <string name="modes_term_connect">Connect</string>
+    <!-- Button: disconnect. Half-width. -->
+    <string name="modes_term_disconnect">Disconnect</string>
+    <!-- Toggle button: incoming connections are accepted. Half-width. -->
+    <string name="modes_term_accept">Incoming: accept</string>
+    <!-- Toggle button: incoming connections are refused. Half-width. -->
+    <string name="modes_term_refuse">Incoming: refuse</string>
+    <!-- Hint in the line to send. Short. -->
+    <string name="modes_term_input_hint">Type a line</string>
+    <!-- Terminal state with frames not acknowledged yet. %1$s the link state, %2$d the frames waiting. One line. -->
+    <plurals name="modes_term_state_pending">
+        <item quantity="one">%1$s\u0020 ·\u0020 %2$d waiting to be acknowledged</item>
+        <item quantity="other">%1$s\u0020 ·\u0020 %2$d waiting to be acknowledged</item>
+    </plurals>
+    <!-- Terminal screen before anything came in. Short. -->
+    <string name="modes_term_nothing">Nothing yet.</string>
+
+    <!-- ===== Pager (POCSAG) compose screen ===== -->
+    <!-- Title of the pager screen. One word. -->
+    <string name="modes_pager_title">Pager</string>
+    <!-- Section heading above the frequency field. Short. -->
+    <string name="modes_pager_freq">Frequency (MHz)</string>
+    <!-- Hint under the frequency. Two lines. -->
+    <string name="modes_pager_freq_hint">The page goes out on this frequency, low power. If it is not the channel you are on, the radio tunes there first and waits for the retune to settle.</string>
+    <!-- Hint when no own pager address (RIC) is set. Two lines. -->
+    <string name="modes_pager_rics_none">Your pager RICs are set in PKT → APRS settings. Pages to those RICs are yours.</string>
+    <!-- Hint listing the user's own pager addresses. %1$s the RICs. One line. -->
+    <string name="modes_pager_rics">Your RICs: %1$s</string>
+    <!-- Section heading above the recipients field. Short. -->
+    <string name="modes_pager_to">To (RICs, or a contact name)</string>
+    <!-- Section heading above the message text. One word. -->
+    <string name="modes_pager_message">Message</string>
+    <!-- Character count under the message. %1$d characters. Short. -->
+    <plurals name="modes_pager_chars">
+        <item quantity="one">%1$d characters</item>
+        <item quantity="other">%1$d characters</item>
+    </plurals>
+    <!-- Explanation of signing and the pager types. A paragraph. -->
+    <string name="modes_pager_sign_hint">Alphanumeric pagers, function 3. A numeric-only pager is not sent yet. Signing puts your callsign and a colon at the start of the text, which is how a reply finds you. A pager that is not SignalDeck shows that as part of the message. On the firmware the phone shipped with, Send explains that pages need the symbol engine.</string>
+    <!-- The chosen speed. %1$d baud rate, %2$d the POCSAG function number. One line. -->
+    <string name="modes_pager_speed">%1$d baud\u0020 ·\u0020 function %2$d (alphanumeric)</string>
+    <!-- Toggle line: signing is on. One line. -->
+    <string name="modes_pager_sign_on">Sign with my callsign: on</string>
+    <!-- Toggle line: signing is off. One line. -->
+    <string name="modes_pager_sign_off">Sign with my callsign: off</string>
+    <!-- Status: the frequency is not a number. One line. -->
+    <string name="modes_pager_err_freq">Enter the frequency in MHz</string>
+    <!-- Status after Send. %1$d the number of pager addresses. One line. -->
+    <plurals name="modes_pager_sending">
+        <item quantity="one">Sending to %1$d RIC</item>
+        <item quantity="other">Sending to %1$d RICs</item>
+    </plurals>
+    <!-- Status: no recipient was entered. One line. -->
+    <string name="modes_pager_err_empty">Add a RIC or a contact</string>
+    <!-- Status: a number is out of the RIC range. %1$s what was typed. One line. -->
+    <string name="modes_pager_err_ric">%1$s is not a RIC (0 to 2097151)</string>
+    <!-- Status: no contact has that name. %1$s what was typed. One line. -->
+    <string name="modes_pager_err_contact">No contact named %1$s</string>
+    <!-- Status: the contact has no pager address. %1$s the contact's name. One line. -->
+    <string name="modes_pager_err_no_ric">%1$s has no pager RIC</string>
+
+    <!-- ===== Decode a recording ===== -->
+    <!-- Title of the recording picker, decoding SSTV. One line. -->
+    <string name="modes_recdec_title_sstv">Decode a recording: SSTV</string>
+    <!-- Title of the recording picker, decoding APRS. One line. -->
+    <string name="modes_recdec_title_aprs">Decode a recording: APRS</string>
+    <!-- Explanation for SSTV decoding; Robot, Martin, Scottie and PD are SSTV mode names. A paragraph. -->
+    <string name="modes_recdec_hint_sstv">Finds the SSTV pictures in a recording, in every mode SignalDeck receives (Robot, Martin, Scottie, PD… from the header that starts each picture, and Robot 36 pictures whose header was lost in a fade), whole or partial, and saves them with the received pictures. It runs in the background, faster than the recording plays, and never uses the radio.</string>
+    <!-- Explanation for APRS decoding. A paragraph. -->
+    <string name="modes_recdec_hint_aprs">Finds the APRS packets in a recording and lists them with the time they were on the air (also saved next to the recording as a .aprs.txt file). Nothing is sent, digipeated or gated. It runs in the background and never uses the radio.</string>
+    <!-- Section heading (capitals) when there are no recordings. Short. -->
+    <string name="modes_recdec_none">No recordings yet</string>
+    <!-- Section heading (capitals) above the recordings. Short. -->
+    <string name="modes_recdec_list">Recordings, newest first</string>
+    <!-- Hint when there are no recordings: where they come from. Two lines. -->
+    <string name="modes_recdec_none_hint">Satellite passes → Record each pass saves every pass; REC saves what the radio receives; Upload a recording adds one from anywhere.</string>
+    <!-- Button: pick an audio file from the phone. Full width. -->
+    <string name="modes_recdec_upload">Upload a recording…</string>
+    <!-- A recording's length, a minute or more. %1$d minutes, %2$d seconds. Very short. -->
+    <string name="modes_recdec_minutes">%1$d min %2$d s</string>
+    <!-- A recording's length under a minute. %1$d seconds. Very short. -->
+    <string name="modes_recdec_seconds">%1$d s</string>
+    <!-- A compressed recording's size. %1$s kilobytes. Very short. -->
+    <string name="modes_recdec_kb">%1$s kB</string>
+    <!-- Line under a recording. %1$s its folder, %2$s date and time, %3$s its length or size. One line. -->
+    <string name="modes_recdec_row">%1$s · %2$s · %3$s</string>
+    <!-- Title of a satellite pass recording in the list. Short. -->
+    <string name="modes_recdec_pass">Pass recording</string>
+    <!-- Toast: the picked file could not be read. One line. -->
+    <string name="modes_recdec_unreadable">Could not read the file</string>
+    <!-- Title of the progress sheet, SSTV. One line. -->
+    <string name="modes_recdec_decoding_sstv">Decoding SSTV</string>
+    <!-- Title of the progress sheet, APRS. One line. -->
+    <string name="modes_recdec_decoding_aprs">Decoding APRS</string>
+    <!-- Progress state: decoding failed. %1$s the technical reason. One line, large text. -->
+    <string name="modes_recdec_failed">Could not decode: %1$s</string>
+    <!-- Progress state. %1$d the percentage done. Short, large text. -->
+    <string name="modes_recdec_percent">%1$d %%</string>
+    <!-- Progress state with the stage. %1$d percentage, %2$s the stage ("looking for APRS packets"). One line, large text. -->
+    <string name="modes_recdec_percent_stage">%1$d %% · %2$s</string>
+    <!-- Above a long packet list: only the newest 60 are shown. %1$d how many there are. One line. -->
+    <string name="modes_recdec_last_60">(the last 60 of %1$d)</string>
+    <!-- Placeholder while decoding SSTV. One line. -->
+    <string name="modes_recdec_pictures_here">Pictures appear here as they are found.</string>
+    <!-- Placeholder while decoding APRS. One line. -->
+    <string name="modes_recdec_packets_here">Packets appear here as they are found.</string>
+
+    <!-- ===== Morse trainer ===== -->
+    <!-- Title of the Morse trainer sheet. One line. -->
+    <string name="modes_morse_title">Morse trainer</string>
+    <!-- Explanation of the Koch method and Farnsworth spacing. A paragraph. -->
+    <string name="modes_morse_hint">The Koch method: start with two characters at full speed and add one each time you copy a lesson with 90 %. Farnsworth spacing leaves longer gaps between characters while you learn; close it up as you improve. Sound plays on the phone, not on the air.</string>
+    <!-- Lesson line. %1$d lesson, %2$d lessons in all, %3$s its characters (spaced), %4$s the new character. One line beside two buttons. -->
+    <string name="modes_morse_lesson">Lesson %1$d of %2$d:\u0020 %3$s\u0020\u0020 (new: %4$s)</string>
+    <!-- Speed line. %1$d character speed, %2$d the spacing (Farnsworth) speed, both in words per minute. One line beside two buttons. -->
+    <string name="modes_morse_speed">Characters %1$d WPM\u0020 ·\u0020 spacing %2$d WPM</string>
+    <!-- Label of the spacing stepper. One word. -->
+    <string name="modes_morse_spacing">Spacing</string>
+    <!-- Section heading (capitals): listening practice. Short. -->
+    <string name="modes_morse_copy">Copy practice</string>
+    <!-- Button: play five random groups. Half width. -->
+    <string name="modes_morse_play">Play 5 groups</string>
+    <!-- Button: play the same groups again. Half width. -->
+    <string name="modes_morse_again">Again</string>
+    <!-- Hint in the field where the user types what was heard. Short. -->
+    <string name="modes_morse_copy_hint">Type what you heard</string>
+    <!-- Button: score what was typed. Full width. -->
+    <string name="modes_morse_check">Check</string>
+    <!-- Copy result, monospaced: "sent:" and "you:" are padded so the two lines line up; keep them the same width. %1$s the score in percent, %2$s the verdict, %3$s what was sent, %4$s what was typed. Three lines. -->
+    <string name="modes_morse_result">%1$s %%\u0020 %2$s\nsent:\u0020 %3$s\nyou:\u0020\u0020 %4$s</string>
+    <!-- Verdict: 90 % or more, the next lesson opens. Short. -->
+    <string name="modes_morse_next_lesson">✔ next lesson unlocked</string>
+    <!-- Verdict: 90 % or more on the last lesson. Short. -->
+    <string name="modes_morse_all_done">✔ all characters done</string>
+    <!-- Verdict: under 90 %. Short. -->
+    <string name="modes_morse_keep_going">keep going at this lesson</string>
+    <!-- Section heading (capitals): keying practice. Short. -->
+    <string name="modes_morse_sending">Sending practice</string>
+    <!-- Hint for the key. Two lines. -->
+    <string name="modes_morse_sending_hint">Hold the key for dahs, tap for dits; after a pause of a second and a half the decoder shows what you sent and your speed.</string>
+    <!-- The big Morse key button (capitals). One short word. -->
+    <string name="modes_morse_key">KEY</string>
+    <!-- Decoder output when nothing could be read. One line. -->
+    <string name="modes_morse_unreadable">(not readable yet: keep dits short and dahs three times as long)</string>
+    <!-- Decoder output. %1$s the decoded text, %2$d the speed in words per minute. One line. -->
+    <string name="modes_morse_decoded">%1$s\u0020\u0020 ≈ %2$d WPM</string>
+
+    <!-- ===== Voice keyer ===== -->
+    <!-- Default name of keyer message 1: a CQ call. Short. -->
+    <string name="modes_keyer_slot_cq">CQ</string>
+    <!-- Default name of keyer message 2: the opening of a net. Short. -->
+    <string name="modes_keyer_slot_net">Net preamble</string>
+    <!-- Default name of keyer message 3: the user's identification. Short. -->
+    <string name="modes_keyer_slot_id">My ID</string>
+    <!-- Title of the voice keyer sheet. One line. -->
+    <string name="modes_keyer_title">Voice keyer</string>
+    <!-- Explanation on the voice keyer sheet; Record, Stop, Listen and Send are the button names. A paragraph. -->
+    <string name="modes_keyer_hint">Record with the phone\'s microphone (Record, speak, Stop; up to 25 seconds, silence at the ends is trimmed). Listen plays it on the phone; Send transmits it on the current channel. With Morse ID on, your callsign follows in Morse on amateur channels.</string>
+    <!-- Dialog title for renaming a keyer message. One line. -->
+    <string name="modes_keyer_name_title">Name this message</string>
+    <!-- Button: record a message. Quarter-width button, very short. -->
+    <string name="modes_keyer_record">Record</string>
+    <!-- Button: play the message on the phone. Quarter-width button, very short. -->
+    <string name="modes_keyer_listen">Listen</string>
+    <!-- Toast: the slot is empty. One line. -->
+    <string name="modes_keyer_nothing">Nothing recorded yet</string>
+    <!-- Toast after Send. %1$s the message's name. One line. -->
+    <string name="modes_keyer_sending">Sending %1$s</string>
+    <!-- Section heading (capitals): the identification timer. Short. -->
+    <string name="modes_keyer_id_section">Identification</string>
+    <!-- Explanation of the ten-minute ID timer; "I just identified" is the button below. A paragraph. -->
+    <string name="modes_keyer_id_hint">Amateur rules ask for your callsign every ten minutes while you talk and at the end. The timer starts with your first transmission on an amateur channel after you last identified; when it runs out, the phone vibrates and reminds you as you key. A Morse ID (PKT, the keyer or after talking) restarts it, or tap I just identified after saying your callsign.</string>
+    <!-- Button: reset the ID timer after saying the callsign. Full width. -->
+    <string name="modes_keyer_identified">I just identified</string>
+    <!-- Slot state while recording. Lower case, very short. -->
+    <string name="modes_keyer_recording">recording…</string>
+    <!-- Slot state: its length. %1$s seconds ("4.2"). Very short. -->
+    <string name="modes_keyer_length">%1$s s</string>
+    <!-- Slot state: nothing recorded. Lower case, one word. -->
+    <string name="modes_keyer_empty">empty</string>
+    <!-- Toggle button: Morse ID after this message is on. Quarter-width, very short. -->
+    <string name="modes_keyer_id_on">ID: on</string>
+    <!-- Toggle button: Morse ID after this message is off. Quarter-width, very short. -->
+    <string name="modes_keyer_id_off">ID: off</string>
+    <!-- ID clock when not counting. Large text, short. -->
+    <string name="modes_keyer_timer_idle">ID timer idle</string>
+    <!-- ID clock counting down. %1$s minutes and seconds (m:ss). Large text, short. -->
+    <string name="modes_keyer_timer_due">ID due in %1$s</string>
+    <!-- ID clock at zero: say the callsign now. Large text, short. -->
+    <string name="modes_keyer_timer_now">Identify now</string>
+
+    <!-- Joins whole sentences into one paragraph. A space (empty in languages written without spaces). -->
+    <string name="modes_sentence_separator">\u0020</string>
+    <!-- Joins facts on one line ("35 questions, pass at 26  ·  best 30/35"). A middle dot with two spaces each side. -->
+    <string name="modes_dot_separator">\u0020 ·\u0020\u0020</string>
+
+    <!-- ===== M17 screen ===== -->
+    <!-- Section heading (capitals) above the M17 text field. One word. -->
+    <string name="modes_m17_text">Text</string>
+    <!-- Hint in the M17 text field. One word. -->
+    <string name="modes_m17_message_hint">Message</string>
+    <!-- Section heading (capitals) above the M17 texts sent and received. One word. -->
+    <string name="modes_m17_texts">Texts</string>
+    <!-- Section heading (capitals) above the M17 transmissions heard. One word. -->
+    <string name="modes_m17_heard">Heard</string>
+    <!-- Button held down to transmit M17 voice. Short (half of the button row). -->
+    <string name="modes_m17_hold_to_talk">Hold to talk</string>
+    <!-- Button: stop M17 and close the screen. Short. -->
+    <string name="modes_m17_stop">Stop M17</string>
+    <!-- Subtitle. %1$s the channel number, %2$s its name. One line. -->
+    <string name="modes_m17_on_channel">Receiving M17 on Ch %1$s · %2$s</string>
+    <!-- Subtitle when no channel is known. One line. -->
+    <string name="modes_m17_on_this">Receiving M17 on this channel</string>
+    <!-- Big state (capitals): a transmission is coming in. Large text, one line. -->
+    <string name="modes_m17_receiving">RECEIVING</string>
+    <!-- Big state (capitals): waiting for a transmission. Large text, one line. -->
+    <string name="modes_m17_listening">LISTENING FOR M17</string>
+    <!-- Under the caller: an encrypted transmission is not played. One line. -->
+    <string name="modes_m17_encrypted">Encrypted: not played</string>
+    <!-- Under the caller: a data transmission. One line. -->
+    <string name="modes_m17_data">Data, not voice</string>
+    <!-- Statistics line (monospaced). %1$s seconds ("4.2"), %2$d frames, %3$d signal quality in percent. One line. -->
+    <string name="modes_m17_stats">%1$s s\u0020 ·\u0020 %2$d frames\u0020 ·\u0020 signal %3$d %%</string>
+    <!-- An M17 text this phone sent. %1$s time, %2$s from, %3$s to, %4$s the text. One line. -->
+    <string name="modes_m17_text_sent">%1$s\u0020 sent\u0020 %2$s → %3$s\u0020 %4$s</string>
+    <!-- An M17 text received. %1$s time, %2$s from, %3$s to, %4$s the text. One line. -->
+    <string name="modes_m17_text_received">%1$s\u0020 %2$s → %3$s\u0020 %4$s</string>
+    <!-- Empty heard list. VFO is the free-tuning mode. Two lines. -->
+    <string name="modes_m17_nothing">Nothing yet. Tune the M17 frequency (the channel or the VFO). A transmission is found from its sync and played on the phone\'s speaker.</string>
+    <!-- Notes paragraph, first sentence when this radio can send M17. @ALL is the M17 broadcast address. -->
+    <string name="modes_m17_note_send">Hold to talk sends your voice as M17, to everyone (@ALL), up to the transmit limit (Device → Longest transmission). A short tail follows the last word so the ending is not cut off. Your callsign is the one in APRS settings.</string>
+    <!-- Notes paragraph, first sentence on a firmware without the symbol engine. -->
+    <string name="modes_m17_note_firmware">Receive only on this firmware: transmitting M17 needs the module firmware with the symbol engine.</string>
+    <!-- Notes paragraph, first sentence on a radio that cannot send M17. -->
+    <string name="modes_m17_note_rx_only">Receive only: this radio\'s module cannot send M17.</string>
+    <!-- Notes paragraph: the receiver rebuilds the low tones. %1$s the calibration line ("calibrated for this phone"). -->
+    <string name="modes_m17_note_rebuild">The radio\'s audio path removes the low tones M17 needs, so SignalDeck rebuilds them on receive (%1$s).</string>
+    <!-- Notes paragraph, on phones where the radio's own sound cannot be muted. -->
+    <string name="modes_m17_note_buzz">On this phone the radio plays its own sound through the speaker, so you hear its buzz under the decoded voice while a transmission plays.</string>
+    <!-- Notes paragraph, last sentence with the fixed-tap receiver. -->
+    <string name="modes_m17_note_held">The module\'s voice filter is held open, so a transmission already in progress can still lock.</string>
+    <!-- Notes paragraph, last sentence otherwise. -->
+    <string name="modes_m17_note_strong">It needs a fairly strong signal and the start of each transmission (its preamble).</string>
+
+    <!-- ===== Exam practice (the questions themselves stay English: they are the US pools) ===== -->
+    <!-- Toast: the question pool file could not be read. %1$s the technical reason. -->
+    <string name="modes_exam_err_pool">Could not read the question pool: %1$s</string>
+    <!-- Title of the exam practice sheet. One line. -->
+    <string name="modes_exam_title">Exam practice</string>
+    <!-- Explanation on the exam home page; NCVEC and Russ Olsen are names. A paragraph. -->
+    <string name="modes_exam_hint">Practice for the US amateur licence exams with the official question pools. A practice exam draws one question from each group, as the real exam does; you need 26 of 35 right (37 of 50 for Extra). The pools are public domain (NCVEC); machine-readable edition by Russ Olsen.</string>
+    <!-- Exam card: the exam's size and pass mark. %1$d questions, %2$d right answers needed. Short. -->
+    <plurals name="modes_exam_questions_pass">
+        <item quantity="one">%1$d question, pass at %2$d</item>
+        <item quantity="other">%1$d questions, pass at %2$d</item>
+    </plurals>
+    <!-- Exam card: the best practice score. %1$d right, %2$d questions. Very short. -->
+    <string name="modes_exam_best">best %1$d/%2$d</string>
+    <!-- Exam card: questions answered wrong, to go over again. %1$d a count. Short. -->
+    <plurals name="modes_exam_missed_review">
+        <item quantity="one">%1$d missed to review</item>
+        <item quantity="other">%1$d missed to review</item>
+    </plurals>
+    <!-- Element page: the pool's size. %1$d questions. One line. -->
+    <plurals name="modes_exam_pool_size">
+        <item quantity="one">%1$d question in the pool.</item>
+        <item quantity="other">%1$d questions in the pool.</item>
+    </plurals>
+    <!-- Button: start a practice exam. %1$d its questions. Full width. -->
+    <plurals name="modes_exam_practice">
+        <item quantity="one">Practice exam (%1$d question)</item>
+        <item quantity="other">Practice exam (%1$d questions)</item>
+    </plurals>
+    <!-- Button: go over the missed questions. %1$d how many. Full width. -->
+    <string name="modes_exam_missed_button">Missed questions (%1$d)</string>
+    <!-- Toast: no question was missed yet. One line. -->
+    <string name="modes_exam_nothing_missed">Nothing missed yet</string>
+    <!-- Section heading (capitals) above the subelements (chapters of the pool). Short. -->
+    <string name="modes_exam_study_section">Study a subelement</string>
+    <!-- Subelement card. %1$d its questions. One line. -->
+    <plurals name="modes_exam_study_card">
+        <item quantity="one">%1$d question, with the answer shown after each</item>
+        <item quantity="other">%1$d questions, with the answer shown after each</item>
+    </plurals>
+    <!-- Sheet title during a practice exam. %1$d this question, %2$d all of them. One line. -->
+    <string name="modes_exam_question_exam">Exam %1$d of %2$d</string>
+    <!-- Sheet title while studying. %1$d this question, %2$d all of them. One line. -->
+    <string name="modes_exam_question_study">Study %1$d of %2$d</string>
+    <!-- Button after a right answer while studying. Full width. -->
+    <string name="modes_exam_right_next">Right — next</string>
+    <!-- Button after a wrong answer while studying. %1$s the right answer's letter (A–D). Full width. -->
+    <string name="modes_exam_answer_next">The answer is %1$s — next</string>
+    <!-- Sheet title at the end of a practice exam. One line. -->
+    <string name="modes_exam_result_exam">Exam result</string>
+    <!-- Sheet title at the end of a study run. One line. -->
+    <string name="modes_exam_result_study">Study result</string>
+    <!-- Result: passed. %1$d the right answers that were needed. One line. -->
+    <plurals name="modes_exam_passed">
+        <item quantity="one">Pass: %1$d were needed.</item>
+        <item quantity="other">Pass: %1$d were needed.</item>
+    </plurals>
+    <!-- Result: not passed. %1$d the right answers needed. Two lines. -->
+    <plurals name="modes_exam_not_yet">
+        <item quantity="one">Not yet: %1$d are needed. Review the misses below, then try again.</item>
+        <item quantity="other">Not yet: %1$d are needed. Review the misses below, then try again.</item>
+    </plurals>
+    <!-- Result of a study run or a stopped exam. %1$s percent right; "Missed questions" is the button name. Two lines. -->
+    <string name="modes_exam_percent">%1$s %% right. Misses are kept under Missed questions until you answer them right.</string>
+    <!-- Section heading (capitals) above the missed questions. One word. -->
+    <string name="modes_exam_missed_section">Missed</string>
+    <!-- Under a missed question: the right answer. %1$s its letter, %2$s its text (English). One line or more. -->
+    <string name="modes_exam_answer">Answer %1$s: %2$s</string>
+    <!-- Under a missed question: what was chosen. %1$s its letter, %2$s its text (English). One line or more. -->
+    <string name="modes_exam_you_chose">You chose %1$s: %2$s</string>
+    <!-- Button back to the exam element. %1$s its name ("Technician"). Full width. -->
+    <string name="modes_exam_back_to">Back to %1$s</string>
+
+    <!-- ===== Band scope screen ===== -->
+    <!-- Title of the band scope screen. One or two words. -->
+    <string name="modes_scope_title">Band scope</string>
+    <!-- Subtitle while the scope is stopped. One line. -->
+    <string name="modes_scope_subtitle">Receive only · nothing is transmitted</string>
+    <!-- Subtitle while sweeping. %1$s start MHz, %2$s end MHz, %3$d steps, %4$s step in kHz, %5$s "≈" when the time is an estimate (else empty), %6$s the sweep time ("40 s"). One line. -->
+    <string name="modes_scope_running">%1$s–%2$s · %3$d × %4$s kHz · sweep %5$s%6$s</string>
+    <!-- The same during a sweep, with the step in progress. %7$d the step number. One line. -->
+    <string name="modes_scope_running_step">%1$s–%2$s · %3$d × %4$s kHz · sweep %5$s%6$s · step %7$d</string>
+    <!-- Under the graph: no peak stands out. One line. -->
+    <string name="modes_scope_no_peaks">No signal stands out above the noise (8 dB).</string>
+    <!-- Under the graph: the strongest signals. %1$s the list, one frequency and level per line. -->
+    <string name="modes_scope_peaks">Strongest above the noise:\n%1$s</string>
+    <!-- Under the graph while the first sweep runs. Short. -->
+    <string name="modes_scope_first_sweep">First sweep…</string>
+    <!-- Under the graph before starting; Start is the button name. Two or three lines. -->
+    <string name="modes_scope_intro">Choose a band or a custom range and Start. The radio sweeps it step by step (receive only; your channel comes back when it stops). Tap the graph to read a frequency.</string>
+    <!-- Button: tune the radio (VFO) to the frequency picked on the graph. Half width. -->
+    <string name="modes_scope_listen_here">Listen here</string>
+    <!-- Button: reset the peak-hold line. Half width. -->
+    <string name="modes_scope_clear_peaks">Clear peaks</string>
+    <!-- Band list item. %1$s band name, %2$s start MHz, %3$s end MHz, %4$s step kHz, %5$d steps, %6$s the sweep time. One or two lines. -->
+    <plurals name="modes_scope_preset_item">
+        <item quantity="one">%1$s\u0020 (%2$s–%3$s, %4$s kHz, %5$d step, about %6$s)</item>
+        <item quantity="other">%1$s\u0020 (%2$s–%3$s, %4$s kHz, %5$d steps, about %6$s)</item>
+    </plurals>
+    <!-- Band list item: enter a range by hand. Short. -->
+    <string name="modes_scope_custom_item">Custom range…</string>
+    <!-- Band list item: show the bands the region leaves out. Short. -->
+    <string name="modes_scope_show_all">Show all bands…</string>
+    <!-- Title of the band list dialog. Short. -->
+    <string name="modes_scope_which_band">Which band?</string>
+    <!-- Title of the custom range sheet. Short. -->
+    <string name="modes_scope_custom_title">Custom range</string>
+    <!-- Custom range hint. %1$s the radio's bands, %2$d the most steps. Three lines. -->
+    <string name="modes_scope_custom_hint">Any range inside %1$s (the radio tunes nothing else), up to %2$d steps. Each step takes about a second, so a narrow range with a fine step comes round quickly; a wide one takes minutes.</string>
+    <!-- Section heading above the start frequency. Short. -->
+    <string name="modes_scope_from">From (MHz)</string>
+    <!-- Section heading above the end frequency. Short. -->
+    <string name="modes_scope_to">To (MHz)</string>
+    <!-- Section heading above the step. Short. -->
+    <string name="modes_scope_step">Step (kHz)</string>
+    <!-- Button: use the custom range. Full width. -->
+    <string name="modes_scope_use">Use this range</string>
+    <!-- Custom range estimate. %1$d steps, %2$s the sweep time ("2 min"). One line. -->
+    <plurals name="modes_scope_estimate">
+        <item quantity="one">%1$d step, a sweep takes about %2$s</item>
+        <item quantity="other">%1$d steps, a sweep takes about %2$s</item>
+    </plurals>
+    <!-- Toast: Listen here needs a frequency picked on the graph. One line. -->
+    <string name="modes_scope_tap_first">Tap the graph first to pick a frequency</string>
+    <!-- Toast after Listen here. %1$s the frequency in MHz. One line. -->
+    <string name="modes_scope_listening">Listening on %1$s MHz (VFO)</string>
+    <!-- Screen reader description of the graph. One line. -->
+    <string name="modes_scope_graph_description">Band scope graph and waterfall</string>
+
+    <!-- ===== FT8 screen ===== -->
+    <!-- Button: start calling CQ. Third of a row, short. -->
+    <string name="modes_ft8_call_cq">Call CQ</string>
+    <!-- Button: stop transmitting. Third of a row, short. -->
+    <string name="modes_ft8_halt">Halt TX</string>
+    <!-- Button: type a message to send. Third of a row, short. -->
+    <string name="modes_ft8_send_text">Send text</string>
+    <!-- Button: open the FT8 settings. Third of a row, short. -->
+    <string name="modes_ft8_settings">Settings</string>
+    <!-- Button: stop FT8 and close. Third of a row, short. -->
+    <string name="modes_ft8_stop">Stop FT8</string>
+    <!-- Subtitle. %1$s channel number, %2$s its name. One line. -->
+    <string name="modes_ft8_on_channel">FT8 over FM on Ch %1$s · %2$s</string>
+    <!-- Subtitle when no channel is known. One line. -->
+    <string name="modes_ft8_on_this">FT8 over FM on this channel</string>
+    <!-- QSO line while transmitting in the first period (:00 :30). %1$s the FT8 message. Monospaced, one line. -->
+    <string name="modes_ft8_tx_first">TX 1st ▸ %1$s</string>
+    <!-- QSO line while transmitting in the second period (:15 :45). %1$s the FT8 message. Monospaced, one line. -->
+    <string name="modes_ft8_tx_second">TX 2nd ▸ %1$s</string>
+    <!-- QSO line: in a contact. %1$s the other callsign. One line. -->
+    <string name="modes_ft8_qso_with">QSO with %1$s</string>
+    <!-- QSO line: idle. One line. -->
+    <string name="modes_ft8_not_tx">Not transmitting</string>
+    <!-- Status line. %1$s the station status ("Listening"), %2$s the audio transmit frequency in Hz. One line. -->
+    <string name="modes_ft8_status_line">%1$s\u0020 ·\u0020 transmit at %2$s Hz</string>
+    <!-- The same with the grid sent. %3$s the grid ("FN42"). One line. -->
+    <string name="modes_ft8_status_line_grid">%1$s\u0020 ·\u0020 transmit at %2$s Hz\u0020 ·\u0020 grid %3$s</string>
+    <!-- Period button: transmit in the first period (seconds :00 and :30). Third of a row. -->
+    <string name="modes_ft8_period_first">TX 1st (:00 :30)</string>
+    <!-- Period button: transmit in the second period (seconds :15 and :45). Third of a row. -->
+    <string name="modes_ft8_period_second">TX 2nd (:15 :45)</string>
+    <!-- Empty decode list. RR73 and 73 are FT8 messages; WSJT-X is a program. Two paragraphs. -->
+    <string name="modes_ft8_empty_hint">Listening. Every 15 s the last slot is decoded and listed here, newest at the top. Tap a CQ to answer it; the app then runs the exchange (grid, report, R-report, RR73, 73) by itself and logs the contact.\n\nFT8 over FM talks to stations sending FT8 audio on this FM channel: another SignalDeck, or WSJT-X through an FM radio. It cannot hear SSB FT8 (144.174 / 432.174 MHz), and FM lets only the strongest station of each slot through.</string>
+    <!-- Toast after tapping a decode, first period. %1$s the callsign. One line. -->
+    <string name="modes_ft8_calling_first">Calling %1$s in the 1st period</string>
+    <!-- Toast after tapping a decode, second period. %1$s the callsign. One line. -->
+    <string name="modes_ft8_calling_second">Calling %1$s in the 2nd period</string>
+    <!-- Section heading (capitals) above our own transmissions. One word. -->
+    <string name="modes_ft8_sent">Sent</string>
+    <!-- Title of the send-a-message sheet. One line. -->
+    <string name="modes_ft8_send_title">Send an FT8 message</string>
+    <!-- Hint on the send sheet. %1$s the user's callsign (or YOURCALL). The message itself is sent in English as typed. Two lines. -->
+    <string name="modes_ft8_send_hint">Any standard message (for example \"CQ %1$s\") or up to 13 characters of free text: A-Z, 0-9, space and + - . / ?. It goes out once, in your period.</string>
+    <!-- Toast after queuing a typed message. One line. -->
+    <string name="modes_ft8_queued">Queued for your next period</string>
+    <!-- Title of the FT8 settings sheet. One line. -->
+    <string name="modes_ft8_settings_title">FT8 settings</string>
+    <!-- Section heading (capitals): the grid locator sent. One line. -->
+    <string name="modes_ft8_grid_section">Grid sent with CQ and replies</string>
+    <!-- Grid hint. %1$s the grid in use ("FN42", or modes_ft8_grid_none). Three lines. -->
+    <string name="modes_ft8_grid_hint">FT8 sends a 4-character Maidenhead grid (about 100 x 200 km). Leave it empty to use the phone\'s location, type one to fix it, or type - to send no grid. Now: %1$s.</string>
+    <!-- No grid is sent. Lower case, one word. -->
+    <string name="modes_ft8_grid_none">none</string>
+    <!-- Hint in the grid field when empty: the phone's location is used. Short. -->
+    <string name="modes_ft8_grid_input_hint">from location</string>
+    <!-- Section heading (capitals): the audio transmit frequency. Short. -->
+    <string name="modes_ft8_txfreq_section">Transmit frequency</string>
+    <!-- Transmit frequency hint. %1$s the frequency in Hz. Two lines. -->
+    <string name="modes_ft8_txfreq_hint">The audio frequency of your signal (%1$s Hz). Tap the waterfall to move it. On FM it matters little: the receiver hears one station at a time.</string>
+    <!-- Section heading (capitals): clock accuracy. One word. -->
+    <string name="modes_ft8_clock_section">Clock</string>
+    <!-- Button: empty the decode list. Half width. -->
+    <string name="modes_ft8_clear_list">Clear list</string>
+    <!-- Toast: the grid typed is not valid. FN42 is an example. One line. -->
+    <string name="modes_ft8_grid_invalid">A grid is two letters A-R and two digits, like FN42</string>
+    <!-- Clock hint before any decode. DT is the time-offset column. Two lines. -->
+    <string name="modes_ft8_clock_hint">FT8 needs your clock within about a second of the other station\'s. The phone sets its clock from the network; after the first decodes, their DT column shows the difference.</string>
+    <!-- Clock hint: the time offset is small. %1$s the average offset in seconds ("+0.3"). One line. -->
+    <string name="modes_ft8_clock_fine">Recent decodes average DT %1$s s. That is fine.</string>
+    <!-- Clock hint: the time offset is large. %1$s the average offset in seconds. Two lines. -->
+    <string name="modes_ft8_clock_off">Recent decodes average DT %1$s s. That is a lot: check the phone\'s automatic time setting (or the other station\'s clock).</string>
+    <!-- Slot clock bar (monospaced, drawn on a thin bar): the first period. %1$s seconds into the slot (" 7.3"). Short. -->
+    <string name="modes_ft8_clock_first">1st period\u0020 %1$s s</string>
+    <!-- The same while we transmit in it. Short. -->
+    <string name="modes_ft8_clock_first_tx">1st period\u0020 %1$s s\u0020 · TX</string>
+    <!-- Slot clock bar: the second period. %1$s seconds into the slot. Short. -->
+    <string name="modes_ft8_clock_second">2nd period\u0020 %1$s s</string>
+    <!-- The same while we transmit in it. Short. -->
+    <string name="modes_ft8_clock_second_tx">2nd period\u0020 %1$s s\u0020 · TX</string>
+    <!-- Screen reader description of the waterfall. One line. -->
+    <string name="modes_ft8_waterfall_description">Waterfall; tap to choose the transmit frequency</string>
+
+    <!-- ===== Satellite passes sheet (PKT → Satellite passes) ===== -->
+    <!-- Toast while the orbits download. One line. -->
+    <string name="modes_satd_downloading">Downloading satellite orbits…</string>
+    <!-- Title of the ISS frequencies sheet, and the button that opens it. Short. -->
+    <string name="modes_satd_iss_title">ISS frequencies</string>
+    <!-- ISS frequencies explanation; ARISS is the ISS amateur radio programme. Three lines. -->
+    <string name="modes_satd_iss_hint">ARISS changes what the space station\'s radios do: APRS moves between 145.825 and 437.825, the repeater comes and goes, SSTV runs only during announced events. Set what the ARISS status page says now. The defaults are the status of 7 October 2026.</string>
+    <!-- Field label: the ISS APRS digipeater frequency. One line. -->
+    <string name="modes_satd_iss_aprs">APRS digipeater (MHz)</string>
+    <!-- Field label: the ISS SSTV frequency. One line. -->
+    <string name="modes_satd_iss_sstv">SSTV pictures (MHz)</string>
+    <!-- Field label: the ISS repeater's downlink. One line. -->
+    <string name="modes_satd_iss_rptr_down">Repeater: listen (MHz)</string>
+    <!-- Field label: the ISS repeater's uplink. One line. -->
+    <string name="modes_satd_iss_rptr_up">Repeater: talk (MHz)</string>
+    <!-- Field label: the ISS crew voice downlink. One line. -->
+    <string name="modes_satd_iss_voice_down">Crew voice: listen (MHz)</string>
+    <!-- Field label: the ISS crew voice uplink. One line. -->
+    <string name="modes_satd_iss_voice_up">Crew voice: talk (MHz)</string>
+    <!-- Field label with a warning: this radio cannot tune the frequency. %1$s the label above. One line. -->
+    <string name="modes_satd_not_tunable">%1$s\u0020 ·\u0020 not tunable on this radio</string>
+    <!-- Field label with a warning: this radio can only receive there. %1$s the label above. One line. -->
+    <string name="modes_satd_listen_only">%1$s\u0020 ·\u0020 listen only on this radio</string>
+    <!-- Field label: the ISS repeater's CTCSS tone. One line. -->
+    <string name="modes_satd_iss_tone">Repeater tone (Hz)</string>
+    <!-- Button: put the ISS frequencies back to the defaults. Third of a row. -->
+    <string name="modes_satd_defaults">Defaults</string>
+    <!-- Button: open the ARISS status web page. Third of a row. -->
+    <string name="modes_satd_ariss_status">ARISS status</string>
+    <!-- Toast after saving the ISS frequencies. One line. -->
+    <string name="modes_satd_iss_saved">Saved: used from the next pass you track</string>
+    <!-- Toast: a frequency is out of range. %1$s the bands this radio tunes. Two lines. -->
+    <string name="modes_satd_iss_invalid">Check the numbers: listen frequencies inside %1$s (what this radio tunes), talk frequencies between 136 and 480 MHz</string>
+    <!-- Toast after resetting the ISS frequencies. One line. -->
+    <string name="modes_satd_iss_reset">ISS frequencies back to the defaults</string>
+    <!-- Toast: no app can open the web page. Short. -->
+    <string name="modes_satd_no_browser">No browser</string>
+    <!-- Title of the satellite passes sheet. One line. -->
+    <string name="modes_satd_title">Satellite passes</string>
+    <!-- Explanation on the passes sheet. %1$s the age of the orbits in hours. A paragraph. -->
+    <string name="modes_satd_hint">Passes over you in the next 24 hours. Track a pass and the radio follows it: a minute before it rises the VFO takes the satellite\'s frequencies, corrected for Doppler every couple of seconds (never while you talk), and goes back to your channel after it sets. A vertical antenna hears the higher passes best. Orbits from %1$s h ago.</string>
+    <!-- The same before any orbit was downloaded. A paragraph. -->
+    <string name="modes_satd_hint_no_orbits">Passes over you in the next 24 hours. Track a pass and the radio follows it: a minute before it rises the VFO takes the satellite\'s frequencies, corrected for Doppler every couple of seconds (never while you talk), and goes back to your channel after it sets. A vertical antenna hears the higher passes best. Orbits not downloaded.</string>
+    <!-- Button: stop following a pass. Full width. -->
+    <string name="modes_satd_stop_tracking">Stop tracking</string>
+    <!-- Toast after Stop tracking. Short. -->
+    <string name="modes_satd_tracking_stopped">Tracking stopped</string>
+    <!-- Hint: the phone has no location. One line. -->
+    <string name="modes_satd_no_fix">No position fix yet: turn on location, then open this again.</string>
+    <!-- Hint: satellites left out because this radio cannot tune them. %1$d how many, %2$s the radio's bands. Two lines. -->
+    <plurals name="modes_satd_outside">
+        <item quantity="one">%1$d satellite sends outside what this radio tunes (%2$s) and is not listed.</item>
+        <item quantity="other">%1$d satellites send outside what this radio tunes (%2$s) and are not listed.</item>
+    </plurals>
+    <!-- Placeholder while AMSAT's reports load. Short. -->
+    <string name="modes_satd_amsat_loading">AMSAT status …</string>
+    <!-- Satellite frequencies, receive only. %1$s downlink MHz, %2$s the satellite's description. Two lines. -->
+    <string name="modes_satd_listen">Listen %1$s MHz (receive only). %2$s</string>
+    <!-- Satellite frequencies. %1$s downlink MHz, %2$s uplink MHz, %3$s the description. Two lines. -->
+    <string name="modes_satd_listen_talk">Listen %1$s, talk %2$s MHz. %3$s</string>
+    <!-- Satellite frequencies with a tone. %1$s downlink, %2$s uplink MHz, %3$s the CTCSS tone in Hz, %4$s the description. Two lines. -->
+    <string name="modes_satd_listen_talk_tone">Listen %1$s, talk %2$s MHz with %3$s Hz. %4$s</string>
+    <!-- Hint: no orbit for this satellite. One line. -->
+    <string name="modes_satd_no_orbit">No orbit for it in the download.</string>
+    <!-- Pass row, the satellite is up now. %1$s highest elevation in degrees, %2$d the pass length in minutes. One line. -->
+    <string name="modes_satd_pass_up">Up now\u0020 ·\u0020 highest %1$s°\u0020 ·\u0020 %2$d min</string>
+    <!-- Pass row. %1$s weekday and time it rises, %2$s highest elevation in degrees, %3$d minutes. One line. -->
+    <string name="modes_satd_pass_at">%1$s\u0020 ·\u0020 highest %2$s°\u0020 ·\u0020 %3$d min</string>
+    <!-- Pass row, second line. %1$s compass direction it rises, %2$s where it sets ("NE"). One line. -->
+    <string name="modes_satd_pass_rises">Rises %1$s, sets %2$s\u0020 ·\u0020 tap to track</string>
+    <!-- Toast after tapping a pass that comes later. %1$s the satellite, %2$s when tracking starts (HH:mm). One line. -->
+    <string name="modes_satd_tracking_from">Tracking %1$s from %2$s</string>
+    <!-- Toast after tapping a pass under way. %1$s the satellite. One line. -->
+    <string name="modes_satd_tracking_now">Tracking %1$s now</string>
+    <!-- Hint: no pass coming. One line. -->
+    <string name="modes_satd_no_pass">No pass above 10° in the next 24 hours.</string>
+    <!-- Switch: record every tracked pass. Short. -->
+    <string name="modes_satd_record">Record each pass</string>
+    <!-- Switch description; keep the path. Two lines. -->
+    <string name="modes_satd_record_hint">The whole pass as a WAV in Download/DMR/Audio/&lt;satellite&gt; (about 1 MB a minute), so a missed picture or packet can be decoded again</string>
+    <!-- Button: download the orbits and the FM satellite list. Full width. -->
+    <string name="modes_satd_update">Update orbits</string>
+    <!-- Toast after updating the orbits. Short. -->
+    <string name="modes_satd_updated">Orbits updated</string>
+    <!-- Live line before the pass. %1$s the satellite, %2$s when it rises (HH:mm). One line. -->
+    <string name="modes_satd_live_waiting">Tracking %1$s: waiting for the pass at %2$s</string>
+    <!-- Live line during a pass, satellite coming closer. %1$s satellite, %2$s azimuth degrees, %3$s compass, %4$s elevation degrees, %5$s listen MHz, %6$s talk MHz. Two lines. -->
+    <string name="modes_satd_live_approaching">%1$s\u0020 ·\u0020 azimuth %2$s° %3$s, elevation %4$s°\nlisten %5$s\u0020 ·\u0020 talk %6$s MHz\u0020 ·\u0020 approaching</string>
+    <!-- The same, satellite moving away. Two lines. -->
+    <string name="modes_satd_live_receding">%1$s\u0020 ·\u0020 azimuth %2$s° %3$s, elevation %4$s°\nlisten %5$s\u0020 ·\u0020 talk %6$s MHz\u0020 ·\u0020 receding</string>
+
+    <!-- ===== Logbook ===== -->
+    <!-- Title of the logbook sheet. One word. -->
+    <string name="modes_log_title">Logbook</string>
+    <!-- Top line with the user's grid. %1$s the grid ("FN42ab"), %2$d grid squares worked. One line. -->
+    <plurals name="modes_log_grids_here">
+        <item quantity="one">You are in %1$s\u0020 ·\u0020 %2$d grid square worked</item>
+        <item quantity="other">You are in %1$s\u0020 ·\u0020 %2$d grid squares worked</item>
+    </plurals>
+    <!-- Top line without a position. %1$d grid squares worked. One line. -->
+    <plurals name="modes_log_grids">
+        <item quantity="one">%1$d grid square worked</item>
+        <item quantity="other">%1$d grid squares worked</item>
+    </plurals>
+    <!-- Part of modes_log_hint: the contacts logged. %1$d a count. -->
+    <plurals name="modes_log_contacts">
+        <item quantity="one">%1$d contact</item>
+        <item quantity="other">%1$d contacts</item>
+    </plurals>
+    <!-- Part of modes_log_hint: stations heard but not worked. %1$d a count. -->
+    <plurals name="modes_log_heard">
+        <item quantity="one">%1$d station heard</item>
+        <item quantity="other">%1$d stations heard</item>
+    </plurals>
+    <!-- Logbook explanation. %1$s the contacts ("3 contacts"), %2$s the stations heard ("12 stations heard"). RadioID is a service name; ADIF is the log file format. A paragraph. -->
+    <string name="modes_log_hint">%1$s, %2$s. Heard stations are logged by themselves (DMR callers with a RadioID callsign, APRS stations, Morse IDs); tap one to fill in the reports and mark it a contact. Export ADIF for your logging program or QSL service.</string>
+    <!-- Button: log a contact by hand. Half width. -->
+    <string name="modes_log_add">Add contact</string>
+    <!-- Button: save and share the log as an ADIF file. Half width. -->
+    <string name="modes_log_export">Export ADIF</string>
+    <!-- Filter button: only contacts are listed. Third of a row. -->
+    <string name="modes_log_showing_contacts">Showing: contacts</string>
+    <!-- Filter button: everything is listed. Third of a row. -->
+    <string name="modes_log_showing_all">Showing: all</string>
+    <!-- Toggle button: stations heard are logged automatically. Third of a row. -->
+    <string name="modes_log_heard_on">Log heard: on</string>
+    <!-- Toggle button: stations heard are not logged. Third of a row. -->
+    <string name="modes_log_heard_off">Log heard: off</string>
+    <!-- Toggle button: callsigns are looked up online. Third of a row. -->
+    <string name="modes_log_lookup_on">Look up: on</string>
+    <!-- Toggle button: no online lookup. Third of a row. -->
+    <string name="modes_log_lookup_off">Look up: off</string>
+    <!-- Empty list, contacts only. One line. -->
+    <string name="modes_log_no_contacts">No contacts logged yet.</string>
+    <!-- Empty list. One line. -->
+    <string name="modes_log_nothing">Nothing logged yet.</string>
+    <!-- Chip on an entry that was heard, not worked. Lower case, one short word. -->
+    <string name="modes_log_chip_heard">heard</string>
+    <!-- Entry line part: the signal report sent. %1$s the report ("59"). Very short. -->
+    <string name="modes_log_rst_sent">sent %1$s</string>
+    <!-- Entry line part: the signal report received. %1$s the report. Very short. -->
+    <string name="modes_log_rst_rcvd">rcvd %1$s</string>
+    <!-- Title of the entry editor for an existing entry. One line. -->
+    <string name="modes_log_entry_title">Logbook entry</string>
+    <!-- Title of the entry editor for a new contact. One line. -->
+    <string name="modes_log_new_title">New contact</string>
+    <!-- Field label: callsign. Short. -->
+    <string name="modes_log_f_call">Callsign</string>
+    <!-- Field label: frequency. Short. -->
+    <string name="modes_log_f_freq">Frequency (MHz)</string>
+    <!-- Button that cycles the mode. %1$s the mode (FM, DMR, PKT, CW). Full width. -->
+    <string name="modes_log_mode">Mode: %1$s</string>
+    <!-- Field label: report sent; 59 is a typical report. Short. -->
+    <string name="modes_log_f_sent">Report sent (e.g. 59)</string>
+    <!-- Field label: report received. Short. -->
+    <string name="modes_log_f_rcvd">Report received</string>
+    <!-- Field label: the other operator's name. Short. -->
+    <string name="modes_log_f_name">Name</string>
+    <!-- Field label: where the other station is (QTH). Short. -->
+    <string name="modes_log_f_qth">Location</string>
+    <!-- Field label: Maidenhead grid square. Short. -->
+    <string name="modes_log_f_grid">Grid square</string>
+    <!-- Button: look the callsign up online (HamDB). Full width. -->
+    <string name="modes_log_lookup">Look up the callsign</string>
+    <!-- Toast: Look up needs a callsign. One line. -->
+    <string name="modes_log_enter_call_first">Enter a callsign first</string>
+    <!-- Button text while looking up. Short. -->
+    <string name="modes_log_looking_up">Looking up…</string>
+    <!-- Toast: the lookup found nothing; HamDB is a service name. One line. -->
+    <string name="modes_log_not_found">Not found (HamDB lists US, Canadian and some other licences)</string>
+    <!-- Toast after a lookup. %1$s the name found, %2$s the licence class ("Extra"). One line. -->
+    <string name="modes_log_found_class">%1$s, class %2$s</string>
+    <!-- Field label: notes. Short. -->
+    <string name="modes_log_f_notes">Notes</string>
+    <!-- Toggle button: the entry is a contact (QSO). Full width. -->
+    <string name="modes_log_was_qso">This was a contact (QSO)</string>
+    <!-- Toggle button: the station was only heard. Full width. -->
+    <string name="modes_log_only_heard">Only heard (not a contact)</string>
+    <!-- Toast: Save needs a callsign. One line. -->
+    <string name="modes_log_enter_call">Enter the callsign</string>
+    <!-- Toast: the frequency is not a number. One line. -->
+    <string name="modes_log_freq_invalid">Frequency in MHz, e.g. 146.520</string>
+    <!-- Toast after export. %1$s the file name; keep the path. One line. -->
+    <string name="modes_log_exported">Saved Download/DMR/Logbook/%1$s</string>
+    <!-- Title of Android's share chooser for the log. One line. -->
+    <string name="modes_log_share">Share the logbook</string>
+    <!-- Toast: the export failed. %1$s the technical reason. One line. -->
+    <string name="modes_log_export_failed">Export failed: %1$s</string>
+
+    <!-- ===== SSTV screen ===== -->
+    <!-- Explanation of the two decoders; "Any mode" and "Robot 36 continuous" are the decoder button's names; Robot, Martin, Scottie, PD are SSTV modes. A paragraph. -->
+    <string name="modes_sstv_hint">Two decoders (the button below switches): Any mode recognises Robot, Martin, Scottie and PD pictures from their VIS header at the start. Robot 36 continuous (always used for the ISS) needs no header: it locks on the line syncs, so a picture picked up halfway is drawn and placed at the bottom, fades are coasted through, and the screen shows the static until a picture comes in. Every picture, and every partial one of 16 lines or more, is saved to Download/DMR/SSTV.</string>
+    <!-- Gallery heading (capitals) before it loads. One word. -->
+    <string name="modes_sstv_received">RECEIVED</string>
+    <!-- Gallery heading (capitals) with no pictures. Short. -->
+    <string name="modes_sstv_received_none">RECEIVED\u0020 ·\u0020 none yet</string>
+    <!-- Gallery heading (capitals). %1$d the number of pictures. Short. -->
+    <string name="modes_sstv_received_count">RECEIVED\u0020 ·\u0020 %1$d</string>
+    <!-- Button: combine the selected pictures into one. Quarter of a row, very short. -->
+    <string name="modes_sstv_combine">Combine</string>
+    <!-- Toast: Share or Delete with nothing selected. One line. -->
+    <string name="modes_sstv_tap_to_select">Tap pictures to select them</string>
+    <!-- Button: open the SSTV send sheet. Half width. -->
+    <string name="modes_sstv_send">Send picture</string>
+    <!-- Toast: the decoder cannot be switched during an ISS pass. One line. -->
+    <string name="modes_sstv_iss_robot">ISS events are Robot 36: the continuous decoder is always used</string>
+    <!-- Toast after switching to the continuous decoder. One line. -->
+    <string name="modes_sstv_mode_continuous_toast">Robot 36 continuous: no header needed, partial pictures kept</string>
+    <!-- Toast after switching to the any-mode decoder. One line. -->
+    <string name="modes_sstv_mode_any_toast">Any mode: starts on the VIS header</string>
+    <!-- Button: stop SSTV and close. Half width. -->
+    <string name="modes_sstv_stop">Stop receiving</string>
+    <!-- Toast after stopping an ISS SSTV session. Short. -->
+    <string name="modes_sstv_iss_stopped">ISS SSTV stopped</string>
+    <!-- Button: decode SSTV from a recording. Full width. -->
+    <string name="modes_sstv_decode_recording">Decode a recording</string>
+    <!-- Progress under the picture. %1$d lines received, %2$d lines in the picture. Monospaced, short. -->
+    <string name="modes_sstv_lines">%1$d of %2$d lines</string>
+    <!-- Status when the decoder is idle. One word. -->
+    <string name="modes_sstv_waiting">Waiting</string>
+    <!-- Decoder button: the Robot 36 continuous decoder. Half width. -->
+    <string name="modes_sstv_dec_continuous">Robot 36 continuous</string>
+    <!-- Decoder button: any mode, started by the header. Half width. -->
+    <string name="modes_sstv_dec_any">Any mode (header)</string>
+    <!-- Status while waiting for an ISS pass. One line. -->
+    <string name="modes_sstv_starts_with_pass">The decoder starts with the pass</string>
+    <!-- Subtitle during an ISS pass. %1$s the nominal frequency in MHz. One line. -->
+    <string name="modes_sstv_iss_subtitle">ISS SSTV %1$s · Doppler-tracked</string>
+    <!-- Subtitle: listening on the SSTV calling frequency. One line. -->
+    <string name="modes_sstv_on_144">Receiving on 144.500 MHz</string>
+    <!-- Subtitle: listening on the current channel. One line. -->
+    <string name="modes_sstv_on_channel">Receiving on this channel</string>
+    <!-- Button: go back to the channel. Half width. -->
+    <string name="modes_sstv_use_channel">Use this channel</string>
+    <!-- Button: tune the SSTV frequency 144.500 MHz. Half width. -->
+    <string name="modes_sstv_go_144">Go to 144.500</string>
+    <!-- Picture viewer hint. %1$s date and time received. One line. -->
+    <string name="modes_sstv_received_at">Received %1$s · Download/DMR/SSTV</string>
+    <!-- Title of Android's share chooser for one picture. One line. -->
+    <string name="modes_sstv_share_picture">Share picture</string>
+    <!-- Toast: sharing failed. %1$s the technical reason. One line. -->
+    <string name="modes_sstv_share_failed">Could not share: %1$s</string>
+    <!-- Selection count above the selection buttons. %1$d pictures selected. Short. -->
+    <plurals name="modes_sstv_selected">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
+    <!-- Toast: Combine needs two pictures or more. One line. -->
+    <string name="modes_sstv_select_two">Select two or more receptions of the same picture</string>
+    <!-- Toast while the pictures are lined up. %1$d pictures (2 or more). One line. -->
+    <plurals name="modes_sstv_lining_up">
+        <item quantity="one">Lining up %1$d pictures…</item>
+        <item quantity="other">Lining up %1$d pictures…</item>
+    </plurals>
+    <!-- Title of the combine sheet. %1$d pictures (2 or more). One line. -->
+    <plurals name="modes_sstv_combine_title">
+        <item quantity="one">Combine %1$d pictures</item>
+        <item quantity="other">Combine %1$d pictures</item>
+    </plurals>
+    <!-- Button: undo manual moves, back to the automatic line-up. Half width. -->
+    <string name="modes_sstv_automatic">Automatic</string>
+    <!-- Where this picture is: it is the reference the others line up on. Lower case, short. -->
+    <string name="modes_sstv_where_ref">reference</string>
+    <!-- Where this picture is: not used in the combination. Lower case, short. -->
+    <string name="modes_sstv_where_out">left out</string>
+    <!-- Offset of the picture. %1$d lines up, %2$d pixels left. Lower case, short. -->
+    <string name="modes_sstv_where_up_left">up %1$d lines, left %2$d px</string>
+    <!-- Offset of the picture. %1$d lines up, %2$d pixels right. Lower case, short. -->
+    <string name="modes_sstv_where_up_right">up %1$d lines, right %2$d px</string>
+    <!-- Offset of the picture. %1$d lines down, %2$d pixels left. Lower case, short. -->
+    <string name="modes_sstv_where_down_left">down %1$d lines, left %2$d px</string>
+    <!-- Offset of the picture. %1$d lines down, %2$d pixels right. Lower case, short. -->
+    <string name="modes_sstv_where_down_right">down %1$d lines, right %2$d px</string>
+    <!-- Picture picker button (tap for the next). %1$d this picture, %2$d all, %3$s its name, %4$s where it is. Two lines. -->
+    <string name="modes_sstv_pick">Picture %1$d of %2$d ▸\n%3$s · %4$s</string>
+    <!-- Toggle button: this is the reference picture. Short (104 dp). -->
+    <string name="modes_sstv_use_ref">Reference</string>
+    <!-- Toggle button: the picture is used. Short (104 dp). -->
+    <string name="modes_sstv_use_in">In</string>
+    <!-- Toggle button: the picture is left out. Short (104 dp). -->
+    <string name="modes_sstv_use_out">Left out</string>
+    <!-- Combine note: only one picture is still used. A sentence. -->
+    <string name="modes_sstv_note_one">Only one picture is in.</string>
+    <!-- Combine note: the user moved pictures. A sentence. -->
+    <string name="modes_sstv_note_manual">Placed by hand.</string>
+    <!-- Combine note: the line-up was found automatically. A sentence. -->
+    <string name="modes_sstv_note_auto">Lined up automatically.</string>
+    <!-- Combine note: some line-ups are guesses. %1$s the picture numbers ("2, 4"). A sentence. -->
+    <string name="modes_sstv_note_unsure">Not sure of the line-up of picture %1$s: check it and move it with the arrows.</string>
+    <!-- Combine note, always shown. Two sentences. -->
+    <string name="modes_sstv_note_partial">Partial pictures are drawn at the bottom, so a piece may belong higher up. Tap the picture name to choose which one the arrows move; long-press an arrow for 8 steps.</string>
+    <!-- Text shared with one picture. One line. -->
+    <string name="modes_sstv_share_text_one">An SSTV picture received with SignalDeck</string>
+    <!-- Text shared with several pictures. %1$d how many (2 or more). One line. -->
+    <plurals name="modes_sstv_share_text">
+        <item quantity="one">%1$d SSTV pictures received with SignalDeck</item>
+        <item quantity="other">%1$d SSTV pictures received with SignalDeck</item>
+    </plurals>
+    <!-- Share chooser title for one picture. One line. -->
+    <string name="modes_sstv_share_title_one">Share the picture</string>
+    <!-- Share chooser title for several pictures. %1$d how many (2 or more). One line. -->
+    <plurals name="modes_sstv_share_title">
+        <item quantity="one">Share %1$d pictures</item>
+        <item quantity="other">Share %1$d pictures</item>
+    </plurals>
+    <!-- Delete confirmation title for one picture. One line. -->
+    <string name="modes_sstv_delete_one">Delete this picture?</string>
+    <!-- Delete confirmation title for several pictures. %1$d how many (2 or more). One line. -->
+    <plurals name="modes_sstv_delete_many">
+        <item quantity="one">Delete these %1$d pictures?</item>
+        <item quantity="other">Delete these %1$d pictures?</item>
+    </plurals>
+    <!-- Delete confirmation message. Two lines. -->
+    <string name="modes_sstv_delete_message">They are removed from Download/DMR/SSTV on this phone. This cannot be undone.</string>
+    <!-- Toast after deleting. %1$d pictures deleted. One line. -->
+    <plurals name="modes_sstv_deleted">
+        <item quantity="one">%1$d picture deleted</item>
+        <item quantity="other">%1$d pictures deleted</item>
+    </plurals>
+
+    <!-- Joins facts on one line ("146.5200 MHz FM · under your activation US-1234"). A middle dot with a space each side. -->
+    <string name="modes_middot_separator">\u0020·\u0020</string>
+
+    <!-- ===== POTA / SOTA (program names and references stay as they are) ===== -->
+    <!-- Explanation on the POTA/SOTA sheet. Two lines. -->
+    <string name="modes_pota_hint">Parks on the Air and Summits on the Air: hams operate from parks and summits, others work them. Activate from a park or summit and log your contacts here, or find activators on the air and work them.</string>
+    <!-- Section heading (capitals): the user's own activation. Short. -->
+    <string name="modes_pota_your_activation">Your activation</string>
+    <!-- Activation card. %1$s start time, %2$d contacts today (UTC), %3$d needed for the activation to count. One line. -->
+    <string name="modes_pota_since">Since %1$s · today (UTC) %2$d of %3$d contacts</string>
+    <!-- The same once enough contacts are logged. One line. -->
+    <string name="modes_pota_since_counts">Since %1$s · today (UTC) %2$d of %3$d contacts: it counts</string>
+    <!-- Button and sheet title: log a contact. Half width. -->
+    <string name="modes_pota_log_contact">Log a contact</string>
+    <!-- Button: end the activation. Full width. -->
+    <string name="modes_pota_end_activation">End the activation</string>
+    <!-- Confirmation title. %1$s the reference ("US-1234"). One line. -->
+    <string name="modes_pota_end_confirm">End %1$s?</string>
+    <!-- Confirmation message. One line. -->
+    <string name="modes_pota_end_message">Its contacts stay in the logbook (and can still be exported).</string>
+    <!-- Dialog button: end the activation. One word. -->
+    <string name="modes_pota_end">End</string>
+    <!-- Hint when no activation runs. Two lines. -->
+    <string name="modes_pota_start_hint">Start one when you are set up in a park or on a summit: your contacts are then logged under its reference and counted (POTA: 10 in a UTC day, SOTA: 4).</string>
+    <!-- Button: start a park activation. Half width. -->
+    <string name="modes_pota_activate_park_button">Activate a park…</string>
+    <!-- Button: start a summit activation. Half width. -->
+    <string name="modes_pota_activate_summit_button">Activate a summit…</string>
+    <!-- Section heading (capitals): activators spotted now. Short. -->
+    <string name="modes_pota_on_air">On the air now</string>
+    <!-- Shown while the spots download. One line. -->
+    <string name="modes_pota_loading">Loading the POTA and SOTA spots…</string>
+    <!-- Spots: nobody on FM, and no spot at all. One line. -->
+    <string name="modes_pota_nobody">Nobody is on FM on 2 m or 70 cm right now.</string>
+    <!-- Spots: nobody on FM, others on HF. %1$d activators listed. Two lines. -->
+    <plurals name="modes_pota_nobody_others">
+        <item quantity="one">Nobody is on FM on 2 m or 70 cm right now (%1$d activators on HF and other modes, listed below).</item>
+        <item quantity="other">Nobody is on FM on 2 m or 70 cm right now (%1$d activators on HF and other modes, listed below).</item>
+    </plurals>
+    <!-- Spots: some can be worked. %1$d how many. One line. -->
+    <string name="modes_pota_workable">%1$d on FM on 2 m / 70 cm: tap one to tune or log it.</string>
+    <!-- Spot action: tune the VFO there. %1$s MHz. One line. -->
+    <string name="modes_pota_tune_to">Tune to %1$s MHz (VFO)</string>
+    <!-- Spot action: log the activator. %1$s callsign, %2$s their reference. One line. -->
+    <string name="modes_pota_log_hunting">Log %1$s (hunting %2$s)</string>
+    <!-- Toast after tuning. %1$s the callsign. One line. -->
+    <string name="modes_pota_tuned">Tuned to %1$s</string>
+    <!-- Sheet title: start a park activation. One line. -->
+    <string name="modes_pota_activate_park">Activate a park</string>
+    <!-- Sheet title: start a summit activation. One line. -->
+    <string name="modes_pota_activate_summit">Activate a summit</string>
+    <!-- Section heading above the park reference field; the examples stay as they are. One line. -->
+    <string name="modes_pota_park_ref">Park reference (US-1234, GB-0001…)</string>
+    <!-- Section heading above the summit reference field; the examples stay as they are. One line. -->
+    <string name="modes_pota_summit_ref">Summit reference (W0C/FR-001, G/SE-001…)</string>
+    <!-- Button: start the activation. Full width. -->
+    <string name="modes_pota_start">Start the activation</string>
+    <!-- Toast: the reference has the wrong shape. %1$s POTA or SOTA. One line. -->
+    <string name="modes_pota_bad_ref">That does not look like a %1$s reference</string>
+    <!-- Dialog title: the reference is unknown. %1$s the reference. One line. -->
+    <string name="modes_pota_not_found">%1$s was not found</string>
+    <!-- Dialog message. %1$s POTA or SOTA. Two lines. -->
+    <string name="modes_pota_not_found_message">%1$s does not know it (or could not be reached). Start anyway?</string>
+    <!-- Toast after starting. %1$s reference, %2$s park or summit name. One line. -->
+    <string name="modes_pota_activating">Activating %1$s: %2$s</string>
+    <!-- Section heading (capitals): parks near the phone. Short. -->
+    <string name="modes_pota_parks_near">Parks near you</string>
+    <!-- Shown while nearby parks load. Short. -->
+    <string name="modes_pota_looking">Looking…</string>
+    <!-- Nearby parks need a location. One line. -->
+    <string name="modes_pota_needs_fix">Needs a position fix.</string>
+    <!-- Nearby parks failed to load. One line. -->
+    <string name="modes_pota_unreachable_parks">POTA could not be reached.</string>
+    <!-- No park nearby. One line. -->
+    <string name="modes_pota_no_park">No park within 60 km.</string>
+    <!-- Above the nearby parks. One line. -->
+    <string name="modes_pota_tap_park">Tap one to fill in its reference:</string>
+    <!-- Log sheet title for a hunted activator. %1$s the callsign. One line. -->
+    <string name="modes_pota_log_call">Log %1$s</string>
+    <!-- Log sheet fact: logged under your activation. %1$s the reference. Short. -->
+    <string name="modes_pota_under_activation">under your activation %1$s</string>
+    <!-- Log sheet fact: the activator's reference. %1$s POTA or SOTA, %2$s the reference. Short. -->
+    <string name="modes_pota_their_ref">their %1$s %2$s</string>
+    <!-- Section heading above the report sent. Short. -->
+    <string name="modes_pota_f_sent">Report sent</string>
+    <!-- Section heading above the other station's reference. One line. -->
+    <string name="modes_pota_f_their_ref">Their park or summit (park-to-park, optional)</string>
+    <!-- Section heading above the notes. Short. -->
+    <string name="modes_pota_f_notes">Notes (optional)</string>
+    <!-- Toast: no valid callsign. One line. -->
+    <string name="modes_pota_enter_call">Enter a callsign</string>
+    <!-- Toast after logging. %1$s the callsign. One line. -->
+    <string name="modes_pota_logged">%1$s logged</string>
+    <!-- Toast after logging during an activation. %1$s callsign, %2$d contacts today, %3$d needed. One line. -->
+    <string name="modes_pota_logged_count">%1$s logged (%2$d of %3$d today)</string>
+    <!-- Duplicate warning title. %1$s the callsign. One line. -->
+    <string name="modes_pota_dupe">%1$s is already in the log</string>
+    <!-- Duplicate warning message. %1$s the activation reference. Two lines. -->
+    <string name="modes_pota_dupe_message">Worked on this band today under %1$s. Log it again anyway?</string>
+    <!-- Dialog button: log the duplicate anyway. Short. -->
+    <string name="modes_pota_log_again">Log again</string>
+    <!-- Toast: nothing to export. %1$s the reference. One line. -->
+    <string name="modes_pota_no_contacts">No contacts under %1$s yet</string>
+    <!-- Toast after export without a callsign set. %1$s the file name; keep the path. Two lines. -->
+    <string name="modes_pota_exported_no_call">Saved Download/DMR/Logbook/%1$s (set your callsign in APRS settings for the station field)</string>
+    <!-- Title of Android's share chooser for the activation log. One line. -->
+    <string name="modes_pota_send_log">Send the log</string>
+
+    <!-- ===== Winlink sheet (PKT → Winlink e-mail). Messages themselves (subjects, Re:/Fw:, quoted text) stay as sent. ===== -->
+    <!-- Title of the Winlink sheet. One line. -->
+    <string name="modes_wl_title">Winlink e-mail</string>
+    <!-- Explanation on the Winlink sheet; RMS is a Winlink gateway type. Three lines. -->
+    <string name="modes_wl_hint">E-mail by radio: write messages to callsigns or internet addresses, then connect to send what is in the outbox and collect what is waiting for you. Over the radio through a Winlink packet gateway (RMS) on 2 m or 70 cm, or over the internet when you have it.</string>
+    <!-- Notice tile title: the feature is untested. One line. -->
+    <string name="modes_wl_beta_title">New: not yet tested with the real Winlink system</string>
+    <!-- Notice tile text. One or two lines. -->
+    <string name="modes_wl_beta_text">Please tell us if it works for you: tap here to report it on GitHub.</string>
+    <!-- Button: connect to the Winlink server over the internet. Half width. -->
+    <string name="modes_wl_connect_internet">Connect: internet</string>
+    <!-- Button: connect to a gateway over the radio. Half width. -->
+    <string name="modes_wl_connect_radio">Connect: radio</string>
+    <!-- Button: write a new message. Third of a row. -->
+    <string name="modes_wl_new_message">New message</string>
+    <!-- Button: the gateway list. Third of a row. -->
+    <string name="modes_wl_gateways">Gateways</string>
+    <!-- Button: show the session log. Full width. -->
+    <string name="modes_wl_session_log">Session log</string>
+    <!-- Line after a session with the detailed log on; "Session log" and "Share log" are button names. Two lines. -->
+    <string name="modes_wl_log_recorded">Detailed log recorded: Session log → Share log, whether it worked or not. Thank you!</string>
+    <!-- Line when no password is set. Two lines. -->
+    <string name="modes_wl_no_password">No Winlink password set yet (Settings): needed for your mailbox once your callsign is registered.</string>
+    <!-- Folder name: received mail. One word. -->
+    <string name="modes_wl_inbox">Inbox</string>
+    <!-- Folder name: mail waiting to be sent. Short. -->
+    <string name="modes_wl_outbox">Outbox (goes out at the next connection)</string>
+    <!-- Folder name: mail sent. One word. -->
+    <string name="modes_wl_sent">Sent</string>
+    <!-- Section heading (capitals) of an empty folder. %1$s the folder name. Short. -->
+    <string name="modes_wl_folder_empty">%1$s: empty</string>
+    <!-- Section heading (capitals) of a folder. %1$s the folder name, %2$d messages. Short. -->
+    <string name="modes_wl_folder_count">%1$s (%2$d)</string>
+    <!-- Below a long folder. %1$d messages not listed. One line. -->
+    <plurals name="modes_wl_older">
+        <item quantity="one">%1$d older not shown.</item>
+        <item quantity="other">%1$d older not shown.</item>
+    </plurals>
+    <!-- Message line: the sender. %1$s callsign or address. Short. -->
+    <string name="modes_wl_from">From %1$s</string>
+    <!-- Message line: the recipients. %1$s callsigns or addresses. Short. -->
+    <string name="modes_wl_to">To %1$s</string>
+    <!-- Message header: copies. %1$s callsigns or addresses. Short. -->
+    <string name="modes_wl_cc">Cc %1$s</string>
+    <!-- Message header: its Winlink message ID. %1$s the ID. Short. -->
+    <string name="modes_wl_mid">Message ID %1$s</string>
+    <!-- Title of the gateway sheet and of its import result dialog. One line. -->
+    <string name="modes_wl_gw_title">Winlink gateways</string>
+    <!-- How to get the gateway list. RMS List, Packet, CSV File, Desktop site, Recent and Downloads are names on winlink.org, in the browser and in the file picker; "Open winlink.org" and "Import the CSV" are the buttons below. A paragraph. -->
+    <string name="modes_wl_gw_hint">1. Open winlink.org opens Winlink\'s gateway list in your browser: tap RMS List, choose Packet, then CSV File to download it (if the buttons are cut off, turn on the browser\'s Desktop site). 2. Come back and tap Import the CSV: the file you just downloaded is at the top of Recent, or in Downloads. SignalDeck keeps the 1200-baud packet gateways this radio can tune and sorts them by distance from the phone\'s last known position (worked out on the phone; it is not sent anywhere). Tap one to tune it and connect.</string>
+    <!-- Button: open the gateway list on winlink.org. Half width. -->
+    <string name="modes_wl_gw_open">Open winlink.org</string>
+    <!-- Button: import the downloaded CSV file. Half width. -->
+    <string name="modes_wl_gw_import">Import the CSV</string>
+    <!-- Toast: the file picker needs the app's main screen. One line. -->
+    <string name="modes_wl_gw_from_app">Open this from the app</string>
+    <!-- Import error: the file is over 8 MB. One line. -->
+    <string name="modes_wl_gw_too_large">The file is too large</string>
+    <!-- Import result: it failed. %1$s the reason. One line. -->
+    <string name="modes_wl_gw_import_failed">Could not import: %1$s</string>
+    <!-- Section heading (capitals) with no list. Short. -->
+    <string name="modes_wl_gw_none">No list imported yet</string>
+    <!-- Section heading (capitals). %1$d gateways, %2$s the import date. Short. -->
+    <plurals name="modes_wl_gw_count">
+        <item quantity="one">%1$d gateways · imported %2$s</item>
+        <item quantity="other">%1$d gateways · imported %2$s</item>
+    </plurals>
+    <!-- Button: set the packet finder to the ten nearest gateways. Full width. -->
+    <string name="modes_wl_gw_finder">Packet finder: listen on the nearest 10</string>
+    <!-- Toast. %1$d the gateway frequencies set. One line. -->
+    <plurals name="modes_wl_gw_finder_set">
+        <item quantity="one">Packet finder set to %1$d gateway frequencies, 5 min each</item>
+        <item quantity="other">Packet finder set to %1$d gateway frequencies, 5 min each</item>
+    </plurals>
+    <!-- Below a long list. %1$d gateways not listed. One line. -->
+    <plurals name="modes_wl_gw_farther">
+        <item quantity="one">%1$d farther ones not shown.</item>
+        <item quantity="other">%1$d farther ones not shown.</item>
+    </plurals>
+    <!-- Gateway line with its opening hours. %1$s distance and frequency, %2$s the hours ("06-22"). One line. -->
+    <string name="modes_wl_gw_hours">%1$s · hours %2$s</string>
+    <!-- Gateway action. %1$s the frequency in MHz. One line. -->
+    <string name="modes_wl_gw_tune_connect">Tune %1$s and connect</string>
+    <!-- Gateway action. One line. -->
+    <string name="modes_wl_gw_tune_listen">Tune and listen first</string>
+    <!-- Gateway action: remember it as the gateway to call. One line. -->
+    <string name="modes_wl_gw_use">Use it as my gateway</string>
+    <!-- Toast. %1$s the frequency in MHz. One line. -->
+    <string name="modes_wl_gw_tuning">Tuning %1$s MHz, connecting in a few seconds</string>
+    <!-- Button: forget the imported list. Full width. -->
+    <string name="modes_wl_gw_remove">Remove the list</string>
+    <!-- Radio connect dialog hint. A paragraph. -->
+    <string name="modes_wl_radio_hint">Tune the gateway\'s channel first (an analog channel; most packet gateways use 1200 baud on 2 m or 70 cm, listed at winlink.org under RMS channels). A session takes minutes: every transmission starts with a 1.6-second lead-in and frames lost on the air are sent again.</string>
+    <!-- Hint in the gateway field; N0ABC-10 is an example. Short. -->
+    <string name="modes_wl_radio_gateway_hint">Gateway, e.g. N0ABC-10</string>
+    <!-- Hint in the digipeater field. Short. -->
+    <string name="modes_wl_radio_via_hint">Via digipeaters (optional)</string>
+    <!-- Title of the radio connect dialog. One line. -->
+    <string name="modes_wl_radio_title">Connect to a radio gateway</string>
+    <!-- Winlink settings explanation. A paragraph. -->
+    <string name="modes_wl_set_hint">Your callsign comes from PKT → Settings. The first connection with a new callsign creates its Winlink account; set its password at winlink.org and enter it here. It is kept only in SignalDeck\'s private settings, never shown, logged, put in a device report or a backup.</string>
+    <!-- Password field hint when one is stored. One line. -->
+    <string name="modes_wl_set_password_set">Password (set; leave empty to keep, - to clear)</string>
+    <!-- Password field hint. Short. -->
+    <string name="modes_wl_set_password">Winlink password</string>
+    <!-- Grid field hint; JO01 is an example. Short. -->
+    <string name="modes_wl_set_grid">Grid square (optional, e.g. JO01)</string>
+    <!-- Under the grid field. One line. -->
+    <string name="modes_wl_set_grid_hint">The grid square is sent to the gateway at login (optional).</string>
+    <!-- Check box: the detailed diagnostic log. Two lines. -->
+    <string name="modes_wl_set_diag">Detailed diagnostic log (timing, raw protocol bytes, every radio frame)</string>
+    <!-- Check box: include message data in the log. One line. -->
+    <string name="modes_wl_set_diag_data">Include the messages\' data in that log</string>
+    <!-- Under the check boxes. Two lines. -->
+    <string name="modes_wl_set_diag_hint">For reporting a problem: the password is never logged; message data is left out unless you tick the second box.</string>
+    <!-- Title of the Winlink settings dialog. One line. -->
+    <string name="modes_wl_set_title">Winlink settings</string>
+    <!-- Toast: the grid is not valid. One line. -->
+    <string name="modes_wl_set_grid_invalid">Grid square like JO01 or JO01ab</string>
+    <!-- Title of the session log sheet. One line. -->
+    <string name="modes_wl_log_title">Winlink session log</string>
+    <!-- Session log before any session. Short. -->
+    <string name="modes_wl_log_none">No session yet.</string>
+    <!-- Button: share the session log. Full width. -->
+    <string name="modes_wl_log_share">Share log</string>
+    <!-- Title of Android's share chooser for the log. One line. -->
+    <string name="modes_wl_log_share_title">Share the Winlink log</string>
+    <!-- Under the log. %1$s the GitHub issues address. Two lines. -->
+    <string name="modes_wl_log_hint">Share it by e-mail or attach it to an issue on SignalDeck\'s GitHub page (%1$s). It contains your callsign and the gateway\'s; the password is never in it.</string>
+    <!-- Title of the first-connection dialog. Short. -->
+    <string name="modes_wl_ask_title">Help test Winlink</string>
+    <!-- First-connection dialog message; "Session log", "Share log" and "Settings" are names in the app. Three paragraphs. -->
+    <string name="modes_wl_ask_message">Winlink in SignalDeck is new and has not yet been tested with the real Winlink system.\n\nTurn on the detailed diagnostic log for your connections? It records the timing, the protocol and every radio frame (never your password; the messages\' data only if you choose to in Settings).\n\nWhether it works or not, please send us the log afterwards (Session log → Share log): that is how we fix it. You can turn it off in Winlink → Settings.</string>
+    <!-- Dialog button: turn the detailed log on. Short. -->
+    <string name="modes_wl_ask_on">Turn on the log</string>
+    <!-- Title of the compose sheet. One line. -->
+    <string name="modes_wl_compose_title">New Winlink message</string>
+    <!-- Compose hint. Two or three lines. -->
+    <string name="modes_wl_compose_hint">To: callsigns (they read it in their Winlink mailbox) or e-mail addresses, separated by commas. Plain text; keep it short on the radio. It is stored in the outbox and goes out at your next connection.</string>
+    <!-- Field label: recipients. One word. -->
+    <string name="modes_wl_f_to">To</string>
+    <!-- Field label: copies. Short. -->
+    <string name="modes_wl_f_cc">Cc (optional)</string>
+    <!-- Field label: subject. One word. -->
+    <string name="modes_wl_f_subject">Subject</string>
+    <!-- Field label: the text. One word. -->
+    <string name="modes_wl_f_message">Message</string>
+    <!-- Toast after queuing a message. Short. -->
+    <string name="modes_wl_in_outbox">In the outbox</string>
+    <!-- Attachment tile line. %1$d its size in bytes (under 1024). One line. -->
+    <plurals name="modes_wl_attach_bytes">
+        <item quantity="one">%1$d bytes · tap to open or share</item>
+        <item quantity="other">%1$d bytes · tap to open or share</item>
+    </plurals>
+    <!-- Attachment tile line. %1$d its size in kilobytes. One line. -->
+    <string name="modes_wl_attach_kb">%1$d KB · tap to open or share</string>
+    <!-- Button: forward the message. Third of a row. -->
+    <string name="modes_wl_forward">Forward</string>
+    <!-- Delete confirmation for a message in the outbox. One line. -->
+    <string name="modes_wl_delete_outbox">Delete this message? It will not be sent.</string>
+    <!-- Delete confirmation. One line. -->
+    <string name="modes_wl_delete">Delete this message?</string>
+    <!-- Toast: the attachment could not be opened. %1$s the reason. One line. -->
+    <string name="modes_wl_open_failed">Could not open: %1$s</string>
+
+    <!-- ===== Fox hunt sheet ===== -->
+    <!-- Title of the fox hunt sheet (finding a hidden transmitter). One line. -->
+    <string name="modes_fox_title">Fox hunt</string>
+    <!-- Fox hunt hint. %1$s the channel name, %2$s its frequency in MHz; "Mark" is the button name. Three lines. -->
+    <string name="modes_fox_hint">Listening on %1$s (%2$s MHz). Walk or drive, point the phone where the signal is strongest and tap Mark; where the bearings cross is where the fox is.</string>
+    <!-- The same with no channel. Three lines. -->
+    <string name="modes_fox_hint_no_channel">Listening on no channel. Walk or drive, point the phone where the signal is strongest and tap Mark; where the bearings cross is where the fox is.</string>
+    <!-- Layer pill: compass bearings. Third of a row, one word. -->
+    <string name="modes_fox_pill_bearings">Bearings</string>
+    <!-- Layer pill: the signal-strength heat map. Third of a row, short. -->
+    <string name="modes_fox_pill_heat">Heat map</string>
+    <!-- Layer pill: terrain shadowing. Third of a row, one word. -->
+    <string name="modes_fox_pill_terrain">Terrain</string>
+    <!-- Section heading (capitals): the prediction layers. One word. -->
+    <string name="modes_fox_prediction">Prediction</string>
+    <!-- Button cycling the fox's antenna height: on the ground. Half width. -->
+    <string name="modes_fox_agl_ground">Fox on the ground</string>
+    <!-- The same: on a roof. Half width. -->
+    <string name="modes_fox_agl_roof">Fox on a roof (10 m)</string>
+    <!-- The same: on a tower. Half width. -->
+    <string name="modes_fox_agl_tower">Fox on a tower (30 m)</string>
+    <!-- Button and dialog title: download the ground heights. Half width. -->
+    <string name="modes_fox_download_terrain">Download terrain</string>
+    <!-- The same button with the size. %1$s megabytes ("2.4"). Half width. -->
+    <string name="modes_fox_download_terrain_size">Download terrain (about %1$s MB)</string>
+    <!-- Download dialog message. %1$s megabytes. "Terrain" is the layer pill. Three lines. -->
+    <string name="modes_fox_download_message">Ground heights for this area (about %1$s MB), downloaded once and kept on the phone for later hunts and the coverage maps, so the Terrain layer works offline afterwards.</string>
+    <!-- Dialog button: download. One word. -->
+    <string name="modes_fox_download">Download</string>
+    <!-- Chip on the map that switches to the plot. One word. -->
+    <string name="modes_fox_chip_plot">Plot</string>
+    <!-- The same chip on the plot, back to the map (capitals). One word. -->
+    <string name="modes_fox_chip_map_caps">MAP</string>
+    <!-- The same chip on the map (capitals). One word. -->
+    <string name="modes_fox_chip_plot_caps">PLOT</string>
+    <!-- Caveat under the map. Two lines. -->
+    <string name="modes_fox_rough_hint">Strength-based estimates are rough: walls, cars and your body change readings by 10 dB or more. Take marks in the open, spread out, and hold the phone the same way every time.</string>
+    <!-- Button: save a reading here. Third of a row, one word. -->
+    <string name="modes_fox_mark">Mark</string>
+    <!-- The Mark button while waiting for the fox to transmit. Third of a row. -->
+    <string name="modes_fox_mark_waiting">Waiting…</string>
+    <!-- Toggle button: the rising beep is off. Third of a row. -->
+    <string name="modes_fox_beeper_off">Beeper off</string>
+    <!-- Toggle button: the rising beep is on. Third of a row. -->
+    <string name="modes_fox_beeper_on">Beeper on</string>
+    <!-- Button: tune off the channel when the signal is too strong. Third of a row. -->
+    <string name="modes_fox_off_freq">Off-frequency</string>
+    <!-- The same button once tuned off. %1$d kHz. Third of a row. -->
+    <string name="modes_fox_offset">+%1$d kHz</string>
+    <!-- Button: take a bearing by turning on the spot. Third of a row, one word. -->
+    <string name="modes_fox_spin">Spin</string>
+    <!-- Button: show the estimate in a maps app. Third of a row. -->
+    <string name="modes_fox_open_maps">Open in maps</string>
+    <!-- Button: remove all marks. Third of a row. -->
+    <string name="modes_fox_clear_marks">Clear marks</string>
+    <!-- Section heading (capitals): which receptions count. Short. -->
+    <string name="modes_fox_signal_section">Fox signal</string>
+    <!-- Pill: only the fox's own transmissions count. Half width. -->
+    <string name="modes_fox_only_fox">Only the fox\'s</string>
+    <!-- Button: say how the fox is told apart (tone or DMR ID). Half width. -->
+    <string name="modes_fox_set_fox">Set the fox</string>
+    <!-- The same button with the setting. %1$s what identifies the fox ("CTCSS 88.5 Hz"). Half width. -->
+    <string name="modes_fox_fox_is">Fox: %1$s</string>
+    <!-- Button: automatic marks are off. Half width. -->
+    <string name="modes_fox_auto_off">Auto-marks off</string>
+    <!-- Button: automatic marks every N metres. %1$d metres. Half width. -->
+    <string name="modes_fox_auto_every">Auto-mark every %1$d m</string>
+    <!-- Field hint: the fox's DMR ID. One line. -->
+    <string name="modes_fox_dmr_id_hint">Fox DMR ID (empty = any caller)</string>
+    <!-- Field hint: the fox's colour code. One line. -->
+    <string name="modes_fox_dmr_cc_hint">Colour code 0-15 (empty = any)</string>
+    <!-- Dialog title: the fox on a DMR channel. One line. -->
+    <string name="modes_fox_dmr_title">The fox on DMR</string>
+    <!-- Dialog button: use the last DMR caller. %1$s the ID. Short. -->
+    <string name="modes_fox_last_caller">Last caller %1$s</string>
+    <!-- Tone choice: the channel's own tone, none set. One line. -->
+    <string name="modes_fox_tone_channel_none">The channel\'s tone squelch (none set: any reception)</string>
+    <!-- Tone choice: the channel's own tone. %1$s the tone ("88.5 Hz", "D023N"). One line. -->
+    <string name="modes_fox_tone_channel">The channel\'s tone squelch (%1$s)</string>
+    <!-- Tone choice: the tone heard now. %1$s Hz. One line. -->
+    <string name="modes_fox_tone_heard">The tone heard now (%1$s Hz)</string>
+    <!-- Tone choice: pick from the list. One line. -->
+    <string name="modes_fox_tone_pick">Pick a CTCSS tone…</string>
+    <!-- Dialog title: the fox's tone. One line. -->
+    <string name="modes_fox_tone_title">The fox\'s tone</string>
+    <!-- Dialog title: the CTCSS tone list. One line. -->
+    <string name="modes_fox_ctcss_title">CTCSS tone</string>
+    <!-- On a radio without signal readings. Two lines. -->
+    <string name="modes_fox_no_rssi">This radio does not report signal strength, so it cannot hunt a fox. It can be one: the beacon below is what the hunters look for.</string>
+    <!-- Section heading (capitals): be the hidden transmitter. Short. -->
+    <string name="modes_fox_be_fox">Be the fox</string>
+    <!-- Button: stop the fox beacon. Full width. -->
+    <string name="modes_fox_beacon_stop">Stop the fox beacon</string>
+    <!-- Button: start the fox beacon. Full width. -->
+    <string name="modes_fox_beacon_start">Start the fox beacon</string>
+    <!-- Beacon hint. Three lines. -->
+    <string name="modes_fox_beacon_hint">Sends 5 seconds of beeps on this channel every minute (your callsign follows in Morse on amateur channels) until stopped or the channel changes, so others can hunt you. Hide the phone with a full battery.</string>
+    <!-- Prediction note: both layers are off. One line. -->
+    <string name="modes_fox_pred_off">Prediction off: the estimate is the bearing crossing, as without layers.</string>
+    <!-- Prediction note while terrain is computed. One line. -->
+    <string name="modes_fox_working_terrain">Working out the terrain…</string>
+    <!-- Prediction note with no marks. One line. -->
+    <string name="modes_fox_mark_to_start">Mark a reading to start.</string>
+    <!-- Prediction note: the map legend. One line. -->
+    <string name="modes_fox_shaded">Shaded: where the fox probably is; bright outline 50 %, faint 90 %.</string>
+    <!-- Prediction note: why a layer is not used. %1$s the reasons (lower case, joined with "; "). Ends with a space. Two lines. -->
+    <string name="modes_fox_not_used">Not used yet: %1$s.\u0020</string>
+    <!-- The same followed by the map legend. %1$s the reasons. Two lines. -->
+    <string name="modes_fox_not_used_shaded">Not used yet: %1$s. Shaded: where the fox probably is; bright outline 50 %%, faint 90 %%.</string>
+    <!-- Prediction note while the terrain downloads. One line. -->
+    <string name="modes_fox_downloading">Downloading terrain…</string>
+    <!-- The same with progress. %1$d tiles done, %2$d in all. One line. -->
+    <string name="modes_fox_downloading_n">Downloading terrain %1$d of %2$d…</string>
+    <!-- Under the big number: no signal reading. Lower case, short. -->
+    <string name="modes_fox_no_reading">no reading</string>
+    <!-- Under the big number: the strongest reading. %1$d dBm. Short. -->
+    <string name="modes_fox_peak">peak %1$d</string>
+    <!-- Under the big number: tuned off the channel. %1$d kHz. Short. -->
+    <string name="modes_fox_tuned_off">tuned %1$d kHz off</string>
+    <!-- Toast label for a mark from the fox's transmission, before "-85 dBm". Short. -->
+    <string name="modes_fox_how_fox">Marked the fox at</string>
+    <!-- Toast label for an automatic mark. Short. -->
+    <string name="modes_fox_how_auto">Auto-mark</string>
+    <!-- Toast label for a mark. Short. -->
+    <string name="modes_fox_how_marked">Marked</string>
+    <!-- Toast label for a mark from a spin. Short. -->
+    <string name="modes_fox_how_spin">Spin mark</string>
+    <!-- Mark toast. %1$s one of the labels above, %2$d dBm. One line. -->
+    <string name="modes_fox_marked">%1$s %2$d dBm</string>
+    <!-- Mark toast with a bearing. %1$s label, %2$d dBm, %3$s bearing (3 digits). One line. -->
+    <string name="modes_fox_marked_toward">%1$s %2$d dBm toward %3$s°</string>
+    <!-- Mark toast with a bearing and its spread. %4$s ± degrees. One line. -->
+    <string name="modes_fox_marked_toward_sigma">%1$s %2$d dBm toward %3$s° (±%4$s°)</string>
+    <!-- Fox state: any signal, with auto-marks. %1$d metres. Two lines. -->
+    <string name="modes_fox_state_auto">Auto-marks: one mark per reception, once you have moved %1$d m from the last mark.</string>
+    <!-- Fox state: any signal. One line. -->
+    <string name="modes_fox_state_any">Every reading counts, whoever transmits.</string>
+    <!-- Fox state: Soft SQ defeats the DCS check. "Soft SQ" is a setting's name. Two lines. -->
+    <string name="modes_fox_state_softsq">Soft SQ holds the radio\'s squelch open, so DCS cannot tell the fox apart: turn Soft SQ off.</string>
+    <!-- Fox state: a mark waits for the fox. One line. -->
+    <string name="modes_fox_state_waiting">Waiting for the fox… the mark is taken at its next transmission.</string>
+    <!-- Fox state: the fox transmits now. One line. -->
+    <string name="modes_fox_state_on">The fox is on the air: readings count.</string>
+    <!-- Fox state: the fox is quiet. One line. -->
+    <string name="modes_fox_state_off">The fox is not on the air: readings wait for it.</string>
+    <!-- Fox state: auto-marks are on. %1$d metres. Short. -->
+    <string name="modes_fox_state_auto_every">Auto-marks every %1$d m.</string>
+    <!-- Info line: no compass. Short. -->
+    <string name="modes_fox_no_compass">No compass</string>
+    <!-- Info line: where the phone points. %1$s degrees (3 digits), %2$s compass point ("NE"). Short. -->
+    <string name="modes_fox_pointing">Pointing %1$s° %2$s</string>
+    <!-- What the distance is to: the strongest mark. Short. -->
+    <string name="modes_fox_what_strongest">Strongest mark</string>
+    <!-- What the distance is to: the estimate. %1$s the layers ("bearings + heat map"). Short. -->
+    <string name="modes_fox_what_estimate">Fox estimate (%1$s)</string>
+    <!-- The same with its confidence. %2$s good, fair or rough. Short. -->
+    <string name="modes_fox_what_estimate_conf">Fox estimate (%1$s, %2$s)</string>
+    <!-- What the distance is to: the bearing crossing. %1$d bearings. Short. -->
+    <plurals name="modes_fox_what_bearings">
+        <item quantity="one">Fox estimate from %1$d bearings</item>
+        <item quantity="other">Fox estimate from %1$d bearings</item>
+    </plurals>
+    <!-- Info line: the estimate is where you are. %1$s what (one of the above). One line. -->
+    <string name="modes_fox_here">%1$s: here (within 10 m)</string>
+    <!-- Info line: no marks. Short. -->
+    <string name="modes_fox_no_marks">No marks yet</string>
+    <!-- Toast: Mark and Spin are refused while transmitting. One line. -->
+    <string name="modes_fox_not_while_tx">Not while transmitting: the reading would be your own signal</string>
+    <!-- Toast: no location yet. One line. -->
+    <string name="modes_fox_no_position">No position yet: turn on location</string>
+    <!-- Toast: the waiting mark was cancelled. Short. -->
+    <string name="modes_fox_mark_cancelled">Mark cancelled</string>
+    <!-- Toast: the mark waits for the fox. Two lines. -->
+    <string name="modes_fox_mark_wait_toast">Waiting for the fox: the mark is taken at its next transmission (tap Mark again to cancel)</string>
+    <!-- Toast: no signal reading yet. Short. -->
+    <string name="modes_fox_no_signal">No signal reading yet</string>
+    <!-- Toast: the spin needs a compass. One line. -->
+    <string name="modes_fox_spin_compass">The spin needs the phone\'s compass</string>
+    <!-- Toast: Open in maps needs a mark. Short. -->
+    <string name="modes_fox_mark_first">Mark a reading first</string>
+    <!-- Toast: no maps app. Short. -->
+    <string name="modes_fox_no_map_app">No map app</string>
+    <!-- Confirmation title. One line. -->
+    <string name="modes_fox_clear_confirm">Clear all marks?</string>
+    <!-- Confirmation message. One line. -->
+    <string name="modes_fox_clear_message">The marks, bearings and the estimate of this hunt are removed.</string>
+    <!-- Title of the spin sheet. One line. -->
+    <string name="modes_fox_spin_title">Spin for the bearing</string>
+    <!-- How to spin. Three lines. -->
+    <string name="modes_fox_spin_hint">Hold the phone flat against your chest, top pointing ahead, and turn slowly on the spot through a full circle (20 to 40 seconds). Your body hides the signal from behind: the strongest direction is toward the fox, the weakest away from it.</string>
+    <!-- Large guidance before turning. Short. -->
+    <string name="modes_fox_spin_start">Start turning</string>
+    <!-- Button: fit the bearing now. Half width. -->
+    <string name="modes_fox_spin_fit">Fit now</string>
+    <!-- Button: save the bearing as a mark. Half width. -->
+    <string name="modes_fox_spin_save">Save mark</string>
+    <!-- Button: start the spin over. Half width. -->
+    <string name="modes_fox_spin_again">Spin again</string>
+    <!-- Large result. %1$s bearing (3 digits), %2$s compass point. Short. -->
+    <string name="modes_fox_spin_toward">Fox toward %1$s° %2$s</string>
+    <!-- Large result when the fit failed. Short. -->
+    <string name="modes_fox_spin_retry">Try again</string>
+    <!-- Large guidance while waiting for the fox to transmit. Short. -->
+    <string name="modes_fox_spin_waiting">Waiting for the fox</string>
+    <!-- Result detail from the strongest direction. %1$s ± degrees, %2$s dB, %3$d readings. Two lines. -->
+    <plurals name="modes_fox_spin_within_peak">
+        <item quantity="one">Within about ±%1$s° (from the strongest direction, %2$s dB between strongest and weakest, %3$d readings)</item>
+        <item quantity="other">Within about ±%1$s° (from the strongest direction, %2$s dB between strongest and weakest, %3$d readings)</item>
+    </plurals>
+    <!-- Result detail from the weakest direction (behind the user). Two lines. -->
+    <plurals name="modes_fox_spin_within_null">
+        <item quantity="one">Within about ±%1$s° (from the weakest direction, behind you, %2$s dB between strongest and weakest, %3$d readings)</item>
+        <item quantity="other">Within about ±%1$s° (from the weakest direction, behind you, %2$s dB between strongest and weakest, %3$d readings)</item>
+    </plurals>
+    <!-- Spin progress. %1$s percent of the circle, %2$d readings, %3$s degrees turned. One line. -->
+    <plurals name="modes_fox_spin_progress">
+        <item quantity="one">%1$s %% of the circle\u0020 ·\u0020 %2$d readings\u0020 ·\u0020 turned %3$s°</item>
+        <item quantity="other">%1$s %% of the circle\u0020 ·\u0020 %2$d readings\u0020 ·\u0020 turned %3$s°</item>
+    </plurals>
+    <!-- The same while only the fox's transmissions count. Two or three lines. -->
+    <plurals name="modes_fox_spin_progress_wait">
+        <item quantity="one">%1$s %% of the circle\u0020 ·\u0020 %2$d readings\u0020 ·\u0020 turned %3$s°\nOnly the fox\'s transmissions count: keep turning slowly while it is on the air.</item>
+        <item quantity="other">%1$s %% of the circle\u0020 ·\u0020 %2$d readings\u0020 ·\u0020 turned %3$s°\nOnly the fox\'s transmissions count: keep turning slowly while it is on the air.</item>
+    </plurals>
+    <!-- Plot placeholder (drawn in the middle of the plot). Short. -->
+    <string name="modes_fox_plot_empty">Marks appear here</string>
+    <!-- Plot scale. %1$s kilometres. Small text, short. -->
+    <string name="modes_fox_rings_km">rings %1$s km apart</string>
+    <!-- Plot scale. %1$s metres. Small text, short. -->
+    <string name="modes_fox_rings_m">rings %1$s m apart</string>
+    <!-- Plot scale. %1$s miles. Small text, short. -->
+    <string name="modes_fox_rings_mi">rings %1$s mi apart</string>
+</resources>

@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,14 +30,25 @@ public final class Forms {
     /** Field keys and labels, in form order. */
     public static String[][] fields(String kind) {
         if (RADIOGRAM.equals(kind)) return new String[][] {
-            { "NR", "Number" }, { "PR", "Precedence (R routine, P priority, O immediate, EMERGENCY)" }, { "HX", "Handling (HX…, optional)" }, { "SO", "Station of origin" },
-            { "CK", "Check (word count of the text)" }, { "PL", "Place of origin" }, { "TF", "Time filed" }, { "DT", "Date" },
-            { "TO", "To: name and address" }, { "PH", "Phone" }, { "MS", "Text" }, { "SG", "Signature" } };
+            { "NR", "Number" }, { "PR", "Precedence (R routine, P priority, O immediate, EMERGENCY)" }, { "HX", "Handling (HX…, optional)" }, { "SO", "Station of origin" },   // i18n: form field names, sent in the form text
+            { "CK", "Check (word count of the text)" }, { "PL", "Place of origin" }, { "TF", "Time filed" }, { "DT", "Date" },   // i18n: form field names, sent in the form text
+            { "TO", "To: name and address" }, { "PH", "Phone" }, { "MS", "Text" }, { "SG", "Signature" } };   // i18n: form field names, sent in the form text
         return new String[][] {
-            { "TO", "To (name and position)" }, { "FR", "From (name and position)" }, { "SU", "Subject" }, { "DT", "Date" }, { "TM", "Time" },
-            { "MS", "Message" }, { "AP", "Approved by (name and position)" } };
+            { "TO", "To (name and position)" }, { "FR", "From (name and position)" }, { "SU", "Subject" }, { "DT", "Date" }, { "TM", "Time" },   // i18n: form field names, sent in the form text
+            { "MS", "Message" }, { "AP", "Approved by (name and position)" } };   // i18n: form field names, sent in the form text
     }
-    public static String title(String kind) { return RADIOGRAM.equals(kind) ? "ARRL Radiogram" : "ICS-213 General Message"; }
+    public static String title(String kind) { return RADIOGRAM.equals(kind) ? "ARRL Radiogram" : "ICS-213 General Message"; }   // i18n: form names (proper names, sent in the form text)
+
+    private static final int[] RADIOGRAM_LABELS = { R.string.modes_forms_rg_nr, R.string.modes_forms_rg_pr, R.string.modes_forms_rg_hx, R.string.modes_forms_rg_so,
+        R.string.modes_forms_rg_ck, R.string.modes_forms_rg_pl, R.string.modes_forms_rg_tf, R.string.modes_forms_rg_dt,
+        R.string.modes_forms_rg_to, R.string.modes_forms_rg_ph, R.string.modes_forms_rg_ms, R.string.modes_forms_rg_sg };
+    private static final int[] ICS213_LABELS = { R.string.modes_forms_ics_to, R.string.modes_forms_ics_fr, R.string.modes_forms_ics_su, R.string.modes_forms_ics_dt, R.string.modes_forms_ics_tm,
+        R.string.modes_forms_ics_ms, R.string.modes_forms_ics_ap };
+    /**
+     * Field {@code i} of {@link #fields}'s label in the app's language, for the form editor and viewer. The text sent
+     * and read on the air ({@link #text}) keeps the English labels: the form is the same for whoever receives it.
+     */
+    public static String label(String kind, int i) { return Txt.s((RADIOGRAM.equals(kind) ? RADIOGRAM_LABELS : ICS213_LABELS)[i]); }
 
     public static final class Form { public String kind = ICS213, id = ""; public final Map<String, String> f = new LinkedHashMap<>(); }
 
@@ -73,9 +86,9 @@ public final class Forms {
     /** A Winlink message for this form: subject and body (the form to read, then its one-line code for SignalDeck). */
     public static String[] winlink(Form form) {
         String su = form.f.get("SU"), nr = form.f.get("NR");
-        String subject = RADIOGRAM.equals(form.kind) ? "Radiogram" + (nr == null || nr.trim().isEmpty() ? "" : " " + nr.trim()) + (form.f.get("MS") == null ? "" : ": " + first(form.f.get("MS"), 60))
-                : "ICS-213: " + (su == null || su.trim().isEmpty() ? "General Message" : su.trim());
-        String body = text(form) + "\n\n--\nSignalDeck form (SignalDeck puts it back in Message forms):\n" + split(form, 100_000).get(0) + "\n";
+        String subject = RADIOGRAM.equals(form.kind) ? "Radiogram" + (nr == null || nr.trim().isEmpty() ? "" : " " + nr.trim()) + (form.f.get("MS") == null ? "" : ": " + first(form.f.get("MS"), 60))   // i18n: Winlink message
+                : "ICS-213: " + (su == null || su.trim().isEmpty() ? "General Message" : su.trim());   // i18n: Winlink message
+        String body = text(form) + "\n\n--\nSignalDeck form (SignalDeck puts it back in Message forms):\n" + split(form, 100_000).get(0) + "\n";   // i18n: Winlink message
         return new String[] { subject, body };
     }
     private static String first(String s, int n) { s = s.trim().replace('\n', ' '); return s.length() <= n ? s : s.substring(0, n - 3) + "..."; }     // ASCII: Winlink subjects are ISO-8859-1

@@ -12,6 +12,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -30,7 +33,11 @@ import java.util.Locale;
 public final class Scheduler {
     public static final String LISTEN = "listen", SCAN = "scan", APRS = "aprs", SSTV = "sstv", BEACON = "beacon", WINLINK = "winlink", WINLINK_NET = "winlinknet", FINDER = "finder";
     public static final String[] ACTIONS = { LISTEN, SCAN, APRS, SSTV, BEACON, WINLINK, WINLINK_NET, FINDER };
-    public static final String[] ACTION_NAMES = { "Listen to a channel", "Scan the zone", "APRS monitoring", "SSTV receive", "Send an APRS beacon", "Check Winlink mail (radio gateway)", "Check Winlink mail (internet)", "Packet finder (listen for BBSs, nodes, gateways)" };
+    /** The action names' strings, in {@link #ACTIONS} order. */
+    static final int[] ACTION_NAME_IDS = { R.string.service_sched_listen, R.string.service_sched_scan, R.string.service_sched_aprs, R.string.service_sched_sstv, R.string.service_sched_beacon, R.string.service_sched_winlink_radio, R.string.service_sched_winlink_net, R.string.service_sched_finder };
+    /** The action names in the language at start-up; {@link Entry#actionNames} and {@link Entry#actionName} read them in the language now. */
+    public static final String[] ACTION_NAMES = names();
+    private static String[] names() { String[] n = new String[ACTION_NAME_IDS.length]; for (int i = 0; i < n.length; i++) n[i] = Txt.s(ACTION_NAME_IDS[i]); return n; }
     /** Actions that use a channel of their own (the rest work on the current one). */
     public static boolean usesChannel(String a) { return LISTEN.equals(a) || SSTV.equals(a) || WINLINK.equals(a); }
     /** Whether the radio of {@code dp} can run the action at all: APRS monitoring parks on 144.390, which a UHF-only radio (the W6) does not tune. */
@@ -40,8 +47,8 @@ public final class Scheduler {
     /** Why the radio of {@code dp} cannot run the entry ({@code ch}: its channel, null for none or the current one), or null when it can. */
     public static String bandProblem(DeviceProfile dp, Entry e, ChannelStore.Channel ch) { return bandProblem(dp, e, ch, PacketEngine.APRS_FREQ_HZ); }
     public static String bandProblem(DeviceProfile dp, Entry e, ChannelStore.Channel ch, int aprsHz) {
-        if (!available(dp, e.action, aprsHz)) return "This radio tunes " + dp.bandsText() + ", not " + com.macdmr.radio.region.Region.mhz(aprsHz) + " MHz: no APRS monitoring";
-        if (usesChannel(e.action) && ch != null && !ChannelStore.tunable(dp, ch)) return ch.name + " is outside " + dp.bandsText() + ": this radio cannot tune it";
+        if (!available(dp, e.action, aprsHz)) return Txt.s(R.string.service_sched_no_aprs, dp.bandsText(), com.macdmr.radio.region.Region.mhz(aprsHz));
+        if (usesChannel(e.action) && ch != null && !ChannelStore.tunable(dp, ch)) return Txt.s(R.string.service_sched_channel_outside, ch.name, dp.bandsText());
         return null;
     }
 
@@ -55,19 +62,20 @@ public final class Scheduler {
         public boolean oneShot() { return days == 0; }
         public boolean hasDuration() { return !BEACON.equals(action) && !WINLINK.equals(action) && !WINLINK_NET.equals(action); }
         /** The names with the APRS frequency in use, e.g. "APRS monitoring (144.800)". */
-        public static String[] actionNames(int aprsHz) { String[] n = ACTION_NAMES.clone(); n[2] = "APRS monitoring (" + com.macdmr.radio.region.Region.mhz(aprsHz) + ")"; return n; }
-        public String actionName() { for (int i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].equals(action)) return ACTION_NAMES[i]; return action; }
+        public static String[] actionNames(int aprsHz) { String[] n = names(); n[2] = Txt.s(R.string.service_sched_aprs_freq, com.macdmr.radio.region.Region.mhz(aprsHz)); return n; }
+        public String actionName() { for (int i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].equals(action)) return Txt.s(ACTION_NAME_IDS[i]); return action; }
+        /** The action's name as a message (history lines keep it in English and show it in the app's language); an unknown action as it is. */
+        public Object actionMsg() { for (int i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].equals(action)) return Msg.of(ACTION_NAME_IDS[i]); return action; }
         /** "Tue, Thu 19:00 for 60 min" / "23 Oct 19:00". */
         public String when() {
             StringBuilder b = new StringBuilder();
-            if (oneShot()) b.append(date.isEmpty() ? "once" : date);
-            else if (days == 0x7F) b.append("Every day");
-            else if (days == 0x1F) b.append("Weekdays");
-            else if (days == 0x60) b.append("Weekends");
-            else { String[] n = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" }; for (int i = 0; i < 7; i++) if ((days & (1 << i)) != 0) b.append(b.length() > 0 ? ", " : "").append(n[i]); }
-            b.append(String.format(Locale.US, " %02d:%02d", hour, minute));
-            if (hasDuration()) b.append(" for ").append(minutes).append(" min");
-            return b.toString();
+            if (oneShot()) b.append(date.isEmpty() ? Txt.s(R.string.service_sched_once) : date);
+            else if (days == 0x7F) b.append(Txt.s(R.string.service_sched_every_day));
+            else if (days == 0x1F) b.append(Txt.s(R.string.service_sched_weekdays));
+            else if (days == 0x60) b.append(Txt.s(R.string.service_sched_weekends));
+            else { int[] n = { R.string.service_sched_mon, R.string.service_sched_tue, R.string.service_sched_wed, R.string.service_sched_thu, R.string.service_sched_fri, R.string.service_sched_sat, R.string.service_sched_sun }; for (int i = 0; i < 7; i++) if ((days & (1 << i)) != 0) b.append(b.length() > 0 ? Txt.s(R.string.service_sched_day_sep) : "").append(Txt.s(n[i])); }
+            String time = String.format(Locale.US, "%02d:%02d", hour, minute);
+            return hasDuration() ? Txt.s(R.string.service_sched_when_for, b.toString(), time, minutes) : Txt.s(R.string.service_sched_when, b.toString(), time);
         }
     }
 
@@ -116,7 +124,7 @@ public final class Scheduler {
     }
 
     // ---- the alarm: the next start, or the end of the one running ----
-    static final String ACTION_FIRE = "com.macdmr.radio.SCHEDULE";
+    static final String ACTION_FIRE = "com.macdmr.radio.SCHEDULE";   // i18n: intent action
     public static long runningEnd(Context c) { return prefs(c).getLong("runningEnd", 0); }
     public static int runningId(Context c) { return prefs(c).getInt("runningId", 0); }
     static void setRunning(Context c, int id, long end) { prefs(c).edit().putInt("runningId", id).putLong("runningEnd", end).apply(); }
@@ -131,7 +139,7 @@ public final class Scheduler {
             am.cancel(pi);
             if (when == Long.MAX_VALUE) return;
             boolean exact = android.os.Build.VERSION.SDK_INT < 31 || am.canScheduleExactAlarms();
-            if (!exact && RootSetup.haveRoot()) { RootSetup.run("appops set " + c.getPackageName() + " SCHEDULE_EXACT_ALARM allow"); exact = am.canScheduleExactAlarms(); }   // root: grant it ourselves
+            if (!exact && RootSetup.haveRoot()) { RootSetup.run("appops set " + c.getPackageName() + " SCHEDULE_EXACT_ALARM allow"); exact = am.canScheduleExactAlarms(); }   // root: grant it ourselves   // i18n: shell
             if (exact) am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when, pi); else am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, when, pi);
         } catch (Throwable t) { android.util.Log.w("Scheduler", "arm: " + t); }
     }

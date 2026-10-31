@@ -5,6 +5,7 @@
  * (keep this notice and the author credit, mark modified versions, no rights to the SignalDeck name or icon).
  */
 package com.macdmr.radio.dsp;
+// i18n: stays English (DSP diagnostics for the log and the bench)
 
 /**
  * CTCSS decoder bank (SQ2): runs a Goertzel filter at <b>all</b> 51 standard CTCSS tone

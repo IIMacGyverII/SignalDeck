@@ -5,6 +5,7 @@
  * (keep this notice and the author credit, mark modified versions, no rights to the SignalDeck name or icon).
  */
 package com.macdmr.radio;
+// i18n: stays English (serial and module diagnostics: log lines, shell commands and device-report text)
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

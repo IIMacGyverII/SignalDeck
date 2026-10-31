@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.dsp;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 /**
  * CTCSS and DCS Tone Converter
  * 
@@ -94,7 +97,7 @@ public class ToneConverter {
         try {
             switch (type) {
                 case 0:
-                    return "None";
+                    return "None";   // i18n: CSV file format
                 case 1: // CTCSS
                     if (subCode >= 0 && subCode < CTCSS_TONES.length) {
                         return CTCSS_TONES[subCode];
@@ -118,7 +121,7 @@ public class ToneConverter {
         } catch (Exception e) {
             // Fall through to default
         }
-        return "None";
+        return "None";   // i18n: CSV file format
     }
     
     /**
@@ -219,30 +222,30 @@ public class ToneConverter {
     public static String formatForDisplay(int toneType, int subCode) {
         switch (toneType) {
             case 0: // None
-                return "None";
+                return Txt.s(R.string.service_tone_none);
                 
             case 1: // CTCSS
                 if (subCode >= 0 && subCode < CTCSS_TONES.length) {
-                    return "CTCSS " + CTCSS_TONES[subCode] + " Hz";
+                    return Txt.s(R.string.service_tone_ctcss, CTCSS_TONES[subCode]);
                 }
-                return "CTCSS (Invalid)";
+                return Txt.s(R.string.service_tone_ctcss_invalid);
                 
             case 2: // Forward DCS
                 if (subCode >= 0 && subCode < FDCS_CODES.length) {
                     String code = FDCS_CODES[subCode];
-                    return "DCS " + code;
+                    return Txt.s(R.string.service_tone_dcs, code);
                 }
-                return "DCS (Invalid)";
+                return Txt.s(R.string.service_tone_dcs_invalid);
                 
             case 3: // Backward DCS
                 if (subCode >= 0 && subCode < BDCS_CODES.length) {
                     String code = BDCS_CODES[subCode];
-                    return "DCS " + code;
+                    return Txt.s(R.string.service_tone_dcs, code);
                 }
-                return "DCS (Invalid)";
+                return Txt.s(R.string.service_tone_dcs_invalid);
                 
             default:
-                return "Unknown";
+                return Txt.s(R.string.service_tone_unknown);
         }
     }
 }

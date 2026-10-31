@@ -16,8 +16,8 @@ import java.io.File;
  * sysfs nodes exist.
  */
 public final class DeviceProfile {
-    /** TINY_SERVICE: PrizeTinyService; UART_PCM: a second UART; CAMCORDER: Android's camcorder input carries the radio (W6). */
-    public enum Audio { TINY_SERVICE, UART_PCM, CAMCORDER }
+    /** TINY_SERVICE: PrizeTinyService; UART_PCM: a second UART; CAMCORDER: Android's camcorder input carries the radio (W6); EXTMODULE: the vendor daemon's audio socket (Armor 3WT). */
+    public enum Audio { TINY_SERVICE, UART_PCM, CAMCORDER, EXTMODULE }
 
     public final String name;
     public final String controlPort;     // MCU command UART
@@ -42,6 +42,14 @@ public final class DeviceProfile {
     public boolean globalSquelch;        // the module follows its global squelch (0x30) rather than the channel's sq byte: send it with every analog channel
     /** How long the scanner listens on each channel before moving on (the module's "receiving" report must arrive in time). */
     public long scanDwellMs = 1500;
+    /**
+     * Timing of the module after a retune, per phone (DEVICE_CERTIFICATION 3.7): how long the scanner waits before it
+     * trusts the reception report, how long the band scope waits before it reads the signal, and how long a reading
+     * takes. The defaults are the Armor's (2026-10-22: the reading is 15-20 dB low until 0.7 s after a retune, a reading
+     * takes 0.1-0.5 s). The Atom XL settles in about 50 ms and answers in 6-7 ms (2026-10-30).
+     */
+    public long scanSettleMs = 700;
+    public int scopeSettleMs = 700, scopeReadMs = 300;
     /** High-pass time constant of this phone's pager audio, seconds. 0 means no DC restoration. The Armor 26 Ultra's is from a 512 baud clip. */
     public double pocsagTauSec;
     /** Least time between two channel writes (0 = none); quicker channel changes collapse into the last one. */
@@ -49,7 +57,11 @@ public final class DeviceProfile {
     public String[][] lineSetup;         // {node, value} written in this order before the power line, every bring-up (null = none)
     /** TINY_SERVICE phones: how to reach the radio audio straight on the sound hardware when the ROM lacks the vendor service (null = not known). */
     public DirectAudio directAudio;
-    /** "mcu68" (the DMR module's 68 … 10 frames, RadioEngine), "agold" (those commands inside the 7E 96 69 envelope), or "sa818" (AT+DMO… text commands, AtModuleEngine). */
+    /**
+     * "mcu68" (the DMR module's 68 … 10 frames, RadioEngine), "agold" (those commands inside the 7E 96 69 envelope),
+     * "agold-legacy" (the envelope around the older command set, through the vendor daemon: Armor 3WT) or "sa818"
+     * (AT+DMO… text commands, AtModuleEngine).
+     */
     public String protocol = "mcu68";
     /**
      * What the module tunes, as {low, high} pairs in Hz (both ends included). The HR-C7000 module itself refuses
@@ -58,6 +70,12 @@ public final class DeviceProfile {
     public long[] bandsHz = { 136_000_000L, 174_000_000L, 400_000_000L, 480_000_000L };
     /** Whether the module reports signal strength (S-meter, band scope, fox hunt); the W6's answers no RSSI query. */
     public boolean rssi = true;
+    /**
+     * The signal reading in dBm is -120 + raw x {@code rssiStepDb} + {@code rssiOffsetDb}. The Armor's module reads half a
+     * dB per step; the Atom XL's DMR006 about one (2026-10-30, HackRF in 10 dB steps: 0x3A, 0x44, 0x50, 0x5B, 0x65, 0x6C),
+     * with the offset keeping its idle reading where it showed before (raw 0x22 = -103 dBm).
+     */
+    public double rssiStepDb = 0.5, rssiOffsetDb = 0;
     /**
      * Soft SQ sets the module's own squelch level instead of gating the audio in the app. The W6: its module drives the
      * speaker itself, its audio level follows the volume (no fixed noise threshold fits) and passes nothing above ~3.4 kHz
@@ -82,10 +100,18 @@ public final class DeviceProfile {
      */
     public int dataSquelch;
     /**
-     * False when the module's image must stay the vendor's: SignalDeck's loader (and so the bench firmware's symbol engine)
-     * is off. The W6Plus DMR's module is outside the loader safety contract (no dmr009 knock, an undiffed image).
+     * True only on a phone whose firmware load was bench-tested end to end (owner, 2026-10-30: flashing must work only on
+     * certified phones): SignalDeck's loader (and so the bench firmware's symbol engine) is off everywhere else. Off by
+     * default, so a new profile, a profile from the signed list or a phone that only falls back to another phone's profile
+     * never gets it; see {@link #LOADER_CERTIFIED}.
      */
-    public boolean moduleLoader = true;
+    public boolean moduleLoader = false;
+    /**
+     * The profile ids whose firmware load is certified (bench-tested from the stock image through the Module firmware page,
+     * restore included). The signed profile list can switch a certified phone's loader off, never on for another phone;
+     * adding a phone here needs an app release.
+     */
+    static final java.util.Set<String> LOADER_CERTIFIED = java.util.Collections.singleton("ulefone-armor26ultra");
     /** Audio.CAMCORDER: the fixed gain on the camcorder input (the W6+'s module is ~21 dB quieter than the W6Plus DMR's). */
     public int camcorderGain = 12;
     /** sa818: the module's receive line, a GPIO input that reads 1 while the squelch is open (null = none). */
@@ -98,6 +124,76 @@ public final class DeviceProfile {
      * stays. The module's own volume then follows the media volume.
      */
     public String[][] muteLines;
+    /**
+     * Camcorder phones whose module microphone input can be switched to the phone's own audio output (the W6Plus DMR stock
+     * app's PoC gateway, SpeakUtil.start8541ToDmr / stop8541ToDmr): written around a transmission SignalDeck makes itself
+     * (APRS, SSTV, tones) while keyed, so the samples reach the module instead of the microphone. Null = no such path.
+     */
+    public String[][] gatewayLinesOn, gatewayLinesOff;
+    /** Gateway route: the factor on SignalDeck's own transmit samples (its encoders write near full scale), so data tones stay below the module's limiter. */
+    public float txAudioScale = 1f;
+    /**
+     * The CTCSS decoder's dead-air floor (per-sample energy of the receive audio): set on the Armor's loud vendor audio; a
+     * camcorder-input phone carries a carrier with only its tone ~30 dB lower, which the default never lets through.
+     */
+    public double toneEnergyMin = com.macdmr.radio.dsp.CtcssDecoderBank.ENERGY_MIN;
+    /**
+     * Gateway route: Android's media volume, as a share of its maximum, held while SignalDeck's own audio plays (the samples
+     * go through the media stream, so at the user's volume 0 nothing would be sent); the user's volume comes back afterwards.
+     */
+    public float gatewayVolume = 0.4f;
+    /**
+     * The boot handshake's third step: interrupt off (digital) or mic gain (analog), as the Armor 26 Ultra's stock app does.
+     * The Armor 20WT's stock app never sends either (its handshake is channel, version, time-out), so it is left out there.
+     */
+    public boolean bootMicInterrupt = true;
+    /** Voice transmit: open the audio path this long before the key command (the Armor 20WT's stock app opens it 600 ms early; 0 = key first). */
+    public long txAudioLeadMs;
+    /** Voice transmit: a key less than this long after the last release waits for the rest (the Armor 20WT's stock app: 2 s; 0 = none). */
+    public long minKeyGapMs;
+    /** The volume byte in analog channel writes (the Armor 26 Ultra's stock app sends 8, the Armor 20WT's 5). */
+    public int analogVolume = 8;
+    /** The stock app's per-area channel files: {@code <prefix><area>.db} holding table {@code <prefix><area>}, and the area to use when none is chosen. */
+    public String stockAreaPrefix = "database_channel_area_", stockDefaultArea = "default_uhf";
+    /**
+     * The module commands the stock app is seen to send (null = not listed). The device report lists every other command
+     * SignalDeck sent with the module's answers, since nothing shows that this module implements them.
+     */
+    public int[] stockCommands;
+    /**
+     * An untested profile whose owner may run the guided Transmit test session (Device report → Transmit test session) to
+     * collect what verifying it needs. Only that session keys the radio; the Talk key, the side key, packet modes and the
+     * web stay off until the profile is verified. The Armor 20WT (owner, 2026-10-30).
+     */
+    public boolean txTestUnverified;
+    /** False on a module whose digital channel has no time slot (the Armor 3WT's legacy set): the slot is not offered. */
+    public boolean timeSlots = true;
+    /**
+     * The phone's own side key as {input device name, key code as getevent prints it}, used as the custom PTT key when the
+     * owner has not chosen one (the Armor 3WT: its key reaches only getevent). Null = none.
+     */
+    public String[] pttKey;
+    /**
+     * Transmit audio starts when the module reports SEND_START (status 3) after the key, not at the key: the Xplore 1's
+     * QuickChat opens its microphone only on that report (2 s at most here; without it nothing is sent).
+     */
+    public boolean txAudioOnSendStart;
+    /** Voice transmit: the microphone keeps feeding the module this long after the release (QuickChat: 200 ms; 0 = stop first). */
+    public long txAudioTailMs;
+    /**
+     * Voice transmit: after the release the transmitter stays keyed and the microphone keeps running this long, then both
+     * stop (the Armor 3WT's intercom app: 500 ms, then PTT off; 0 = none).
+     */
+    public long txReleaseHoldMs;
+    /** After each channel's acknowledgement send 0x35 2 (interrupt off) and then 0x37 with this value (QuickChat: 0); -1 = neither. */
+    public int politeAfterChannel = -1;
+    /**
+     * DMR texts as QuickChat sends them: type, target little-endian, the text in UTF-8, no second ID; received texts are
+     * read as UTF-8 unless they look like UTF-16LE. False = the Armor 26 Ultra's body (9-byte header, UTF-16LE).
+     */
+    public boolean smsUtf8;
+    /** The text body this profile sends, for the reports. */
+    public String textBody() { return smsUtf8 ? "type, target, UTF-8 text (QuickChat's)" : "type, target, second ID, UTF-16LE text"; }
 
     /**
      * The radio's audio as plain ALSA streams on the phone's sound card, for a ROM without the vendor audio service
@@ -162,6 +258,8 @@ public final class DeviceProfile {
      * device), the serial library is libserial_port_app.so in the stock app's own folder, bound to
      * com.serial.port.SerialPort, and the side key arrives as keycode 301 with com.interphone.ptt.down/up. The report's
      * probe got no answer because the module was powered off at the time. Not run on the phone yet: unverified.
+     * Revision 2 (stock-app review, phonedmrapp docs/armor20wt/stock-app-review.md): the stock app is an older build
+     * with a smaller command set; see the fields set in the static block.
      */
     public static final DeviceProfile ARMOR_20WT = new DeviceProfile(
             "Ulefone Armor 20WT", "/dev/ttyS1", 57600, Audio.TINY_SERVICE, null, 0,
@@ -194,6 +292,7 @@ public final class DeviceProfile {
         // ptt_control 0 is its transmit state (setPttLaunch). So the PTT line goes to receive first, before the module is
         // powered, or a module left by QuickChat's power-off would come up with its PTT line asserted.
         ARMOR_26_ULTRA.id = "ulefone-armor26ultra"; ARMOR_26_ULTRA.revision = 1;
+        ARMOR_26_ULTRA.moduleLoader = true;     // certified: FW57 loaded from the stock image through the Module firmware page (2026-10-30)
         // Fitted on the 17-bit POCSAG padding run (bits 806–822 of the padded RESTORE B clip): τ ≈ 7.49 ms.
         ARMOR_26_ULTRA.pocsagTauSec = 0.0075;
         // Measured on the owner's Armor 2026-10-24 (stock ROM, mixer read while tinyserver received and while it sent a
@@ -205,8 +304,35 @@ public final class DeviceProfile {
                 new String[] { "UL2_CH1 I2S2_CH1=0", "UL2_CH2 I2S2_CH2=0" },
                 new String[] { "I2S1_HD_Mux=Low_Jitter", "I2S1_CH1 DL8_CH1=1", "I2S1_Out_Mux=Output_Widget", "ADC SDP MUTE=1", "DAC VOLUME=163", "DAC SDP SRC MUX=SELECT SDP LEFT DATA" },
                 new String[] { "I2S1_CH1 DL8_CH1=0", "I2S1_Out_Mux=Normal", "I2S1_HD_Mux=Normal", "DAC VOLUME=0", "ADC SDP MUTE=0", "DAC SDP SRC MUX=SELECT SDP RIGHT DATA" });
-        ARMOR_20WT.id = "ulefone-armor20wt"; ARMOR_20WT.revision = 1;
-        XPLORE_1.id = "blackview-xplore1"; XPLORE_1.revision = 2;
+        ARMOR_20WT.id = "ulefone-armor20wt"; ARMOR_20WT.revision = 2;
+        // Its stock app (review 2026-10-30): channel, version, time-out at boot and nothing else; opens the audio path and
+        // waits 600 ms before keying; keys no sooner than 2 s after a release; analog volume byte 5; channel files
+        // channel_database_<area>.db (areas Default, USA_FRS, …); no firmware updater and no image in the app, so the
+        // loader stays off (an undiffed variant).
+        ARMOR_20WT.bootMicInterrupt = false;
+        ARMOR_20WT.txAudioLeadMs = 600;
+        ARMOR_20WT.minKeyGapMs = 2000;
+        ARMOR_20WT.analogVolume = 5;
+        ARMOR_20WT.stockAreaPrefix = "channel_database_"; ARMOR_20WT.stockDefaultArea = "Default";
+        ARMOR_20WT.moduleLoader = false;
+        ARMOR_20WT.stockCommands = new int[] { 0x22, 0x23, 0x26, 0x27, 0x2C, 0x2D, 0x34, 0x36, 0x3B };
+        ARMOR_20WT.txTestUnverified = true;    // owner, 2026-10-30: the device report's transmit tests may key it
+        XPLORE_1.id = "blackview-xplore1"; XPLORE_1.revision = 3;
+        // QuickChat, read 2026-10-30 (phonedmrapp docs/xplore1/stock-app-review.md): it never sends 0x26; it keys with
+        // intercom_ptt_control 0 and releases with 1, opens the microphone at the module's SEND_START, stops it 200 ms
+        // after the release, refuses a key within 1.5 s of the last release, sends neither 0x2A nor 0x35 at boot but 0x35 2
+        // and 0x37 0 after every channel, and sends texts as type + target + UTF-8. Its updater has no image (undiffed variant).
+        XPLORE_1.txLinesOn = new String[][] { { "/sys/devices/platform/intercom/intercom_ptt_control", "0" } };
+        XPLORE_1.txLinesOff = new String[][] { { "/sys/devices/platform/intercom/intercom_ptt_control", "1" } };
+        XPLORE_1.txAudioOnSendStart = true;
+        XPLORE_1.txAudioTailMs = 200;
+        XPLORE_1.minKeyGapMs = 1500;
+        XPLORE_1.bootMicInterrupt = false;
+        XPLORE_1.politeAfterChannel = 0;
+        XPLORE_1.smsUtf8 = true;
+        XPLORE_1.moduleLoader = false;
+        XPLORE_1.stockCommands = new int[] { 0x22, 0x23, 0x27, 0x28, 0x2C, 0x2D, 0x2F, 0x30, 0x34, 0x35, 0x37, 0x3B };
+        XPLORE_1.txTestUnverified = true;     // owner, 2026-10-30: the device report's transmit tests may key it (the guided session only)
         XPLORE_1.scanDwellMs = 2500;
         XPLORE_1.minWriteGapMs = 1000;        // QuickChat never writes channels less than 1 s apart; a burst of writes made the module refuse MON (2026-10-22)          // owner's tester 2026-10-22: the first scan stepped past an active channel; its receive report comes later than the Armor's
         XPLORE_1.globalSquelch = true;        // QuickChat sends 0x30 after each channel; the beta.3/5 trials showed the channel's sq 0 alone did not open it
@@ -242,6 +368,15 @@ public final class DeviceProfile {
         // readable, levels 7-9 only clean signals, static never opens.
         ANYSECU_W6.softSqThresholds = new double[] { 11, 9.5, 8, 6.5, 5, 4, 3.3, 2.8, 2.4 }; ANYSECU_W6.softSqCloseCap = 12;
         ANYSECU_W6.rxDetectNode = "/sys/class/gpio/gpio189/value";
+        // the W6Plus DMR's gateway relay for SignalDeck's own transmit audio: the same nodes exist on the W6+ (same board) though
+        // its stock app never uses them; a tone and an N0CALL APRS packet sent through them decoded on a W6Plus DMR (2026-10-29)
+        ANYSECU_W6.gatewayLinesOn = new String[][] { { "/sys/kernel/dmr_state/dmr_state", "0" }, { "/sys/kernel/relay_state/relay_state", "1" }, { "/sys/class/gpio/gpio223/value", "1" }, { "/sys/class/gpio/gpio222/value", "1" }, { "/sys/class/gpio/gpio179/value", "1" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "0" } };
+        ANYSECU_W6.gatewayLinesOff = new String[][] { { "/sys/kernel/relay_state/relay_state", "0" }, { "/sys/class/gpio/gpio223/value", "0" }, { "/sys/class/gpio/gpio179/value", "0" }, { "/sys/kernel/dmr_state/dmr_state", "0" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "1" } };
+        // the relay path on the W6+ is ~16 dB quieter than the W6Plus DMR's for the same samples: at 0.03 its DTMF arrived at
+        // RMS 50 (under the decoder's floor) and PSK31 lost words; it is linear up to 0.5 (no harmonics) and at 0.2 DTMF (16/16),
+        // PSK31, SSTV Robot 24 (clean, 118 lines), RTTY and FT8 all decoded on a W6Plus DMR (2026-10-29). HackRF 2026-10-30
+        // (§3.7 item 9, media volume held at 10/25): an APRS packet at 0.2 deviates 2900 Hz p99 (0.3: 4086), on target.
+        ANYSECU_W6.txAudioScale = 0.2f; ANYSECU_W6.gatewayVolume = 0.4f;
         // the stock app's receStart / receEnd (speaker path; the camcorder input carries the audio while these are set)
         ANYSECU_W6.rxLinesOn = new String[][] { { "/sys/kernel/dmr_state/dmr_state", "1" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "0" }, { "/sys/class/gpio/gpio183/value", "1" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "1" } };
         // the speaker route only: the stock app skips it at volume 0; the amplifier must stay on, the camcorder input is behind it (measured: amplifier off = silent recording)
@@ -261,8 +396,9 @@ public final class DeviceProfile {
      * the W6+'s: power gpio322; the receive audio reaches Android on the camcorder input behind the speaker route
      * (dmr_state, ext_pa_en, gpio183), which the stock app switches on the module's RECEIVE_START / RECEIVE_STOP pushes
      * (SpeakUtil.startGroup / stopGroup); it keys with the PTT line gpio188 and the mic lines and never sends 0x26. The
-     * module keeps the vendor's image (no loader). Never read the flyscale_misc attributes. Not verified yet: no automatic
-     * take-over, no transmit.
+     * module keeps the vendor's image (no loader). Never read the flyscale_misc attributes. Revision 2 (owner, 2026-10-29):
+     * verified; transmit tested in the cage on 446.000 MHz at low power (FM tone key, DMR group call CC1 TG 9 decoded from
+     * a HackRF capture, the 28 s watchdog unkeyed), carrier about +1.6 kHz against the HackRF.
      */
     public static final DeviceProfile ANYSECU_W6_DMR = new DeviceProfile(
             "ANYSECU W6Plus DMR", "/dev/ttyS2", 57600, Audio.CAMCORDER, null, 0,
@@ -272,9 +408,9 @@ public final class DeviceProfile {
             new String[] {
                     "allow untrusted_app console_device chr_file { open read write ioctl getattr lock }",
                     "typeattribute console_device mlstrustedobject" },
-            null, true, false);
+            null, true, true);
     static {
-        ANYSECU_W6_DMR.id = "anysecu-w6plus-dmr"; ANYSECU_W6_DMR.revision = 1;
+        ANYSECU_W6_DMR.id = "anysecu-w6plus-dmr"; ANYSECU_W6_DMR.revision = 2;
         // 0x23 writes 2026-10-29 (nothing keyed): 400.000-480.000 acknowledged; 399.995, 395, 136 and 174 MHz never answered
         // (UHF only, whatever "dual band" in the listing means); 480.005 and 485 acknowledged too, receive there unmeasured,
         // so the band stays the stock app's 400.000-480.000.
@@ -292,6 +428,28 @@ public final class DeviceProfile {
         ANYSECU_W6_DMR.rxLinesOff = new String[][] { { "/sys/kernel/dmr_state/dmr_state", "0" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "0" }, { "/sys/class/gpio/gpio183/value", "0" } };
         ANYSECU_W6_DMR.txLinesOn = new String[][] { { "/sys/class/gpio/gpio222/value", "1" }, { "/sys/class/gpio/gpio179/value", "0" }, { "/sys/class/gpio/gpio188/value", "1" } };
         ANYSECU_W6_DMR.txLinesOff = new String[][] { { "/sys/class/gpio/gpio188/value", "0" }, { "/sys/class/gpio/gpio222/value", "0" } };
+        // the stock app's start8541ToDmr (PoC gateway): the relay puts the phone's audio output on the module's microphone input,
+        // poc_spk_en on, speaker amplifier off; stop8541ToDmr turns the relay and poc_spk_en off again
+        ANYSECU_W6_DMR.gatewayLinesOn = new String[][] { { "/sys/kernel/dmr_state/dmr_state", "0" }, { "/sys/kernel/relay_state/relay_state", "1" }, { "/sys/class/gpio/gpio223/value", "1" }, { "/sys/class/gpio/gpio222/value", "1" }, { "/sys/class/gpio/gpio179/value", "1" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "0" } };
+        // HackRF 2026-10-29, 446.000 MHz: 1 kHz deviates ~1.09 Hz per sample unit, the module limits near 4.3 kHz, and the
+        // path lifts 2.5 kHz by ~8 dB (pre-emphasis), cuts below 300 Hz (100-250 Hz at the floor) and above 3 kHz, so no M17
+        // over audio. That 0.03 was set at an unknown media volume; with the volume held at 10/25 (gatewayVolume) an APRS packet
+        // at 0.03 deviated only 879 Hz p99 (HackRF 2026-10-30, §3.7 item 9): 0.10 -> 2040, 0.12 -> 2408, 0.15 -> 2954 Hz, all decoded.
+        ANYSECU_W6_DMR.txAudioScale = 0.15f;
+        // §3.7 item 1 (HackRF carriers stepped 10 dB, 2026-10-30): one raw unit per dB, linear over at least 56 dB above the idle
+        // 42-43, like the Atom XL's module of the same DMR006 family; its offset kept (idle 0x22 = -103 dBm). Item 4: squelch
+        // levels 1-9 open at one point, 4-5 dB above the floor; 0 is monitor (no reception reported).
+        ANYSECU_W6_DMR.rssiStepDb = 1.0; ANYSECU_W6_DMR.rssiOffsetDb = -17;
+        // a carrier with only its CTCSS arrives at RMS ~24 on this camcorder input (100.0 Hz from a W6+, 2026-10-30): the tone
+        // stands ~300x above the other bins, but the default dead-air floor (RMS ~630) never let it count; 200 = RMS ~14, above
+        // the idle input (RMS 7-10), the ratio tests still keep noise and voice out
+        ANYSECU_W6_DMR.toneEnergyMin = 200;
+        // the media volume held during those plays: 10 of 25, at which APRS, RTTY, FT8 and SSTV from this phone all decoded on a
+        // W6+ (2026-10-29); at the user's volume 0 the route had sent a silent carrier
+        ANYSECU_W6_DMR.gatewayVolume = 0.4f;
+        // ... and the idle values of what start8541ToDmr changed (speaker amplifier on, dmr_state 0, measured between receptions
+        // 2026-10-29), so a play whose snapshot of the nodes failed still leaves the speaker working
+        ANYSECU_W6_DMR.gatewayLinesOff = new String[][] { { "/sys/kernel/relay_state/relay_state", "0" }, { "/sys/class/gpio/gpio223/value", "0" }, { "/sys/class/gpio/gpio179/value", "0" }, { "/sys/kernel/dmr_state/dmr_state", "0" }, { "/sys/kernel/ext_pa_en/ext_pa_en", "1" } };
     }
 
     /** Any other phone: nothing is touched until a device report has been made and a profile written. */
@@ -318,8 +476,41 @@ public final class DeviceProfile {
         ATOM_XL.bandsHz = new long[] { 400_000_000L, 480_000_000L };          // the UHF module (DMR006.U4A); to be measured
         // the bridge's USB Audio Class card: S16_LE, 2 channels, 32 kHz both ways, no mixer controls (the HAL's pcm_open)
         ATOM_XL.directAudio = new DirectAudio(1, 0, 0, new String[0], new String[0], new String[0], new String[0]);
+        ATOM_XL.rssiStepDb = 1.0; ATOM_XL.rssiOffsetDb = -17;                  // one step per dB, idle 0x22 = -103 dBm as before
+        ATOM_XL.scopeSettleMs = 100; ATOM_XL.scopeReadMs = 20;               // settles in ~50 ms, answers in 6-7 ms (2026-10-30, HackRF); 100 ms leaves margin
+        ATOM_XL.scanSettleMs = 100; ATOM_XL.scanDwellMs = 500;               // the reception line reports 0.22 s after a retune onto an active channel
         ATOM_XL.directAudio.capturePeriod = 1280; ATOM_XL.directAudio.capturePeriods = 4;   // what the stock HAL opens (vendor.mediatek.hardware.aguiextmodule@1.0-service: 32 kHz, 2 ch, 1280 x 4)
         ATOM_XL.directAudio.rate = 32000;
+    }
+
+    /**
+     * Ulefone Armor 3WT (Agold, MT6771, board s62v71c2k_gq_3wt): the Atom XL's USB bridge family with an older module
+     * ({@code ver0.5.4_470M_TONE}: the legacy command set, DMR without a time slot) behind the vendor daemon
+     * {@code /system/bin/extmodule}, which the tester's own Magisk module starts at boot on a GSI. SignalDeck talks to the
+     * daemon as the intercom app does: commands on 127.0.0.1:9980, audio on 9985 ({@link ExtModuleLink}, {@link
+     * AgoldLegacyCodec}, {@link ExtModuleAudio}). Written from the intercom app, the daemon and one device report
+     * (phonedmrapp docs/armor3wt/stock-app-review.md); never run by us, so unverified: no transmit. No signal reading
+     * (the module has no known RSSI command). Bands: what the intercom app accepts, 100–470 MHz, without 174–400 MHz;
+     * the module's own range is not measured.
+     */
+    public static final DeviceProfile ARMOR_3WT = new DeviceProfile(
+            "Ulefone Armor 3WT", ExtModuleLink.CONTROL_PORT, 0, Audio.EXTMODULE, null, 0,
+            AgoldUsb.MCU_POWER, AgoldUsb.HANDLE_PTT, "power on = 1",
+            new String[] { "android.intent.action.PTT.down", "android.intent.action.PTT.up" },
+            "com.agold.intercom",
+            new String[0],                                                       // TCP to 127.0.0.1 only: no device node, no new rule
+            null, true, false);
+    static {
+        ARMOR_3WT.id = "ulefone-armor3wt"; ARMOR_3WT.revision = 1; ARMOR_3WT.protocol = "agold-legacy";
+        ARMOR_3WT.bandsHz = new long[] { 100_000_000L, 174_000_000L, 400_000_000L, 470_000_000L };
+        ARMOR_3WT.rssi = false; ARMOR_3WT.moduleLoader = false;
+        ARMOR_3WT.bootMicInterrupt = false;                                     // its stock app: channel after the version, nothing else
+        ARMOR_3WT.timeSlots = false;
+        // what the intercom app sends, in the engine's (Armor) numbers: channels, version, volume, call info, texts
+        ARMOR_3WT.stockCommands = new int[] { 0x22, 0x23, 0x2B, 0x2C, 0x2D, 0x2E, 0x34 };
+        ARMOR_3WT.pttKey = new String[] { "mtk-kpd", "00f9" };                  // scancode 249 at getevent; no keycode reached an app in the report
+        ARMOR_3WT.txReleaseHoldMs = 500;                                        // its intercom app: microphone and key run on 500 ms after the release (stopRecord)
+        ARMOR_3WT.txTestUnverified = true;                                      // owner, 2026-10-30: transmit unlocked for the device report's Transmit test session
     }
 
     public static final DeviceProfile UNKNOWN = new DeviceProfile(
@@ -331,8 +522,33 @@ public final class DeviceProfile {
 
     /** The profile built into this release for this phone (no profile list, no advisories). */
     public static DeviceProfile detectBuiltIn() {
-        String m = (Build.MANUFACTURER + " " + Build.MODEL + " " + Build.DEVICE).toLowerCase();
+        String m = (Build.MANUFACTURER + " " + Build.MODEL + " " + Build.DEVICE + " " + vendorModel()).toLowerCase();   // a GSI keeps the phone's model on its vendor partition
+        if (armor3wt(m, Build.BOARD, vendorFingerprint(), new File(ExtModuleLink.DAEMON).exists())) return ARMOR_3WT;
         return detectBuiltIn(m, new File("/sys/devices/platform/dmr009").exists(), new File("/sys/devices/platform/intercom").exists());
+    }
+
+    /**
+     * The Armor 3WT: its model, or on a GSI (model "TrebleDroid …") its board or vendor build, and in either case the radio
+     * daemon {@code extmodule} installed (without it SignalDeck has nothing to talk to).
+     */
+    static boolean armor3wt(String model, String board, String vendorFingerprint, boolean daemon) {
+        if (!daemon) return false;
+        String m = model == null ? "" : model.toLowerCase(java.util.Locale.US);
+        return m.contains("armor 3wt") || m.contains("armor_3wt") || "s62v71c2k_gq_3wt".equals(board)
+                || (vendorFingerprint != null && vendorFingerprint.contains("/Armor_3WT/"));
+    }
+    /**
+     * The phone's own model from its vendor partition ({@code ro.product.vendor.model}), or "" when unset. A GSI replaces only
+     * the system, so this still names the phone (an Armor 26 Ultra on a LineageOS GSI: same phone, same module) where
+     * {@link Build#MODEL} names the GSI.
+     */
+    public static String vendorModel() {
+        try { String v = (String) Class.forName("android.os.SystemProperties").getMethod("get", String.class).invoke(null, "ro.product.vendor.model"); return v == null ? "" : v.trim(); }
+        catch (Throwable t) { return ""; }
+    }
+    private static String vendorFingerprint() {
+        try { return (String) Class.forName("android.os.SystemProperties").getMethod("get", String.class).invoke(null, "ro.vendor.build.fingerprint"); }
+        catch (Throwable t) { return null; }
     }
 
     /** Model text first (the Armor 20WT has the same dmr009 node as the Armor 26 Ultra, on another port), then the nodes. */
@@ -341,7 +557,10 @@ public final class DeviceProfile {
         if (m.contains("w6+") && m.contains("sl8541e")) return ANYSECU_W6;          // "UNISOC W6+ sl8541e_3h10_32b"
         if (m.contains(" v69 ") && m.contains("sl8541e")) return ANYSECU_W6_DMR;     // "UNISOC V69 sl8541e_3h10_32b"
         if (m.contains("unihertz atom_xl")) return ATOM_XL;                         // "Unihertz Atom_XL Atom_XL"
-        if (dmr009 || m.contains("armor 26")) return ARMOR_26_ULTRA;
+        if (m.contains("armor 26")) return ARMOR_26_ULTRA;
+        if (dmr009) {                                                            // another phone with the same power node: the 26 Ultra's radio path, never its loader
+            DeviceProfile p = ARMOR_26_ULTRA.copy(ARMOR_26_ULTRA.supported, ARMOR_26_ULTRA.verified); p.moduleLoader = false; return p;
+        }
         if (intercom || m.contains("xplore")) return XPLORE_1;
         return UNKNOWN;
     }
@@ -377,6 +596,8 @@ public final class DeviceProfile {
     /** Whether the module tunes {@code hz}. */
     public boolean tunable(long hz) { for (int i = 0; i + 1 < bandsHz.length; i += 2) if (hz >= bandsHz[i] && hz <= bandsHz[i + 1]) return true; return false; }
     /** Whether this phone's radio tunes {@code hz} (the active profile). */
+    /** The radio has the 2 m APRS frequencies (144.390 / 144.800 / 145.825 MHz); a UHF-only radio sends no automatic APRS acknowledgements (owner, 2026-10-30). */
+    public boolean hasTwoMetre() { return tunable(144_390_000L) || tunable(144_800_000L) || tunable(145_825_000L); }
     public static boolean inBands(long hz) { return detect().tunable(hz); }
     /** The nearest tunable frequency from {@code hz} going up ({@code dir} > 0) or down, or {@code hz} itself when it is tunable; -1 when there is none that way. */
     public long nextTunable(long hz, int dir) {
@@ -404,7 +625,10 @@ public final class DeviceProfile {
     /** The same profile with other support flags (an advisory's restricted copy). */
     DeviceProfile copy(boolean supported, boolean verified) {
         DeviceProfile p = new DeviceProfile(name, controlPort, baud, audio, pcmPort, pcmBaud, powerNode, pttNode, powerOnToken, pttActions, stockApp, sepolicy, serialLib, supported, verified);
-        p.id = id; p.revision = revision; p.source = source; p.txBlocked = txBlocked; p.restrictedBy = restrictedBy; p.globalSquelch = globalSquelch; p.lineSetup = lineSetup; p.scanDwellMs = scanDwellMs; p.protocol = protocol; p.bandsHz = bandsHz.clone(); p.rssi = rssi; p.softSqInModule = softSqInModule; p.appPlayback = appPlayback; p.fixedModuleVolume = fixedModuleVolume; p.subaudible = subaudible; p.dataSquelch = dataSquelch; p.moduleLoader = moduleLoader; p.camcorderGain = camcorderGain; p.softSqThresholds = softSqThresholds; p.softSqCloseCap = softSqCloseCap; p.rxDetectNode = rxDetectNode; p.rxLinesOn = rxLinesOn; p.muteLines = muteLines; p.rxLinesOff = rxLinesOff; p.txLinesOn = txLinesOn; p.txLinesOff = txLinesOff; p.minWriteGapMs = minWriteGapMs; p.directAudio = directAudio;
+        p.id = id; p.revision = revision; p.source = source; p.txBlocked = txBlocked; p.restrictedBy = restrictedBy; p.globalSquelch = globalSquelch; p.lineSetup = lineSetup; p.scanDwellMs = scanDwellMs; p.protocol = protocol; p.bandsHz = bandsHz.clone(); p.rssi = rssi; p.softSqInModule = softSqInModule; p.appPlayback = appPlayback; p.fixedModuleVolume = fixedModuleVolume; p.subaudible = subaudible; p.dataSquelch = dataSquelch; p.moduleLoader = moduleLoader; p.camcorderGain = camcorderGain; p.softSqThresholds = softSqThresholds; p.softSqCloseCap = softSqCloseCap; p.rxDetectNode = rxDetectNode; p.rxLinesOn = rxLinesOn; p.muteLines = muteLines; p.rxLinesOff = rxLinesOff; p.txLinesOn = txLinesOn; p.txLinesOff = txLinesOff; p.gatewayLinesOn = gatewayLinesOn; p.gatewayLinesOff = gatewayLinesOff; p.txAudioScale = txAudioScale; p.toneEnergyMin = toneEnergyMin; p.gatewayVolume = gatewayVolume; p.minWriteGapMs = minWriteGapMs; p.directAudio = directAudio;
+        p.bootMicInterrupt = bootMicInterrupt; p.txAudioLeadMs = txAudioLeadMs; p.minKeyGapMs = minKeyGapMs; p.analogVolume = analogVolume; p.stockAreaPrefix = stockAreaPrefix; p.stockDefaultArea = stockDefaultArea; p.stockCommands = stockCommands; p.txTestUnverified = txTestUnverified;
+        p.txAudioOnSendStart = txAudioOnSendStart; p.txAudioTailMs = txAudioTailMs; p.politeAfterChannel = politeAfterChannel; p.smsUtf8 = smsUtf8;
+        p.timeSlots = timeSlots; p.pttKey = pttKey; p.txReleaseHoldMs = txReleaseHoldMs;
         return p;
     }
 
@@ -414,7 +638,7 @@ public final class DeviceProfile {
                 o.optString("pcmPort", null), o.optInt("pcmBaud", 0), o.optString("powerNode", null), o.optString("pttNode", null), o.optString("powerOnToken", "1"),
                 strings(o.optJSONArray("pttActions")), o.optString("stockApp", ""), strings(o.optJSONArray("sepolicy")), o.optString("serialLib", null),
                 o.optBoolean("supported", true), o.optBoolean("verified", false));
-        p.id = o.getString("id"); p.revision = o.getInt("revision"); p.globalSquelch = o.optBoolean("globalSquelch", false); p.scanDwellMs = o.optLong("scanDwellMs", 1500); p.minWriteGapMs = o.optLong("minWriteGapMs", 0);
+        p.id = o.getString("id"); p.revision = o.getInt("revision"); p.globalSquelch = o.optBoolean("globalSquelch", false); p.scanSettleMs = o.optLong("scanSettleMs", p.scanSettleMs); p.scopeSettleMs = o.optInt("scopeSettleMs", p.scopeSettleMs); p.scopeReadMs = o.optInt("scopeReadMs", p.scopeReadMs); p.scanDwellMs = o.optLong("scanDwellMs", 1500); p.minWriteGapMs = o.optLong("minWriteGapMs", 0);
         org.json.JSONArray ls = o.optJSONArray("lineSetup");
         if (ls != null) { p.lineSetup = new String[ls.length()][]; for (int i = 0; i < ls.length(); i++) p.lineSetup[i] = strings(ls.getJSONArray(i)); }
         p.protocol = o.optString("protocol", "mcu68"); p.rxDetectNode = o.optString("rxDetectNode", null);
@@ -425,13 +649,35 @@ public final class DeviceProfile {
             for (int i = 0; i < bands.length(); i++) p.bandsHz[i] = bands.getLong(i);
             for (int i = 0; i < bands.length(); i += 2) if (p.bandsHz[i] >= p.bandsHz[i + 1]) throw new org.json.JSONException("bandsHz: low below high");
         }
-        p.rssi = o.optBoolean("rssi", true); p.softSqInModule = o.optBoolean("softSqInModule", false); p.appPlayback = o.optBoolean("appPlayback", false); p.subaudible = o.optBoolean("subaudible", true); p.dataSquelch = Math.max(0, Math.min(8, o.optInt("dataSquelch", 0))); p.moduleLoader = o.optBoolean("moduleLoader", true); p.camcorderGain = Math.max(1, Math.min(32, o.optInt("camcorderGain", 12)));
+        p.rssi = o.optBoolean("rssi", true); p.rssiStepDb = o.optDouble("rssiStepDb", p.rssiStepDb); p.rssiOffsetDb = o.optDouble("rssiOffsetDb", p.rssiOffsetDb); p.softSqInModule = o.optBoolean("softSqInModule", false); p.appPlayback = o.optBoolean("appPlayback", false); p.subaudible = o.optBoolean("subaudible", true); p.dataSquelch = Math.max(0, Math.min(8, o.optInt("dataSquelch", 0))); p.moduleLoader = o.optBoolean("moduleLoader", true) && LOADER_CERTIFIED.contains(p.id);   // the list can switch it off, never on for an uncertified phone p.camcorderGain = Math.max(1, Math.min(32, o.optInt("camcorderGain", 12)));
         org.json.JSONArray sst = o.optJSONArray("softSqThresholds");
         if (sst != null && sst.length() == 9) { p.softSqThresholds = new double[9]; for (int i = 0; i < 9; i++) p.softSqThresholds[i] = sst.optDouble(i, 0); p.softSqCloseCap = o.optDouble("softSqCloseCap", 0); } p.fixedModuleVolume = Math.max(1, Math.min(8, o.optInt("fixedModuleVolume", 4)));
         p.rxLinesOn = pairs(o.optJSONArray("rxLinesOn")); p.rxLinesOff = pairs(o.optJSONArray("rxLinesOff")); p.muteLines = pairs(o.optJSONArray("muteLines"));
         p.txLinesOn = pairs(o.optJSONArray("txLinesOn")); p.txLinesOff = pairs(o.optJSONArray("txLinesOff"));
+        p.gatewayLinesOn = pairs(o.optJSONArray("gatewayLinesOn")); p.gatewayLinesOff = pairs(o.optJSONArray("gatewayLinesOff"));
+        p.txAudioScale = (float) Math.max(0.001, Math.min(1, o.optDouble("txAudioScale", 1)));
+        p.toneEnergyMin = Math.max(1, o.optDouble("toneEnergyMin", com.macdmr.radio.dsp.CtcssDecoderBank.ENERGY_MIN));
+        p.gatewayVolume = (float) Math.max(0.05, Math.min(1, o.optDouble("gatewayVolume", 0.4)));
         org.json.JSONObject da = o.optJSONObject("directAudio");
         if (da != null) p.directAudio = DirectAudio.fromJson(da);
+        p.bootMicInterrupt = o.optBoolean("bootMicInterrupt", true); p.txTestUnverified = o.optBoolean("txTestUnverified", false);
+        p.txAudioOnSendStart = o.optBoolean("txAudioOnSendStart", false); p.txAudioTailMs = Math.max(0, Math.min(1000, o.optLong("txAudioTailMs", 0)));
+        p.politeAfterChannel = Math.max(-1, Math.min(1, o.optInt("politeAfterChannel", -1))); p.smsUtf8 = o.optBoolean("smsUtf8", false);
+        p.timeSlots = o.optBoolean("timeSlots", true);
+        p.txReleaseHoldMs = Math.max(0, Math.min(1000, o.optLong("txReleaseHoldMs", 0)));
+        org.json.JSONArray pk = o.optJSONArray("pttKey");                    // {input device name, key code}: compared with getevent output, never on a command line
+        if (pk != null) {
+            String[] k = strings(pk);
+            if (k.length != 2 || !k[0].matches("[A-Za-z0-9 _.:-]{1,60}") || !k[1].matches("(KEY|BTN)_[A-Z0-9_]{1,30}|[0-9a-f]{4}")) throw new org.json.JSONException("pttKey: device name, key code");
+            p.pttKey = k;
+        }
+        p.txAudioLeadMs = Math.max(0, Math.min(2000, o.optLong("txAudioLeadMs", 0))); p.minKeyGapMs = Math.max(0, Math.min(5000, o.optLong("minKeyGapMs", 0)));
+        p.analogVolume = Math.max(1, Math.min(8, o.optInt("analogVolume", 8)));
+        p.stockAreaPrefix = o.optString("stockAreaPrefix", p.stockAreaPrefix); p.stockDefaultArea = o.optString("stockDefaultArea", p.stockDefaultArea);
+        // both end up in root shell command lines (cp, ls)
+        if (!p.stockAreaPrefix.matches("[A-Za-z0-9_]{1,40}") || !p.stockDefaultArea.matches("\\w{1,40}")) throw new org.json.JSONException("stockAreaPrefix / stockDefaultArea: letters, digits and _ only");
+        org.json.JSONArray sc = o.optJSONArray("stockCommands");
+        if (sc != null) { p.stockCommands = new int[sc.length()]; for (int i = 0; i < sc.length(); i++) p.stockCommands[i] = sc.getInt(i) & 0xFF; }
         return p;
     }
     /** [[node, value], …] from the profile list; only /sys paths and short digit values (they end up on a root command line). */

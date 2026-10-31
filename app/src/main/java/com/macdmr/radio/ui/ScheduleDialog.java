@@ -78,7 +78,8 @@ public final class ScheduleDialog {
         final List<ChannelStore.Channel> chans = ChannelStore.tunable(svc.store().all());   // only channels this radio can tune
         final boolean sstv144 = svc.profile().tunable(com.macdmr.radio.PacketEngine.SSTV_FREQ_HZ);   // the W6 tunes UHF only: SSTV then runs on the channel the radio is on
         final List<String> acts = new java.util.ArrayList<>(), actNames = new java.util.ArrayList<>();
-        for (int i = 0; i < Scheduler.ACTIONS.length; i++) if (Scheduler.available(svc.profile(), Scheduler.ACTIONS[i]) || Scheduler.ACTIONS[i].equals(e.action)) { acts.add(Scheduler.ACTIONS[i]); actNames.add(Scheduler.ACTION_NAMES[i]); }
+        final String[] allNames = Scheduler.Entry.actionNames(svc.aprsHz());     // APRS monitoring names the region's frequency
+        for (int i = 0; i < Scheduler.ACTIONS.length; i++) if (Scheduler.available(svc.profile(), Scheduler.ACTIONS[i], svc.aprsHz()) || Scheduler.ACTIONS[i].equals(e.action)) { acts.add(Scheduler.ACTIONS[i]); actNames.add(allNames[i]); }
         final Runnable showCh = () -> {
             boolean need = Scheduler.usesChannel(e.action);
             chRow.setVisibility(need ? android.view.View.VISIBLE : android.view.View.GONE);
@@ -136,7 +137,7 @@ public final class ScheduleDialog {
             e.label = label.getText().toString().trim(); e.record = rec.isChecked() && Scheduler.LISTEN.equals(e.action); e.enabled = true;
             if (!Scheduler.usesChannel(e.action)) e.channel = -1;
             if (e.days != 0) e.date = "";
-            { String bp = Scheduler.bandProblem(svc.profile(), e, e.channel >= 0 ? svc.store().byNumber(e.channel) : null); if (bp != null) { Toast.makeText(c, bp, Toast.LENGTH_LONG).show(); return; } }
+            { String bp = Scheduler.bandProblem(svc.profile(), e, e.channel >= 0 ? svc.store().byNumber(e.channel) : null, svc.aprsHz()); if (bp != null) { Toast.makeText(c, bp, Toast.LENGTH_LONG).show(); return; } }
             long next = Scheduler.nextStart(e, System.currentTimeMillis(), java.util.TimeZone.getDefault());
             if (next < 0) { Toast.makeText(c, "That time has already passed: choose a later date or tick some days", Toast.LENGTH_LONG).show(); return; }
             Scheduler.put(c, e);

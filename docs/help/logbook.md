@@ -2,7 +2,7 @@
 
 # Logbook
 
-*Pages · 9 of 33*
+*Pages · 9 of 34*
 
 Your contacts, and the stations the radio heard.
 

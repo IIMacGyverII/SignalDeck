@@ -50,7 +50,10 @@ public final class CtcssDecoderBank {
     private static final double RATIO_ON = 50.0;      // peak / mean(other bins) to lock
     private static final double RATIO_OFF = 25.0;     // ... to release (hysteresis)
     private static final double NEIGHBOUR = 1.2;      // peak must beat each neighbour tone by this
-    private static final double ENERGY_MIN = 4.0e5;   // per-sample energy floor (raw 16-bit, dead-air guard)
+    public static final double ENERGY_MIN = 4.0e5;    // per-sample energy floor (raw 16-bit, dead-air guard), set on the Armor's vendor audio
+    private volatile double energyMin = ENERGY_MIN;
+    /** The dead-air floor for this phone's receive audio (a profile's toneEnergyMin): a quiet input carries a lone tone far lower. */
+    public void setEnergyMin(double e) { energyMin = Math.max(1, e); }
 
     public CtcssDecoderBank(int sampleRate) {
         this.sampleRate = sampleRate;
@@ -109,7 +112,7 @@ public final class CtcssDecoderBank {
 
         boolean locked = detectedIndex >= 0;
         boolean ok = bi >= 0
-                && perSample >= ENERGY_MIN
+                && perSample >= energyMin
                 && ratio >= (locked ? RATIO_OFF : RATIO_ON)
                 && beatsNeighbours(bi);
         int found = ok ? bi : -1;

@@ -232,13 +232,13 @@ public final class DmrAudioCheck {
             }
             Thread.sleep(2000);                                                   // the squelch settles back before the minute
             // did MON off really close the squelch? Only judged with no signal on the channel (below the radio's squelch level)
-            svc.pollRssi(); Thread.sleep(600);
+            svc.pollRssiMeasure(); Thread.sleep(600);
             if (svc.mcuReceiving() && svc.lastRssi() > -999 && svc.lastRssi() <= -100) {
                 f.squelchStuck = true; f.closedBy = 0;
                 for (int step = 1; step <= 2 && f.closedBy == 0; step++) {
                     p.step("The squelch stayed open with no signal: trying fix " + step + " of 2 (receive only)…");
                     String what = svc.squelchCloseAttempt(step);
-                    Thread.sleep(2500); svc.pollRssi(); Thread.sleep(600);
+                    Thread.sleep(2500); svc.pollRssiMeasure(); Thread.sleep(600);
                     boolean closed = !svc.mcuReceiving();
                     sqProbe.append(String.format(Locale.US, "  fix %d: sent %s → %s (signal %d dBm)\n", step, what, closed ? "squelch CLOSED" : "still open", svc.lastRssi()));
                     if (closed) f.closedBy = step;
@@ -255,7 +255,7 @@ public final class DmrAudioCheck {
         boolean rxAtStart = svc.rxActive(), prev = rxAtStart; long prevBytes = pcm0;
         StringBuilder rs = new StringBuilder(); int heard = 0;
         while (System.currentTimeMillis() - t0 < seconds * 1000L) {
-            svc.pollRssi(); Thread.sleep(1000);
+            svc.pollRssiMeasure(); Thread.sleep(1000);
             boolean act = svc.rxActive(); long nb = svc.rxAudioBytes();
             if (act || prev) f.pcmDuringCalls += Math.max(0, nb - prevBytes);   // audio in the seconds a reception was on (a continuous station like NOAA included)
             prev = act; prevBytes = nb;

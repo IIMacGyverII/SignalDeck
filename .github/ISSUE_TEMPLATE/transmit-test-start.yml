@@ -1,0 +1,79 @@
+name: Starting transmit tests
+description: Tell us you are about to test transmit on a phone you are adding (certification guide, section 3.3).
+title: "Starting transmit tests on <phone model>"
+labels: ["device-support"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping a new phone along. Please read [Getting your phone certified](https://github.com/IIMacGyverII/SignalDeck/blob/main/docs/DEVICE_CERTIFICATION.md) first, especially section 1 (safety and the law) and section 3.3 (the transmit tests).
+
+        **Do not post your callsign, DMR ID, phone number or location here.** None of them is needed. SignalDeck removes the callsign and DMR ID set in the app from its reports; check screenshots and logs yourself.
+  - type: input
+    id: model
+    attributes:
+      label: Phone model
+      description: Maker and model as the phone names itself (Settings → About phone), and the Android version.
+      placeholder: "Maker Model, Android 13"
+    validations:
+      required: true
+  - type: input
+    id: fork
+    attributes:
+      label: Your fork
+      description: The URL of the repository you build from (no tokens in it).
+      placeholder: "https://github.com/<you>/SignalDeck"
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit you will test
+      description: The commit of the build on the phone. The device report's "SignalDeck build" section shows it (commit, branch, official or fork).
+      placeholder: "0123456789"
+    validations:
+      required: true
+  - type: textarea
+    id: equipment
+    attributes:
+      label: Test equipment
+      description: What checks your signal (an SDR such as an RTL-SDR, a service monitor), the receiving radio, and the dummy load or antenna.
+      placeholder: |
+        RTL-SDR v4 with SDR++
+        Receiving radio: a handheld (make and model)
+        Dummy load: 50 ohm, 5 W
+    validations:
+      required: true
+  - type: dropdown
+    id: band
+    attributes:
+      label: Planned frequency band
+      description: Where you will transmit. Choose a band your licence or a licence-free service allows for this radio.
+      options:
+        - 2 m amateur (144–148 MHz)
+        - 70 cm amateur (420–450 MHz)
+        - PMR446 (446 MHz, Europe)
+        - FRS / GMRS (462–467 MHz, USA)
+        - Other (say which in the notes)
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Before the first key
+      options:
+        - label: I hold a licence for the frequencies I will use, or they are a licence-free service this radio may use.
+          required: true
+        - label: I will transmit into a dummy load, or at low power on a quiet simplex frequency I am allowed to use.
+          required: true
+        - label: I will keep keys short (10 s or less, except the one 28 s limit check), stay with the phone, and stop if it gets hot.
+          required: true
+        - label: My build keeps every change to transmit in my fork; the profile in my pull request will stay verified = false.
+          required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything else (what already works on receive, the device report issue, questions).
+    validations:
+      required: false

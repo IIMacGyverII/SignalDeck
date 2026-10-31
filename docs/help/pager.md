@@ -2,7 +2,7 @@
 
 # Pager
 
-*Pages · 15 of 33*
+*Pages · 15 of 34*
 
 Send a POCSAG page to one RIC or several, in one transmission.
 

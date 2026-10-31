@@ -51,6 +51,8 @@ public interface ModuleEngine {
 
     // settings and channel
     void setTot(int seconds) throws IOException;
+    /** The module timer value the boot handshake sends (TxLimit.moduleTot of the setting); engines without a timer ignore it. */
+    default void setBootTot(int seconds) { }
     void setVolume(int v) throws IOException;
     void setMic(int gain) throws IOException;
     void setSquelch(int level) throws IOException;
@@ -58,6 +60,8 @@ public interface ModuleEngine {
     void setMonitorRaw(int v) throws IOException;
     void setSpkEn(boolean on) throws IOException;
     void setInterrupt(boolean on) throws IOException;
+    /** 0x37 polite (busy-channel rule), only where the profile asks for it (DeviceProfile.politeAfterChannel). */
+    default void setPolite(int v) throws IOException { }
     void setAnalog(int rxHz, int txHz, int band, int power, int sq, int rxType, int rxSub, int txType, int txSub, int volume, int monitor) throws IOException;
     void setDigital(int rxHz, int txHz, int localId, int[] groups, int txContact, int contactType, int power, int cc, int inSlot, int outSlot, int volume, int mic) throws IOException;
     void ptt(boolean down) throws IOException;

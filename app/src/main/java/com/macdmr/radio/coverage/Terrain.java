@@ -48,6 +48,16 @@ public final class Terrain implements Predictor.Elevation {
         return missing == 0 ? null : missing + " of " + total + " terrain tiles could not be loaded (no connection?)";
     }
 
+    /** {tiles covering the box, of which not on the phone yet}: whether a load would download, and how much. */
+    public int[] tiles(double s, double w, double n, double e) {
+        int x0 = tileX(w), x1 = tileX(e), y0 = tileY(n), y1 = tileY(s), missing = 0;
+        for (int y = y0; y <= y1; y++) for (int x = x0; x <= x1; x++) if (!tiles.containsKey(key(x, y)) && !new File(dir, x + "/" + y + ".png").exists()) missing++;
+        return new int[] { (x1 - x0 + 1) * (y1 - y0 + 1), missing };
+    }
+
+    /** A terrain tile is about this big to download (bytes; zoom 11 terrarium PNGs run ~60-150 kB). */
+    public static final int TILE_BYTES = 120_000;
+
     private short[] fetch(int x, int y) {
         File f = new File(dir, x + "/" + y + ".png");
         try {

@@ -49,7 +49,7 @@ public final class RepeatersDialog {
         LinearLayout body = page("📡  Nearby repeaters");
         body.addView(hint("DMR repeaters from BrandMeister and RadioID, FM repeaters from hearham, sorted by distance from the phone; the rows below the distances filter by mode and band. Tap one to see its details and add it to your channels; installs can be undone."));
         LinearLayout row = row();
-        for (int mi : RADII) { final int k = mi; chips.add(pill(row, mi + " mi", radiusMi == mi, x -> { radiusMi = k; c.getSharedPreferences("repeaters", Context.MODE_PRIVATE).edit().putInt("radiusMi", k).apply(); for (int i = 0; i < chips.size(); i++) style(chips.get(i), RADII[i] == k); load(false); })); }
+        for (int mi : RADII) { final int k = mi; chips.add(pill(row, GeoUtil.radiusText(mi), radiusMi == mi, x -> { radiusMi = k; c.getSharedPreferences("repeaters", Context.MODE_PRIVATE).edit().putInt("radiusMi", k).apply(); for (int i = 0; i < chips.size(); i++) style(chips.get(i), RADII[i] == k); load(false); })); }
         TextView refresh = pill(row, "↻", false, x -> load(true)); refresh.setTextSize(16);
         body.addView(row);
         final android.content.SharedPreferences fp = c.getSharedPreferences("repeaters", Context.MODE_PRIVATE);
@@ -74,7 +74,7 @@ public final class RepeatersDialog {
         final double lat = me.getLatitude(), lon = me.getLongitude();
         new Thread(() -> {
             StringBuilder st = new StringBuilder();
-            final List<Repeater> found = rs.nearby(lat, lon, radiusMi * KM_PER_MI, force, st);
+            final List<Repeater> found = rs.nearby(lat, lon, GeoUtil.radiusKm(radiusMi), force, st);
             final String s = st.toString();
             list.post(() -> { current = found; status.setText(s); lastLat = lat; lastLon = lon; render(lat, lon); });
         }, "repeaters-load").start();
@@ -92,9 +92,9 @@ public final class RepeatersDialog {
     private void render(double lat, double lon) {
         if (list == null || current == null) return;
         list.removeAllViews();
-        if (current.isEmpty()) { list.addView(hint("Nothing within " + radiusMi + " miles. Try a larger radius.")); return; }
+        if (current.isEmpty()) { list.addView(hint("Nothing within " + GeoUtil.radiusText(radiusMi) + ". Try a larger radius.")); return; }
         int shown = 0; for (Repeater r : current) if (passes(r)) shown++;
-        if (shown == 0) { list.addView(hint("None of the " + current.size() + " repeaters within " + radiusMi + " miles match these filters.")); return; }
+        if (shown == 0) { list.addView(hint("None of the " + current.size() + " repeaters within " + GeoUtil.radiusText(radiusMi) + " match these filters.")); return; }
         if (shown < current.size()) list.addView(hint(shown + " of " + current.size() + " shown"));
         int n = 0;
         for (final Repeater r : current) {

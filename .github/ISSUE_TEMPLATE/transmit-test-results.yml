@@ -1,0 +1,81 @@
+name: Transmit test results
+description: Results of the transmit test session for a phone you are adding (certification guide, section 3.3).
+title: "Transmit test results: <phone model>"
+labels: ["device-support"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Run **Device → Device report → Transmit test session** in SignalDeck, then share the device report zip (it holds `tx-report.json`, `report.json` and `00_SUMMARY.txt`). The zip carries the build identity (commit, repository, official or fork) and every key's details, so the steps below only need your one-line result and anything the app could not see.
+
+        **Do not post your callsign, DMR ID, phone number or location.** The report replaces the callsign and DMR ID set in the app with `<callsign>` and `<dmr id>`; check anything you add by hand.
+  - type: input
+    id: model
+    attributes:
+      label: Phone model
+      placeholder: "Maker Model, Android 13"
+    validations:
+      required: true
+  - type: input
+    id: start
+    attributes:
+      label: Your "Starting transmit tests" issue
+      description: Link or number, if you opened one.
+      placeholder: "#123"
+    validations:
+      required: false
+  - type: input
+    id: commit
+    attributes:
+      label: Commit tested
+      description: As in the report's "SignalDeck build" section.
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Device report zip
+      description: Drag the zip here (Device → Device report → Share last report). It must contain tx-report.json. If you sent tx-report.json on its own, attach it too.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Results per step
+      description: Pass, fail, skipped or not supported, with a short note. tx-report.json has the details.
+      value: |
+        | Step | Result | Note |
+        |---|---|---|
+        | 1 FM voice key (5 s) | | |
+        | 2 Release check (three 2 s keys) | | |
+        | 3 28 s limit check | | |
+        | 4 Frequency offset and deviation | | e.g. +600 Hz, 2.4 kHz peak, measured with … |
+        | 5 DMR group call (DMR phones) | | caller ID shown? |
+        | 6 Heat (five 3 s keys) | | battery before → after |
+    validations:
+      required: true
+  - type: textarea
+    id: recordings
+    attributes:
+      label: Recordings
+      description: Links to recordings of your transmissions (from the receiving radio or the SDR), each with its SHA-256 (the transmit test session computes it for a file you pick on the phone; on a computer, sha256sum).
+      placeholder: |
+        https://… capture.wav  sha256 0123…
+    validations:
+      required: false
+  - type: textarea
+    id: method
+    attributes:
+      label: Method and equipment
+      description: How you measured (SDR and software, settings, distance, dummy load or antenna, power level).
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirm
+      options:
+        - label: All transmissions were within my licence (or a licence-free service), into a dummy load or at low power, attended.
+          required: true
+        - label: I checked the attachments for my callsign, DMR ID, phone number and location.
+          required: true

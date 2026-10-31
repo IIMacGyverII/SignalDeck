@@ -24,10 +24,14 @@ final class ReportJson {
 
     static final int SCHEMA = 1;
 
-    static JSONObject build(String report, Map<String, String> phone) throws JSONException {
+    static JSONObject build(String report, Map<String, String> phone) throws JSONException { return build(report, phone, null); }
+
+    /** With {@code build} (BuildIdentity.Info as JSON): which commit, repository and signing key made the app, and its profile flags. */
+    static JSONObject build(String report, Map<String, String> phone, JSONObject build) throws JSONException {
         String r = report == null ? "" : report;
         JSONObject o = new JSONObject();
         o.put("schema", SCHEMA);
+        if (build != null) o.put("build", build);
         Matcher h = Pattern.compile("==== SignalDeck device report (\\S+)\\s+([^\\n]*?) ====").matcher(r);
         if (h.find()) { o.put("signaldeck", h.group(1)); o.put("generated", h.group(2).trim()); }
         JSONObject p = new JSONObject();

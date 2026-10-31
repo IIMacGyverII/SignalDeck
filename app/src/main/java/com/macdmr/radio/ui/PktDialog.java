@@ -74,8 +74,9 @@ public final class PktDialog {
         body.addView(section("APRS"));
         body.addView(status());
         LinearLayout r1 = row();
-        final boolean aprs144 = com.macdmr.radio.DeviceProfile.inBands(com.macdmr.radio.PacketEngine.APRS_FREQ_HZ);   // the W6 tunes UHF only
-        if (aprs144 || pe.monitoring()) button(r1, pe.monitoring() ? "Stop monitoring" : "Monitor 144.390", Theme.PKT, x -> { boolean start = !pe.monitoring(); toast(svc.aprsMonitor(start)); if (start) openScreen(); else dlg.dismiss(); });
+        final boolean aprsHere = svc.aprsTunable();          // the region's APRS frequency (Device → Region); the W6 tunes UHF only
+        final String aprsMhz = pe.aprsMhz();
+        if (aprsHere || pe.monitoring()) button(r1, pe.monitoring() ? "Stop monitoring" : "Monitor " + aprsMhz, Theme.PKT, x -> { boolean start = !pe.monitoring(); toast(svc.aprsMonitor(start)); if (start) openScreen(); else dlg.dismiss(); });
         button(r1, pe.kiss().isActive() ? "Stop KISS TNC" : "KISS TNC", Theme.PKT, x -> {
             if (pe.kiss().isActive()) { pe.kissStop(); toast("KISS TNC stopped"); }
             else { if (!pe.monitoring()) svc.markModeStart(); String e = pe.kissStart(); toast(e == null ? "KISS TNC on 127.0.0.1:" + pe.kissPort() + " — point APRSdroid/YAAC at it (TCP KISS)" : e); }
@@ -118,7 +119,7 @@ public final class PktDialog {
         if (issTunable) button(rIss, "Beacon via ISS", Theme.VFO, x -> toast(svc.issBeacon()));
         if (issTunable || issMon) body.addView(rIss);
         String[] autoNames = { "off", "every " + pe.beaconMin() + " min", "SmartBeaconing" };
-        body.addView(hint("Automatic beacons: " + autoNames[Math.max(0, Math.min(2, pe.autoBeacon()))] + (pe.telemetryOn() ? ", telemetry every 30 min" : "") + (pe.weatherOn() ? ", weather every 30 min" : "") + (aprs144 ? " (only on 144.390, set in Settings)." : " (they go out on 144.390, which this radio does not tune).") + (pe.txIgate() ? " Two-way iGate on: " + pe.gatedToRfCount() + " internet messages sent to the radio." : "") + (pe.groups().isEmpty() ? "" : " Following groups: " + String.join(", ", pe.groups()) + ".")));
+        body.addView(hint("Automatic beacons: " + autoNames[Math.max(0, Math.min(2, pe.autoBeacon()))] + (pe.telemetryOn() ? ", telemetry every 30 min" : "") + (pe.weatherOn() ? ", weather every 30 min" : "") + (aprsHere ? " (only on " + aprsMhz + ", set in Settings)." : " (they go out on " + aprsMhz + ", which this radio does not tune).") + (pe.txIgate() ? " Two-way iGate on: " + pe.gatedToRfCount() + " internet messages sent to the radio." : "") + (pe.groups().isEmpty() ? "" : " Following groups: " + String.join(", ", pe.groups()) + ".")));
         LinearLayout rIs = row();
         button(rIs, (pe.isEnabled() ? "Stop APRS-IS" : "APRS-IS (internet)") , Theme.PKT, x -> {
             if (pe.isEnabled()) { pe.isStop(); toast("APRS-IS off"); } else { String e = pe.isStart(); toast(e == null ? "Connecting to " + pe.isServer() : e); }
@@ -134,7 +135,7 @@ public final class PktDialog {
         button(r3, "Bulletins", Theme.SOFTSQ, x -> bulletinsHeard());
         button(r3, "Settings", Theme.MON, x -> settings());
         body.addView(r3);
-        body.addView(hint("Passive decode runs on " + (pe.passiveMode() == 2 ? "every analog channel" : pe.passiveMode() == 1 ? "flagged channels" : "no channel (off)") + (aprs144 ? ". Monitoring parks the radio on 144.390 MHz, acks messages for you" : ". This radio does not tune 144.390 MHz, so there is no monitoring: APRS is decoded on your own channels") + (pe.digipeat() ? " and digipeats WIDE1-1" : "") + ". Your channel comes back when you stop."));
+        body.addView(hint("Passive decode runs on " + (pe.passiveMode() == 2 ? "every analog channel" : pe.passiveMode() == 1 ? "flagged channels" : "no channel (off)") + (aprsHere ? ". Monitoring parks the radio on " + aprsMhz + " MHz (your region's APRS frequency, Device \u2192 Region), acks messages for you" : ". This radio does not tune " + aprsMhz + " MHz, so there is no monitoring: APRS is decoded on your own channels") + (pe.digipeat() ? " and digipeats WIDE1-1" : "") + ". Your channel comes back when you stop."));
         // ---- simplex repeater ----
         body.addView(section("Simplex repeater (parrot)"));
         LinearLayout pr = row();
@@ -178,7 +179,8 @@ public final class PktDialog {
         // ---- logbook ----
         body.addView(section("Logbook"));
         LinearLayout lr = row();
-        button(lr, "Logbook (" + svc.logbook().count(true) + " contacts)", Theme.SOFTSQ, x -> { dlg.dismiss(); LogbookDialog.show(c, svc); });
+        int lbn = svc.logbook().count(true);
+        button(lr, "Logbook (" + lbn + (lbn == 1 ? " contact)" : " contacts)"), Theme.SOFTSQ, x -> { dlg.dismiss(); LogbookDialog.show(c, svc); });
         com.macdmr.radio.ham.Pota.Activation act = com.macdmr.radio.ham.Pota.active(c);
         button(lr, act != null ? "Activating " + act.ref : "POTA / SOTA", Theme.SOFTSQ, x -> { dlg.dismiss(); PotaDialog.show(c, svc); });
         body.addView(lr);
@@ -265,7 +267,14 @@ public final class PktDialog {
         body.addView(r4);
         body.addView(hint("Touch-tone keys heard on any analog channel are decoded and logged" + (pe.dtmfEnabled() ? "." : " (decoder off in Settings).")));
         // ---- Weather ----
-        if (com.macdmr.radio.DeviceProfile.inBands(162_400_000L)) {                 // the weather channels: VHF
+        boolean wxRegion = com.macdmr.radio.region.Region.current(c).weatherRadio;  // NOAA-style weather radio exists in the region (Device → Region)
+        if (com.macdmr.radio.DeviceProfile.inBands(162_400_000L) && !wxRegion) {     // elsewhere: one tap away
+            LinearLayout r6 = row();
+            button(r6, "Show NOAA weather alerts", Theme.REC, x -> wxLog());
+            body.addView(r6);
+            body.addView(hint("Your region (Device \u2192 Region) has no NOAA-style weather radio, so the SAME alert decoder is tucked away here; it still decodes alerts heard on 162.400–162.550 MHz" + (pe.wxEnabled() ? "." : " (off in Settings).")));
+        }
+        if (com.macdmr.radio.DeviceProfile.inBands(162_400_000L) && wxRegion) {     // the weather channels: VHF
         body.addView(section("NOAA weather alerts"));
         LinearLayout r5 = row();
         button(r5, "Alerts heard", Theme.REC, x -> wxLog());
@@ -277,7 +286,7 @@ public final class PktDialog {
 
     private TextView status() {
         String call = pe.callsignSet() ? pe.myCall() : "no callsign set";
-        String st = (pe.monitoring() ? "monitoring 144.390" : "passive") + (pe.kiss().isActive() ? " · KISS " + (pe.kiss().clientConnected() ? "client connected" : "waiting for a client") + " · " + pe.kiss().rxFrames() + " rx / " + pe.kiss().txFrames() + " tx" : "");
+        String st = (pe.monitoring() ? "monitoring " + com.macdmr.radio.region.Region.mhz(svc.aprsMonitorHz()) : "passive") + (pe.kiss().isActive() ? " · KISS " + (pe.kiss().clientConnected() ? "client connected" : "waiting for a client") + " · " + pe.kiss().rxFrames() + " rx / " + pe.kiss().txFrames() + " tx" : "");
         return hint("🔸 " + call + "  ·  " + st);
     }
 
@@ -567,7 +576,7 @@ public final class PktDialog {
         final EditText isPass = field(body, "Passcode (-1 = receive-only; never shown or logged)", p.getString("isPasscode", "-1"), InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         final EditText isMin = field(body, "Internet beacon every N minutes (0 = off)", String.valueOf(pe.isBeaconMin()), InputType.TYPE_CLASS_NUMBER);
         final EditText isComment = field(body, "Internet beacon comment", p.getString("isComment", pe.comment()), InputType.TYPE_CLASS_TEXT);
-        body.addView(section("Automatic beacons (on 144.390 only)"));
+        body.addView(section("Automatic beacons (on " + pe.aprsMhz() + " only)"));
         final String[] autoModes = { "Off", "Every N minutes", "SmartBeaconing" };
         final int[] auto = { Math.max(0, Math.min(2, pe.autoBeacon())) };
         cycle(body, "Beacon", autoModes, auto[0], v -> auto[0] = v);
@@ -584,7 +593,7 @@ public final class PktDialog {
         body.addView(section("Transmit power"));
         final int[] power = { pe.dataTxPower() == 0 ? 1 : 0 };
         cycle(body, "Power", new String[] { "High (default)", "Low" }, power[0], v -> power[0] = v);
-        body.addView(hint("Used on the frequencies the app tunes itself: APRS monitoring on 144.390 (automatic beacons, auto-acks, digipeats), ISS APRS and its beacon, and SSTV on 144.500. Messages and beacons sent from one of your channels use that channel's power."));
+        body.addView(hint("Used on the frequencies the app tunes itself: APRS monitoring on " + pe.aprsMhz() + " (automatic beacons, auto-acks, digipeats), ISS APRS and its beacon, and SSTV on 144.500. Messages and beacons sent from one of your channels use that channel's power."));
         body.addView(section("Packet lead-in (testing)"));
         final int[] lead = { 0 };
         for (int k = 0; k < PacketEngine.LEAD_CHOICES.length; k++) if (PacketEngine.LEAD_CHOICES[k] == pe.packetLeadMs()) lead[0] = k;
@@ -593,7 +602,8 @@ public final class PktDialog {
         cycle(body, "Length", PacketEngine.LEAD_NAMES, lead[0], v -> lead[0] = v);
         body.addView(hint("Sent before each packet while the radio's transmit audio settles (it reaches the air about 1 s after the carrier). Flags (the default) are the standard AX.25 TXDELAY every TNC sends; tone is a steady 1200 Hz; silence is dead air. Bench test, 252 packets: at 1.6 s all three decode alike, silence is the weakest when short. Shorter lengths are for testing with your digipeaters. SSTV and DTMF keep their own lead."));
         final boolean[] flags = { pe.autoAck(), pe.digipeat(), pe.dtmfEnabled(), pe.wxEnabled(), pe.cwEnabled(), pe.cwIdEnabled() };
-        toggle(body, "Auto-ack messages addressed to me (monitoring)", flags, 0);
+        if (pe.autoAckAllowed()) toggle(body, "Auto-ack messages addressed to me (monitoring)", flags, 0);
+        else body.addView(hint("Auto-ack is off on this radio: it has no 2 m band, so messages are not acknowledged automatically."));
         toggle(body, "Fill-in digipeater for WIDE1-1 (monitoring)", flags, 1);
         toggle(body, "DTMF decoder", flags, 2);
         toggle(body, "NOAA SAME weather alerts", flags, 3);
@@ -619,7 +629,7 @@ public final class PktDialog {
                         .putInt("isBeaconMin", Integer.parseInt(isMin.getText().toString().trim())).putString("isComment", isComment.getText().toString().trim())
                         .putInt("txLeadMs", PacketEngine.LEAD_CHOICES[lead[0]]).putInt("txLeadKind", kind[0]).putInt("txPower", power[0] == 1 ? 0 : 1).putInt("autoBeacon", auto[0]).putInt("beaconMin", Math.max(1, Integer.parseInt(bMin.getText().toString().trim())))
                         .putBoolean("telemetry", extra[0]).putBoolean("weather", extra[1]).putBoolean("txIgate", extra[2]).putString("groups", groups.getText().toString().trim().toUpperCase(Locale.US))
-                        .putBoolean("autoAck", flags[0]).putBoolean("digipeat", flags[1]).putBoolean("dtmf", flags[2]).putBoolean("wx", flags[3]).putBoolean("cw", flags[4]).putBoolean("cwId", flags[5]).apply();
+                        .putBoolean("autoAck", pe.autoAckAllowed() ? flags[0] : pe.prefs().getBoolean("autoAck", false)).putBoolean("digipeat", flags[1]).putBoolean("dtmf", flags[2]).putBoolean("wx", flags[3]).putBoolean("cw", flags[4]).putBoolean("cwId", flags[5]).apply();
                 com.macdmr.radio.Station.setRics(c, myRics.getText().toString());
                 pe.applySettings();
                 toast("Saved"); sub.dismiss();

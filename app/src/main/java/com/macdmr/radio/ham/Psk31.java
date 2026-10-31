@@ -10,7 +10,7 @@ package com.macdmr.radio.ham;
  * PSK31 (BPSK, 31.25 baud, varicode), the keyboard mode of fldigi and other sound-card programs. 8 kHz mono audio.
  *
  * Transmit: a zero is a phase reversal (with the amplitude shaped by a cosine so the signal stays narrow), a one keeps
- * the phase; characters are varicode words separated by "00". A second of reversals leads, a second of steady
+ * the phase; characters are varicode words separated by "00". Two seconds of reversals lead, a second of steady
  * carrier ends.
  *
  * Receive: every half second, while nothing is being decoded, the strongest narrow carrier between 300 and 2700 Hz
@@ -44,7 +44,7 @@ public final class Psk31 {
 
     public static short[] encode(String text, double hz) {
         StringBuilder bits = new StringBuilder();
-        for (int i = 0; i < 32; i++) bits.append('0');                      // about a second of reversals for the receiver to lock
+        for (int i = 0; i < 64; i++) bits.append('0');                      // two seconds of reversals: over FM the first ~1.2 s goes to the key-up and the receiver's carrier search
         for (char ch : text.replace("\n", "\r\n").toCharArray()) { if (ch < 128) bits.append(VARICODE[ch]).append("00"); }
         for (int i = 0; i < 32; i++) bits.append('1');                      // steady carrier to finish
         short[] out = new short[bits.length() * SPS];

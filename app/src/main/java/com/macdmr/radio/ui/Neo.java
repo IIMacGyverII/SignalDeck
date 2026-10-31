@@ -258,6 +258,7 @@ public final class Neo {
         ICONS.put("widget", "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z");
         ICONS.put("search", "M11 4.5a6.5 6.5 0 1 0 0.01 0M16 16l4.5 4.5");
         ICONS.put("star", "M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z");
+        ICONS.put("heart", "M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z");
         ICONS.put("menu", "M4 7h16M4 12h16M4 17h10");
         ICONS.put("left", "M15 5l-7 7 7 7");
         ICONS.put("right", "M9 5l7 7-7 7");
@@ -275,6 +276,7 @@ public final class Neo {
         ICONS.put("globe", "M12 3a9 9 0 1 0 0.01 0M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18");
         ICONS.put("report", "M9 3h6l1 3h3v15H5V6h3zM9 12h6M9 16h4");
         ICONS.put("update", "M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5");
+        ICONS.put("spin", "M12 4a8 8 0 1 1-7.4 5M4.6 4.5v4.5h4.5M12 10.5a1.5 1.5 0 1 0 0.01 0");
         ICONS.put("help", "M12 3a9 9 0 1 0 0.01 0M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01");
         ICONS.put("diag", "M3 12h4l3-8 4 16 3-8h4");
         ICONS.put("id", "M3 6h18v12H3zM7 10h4M7 14h6M16 10a1.5 1.5 0 1 0 0.01 0");

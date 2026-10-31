@@ -2,7 +2,7 @@
 
 # Scheduled operations
 
-*Pages · 21 of 33*
+*Pages · 21 of 34*
 
 Start something at a set time, every week or once.
 
@@ -12,7 +12,7 @@ PKT → Scheduled operations → Schedules, or SignalDeck Web → Settings → S
 
 ## What it can do
 
-Listen to a channel (optionally recording it the whole time, into Download/DMR/Audio/\<channel\>), scan the zone, APRS monitoring on 144.390, SSTV receive (on 144.500 or a channel you choose), send one APRS position beacon, run the packet finder, or check your Winlink mail: by radio (the gateway you last connected to, on the channel you choose; the radio goes back afterwards, and a check never holds the radio more than 20 minutes) or over the internet. The result (sent and received) goes in the history. Tick weekdays for a weekly schedule, or none for once on a date; set the start time and how many minutes it lasts.
+Listen to a channel (optionally recording it the whole time, into Download/DMR/Audio/\<channel\>), scan the zone, APRS monitoring on your region's APRS frequency, SSTV receive (on 144.500 or a channel you choose), send one APRS position beacon, run the packet finder, or check your Winlink mail: by radio (the gateway you last connected to, on the channel you choose; the radio goes back afterwards, and a check never holds the radio more than 20 minutes) or over the internet. The result (sent and received) goes in the history. Tick weekdays for a weekly schedule, or none for once on a date; set the start time and how many minutes it lasts.
 
 ## When it runs
 

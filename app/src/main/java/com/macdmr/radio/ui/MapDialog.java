@@ -220,8 +220,8 @@ public final class MapDialog {
             ui.post(() -> { publish(ms, fst, fch, -1); if (me == null) fitVisible(); });
             if (me == null) return;
             try {
-                double mi = c.getSharedPreferences("repeaters", Context.MODE_PRIVATE).getInt("radiusMi", 30);
-                List<Repeater> reps = new RepeaterService(c, svc.store()).nearby(me.getLatitude(), me.getLongitude(), mi * 1.609344, false, new StringBuilder());
+                int mi = c.getSharedPreferences("repeaters", Context.MODE_PRIVATE).getInt("radiusMi", 30);
+                List<Repeater> reps = new RepeaterService(c, svc.store()).nearby(me.getLatitude(), me.getLongitude(), GeoUtil.radiusKm(mi), false, new StringBuilder());
                 for (Repeater r : reps) {
                     if (!r.hasCoords) continue;
                     ms.add(new MapView.Marker(r.lat, r.lon, r.dmr ? MapView.REPEATER_DMR : MapView.REPEATER_FM, (r.callsign == null ? "?" : r.callsign) + " " + String.format(Locale.US, "%.3f", r.rxHz / 1e6), r)); rp++;
@@ -237,12 +237,12 @@ public final class MapDialog {
     private void repeatersHere() {
         repeatersMoved = true;
         final double lat = map.centerLat(), lon = map.centerLon();
-        final double mi = c.getSharedPreferences("repeaters", Context.MODE_PRIVATE).getInt("radiusMi", 30);
+        final int mi = c.getSharedPreferences("repeaters", Context.MODE_PRIVATE).getInt("radiusMi", 30);
         status.setText("Finding repeaters around the middle of the map\u2026");
         new Thread(() -> {
             final List<MapView.Marker> reps = new ArrayList<>();
             try {
-                for (Repeater r : new RepeaterService(c, svc.store()).nearby(lat, lon, mi * 1.609344, false, new StringBuilder())) {
+                for (Repeater r : new RepeaterService(c, svc.store()).nearby(lat, lon, GeoUtil.radiusKm(mi), false, new StringBuilder())) {
                     if (!r.hasCoords) continue;
                     reps.add(new MapView.Marker(r.lat, r.lon, r.dmr ? MapView.REPEATER_DMR : MapView.REPEATER_FM, (r.callsign == null ? "?" : r.callsign) + " " + String.format(Locale.US, "%.3f", r.rxHz / 1e6), r));
                 }
@@ -255,8 +255,8 @@ public final class MapDialog {
                     map.setVisible(MapView.REPEATER_FM, true); map.setVisible(MapView.REPEATER_DMR, true); Neo.pillStyle(pills[2], true, Neo.CYAN);
                     c.getSharedPreferences("map", Context.MODE_PRIVATE).edit().putBoolean("showRepeaters", true).apply();
                 }
-                status.setText(reps.isEmpty() ? String.format(Locale.US, "No repeaters known within %.0f mi of the middle of the map", mi)
-                        : String.format(Locale.US, "%d repeaters within %.0f mi of the middle of the map", reps.size(), mi));
+                status.setText(reps.isEmpty() ? "No repeaters known within " + GeoUtil.radiusText(mi) + " of the middle of the map"
+                        : reps.size() + " repeaters within " + GeoUtil.radiusText(mi) + " of the middle of the map");
             });
         }, "map-repeaters-here").start();
     }
@@ -270,10 +270,11 @@ public final class MapDialog {
 
     private String dist(double lat, double lon) {
         if (me == null) return "";
-        double m = GeoUtil.haversineMeters(me.getLatitude(), me.getLongitude(), lat, lon), mi = m * 0.000621371;
+        double m = GeoUtil.haversineMeters(me.getLatitude(), me.getLongitude(), lat, lon), mi = com.macdmr.radio.region.Region.km() ? m / 1000 : m * 0.000621371;
+        String u = com.macdmr.radio.region.Region.km() ? " km" : " mi";
         double brg = GeoUtil.bearingDegrees(me.getLatitude(), me.getLongitude(), lat, lon);
         String[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
-        return (mi < 10 ? String.format(Locale.US, "%.1f mi", mi) : String.format(Locale.US, "%.0f mi", mi)) + " " + dirs[(int) Math.round(brg / 45) % 8];
+        return (mi < 10 ? String.format(Locale.US, "%.1f", mi) : String.format(Locale.US, "%.0f", mi)) + u + " " + dirs[(int) Math.round(brg / 45) % 8];
     }
 
     private static String ago(long ts) {

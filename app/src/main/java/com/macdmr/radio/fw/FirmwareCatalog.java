@@ -28,6 +28,8 @@ public final class FirmwareCatalog {
         public final String tag, sha256, summary, baseTag, model, stockPackage, stockVersion, url, status, device;
         public final int size;
         public final boolean factory, readBack;
+        /** Lowest SignalDeck versionCode that may load this image (catalogue status "released-min"); 0 = any. */
+        public int minAppVersionCode;
 
         Image(String tag, String sha256, int size, String summary, String baseTag, String model,
               String stockPackage, String stockVersion, String url, String status, String device,
@@ -83,6 +85,7 @@ public final class FirmwareCatalog {
                     row.optString("stockPackage"), row.optString("stockVersion"), row.optString("url"),
                     row.optString("status"), row.optString("device"),
                     row.optBoolean("factory"), row.optBoolean("readBack")));
+            images.get(images.size() - 1).minAppVersionCode = row.optInt("minAppVersionCode", 0);
         }
         List<Variant> variants = new ArrayList<>();
         JSONArray devices = o.optJSONArray("variants");
@@ -105,12 +108,26 @@ public final class FirmwareCatalog {
         return new Doc(o.optInt("serial"), images, variants);
     }
 
+    /**
+     * The firmware catalogue's own signing key (AndroidRadio_Firmware_Project catalog/public_key_firmware.b64, KEYS.md),
+     * used from serial {@link #FIRMWARE_KEY_FROM_SERIAL} on. Earlier serials were signed with the profile-list key. Builds
+     * before beta.22 only know the profile key, so they cannot verify serial 6 or later and keep serial 5.
+     */
+    public static final String FIRMWARE_PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEm8EYMfAtrrQnIqRzAPjH2ZdZjKm9z8SnrVQep042zlGbaxPomUz8qw7ref7vBOBY/hB1UrBNyElaF6SqOydVcw==";
+    public static final int FIRMWARE_KEY_FROM_SERIAL = 6;
+
     /** @return null when the signature, the serial, or the body is not acceptable */
     public static Doc accept(byte[] json, String sig, int previousSerial) {
+        return accept(json, sig, previousSerial, ProfileRegistry.PUBLIC_KEY, FIRMWARE_PUBLIC_KEY);
+    }
+
+    /** The key follows the serial inside the signed body: the firmware key from serial 6 on, the profile key before. */
+    static Doc accept(byte[] json, String sig, int previousSerial, String profileKey, String firmwareKey) {
         if (json == null || sig == null) return null;
-        if (!ProfileRegistry.verify(json, sig, ProfileRegistry.PUBLIC_KEY)) return null;
         try {
             Doc doc = parse(json);
+            String key = doc.serial >= FIRMWARE_KEY_FROM_SERIAL ? firmwareKey : profileKey;
+            if (!ProfileRegistry.verify(json, sig, key)) return null;
             if (doc.serial < previousSerial) return null;
             return doc;
         } catch (Exception e) { return null; }
@@ -126,15 +143,29 @@ public final class FirmwareCatalog {
         } catch (Exception e) { return null; }
     }
 
-    /** Built-in rows, plus catalogue rows that are stock or released and not already listed. */
+    /**
+     * Whether a catalogue row may be offered to this app. "released-min" is a released image that needs at least
+     * {@code minAppVersionCode}: builds older than its introduction only know "stock" and "released", so they never see it
+     * (FW57 needs SignalDeck beta.22's data-hold fix; with beta.21 and M17 receive on, its DMR keys are silent).
+     */
+    public static boolean offered(String status, int minAppVersionCode, int appVersionCode) {
+        if ("stock".equals(status) || "released".equals(status)) return true;
+        return "released-min".equals(status) && minAppVersionCode > 0 && appVersionCode >= minAppVersionCode;
+    }
+
+    /** Built-in rows, plus catalogue rows that are stock or released (and, for "released-min", new enough) and not already listed. */
     public static List<ImageTable.Row> rows(Context c) {
+        Doc doc = c == null ? null : cached(c);
+        return rows(doc == null ? null : doc.images, com.macdmr.radio.BuildConfig.VERSION_CODE);
+    }
+    /** {@link #rows(Context)} for a given catalogue image list and app versionCode. */
+    static List<ImageTable.Row> rows(List<Image> images, int appVersionCode) {
         List<ImageTable.Row> out = new ArrayList<>();
         java.util.Collections.addAll(out, ImageTable.rows());
-        Doc doc = c == null ? null : cached(c);
-        if (doc == null) return out;
-        for (Image im : doc.images) {
+        if (images == null) return out;
+        for (Image im : images) {
             if (im.tag == null || im.sha256 == null || im.sha256.length() != 64) continue;
-            if (!"stock".equals(im.status) && !"released".equals(im.status)) continue;
+            if (!offered(im.status, im.minAppVersionCode, appVersionCode)) continue;
             boolean have = false;
             for (ImageTable.Row r : out) if (r.sha256.equals(im.sha256)) have = true;
             if (have) continue;
@@ -182,19 +213,25 @@ public final class FirmwareCatalog {
         } catch (Exception e) { return "Firmware catalogue check failed"; }
     }
 
-    /** Download one catalogue image and, for the factory row, keep it as the verified backup. @return the bytes, or null */
+    /**
+     * Download one catalogue image this build is offered and keep it: the factory row as the verified backup, any other
+     * image beside it ({@link FirmwareVault#keepImage}). Size, sha256 and the version string must all match the signed row.
+     * @return the bytes, or null
+     */
     public static byte[] download(Context c, String tag) {
         Doc doc = cached(c);
         if (doc == null || tag == null) return null;
         Image want = null;
         for (Image im : doc.images) if (tag.equals(im.tag)) want = im;
         if (want == null || want.url == null || want.url.isEmpty()) return null;
+        if (!want.factory && !offered(want.status, want.minAppVersionCode, com.macdmr.radio.BuildConfig.VERSION_CODE)) return null;
         try {
             com.macdmr.radio.repeaters.HttpClient.Response r = com.macdmr.radio.repeaters.HttpClient.get(want.url);
             if (!r.isOk() || r.body.length != want.size) return null;
             if (!want.sha256.equals(FirmwareVault.sha256(r.body))) return null;
             if (!want.tag.equals(ImageTable.tagOf(r.body))) return null;
             if (want.factory) FirmwareVault.keepFactory(c, r.body);
+            else if (!FirmwareVault.keepImage(c, r.body, want.tag, want.sha256, want.size)) return null;
             return r.body;
         } catch (Exception e) { return null; }
     }

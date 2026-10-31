@@ -2,7 +2,7 @@
 
 # Soft SQ
 
-*On the intercom · 4 of 33*
+*On the intercom · 4 of 34*
 
 A smarter squelch for weak signals.
 

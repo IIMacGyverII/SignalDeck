@@ -2,7 +2,7 @@
 
 # Intercom
 
-*On the intercom · 2 of 33*
+*On the intercom · 2 of 34*
 
 The main page: channel, talk key, activity.
 

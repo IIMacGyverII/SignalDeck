@@ -101,7 +101,9 @@ final class DraftProfile {
         // power
         if (bridged || bridge != null) f.add(new Field("powerNode", "/sys/bus/platform/drivers/mcu/mcu_power, through the HAL's startMcu/stopMcu (release: STOP_DEVICE, then the USB controller's cmode 0 and 1)", MEDIUM,
                 watch.contains("mcu_power = 0") ? "the release at the end of the watch read it as off" : "the probe through the bridge powered it this way"));
+        else if (namedLine(r, "(?i)(^|_)(pwd|pwr|power)(_|$)") != null) { String[] l = namedLine(r, "(?i)(^|_)(pwd|pwr|power)(_|$)"); f.add(new Field("powerNode", l[1], MEDIUM, "named " + l[0] + " in the stock app's code")); }
         else f.add(new Field("powerNode", "unknown", UNKNOWN, "not found by the report"));
+        { String[] l = namedLine(r, "(?i)(^|_)ptt(_|$)"); if (l != null && !bridged && bridge == null) f.add(new Field("pttNode", l[1], MEDIUM, "named " + l[0] + " in the stock app's code")); }
 
         // PTT key and broadcasts
         String layout = first(ptt, "(?m)^  scancode 0x[0-9a-f]+ \\(\\d+\\) on [^\\n]+ maps it to [^\\n]+", 0);
@@ -140,5 +142,18 @@ final class DraftProfile {
         StringBuilder out = new StringBuilder("draft profile (confidence: evidence); nothing here is applied:\n");
         for (Field x : fields(report)) out.append(String.format(java.util.Locale.US, "  %-12s %s\n  %-12s   (%s: %s)\n", x.name, x.value, "", x.confidence, x.evidence));
         return out.toString();
+    }
+
+    /** {field, path} of the first line in the report's "named lines:" whose field name matches {@code nameRegex}, or null. */
+    static String[] namedLine(String report, String nameRegex) {
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(?m)^  named lines: (.+)$").matcher(report == null ? "" : report);
+        if (!m.find()) return null;
+        java.util.regex.Pattern n = java.util.regex.Pattern.compile(nameRegex);
+        for (String kv : m.group(1).trim().split("\\s+")) {
+            int eq = kv.indexOf('='); if (eq <= 0) continue;
+            String name = kv.substring(0, eq), path = kv.substring(eq + 1);
+            if (path.startsWith("/sys/") && n.matcher(name).find()) return new String[] { name, path };
+        }
+        return null;
     }
 }

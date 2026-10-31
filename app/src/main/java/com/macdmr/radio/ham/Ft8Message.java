@@ -101,12 +101,22 @@ public final class Ft8Message {
         if (call.equals("CQ")) return 2;
         int len = call.length();
         if (call.startsWith("CQ ") && len < 8) { int v = parseCqModifier(call); return v < 0 ? -1 : 3 + v; }
+        if (len > 2 && call.startsWith("<") && call.endsWith(">")) {                // <CALL>: send it as its 22-bit hash (WSJT-X's non-standard calls)
+            String in = call.substring(1, len - 1); int n22 = hash22(in); if (n22 < 0) return -1; if (h != null) h.save(in); return NTOKENS + n22;
+        }
         String base = call;
         if (call.endsWith("/P") || call.endsWith("/R")) { ip[0] = 1; base = call.substring(0, len - 2); }
         int n28 = packBasecall(base);
         if (n28 >= 0) { if (h != null) h.save(call); return NTOKENS + MAX22 + n28; }
         if (len >= 3 && len <= 11) { int n22 = hash22(call); if (n22 < 0) return -1; if (h != null) h.save(call); ip[0] = 0; return NTOKENS + n22; }
         return -1;
+    }
+
+    /** True for a call that packs in full in a standard message (not one that goes as a hash or in a type 4 message). */
+    public static boolean standardCall(String call) {
+        String c = call == null ? "" : call.trim().toUpperCase(Locale.US);
+        if (c.endsWith("/P") || c.endsWith("/R")) c = c.substring(0, c.length() - 2);
+        return packBasecall(c) >= 0;
     }
 
     static int packGrid(String g) {
@@ -173,8 +183,9 @@ public final class Ft8Message {
         int slash = de.indexOf('/');
         boolean cq = to.equals("CQ") || to.startsWith("CQ ");
         if (slash >= 2 && cq && !(de.substring(slash).equals("/P") || de.substring(slash).equals("/R"))) return null;
-        // A non-standard "de" call goes in a type 4 message, which carries it in full (a hashed "to" call is fine here)
-        if (b < NTOKENS + MAX22 && b >= NTOKENS) return null;
+        // A non-standard "de" call goes in a type 4 message, which carries it in full (a hashed "to" call is fine here), unless
+        // it is written <CALL>: then it goes hashed, as WSJT-X sends it with a report (the other side has had it in full)
+        if (b < NTOKENS + MAX22 && b >= NTOKENS && !de.startsWith("<")) return null;
         int g = packGrid(extra);
         if (g < 0) return null;
         long n29a = (a << 1) | ipa[0], n29b = (b << 1) | ipb[0];

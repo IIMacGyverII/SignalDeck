@@ -41,13 +41,7 @@ public final class Propagation {
         int n = terrain.length;
         double d = (n - 1) * step;
         if (n < 3) return fspl(d, hz);
-        double lambda = 299_792_458.0 / hz;
-        double ha = terrain[0] + txAgl, hb = terrain[n - 1] + rxAgl;
-        // what the real terrain adds over smooth ground: its diffraction loss minus that of a smooth profile (which only has
-        // the earth's bulge, already inside the smooth-earth term)
-        double terrainDiff = deygout(terrain, step, 0, n - 1, ha, hb, lambda, 0);
-        double smoothDiff = deygout(new double[n], step, 0, n - 1, txAgl, rxAgl, lambda, 0);
-        double excess = Math.max(0, terrainDiff - smoothDiff);
+        double excess = terrainExcess(terrain, step, txAgl, rxAgl, hz);
         // effective heights for the smooth-earth part: above the average ground along the path (tx) and near the phone (rx),
         // so a transmitter on a hill or a phone on a rise keeps its advantage
         double meanAll = 0; int from = Math.max(1, n / 10); for (int i = from; i < n; i++) meanAll += terrain[i]; meanAll /= Math.max(1, n - from);
@@ -55,6 +49,19 @@ public final class Propagation {
         for (int i = Math.max(0, n - 1 - near); i < n; i++) { meanNear += terrain[i]; cnt++; } meanNear /= Math.max(1, cnt);
         double h1 = Math.max(1, txAgl + terrain[0] - meanAll), h2 = Math.max(rxAgl, rxAgl + terrain[n - 1] - meanNear);
         return smoothEarth(d, h1, h2, hz) + excess;
+    }
+
+    /**
+     * What the hills along a profile add over smooth ground (dB, never negative): the profile's knife-edge diffraction
+     * loss minus that of a smooth profile (which only has the earth's bulge, already inside the smooth-earth term).
+     */
+    public static double terrainExcess(double[] terrain, double step, double txAgl, double rxAgl, double hz) {
+        int n = terrain.length;
+        if (n < 3) return 0;
+        double lambda = 299_792_458.0 / hz;
+        double terrainDiff = deygout(terrain, step, 0, n - 1, terrain[0] + txAgl, terrain[n - 1] + rxAgl, lambda, 0);
+        double smoothDiff = deygout(new double[n], step, 0, n - 1, txAgl, rxAgl, lambda, 0);
+        return Math.max(0, terrainDiff - smoothDiff);
     }
 
     /** Effective earth radius (km) for k = 4/3. */

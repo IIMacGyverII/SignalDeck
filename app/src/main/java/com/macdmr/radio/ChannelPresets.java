@@ -15,7 +15,9 @@ import java.util.Locale;
 /**
  * Standard channel lists offered when adding a zone (FRS, GMRS, NOAA weather, MURS, marine, ham simplex, DMR simplex,
  * PMR446). Installing one adds its channels (reusing any channel the user already has on the same frequencies and
- * tones) and a zone holding them, named after the list.
+ * tones) and a zone holding them, named after the list. {@link #offers} orders them for the region (Device → Region):
+ * its licence-free services first, licence-free services it does not have marked "not legal here", and lists that only
+ * exist elsewhere (NOAA weather outside weather-radio countries, US business and railroad channels) under Show all.
  */
 public final class ChannelPresets {
     private ChannelPresets() { }
@@ -31,6 +33,12 @@ public final class ChannelPresets {
 
     public static final class Preset {
         public final String zone, region, about, licence; public final List<Ch> channels = new ArrayList<>();
+        /** A licence-free personal radio service (FRS, GMRS, MURS, UHF CB, PMR446): legal where the region lists its frequencies. */
+        public boolean licenceFree;
+        /** Only of use in these countries (null: anywhere). */
+        public java.util.Set<String> where;
+        /** NOAA-style weather radio: shown where the region has it. */
+        public boolean weather;
         Preset(String zone, String region, String about, String licence) { this.zone = zone; this.region = region; this.about = about; this.licence = licence; }
         public boolean hasRepeaters() { for (Ch c : channels) if (c.repeater) return true; return false; }
         public boolean receiveOnly() { for (Ch c : channels) if (!ChannelStore.receiveOnly(c.tx)) return false; return true; }
@@ -48,26 +56,28 @@ public final class ChannelPresets {
     /** Whether the radio of {@code dp} tunes the channel: both frequencies inside its bands (NOAA, marine and 2 m lists on a UHF-only radio: no). */
     public static boolean tunable(DeviceProfile dp, Ch c) { return dp.tunable(c.rx) && dp.tunable(c.tx); }
 
-    public static List<Preset> all() {
+    public static List<Preset> all() { return all(com.macdmr.radio.region.Region.cached()); }
+    /** The lists, with the region's calling, APRS and SSTV frequencies (Device → Region) in the ham list. */
+    public static List<Preset> all(com.macdmr.radio.region.Region region) {
         List<Preset> out = new ArrayList<>();
 
         Preset frs = new Preset("FRS", "US", "Family Radio Service: the 22 channels of bubble-pack walkie-talkies. Narrow band, low power.", "No licence needed");
         for (int n = 1; n <= 22; n++) frs.fm(String.format(Locale.US, "FRS %d", n), frsMhz(n), false, false);
-        out.add(frs);
+        frs.licenceFree = true; out.add(frs);
 
         Preset gmrs = new Preset("GMRS", "US", "General Mobile Radio Service: the same 22 channels as FRS (they talk to FRS radios) plus the 8 repeater channels 15R to 22R, which listen on 462 MHz and transmit 5 MHz higher. Channels 8 to 14 are narrow band at low power.", "FCC GMRS licence needed (no exam; it covers your family)");
         for (int n = 1; n <= 22; n++) { boolean interstitial467 = n >= 8 && n <= 14; gmrs.fm(String.format(Locale.US, "GMRS %d", n), frsMhz(n), !interstitial467, !interstitial467); }
         for (int n = 15; n <= 22; n++) gmrs.channels.add(new Ch(String.format(Locale.US, "GMRS %dR", n), frsMhz(n), frsMhz(n) + 5, false, true, true, true));
-        out.add(gmrs);
+        gmrs.licenceFree = true; out.add(gmrs);
 
         Preset wx = new Preset("NOAA Weather", "US / Canada", "The seven NOAA Weather Radio (and Environment Canada) broadcast channels. Receive-only; the strongest one is your local station. With SAME alerts on (PKT) the radio decodes the warnings.", "Receive-only");
         double[] wxMhz = { 162.550, 162.400, 162.475, 162.425, 162.450, 162.500, 162.525 };
         for (int i = 0; i < wxMhz.length; i++) wx.fm("NOAA WX" + (i + 1), wxMhz[i], false, true);
-        out.add(wx);
+        wx.weather = true; out.add(wx);
 
         Preset murs = new Preset("MURS", "US", "Multi-Use Radio Service: five licence-free VHF channels, less crowded than FRS and reaching further outdoors. Low power (the limit is 2 W).", "No licence needed");
         murs.fm("MURS 1", 151.820, false, true).fm("MURS 2", 151.880, false, true).fm("MURS 3", 151.940, false, true).fm("MURS 4 Blue", 154.570, false, true).fm("MURS 5 Green", 154.600, false, true);
-        out.add(murs);
+        murs.licenceFree = true; out.add(murs);
 
         Preset marine = new Preset("Marine VHF", "US / international", "Marine VHF channels to listen to boats, harbours and the Coast Guard: 16 is distress and calling, 9 boater calling, 13 bridge to bridge, 22A the US Coast Guard. Receive-only: this radio is not a marine radio.", "Receive-only");
         marine.fm("Marine 16", 156.800, false, true).fm("Marine 9", 156.450, false, true).fm("Marine 13", 156.650, false, true).fm("Marine 22A", 157.100, false, true)
@@ -75,13 +85,7 @@ public final class ChannelPresets {
               .fm("Marine 72", 156.625, false, true).fm("Marine 78A", 156.925, false, true);
         out.add(marine);
 
-        Preset ham = new Preset("Ham simplex", "US", "Amateur FM simplex: the 2 m and 70 cm national calling channels, common simplex channels and APRS (144.390, where the radio decodes position reports).", "Amateur licence needed");
-        ham.fm("2m Call", 146.520, true, true);
-        for (double f : new double[] { 146.550, 146.580, 147.420, 147.450, 147.480, 147.510, 147.540, 147.570 }) ham.fm(String.format(Locale.US, "2m %.3f", f), f, true, true);
-        ham.fm("APRS", 144.390, true, true);
-        ham.fm("70cm Call", 446.000, true, true);
-        for (double f : new double[] { 445.950, 446.050, 446.100, 446.150 }) ham.fm(String.format(Locale.US, "70cm %.3f", f), f, true, true);
-        out.add(ham);
+        out.add(ham(region));
 
         Preset dmr = new Preset("DMR simplex", "Worldwide", "Amateur DMR simplex: the channels most DMR radios carry, all colour code 1, time slot 1, talkgroup 99.", "Amateur licence needed");
         for (double f : new double[] { 441.000, 446.500, 446.075, 433.450, 145.790, 145.510 }) dmr.channels.add(new Ch(String.format(Locale.US, "DMR S %.3f", f), f, f, true, true, true, false));
@@ -91,12 +95,12 @@ public final class ChannelPresets {
         biz.fm("Red Dot", 151.625, true, true).fm("Purple Dot", 151.955, true, true).fm("Biz 151.700", 151.700, true, true).fm("Biz 151.760", 151.760, true, true)
            .fm("Brown Dot", 464.500, true, false).fm("Yellow Dot", 464.550, true, false).fm("Biz 469.500", 469.500, true, false).fm("Biz 469.550", 469.550, true, false)
            .fm("Silver Star", 467.850, true, false).fm("Gold Star", 467.875, true, false).fm("Red Star", 467.900, true, false).fm("Blue Star", 467.925, true, false);
-        out.add(biz);
+        biz.where = new java.util.HashSet<>(java.util.Arrays.asList("US")); out.add(biz);
 
         Preset rail = new Preset("Railroad", "US / Canada", "The 96 AAR railroad channels (02 to 97, 159.810 to 161.565 MHz; 02 to 04 are used in Canada): dispatchers, trains, yards and the trackside defect detectors that read out axle counts. Receive-only. Scan the zone to find your local railroad's channels, then star them.", "Receive-only");
         rail.fm("AAR 02", 159.810, false, true).fm("AAR 03", 159.930, false, true).fm("AAR 04", 160.050, false, true);
         for (int n = 5; n <= 97; n++) rail.fm(String.format(Locale.US, "AAR %02d", n), 160.185 + (n - 5) * 0.015, false, true);
-        out.add(rail);
+        rail.where = new java.util.HashSet<>(java.util.Arrays.asList("US", "CA")); out.add(rail);
 
         Preset sat = new Preset("ISS and satellites", "Worldwide", "The International Space Station and the SO-50 FM satellite, each heard for about ten minutes per pass (an app such as Heavens-Above gives the times). ISS Voice: crew contacts on 145.800 (the crew listens on 144.490 in the Americas). ISS APRS: the station's packet digipeater, on 437.825 since 2026 (it has used 145.825 before). ISS SSTV: picture events on 437.550 (receive only). On 70 cm the signal shifts up to 10 kHz with Doppler, so the APRS and SSTV channels come as + (rising), plain (overhead) and - (setting); PKT \u2192 ISS APRS and ISS SSTV follow the shift automatically and are the better way. ISS Rptr and SO-50 listen on 2 m and send on 70 cm, opened with a 67 Hz tone; use the + channel as the pass begins, the plain one overhead and the - one as it ends. ARISS changes the station's modes often: check ariss.org. Talking through a satellite with a handheld is hard: listen first. Cross-band (2 m transmit, 70 cm receive) is untested on this radio.", "Amateur licence needed to transmit");
         sat.split("ISS Voice", 145.800, 144.490, true, true, 0)
@@ -115,11 +119,56 @@ public final class ChannelPresets {
             if (output) cb.channels.add(new Ch(String.format(Locale.US, "CB %dR%s", n, tag), f, f + 0.750, false, true, false, true));
             else cb.fm(String.format(Locale.US, "CB %d%s", n, tag), f, true, false);
         }
-        out.add(cb);
+        cb.licenceFree = true; out.add(cb);
 
         Preset pmr = new Preset("PMR446", "Europe / UK", "PMR446, the licence-free walkie-talkie channels of Europe and the UK: 16 narrow-band channels. Low power (the limit is 0.5 W).", "No licence needed in Europe; not for use in the US");
         for (int n = 1; n <= 16; n++) pmr.fm(String.format(Locale.US, "PMR %d", n), 446.00625 + (n - 1) * 0.0125, false, false);
-        out.add(pmr);
+        pmr.licenceFree = true; out.add(pmr);
+        return out;
+    }
+
+    /** Amateur FM simplex for the region: calling channels, APRS, FM SSTV, and the North American simplex channels where its calling channels are 146.520 / 446.000. */
+    static Preset ham(com.macdmr.radio.region.Region region) {
+        boolean na2 = region.call2mHz == 146_520_000, na70 = region.call70Hz == 446_000_000;
+        String where = !region.chosen || region.id.equals("US") ? "US" : region.name;
+        Preset ham = new Preset("Ham simplex", where, "Amateur FM simplex: the 2 m and 70 cm calling channels" + (na2 || na70 ? ", common simplex channels" : "") + " and APRS ("
+                + com.macdmr.radio.region.Region.mhz(region.aprsHz) + ", your region's APRS frequency, where the radio decodes position reports)" + (region.sstvHz > 0 ? ", and FM SSTV" : "") + ". Device \u2192 Region sets them.", "Amateur licence needed");
+        if (region.call2mHz > 0) ham.fm("2m Call", region.call2mHz / 1e6, true, true);
+        if (na2) for (double f : new double[] { 146.550, 146.580, 147.420, 147.450, 147.480, 147.510, 147.540, 147.570 }) ham.fm(String.format(Locale.US, "2m %.3f", f), f, true, true);
+        ham.fm("APRS", region.aprsHz / 1e6, true, true);
+        if (region.sstvHz > 0) ham.fm("SSTV", region.sstvHz / 1e6, true, true);
+        if (region.call70Hz > 0) ham.fm("70cm Call", region.call70Hz / 1e6, true, true);
+        if (na70) for (double f : new double[] { 445.950, 446.050, 446.100, 446.150 }) ham.fm(String.format(Locale.US, "70cm %.3f", f), f, true, true);
+        return ham;
+    }
+
+    public static final int NA = -1, LEGAL = 0, PARTLY = 1, NOT_LEGAL = 2;
+    /** For a licence-free list: are its transmit channels inside one of the region's licence-free services? NA for other lists or before a region is chosen. */
+    public static int legality(Preset p, com.macdmr.radio.region.Region r) {
+        if (!p.licenceFree || !r.chosen) return NA;
+        int tx = 0, in = 0;
+        for (Ch c : p.channels) { if (ChannelStore.receiveOnly(c.tx)) continue; tx++; for (com.macdmr.radio.region.Region.Service s : r.licenseFree) if (s.covers(c.tx)) { in++; break; } }
+        return in == 0 ? NOT_LEGAL : in == tx ? LEGAL : PARTLY;
+    }
+    /** One list as the Add-a-zone sheet offers it. */
+    public static final class Offer {
+        public final Preset preset; public final int legal; public final boolean hidden;
+        Offer(Preset p, int legal, boolean hidden) { preset = p; this.legal = legal; this.hidden = hidden; }
+    }
+    /**
+     * The lists in the region's order: its licence-free services (legal, then partly), the lists of use everywhere and those
+     * of this region, then licence-free services it does not have ("not legal here", the user's call), then the lists that
+     * only exist elsewhere, hidden until Show all. Before a region is chosen: every list, as before.
+     */
+    public static List<Offer> offers(com.macdmr.radio.region.Region r) {
+        List<Preset> all = all(r); List<Offer> out = new ArrayList<>();
+        if (!r.chosen) { for (Preset p : all) out.add(new Offer(p, NA, false)); return out; }
+        for (int pass = 0; pass < 5; pass++) for (Preset p : all) {
+            int l = legality(p, r);
+            boolean here = p.weather ? r.weatherRadio : p.where == null || p.where.contains(r.id);
+            int k = l == LEGAL ? 0 : l == PARTLY ? 1 : l == NOT_LEGAL ? 3 : here ? 2 : 4;
+            if (k == pass) out.add(new Offer(p, l, k == 4));
+        }
         return out;
     }
 
@@ -138,20 +187,27 @@ public final class ChannelPresets {
 
     public static final class Result { public long zoneId; public int added, reused, skipped; public String summary; }
 
+    /** Whether this radio can use the channel: its receive and transmit frequencies both in the radio's bands. */
+    public static boolean inBands(Ch c, java.util.function.LongPredicate tunable) { return tunable.test(c.rx) && tunable.test(c.tx); }
+    /** How many of the list's channels this radio can use (a UHF-only phone cannot use Marine VHF or a 2 m list). */
+    public static int tunableCount(Preset p, java.util.function.LongPredicate tunable) { int n = 0; for (Ch c : p.channels) if (inBands(c, tunable)) n++; return n; }
+
     /**
      * Add the list's channels and its zone. {@code repeaterTone}: CTCSS sub-code for the repeater channels (sent and
      * received), or -1 for none. A channel already present (same frequencies, mode and tones) is reused, not duplicated.
      */
-    public static Result install(ChannelStore store, Preset p, int repeaterTone) {
+    public static Result install(ChannelStore store, Preset p, int repeaterTone) { return install(store, p, repeaterTone, hz -> true); }
+    /** The same, leaving out the channels this radio cannot tune ({@code tunable}: the profile's bands). */
+    public static Result install(ChannelStore store, Preset p, int repeaterTone, java.util.function.LongPredicate tunable) {
         Result r = new Result();
         DeviceProfile dp = DeviceProfile.detect();
-        if (p.tunableCount(dp) == 0) throw new IllegalStateException("none of its channels is inside what this radio tunes (" + dp.bandsText() + ")");
+        if (tunableCount(p, tunable) == 0) throw new IllegalStateException("none of its channels is inside what this radio tunes (" + dp.bandsText() + ")");
         ChannelStore.Zone zone = null; for (ChannelStore.Zone z : store.zones()) if (z.name.equals(p.zone)) zone = z;
         if (zone == null) { zone = new ChannelStore.Zone(); zone.name = p.zone; zone.numbers = new int[0]; }
         List<Integer> nums = new ArrayList<>(); for (int n : zone.numbers) nums.add(n);
         if (p.channels.stream().anyMatch(c -> c.digital)) ensureSimplexContact(store);
         for (Ch c : p.channels) {
-            if (!tunable(dp, c)) { r.skipped++; continue; }                    // the module would refuse it: never add a channel this radio cannot tune
+            if (!inBands(c, tunable)) { r.skipped++; continue; }
             ChannelStore.Channel ch = build(c, repeaterTone);
             ChannelStore.Channel have = find(store, ch);
             if (have != null) { r.reused++; if (!nums.contains(have.number)) nums.add(have.number); continue; }
@@ -159,7 +215,7 @@ public final class ChannelPresets {
         }
         zone.numbers = new int[nums.size()]; for (int i = 0; i < nums.size(); i++) zone.numbers[i] = nums.get(i);
         r.zoneId = store.saveZone(zone);
-        r.summary = r.added + " channel" + (r.added == 1 ? "" : "s") + " added" + (r.reused > 0 ? ", " + r.reused + " you already had" : "") + (r.skipped > 0 ? ", " + r.skipped + " skipped (outside " + dp.bandsText() + ")" : "") + " · zone " + p.zone;
+        r.summary = r.added + " channel" + (r.added == 1 ? "" : "s") + " added" + (r.reused > 0 ? ", " + r.reused + " you already had" : "") + (r.skipped > 0 ? ", " + r.skipped + " outside this radio's bands left out" : "") + " · zone " + p.zone;
         return r;
     }
 

@@ -52,7 +52,7 @@ public class DiagnosticsView extends LinearLayout implements RadioService.Listen
         LayoutParams cml = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); cml.setMargins(4, 0, 4, 8); addView(cm, cml);
         cm.setOnClickListener(v -> { com.macdmr.radio.CarMessages.test(c); say("test message posted (shows on the phone and in Android Auto; its reply is not sent)"); });
         down.setOnClickListener(v -> { if (svc != null) svc.shutDown(true); });
-        rssi.setOnClickListener(v -> { if (svc != null) svc.pollRssi(); });
+        rssi.setOnClickListener(v -> { if (svc != null) svc.pollRssiMeasure(); });
         ScrollView sv = new ScrollView(c);
         log = new TextView(c); log.setTextSize(11); log.setTypeface(Typeface.MONOSPACE); log.setTextColor(0xFFB0E8F0); log.setMovementMethod(new ScrollingMovementMethod());
         sv.addView(log);

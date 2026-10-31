@@ -15,6 +15,8 @@
 
 **Download:** the newest build is on the [Releases](https://github.com/IIMacGyverII/SignalDeck/releases) page (`SignalDeck-<version>.apk`). Once installed, **Device → Updates** finds later builds, with a Release path and a Beta path and the changes since your version.
 
+**Website:** [signaldeckradio.com](https://signaldeckradio.com) has the features, the [supported phones](https://signaldeckradio.com/phones/) with what works on each, the [guide](https://signaldeckradio.com/docs/) and the [certification guide](https://signaldeckradio.com/phones/certification/).
+
 **Help is built in:** every screen and feature is explained in the app (**Device → Help & how-to**, and the ⓘ buttons next to fields and settings).
 
 ## Getting started
@@ -80,14 +82,16 @@ The screenshots use demo data: made-up callsigns (unallocated `Q` prefixes, `DEM
 - **Logbook** with ADIF export, **POTA and SOTA** (spots, your activation, duplicate check), **nets near you** and **net control** (check-ins, traffic, a report).
 - **Message forms:** ICS-213 and ARRL radiograms over APRS, DMR text or Winlink.
 - **Scheduled operations:** at a set time, once or every week, listen to (and record) a channel, scan a zone, monitor APRS, receive SSTV, send a beacon, run the packet finder or check your Winlink mail.
-- **Fox hunt**, **exam practice**, and the **map** with **coverage maps** (where your repeaters really work, measured as you move).
+- **Fox hunt** with a prediction map: compass bearings, a signal heat map and terrain (ridges the signal could not cross), each a switch, combined into one estimate. It can count only the fox's own transmissions (its CTCSS tone, or its DMR caller and colour code), take marks as you walk, and take a bearing from a spin with the phone against your chest.
+- **Exam practice**, and the **map** with **coverage maps** (where your repeaters really work, measured as you move).
 
 ### Everywhere
 - **SignalDeck Web:** the whole radio in a browser on your Wi-Fi, protected by a PIN (https on port 8443 for sharing and the microphone): intercom, channels, messages, APRS, SSTV, packet and Winlink, FT8, M17, satellites, band scope, map, logbook, recordings, and the phone's battery and signal. Transmitting from the web stays off until you allow it.
 - **Android Auto** (the radio on the car's screen, including talk), a home-screen **widget**, and a notification with controls.
+- **Region:** your country sets the APRS frequency, the channel lists offered (others are marked "not legal here"), weather radio, band edges, the station-ID interval and km or miles. The country data may be inaccurate: please report corrections with a source.
 - **Backups**, channel sharing (Android share sheet, CHIRP CSV) and boot persistence.
-- **Support tools:** Radio audio check, second radio test, device reports (**Run all checks**, also driven from adb), and a watchdog that restarts a radio module that stops taking commands.
-- **Module firmware page** (Device): shows the radio module's firmware, keeps a verified backup of the factory image taken from the stock app, and loads images from the project's signed catalogue, with every safety check shown before a load and the factory image restored when anything does not match. Experimental, and only for the listed phones.
+- **Support tools:** Radio audio check, second radio test, device reports (**Run all checks**, also driven from adb; every report names the build that made it, official or a fork), a guided **transmit test session** for certifying a phone (`tx-report.json`), and a watchdog that restarts a radio module that stops taking commands.
+- **Module firmware page** (Device): shows the radio module's firmware, keeps a verified backup of the factory image taken from the stock app, and downloads and loads images from the project's signed catalogue, with every safety check shown before a load and the factory image restored when anything does not match. The first released image, **FW57** for the Armor 26 Ultra (beta.22 or newer), adds M17 voice and POCSAG transmit and the module's tone engine for FT8, RTTY and Morse. Experimental, and only for the listed phones.
 
 ## What the hardware cannot do
 
@@ -102,15 +106,27 @@ These are limits of the radio module, measured on the reference phone. SignalDec
 
 ## Phones
 
+Specs, what works, known quirks and test-unit measurements for each phone: [docs/radios](docs/radios/README.md) (in the app: **Device → About this radio**).
+
 | Phone | Status |
 |---|---|
 | **Ulefone Armor 26 Ultra** (walkie-talkie model) | Tested — the reference phone. Custom ROMs and GSIs work too: SignalDeck takes the radio audio straight from the sound card when the vendor audio service is missing. |
 | **Blackview Xplore 1** | **Profile in testing** ([analysis](docs/multi-device-xplore1-findings.md)): same radio-module protocol, audio over a second serial port. A tester has receive, channel import and CTCSS working; transmit stays blocked until the profile is verified. Owners: please run **Device → Run all checks** and send the zip. |
 | **Ulefone Armor 20WT** | **Profile written, untested** (from an owner's device report and its stock app): the Armor 26 Ultra's radio family on another serial port. SignalDeck does not take over or transmit by itself until it is tested. Owners: please run **Device → Run all checks** and send the zip. |
-| **ANYSECU W6+** (UHF analog) | **Tested** (2026-10-28: receive, and transmit on the air): an analog-only UHF radio (400–470 MHz, no DMR) with its own module, driven by SignalDeck's second radio engine. Takes over, imports the stock app's channels, tones and squelch; receive, recording, captions, APRS, SSTV, FT8 and M17 work. No S-meter (the module gives no signal readings). DMR screens are hidden. Transmit works (confirmed on the air); the data modes' transmit (APRS, SSTV, FT8) is not yet tested on it. |
-| Other DMR phones (Oukitel WP61, UNIWA P2 Plus…) | No profile yet — the app starts in discovery mode and offers **Run all checks**. See [docs/DEVICE_SUPPORT_REQUEST.md](docs/DEVICE_SUPPORT_REQUEST.md). |
+| **Unihertz Atom XL** (UHF, DMR) | **Tested** (receive and transmit): its radio sits behind a USB bridge, and SignalDeck drives it through that. FM and DMR voice, DMR texts, APRS, DTMF, SSTV, FT8 and RTTY receive, and M17 receive with its own calibration. UHF only; no computer data over the USB cable while SignalDeck has the radio; the S-meter holds still during a reception. |
+| **ANYSECU W6+** (UHF analog) | **Tested** (receive, and transmit on the air): an analog-only UHF radio (400–470 MHz, no DMR) with its own module, driven by SignalDeck's second radio engine. Takes over, imports the stock app's channels, tones and squelch; receive, recording, captions, APRS, SSTV, FT8 and M17 work. No S-meter (the module gives no signal readings). DMR screens are hidden. SignalDeck's own sounds (APRS, SSTV, FT8, RTTY, DTMF, PSK31) go on the air through the stock app's relay and were decoded on a second phone. |
+| **ANYSECU W6Plus DMR** (V69, UHF, DMR) | **Beta** (receive and transmit verified, 2026-10-29): DMR and analog on 400–480 MHz with the Armor's command set. DMR voice works both ways with another DMR radio; data modes decoded between two phones. |
+| Other DMR phones (Oukitel WP61, UNIWA P2 Plus…) | No profile yet — the app starts in discovery mode and offers **Run all checks**. See [docs/DEVICE_SUPPORT_REQUEST.md](docs/DEVICE_SUPPORT_REQUEST.md), then [docs/DEVICE_CERTIFICATION.md](docs/DEVICE_CERTIFICATION.md) for the levels and tests. |
 
 **Root (Magisk) is required:** Android's SELinux policy only lets the stock app open the radio's serial port. SignalDeck applies the rules it needs with Magisk (Device → *Keep access after reboot* makes them permanent as a small Magisk module). The stock walkie-talkie app is turned off while SignalDeck owns the radio, and turned back on when you hand the radio back.
+
+## Contribute
+
+SignalDeck is a free and open-source project. If you like it, please consider helping it grow:
+
+- **Donate:** [Ko-fi](https://ko-fi.com/iimacgyverii) or [GitHub Sponsors](https://github.com/sponsors/IIMacGyverII). Donations buy more phones to develop for and make compatible, and keep new features coming.
+- **Take part:** test for bugs, suggest features, and join the community at [signaldeckradio.com](https://signaldeckradio.com).
+- **Make your own phone compatible:** fork the project and follow the [certification guide](docs/DEVICE_CERTIFICATION.md); pull requests from forks are welcome and are reviewed before merging.
 
 **Bugs and new phones:** open an [issue](https://github.com/IIMacGyverII/SignalDeck/issues) with your phone model, the SignalDeck version, what happened, and the zip from *Run all checks* (or **Device → Device report**).
 
@@ -129,7 +145,7 @@ The device profile list in [`profiles/`](profiles/README.md) is signed separatel
 
 ## History
 
-SignalDeck began on 2026-10-17 inside [phonedmrapp](https://github.com/IIMacGyverII/phonedmrapp), the research project and **DMRModHooks** LSPosed module for the Ulefone Armor 26 Ultra, and moved here with its full history. Beta builds 1.0.0-beta.1 to beta.11 were published there, and later betas here (beta.20 on 2026-10-27); the changes of every build are in [CHANGELOG.md](CHANGELOG.md). The research behind the radio work (the module firmware, M17, POCSAG and the bench methods) is documented in phonedmrapp.
+SignalDeck began on 2026-10-17 inside [phonedmrapp](https://github.com/IIMacGyverII/phonedmrapp), the research project and **DMRModHooks** LSPosed module for the Ulefone Armor 26 Ultra, and moved here with its full history. Beta builds 1.0.0-beta.1 to beta.11 were published there, and later betas here (beta.22 on 2026-10-30); the changes of every build are in [CHANGELOG.md](CHANGELOG.md). The research behind the radio work (the module firmware, M17, POCSAG and the bench methods) is documented in phonedmrapp.
 
 ## License
 

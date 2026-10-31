@@ -1,0 +1,3381 @@
+{
+ "version": 1,
+ "regions": [
+  {
+   "id": "iaru1",
+   "name": "IARU Region 1 (Europe, Africa, Middle East)",
+   "iaruRegion": 1,
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": null,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "Regional band-plan values. 439.9875 MHz POCSAG is a national-usage note in the plan; several countries cannot transmit there.",
+   "unverified": [
+    "dapnetHz"
+   ]
+  },
+  {
+   "id": "iaru2",
+   "name": "IARU Region 2 (the Americas)",
+   "iaruRegion": 2,
+   "aprsHz": 144390000,
+   "callingHz": {
+    "2m": 146520000,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     420000000,
+     450000000
+    ]
+   ],
+   "licenseFree": [],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": null,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.iaru.org/wp-content/uploads/2020/10/IARU-Region-2-Band-plan.pdf",
+     "title": "IARU Region 2 Band Plan (September 2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.iaru.org/wp-content/uploads/2020/10/IARU-Region-2-Band-plan.pdf",
+     "title": "IARU Region 2 Band Plan (September 2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.iaru.org/wp-content/uploads/2020/10/IARU-Region-2-Band-plan.pdf",
+     "title": "IARU Region 2 Band Plan (September 2020)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "The Region 2 plan names no 70 cm FM calling frequency; not every country has 420-450 MHz (many have 430-440)."
+  },
+  {
+   "id": "iaru3",
+   "name": "IARU Region 3 (Asia-Pacific)",
+   "iaruRegion": 3,
+   "aprsHz": 144800000,
+   "aprsAltHz": 144390000,
+   "callingHz": {
+    "2m": null,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": null,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://iaru-r3.org/wp-content/uploads/2025/01/R3-004-Band-Plans-IARU-Region-3.pdf",
+     "title": "IARU Region 3 Band Plan R3-004 Rev. 2 (November 2024)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://iaru-r3.org/wp-content/uploads/2025/01/R3-004-Band-Plans-IARU-Region-3.pdf",
+     "title": "IARU Region 3 Band Plan R3-004 Rev. 2 (November 2024)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://iaru-r3.org/wp-content/uploads/2025/01/R3-004-Band-Plans-IARU-Region-3.pdf",
+     "title": "IARU Region 3 Band Plan R3-004 Rev. 2 (November 2024)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "R3-004 suggests 144.800 MHz as the APRS spot frequency; as of 2018 MARTS, RAST, SARTS and ORARI used 144.390 and CRAC, CTARL and HARTS 144.640. No regional FM calling frequencies."
+  },
+  {
+   "id": "US",
+   "name": "United States",
+   "iaruRegion": 2,
+   "fallback": "iaru2",
+   "aprsHz": 144390000,
+   "callingHz": {
+    "2m": 146520000,
+    "70cm": 446000000
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": true,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     420000000,
+     450000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "FRS",
+     "lowHz": 462550000,
+     "highHz": 467712500,
+     "channels": 22,
+     "maxPowerW": 2.0,
+     "notes": "Licensed by rule (no individual licence). 2 W ERP on channels 1-7 and 15-22, 0.5 W on 8-14. Certified radios only."
+    },
+    {
+     "service": "GMRS",
+     "lowHz": 462550000,
+     "highHz": 467725000,
+     "channels": 30,
+     "maxPowerW": 50.0,
+     "notes": "Needs an FCC GMRS licence (no exam, covers the family). 50 W on main channels, 5 W on 462 MHz interstitials, 0.5 W on 467 MHz interstitials; repeaters on 467 MHz inputs."
+    },
+    {
+     "service": "MURS",
+     "lowHz": 151820000,
+     "highHz": 154600000,
+     "channels": 5,
+     "maxPowerW": 2.0,
+     "notes": "Licensed by rule. 151.820, 151.880, 151.940, 154.570, 154.600 MHz; 2 W transmitter output."
+    }
+   ],
+   "units": "mi",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 3100,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "http://www.arrl.org/automatic-packet-reporting-system-qst",
+     "title": "ARRL: Automatic Packet Reporting System",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://www.iaru.org/wp-content/uploads/2020/10/IARU-Region-2-Band-plan.pdf",
+     "title": "IARU Region 2 Band Plan (September 2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.arrl.org/band-plan",
+     "title": "ARRL Band Plan",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "weatherRadio",
+     "url": "https://www.weather.gov/nwr/",
+     "title": "NOAA Weather Radio All Hazards",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "weatherRadio",
+     "url": "https://www.weather.gov/nwr/nwrsame",
+     "title": "NWR Specific Area Message Encoding (SAME)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.ecfr.gov/current/title-47/part-97/section-97.301",
+     "title": "47 CFR 97.301 Authorized frequency bands",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.ecfr.gov/current/title-47/section-95.563",
+     "title": "47 CFR 95.563 / 95.567 FRS channels and power",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.ecfr.gov/current/title-47/section-95.1705",
+     "title": "47 CFR 95.1705 / 95.1763 / 95.1767 GMRS licence, channels, power",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.ecfr.gov/current/title-47/section-95.2763",
+     "title": "47 CFR 95.2763 / 95.2767 MURS channels and power",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.ecfr.gov/current/title-47/section-97.119",
+     "title": "47 CFR 97.119 Station identification",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "NOAA Weather Radio: seven channels 162.400-162.550 MHz with SAME. BrandMeister TG 3100 is the US nationwide bridge (310 is a TAC group)."
+  },
+  {
+   "id": "CA",
+   "name": "Canada",
+   "iaruRegion": 2,
+   "fallback": "iaru2",
+   "aprsHz": 144390000,
+   "callingHz": {
+    "2m": 146520000,
+    "70cm": 446000000
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     450000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "FRS/GMRS",
+     "lowHz": 462550000,
+     "highHz": 467712500,
+     "channels": 22,
+     "maxPowerW": 2.0,
+     "notes": "One licence-exempt class (RSS-210 Annex E): the US FRS frequencies, 2 W ERP (0.5 W on 8-14), integral antenna, no repeaters. MURS is not authorised in Canada."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 30,
+   "dmrCountryTg": 302,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.rac.ca/mivahih/2021/01/TwoMetre_Bandplan_ND2020TCA.pdf",
+     "title": "RAC Canadian Amateur Two Metre (2m) Band Plan (October 2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.rac.ca/mivahih/2021/01/TwoMetre_Bandplan_ND2020TCA.pdf",
+     "title": "RAC Canadian Amateur Two Metre (2m) Band Plan (October 2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://wp.rac.ca/432-mhz-70-cm-page/",
+     "title": "RAC 432 MHz (70 cm) band plan page",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "weatherRadio",
+     "url": "https://www.canada.ca/en/environment-climate-change/services/weatheradio.html",
+     "title": "Environment Canada: Weatheradio (no longer in service)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.ece.unb.ca/petersen/amateur-radio-files/RBR04e-Operating-Standards-2022-Jul.pdf",
+     "title": "ISED RBR-4 Issue 3 (July 2022), Standards for the Operation of Radio Stations in the Amateur Radio Service (mirror; ISED URL returned 404)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://wp.rac.ca/432-mhz-70-cm-page/",
+     "title": "RAC 432 MHz (70 cm) band plan page",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://ised-isde.canada.ca/site/spectrum-management-telecommunications/sites/default/files/attachments/2022/RSS-210-Issue10A1.pdf",
+     "title": "ISED RSS-210 Issue 10, Annex E (FRS/GMRS)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.ece.unb.ca/petersen/amateur-radio-files/RBR04e-Operating-Standards-2022-Jul.pdf",
+     "title": "ISED RBR-4 Issue 3 (July 2022), Standards for the Operation of Radio Stations in the Amateur Radio Service (mirror; ISED URL returned 404)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "Weatheradio Canada (162 MHz, SAME) was shut down in 2026; US NWR stations may still be heard near the border."
+  },
+  {
+   "id": "MX",
+   "name": "Mexico",
+   "iaruRegion": 2,
+   "fallback": "iaru2",
+   "aprsHz": 144390000,
+   "callingHz": {
+    "2m": 146520000,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": true,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "FRS (banda libre)",
+     "lowHz": 462562500,
+     "highHz": 467712500,
+     "channels": 14,
+     "maxPowerW": 0.5,
+     "notes": "14 x 12.5 kHz channels 462.5625-462.7125 and 467.5625-467.7125 MHz (CNAF MX140), certified equipment; 0.5 W from a secondary source. Other espectro-libre VHF/UHF bands exist (MX107)."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 334,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.iaru.org/wp-content/uploads/2020/10/IARU-Region-2-Band-plan.pdf",
+     "title": "IARU Region 2 Band Plan (September 2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.iaru.org/wp-content/uploads/2020/10/IARU-Region-2-Band-plan.pdf",
+     "title": "IARU Region 2 Band Plan (September 2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "weatherRadio",
+     "url": "https://www.ift.org.mx/sites/default/files/c-erro-06-cnaf_06-22_version_accesible.pdf",
+     "title": "IFT Cuadro Nacional de Atribucion de Frecuencias (notes MX107, MX114A, MX135, MX140)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.ift.org.mx/sites/default/files/c-erro-06-cnaf_06-22_version_accesible.pdf",
+     "title": "IFT Cuadro Nacional de Atribucion de Frecuencias (notes MX107, MX114A, MX135, MX140)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.ift.org.mx/sites/default/files/c-erro-06-cnaf_06-22_version_accesible.pdf",
+     "title": "IFT Cuadro Nacional de Atribucion de Frecuencias (notes MX107, MX114A, MX135, MX140)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.qsl.net/wd9ewk/xe-frs.html",
+     "title": "Mexico's Family Radio Service (FRS) equivalent (secondary, 2006)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "aprsHz",
+    "callingHz",
+    "weatherRadio",
+    "licenseFree"
+   ],
+   "notes": "APRS and 2 m calling come from the Region 2 plan (no FMRE/IFT document found). 440-450 MHz is not amateur in Mexico, so there is no 446.000. The 162.400-162.550 MHz channels are protected for early-alert broadcasting (CNAF MX114A; SASMEX seismic alerts reportedly use SAME), not NOAA-style weather."
+  },
+  {
+   "id": "BR",
+   "name": "Brazil",
+   "iaruRegion": 2,
+   "fallback": "iaru2",
+   "aprsHz": 145570000,
+   "callingHz": {
+    "2m": 146520000,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 724,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://gcremeri.freeshell.org/wiki/pub/files/2024%20Plano%20Bandas%20BR%202m%202024-02-05v1.1.pdf",
+     "title": "Plano de Bandas de 2m 2024 conforme Ato 926/2024 (private, secondary)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://sistemas.anatel.gov.br/anexar-api/publico/anexos/download/e2bee3ec4783c5c41a8ce4affe7baef8",
+     "title": "Anatel Cartilha do Servico Radioamador (2026-06), section 9.2",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://gcremeri.freeshell.org/wiki/pub/files/2024%20Plano%20Bandas%20BR%202m%202024-02-05v1.1.pdf",
+     "title": "Plano de Bandas de 2m 2024 conforme Ato 926/2024 (private, secondary)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.iaru.org/wp-content/uploads/2020/10/IARU-Region-2-Band-plan.pdf",
+     "title": "IARU Region 2 Band Plan (September 2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "aprsHz",
+    "amateurBands"
+   ],
+   "notes": "145.570 MHz is widely reported (aprs.fi, secondary plans) but not confirmed from LABRE or Anatel. 144-148 / 430-440 MHz from the revoked Res. 452/2006 and secondary plans; the current Ato 926/2024 page was down. FRS-type 'radiacao restrita' radios (462/467 MHz, 0.5 W, Res. 680/2017) are sold, but the regulation text was not read, so none is listed. Anatel sets no fixed ID interval (Ato 3448/2026)."
+  },
+  {
+   "id": "AR",
+   "name": "Argentina",
+   "iaruRegion": 2,
+   "fallback": "iaru2",
+   "aprsHz": 144930000,
+   "aprsAltHz": 430930000,
+   "callingHz": {
+    "2m": 146520000,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "Uso familiar",
+     "lowHz": 462556250,
+     "highHz": 462718750,
+     "channels": 7,
+     "maxPowerW": 0.5,
+     "notes": "7 channels 462.5625-462.7125 MHz, 500 mW, integral antenna, registered models, no individual licence (SC Res. 2750/1998)."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 722,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.argentina.gob.ar/normativa/286986_res3635-Anexo-5_jpg/archivo",
+     "title": "ENACOM Res. 3635-E/2017, Anexo A band plan",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://www.argentina.gob.ar/normativa/286986_res3635-Anexo-5_jpg/archivo",
+     "title": "ENACOM Res. 3635-E/2017, Anexo A band plan",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.argentina.gob.ar/normativa/286986_res3635-Anexo-5_jpg/archivo",
+     "title": "ENACOM Res. 3635-E/2017, Anexo A band plan",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.argentina.gob.ar/normativa/286986_res3635-Anexo-5_jpg/archivo",
+     "title": "ENACOM Res. 3635-E/2017, Anexo A band plan",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.argentina.gob.ar/normativa/nacional/norma-55385/texto",
+     "title": "SC Res. 2750/1998 (uso familiar portable radios)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.argentina.gob.ar/normativa/nacional/norma-286986/texto",
+     "title": "ENACOM Res. 3635-E/2017 Reglamento General de Radioaficionados (rule 1.5.8)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ]
+  },
+  {
+   "id": "GB",
+   "name": "United Kingdom",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 433800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    }
+   ],
+   "units": "mi",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 2350,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://rsgb.services/public/bandplans/docs/260125_rsgb_band_plan_2026.pdf",
+     "title": "RSGB Band Plan (effective 1 January 2026)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://rsgb.services/public/bandplans/docs/260125_rsgb_band_plan_2026.pdf",
+     "title": "RSGB Band Plan (effective 1 January 2026)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://rsgb.services/public/bandplans/docs/260125_rsgb_band_plan_2026.pdf",
+     "title": "RSGB Band Plan (effective 1 January 2026)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://rsgb.services/public/bandplans/docs/260125_rsgb_band_plan_2026.pdf",
+     "title": "RSGB Band Plan (effective 1 January 2026)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://rsgb.services/public/bandplans/docs/260125_rsgb_band_plan_2026.pdf",
+     "title": "RSGB Band Plan (effective 1 January 2026)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://rsgb.services/public/bandplans/docs/260125_rsgb_band_plan_2026.pdf",
+     "title": "RSGB Band Plan (effective 1 January 2026)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://wiki.oarc.uk/_media/uk-licence-2024-02-21.pdf",
+     "title": "Ofcom Amateur Radio Licence (21 Feb 2024), clause 21 (mirror; ofcom.org.uk unreachable)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "licenseFree"
+   ],
+   "notes": "433.800 is for APRS where 144.800 cannot be used. 146-147 MHz is a UK extension for Full licensees with an NoV only (not listed as a band here). Ofcom sets no fixed ID interval (identify 'as frequently as practicable'). Ofcom IR 2030 was unreachable, so PMR446/LPD433 are not confirmed nationally. BrandMeister TG 235 is a call channel; 2350 is 'United Kingdom'."
+  },
+  {
+   "id": "IE",
+   "name": "Ireland",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 272,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.comreg.ie/media/2023/05/ComReg-0945R5.pdf",
+     "title": "ComReg 09/45R5 Amateur Station Licence Guidelines (May 2023), Annex 1",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "aprsHz",
+    "callingHz",
+    "sstvHz",
+    "licenseFree"
+   ],
+   "notes": "IRTS was unreachable; APRS, calling and SSTV follow the Region 1 plan. A vendor list gives DAPNET 433.625 MHz (doubtful, not set). ERC/REC 70-03 notes Ireland allows voice on 433 MHz SRD with limits."
+  },
+  {
+   "id": "DE",
+   "name": "Germany",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 432500000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    },
+    {
+     "service": "Freenet",
+     "lowHz": 149021875,
+     "highHz": 149115625,
+     "channels": 6,
+     "maxPowerW": 1.0,
+     "notes": "BNetzA Vfg. 45/2025 (valid to 2035): six 12.5 kHz channels 149.0250-149.1125 MHz plus 6.25 kHz digital channels, 1 W ERP (0.5 W near the Belgian and Polish borders)."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 262,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/distrikte/h/ortsverbaende/02/Nuetzliches/Bandplan_2_m_August_2017.pdf",
+     "title": "DARC Bandplan 2 m (August 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/referate/vus/bandplaene/UHF_Bandplan_70_cm_Mai_2025.pdf",
+     "title": "DARC Bandplan 70 cm (May 2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/distrikte/h/ortsverbaende/02/Nuetzliches/Bandplan_2_m_August_2017.pdf",
+     "title": "DARC Bandplan 2 m (August 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/referate/vus/bandplaene/UHF_Bandplan_70_cm_Mai_2025.pdf",
+     "title": "DARC Bandplan 70 cm (May 2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/referate/vus/bandplaene/UHF_Bandplan_70_cm_Mai_2025.pdf",
+     "title": "DARC Bandplan 70 cm (May 2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/referate/vus/bandplaene/UHF_Bandplan_70_cm_Mai_2025.pdf",
+     "title": "DARC Bandplan 70 cm (May 2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.gesetze-im-internet.de/afuv_2005/anlage_1.html",
+     "title": "AFuV Anlage 1 (amateur frequency bands)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.eurofunker.lima-city.de/PDF/Vfg_45_2025.pdf",
+     "title": "BNetzA Vfg. 45/2025 Freenet (copy)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.gesetze-im-internet.de/afuv_2005/__11.html",
+     "title": "AFuV section 11 (call sign every ten minutes)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ]
+  },
+  {
+   "id": "FR",
+   "name": "France",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 432500000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 15,
+   "dmrCountryTg": 208,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://ref73.webador.fr/_downloads/0f24e91d6fef71a878553fd9f5dbde08",
+     "title": "Plan de la bande IARU Region 1 144-146 MHz, French usage (F6ETI, 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://ref73.webador.fr/_downloads/729843b37bd9d1dd0dc0a7a419b94319",
+     "title": "Plan de la bande IARU Region 1 430-440 MHz, French usage (F6ETI, 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://ref73.webador.fr/_downloads/0f24e91d6fef71a878553fd9f5dbde08",
+     "title": "Plan de la bande IARU Region 1 144-146 MHz, French usage (F6ETI, 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://ref73.webador.fr/_downloads/729843b37bd9d1dd0dc0a7a419b94319",
+     "title": "Plan de la bande IARU Region 1 430-440 MHz, French usage (F6ETI, 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://ref73.webador.fr/_downloads/729843b37bd9d1dd0dc0a7a419b94319",
+     "title": "Plan de la bande IARU Region 1 430-440 MHz, French usage (F6ETI, 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.r-e-f.org/images/stories/ARCEP/2013_1515.pdf",
+     "title": "ARCEP Decision 2013-1515 annex (amateur bands)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.arcep.fr/uploads/tx_gsavis/12-1241.pdf",
+     "title": "ARCEP Decision 2012-1241 article 4 (identification every 15 minutes)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "dapnetHz",
+    "licenseFree"
+   ],
+   "notes": "The French plan (2017, REF73) puts digital links in 439.800-439.975; DAPNET 439.9875 is from a vendor list only."
+  },
+  {
+   "id": "NL",
+   "name": "Netherlands",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 432500000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 5,
+   "dmrCountryTg": 204,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://vhf-uhf.veron.nl/frequenties/operating/",
+     "title": "VERON VHF-UHF Operating frequencies (2025-11-17)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://vhf-uhf.veron.nl/frequenties/operating/",
+     "title": "VERON VHF-UHF Operating frequencies (2025-11-17)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://veron.nl/vereniging/radioamateur/frequentiegebruik/",
+     "title": "VERON Frequentiegebruik (from the Nationaal Frequentieplan)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://wetten.overheid.nl/BWBR0036375/",
+     "title": "Regeling gebruik van frequentieruimte met meldingsplicht 2015, art. 10 (call sign every five minutes)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "callingHz",
+    "sstvHz",
+    "dapnetHz",
+    "licenseFree"
+   ],
+   "notes": "VERON publishes no national 2 m/70 cm plan and follows the Region 1 plan. 436-440 MHz is secondary."
+  },
+  {
+   "id": "BE",
+   "name": "Belgium",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 206,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.uba.be/nl/v-u-shf/bandplan",
+     "title": "UBA V/U/SHF Bandplan (links the IARU Region 1 plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.uba.be/nl/v-u-shf/bandplan",
+     "title": "UBA V/U/SHF Bandplan (links the IARU Region 1 plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.uba.be/nl/v-u-shf/bandplan",
+     "title": "UBA V/U/SHF Bandplan (links the IARU Region 1 plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.bipt.be/file/cc73d96153bbd5448a56f19d925d05b1379c7f21/dd6ba0d4094625ded08277255de9ac1143f4976c/freq-en.pdf",
+     "title": "BIPT Frequency bands and technical characteristics authorised for radio amateurs (2019)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02, 430 MHz band plan: 433.400 SSTV (FM/AFSK), 433.500 FM calling; national usage note q: 439.9875 POCSAG",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02, 430 MHz band plan: 433.400 SSTV (FM/AFSK), 433.500 FM calling; national usage note q: 439.9875 POCSAG",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://www.iaru-r1.org/wp-content/uploads/2024/11/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02, 430 MHz band plan: 433.400 SSTV (FM/AFSK), 433.500 FM calling; national usage note q: 439.9875 POCSAG",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://github.com/IIMacGyverII/SignalDeck/issues/95",
+     "title": "ON4WX source review for Belgium (ON0LG paging installation), 2026-10-30",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.bipt.be/secteurs/telecoms/spectre/plan-des-frequences",
+     "title": "BIPT/IBPT national frequency plan",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.bipt.be/utilisateurs/frequences-radio/utilisation-privee-de-loisir/utilisation-libre-de-radio",
+     "title": "BIPT/IBPT licence-free private use (PMR446)",
+     "checked": "2026-10-30"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.bipt.be/secteurs/telecoms/equipements-hertziens/specifications-d-interfaces/cb-pmr446-amateur",
+     "title": "BIPT/IBPT interface specifications CB, PMR446, amateur",
+     "checked": "2026-10-30"
+    }
+   ],
+   "unverified": [
+    "licenseFree.LPD433"
+   ],
+   "notes": "UBA's band plan is the IARU Region 1 plan. Reviewed by ON4WX 2026-10-30 (issue #95): 2 m and 70 cm allocations, APRS 144.800, FM calling 145.500, DAPNET 439.9875 and PMR446 confirmed. 433.500 (70 cm FM calling) and 433.400 (FM SSTV) are in the Region 1 430 MHz plan itself; 144.500 is the 2 m image-mode centre in the all-mode (SSB) segment, so this FM radio's SSTV default is 433.400. LPD433: the national plan lists short-range devices at 433.05-434.79 MHz, but the channel plan and voice use are not confirmed for Belgium. No ID interval found in the BIPT 2019 decision; none is inferred (the app's 10-minute reminder is only a reminder)."
+  },
+  {
+   "id": "IT",
+   "name": "Italy",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     434000000
+    ],
+    [
+     435000000,
+     438000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 222,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.qsl.net/iw2hdc/pag12.html",
+     "title": "Italian amateur allocations table (secondary, undated)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.ari-rivarolo.org/docs/Allegato-26-CdC.pdf",
+     "title": "Allegato 26 Codice delle comunicazioni elettroniche (DM 1 March 2021)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "aprsHz",
+    "callingHz",
+    "sstvHz",
+    "amateurBands",
+    "licenseFree"
+   ],
+   "notes": "ARI's national plan and MIMIT were unreachable; values follow the Region 1 plan. 434-435 and 438-440 MHz are not amateur in Italy, so 439.9875 cannot be used; a vendor list gives DAPNET 144.5125 / 144.9375 MHz (not set)."
+  },
+  {
+   "id": "ES",
+   "name": "Spain",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 433800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 214,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://ea4ffi.ure.es/radioaficionados%20page%20docs/PLAN%20DE%20BANDAS%20DE%20LA%20IARU%20-%202m%20y%2070cm.pdf",
+     "title": "URE-hosted Plan de bandas de la IARU 2m y 70cm (in force since January 2006)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://ea4ffi.ure.es/radioaficionados%20page%20docs/PLAN%20DE%20BANDAS%20DE%20LA%20IARU%20-%202m%20y%2070cm.pdf",
+     "title": "URE-hosted Plan de bandas de la IARU 2m y 70cm (in force since January 2006)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://ea4ffi.ure.es/radioaficionados%20page%20docs/PLAN%20DE%20BANDAS%20DE%20LA%20IARU%20-%202m%20y%2070cm.pdf",
+     "title": "URE-hosted Plan de bandas de la IARU 2m y 70cm (in force since January 2006)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://ea4ffi.ure.es/radioaficionados%20page%20docs/PLAN%20DE%20BANDAS%20DE%20LA%20IARU%20-%202m%20y%2070cm.pdf",
+     "title": "URE-hosted Plan de bandas de la IARU 2m y 70cm (in force since January 2006)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://ea4ffi.ure.es/radioaficionados%20page%20docs/PLAN%20DE%20BANDAS%20DE%20LA%20IARU%20-%202m%20y%2070cm.pdf",
+     "title": "URE-hosted Plan de bandas de la IARU 2m y 70cm (in force since January 2006)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.boe.es/buscar/pdf/2013/BOE-A-2013-7624-consolidado.pdf",
+     "title": "Orden IET/1311/2013 (consolidated), annex and art. 29.1",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.boe.es/buscar/pdf/2013/BOE-A-2013-7624-consolidado.pdf",
+     "title": "Orden IET/1311/2013 (consolidated), annex and art. 29.1",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "dapnetHz",
+    "licenseFree"
+   ],
+   "notes": "The URE-hosted plan dates from 2006. It names 439.9875 as POCSAG centre 'per the national plan'; a vendor list says Spain uses 144.8625."
+  },
+  {
+   "id": "PT",
+   "name": "Portugal",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     435000000
+    ],
+    [
+     438000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 268,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://rep.pt/wp/2020/10/04/cq0psl-novo-sistema-de-aprs/",
+     "title": "REP: CQ0PSL novo sistema de APRS (2020)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://groups.google.com/group/ct-comunicacoes-e-tecnologias/attach/e8e4eefce728/anexo6_Adenda_2013_QNAF.pdf?part=0.1",
+     "title": "QNAF Anexo 6, amateur services (2013 addendum copy)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "callingHz",
+    "sstvHz",
+    "dapnetHz",
+    "amateurBands",
+    "licenseFree"
+   ],
+   "notes": "Band table from a 2013 QNAF addendum (435-438 MHz amateur-satellite only); recheck against current ANACOM. ERC/REC 70-03 notes Portugal excludes analogue audio other than voice on 433 MHz SRD."
+  },
+  {
+   "id": "CH",
+   "name": "Switzerland",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 432500000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 228,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://uska.ch/de/funkamateure/repeater-liste-und-bandplaene/bandplaene/bandplan/",
+     "title": "USKA Bandplaene (uses the DARC 2 m 2017 and 70 cm 2025 plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/distrikte/h/ortsverbaende/02/Nuetzliches/Bandplan_2_m_August_2017.pdf",
+     "title": "DARC Bandplan 2 m (August 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://uska.ch/de/funkamateure/repeater-liste-und-bandplaene/bandplaene/bandplan/",
+     "title": "USKA Bandplaene (uses the DARC 2 m 2017 and 70 cm 2025 plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/referate/vus/bandplaene/UHF_Bandplan_70_cm_Mai_2025.pdf",
+     "title": "DARC Bandplan 70 cm (May 2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://uska.ch/de/funkamateure/repeater-liste-und-bandplaene/bandplaene/bandplan/",
+     "title": "USKA Bandplaene (uses the DARC 2 m 2017 and 70 cm 2025 plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/distrikte/h/ortsverbaende/02/Nuetzliches/Bandplan_2_m_August_2017.pdf",
+     "title": "DARC Bandplan 2 m (August 2017)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/referate/vus/bandplaene/UHF_Bandplan_70_cm_Mai_2025.pdf",
+     "title": "DARC Bandplan 70 cm (May 2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://uska.ch/de/funkamateure/repeater-liste-und-bandplaene/bandplaene/bandplan/",
+     "title": "USKA Bandplaene (uses the DARC 2 m 2017 and 70 cm 2025 plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/referate/vus/bandplaene/UHF_Bandplan_70_cm_Mai_2025.pdf",
+     "title": "DARC Bandplan 70 cm (May 2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://uska.ch/de/funkamateure/repeater-liste-und-bandplaene/bandplaene/bandplan/",
+     "title": "USKA Bandplaene (uses the DARC 2 m 2017 and 70 cm 2025 plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://www.darc.de/fileadmin/filemounts/referate/vus/bandplaene/UHF_Bandplan_70_cm_Mai_2025.pdf",
+     "title": "DARC Bandplan 70 cm (May 2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.bakom.admin.ch/dam/it/sd-web/NMOiPhk4y4w5/20251028_Hilfstabellen%20it.pdf",
+     "title": "BAKOM Hilfstabellen OUUS Art. 6 (2025-10-28)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.lexaris.de/book/version/documentflat/head/227562",
+     "title": "VVNF SR 784.102.11 Art. 2 (copy)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "licenseFree",
+    "stationIdMinutes"
+   ],
+   "notes": "USKA uses the DARC plans. The 10-minute ID rule is from VVNF Art. 2; that it applies to amateurs is an inference."
+  },
+  {
+   "id": "AT",
+   "name": "Austria",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 432500000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439930000,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     439100000
+    ],
+    [
+     439920000,
+     439940000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 232,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://adl612.oevsv.at/export/shared/.content/.galleries/Downloads_Referate/UKW-Referat-Downloads/UKW-Bandplan.pdf",
+     "title": "OeVSV UKW-Bandplan (August 2023)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://adl612.oevsv.at/export/shared/.content/.galleries/Downloads_Referate/UKW-Referat-Downloads/UKW-Bandplan.pdf",
+     "title": "OeVSV UKW-Bandplan (August 2023)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://adl612.oevsv.at/export/shared/.content/.galleries/Downloads_Referate/UKW-Referat-Downloads/UKW-Bandplan.pdf",
+     "title": "OeVSV UKW-Bandplan (August 2023)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://adl612.oevsv.at/export/shared/.content/.galleries/Downloads_Referate/UKW-Referat-Downloads/UKW-Bandplan.pdf",
+     "title": "OeVSV UKW-Bandplan (August 2023)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://adl612.oevsv.at/export/shared/.content/.galleries/Downloads_Referate/UKW-Referat-Downloads/UKW-Bandplan.pdf",
+     "title": "OeVSV UKW-Bandplan (August 2023)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://cert05external-www.360.lexisnexis.at/media/attachment/nor40251381ii_61_2023_anlage_4/pdf",
+     "title": "BGBl. II Nr. 61/2023 Anlage 4 Amateurfunkfrequenzbereiche",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "dapnetHz",
+    "licenseFree"
+   ],
+   "notes": "439.1-440 MHz is receive-only except 439.930 MHz (20 kHz, pager relays), so 439.9875 cannot be transmitted; that DAPNET uses 439.930 is not confirmed. ID interval not found (RIS unreachable)."
+  },
+  {
+   "id": "SE",
+   "name": "Sweden",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 432500000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     432000000,
+     438000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.015,
+     "notes": "PTSFS 2025:1 section 124 reads 15 mW e.r.p. (CEPT says 10 mW); check. 69 x 25 kHz is an equipment convention."
+    },
+    {
+     "service": "KDR 444",
+     "lowHz": 444587500,
+     "highHz": 444987500,
+     "channels": 8,
+     "maxPowerW": 2.0,
+     "notes": "Land mobile, 2 W e.r.p., 10 % duty cycle; 25 kHz channels 444.600, .650, .800, .825, .850, .875, .925, .975 MHz."
+    },
+    {
+     "service": "Jaktradio 155 MHz",
+     "lowHz": 155400000,
+     "highHz": 155525000,
+     "channels": 6,
+     "maxPowerW": 5.0,
+     "notes": "155.400-155.525 MHz (25 kHz) for agriculture, forestry and hunting, 5 W e.r.p.; the first four not on internal waters or territorial sea."
+    },
+    {
+     "service": "SRBR 31 MHz",
+     "lowHz": 30925000,
+     "highHz": 31375000,
+     "channels": null,
+     "maxPowerW": 5.0,
+     "notes": "Outside the module's tuning range (31 MHz land mobile, 5 W)."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 240,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.ssa.se/ssa/dokument/bandplaner-vhf-shf/",
+     "title": "SSA Bandplan 144-146 MHz (2020) and 432-438 MHz",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://www.ssa.se/ssa/dokument/bandplaner-vhf-shf/",
+     "title": "SSA Bandplan 144-146 MHz (2020) and 432-438 MHz",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.ssa.se/ssa/dokument/bandplaner-vhf-shf/",
+     "title": "SSA Bandplan 144-146 MHz (2020) and 432-438 MHz",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.ssa.se/ssa/dokument/bandplaner-vhf-shf/",
+     "title": "SSA Bandplan 144-146 MHz (2020) and 432-438 MHz",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://pts.se/contentassets/b05c8a7d01a64783aafc6a19e1b78590/ptsfs-2025-1-foreskrifter-om-undantag-fran-tillstandsplikt-for-anvandning-av-vissa-radiosandare.pdf",
+     "title": "PTSFS 2025:1 (licence-exempt transmitters incl. amateur, KDR, PMR446)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.ssa.se/ssa/dokument/bandplaner-vhf-shf/",
+     "title": "SSA Bandplan 144-146 MHz (2020) and 432-438 MHz",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://pts.se/contentassets/b05c8a7d01a64783aafc6a19e1b78590/ptsfs-2025-1-foreskrifter-om-undantag-fran-tillstandsplikt-for-anvandning-av-vissa-radiosandare.pdf",
+     "title": "PTSFS 2025:1 (licence-exempt transmitters incl. amateur, KDR, PMR446)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "licenseFree"
+   ],
+   "notes": "Nordic 70 cm is 432-438 MHz, so 439.9875 POCSAG is outside the band. PTS requires the call sign 'at short intervals' with no minute figure."
+  },
+  {
+   "id": "NO",
+   "name": "Norway",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 432500000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     432000000,
+     438000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "KDR 444",
+     "lowHz": 444600000,
+     "highHz": 444975000,
+     "channels": 6,
+     "maxPowerW": 0.5,
+     "notes": "Six 25 kHz channels 444.600, .650, .800, .825, .850, .975 MHz, 500 mW e.r.p., integral antenna."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "10 mW e.r.p., 10 % duty cycle unless listen-before-talk. 69 x 25 kHz is an equipment convention."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 242,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://nrrl.no/wp-content/uploads/2m.pdf",
+     "title": "NRRL Baandplan 2 m (January 2019)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://nrrl.no/wp-content/uploads/70cm.pdf",
+     "title": "NRRL Baandplan 70 cm",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://nrrl.no/wp-content/uploads/2m.pdf",
+     "title": "NRRL Baandplan 2 m (January 2019)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://nrrl.no/wp-content/uploads/70cm.pdf",
+     "title": "NRRL Baandplan 70 cm",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://nrrl.no/wp-content/uploads/70cm.pdf",
+     "title": "NRRL Baandplan 70 cm",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://lovdata.no/dokument/SF/forskrift/2026-03-23-465",
+     "title": "Forskrift om radioamatoervirksomhet FOR-2026-03-23-465",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://lovdata.no/dokument/SF/forskrift/2012-01-19-77",
+     "title": "Fribruksforskriften FOR-2012-01-19-77 section 40 (KDR 444, PMR446)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "144.825 is a secondary APRS frequency. 70 cm is 432-438 MHz. The regulation requires the call sign 'at short intervals' with no minute figure."
+  },
+  {
+   "id": "DK",
+   "name": "Denmark",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "aprsAltHz": 432500000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     432000000,
+     438000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 238,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.edr.dk/baandplan-vushf/",
+     "title": "EDR Baandplan VUSHF",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://www.edr.dk/baandplan-vushf/",
+     "title": "EDR Baandplan VUSHF",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.edr.dk/baandplan-vushf/",
+     "title": "EDR Baandplan VUSHF",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.edr.dk/baandplan-vushf/",
+     "title": "EDR Baandplan VUSHF",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.lovtidende.dk/api/pdf/250849",
+     "title": "BEK nr 939 af 18/06/2025, Bilag 4",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.lovtidende.dk/api/pdf/250849",
+     "title": "BEK nr 939 af 18/06/2025, Bilag 4",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.lovtidende.dk/api/pdf/250849",
+     "title": "BEK nr 939 af 18/06/2025, Bilag 4",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "EDR prints 'SSTV U272' as 432.4000 (a typo: U272 is 433.400). No KDR 444 in Denmark. 70 cm is 432-438 MHz."
+  },
+  {
+   "id": "FI",
+   "name": "Finland",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     432000000,
+     438000000
+    ],
+    [
+     438062500,
+     438162500
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "10 % duty cycle; 434.040-434.790 MHz not for audio or video (Traficom 4AE/2024M)."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 244,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.sral.fi/toiminta/maaraykset/iaru-taajuusjakosuositus/",
+     "title": "SRAL: IARU taajuusjakosuositus (defers to the IARU Region 1 plan)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.sral.fi/toiminta/maaraykset/iaru-taajuusjakosuositus/",
+     "title": "SRAL: IARU taajuusjakosuositus (defers to the IARU Region 1 plan)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.sral.fi/toiminta/maaraykset/iaru-taajuusjakosuositus/",
+     "title": "SRAL: IARU taajuusjakosuositus (defers to the IARU Region 1 plan)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.traficom.fi/files/media/file/Radioamat%C3%B6%C3%B6riviestinn%C3%A4n%20taajuusalueet.pdf",
+     "title": "Traficom Radioamatooriviestinnan taajuusalueet (15.8.2025)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.traficom.fi/sites/default/files/media/regulation/M%C3%A4%C3%A4r%C3%A4ys%2015AV2025M.pdf",
+     "title": "Traficom Maarays 15 AV/2025 M (licence-exempt radios: PMR446, RHA68, SRD)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://finlex.fi/en/authorities/regulations/traficom-viestinta/2019/45134",
+     "title": "Traficom Regulation 6K/2019 M explanatory notes (call sign every 10 minutes)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "aprsHz",
+    "callingHz",
+    "sstvHz",
+    "licenseFree",
+    "stationIdMinutes"
+   ],
+   "notes": "SRAL publishes no national VHF plan and defers to the Region 1 plan. 155.400 MHz +n x 25 kHz is for dog trackers only. No KDR 444. The hobby/hunting voice service RHA68 is at 68 MHz, outside the module's range (group E 5 W licence-exempt)."
+  },
+  {
+   "id": "PL",
+   "name": "Poland",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 260,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://hampager.de/api/transmitters",
+     "title": "DAPNET transmitter list (shows activity per country; has no frequency field)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://eli.gov.pl/api/acts/DU/2026/406/text/I/D20260406.pdf",
+     "title": "Rozporzadzenie Ministra Cyfryzacji, Dz.U. 2026 poz. 406",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "aprsHz",
+    "callingHz",
+    "sstvHz",
+    "dapnetHz",
+    "licenseFree"
+   ],
+   "notes": "PZK's site was down; values follow the Region 1 plan. DAPNET is active in Poland (many transmitters), frequency not confirmed."
+  },
+  {
+   "id": "CZ",
+   "name": "Czech Republic",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "LPD433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": 69,
+     "maxPowerW": 0.01,
+     "notes": "Short-range devices band (ERC/REC 70-03 Annex 1): 10 mW e.r.p. with 10 % duty cycle. The 69 x 25 kHz channel plan is an equipment convention, not regulation; voice use depends on national rules. Overlaps the 70 cm amateur band."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 230,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.zakonyprolidi.cz/cs/2005-156",
+     "title": "Vyhlaska 156/2005 Sb. (amateur bands; IARU R1 segments mandatory)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://ceskyradioklub.cz/provoz/vkv",
+     "title": "Cesky radioklub VKV (points to the IARU R1 VHF Handbook)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.zakonyprolidi.cz/cs/2005-156",
+     "title": "Vyhlaska 156/2005 Sb. (amateur bands; IARU R1 segments mandatory)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://ceskyradioklub.cz/provoz/vkv",
+     "title": "Cesky radioklub VKV (points to the IARU R1 VHF Handbook)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.zakonyprolidi.cz/cs/2005-156",
+     "title": "Vyhlaska 156/2005 Sb. (amateur bands; IARU R1 segments mandatory)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://ceskyradioklub.cz/provoz/vkv",
+     "title": "Cesky radioklub VKV (points to the IARU R1 VHF Handbook)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://hampager.de/api/transmitters",
+     "title": "DAPNET transmitter list (shows activity per country; has no frequency field)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.zakonyprolidi.cz/cs/2005-156",
+     "title": "Vyhlaska 156/2005 Sb. (amateur bands; IARU R1 segments mandatory)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/845",
+     "title": "ERC Recommendation 70-03 (edition October 2026), Annex 1 and Annex A",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://docdb.cept.org/document/448",
+     "title": "ECC/DEC/(15)05 on PMR446 (amended March 2018)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "dapnetHz",
+    "licenseFree"
+   ],
+   "notes": "Decree 156/2005 makes the IARU Region 1 segments binding. DAPNET is active, frequency not confirmed."
+  },
+  {
+   "id": "ZA",
+   "name": "South Africa",
+   "iaruRegion": 1,
+   "fallback": "iaru1",
+   "aprsHz": 144800000,
+   "callingHz": {
+    "2m": 145500000,
+    "70cm": 433500000
+   },
+   "sstvHz": 433400000,
+   "dapnetHz": 439987500,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "Analogue 446.00625-446.19375 MHz, 12.5 kHz; digital dPMR446 (32 x 6.25 kHz) and DMR446 (16 x 12.5 kHz). 0.5 W e.r.p., hand-held with integral antenna, no base or repeater. Licence-exempt."
+    },
+    {
+     "service": "SRD 433",
+     "lowHz": 433050000,
+     "highHz": 434790000,
+     "channels": null,
+     "maxPowerW": 0.01,
+     "notes": "433.05-434.79 MHz short-range devices, 1 mW and 10 mW e.r.p. (RFSR Annexure B)."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 655,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://gadgeteer.co.za/configuring-aprs-reporting-south-africa/",
+     "title": "Configuring APRS reporting in South Africa (secondary)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://mysarl.org.za/bandplans/",
+     "title": "SARL band plans (hosts the IARU R1 VHF/UHF plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://mysarl.org.za/bandplans/",
+     "title": "SARL band plans (hosts the IARU R1 VHF/UHF plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://mysarl.org.za/bandplans/",
+     "title": "SARL band plans (hosts the IARU R1 VHF/UHF plans)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://erau.ee/images/ULL/VHF_Handbook_V10_02.pdf",
+     "title": "IARU Region 1 VHF Handbook v10.02 (March 2024), 144 and 430 MHz band plans (mirror of the iaru-r1.org edition)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dapnetHz",
+     "url": "https://hampager.de/api/transmitters",
+     "title": "DAPNET transmitter list (shows activity per country; has no frequency field)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://mysarl.org.za/wp-content/uploads/2026/07/Published-National-Radio-Frequency-Plan-2026-1.pdf",
+     "title": "ICASA National Radio Frequency Plan 2026 (hosted by SARL)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.gov.za/sites/default/files/gcis_document/202305/48643gon1822.pdf",
+     "title": "ICASA Notice 1822 of 2023, RFSR Annexure B (licence-exempt apparatus)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "aprsHz",
+    "callingHz",
+    "sstvHz",
+    "dapnetHz"
+   ],
+   "notes": "SARL hosts the IARU Region 1 plans as its VHF plan. ICASA's exemption lists PMR446 at 446-446.2 MHz, 500 mW; the 2026 frequency plan lists 446-446.1 MHz only."
+  },
+  {
+   "id": "AU",
+   "name": "Australia",
+   "iaruRegion": 3,
+   "fallback": "iaru3",
+   "aprsHz": 145175000,
+   "aprsAltHz": 439100000,
+   "callingHz": {
+    "2m": 146500000,
+    "70cm": 439000000
+   },
+   "sstvHz": 145100000,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     450000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "UHF CB",
+     "lowHz": 476425000,
+     "highHz": 477412500,
+     "channels": 80,
+     "maxPowerW": 5.0,
+     "notes": "80 x 12.5 kHz channels; repeater outputs 1-8 and 41-48 with inputs 31-38 and 71-78; 5 and 35 emergency; 22/23 data only; 61-63 not for voice. Class licence 2025."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 505,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.wia.org.au/members/bandplans/data/documents/Background%20-%202%20metre%20band%20plan%202015.pdf",
+     "title": "WIA Australian Amateur Band Plans, 2 m (29/07/2015)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://www.wia.org.au/members/tac/consultation/documents/WIA%20Australian%20Band%20Plan%20Review%20v6.0%20-%20RELEASE%20VERSION.pdf",
+     "title": "WIA Australian Band Plan Review 2025 (consultation TAC-2025/01)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://www.wia.org.au/members/bandplans/data/documents/Background%20-%2070%20cm%20band%20plan%202015.pdf",
+     "title": "WIA Australian Amateur Band Plans, 70 cm (2015)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://www.wia.org.au/members/tac/consultation/documents/WIA%20Australian%20Band%20Plan%20Review%20v6.0%20-%20RELEASE%20VERSION.pdf",
+     "title": "WIA Australian Band Plan Review 2025 (consultation TAC-2025/01)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.wia.org.au/members/bandplans/data/documents/Background%20-%202%20metre%20band%20plan%202015.pdf",
+     "title": "WIA Australian Amateur Band Plans, 2 m (29/07/2015)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.wia.org.au/members/bandplans/data/documents/Background%20-%2070%20cm%20band%20plan%202015.pdf",
+     "title": "WIA Australian Amateur Band Plans, 70 cm (2015)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.wia.org.au/members/tac/consultation/documents/WIA%20Australian%20Band%20Plan%20Review%20v6.0%20-%20RELEASE%20VERSION.pdf",
+     "title": "WIA Australian Band Plan Review 2025 (consultation TAC-2025/01)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://www.wia.org.au/members/bandplans/data/documents/Background%20-%202%20metre%20band%20plan%202015.pdf",
+     "title": "WIA Australian Amateur Band Plans, 2 m (29/07/2015)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://legislation.gov.au/F2023L01648/asmade/2023-12-12/text/original/pdf",
+     "title": "Radiocommunications (Amateur Stations) Class Licence 2023",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.legislation.gov.au/F2025L01088/asmade/2025-09-15/text/original/epub/OEBPS/document_1/document_1.html",
+     "title": "Radiocommunications (Citizen Band Radio Stations) Class Licence 2025",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://legislation.gov.au/F2023L01648/asmade/2023-12-12/text/original/pdf",
+     "title": "Radiocommunications (Amateur Stations) Class Licence 2023",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "145.100 is the 2015 plan's non-voice (RTTY/SSTV/fax) frequency; the 2025 review no longer names it. 420-430 MHz has been closed to amateurs since 2013. 439.9875 is in a repeater-output block, so no DAPNET default."
+  },
+  {
+   "id": "NZ",
+   "name": "New Zealand",
+   "iaruRegion": 3,
+   "fallback": "iaru3",
+   "aprsHz": 144575000,
+   "aprsAltHz": 432575000,
+   "callingHz": {
+    "2m": 144500000,
+    "70cm": 432500000
+   },
+   "sstvHz": 145250000,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PRS (UHF CB)",
+     "lowHz": 476425000,
+     "highHz": 477412500,
+     "channels": 80,
+     "maxPowerW": 8.3,
+     "notes": "PRS01-PRS80 on the Australian frequencies, 9.2 dBW EIRP (about 8.3 W EIRP); repeaters need their own licence."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 15,
+   "dmrCountryTg": 530,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://nzart.org.nz/wp-content/uploads/2024/11/NZ-2m-70cm-Band-Plan-2022-final.pdf",
+     "title": "NZART New Zealand 2 m and 70 cm Band Plan 2022",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://nzart.org.nz/wp-content/uploads/2024/11/NZ-2m-70cm-Band-Plan-2022-final.pdf",
+     "title": "NZART New Zealand 2 m and 70 cm Band Plan 2022",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://nzart.org.nz/wp-content/uploads/2024/11/NZ-2m-70cm-Band-Plan-2022-final.pdf",
+     "title": "NZART New Zealand 2 m and 70 cm Band Plan 2022",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "sstvHz",
+     "url": "https://nzart.org.nz/wp-content/uploads/2024/11/NZ-2m-70cm-Band-Plan-2022-final.pdf",
+     "title": "NZART New Zealand 2 m and 70 cm Band Plan 2022",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.rsm.govt.nz/assets/Uploads/documents/gazette/radiocommunications-regulations-general-user-radio-licence-for-amateur-radio-operators-notice-2025.pdf",
+     "title": "RSM GURL for Amateur Radio Operators Notice 2025",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.rsm.govt.nz/assets/Uploads/pdfs/gazette/43ec454362/radiocommunications-regulations-general-licence-for-cb-radio-notice-2011.pdf",
+     "title": "RSM GURL for Citizen Band Radio Notice 2011 (PRS 476-477 MHz)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.rsm.govt.nz/assets/Uploads/documents/gazette/radiocommunications-regulations-general-user-radio-licence-for-amateur-radio-operators-notice-2025.pdf",
+     "title": "RSM GURL for Amateur Radio Operators Notice 2025",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "NZART's June 2026 plan is image-only and was not read; values are from the 2022 plan. Repeater channel pairs assumed as in Australia."
+  },
+  {
+   "id": "JP",
+   "name": "Japan",
+   "iaruRegion": 3,
+   "fallback": "iaru3",
+   "aprsHz": 144660000,
+   "aprsAltHz": 144640000,
+   "callingHz": {
+    "2m": 145000000,
+    "70cm": 433000000
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "Tokutei shoudenryoku (simplex)",
+     "lowHz": 422050000,
+     "highHz": 422300000,
+     "channels": 21,
+     "maxPowerW": 0.01,
+     "notes": "Specified low-power radio, 12.5 kHz steps, 10 mW."
+    },
+    {
+     "service": "Tokutei shoudenryoku (duplex 421 MHz)",
+     "lowHz": 421575000,
+     "highHz": 421912500,
+     "channels": 28,
+     "maxPowerW": 0.01,
+     "notes": "Paired with 440.025-440.3625 MHz; 10 mW (1 mW in 421.575-421.8)."
+    },
+    {
+     "service": "Tokutei shoudenryoku (duplex 440 MHz)",
+     "lowHz": 440025000,
+     "highHz": 440362500,
+     "channels": 28,
+     "maxPowerW": 0.01,
+     "notes": "Paired with 421.575-421.9125 MHz; just above Japan's 70 cm amateur band."
+    },
+    {
+     "service": "Digital community radio 142 MHz",
+     "lowHz": 142934375,
+     "highHz": 142984375,
+     "channels": null,
+     "maxPowerW": 0.5,
+     "notes": "Digital-only (no plain FM), 500 mW. Retailer information only."
+    },
+    {
+     "service": "Digital community radio 146 MHz",
+     "lowHz": 146934375,
+     "highHz": 146984375,
+     "channels": null,
+     "maxPowerW": 0.5,
+     "notes": "Digital-only (no plain FM), 500 mW, just above Japan's 2 m amateur band. Retailer information only."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 440,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://wikiwiki.jp/dcn/APRS/Frequency",
+     "title": "APRS operating frequencies in Japan (secondary wiki)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsAltHz",
+     "url": "https://wikiwiki.jp/dcn/APRS/Frequency",
+     "title": "APRS operating frequencies in Japan (secondary wiki)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.jarl.org/Japanese/A_Shiryo/A-3_Band_Plan/bandplan20250717.pdf",
+     "title": "JARL band plan (effective 2025-07-17)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.jarl.org/Japanese/A_Shiryo/A-3_Band_Plan/bandplan20250717.pdf",
+     "title": "JARL band plan (effective 2025-07-17)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://pedia.3rd-in.co.jp/wiki/%E7%84%A1%E7%B7%9A%E9%9B%BB%E8%A9%B1%E7%94%A8%E7%89%B9%E5%AE%9A%E5%B0%8F%E9%9B%BB%E5%8A%9B%E7%84%A1%E7%B7%9A%E5%B1%80",
+     "title": "Specified low-power radio telephone stations (secondary)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://laws.e-gov.go.jp/api/1/lawdata/325M50080000017",
+     "title": "Musenkyoku Unyo Kisoku art. 30 (amateur call sign about every 10 minutes)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "aprsHz",
+    "aprsAltHz",
+    "licenseFree"
+   ],
+   "notes": "144.660 MHz is 1200 baud (the usual APRS), 144.640 MHz is 9600 baud; JARL names no APRS frequency (144.60-144.70 is wideband data). 145.00/433.00 are calling and emergency frequencies. 351 MHz digital simple radio is outside the module's range and is registered, not licence-free."
+  },
+  {
+   "id": "KR",
+   "name": "South Korea",
+   "iaruRegion": 3,
+   "fallback": "iaru3",
+   "aprsHz": null,
+   "callingHz": {
+    "2m": null,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "Low-power voice 447.6 MHz",
+     "lowHz": 447600000,
+     "highHz": 447850000,
+     "channels": 21,
+     "maxPowerW": 0.005,
+     "notes": "21 x 12.5 kHz, 5 mW; no notification needed."
+    },
+    {
+     "service": "Low-power voice 447.9 MHz",
+     "lowHz": 447862500,
+     "highHz": 447987500,
+     "channels": 11,
+     "maxPowerW": 0.01,
+     "notes": "11 x 12.5 kHz, 10 mW; no notification needed."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 450,
+   "sources": [
+    {
+     "field": "amateurBands",
+     "url": "https://iaru-r3.org/wp-content/uploads/2025/01/R3-004-Band-Plans-IARU-Region-3.pdf",
+     "title": "IARU Region 3 Band Plan R3-004 Rev. 2 (November 2024)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.law.go.kr/LSW/flDownload.do?flSeq=161548805",
+     "title": "MSIT Notice 2026-9, radio equipment for stations opened without notification",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "amateurBands"
+   ],
+   "notes": "No Korean source for APRS (144.620 is reported but unconfirmed) or calling frequencies; KARL's band plan needs a login. The app uses the Region 3 default. Analogue 448 MHz family radio (0.5 W) reportedly ends 2026-12-31; its frequencies are unconfirmed."
+  },
+  {
+   "id": "CN",
+   "name": "China",
+   "iaruRegion": 3,
+   "fallback": "iaru3",
+   "aprsHz": 144640000,
+   "callingHz": {
+    "2m": null,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     440000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "Public walkie-talkie",
+     "lowHz": 409750000,
+     "highHz": 409987500,
+     "channels": 20,
+     "maxPowerW": 0.5,
+     "notes": "20 x 12.5 kHz analogue FM (and 40 x 6.25 kHz digital 409.746875-409.990625), 0.5 W e.r.p. hand-helds, no licence; equipment locked to the planned channels (2025 notice)."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 460,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://iaru-r3.org/wp-content/uploads/2025/01/R3-004-Band-Plans-IARU-Region-3.pdf",
+     "title": "IARU Region 3 Band Plan R3-004 Rev. 2 (November 2024)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://iaru-r3.org/wp-content/uploads/2025/01/R3-004-Band-Plans-IARU-Region-3.pdf",
+     "title": "IARU Region 3 Band Plan R3-004 Rev. 2 (November 2024)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.beijing.gov.cn/zhengce/zhengcefagui/qtwj/202505/W020250508533710250422.pdf",
+     "title": "National Radio Office notice 2025 No. 1 (public walkie-talkie, 409 MHz)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.waizi.org.cn/doc/227732.html",
+     "title": "MIIT Order 67 amateur radio station rules, art. 37 (reprint)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "amateurBands",
+    "stationIdMinutes"
+   ],
+   "notes": "145.000 and 433.000 MHz appear as emergency (not calling) frequencies in unofficial copies of the band plan."
+  },
+  {
+   "id": "TH",
+   "name": "Thailand",
+   "iaruRegion": 3,
+   "fallback": "iaru3",
+   "aprsHz": 144390000,
+   "callingHz": {
+    "2m": 145000000,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146500000
+    ]
+   ],
+   "licenseFree": [],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 520,
+   "sources": [
+    {
+     "field": "aprsHz",
+     "url": "https://www.qsl.net/rast/text/2mbandplan.htm",
+     "title": "RAST 2 metre band plan for Thailand (effective 2014-07-24)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "aprsHz",
+     "url": "https://iaru-r3.org/wp-content/uploads/2025/01/R3-004-Band-Plans-IARU-Region-3.pdf",
+     "title": "IARU Region 3 Band Plan R3-004 Rev. 2 (November 2024)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "callingHz",
+     "url": "https://www.qsl.net/rast/text/2mbandplan.htm",
+     "title": "RAST 2 metre band plan for Thailand (effective 2014-07-24)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.qsl.net/rast/text/2mbandplan.htm",
+     "title": "RAST 2 metre band plan for Thailand (effective 2014-07-24)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://www.qsl.net/rast/text/licensing2016.html",
+     "title": "RAST: Thai amateur licensing 2016 (70 cm receive only)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "notes": "Not 145.525: RAST and the Region 3 plan give 144.390. 144.900 is the general calling channel, 145.000 calling and emergency. Amateurs may only receive on 70 cm (RAST 2016). Thai CB is at 245 MHz, outside the module's range."
+  },
+  {
+   "id": "IN",
+   "name": "India",
+   "iaruRegion": 3,
+   "fallback": "iaru3",
+   "aprsHz": null,
+   "callingHz": {
+    "2m": null,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     146000000
+    ],
+    [
+     434000000,
+     438000000
+    ]
+   ],
+   "licenseFree": [
+    {
+     "service": "PMR446",
+     "lowHz": 446000000,
+     "highHz": 446200000,
+     "channels": 16,
+     "maxPowerW": 0.5,
+     "notes": "446.0-446.2 MHz, 500 mW e.r.p., hand-held with integral antenna, no base or repeater; WPC type approval still required (G.S.R. 1047(E) 2018)."
+    }
+   ],
+   "units": "km",
+   "stationIdMinutes": 10,
+   "dmrCountryTg": 404,
+   "sources": [
+    {
+     "field": "amateurBands",
+     "url": "https://www.qsl.net/vu2kyp/rule.html",
+     "title": "Indian Wireless Telegraphs (Amateur Service) Rules 1978 (text copy)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://en.wikipedia.org/wiki/List_of_amateur_radio_frequency_bands_in_India",
+     "title": "Wikipedia: amateur radio frequency bands in India (secondary)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "licenseFree",
+     "url": "https://www.legitquest.com/act/use-of-low-power-and-very-low-power-short-range-radio-frequency-devices-exemption-from-licensing-requirement-rules-2018/9F4C",
+     "title": "G.S.R. 1047(E) 2018 licence-exemption rules, Table V (copy)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "stationIdMinutes",
+     "url": "https://www.qsl.net/vu2kyp/rule.html",
+     "title": "Indian Wireless Telegraphs (Amateur Service) Rules 1978 (text copy)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "amateurBands",
+    "licenseFree",
+    "stationIdMinutes"
+   ],
+   "notes": "No national APRS source: 144.390 is seen only in station comments, so the Region 3 default is used. 70 cm (434-438 MHz, secondary) is from a secondary source."
+  },
+  {
+   "id": "PH",
+   "name": "Philippines",
+   "iaruRegion": 3,
+   "fallback": "iaru3",
+   "aprsHz": null,
+   "callingHz": {
+    "2m": null,
+    "70cm": null
+   },
+   "sstvHz": null,
+   "dapnetHz": null,
+   "weatherRadio": false,
+   "amateurBands": [
+    [
+     144000000,
+     148000000
+    ],
+    [
+     430000000,
+     450000000
+    ]
+   ],
+   "licenseFree": [],
+   "units": "km",
+   "stationIdMinutes": null,
+   "dmrCountryTg": 515,
+   "sources": [
+    {
+     "field": "amateurBands",
+     "url": "https://iaru-r3.org/wp-content/uploads/2025/01/R3-004-Band-Plans-IARU-Region-3.pdf",
+     "title": "IARU Region 3 Band Plan R3-004 Rev. 2 (November 2024)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "amateurBands",
+     "url": "https://ntc.gov.ph/wp-content/uploads/2019/07/MC-02-06-2019.pdf",
+     "title": "NTC MC-02-06-2019 amateur rules (unreachable: Cloudflare)",
+     "checked": "2026-10-29"
+    },
+    {
+     "field": "dmrCountryTg",
+     "url": "https://api.brandmeister.network/v2/talkgroup",
+     "title": "BrandMeister API v2 talkgroup list (TG number = MCC; names as published)",
+     "checked": "2026-10-29"
+    }
+   ],
+   "unverified": [
+    "amateurBands"
+   ],
+   "notes": "No national APRS source (the Philippines is not in the Region 3 APRS footnote; 144.390 is reported but unconfirmed), so the Region 3 default is used. 440-450 MHz is amateur in the Philippines and Australia (RR 5.270); class privileges (NTC) were unreachable."
+  }
+ ]
+}

@@ -58,6 +58,9 @@ public final class FirstRunCheck {
             String w = watchStockApp(c, watchPkg, p); watchText = w;
             DeviceReport.append("The stock app at work (" + watchPkg + ", 15 s, receive only)", w);
             sum.append("watched ").append(watchPkg).append(" start up for 15 s\n");
+            // a stock app that had not run since its data was cleared has no databases before the watch (Armor 20WT beta.18
+            // report): it creates them as it starts, so the structure is read again here
+            if (watchPkg.equals(dp.stockApp)) DeviceReport.append("Databases of " + watchPkg + " after the watch (structure only)", DeviceReport.dbStructure(c, watchPkg));
             File dir = DeviceReport.newestDir();
             if (lastTrace != null && dir != null) {                              // the whole sniff beside report.txt (radio IDs blanked)
                 try (java.io.FileOutputStream o = new java.io.FileOutputStream(new File(dir, "stock_serial.txt"))) { o.write(SerialTrace.redact(lastTrace).getBytes("UTF-8")); } catch (Throwable ignored) { }
@@ -107,6 +110,9 @@ public final class FirstRunCheck {
                    .append(stockAnswers).append(": the module works; SignalDeck's probe does not ask through the bridge yet\n");
             else if (!answered && stockAnswers != null)
                 sum.append("  but ").append(stockAnswers).append(": the module works; SignalDeck's probe did not reach the port it is on\n");
+            if (!answered && dp.supported && dp.serialLib != null && speedNotSet(r, dp.controlPort, dp.baud))
+                sum.append("  the probe could not set ").append(dp.controlPort).append(" to ").append(dp.baud)
+                   .append(" baud with stty, so its silence there proves nothing; the trial opens the port through the stock serial library\n");
         }
 
         if (trial && dp.supported && !svc.isReady()) {
@@ -120,13 +126,7 @@ public final class FirstRunCheck {
           String draft = DraftProfile.text((d == null ? "" : DeviceReport.readReport(d)) + "\n==== Summary ====\n" + sum);
           DeviceReport.append("Draft profile", draft); sum.append(draft); }
         DeviceReport.append("Summary", sum.toString());
-        { File d = DeviceReport.newestDir();                                  // report.json: the same facts as data, for scripts/report_diff.py
-          if (d != null) try (java.io.FileOutputStream o = new java.io.FileOutputStream(new File(d, "report.json"))) {
-              java.util.Map<String, String> ph = new java.util.LinkedHashMap<>();
-              ph.put("manufacturer", android.os.Build.MANUFACTURER); ph.put("model", android.os.Build.MODEL); ph.put("device", android.os.Build.DEVICE);
-              ph.put("android", android.os.Build.VERSION.RELEASE); ph.put("build", android.os.Build.DISPLAY);
-              o.write(ReportJson.build(DeviceReport.readReport(d), ph).toString(2).getBytes("UTF-8"));
-          } catch (Throwable t) { android.util.Log.w("BenchChecks", "report.json: " + t); } }
+        DeviceReport.writeJson(DeviceReport.newestDir(), BuildIdentity.gather(c));   // report.json: the same facts as data, for scripts/report_diff.py
         p.step("Zipping");
         return DeviceReport.zipNewest(c, true);
     }
@@ -149,7 +149,7 @@ public final class FirstRunCheck {
         long bytes0 = svc.rxAudioBytes(), t0 = System.currentTimeMillis();
         int samples = 0, heard = 0, rmin = 0, rmax = -999; StringBuilder rs = new StringBuilder();
         while (System.currentTimeMillis() - t0 < seconds * 1000L) {
-            svc.pollRssi(); Thread.sleep(1000);
+            svc.pollRssiMeasure(); Thread.sleep(1000);
             int v = svc.lastRssi(); samples++; if (svc.rxActive()) heard++;
             if (v > -999) { rmax = Math.max(rmax, v); rmin = rmin == 0 ? v : Math.min(rmin, v); }
             if (samples <= 60) rs.append(v).append(svc.rxActive() ? "*" : "").append(' ');
@@ -332,6 +332,213 @@ public final class FirstRunCheck {
     }
 
     /** Take the radio for a few seconds (receive only), record what happened, give it back. */
+    /**
+     * The commands SignalDeck sent that the stock app is never seen to send ({@link DeviceProfile#stockCommands}), one line
+     * each with the module's answers: whether this module implements them is known only from these. "" when the profile
+     * lists no stock commands or SignalDeck sent nothing else.
+     */
+    static String unusedCommands(int[] stockCommands, java.util.Map<Integer, RadioEngine.CommandStats> stats) {
+        if (stockCommands == null || stats == null) return "";
+        java.util.Set<Integer> stock = new java.util.HashSet<>(); for (int x : stockCommands) stock.add(x);
+        StringBuilder b = new StringBuilder();
+        for (java.util.Map.Entry<Integer, RadioEngine.CommandStats> e : new java.util.TreeMap<>(stats).entrySet()) {
+            if (stock.contains(e.getKey())) continue;
+            RadioEngine.CommandStats s = e.getValue();
+            b.append(String.format(Locale.US, "  0x%02X  %d / %d / %d%s\n", e.getKey(), s.sent, s.answered, s.refused,
+                    s.answered == 0 ? "   <- no answer" : s.refused == s.answered ? "   <- always refused" : ""));
+        }
+        return b.toString();
+    }
+
+    /**
+     * Whether the radio probe tried {@code port} at {@code baud} and read another speed back ("  57600 baud (readback
+     * 9600), …"): toybox stty cannot change some UARTs (the Armor 20WT's ttyS1 read 9600 in its beta.18 report), so a
+     * silent module there was never asked at its speed.
+     */
+    static boolean speedNotSet(String probe, String port, int baud) {
+        if (probe == null || port == null) return false;
+        int k = probe.indexOf("--- " + port + " ---"); if (k < 0) return false;
+        int end = probe.indexOf("\n--- ", k + 1); String sec = probe.substring(k, end < 0 ? probe.length() : end);
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\b" + baud + " baud \\(readback (\\d+)\\)").matcher(sec);
+        return m.find() && !m.group(1).equals(String.valueOf(baud));
+    }
+
+    // ---- trial checks for an untested phone (receive only) --------------------------------------------------------------
+
+    /**
+     * Whether the module opens its squelch on the listen channel with squelch 0 alone, and with the monitor command too.
+     * A stock app that never sends monitor (the Armor 20WT's) leaves it open whether this module honours it; with neither
+     * opening the squelch, an empty audio capture says nothing about the audio path.
+     */
+    static String squelchCheck(RadioService svc, Progress p) throws InterruptedException {
+        StringBuilder r = new StringBuilder("squelch check (446.00625 MHz, nobody needed on the channel):\n");
+        boolean[][] seen = new boolean[2][]; long[] bytes = new long[2];
+        for (int mon = 0; mon < 2; mon++) {
+            p.step("Trial: squelch check, " + (mon == 0 ? "squelch 0 alone" : "squelch 0 and monitor"));
+            svc.setMonitor(mon == 1);
+            Thread.sleep(2000);
+            long b0 = svc.rxAudioBytes(); boolean rx = false;
+            for (int i = 0; i < 15; i++) { Thread.sleep(200); rx |= svc.moduleReceiving(); }
+            seen[mon] = new boolean[] { rx }; bytes[mon] = svc.rxAudioBytes() - b0;
+            r.append(String.format(Locale.US, "  %s: the module %s a reception, %d audio bytes in 3 s\n",
+                    mon == 0 ? "squelch 0 alone" : "squelch 0 and monitor (0x2F)", rx ? "reported" : "did not report", bytes[mon]));
+        }
+        svc.setMonitor(false);
+        r.append("  ").append(squelchVerdict(seen[0][0], bytes[0], seen[1][0], bytes[1])).append('\n');
+        return r.toString();
+    }
+
+    /** One line reading the squelch check: which setting opens the module, and whether the audio path carried anything. */
+    static String squelchVerdict(boolean rx0, long bytes0, boolean rxMon, long bytesMon) {
+        if (bytes0 > 0 && bytesMon > 0) return "verdict: audio flows with squelch 0 alone; the audio path works";
+        if (bytesMon > 0) return "verdict: audio flows only with monitor on; the module honours 0x2F";
+        if (bytes0 > 0) return "verdict: audio flows with squelch 0 but not with monitor on; monitor does something else on this module";
+        if (rx0 || rxMon) return "verdict: the module reported a reception but no audio arrived; the audio path is the problem";
+        return "verdict: the module never opened its squelch, so the audio path is still untested (try the Listen check on a busy channel)";
+    }
+
+    /**
+     * The received noise level at the module volume byte this profile uses and at the Armor 26 Ultra's 8, monitor on, two
+     * seconds each, saved as rx_level_v&lt;n&gt;.wav beside the report: the decoders were tuned on the Armor's level.
+     */
+    static String levelCheck(RadioService svc, File dir, Progress p) throws InterruptedException {
+        StringBuilder r = new StringBuilder("receive level by module volume byte (monitor on, noise):\n");
+        int own = svc.profile().analogVolume;
+        svc.setMonitor(true); Thread.sleep(1500);
+        for (int vol : own == 8 ? new int[] { 8 } : new int[] { own, 8 }) {
+            p.step("Trial: receive level at volume " + vol);
+            svc.diagAnalogVolume(vol); Thread.sleep(1500);
+            ClipRecorder clip = null;
+            try { if (dir != null) { clip = new ClipRecorder(new File(dir, "rx_level_v" + vol + ".wav"), 2000); svc.recordClip(clip, false); } } catch (java.io.IOException e) { r.append("  recording failed: ").append(e).append('\n'); }
+            Thread.sleep(2300);
+            if (clip != null) { svc.recordClip(null, false); clip.finish(); }
+            double rms = clip != null ? clip.rms() : -1;
+            r.append(String.format(Locale.US, "  volume %d%s: %s\n", vol, vol == own ? " (this profile)" : "", rms > 0 ? String.format(Locale.US, "%.1f dBFS RMS", 20 * Math.log10(rms / 32768.0)) : "no audio"));
+        }
+        svc.diagAnalogVolume(own); svc.setMonitor(false); Thread.sleep(500);
+        return r.toString();
+    }
+
+    /**
+     * How soon after a retune the module's signal reading is steady (the Armor 26 Ultra: 0.7 s; the Atom XL: 50 ms): five
+     * retunes to the listen channel, the readings every 150 ms for 2 s after each. Needs no signal: the noise floor
+     * settles too.
+     */
+    static String settleCheck(RadioService svc, Progress p) throws InterruptedException {
+        StringBuilder r = new StringBuilder("signal reading after a retune (ms after the channel write: dBm):\n");
+        java.util.List<Long> settled = new java.util.ArrayList<>(), first = new java.util.ArrayList<>();
+        for (int run = 0; run < 5; run++) {
+            p.step("Trial: signal reading after a retune, " + (run + 1) + " of 5");
+            svc.probeTune(run % 2 == 0 ? 446_100_000 : 446_006_250);       // a real retune each time
+            Thread.sleep(100);
+            long t0 = svc.lastTuneAt(), seenAt = svc.lastRssiAt();
+            java.util.List<long[]> pts = new java.util.ArrayList<>();
+            while (System.currentTimeMillis() - t0 < 2000) {
+                svc.pollRssiMeasure(); Thread.sleep(150);
+                long at = svc.lastRssiAt(); if (at != seenAt && at > t0) { seenAt = at; pts.add(new long[] { at - t0, svc.lastRssi() }); }
+            }
+            StringBuilder line = new StringBuilder("  run ").append(run + 1).append(':');
+            for (long[] q : pts) line.append(' ').append(q[0]).append(':').append(q[1]);
+            r.append(line).append(pts.isEmpty() ? " no reading" : "").append('\n');
+            if (!pts.isEmpty()) { first.add(pts.get(0)[0]); long s = settledAtMs(pts, 2); if (s >= 0) settled.add(s); }
+        }
+        r.append(String.format(Locale.US, "  first reading after %s ms; steady (within 2 dB of the end) from %s ms\n", median(first), median(settled)));
+        return r.toString();
+    }
+
+    /** The time of the first reading from which every later one stays within {@code db} of the last; -1 without readings. */
+    static long settledAtMs(java.util.List<long[]> pts, int db) {
+        if (pts.isEmpty()) return -1;
+        long end = pts.get(pts.size() - 1)[1]; long at = pts.get(pts.size() - 1)[0];
+        for (int i = pts.size() - 1; i >= 0 && Math.abs(pts.get(i)[1] - end) <= db; i--) at = pts.get(i)[0];
+        return at;
+    }
+    static String median(java.util.List<Long> l) {
+        if (l.isEmpty()) return "?";
+        java.util.List<Long> s = new java.util.ArrayList<>(l); java.util.Collections.sort(s);
+        return String.valueOf(s.get(s.size() / 2));
+    }
+
+    /** Band edges the Armor family's module enforces (measured on the Armor 26 Ultra): each tuned once, receive only. */
+    static final int[] EDGES_HZ = { 136_000_000, 135_995_000, 174_000_000, 174_005_000, 400_000_000, 399_995_000, 480_000_000, 480_005_000 };
+
+    /** Which frequencies around the band edges the module takes (its 0x23 answer); the profile's bands come from this. */
+    static String bandEdgeCheck(RadioService svc, Progress p) throws InterruptedException { return bandEdgeCheck(svc, p, EDGES_HZ); }
+    static String bandEdgeCheck(RadioService svc, Progress p, int[] edges) throws InterruptedException {
+        StringBuilder r = new StringBuilder("band edges (the module's answer to a receive channel write; nothing keyed):\n");
+        for (int hz : edges) {
+            p.step(String.format(Locale.US, "Trial: band edges, %.3f MHz", hz / 1e6));
+            RadioEngine.CommandStats b = svc.engine().stats().get(RadioEngine.CMD_SET_ANALOG);
+            int a0 = b == null ? 0 : b.answered, f0 = b == null ? 0 : b.refused;
+            svc.probeTune(hz);
+            String res = "no answer";
+            for (int i = 0; i < 20; i++) {
+                Thread.sleep(100);
+                RadioEngine.CommandStats s = svc.engine().stats().get(RadioEngine.CMD_SET_ANALOG);
+                if (s != null && s.answered > a0) { res = s.refused > f0 ? "refused" : "accepted"; break; }
+            }
+            r.append(String.format(Locale.US, "  %.3f MHz: %s\n", hz / 1e6, res));
+            Thread.sleep(300);
+        }
+        return r.toString();
+    }
+
+    /** The Armor 3WT's edges: the intercom app's 100 MHz floor, generic points below 136 MHz, the usual VHF/UHF edges, the module's "470M". */
+    static final int[] EDGES_3WT_HZ = { 100_000_000, 120_000_000, 130_000_000, 135_995_000, 136_000_000, 174_000_000, 174_005_000, 399_995_000, 400_000_000, 470_000_000, 470_005_000, 480_000_000 };
+    /** Armor commands probed raw on the 3WT's module (receive-only queries on the Armor set; their meaning on the legacy set is what the report finds out). */
+    static final int[] PROBES_3WT = { 0x32, 0x34 };
+    /** Whether a socket listens on {@code port}, from /proc/net/tcp(6) text (local address :PORT in hex, state 0A). */
+    static boolean listening(String procNetTcp, int port) {
+        String want = String.format(Locale.US, ":%04X", port);
+        for (String l : procNetTcp.split("\n")) {
+            String[] f = l.trim().split("\\s+");
+            if (f.length > 3 && f[1].toUpperCase(Locale.US).endsWith(want) && "0A".equalsIgnoreCase(f[3])) return true;
+        }
+        return false;
+    }
+
+    /** The Armor 3WT's trial lines (phonedmrapp docs/armor3wt/stock-app-review.md, "What the next 3WT device report must bring back"). */
+    static String armor3wtChecks(RadioService svc, Progress p) throws InterruptedException {
+        StringBuilder r = new StringBuilder("Armor 3WT (extmodule):\n");
+        String pid = RootSetup.run("pidof extmodule || true").trim();
+        String tcp = RootSetup.run("cat /proc/net/tcp /proc/net/tcp6 2>/dev/null");
+        r.append("  extmodule: ").append(pid.isEmpty() ? "not running" : "running (pid " + pid + ")")
+                .append(", listening on ").append(ExtModuleLink.CMD_PORT).append(": ").append(listening(tcp, ExtModuleLink.CMD_PORT) ? "yes" : "no")
+                .append(", on ").append(ExtModuleLink.AUDIO_PORT).append(": ").append(listening(tcp, ExtModuleLink.AUDIO_PORT) ? "yes" : "no").append('\n');
+        ModuleEngine e = svc.engine();
+        String build = e instanceof RadioEngine ? ((RadioEngine) e).bridgeBuild() : null;
+        r.append("  bridge MCU build: ").append(build == null ? "(no answer to route 00 0x01)" : build).append('\n');
+        boolean started = false; for (String l : svc.recentLog()) if (l.contains("the bridge reports the MCU started")) started = true;
+        r.append("  bridge MCU-started report after the daemon's MCU start: ").append(started ? "seen" : "not seen").append('\n');
+        r.append("  ro.agold.extmodule.32k = '").append(RootSetup.run("getprop " + ExtModuleLink.PROP_32K).trim()).append("'\n");
+        ExtModuleAudio a = svc.extModuleAudio();
+        if (a != null) {
+            p.step("Trial: extmodule receive stream, 5 s");
+            long f0 = a.rxFrames(), b0 = a.rxBytes();
+            svc.benchCapture(true); Thread.sleep(5000); svc.benchCapture(false);
+            long f = a.rxFrames() - f0, b = a.rxBytes() - b0;
+            r.append(String.format(Locale.US, "  receive stream forced open 5 s: %d frames, %d bytes (%s per frame; this profile expects %d at %d kHz)\n",
+                    f, b, f > 0 ? String.valueOf(b / f) : "-", a.frameBytes, a.rate / 1000));
+        }
+        r.append(bandEdgeCheck(svc, p, EDGES_3WT_HZ));
+        for (int cmd : PROBES_3WT) {
+            p.step(String.format(Locale.US, "Trial: module command 0x%02X (query)", cmd));
+            java.util.List<String> was = svc.recentLog();
+            String mark = was.isEmpty() ? null : was.get(was.size() - 1);           // the ring drops old lines: find where it stood by content
+            try { e.writeRaw(AgoldFrames.request(0x01, cmd, 0x01)); }
+            catch (java.io.IOException x) { r.append(String.format(Locale.US, "  0x%02X: not sent (%s)\n", cmd, x.getMessage())); continue; }
+            Thread.sleep(1500);
+            java.util.List<String> log = svc.recentLog();
+            StringBuilder got = new StringBuilder();
+            for (int i = mark == null ? 0 : log.lastIndexOf(mark) + 1; i < log.size(); i++) {
+                String l = log.get(i);
+                if (l.contains(" RX ") || l.contains("legacy module frame")) got.append("\n      ").append(DeviceReport.mask(l));
+            }
+            r.append(String.format(Locale.US, "  0x%02X 01 (the Armor set's %s):", cmd, cmd == 0x32 ? "signal reading" : "version")).append(got.length() == 0 ? " no answer" : got.toString()).append('\n');
+        }
+        return r.toString();
+    }
+
     private static String trialTakeOver(Context c, RadioService svc, Progress p) throws InterruptedException {
         StringBuilder r = new StringBuilder();
         p.step("Trial: taking over the radio (receive only)");
@@ -366,7 +573,7 @@ public final class FirstRunCheck {
             String cap = raw != null ? svc.captureRxAudio(raw, 5000) : "no report folder";
             svc.benchCapture(false);
             StringBuilder rs = new StringBuilder();
-            for (int i = 0; i < 5; i++) { svc.pollRssi(); Thread.sleep(1200); rs.append(svc.lastRssi()).append(' '); }
+            for (int i = 0; i < 5; i++) { svc.pollRssiMeasure(); Thread.sleep(1200); rs.append(svc.lastRssi()).append(' '); }
             Thread.sleep(1000);
             r.append("RSSI readings (dBm, -999 = no answer): ").append(rs.toString().trim()).append('\n');
             r.append("receive audio: ").append(cap).append('\n');
@@ -378,6 +585,24 @@ public final class FirstRunCheck {
                 r.append("first ").append(head.length).append(" bytes saved to rx_audio_first.bin; they start: ").append(hx.toString().trim()).append('\n');
             }
             if (!svc.profile().verified) svc.setMonitor(false);
+            if (!svc.profile().verified && "agold-legacy".equals(svc.profile().protocol)) {   // the Armor 3WT: the daemon, the bridge, the edges, two queries; receive only
+                r.append(armor3wtChecks(svc, p));
+                svc.listenTest(446_006_250, "Listen test 446.00625");
+                Thread.sleep(1500);
+            }
+            if (!svc.profile().verified && "mcu68".equals(svc.profile().protocol)) {   // receive only; the module tunes, nothing is keyed
+                r.append(squelchCheck(svc, p));
+                r.append(levelCheck(svc, dir, p));
+                r.append(settleCheck(svc, p));
+                r.append(bandEdgeCheck(svc, p));
+                svc.listenTest(446_006_250, "Listen test 446.00625");       // back on the listen channel, as the app knows it
+                Thread.sleep(1500);
+            }
+            r.append("module version: ").append(svc.moduleVersion().isEmpty() ? "(no answer to 0x34)" : svc.moduleVersion()).append('\n');
+            for (String l : svc.recentLog())                                 // how the port was opened and whether the module printed its banner
+                if (l.contains("UART ") && l.contains(" open") || l.contains("module booted") || l.contains("no boot banner")) r.append("  ").append(DeviceReport.mask(l)).append('\n');
+            String unused = unusedCommands(svc.profile().stockCommands, svc.engine().stats());
+            if (!unused.isEmpty()) r.append("commands the stock app does not use (sent / answered / refused):\n").append(unused);
         }
         p.step("Trial: handing the radio back");
         svc.shutDown(true);

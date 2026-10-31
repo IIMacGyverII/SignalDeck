@@ -2,7 +2,7 @@
 
 # Scanning and zones
 
-*On the intercom · 3 of 33*
+*On the intercom · 3 of 34*
 
 SCAN searches a zone; ZONE picks one.
 

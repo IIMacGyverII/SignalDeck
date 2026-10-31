@@ -49,14 +49,22 @@ public final class PacketEngine {
         Context context();
         boolean analogRx();                      // current channel is FM
         int rxFreqHz();
+        /** The terrestrial APRS frequency in use (the region's, or the user's own). */
+        default int aprsHz() { return APRS_FREQ_HZ; }
         int channelNumber(); String channelName();
         boolean txBusy();
         /** Key, play the 8 kHz mono PCM, release; {@code onDone} runs after release (on the service worker). */
         void transmitPcm(short[] pcm, String label, Runnable onDone);
-        /** The same with the caller's own limit (the long SSTV modes, up to the radio's 120 s less a margin); the cool-down guard applies past 30 s. */
+        /** The same with the caller's own limit as well as the transmit limit; the cool-down guard applies past 30 s. */
         default void transmitPcmLong(short[] pcm, String label, int maxMs, Runnable onDone) { transmitPcm(pcm, label, onDone); }
         /** The cool-down guard's answer for a transmission of {@code ms}: why it must wait, or null. */
         default String longTxWait(int ms) { return null; }
+        /** The transmit limit in ms (Device → Longest transmission), Integer.MAX_VALUE for no limit. */
+        default int txCapMs() { return TxLimit.capMs(TxLimit.DEFAULT_S); }
+        /** The transmit limit's name for a refusal ("2 min", "No limit"). */
+        default String txLimitName() { return TxLimit.name(TxLimit.DEFAULT_S); }
+        /** False when the radio has no 2 m band (a UHF-only phone): no automatic acknowledgements there (owner, 2026-10-30). */
+        default boolean hasVhf() { return true; }
         /** True when the module's tone generator is there (bench firmware FW22 or later): Morse and RTTY go out through it. */
         default boolean tonePath() { return false; }
         /** Plays a pair list through the module's tone generator; the reason it cannot, or null when it is on its way. */
@@ -121,6 +129,7 @@ public final class PacketEngine {
     }
 
     public int packetLeadMs() { return Math.max(0, Math.min(3000, prefs.getInt("txLeadMs", TX_LEAD_MS))); }
+    /** The North American APRS frequency: the default before a region is chosen (Device → Region sets the one in use). */
     public static final int APRS_FREQ_HZ = 144_390_000;
     private static final String TAG = "PacketEngine";
     private static final int SR = 8000, WINDOW = SR * 2, OVERLAP = SR;
@@ -131,7 +140,7 @@ public final class PacketEngine {
     private final ExecutorService decoder = Executors.newSingleThreadExecutor(r -> { Thread t = new Thread(r, "aprs-decode"); t.setDaemon(true); return t; });
     private final KissTnc kiss = new KissTnc();
     private final LinkedBlockingQueue<byte[]> kissTxQueue = new LinkedBlockingQueue<>(32);
-    private volatile boolean monitor;                      // APRS monitoring mode (parked on 144.390 by the service)
+    private volatile boolean monitor;                      // APRS monitoring mode (parked on the region's APRS frequency by the service)
     private final short[] window = new short[WINDOW];
     private int fill;
     private short[] overlapTail;
@@ -218,16 +227,16 @@ public final class PacketEngine {
     }
 
     /**
-     * Encode and transmit a picture. The short Robot modes go as before; the long modes (Robot 36, Martin, Scottie,
-     * PD 90) run up to the radio's own 120 s time-out less a margin and pass the cool-down guard first. Returns an
-     * error, the guard's wait, or null when the picture is on its way.
+     * Encode and transmit a picture. A mode longer than the transmit limit (Device → Longest transmission) is refused;
+     * the long modes (Robot 36, Martin, Scottie, PD 90) pass the cool-down guard first. Returns an error, the guard's
+     * wait, or null when the picture is on its way.
      */
     public String sendSstv(android.graphics.Bitmap bmp, int mode) {
         if (bmp == null) return "No picture";
         if (!SSTVEncoder.isSupported(mode)) return "Unsupported mode";
         if (!host.analogRx()) return "SSTV needs an analog channel";
         final int total = SSTVEncoder.durationMs(mode) + TX_LEAD_MS;
-        if (total > 118_000) return SSTVEncoder.name(mode) + " runs " + Math.round(total / 1000.0) + " s, past what this radio allows (118 s)";
+        if (total > host.txCapMs()) return SSTVEncoder.name(mode) + " runs " + Math.round(total / 1000.0) + " s, past the transmit limit (" + host.txLimitName() + "; Device \u2192 Longest transmission)";
         if (total > 30_000) { String wait = host.longTxWait(total); if (wait != null) { host.event("\u23F3 " + SSTVEncoder.name(mode) + " not sent: " + wait); return wait; } }
         new Thread(() -> {
             short[] pcm = SSTVEncoder.encode(bmp, mode);
@@ -235,7 +244,7 @@ public final class PacketEngine {
             short[] src = new short[lead + pcm.length];
             for (int i = 0; i < lead; i++) src[i] = (short) (30000 * Math.sin(2.0 * Math.PI * 1900 * i / SR));   // leader tone while the TX path settles
             System.arraycopy(pcm, 0, src, lead, pcm.length);
-            host.transmitPcmLong(src, "SSTV " + SSTVEncoder.name(mode), total > 30_000 ? 118_000 : 28_500, () -> host.event("\uD83D\uDCFA Sent SSTV " + SSTVEncoder.name(mode)));
+            host.transmitPcmLong(src, "SSTV " + SSTVEncoder.name(mode), Integer.MAX_VALUE, () -> host.event("\uD83D\uDCFA Sent SSTV " + SSTVEncoder.name(mode)));   // the transmit limit is the cap
         }, "sstv-encode").start();
         return null;
     }
@@ -280,8 +289,11 @@ public final class PacketEngine {
     private volatile double pressureHpa;
     private android.hardware.SensorEventListener baro;
 
-    /** On the APRS frequency (analog, 144.390) and not handing the radio to a TNC client: our own beacons may go out. */
-    public boolean onAprsFrequency() { return host.analogRx() && host.rxFreqHz() == APRS_FREQ_HZ && !kiss.isActive(); }
+    /** On the region's APRS frequency (analog) and not handing the radio to a TNC client: our own beacons may go out. */
+    public boolean onAprsFrequency() { return onAprsFrequency(host.analogRx(), host.rxFreqHz(), host.aprsHz(), kiss.isActive()); }
+    static boolean onAprsFrequency(boolean analog, int rxHz, int aprsHz, boolean kissActive) { return analog && aprsHz > 0 && rxHz == aprsHz && !kissActive; }
+    /** "144.800": the APRS frequency in use, for messages. */
+    public String aprsMhz() { return com.macdmr.radio.region.Region.mhz(host.aprsHz()); }
 
     /** Re-read the settings that need a sensor or GPS running. */
     public void applySettings() {
@@ -446,7 +458,7 @@ public final class PacketEngine {
         final double hz = m == 1 ? (rtty != null && rtty.locked() ? rtty.markHz() : 2125) : (psk != null && psk.locked() ? psk.freq() : 1000);
         final java.util.List<String> parts = new java.util.ArrayList<>();
         StringBuilder cur = new StringBuilder();
-        int limit = m == 1 ? 130 : 55;                                    // characters that fit about 26 s with the lead and tail (capitals are the longest in PSK31)
+        int limit = m == 1 ? 130 : 52;                                    // characters that fit about 26 s with the lead and tail (capitals are the longest in PSK31)
         for (String w : text.trim().split(" ")) { if (cur.length() + w.length() + 1 > limit && cur.length() > 0) { parts.add(cur.toString()); cur.setLength(0); } if (cur.length() > 0) cur.append(' '); cur.append(w); }
         if (cur.length() > 0) parts.add(cur.toString());
         synchronized (this) { textRx.append("\n> ").append(text.trim()).append('\n'); } textPost();
@@ -630,7 +642,7 @@ public final class PacketEngine {
         String key = from + ">" + p.messageTo.trim() + ":" + p.messageText + "{" + p.messageId;
         long now = System.currentTimeMillis();
         synchronized (gatedToRf) { Long t = gatedToRf.get(key); if (t != null && now - t < 30 * 60_000L) return; gatedToRf.put(key, now); if (gatedToRf.size() > 500) gatedToRf.clear(); }
-        if (!onAprsFrequency() && !benchIgate) { host.event("\uD83C\uDF10 Not gated to the radio (not on 144.390): " + from + " \u2192 " + p.messageTo.trim()); return; }
+        if (!onAprsFrequency() && !benchIgate) { host.event("\uD83C\uDF10 Not gated to the radio (not on " + aprsMhz() + "): " + from + " \u2192 " + p.messageTo.trim()); return; }
         final String tp = com.macdmr.radio.pkt.AprsExtras.thirdParty(line, myCall());
         if (tp == null) return;
         final String to = p.messageTo.trim(), text = p.messageText;
@@ -653,7 +665,9 @@ public final class PacketEngine {
     public String comment() { return prefs.getString("comment", "SignalDeck"); }
     public String[] path() { String p = prefs.getString("path", "WIDE1-1,WIDE2-1").trim(); return p.isEmpty() ? new String[0] : p.split("\\s*,\\s*"); }
     public int passiveMode() { return prefs.getInt("passive", 2); }       // 0 off, 1 flagged channels, 2 every analog channel
-    public boolean autoAck() { return prefs.getBoolean("autoAck", true); }
+    /** Auto-ack starts off (a simple toggle turns it on) and is off on a UHF-only radio whatever the setting says (owner, 2026-10-30); the setting is kept for a phone with 2 m. */
+    public boolean autoAckAllowed() { return host.hasVhf(); }
+    public boolean autoAck() { return autoAckAllowed() && prefs.getBoolean("autoAck", false); }
     public boolean digipeat() { return prefs.getBoolean("digipeat", false); }
     public int kissPort() { return prefs.getInt("kissPort", 8001); }
     public boolean dtmfEnabled() { return prefs.getBoolean("dtmf", true); }
@@ -661,12 +675,12 @@ public final class PacketEngine {
     public boolean cwEnabled() { return prefs.getBoolean("cw", true); }
     public boolean remoteOn() { return prefs.getBoolean("remote", false); }
     public String remotePin() { return prefs.getString("remotePin", ""); }
-    /** Send the callsign in Morse after talking on amateur channels, at most every ten minutes. */
+    /** Send the callsign in Morse after talking on amateur channels, at most once per station-ID interval (the region's, else ten minutes). */
     public boolean cwIdEnabled() { return prefs.getBoolean("cwId", false); }
     private volatile long lastCwIdMs;
     /** Morse ID audio to append now, or null when none is due (or no callsign is set). */
     public short[] cwIdIfDue(long now) {
-        if (!cwIdEnabled() || !callsignSet() || (lastCwIdMs != 0 && now - lastCwIdMs < 10 * 60_000L)) return null;
+        if (!cwIdEnabled() || !callsignSet() || (lastCwIdMs != 0 && now - lastCwIdMs < com.macdmr.radio.region.Region.cached().idEveryMs())) return null;
         lastCwIdMs = now; host.identified();
         return com.macdmr.radio.coverage.Morse.pcm(callsign(), 20, 800);
     }
@@ -1072,7 +1086,7 @@ public final class PacketEngine {
         if (!callsignSet()) return "Set your callsign first (PKT → APRS settings)";
         if (to == null || to.trim().isEmpty() || text == null || text.trim().isEmpty()) return "Addressee and text are needed";
         if (text.length() > 67) return "APRS messages are at most 67 characters";
-        if (!host.analogRx()) return "Packet needs an analog channel: tune the APRS channel (144.390 MHz in North America)";
+        if (!host.analogRx()) return "Packet needs an analog channel: tune the APRS channel (" + aprsMhz() + " MHz in your region)";
         final int id = prefs.getInt("msgId", 0) % 999 + 1; prefs.edit().putInt("msgId", id).apply();
         final String addressee = to.trim().toUpperCase(Locale.US);
         txInfo(Ax25.messageInfo(addressee, text.trim(), id), path(), "APRS message to " + addressee, TX_REPS,
@@ -1103,7 +1117,7 @@ public final class PacketEngine {
         if (!callsignSet()) return "Set your callsign first (PKT → APRS settings)";
         Location l = host.location();
         if (l == null) return "No position fix yet (turn on location and open Maps once)";
-        if (!host.analogRx()) return "Packet needs an analog channel: tune the APRS channel (144.390 MHz in North America)";
+        if (!host.analogRx()) return "Packet needs an analog channel: tune the APRS channel (" + aprsMhz() + " MHz in your region)";
         final String info = Ax25.positionInfo(l.getLatitude(), l.getLongitude(), symTable(), symCode(), comment());
         txInfo(info, via, "position beacon", TX_REPS, () -> { store.log("beacon", myCall(), "APZDMR", info, null, false); host.event("📡 Beacon sent" + (via.length > 0 ? " via " + String.join(",", via) : "")); });
         return null;

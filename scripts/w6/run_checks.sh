@@ -39,11 +39,13 @@ a() { "$ADB" -s "$serial" "$@"; }
 
 a get-state >/dev/null || { echo "phone $serial not reachable" >&2; exit 1; }
 if $release; then
-  if [ -n "$(a shell pidof com.macdmr.radio | tr -d '\r')" ]; then
-    echo "handing the radio back to the stock app"
-    a shell am broadcast -a com.macdmr.radio.DIAG --es cmd exit --ez stock true >/dev/null
-    sleep 30                                     # the Atom XL's hand-back checks the bridge first (~20 s)
+  if [ -z "$(a shell pidof com.macdmr.radio | tr -d '\r')" ]; then   # not running (an install stops it): the stock app may still be paused
+    a shell am start -n com.macdmr.radio/.MainActivity --ez noTakeOver true >/dev/null
+    sleep 8
   fi
+  echo "handing the radio back to the stock app"
+  a shell am broadcast -a com.macdmr.radio.DIAG --es cmd exit --ez stock true >/dev/null
+  sleep 30                                       # the Atom XL's hand-back checks the bridge first (~20 s)
   echo "starting SignalDeck without taking the radio over"
   a shell am start -n com.macdmr.radio/.MainActivity --ez noTakeOver true >/dev/null
   sleep 8

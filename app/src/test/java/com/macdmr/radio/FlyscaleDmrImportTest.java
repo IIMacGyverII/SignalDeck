@@ -67,6 +67,16 @@ public class FlyscaleDmrImportTest {
         assertEquals("an empty send frequency is simplex", ch.rxFreq, ch.txFreq);
     }
 
+    @Test public void localIdIsMostSignificantByteFirst() {
+        assertEquals("the factory value is ID 1: no ID set", 0, ChannelStore.flyscaleDmrId("00000001"));
+        assertEquals(1234568, ChannelStore.flyscaleDmrId("0012D688"));
+        assertEquals("the other order only when this one is out of range", 1234568, ChannelStore.flyscaleDmrId("88D61200"));
+        assertEquals(0, ChannelStore.flyscaleDmrId("FFFFFFFF"));
+        assertEquals(0, ChannelStore.flyscaleDmrId("01000000".substring(2)));
+        assertEquals(0, ChannelStore.flyscaleDmrId(null));
+        assertEquals(16776415, ChannelStore.MAX_DMR_ID);
+    }
+
     @Test public void littleEndianHex() {
         assertEquals(1, ChannelStore.leInt("01000000"));
         assertEquals(0x123456, ChannelStore.leInt("56341200"));

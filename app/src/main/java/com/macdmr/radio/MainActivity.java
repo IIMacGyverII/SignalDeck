@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
         ProfileRegistry.init(this);                                 // before any page asks which phone this is
+        com.macdmr.radio.region.Region.ensureDefault(this);         // the phone's country, once (Device → Region); never changed silently
         LinearLayout root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL);
         getWindow().setBackgroundDrawable(com.macdmr.radio.ui.Neo.page(this));   // the one full-screen background layer; tab pages draw none of their own (overdraw cost ~40 ms of GPU per frame)
         content = new FrameLayout(this);
@@ -101,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
         }
         modeBar = buildModeBar();
         root.addView(modeBar, 1);                                  // under the page, over the tab bar: a running mode, tap to open its page
+        regionBar = buildRegionBar();
+        root.addView(regionBar, 1);                                // once: "Region: Belgium (from your SIM). Change" (never a blocking dialog)
         root.addView(nav);
         setContentView(root);
         if (b == null) {                                          // only when the screen is created fresh (first start, or after it was closed); returning to the open app never replays it
@@ -367,7 +370,39 @@ public class MainActivity extends AppCompatActivity {
         b.setContentDescription("Open the running mode's page");
         return b;
     }
+    /** The one-time region card on the intercom: what the phone said (or that it said nothing), Change, and a close button. */
+    private LinearLayout regionBar; private TextView regionBarText;
+    private LinearLayout buildRegionBar() {
+        LinearLayout b = new LinearLayout(this); b.setGravity(Gravity.CENTER_VERTICAL); b.setVisibility(View.GONE);
+        b.setBackgroundColor(com.macdmr.radio.ui.Neo.alpha(com.macdmr.radio.ui.Neo.CYAN, 0x22));
+        b.setPadding(Theme.dp(this, 16), Theme.dp(this, 8), Theme.dp(this, 6), Theme.dp(this, 8));
+        regionBarText = com.macdmr.radio.ui.Neo.text(this, "", com.macdmr.radio.ui.Neo.CYAN_LIGHT, 14.5f, com.macdmr.radio.ui.Neo.uiSemi(this));
+        b.addView(regionBarText, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        TextView change = com.macdmr.radio.ui.Neo.text(this, "CHANGE  ›", com.macdmr.radio.ui.Neo.CYAN, 14, com.macdmr.radio.ui.Neo.ui(this)); change.setLetterSpacing(0.1f);
+        change.setPadding(Theme.dp(this, 10), Theme.dp(this, 6), Theme.dp(this, 6), Theme.dp(this, 6));
+        b.addView(change);
+        android.widget.ImageView x = com.macdmr.radio.ui.Neo.iconButton(this, "close", com.macdmr.radio.ui.Neo.MUTED, "Dismiss");
+        b.addView(x, new LinearLayout.LayoutParams(Theme.dp(this, 40), Theme.dp(this, 40)));
+        Runnable done = () -> { com.macdmr.radio.region.Region.dismissCard(this); updateRegionBar(); if (device != null) device.updateRegion(); };
+        View.OnClickListener open = v -> com.macdmr.radio.ui.RegionSheet.show(this, svc, done);
+        b.setOnClickListener(open); change.setOnClickListener(open);
+        x.setOnClickListener(v -> done.run());
+        return b;
+    }
+    private void updateRegionBar() {
+        if (regionBar == null) return;
+        boolean show = tab == 0 && overlay == null && editor == null && com.macdmr.radio.region.Region.cardPending(this);
+        if (show) {
+            com.macdmr.radio.region.Region r = com.macdmr.radio.region.Region.current(this);
+            String roam = com.macdmr.radio.region.Region.roamingIn(this);
+            regionBarText.setText(r.chosen ? "Region: " + r.name + " (" + com.macdmr.radio.region.Region.howText(com.macdmr.radio.region.Region.how(this))
+                    + (roam != null ? "; the network is " + com.macdmr.radio.region.RegionTable.countryName(roam) + "'s" : "") + "). APRS " + r.aprsMhz()
+                    : "Choose your region for its APRS frequency and channel lists");
+        }
+        int vis = show ? View.VISIBLE : View.GONE; if (regionBar.getVisibility() != vis) regionBar.setVisibility(vis);
+    }
     private void updateModeBar() {
+        updateRegionBar();
         if (modeBar == null) return;
         String l = modeLabel();
         boolean show = l != null && !(overlay instanceof com.macdmr.radio.ui.ModeScreen) && editor == null;

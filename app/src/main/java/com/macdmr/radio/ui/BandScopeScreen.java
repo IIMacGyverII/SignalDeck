@@ -95,7 +95,7 @@ public final class BandScopeScreen extends ModeScreen {
         BandScope s = svc.scope();
         if (s.running()) { new Thread(svc::scopeStop, "scope-stop").start(); return; }
         int[] r = range();
-        toast(svc.scopeStart(r[0], r[1], r[2], prefs().getInt("settle", BandScope.DEFAULT_SETTLE_MS)));
+        toast(svc.scopeStart(r[0], r[1], r[2], prefs().getInt("settle", svc.profile().scopeSettleMs)));
         refresh();
     }
     /** Use a new range: restart the sweep if one is running. */
@@ -105,12 +105,17 @@ public final class BandScopeScreen extends ModeScreen {
         if (svc.scope().running()) new Thread(() -> { svc.scopeStop(); post(this::toggle); }, "scope-restart").start();
         refresh();
     }
-    private void choosePreset() {
-        final java.util.List<Integer> idx = new java.util.ArrayList<>(); for (int i = 0; i < BandScope.PRESETS.length; i++) if (BandScope.fits(BandScope.PRESETS[i])) idx.add(i);   // only bands this radio tunes
-        int k = idx.size(); String[] n = new String[k + 1];
+    private void choosePreset() { choosePreset(false); }
+    /** The region's bands (no NOAA weather band where there is no weather radio), Custom, and Show all when some are left out. */
+    private void choosePreset(boolean all) {
+        java.util.List<Integer> idx = BandScope.offered(com.macdmr.radio.region.Region.current(c), all);
+        idx.removeIf(i -> !BandScope.fits(BandScope.PRESETS[i]));        // only bands this radio tunes
+        int inBand = 0; for (BandScope.Preset p : BandScope.PRESETS) if (BandScope.fits(p)) inBand++;
+        final boolean more = idx.size() < inBand;
+        int k = idx.size(); String[] n = new String[k + (more ? 2 : 1)];
         for (int j = 0; j < k; j++) { BandScope.Preset p = BandScope.PRESETS[idx.get(j)]; int st = BandScope.steps(p.from, p.to, p.step); n[j] = String.format(Locale.US, "%s  (%.3f–%.3f, %s kHz, %d steps, about %s)", p.name, p.from / 1e6, p.to / 1e6, khz(p.step), st, BandScope.duration((long) st * (BandScope.DEFAULT_SETTLE_MS + 300))); }
-        n[k] = "Custom range…";
-        new AlertDialog.Builder(c).setTitle("Which band?").setItems(n, (dd, w) -> { if (w == k) customRange(); else picked(idx.get(w)); }).show();
+        n[k] = "Custom range…"; if (more) n[k + 1] = "Show all bands…";
+        new AlertDialog.Builder(c).setTitle("Which band?").setItems(n, (dd, w) -> { if (w == k) customRange(); else if (w == k + 1) choosePreset(true); else picked(idx.get(w)); }).show();
     }
     /** From, to and step of your own; checked against what the radio can tune before it is used. */
     private void customRange() {
@@ -146,10 +151,10 @@ public final class BandScopeScreen extends ModeScreen {
     }
     private static int parse(android.widget.EditText e) { try { return (int) Math.round(Double.parseDouble(e.getText().toString().trim().replace(',', '.')) * 1e6); } catch (Exception x) { return 0; } }
     private static int parseKhz(android.widget.EditText e) { try { return (int) Math.round(Double.parseDouble(e.getText().toString().trim().replace(',', '.')) * 1e3); } catch (Exception x) { return 0; } }
-    private static String describe(int from, int to, int step) {
+    private String describe(int from, int to, int step) {
         String e = BandScope.problem(from, to, step); if (e != null) return e;
         int n = BandScope.steps(from, to, step);
-        return n + " steps, a sweep takes about " + BandScope.duration((long) n * (BandScope.DEFAULT_SETTLE_MS + 300));
+        return n + " steps, a sweep takes about " + BandScope.duration((long) n * (svc.profile().scopeSettleMs + svc.profile().scopeReadMs));
     }
 
     private void listenHere() {

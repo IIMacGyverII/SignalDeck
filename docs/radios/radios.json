@@ -1,0 +1,283 @@
+{
+  "generated": "2026-10-29",
+  "radios": [
+    {
+      "id": "ulefone-armor26ultra",
+      "aliases": [],
+      "name": "Ulefone Armor 26 Ultra",
+      "maker": "Ulefone",
+      "variant": "Walkie-talkie model",
+      "status": "ok",
+      "summary": "The reference phone: a dual-band DMR and FM radio that every SignalDeck feature was built and measured on.",
+      "radio": {"module": "DMR003.UV4T.V022 (HR-C7000 DMR chip with an AT1846S RF chip)", "modes": ["FM", "DMR Tier II", "M17 receive", "M17 transmit with SignalDeck module firmware"], "bands": [{"name": "VHF", "lowMHz": 136.0, "highMHz": 174.0}, {"name": "UHF", "lowMHz": 400.0, "highMHz": 480.0}], "txPowerW": null, "link": "A serial port inside the phone at 57600 baud for commands; the receive and transmit audio go through the phone's own radio audio service at 8 kHz."},
+      "features": [
+        {"id": "smeter", "name": "Signal meter", "state": "yes", "note": "Reads in dBm, also with the squelch closed"},
+        {"id": "fm_rx", "name": "FM receive", "state": "yes", "note": null},
+        {"id": "fm_tx", "name": "FM transmit", "state": "yes", "note": null},
+        {"id": "dmr_rx", "name": "DMR receive", "state": "yes", "note": "Caller ID and talkgroup shown"},
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "yes", "note": null},
+        {"id": "dmr_text", "name": "DMR texts", "state": "yes", "note": "Both ways"},
+        {"id": "m17_rx", "name": "M17 receive", "state": "yes", "note": "Through a calibrated equalizer"},
+        {"id": "m17_tx", "name": "M17 transmit", "state": "partial", "note": "Only with SignalDeck module firmware loaded"},
+        {"id": "aprs", "name": "APRS", "state": "yes", "note": "Receive, send, beacon, digipeater, KISS TNC, APRS-IS"},
+        {"id": "sstv", "name": "SSTV", "state": "yes", "note": "Receive and send"},
+        {"id": "ft8", "name": "FT8 over FM", "state": "yes", "note": "Receive and send"},
+        {"id": "pager", "name": "POCSAG pager", "state": "partial", "note": "Sending pages needs SignalDeck module firmware"},
+        {"id": "band_scope", "name": "Band scope", "state": "yes", "note": "About 0.7 s per step"},
+        {"id": "firmware_loader", "name": "Module firmware loader", "state": "yes", "note": "With a verified factory backup"},
+        {"id": "android_auto", "name": "Android Auto", "state": "yes", "note": null},
+        {"id": "web", "name": "SignalDeck Web", "state": "yes", "note": null}
+      ],
+      "quirks": [
+        {"title": "The radio enforces its bands", "text": "The radio module itself only tunes 136.000 to 174.000 and 400.000 to 480.000 MHz. A frequency outside those is refused and the radio stays on the frequency it was on, so there is no 220 MHz or other out-of-band receive."},
+        {"title": "Packet data needs a long start", "text": "The transmitter needs about 1.5 seconds after keying before data comes through cleanly. A packet sent right at key-up is lost. SignalDeck therefore leads every APRS or packet transmission with 1.6 seconds of standard AX.25 flags and sends the frame twice."},
+        {"title": "Wait after changing channel before you talk", "text": "A channel change finishes inside the radio about 3 seconds after it is sent, and it stops a transmission that is already running. SignalDeck waits about 4 seconds after a retune before its own automatic transmissions; when you change channel by hand, wait a moment before you press Talk."},
+        {"title": "Signal readings lag a retune", "text": "Right after a frequency change the signal reading is 15 to 20 dB too low for about 0.7 seconds. That is why the band scope takes about 0.7 seconds per step (2 m in 25 kHz steps is about 2 minutes)."},
+        {"title": "Squelch levels act as one", "text": "The radio's squelch levels 1 to 9 all behave like one threshold near -90 dBm. For anything finer, use SignalDeck's Soft SQ, which listens to the audio itself."},
+        {"title": "Transmitting can reset the USB cable", "text": "On some 2 m frequencies at high power, the radio's own signal gets into the phone's USB cable and resets the connection (wired Android Auto drops and reconnects after you let go). Other frequencies on the same band and UHF were fine. It is RF pickup, not an app fault: a ferrite choke, a shorter shielded cable, low power on that channel or wireless Android Auto help. SignalDeck notices when it happens and suggests these."},
+        {"title": "Use wide on VHF", "text": "Setting a VHF channel to narrow made the receiver deaf on our test unit, and only a phone reboot brought it back. SignalDeck's built-in VHF channels (APRS, SSTV, weather) use wide. On UHF both settings receive."},
+        {"title": "Talkgroups you hear", "text": "On a DMR channel the radio only passes group calls for the talkgroups in that channel's receive list, which holds up to 32. Private calls to your own DMR ID always come through."},
+        {"title": "Receive audio is telephone-quality", "text": "The radio delivers its audio at 8 kHz and removes almost everything below about 250 Hz. Voice is fine; digital modes that need the low tones, such as M17, are decoded through a calibrated equalizer."},
+        {"title": "Long transmissions", "text": "SignalDeck releases the transmitter at its transmit limit (2 minutes unless changed on the Device page). A long high-power transmission warms the phone noticeably, and SignalDeck's heat guard stops long transmissions when the phone gets too hot."}
+      ],
+      "measured": [
+        {"what": "Tuning step", "value": "500 Hz", "note": "Requested offsets of 500 Hz to 5 kHz landed within 2 Hz of the target (2026-10-22), so Doppler correction in 500 Hz steps is real."},
+        {"what": "Signal reading settle time after a retune", "value": "about 0.7 s", "note": "Readings taken earlier were 15 to 20 dB low (2026-10-22)."},
+        {"what": "Packet lead-in needed", "value": "about 1.5 s", "note": "Tone, flags and silence decoded alike at 1.6 s; shorter lost packets (2026-10-20)."},
+        {"what": "Phone heat from a 120 s high-power key", "value": "+11 °C processor, +1.7 °C battery", "note": "Back to normal in about 17 minutes (2026-10-25)."},
+        {"what": "M17 receive", "value": "300 of 300 voice frames exact", "note": "Test transmissions at the standard deviation, through the calibrated equalizer."}
+      ],
+      "firmware": {"stock": "DMR003.UV4T.V022", "modified": "SignalDeck module images from the signed firmware catalogue (Device, Radio firmware)", "note": "A loaded image stays in the module's flash across reboots. Loading the factory image again restores the stock firmware."},
+      "sections": [
+        {"head": "Custom ROMs", "text": "On a custom ROM or GSI the vendor radio audio service is usually missing. SignalDeck notices and takes the radio audio straight from the phone's sound card instead."}
+      ],
+      "photos": []
+    },
+    {
+      "id": "unihertz-atomxl",
+      "aliases": [],
+      "name": "Unihertz Atom XL",
+      "maker": "Unihertz",
+      "variant": null,
+      "status": "ok",
+      "summary": "A compact UHF DMR and FM phone whose radio sits behind a USB bridge; tested for receive and transmit.",
+      "radio": {"module": "DMR006.U4A.V067 behind an STM32 USB bridge", "modes": ["FM", "DMR Tier II", "M17 receive"], "bands": [{"name": "UHF", "lowMHz": 400.0, "highMHz": 480.0}], "txPowerW": null, "link": "A USB bridge chip inside the phone: commands over its serial port, audio over its own USB sound card at 32 kHz."},
+      "features": [
+        {"id": "smeter", "name": "Signal meter", "state": "partial", "note": "Holds its last reading during a reception, by design"},
+        {"id": "fm_rx", "name": "FM receive", "state": "yes", "note": null},
+        {"id": "fm_tx", "name": "FM transmit", "state": "yes", "note": null},
+        {"id": "dmr_rx", "name": "DMR receive", "state": "yes", "note": "Group and private calls with caller ID"},
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "yes", "note": null},
+        {"id": "dmr_text", "name": "DMR texts", "state": "yes", "note": "Both ways"},
+        {"id": "m17_rx", "name": "M17 receive", "state": "partial", "note": "71 to 89 of 100 frames exact on test recordings"},
+        {"id": "m17_tx", "name": "M17 transmit", "state": "no", "note": "Needs module firmware this radio cannot load"},
+        {"id": "aprs", "name": "APRS", "state": "yes", "note": "Receive and send"},
+        {"id": "sstv", "name": "SSTV", "state": "yes", "note": "Receive tested"},
+        {"id": "ft8", "name": "FT8 over FM", "state": "yes", "note": "Receive tested"},
+        {"id": "pager", "name": "POCSAG pager", "state": "no", "note": "Needs module firmware this radio cannot load"},
+        {"id": "band_scope", "name": "Band scope", "state": "yes", "note": "Inside 400 to 480 MHz"},
+        {"id": "firmware_loader", "name": "Module firmware loader", "state": "no", "note": "The module sits behind the USB bridge"},
+        {"id": "android_auto", "name": "Android Auto", "state": "yes", "note": "Tested on the desktop head unit"},
+        {"id": "web", "name": "SignalDeck Web", "state": "yes", "note": null}
+      ],
+      "quirks": [
+        {"title": "UHF only", "text": "The radio covers 400 to 480 MHz. There is no 2 m, no NOAA weather radio and no 2 m satellites."},
+        {"title": "No USB data while the radio is on", "text": "The radio is a USB device on the phone's only USB controller. While SignalDeck has the radio on, a computer cannot use the USB cable for data (adb, file transfer). Exit and Hand back switch the radio off and give the USB port back. Developers work over Wi-Fi ADB."},
+        {"title": "The signal meter pauses during a reception", "text": "Any command sent across the USB bridge while audio streams can break the audio. So during a reception the S-meter shows the reading from just before it and moves again when the reception ends. Fox hunt and coverage logging still take readings, which may cost a short drop-out."},
+        {"title": "A nearby transmitter deafens it", "text": "Another radio keying close by, even on a different UHF frequency, pushes this receiver down to the bottom of its range for the length of that key. It recovers at once when the other radio stops, and it does not fake a reception."},
+        {"title": "The reception signal can stick", "text": "Rarely, the bridge's reception start and end signal stops for a whole session. SignalDeck notices, finds receptions from the signal reading instead and restarts the bridge once; a phone reboot always clears it."},
+        {"title": "Short audio drop-outs", "text": "The bridge's USB audio can stop for about 2 seconds. SignalDeck restarts the bridge, which costs a few seconds without sound."},
+        {"title": "Switch off App block", "text": "The phone's App block setting force-stops SignalDeck 5 minutes after the screen goes off. SignalDeck opens that settings page once so you can switch it off for SignalDeck."},
+        {"title": "Charger noise", "text": "With a charger on the USB socket the idle signal reading rises by a few dB. Reception detection copes with it."}
+      ],
+      "measured": [
+        {"what": "Idle signal reading", "value": "-101 to -103 dBm, about -98 dBm with a charger", "note": "Test unit, 2026-10-29."},
+        {"what": "Audio clock", "value": "about 125 ppm fast", "note": "The bridge's sound card; the M17 calibration accounts for it."},
+        {"what": "Hand back", "value": "about 20 s", "note": "SignalDeck checks the bridge answers before handing the radio back."},
+        {"what": "Radio owned after a reboot", "value": "about 67 s", "note": "With Own the radio at boot switched on."},
+        {"what": "Receptions without drop-outs", "value": "17 of 17", "note": "RTTY and speech test transmissions with the signal meter held during receptions (2026-10-29)."}
+      ],
+      "firmware": {"stock": "DMR006.U4A.V067", "modified": null, "note": "SignalDeck cannot load module firmware on this phone; the module is behind the USB bridge."},
+      "sections": [],
+      "photos": []
+    },
+    {
+      "id": "anysecu-w6plus",
+      "aliases": [],
+      "name": "ANYSECU W6+",
+      "maker": "ANYSECU",
+      "variant": "Analog UHF",
+      "status": "ok",
+      "summary": "An analog-only UHF FM phone (400 to 470 MHz) with its own simpler radio module; tested for receive and transmit.",
+      "radio": {"module": "SA818-class analog FM module (PB202EU05)", "modes": ["FM"], "bands": [{"name": "UHF", "lowMHz": 400.0, "highMHz": 470.0}], "txPowerW": null, "link": "A serial port inside the phone at 9600 baud with AT commands; the receive audio reaches the app through the phone's camcorder microphone input."},
+      "features": [
+        {"id": "smeter", "name": "Signal meter", "state": "no", "note": "The module gives no signal readings; the meter shows RECEIVING or QUIET"},
+        {"id": "fm_rx", "name": "FM receive", "state": "yes", "note": null},
+        {"id": "fm_tx", "name": "FM transmit", "state": "yes", "note": "Confirmed on the air"},
+        {"id": "dmr_rx", "name": "DMR receive", "state": "no", "note": "No DMR in this module"},
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "no", "note": "No DMR in this module"},
+        {"id": "m17_rx", "name": "M17 receive", "state": "yes", "note": "With its own calibration"},
+        {"id": "m17_tx", "name": "M17 transmit", "state": "no", "note": "Needs the DMR module's firmware engine"},
+        {"id": "aprs", "name": "APRS", "state": "yes", "note": "Receive works; sending through the gateway relay decoded by a second phone (2026-10-29)"},
+        {"id": "sstv", "name": "SSTV", "state": "yes", "note": "Receive works; Robot 24 colour sent through the gateway relay decoded clean by a second phone (2026-10-29); UHF only, so not 144.500"},
+        {"id": "ft8", "name": "FT8 over FM", "state": "yes", "note": "Receive works; sent through the gateway relay, a full QSO with a second phone completed (2026-10-29)"},
+        {"id": "pager", "name": "POCSAG pager", "state": "no", "note": null},
+        {"id": "band_scope", "name": "Band scope", "state": "no", "note": "Needs signal readings"},
+        {"id": "firmware_loader", "name": "Module firmware loader", "state": "no", "note": null},
+        {"id": "android_auto", "name": "Android Auto", "state": "untested", "note": null},
+        {"id": "web", "name": "SignalDeck Web", "state": "yes", "note": null}
+      ],
+      "quirks": [
+        {"title": "FM only, 400 to 470 MHz", "text": "There is no DMR in this radio, so the DMR pages, contacts and messages are hidden. 2 m modes such as APRS monitoring on 144.390 and NOAA weather are out of band."},
+        {"title": "No signal meter", "text": "The module answers no signal-strength query. The meter shows RECEIVING or QUIET from the radio's receive line, and tools that need readings (band scope, fox hunting, coverage maps) are limited or hidden."},
+        {"title": "Low tones are cut hard", "text": "The receiver removes almost everything below about 300 Hz, more steeply than the Armor. Voice is fine; M17 receive uses its own calibration for it."},
+        {"title": "SignalDeck plays the audio", "text": "The module's own speaker route stays off at a fixed volume and SignalDeck plays the radio audio itself, so the phone's volume keys work as usual. There is a slight delay."},
+        {"title": "DCS codes", "text": "DCS tone squelch works with normal-polarity codes only."},
+        {"title": "Small screen", "text": "The screen is 480 by 854. SignalDeck uses a compact intercom layout here."},
+        {"title": "Its speaker stays on while it sends data", "text": "SignalDeck's own sounds (APRS, tones, SSTV, FT8) go through a relay to the radio, and the phone's speaker amplifier cannot be switched off for that moment, so the tones can be heard from the phone while it transmits them."},
+        {"title": "Mains chargers put a buzz on the air", "text": "With the phone on a mains charger, a 120 Hz buzz got into its transmitted and received audio in a test with two of these phones; data modes that tolerate noise (RTTY, FT8, APRS) still decoded, DTMF and PSK31 did not. On battery, or on a clean charger, it is gone."}
+      ],
+      "measured": [
+        {"what": "Receive response at 250 Hz", "value": "-48 dB", "note": "-57 dB at 125 to 187 Hz (HackRF test transmissions)."},
+        {"what": "M17 receive", "value": "98 and 92 of 100 frames confirmed", "note": "Over the air, with this phone's calibration."},
+        {"what": "SSTV receive", "value": "238 of 240 lines", "note": "Robot 36, clean colour bars."}
+      ],
+      "firmware": {"stock": "Not readable", "modified": null, "note": "The stock app carries no module firmware file and the module has no read command."},
+      "sections": [],
+      "photos": []
+    },
+    {
+      "id": "anysecu-w6plus-dmr",
+      "aliases": [],
+      "name": "ANYSECU W6Plus DMR",
+      "maker": "ANYSECU",
+      "variant": "DMR (V69)",
+      "status": "beta",
+      "summary": "The W6+ body with a UHF DMR module; DMR and FM receive and transmit work.",
+      "radio": {"module": "DMR006.U4A.V140 (the Atom XL's module family, on a plain serial port)", "modes": ["FM", "DMR Tier II"], "bands": [{"name": "UHF", "lowMHz": 400.0, "highMHz": 480.0}], "txPowerW": null, "link": "A serial port inside the phone at 57600 baud with the Armor's command set; the receive audio reaches the app through the phone's camcorder microphone input."},
+      "features": [
+        {"id": "smeter", "name": "Signal meter", "state": "yes", "note": null},
+        {"id": "fm_rx", "name": "FM receive", "state": "yes", "note": "Tested with another radio (2026-10-29); check the channel's CTCSS/DCS setting if nothing is heard"},
+        {"id": "fm_tx", "name": "FM transmit", "state": "yes", "note": "Tested on the bench (2026-10-29)"},
+        {"id": "dmr_rx", "name": "DMR receive", "state": "yes", "note": "Tested with another DMR radio; voice level on the phone is low (under investigation)"},
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "yes", "note": "Tested with another DMR radio (2026-10-29)"},
+        {"id": "m17_rx", "name": "M17 receive", "state": "untested", "note": null},
+        {"id": "m17_tx", "name": "M17 transmit", "state": "no", "note": "The transmit audio path cuts everything below about 300 Hz, and module firmware is not loaded on this phone"},
+        {"id": "aprs", "name": "APRS", "state": "yes", "note": "Sending decoded on the bench (HackRF) and by a second phone, through the stock app's gateway relay; receive tested from a second phone on UHF (144.390 is out of band)"},
+        {"id": "sstv", "name": "SSTV", "state": "yes", "note": "Robot 24 colour sent through the gateway relay decoded clean by a second phone (2026-10-29); UHF only, so not 144.500"},
+        {"id": "ft8", "name": "FT8 over FM", "state": "yes", "note": "Sent through the gateway relay and decoded by a second phone (2026-10-29)"},
+        {"id": "pager", "name": "POCSAG pager", "state": "no", "note": null},
+        {"id": "firmware_loader", "name": "Module firmware loader", "state": "no", "note": "The vendor's module image stays"},
+        {"id": "android_auto", "name": "Android Auto", "state": "untested", "note": null},
+        {"id": "web", "name": "SignalDeck Web", "state": "untested", "note": null}
+      ],
+      "quirks": [
+        {"title": "UHF only", "text": "Despite \"dual band\" in some listings, the radio answers only 400 to 480 MHz; VHF frequencies are never acknowledged."},
+        {"title": "The app's own sounds go through a gateway relay", "text": "Your voice goes from the microphone straight to the radio. Sounds SignalDeck makes itself (APRS, Morse ID, tones, SSTV, FT8) go through the relay the stock app uses for its network gateway, which feeds the phone's audio to the radio's microphone input while it transmits. It is a voice path: nothing below about 300 Hz and a cut above 3 kHz, so M17 cannot be sent."},
+        {"title": "Transmit frequency runs high", "text": "Our test unit transmitted about 1.6 kHz above the set frequency on FM and DMR alike, measured against a test receiver whose own error is part of that figure. It is inside what most DMR radios accept, but a narrow or strict receiver, or a DMR hotspot, may need its receive offset adjusted or may show a high bit error rate for this radio."},
+        {"title": "DMR voice audio is quiet", "text": "DMR calls are detected with the caller's ID, but the decoded voice reaches the app far below FM audio. This is under investigation."},
+        {"title": "Its transmitter desensitises nearby radios", "text": "While it keys, a radio close by on another UHF frequency hears less (its signal reading drops), though it does not open."},
+        {"title": "Mains chargers put a buzz on the air", "text": "With the phone on a mains charger, a 120 Hz buzz got into its transmitted and received audio in a test with two of these phones; data modes that tolerate noise (RTTY, FT8, APRS) still decoded, DTMF and PSK31 did not. On battery, or on a clean charger, it is gone."}
+      ],
+      "measured": [
+        {"what": "Carrier offset", "value": "about +1.6 kHz", "note": "+1598, +1575 and +1604 Hz on three keys (2026-10-29). Includes the test receiver's own error: the same receiver reads an Armor 26 Ultra +0.8 to 1.0 kHz high, so this radio alone is probably 0.6 to 0.8 kHz (about 1.5 ppm) high. Measured on one test unit; your radio may differ."},
+        {"what": "DMR outer deviation", "value": "1815 Hz", "note": "Nominal is 1944 Hz (2026-10-29, one test unit)."},
+        {"what": "DMR voice audio", "value": "about 50 dB below FM", "note": "At the camcorder input (2026-10-29, one test unit)."},
+        {"what": "FM receive audio", "value": "-32 dBFS", "note": "A 1 kHz tone at 2.5 kHz deviation, 12 dB louder than the W6+ (2026-10-29)."},
+        {"what": "Heat during the bench test", "value": "battery 42.1 to 42.8 °C, processor 51 to 53 °C", "note": "Including a 28 s key (2026-10-29)."},
+        {"what": "Transmit audio response (gateway route)", "value": "300 Hz -17 dB, 2.5 kHz +7.8 dB against 1 kHz", "note": "500 Hz -9, 3 kHz +3, 3.5 kHz -31 dB; 100 to 250 Hz at the noise floor; the module limits near 4.3 kHz (2026-10-29, one test unit)."}
+      ],
+      "firmware": {"stock": "DMR006.U4A.V140", "modified": null, "note": "SignalDeck does not load module firmware on this phone."},
+      "sections": [],
+      "photos": []
+    },
+    {
+      "id": "ulefone-armor20wt",
+      "aliases": [],
+      "name": "Ulefone Armor 20WT",
+      "maker": "Ulefone",
+      "variant": null,
+      "status": "exp",
+      "summary": "The Armor 26 Ultra's radio family on another serial port; the profile is written from a report and not yet tested.",
+      "radio": {"module": "Armor DMR module family (version not read yet)", "modes": ["FM", "DMR Tier II"], "bands": [{"name": "VHF", "lowMHz": 136.0, "highMHz": 174.0}, {"name": "UHF", "lowMHz": 400.0, "highMHz": 480.0}], "txPowerW": null, "link": "A serial port inside the phone at 57600 baud (a different port from the Armor 26 Ultra); audio through the phone's radio audio service."},
+      "features": [
+        {"id": "fm_rx", "name": "FM receive", "state": "untested", "note": null},
+        {"id": "fm_tx", "name": "FM transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"},
+        {"id": "dmr_rx", "name": "DMR receive", "state": "untested", "note": null},
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"}
+      ],
+      "quirks": [
+        {"title": "Untested profile", "text": "This profile comes from an owner's device report and the phone's stock app. It has not run on the phone yet, so SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session."},
+        {"title": "Looks like an Armor 26 Ultra", "text": "The phone has the same radio control nodes as the Armor 26 Ultra but its module is on another port. SignalDeck recognises it by its model name."},
+        {"title": "Driven as its own app does", "text": "Its stock walkie-talkie app is an older build than the Armor 26 Ultra's, with the same commands but fewer of them. SignalDeck follows it on this phone: a shorter start-up exchange with the module, the audio opened 0.6 s before the transmitter is keyed, no new key within 2 s of the last one, and its channel files for Import from the stock app. Whether the module answers the extra commands SignalDeck uses (signal strength, caller ID, monitor) is what Run all checks finds out."},
+        {"title": "Bands not measured", "text": "The bands shown are the Armor family's; this model's limits have not been measured yet."}
+      ],
+      "measured": [],
+      "firmware": {"stock": null, "modified": null, "note": "SignalDeck does not load module firmware on this phone: its stock app has no update path and carries no module image."},
+      "sections": [],
+      "photos": []
+    },
+    {
+      "id": "ulefone-armor3wt",
+      "aliases": [],
+      "name": "Ulefone Armor 3WT",
+      "maker": "Ulefone",
+      "variant": null,
+      "status": "exp",
+      "summary": "The Atom XL's USB radio bridge with an older DMR module, driven through the phone's radio daemon; written from a report, not yet tested.",
+      "radio": {"module": "Older Agold DMR module (version ver0.5.4_470M_TONE in one report; chip not known)", "modes": ["FM", "DMR without time slot selection"], "bands": [{"name": "VHF", "lowMHz": 100.0, "highMHz": 174.0}, {"name": "UHF", "lowMHz": 400.0, "highMHz": 470.0}], "txPowerW": null, "link": "The phone's radio daemon (extmodule) over two local network sockets, commands on port 9980 and audio on 9985; the daemon drives the USB bridge and the radio's USB sound card."},
+      "features": [
+        {"id": "fm_rx", "name": "FM receive", "state": "untested", "note": null},
+        {"id": "fm_tx", "name": "FM transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"},
+        {"id": "dmr_rx", "name": "DMR receive", "state": "untested", "note": "No caller ID: the module's call-info answer is not decoded yet"},
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"}
+      ],
+      "quirks": [
+        {"title": "Untested profile", "text": "This profile comes from an owner's device report, the phone's intercom app and its radio daemon. It has not run on the phone yet, so SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session."},
+        {"title": "Needs the radio daemon", "text": "SignalDeck talks to the phone's radio daemon (extmodule), as the intercom app does; on a custom ROM the daemon comes from the owner's own Magisk module and must be running. SignalDeck recognises the phone by its model or its board, and only when the daemon is installed."},
+        {"title": "No time slot", "text": "The module's digital channel has no time slot setting, so SignalDeck does not offer TS1 or TS2 on this phone: the module chooses. Simplex DMR with other radios is the safe use; repeater channels may not work."},
+        {"title": "No signal meter", "text": "The module has no known signal-strength command, so the S-meter, band scope and fox hunt readings are off on this phone. Run all checks asks the module once to find out."},
+        {"title": "Bands from the intercom app", "text": "The bands are what the phone's intercom app accepts, 100 to 470 MHz without the 174 to 400 MHz gap. The module's own range is not measured; Run all checks records its answer at the edges, receive only."},
+        {"title": "Side key", "text": "The side key reaches only the kernel, not apps, on the custom ROM in the report. SignalDeck reads it with root as its default custom PTT key; until the profile is tested it keys nothing outside the Transmit test session."}
+      ],
+      "measured": [],
+      "firmware": {"stock": null, "modified": null, "note": "SignalDeck does not load module firmware on this phone: no module image exists (two stock ROMs checked) and the phone is not certified for loading."},
+      "sections": [],
+      "photos": []
+    },
+    {
+      "id": "blackview-xplore1",
+      "aliases": [],
+      "name": "Blackview Xplore 1",
+      "maker": "Blackview",
+      "variant": "Walkie-talkie model",
+      "status": "beta",
+      "summary": "A DMR phone with the Armor's module protocol and audio over a second serial port; receive works for testers.",
+      "radio": {"module": "DMR003BN.UV4P.V016", "modes": ["FM", "DMR Tier II"], "bands": [{"name": "VHF", "lowMHz": 136.0, "highMHz": 174.0}, {"name": "UHF", "lowMHz": 400.0, "highMHz": 480.0}], "txPowerW": null, "link": "One serial port at 57600 baud for commands and a second one at 230400 baud carrying the audio as 8 kHz mono."},
+      "features": [
+        {"id": "smeter", "name": "Signal meter", "state": "yes", "note": "Signal readings answer"},
+        {"id": "fm_rx", "name": "FM receive", "state": "yes", "note": "Voice clear in testers' reports"},
+        {"id": "fm_tx", "name": "FM transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"},
+        {"id": "dmr_rx", "name": "DMR receive", "state": "untested", "note": null},
+        {"id": "dmr_tx", "name": "DMR transmit", "state": "untested", "note": "Only in the guided Transmit test session until the profile is tested"},
+        {"id": "firmware_loader", "name": "Module firmware loader", "state": "no", "note": "Off: the stock app's updater carries no image, so this module's firmware has not been compared"}
+      ],
+      "quirks": [
+        {"title": "Profile in testing", "text": "Testers have receive, MON, CTCSS and channel import working. SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session."},
+        {"title": "Keyed by its PTT line", "text": "The stock app never sends the transmit command: it keys the radio by switching its PTT line, starts the microphone when the radio reports that it is transmitting, keeps it on a fifth of a second after the release, and takes no new key within 1.5 seconds of the last release. SignalDeck does the same; if the radio does not report transmitting within 2 seconds, no audio is sent."},
+        {"title": "DMR texts in the stock app's format", "text": "The stock app sends texts with a shorter header than the Armor and in UTF-8 rather than UTF-16. SignalDeck sends them the same way on this phone and reads received texts in either encoding. Not checked on the air yet."},
+        {"title": "Channel changes need a pause", "text": "The stock app never writes channels less than 1 second apart; a burst of quick changes made the module refuse MON. SignalDeck keeps the same gap and only sends the newest channel."},
+        {"title": "The module can stop taking commands", "text": "After an update the module was sometimes left on but not answering. SignalDeck checks at start-up and restarts the module when it does not answer."},
+        {"title": "Slower reception reports", "text": "The radio reports a reception later than the Armor, so scanning waits 2.5 seconds per channel."},
+        {"title": "Squelch after MON", "text": "On firmware V016 the squelch was seen to stay open after MON was switched off. SignalDeck now sends the channel, monitor and squelch in the stock app's order; tell us if it still happens."}
+      ],
+      "measured": [
+        {"what": "Receive audio", "value": "100 packets per second, 8 kHz mono", "note": "Tester's unit, 2026-10-21."},
+        {"what": "Signal with a nearby transmitter", "value": "-48 to -53 dBm", "note": "A handheld keyed next to the phone in a shielded box (2026-10-22)."}
+      ],
+      "firmware": {"stock": "DMR003BN.UV4P.V016", "modified": null, "note": null},
+      "sections": [],
+      "photos": []
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 # Live captions
 
-*On the intercom · 5 of 33*
+*On the intercom · 5 of 34*
 
 TXT turns received speech into text.
 

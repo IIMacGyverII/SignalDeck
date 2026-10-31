@@ -2,7 +2,7 @@
 
 # Map
 
-*Pages · 28 of 33*
+*Pages · 29 of 34*
 
 APRS stations, repeaters and channels around you.
 

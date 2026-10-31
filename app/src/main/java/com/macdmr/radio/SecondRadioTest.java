@@ -57,7 +57,7 @@ public final class SecondRadioTest {
         Rx r = new Rx(); long t0 = System.currentTimeMillis(), a0 = svc.rxAudioBytes(); long quietSince = -1;
         Level lv = null; try { lv = new Level(svc, (int) maxMs + 2000); } catch (Throwable ignored) { }
         while (System.currentTimeMillis() - t0 < maxMs) {
-            svc.pollRssi(); Thread.sleep(200);
+            svc.pollRssiMeasure(); Thread.sleep(200);
             long now = System.currentTimeMillis(); int dbm = svc.rssiNow(); boolean rx = svc.receivingNow();
             if (dbm > -900 && dbm >= floor + 10) { if (r.signalAt < 0) r.signalAt = now; r.seen = true; quietSince = -1; if (dbm > r.peakDbm) r.peakDbm = dbm; }
             if (rx && r.reportAt < 0) r.reportAt = now;
@@ -88,7 +88,7 @@ public final class SecondRadioTest {
         // the noise floor
         ui.status("Measuring the noise floor…");
         int floor = -999, n = 0, sum = 0;
-        for (int i = 0; i < 6; i++) { svc.pollRssi(); Thread.sleep(400); int d = svc.rssiNow(); if (d > -900) { sum += d; n++; } }
+        for (int i = 0; i < 6; i++) { svc.pollRssiMeasure(); Thread.sleep(400); int d = svc.rssiNow(); if (d > -900) { sum += d; n++; } }
         floor = n > 0 ? sum / n : -110;
         rep.append("noise floor: ").append(floor).append(" dBm\n");
 

@@ -31,7 +31,7 @@ public final class ParrotScreen extends ModeScreen {
         LinearLayout stats = new LinearLayout(c); stats.setPadding(0, dp(10), 0, dp(10));
         count = stat(stats, "REPEATED"); last = stat(stats, "LAST HEARD");
         body.addView(stats);
-        body.addView(Neo.sheetHint(c, "Everything the radio hears on this channel (up to " + Parrot.MAX_MS / 1000 + " s) is recorded and sent back a second after the other station stops, so they can check how they sound through you. With a callsign set, it adds your callsign in Morse to a replay at most every " + Parrot.ID_EVERY_MS / 60000 + " minutes. The radio's 30-second transmit limit caps each replay."));
+        body.addView(Neo.sheetHint(c, "Everything the radio hears on this channel (up to " + Parrot.MAX_MS / 1000 + " s) is recorded and sent back a second after the other station stops, so they can check how they sound through you. With a callsign set, it adds your callsign in Morse to a replay at most every " + Parrot.idEveryMs() / 60000 + " minutes. The radio's 30-second transmit limit caps each replay."));
         content.addView(sv);
         LinearLayout r = buttonRow();
         button(r, "Stop the parrot", "stop", Neo.RED, v -> { toast(svc.setParrot(false)); close(); });

@@ -123,7 +123,10 @@ function applyRadio(rd) {
   S.dmr = rd.dmr !== false;
   document.body.classList.toggle('no-dmr', !S.dmr);
   document.body.classList.toggle('no-rssi', rd.rssi === false);               // no signal readings: no band scope
-  document.body.classList.toggle('no-aprs144', rd.aprs144 === false);         // 144.390 out of band: no APRS monitoring
+  document.body.classList.toggle('no-aprs-terr', rd.aprsTerrestrial === false);   // the region's APRS frequency out of band: no APRS monitoring
+  S.aprsMhz = rd.aprsHz ? (rd.aprsHz / 1e6).toFixed(3) : '144.390';                // the region's APRS frequency (Device → Region on the phone)
+  const sfa = document.querySelector('#sfAction option[value="aprs"]'); if (sfa) sfa.textContent = 'APRS monitoring (' + S.aprsMhz + ')';
+  if ($('aprsToggle') && !(S.status && S.status.mode && S.status.mode.aprs)) $('aprsToggle').textContent = 'Monitor ' + S.aprsMhz;
   S.sstv144 = rd.sstv144 !== false;                                            // 144.500 out of band: SSTV runs on the channel the radio is on
   document.body.classList.toggle('no-wx', rd.weather === false);              // no 162 MHz weather channels
   const nav = p => document.querySelector('a[data-page="' + p + '"]');
@@ -296,7 +299,7 @@ function renderAprs() {
 function renderAprsState() {
   const m = (S.status && S.status.mode) || {}; const on = !!m.aprs;
   const c = $('aprsState'); c.textContent = on ? 'MONITORING' : 'OFF'; c.className = 'chip ' + (on ? 'green' : 'dim');
-  $('aprsToggle').textContent = on ? 'Stop monitoring' : 'Monitor 144.390';
+  $('aprsToggle').textContent = on ? 'Stop monitoring' : 'Monitor ' + (S.aprsMhz || '144.390');
   $('beaconBtn').disabled = $('msgForm').querySelector('button').disabled = !(S.status && S.status.webTx);
   $('msgNote').textContent = S.status && S.status.webTx ? '' : 'Sending needs “Allow transmit from the web” on the phone (Device → SignalDeck Web).';
 }

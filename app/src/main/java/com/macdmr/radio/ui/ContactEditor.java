@@ -242,7 +242,7 @@ public final class ContactEditor {
     static String fromMe(android.location.Location me, double lat, double lon) {
         if (me == null) return "";
         double km = Maidenhead.km(me.getLatitude(), me.getLongitude(), lat, lon);
-        return String.format(Locale.US, "  ·  %.1f mi %s", km * 0.621371, Maidenhead.compass(Maidenhead.bearing(me.getLatitude(), me.getLongitude(), lat, lon)));
+        return "  ·  " + com.macdmr.radio.repeaters.GeoUtil.dist(km * 1000) + " " + (Maidenhead.compass(Maidenhead.bearing(me.getLatitude(), me.getLongitude(), lat, lon)));
     }
     public static String ago(long ts) {
         long s = (System.currentTimeMillis() - ts) / 1000;

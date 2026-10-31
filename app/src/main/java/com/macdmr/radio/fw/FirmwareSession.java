@@ -52,13 +52,14 @@ public final class FirmwareSession {
         boolean charging = batteryCharging(c);
         boolean fileOk = image != null && row != null && image.length == row.size && row.sha256.equals(FirmwareVault.sha256(image)) && row.tag.equals(ImageTable.tagOf(image));
         boolean busy = svc.isTransmitting() || svc.scanning() || svc.m17Running() || svc.ft8Running() || svc.packetActive() || svc.scope().running();
+        String model = ImageTable.loaderModel(android.os.Build.MODEL, com.macdmr.radio.DeviceProfile.vendorModel());   // a GSI: the vendor partition names the phone
         String policy;
         if (!fileOk) policy = "The file does not match the known image";
         else if (row.unlisted && !Unlisted.allowed(c)) policy = "That file is not a known module image";
-        else if (row.unlisted) policy = ImageTable.unlistedPolicy(module, backup.verified, android.os.Build.MODEL, svc.profile().stockApp);
-        else policy = ImageTable.refuse(row, module, backup.sha256, backup.tag, android.os.Build.MODEL, svc.profile().stockApp, pkgVer, backup.verified, stockThere);
+        else if (row.unlisted) policy = ImageTable.unlistedPolicy(module, backup.verified, model, svc.profile().stockApp, FirmwareCatalog.rows(c));
+        else policy = ImageTable.refuse(row, module, backup.sha256, backup.tag, model, svc.profile().stockApp, pkgVer, backup.verified, stockThere, FirmwareCatalog.rows(c));
         if (policy == null) {
-            String variant = FirmwareCatalog.variantRefusal(c, android.os.Build.MODEL, svc.profile().stockApp);
+            String variant = FirmwareCatalog.variantRefusal(c, model, svc.profile().stockApp);
             if (variant != null) policy = variant;
         }
         String versionNote = ImageTable.versionWarning(backup.sha256, pkgVer);

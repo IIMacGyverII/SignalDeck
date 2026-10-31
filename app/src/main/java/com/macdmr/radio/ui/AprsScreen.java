@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * APRS monitoring (144.390, the ISS on 145.825, or the KISS TNC): live packet feed, stations heard and messages,
+ * APRS monitoring (the region's APRS frequency, the ISS on 145.825, or the KISS TNC): live packet feed, stations heard and messages,
  * counters since monitoring started, the switches that matter while monitoring, and message / beacon / map /
  * settings / stop.
  */
@@ -51,7 +51,7 @@ public final class AprsScreen extends ModeScreen {
         // switches that matter while monitoring
         LinearLayout chips = new LinearLayout(c); chips.setGravity(Gravity.CENTER_VERTICAL); chips.setPadding(0, dp(8), 0, dp(4));
         ackChip = chip(chips); digiChip = chip(chips); beaconChip = chip(chips); isChip = chip(chips);
-        ackChip.setOnClickListener(v -> { pe.prefs().edit().putBoolean("autoAck", !pe.autoAck()).apply(); pe.applySettings(); refresh(); });
+        ackChip.setOnClickListener(v -> { if (!pe.autoAckAllowed()) return; pe.prefs().edit().putBoolean("autoAck", !pe.autoAck()).apply(); pe.applySettings(); refresh(); });
         digiChip.setOnClickListener(v -> { pe.prefs().edit().putBoolean("digipeat", !pe.digipeat()).apply(); pe.applySettings(); refresh(); });
         beaconChip.setOnClickListener(v -> { pe.prefs().edit().putInt("autoBeacon", (pe.autoBeacon() + 1) % 3).apply(); pe.applySettings(); refresh(); });
         isChip.setOnClickListener(v -> { if (pe.isEnabled()) pe.isStop(); else toast(pe.isStart()); refresh(); });
@@ -141,7 +141,7 @@ public final class AprsScreen extends ModeScreen {
         set(statLast, last == 0 ? "—" : ago(last).replace(" ago", ""));
 
         String[] beacon = { "Beacon off", "Beacon " + pe.beaconMin() + " min", "SmartBeacon" };
-        chipState(ackChip, "Auto-ack", pe.autoAck());
+        chipState(ackChip, pe.autoAckAllowed() ? "Auto-ack" : "No auto-ack (UHF)", pe.autoAck());
         chipState(digiChip, "Digipeater", pe.digipeat());
         chipState(beaconChip, beacon[Math.max(0, Math.min(2, pe.autoBeacon()))], pe.autoBeacon() != 0);
         chipState(isChip, pe.isEnabled() ? "APRS-IS: " + pe.isStatus() : "APRS-IS off", pe.isEnabled());
@@ -171,8 +171,8 @@ public final class AprsScreen extends ModeScreen {
         android.location.Location me = svc.lastKnownLocation();
         for (PacketStore.Station s : st) {
             String dist = "";
-            if (me != null) { float[] r = new float[2]; android.location.Location.distanceBetween(me.getLatitude(), me.getLongitude(), s.lat, s.lon, r); dist = String.format(Locale.US, "   %.1f mi %s", r[0] / 1609.344, compass(r[1])); }
-            String extra = (s.speedKmh >= 0 ? String.format(Locale.US, " · %.0f mph", s.speedKmh * 0.621371) : "") + (s.alt != 0 ? " · " + Math.round(s.alt * 3.28084) + " ft" : "");
+            if (me != null) { float[] r = new float[2]; android.location.Location.distanceBetween(me.getLatitude(), me.getLongitude(), s.lat, s.lon, r); dist = "   " + com.macdmr.radio.repeaters.GeoUtil.dist(r[0]) + " " + compass(r[1]); }
+            String extra = (s.speedKmh >= 0 ? " · " + com.macdmr.radio.repeaters.GeoUtil.speed(s.speedKmh) : "") + (s.alt != 0 ? " · " + com.macdmr.radio.repeaters.GeoUtil.alt(s.alt) : "");
             final PacketStore.Station fs = s;
             row("📍  " + s.call + dist, ago(s.lastTs) + (s.count > 1 ? " · heard " + s.count + "×" : "") + extra + (s.via.isEmpty() ? "" : " · via " + s.via) + (s.comment.isEmpty() ? "" : "\n" + s.comment),
                     Neo.CYAN, () -> ContactEditor.open(c, svc, ContactEditor.Identity.call(fs.call).at(fs.lat, fs.lon, fs.lastTs, "APRS"), null), () -> {

@@ -2,7 +2,7 @@
 
 # Widget and notification
 
-*Pages · 31 of 33*
+*Pages · 32 of 34*
 
 Control the radio without opening the app.
 
@@ -16,7 +16,7 @@ Device → Home widget asks the home screen to add it (confirm with Add), or lon
 
 ## Talk from the widget
 
-A widget cannot feel a held finger, so Talk works tap to start, tap to stop: the button turns red while you transmit. Transmitting stops by itself after 28 seconds. The radio's own limit is 120 seconds. Receive-only channels refuse it.
+A widget cannot feel a held finger, so Talk works tap to start, tap to stop: the button turns red while you transmit. Transmitting stops by itself at the transmit limit (Device → Longest transmission, 2 minutes unless you change it). Receive-only channels refuse it.
 
 ## When the radio is off
 

@@ -74,9 +74,11 @@ public class RadioService extends Service implements RadioEngine.Events {
     private ChannelStore.Channel current;
     private volatile boolean receiving, transmitting, rxAudioOn;
     private volatile int rssi = -999;
+    private volatile long rxBeganAt;                                      // when the last reception began (AgoldUsb.historyLevelFresh, with rssiAt below)
     private volatile long rxStart;
     private volatile boolean rxCounts;   // decided at RECEIVE_START: the matching STOP can arrive after a retune, when "current" is already the next channel
-    private volatile int lastCaller, lastCallType, lastTarget;
+    private volatile int lastCaller, lastCallType, lastTarget, lastCallerCc = -1;
+    private volatile long tunedAt, rssiAt;   // the last channel/VFO write to the module and the last signal reading (fox hunt: settle and fresh readings)
     private String link = "stopped";
     private final com.macdmr.radio.dsp.SoftSquelch softSq = new com.macdmr.radio.dsp.SoftSquelch();
     private volatile boolean monitorOn, recordOn, squelchOpen;
@@ -91,6 +93,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public boolean receiving() { return softSq.isEnabled() ? squelchOpen : receiving; }   // with Soft SQ on the module's squelch is open and it reports a reception all the time: the soft gate is the activity signal
         @Override public boolean softGated() { return softSq.isEnabled(); }
         @Override public long dwellMs() { return profile.scanDwellMs; }
+        @Override public long settleMs() { return profile.scanSettleMs; }
         @Override public ChannelStore.Channel priority() { int n = scanPriority(); ChannelStore.Channel p = n > 0 ? store.byNumber(n) : null; return ChannelStore.tunable(p) ? p : null; }
         @Override public void status(boolean s, boolean h, ChannelStore.Channel on) {
             if (voiceOn()) {
@@ -103,7 +106,11 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Every MCU/audio action runs here, in order — a PTT release can never overtake its press. */
     private final java.util.concurrent.ExecutorService worker = java.util.concurrent.Executors.newSingleThreadExecutor(r -> new Thread(r, "radio-worker"));
     private volatile boolean pttDown;
-    private final Runnable txWatchdog = () -> { if (pttDown) { log("TX watchdog: releasing PTT after 28 s"); ptt(false); } };
+    /** Ends a voice key at the transmit limit (Device → Longest transmission, {@link TxLimit}); not posted for No limit. */
+    private final Runnable txWatchdog = () -> { if (pttDown) { String n = TxLimit.name(txLimitS()); log("TX watchdog: releasing PTT after " + n); history("tx", "\u23F1 Transmission ended at the " + n + " limit"); ptt(false); } };
+    /** The heat watch of the voice key in progress, and a count of voice keys so a late watch never ends the next key. */
+    private volatile Thread voiceHeat;
+    private volatile long voiceKeys;
     private PacketEngine packet;
 
     // ---- simplex repeater (parrot): repeats each reception on the channel it was enabled on ----
@@ -118,6 +125,11 @@ public class RadioService extends Service implements RadioEngine.Events {
     });
     private volatile int parrotChannel = -1;
     private volatile long txStartedAt;
+    /** True while SignalDeck itself unkeys: a SEND_STOP then is ours, not the radio's time-out (the W6+ reports it before ptt() returns). */
+    private volatile boolean unkeying;
+    private void unkey() throws IOException { unkeying = true; try { engine.ptt(false); } finally { unkeying = false; } }
+    /** The label of the transmission SignalDeck plays itself (APRS, FT8, SSTV …), for its history line; null for voice. */
+    private volatile String pcmTxLabel;
 
     // ---- voice keyer and the ten-minute identification timer ----
     private final com.macdmr.radio.ham.VoiceKeyer keyer = new com.macdmr.radio.ham.VoiceKeyer(this);
@@ -139,21 +151,23 @@ public class RadioService extends Service implements RadioEngine.Events {
         transmitPcm(out, "voice keyer: " + nm, () -> { history("pkt", "\uD83C\uDF99 Voice keyer sent: " + nm + (sentId ? " + Morse ID" : "")); if (sentId) markIdentified(); });
         return null;
     }
-    public static final long ID_EVERY_MS = 10 * 60_000L;
+    /** The station-ID interval: the region's (Device → Region), else 10 minutes. */
+    public static long idEveryMs() { return com.macdmr.radio.region.Region.cached().idEveryMs(); }
     private volatile long idClockFrom, lastIdReminder;                       // first transmission since the last identification
     public void markIdentified() { idClockFrom = 0; }
     /** Milliseconds until the next identification is due (negative: overdue), or Long.MAX_VALUE when the timer is not running. */
-    public long idDueInMs() { long f = idClockFrom; return f == 0 ? Long.MAX_VALUE : f + ID_EVERY_MS - System.currentTimeMillis(); }
+    public long idDueInMs() { long f = idClockFrom; return f == 0 ? Long.MAX_VALUE : f + idEveryMs() - System.currentTimeMillis(); }
     private void idTimerOnKey() {
         ChannelStore.Channel c = current;
         if (c == null || !amateurBand(c.txFreq) || packet == null || !packet.callsignSet()) return;
         long now = System.currentTimeMillis();
         if (idClockFrom == 0) { idClockFrom = now; return; }
-        if (now - idClockFrom >= ID_EVERY_MS && !packet.cwIdEnabled() && now - lastIdReminder > 120_000) {
+        if (now - idClockFrom >= idEveryMs() && !packet.cwIdEnabled() && now - lastIdReminder > 120_000) {
             lastIdReminder = now;
             try { android.os.Vibrator v = (android.os.Vibrator) getSystemService(VIBRATOR_SERVICE); if (v != null) v.vibrate(android.os.VibrationEffect.createWaveform(new long[] { 0, 120, 80, 120 }, -1)); } catch (Throwable ignored) { }
-            ui.post(() -> android.widget.Toast.makeText(this, "Give your callsign: it has been 10 minutes since you identified", android.widget.Toast.LENGTH_LONG).show());
-            history("pkt", "\u23F0 Time to identify: 10 minutes since your last ID");
+            final long min = idEveryMs() / 60_000L;
+            ui.post(() -> android.widget.Toast.makeText(this, "Give your callsign: it has been " + min + " minutes since you identified", android.widget.Toast.LENGTH_LONG).show());
+            history("pkt", "\u23F0 Time to identify: " + min + " minutes since your last ID");
         }
     }
 
@@ -162,6 +176,54 @@ public class RadioService extends Service implements RadioEngine.Events {
     public com.macdmr.radio.ham.CallLookup callLookup() { if (lookup == null) lookup = new com.macdmr.radio.ham.CallLookup(this); return lookup; }
     public boolean lookupOnline() { return getSharedPreferences("radio", MODE_PRIVATE).getBoolean("lookupOnline", true); }
     public void setLookupOnline(boolean on) { getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("lookupOnline", on).apply(); }
+
+    // ---- the longest transmission (Device → Longest transmission; owner, 2026-10-30) ----
+    /** The setting in whole seconds, {@link TxLimit#NONE} for no limit; 2 minutes until changed. */
+    public int txLimitSetting() { return TxLimit.valid(getSharedPreferences("radio", MODE_PRIVATE).getInt("txLimitS", -1)); }
+    /** The transmit test session's own limit while it runs (0 = none): its limit check must not depend on the setting. */
+    private volatile int txLimitOverrideS;
+    /** The limit in force now, in seconds (NONE for no limit). */
+    public int txLimitS() { return TxLimit.effective(txLimitSetting(), txLimitOverrideS); }
+    /** The limit in force now in ms, -1 for no limit. */
+    public long txLimitMs() { return TxLimit.limitMs(txLimitS()); }
+    /**
+     * Save the setting (whole seconds, at least 10, or NONE); null when saved, else why not. Changing it is an admin
+     * action in Restricted mode. The module's own timer follows at once when the radio is idle, else after the key.
+     */
+    public String setTxLimit(int s) {
+        if (!adminAllowed("txlimit")) return "The transmit limit is locked in Restricted mode";
+        if (s != TxLimit.NONE && s < TxLimit.MIN_CUSTOM_S) return "The limit is at least " + TxLimit.MIN_CUSTOM_S + " seconds";
+        getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("txLimitS", s).apply();
+        log("transmit limit: " + TxLimit.name(s));
+        applyModuleTot();
+        return null;
+    }
+    /** The transmit test session sets its own limit for its run ({@link TxLimit#TEST_SESSION_S}) and clears it (0) at the end. */
+    public void setTxLimitOverride(int s) { txLimitOverrideS = Math.max(0, s); applyModuleTot(); }
+    /** The module timer value last given to the module (0x3B), for the status-4 history line. */
+    private volatile int moduleTotS = TxLimit.moduleTot(TxLimit.DEFAULT_S);
+    private volatile boolean totPending;
+    /** The module's timer follows the limit in force: the boot handshake's value now, the module itself when it is up and not transmitting. */
+    private void applyModuleTot() {
+        ModuleEngine e = engine; if (e != null) e.setBootTot(TxLimit.moduleTot(txLimitS()));
+        worker.execute(this::sendModuleTot);
+    }
+    /** On the worker. While anything transmits, the 0x3B write waits for the end of that key ({@link #totAfterTx}). */
+    private void sendModuleTot() {
+        ModuleEngine e = engine; if (e == null) return;
+        int tot = TxLimit.moduleTot(txLimitS());
+        Thread st = symThread;
+        if (pttDown || m17Tx || transmitting || (st != null && st.isAlive())) {
+            totPending = true;                                                    // try again shortly: the key's own end path can run before
+            ui.removeCallbacks(totRetry); ui.postDelayed(totRetry, 2000);          // its status 4 or its thread has finished (PR 153 device pass, row D)
+            return;
+        }
+        totPending = false; ui.removeCallbacks(totRetry);
+        if (!isReady() || !e.isOpen() || firmwareBusy) return;                    // the boot handshake sends it
+        try { e.setTot(tot); moduleTotS = tot; log("module transmit timer: " + (tot == 0 ? "off (SignalDeck's limit alone)" : tot + " s")); } catch (IOException ex) { log("module transmit timer: " + ex); }
+    }
+    private void totAfterTx() { if (totPending) worker.execute(this::sendModuleTot); }
+    private final Runnable totRetry = () -> { if (totPending) worker.execute(this::sendModuleTot); };
     private final java.util.concurrent.ExecutorService lookups = java.util.concurrent.Executors.newSingleThreadExecutor(r -> { Thread t = new Thread(r, "call-lookup"); t.setDaemon(true); return t; });
     /** Look a callsign up in the background and fill in the logbook (and {@code then}, with the result, on the worker). */
     public void enrichCall(final String call, final java.util.function.Consumer<com.macdmr.radio.ham.CallLookup.Info> then) {
@@ -186,7 +248,13 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Stop tracking and following passes (the Stop buttons). */
     public void endSatTracking() { setIssRepeat(-1); stopSatTrack(); }
     /** Bench (DIAG vfo): listen on a frequency through the VFO, wide, low power. */
-    void diagVfo(int hz, int power) { ChannelStore.Channel a = new ChannelStore.Channel(); a.type = 1; a.rxFreq = a.txFreq = hz; a.band = 1; a.power = power; a.name = "Bench"; applyVfo(a, false); }   // power 0 = low, 1 = high
+    void diagVfo(int hz, int power) { diagVfo(hz, power, 0); }
+    /** {@code ctcssHz} > 0: the bench VFO transmits that tone (a fox for the fox hunt tests); power 0 = low, 1 = high. */
+    void diagVfo(int hz, int power, double ctcssHz) {
+        ChannelStore.Channel a = new ChannelStore.Channel(); a.type = 1; a.rxFreq = a.txFreq = hz; a.band = 1; a.power = power; a.name = "Bench";
+        int t = ctcssHz > 0 ? ChannelPresets.ctcssIndex(ctcssHz) : -1; if (t >= 0) { a.txType = 1; a.txSubCode = t; }
+        applyVfo(a, false);
+    }
     void diagVfoOff() { if (vfo != null && "Bench".equals(vfo.name)) exitVfo(); }
     /** Record whole passes (AOS to LOS, below the squelch too) as WAV in Download/DMR/Audio/<satellite>/…_pass.wav. */
     public boolean satRecord() { return getSharedPreferences("radio", MODE_PRIVATE).getBoolean("satRecord", true); }
@@ -357,8 +425,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         pushModes();
         return "Parrot on " + ch.name + ": transmissions are repeated a second after they end";
     }
-    /** 2 m, 1.25 m and 70 cm amateur bands (US). */
-    public static boolean amateurBand(int hz) { return (hz >= 144_000_000 && hz <= 148_000_000) || (hz >= 222_000_000 && hz <= 225_000_000) || (hz >= 420_000_000 && hz <= 450_000_000); }
+    /** Inside the region's amateur bands (Device → Region; before one is chosen, the US 2 m, 1.25 m and 70 cm bands). */
+    public static boolean amateurBand(int hz) { return com.macdmr.radio.region.Region.cached().amateur(hz); }
     public PacketEngine packet() { return packet; }
     private final DiagReceiver diag = new DiagReceiver();
     private RadioIdStore radioId;
@@ -507,7 +575,9 @@ public class RadioService extends Service implements RadioEngine.Events {
     private final PacketEngine.Host packetHost = new PacketEngine.Host() {
         @Override public android.content.Context context() { return RadioService.this; }
         @Override public boolean analogRx() { ChannelStore.Channel c = current; return c != null && !c.isDigital(); }
+        @Override public boolean hasVhf() { return profile.hasTwoMetre(); }
         @Override public int rxFreqHz() { ChannelStore.Channel c = current; return c == null ? 0 : c.rxFreq; }
+        @Override public int aprsHz() { return RadioService.this.aprsHz(); }
         @Override public int channelNumber() { ChannelStore.Channel c = current; return c == null ? 0 : c.number; }
         @Override public String channelName() { ChannelStore.Channel c = current; return c == null ? "" : c.name; }
         @Override public boolean txBusy() { return pttDown; }
@@ -516,6 +586,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public boolean tonePath() { return RadioService.this.tonePath(); }
         @Override public String transmitTones(java.util.List<com.macdmr.radio.ham.ToneQueue.Pair> pairs, int amplitude, String label, Runnable done) { return RadioService.this.transmitTones(pairs, amplitude, label, done); }
         @Override public String longTxWait(int ms) { return thermal.gate(ms); }
+        @Override public int txCapMs() { return TxLimit.capMs(txLimitS()); }
+        @Override public String txLimitName() { return TxLimit.name(txLimitS()); }
         @Override public android.location.Location location() { return lastKnownLocation(); }
         @Override public void stationHeard(String call, double lat, double lon, long ts, String detail) { ChannelStore.Contact pc = store.contactByCallsign(call); if (pc != null) store.contactHeard(pc.id, ts, "APRS", detail, lat, lon); }
         @Override public void sentTo(String call, String source, String detail) { ChannelStore.Contact pc = store.contactByCallsign(call); if (pc != null) store.contactSent(pc.id, System.currentTimeMillis(), source, detail); }
@@ -662,18 +734,16 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Hands-free one-shot transmission: key, play the PCM through the TX path, release, resume RX. */
     public void transmitPcm(final short[] pcm, final String label, final Runnable onDone) { transmitPcm(pcm, label, onDone, false); }
-    /** liftLimit is the one bench tone that may run to 40 s. It uses engine.ptt, so the 28 s voice watchdog is not in this path. */
-    private void transmitPcm(final short[] pcm, final String label, final Runnable onDone, final boolean liftLimit) { transmitPcm(pcm, label, onDone, liftLimit ? 40000 : 28500); }
+    /** liftLimit is the bench tone that may run to 40 s (diagTestTone clamps it); the transmit limit still applies. */
+    private void transmitPcm(final short[] pcm, final String label, final Runnable onDone, final boolean liftLimit) { transmitPcm(pcm, label, onDone, liftLimit ? 40000 : Integer.MAX_VALUE); }
 
     /** The cool-down guard for transmissions longer than 30 s (the bench's heat table, 2026-10-25). */
     public final ThermalGuard thermal = new ThermalGuard();
-    /** The longest one transmission may run: the module's own 120 s time-out less a margin (FW19 ceiling 120.3 s, stock firmware 120 s start-up value, `setTot(120)` since 2026-10-25). */
-    public static final int TX_MAX_MS = 118_000;
 
     /**
-     * Key, play 8 kHz PCM, release. {@code maxMs} is the caller's limit: 28.5 s for everything that has not been
-     * measured longer (the voice watchdog stays 28 s), up to {@link #TX_MAX_MS} for the long SSTV modes, which also
-     * pass the cool-down guard first.
+     * Key, play 8 kHz PCM, release. Audio longer than the transmit limit ({@link #txLimitS}) or the caller's own
+     * {@code maxMs} is refused, not cut. Anything longer than 30 s passes the cool-down guard first and runs under the
+     * in-key heat watch, whatever the limit (No limit included).
      */
     private void transmitPcm(final short[] pcm, final String label, final Runnable onDone, final int maxMs) {
         worker.execute(() -> {
@@ -682,8 +752,8 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (txInhibited()) { log("TX " + label + " blocked: receive-only channel"); history("warn", "\u26D4 TX blocked on a receive-only channel"); return; }
                 if (pttDown) { log("TX " + label + " skipped: PTT busy"); return; }
                 int ms = pcm.length / 8;
-                int cap = Math.min(maxMs, TX_MAX_MS);
-                if (ms > cap) { log("TX " + label + " refused: " + ms + " ms over " + cap); history("warn", "\u26D4 Too long to send (" + label + ", " + Math.round(ms / 1000.0) + " s; the radio allows " + (cap / 1000) + " s)"); return; }
+                int limit = TxLimit.capMs(txLimitS()), cap = Math.min(maxMs, limit);
+                if (ms > cap) { log("TX " + label + " refused: " + ms + " ms over " + cap); history("warn", "\u26D4 Too long to send (" + label + ", " + Math.round(ms / 1000.0) + " s; " + (cap == limit ? "the transmit limit is " + TxLimit.name(txLimitS()) + ", Device \u2192 Longest transmission" : "this sender allows " + (cap / 1000) + " s") + ")"); return; }
                 Thread heatWatch = null;
                 if (ms > ThermalGuard.LONG_MS) {
                     String wait = thermal.gate(ms, ThermalGuard.batteryC(this));
@@ -691,12 +761,18 @@ public class RadioService extends Service implements RadioEngine.Events {
                     thermal.beforeLong();
                     heatWatch = heatWatchdog(label);
                 }
-                pttDown = true;
+                pttDown = true; txStartedAt = System.currentTimeMillis(); pcmTxLabel = label;   // the history line and the time-out check are about this transmission
                 if (audio != null) audio.stopRx();
+                long keyedAt = System.currentTimeMillis();
                 engine.ptt(true);
                 log("TX " + label + " (" + ms + " ms)");
-                try { Thread.sleep(200); if (audio != null) log(audio.playPcm(pcm)); }
-                finally { if (heatWatch != null) heatWatch.interrupt(); engine.ptt(false); pttDown = false; thermal.after(ms); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); holdAfterTx(); }
+                try {
+                    if (profile.txAudioOnSendStart) {                    // the Xplore 1: audio only once the module reports SEND_START
+                        if (!awaitSendStart(keyedAt, SEND_START_WAIT_MS, false)) { log("TX " + label + ": no SEND_START, nothing sent"); history("warn", "\u26A0\uFE0F " + label + " not sent: the radio did not report transmitting"); }
+                        else if (audio != null) log(audio.playPcm(pcm));
+                    } else { Thread.sleep(200); if (audio != null) log(audio.playPcm(pcm)); }
+                }
+                finally { if (heatWatch != null) heatWatch.interrupt(); unkey(); pttDown = false; thermal.after(ms); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); holdAfterTx(); totAfterTx(); }
                 if (ms > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(ms / 1000.0) + " s (" + label + "); " + thermal.state());
                 if (onDone != null) onDone.run();
             } catch (Throwable t) { log("TX " + label + ": " + t); try { engine.ptt(false); } catch (Throwable ignored) { } pttDown = false; }
@@ -733,8 +809,12 @@ public class RadioService extends Service implements RadioEngine.Events {
         } catch (Throwable t) { log("notify: " + t); }
     }
 
-    /** APRS monitoring: park on the APRS frequency (through the VFO, so the channel comes back) and decode. */
-    public String aprsMonitor(boolean on) { return aprsMonitorAt(on, PacketEngine.APRS_FREQ_HZ, "APRS 144.390"); }
+    /** APRS monitoring: park on the region's APRS frequency (through the VFO, so the channel comes back) and decode. */
+    public String aprsMonitor(boolean on) { int hz = aprsHz(); return aprsMonitorAt(on, hz, "APRS " + com.macdmr.radio.region.Region.mhz(hz)); }
+    /** The terrestrial APRS frequency: the region's (Device → Region) or the user's own; 144.390 before a region is chosen. */
+    public int aprsHz() { return com.macdmr.radio.region.Region.current(this).aprsHz; }
+    /** This radio tunes the region's APRS frequency (else APRS monitoring is hidden, as on a UHF-only radio). */
+    public boolean aprsTunable() { return profile != null && profile.tunable(aprsHz()); }
     private volatile int aprsMonitorHz = PacketEngine.APRS_FREQ_HZ;
     public int aprsMonitorHz() { return aprsMonitorHz; }
     /** APRS monitoring on another frequency (the ISS digipeater on 145.825). */
@@ -765,6 +845,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         watchUsbDuringTx();
         watchPlugChanges();
         ProfileRegistry.init(this);
+        com.macdmr.radio.region.Region.ensureDefault(this); com.macdmr.radio.region.Region.current(this);   // the region's defaults before anything reads them
         profile = DeviceProfile.detect();
         softSq.toneDetect = profile.subaudible; softSq.setNoiseTable(profile.softSqThresholds, profile.softSqCloseCap);   // the W6: noise only, on its own scale
         ProfileRegistry.maybeFetch();                               // a newer revision or an advisory, at most every 12 h
@@ -773,6 +854,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         zoneId = getSharedPreferences("radio", MODE_PRIVATE).getLong("zone", 0);
         if (coverage().enabled()) { coverage.resume(); startForegroundTyped(true); }
         engine = "sa818".equals(profile.protocol) ? new AtModuleEngine(profile, this) : new RadioEngine(profile, this);   // the W6's AT module, else the DMR module
+        engine.setBootTot(moduleTotS = TxLimit.moduleTot(txLimitS()));            // the boot handshake gives the module the transmit limit
         if (profile.muteLines != null && !profile.appPlayback) {                                 // the module drives the speaker itself: follow Android's media volume, like the stock app
             followMediaVolume();
             try { registerReceiver(mediaVolume, new android.content.IntentFilter("android.media.VOLUME_CHANGED_ACTION")); } catch (Throwable t) { log("volume receiver: " + t); }
@@ -901,17 +983,18 @@ public class RadioService extends Service implements RadioEngine.Events {
                         if (!rp.contains("agoldUsbRouting")) rp.edit().putString("agoldUsbRouting", prev).apply();
                         log("USB audio routing off while SignalDeck has the radio (was " + prev + ")");
                     }
+                    else if (ExtModuleLink.isSocket(profile.controlPort)) log("control port: extmodule's command socket (" + profile.controlPort + "), no tty to set");
                     else if (!VendorSerial.load(this, profile.serialLib)) log("tty (stty fallback): " + RootSetup.ensureTty(profile));
                     if (RootSetup.stockAppEnabled(profile)) { log("stock app paused (its icon disappears while this app owns the radio; Device → Release brings it back): " + RootSetup.stockApp(profile, false)); pausedStock = true; Thread.sleep(1500); }
                 }
                 final boolean sa818 = "sa818".equals(profile.protocol);                      // the W6: no DMR, its own channel table
                 final boolean quickChat = "com.chamsion.quickchat".equals(profile.stockApp);      // Xplore 1: a Room database, no module side tables
-                final boolean prizeStock = !sa818 && !quickChat && !agold && !flyscaleDmr();                        // the Armors' stock app: DMR ID and TG lists to read
+                final boolean prizeStock = !sa818 && !quickChat && !agoldStock() && !flyscaleDmr();                        // the Armors' stock app: DMR ID and TG lists to read
                 if (store.count() == 0 && !getSharedPreferences("radio", MODE_PRIVATE).getBoolean("stockImportDeclined", false)) {   // no channels: ask before importing the stock app's (owner, 2026-10-28)
                     stockImportPending = true; log("no channels: asking whether to import the stock app's");
                     ui.post(() -> { for (Listener l : new ArrayList<>(listeners)) l.onStockImportOffer(); });
                 }
-                if (agold && !getSharedPreferences("radio", MODE_PRIVATE).contains("dmrId")) {         // the Atom XL's stock app keeps its DMR ID as device_id (unset = 1)
+                if (agoldStock() && !getSharedPreferences("radio", MODE_PRIVATE).contains("dmrId")) {   // the Agold intercom app (Atom XL, Armor 3WT) keeps its DMR ID as device_id (unset = 1)
                     java.util.regex.Matcher m = java.util.regex.Pattern.compile("name=\"device_id\" value=\"([0-9]+)\"").matcher(RootSetup.run("cat /data/data/" + profile.stockApp + "/shared_prefs/intercom_prefs.xml 2>/dev/null"));
                     if (m.find() && Integer.parseInt(m.group(1)) > 1) { setLocalIdQuiet(Integer.parseInt(m.group(1))); log("DMR ID from the stock app: " + m.group(1)); }
                 }
@@ -926,7 +1009,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 }
                 if (prizeStock && !getSharedPreferences("radio", MODE_PRIVATE).getBoolean("tgListsImported", false)) {   // installs imported before TG lists were read
                     StringBuilder err = new StringBuilder();
-                    int k = store.repairModuleTgLists(this, profile.stockApp, "default_uhf", err);
+                    int k = store.repairModuleTgLists(this, profile.stockApp, profile.stockAreaPrefix, profile.stockDefaultArea, err);
                     log(k >= 0 ? "module TG lists imported; " + k + " channels got their list" : "TG list import failed: " + err);
                     if (k >= 0) getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("tgListsImported", true).apply();
                 }
@@ -941,6 +1024,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 selectChannel(tunableNumber(store.activeNumber()));
                 startRxAudio();
                 setLink("ready");
+                applyModuleTot();                                                     // a module that stayed powered had no boot handshake: give it the limit now
                 if (agold) {                                  // Agold's App block would stop SignalDeck a few minutes after the screen goes off
                     String blocked = AgoldUsb.appBlockProblem(getPackageName());
                     if (blocked != null) {
@@ -992,7 +1076,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             try { if (parrot.enabled()) parrot.setEnabled(false); } catch (Throwable ignored) { }
             try { if (foxTxOn()) setFoxTx(false); } catch (Throwable ignored) { }
             try { stopSatTrack(); } catch (Throwable ignored) { }
-            try { if (audio != null) { audio.stopRx(); rxAudioOn = false; if (restoreStock) audio.releaseForStockApp(); } } catch (Throwable ignored) { }
+            try { if (audio != null) { audio.stopRx(); rxAudioOn = false; if (restoreStock || audio instanceof ExtModuleAudio) audio.releaseForStockApp(); } } catch (Throwable ignored) { }   // the 3WT: its audio socket closes either way
             if ("agold".equals(profile.protocol)) {      // both buttons give the USB port back (owner, 2026-10-28); Hand back checks the bridge first
                 try { engine.close(); } catch (Throwable ignored) { }
                 restoreUsbRouting();
@@ -1051,13 +1135,14 @@ public class RadioService extends Service implements RadioEngine.Events {
     private void startRxAudio() {
         try {
             if (audio == null) {
-                audio = profile.audio == DeviceProfile.Audio.UART_PCM ? new UartPcmAudio(profile.pcmPort, profile.pcmBaud)
-                        : profile.audio == DeviceProfile.Audio.CAMCORDER ? new CamcorderAudio(profile.appPlayback, profile.camcorderGain) : vendorOrDirectAudio();
+                audio = profile.audio == DeviceProfile.Audio.EXTMODULE ? new ExtModuleAudio(ExtModuleLink.audioRate(RootSetup.run("getprop " + ExtModuleLink.PROP_32K)))   // the Armor 3WT: extmodule's audio socket
+                        : profile.audio == DeviceProfile.Audio.UART_PCM ? new UartPcmAudio(profile.pcmPort, profile.pcmBaud)
+                        : profile.audio == DeviceProfile.Audio.CAMCORDER ? new CamcorderAudio(profile.appPlayback, profile.camcorderGain, profile.gatewayLinesOn, profile.gatewayLinesOff, profile.txAudioScale, (android.media.AudioManager) getSystemService(AUDIO_SERVICE), profile.gatewayVolume) : vendorOrDirectAudio();
                 audio.setSink((b, len) -> { if (!injecting) onRxPcm(b, len); });   // a bench injection replaces the live audio while it plays
                 audio.setGate(() -> squelchOpen && !muted && !rawHeld() && !(profile.appPlayback && pttDown) && !dataQuiet());   // M17 in play, a data mode without MON, or app playback while keyed: the raw FM stays off the speaker; decoded M17 voice has its own track
             }
             if (agoldBridge() && audio instanceof AlsaDirectAudio)        // the bridge's stream stops after 20-70 s of capture: open it per reception, as the stock app does
-                ((AlsaDirectAudio) audio).setOnCaptureEnded(err -> recoverBridgeAudio("the USB capture ended by itself (" + err + ")"));   // a dead stream stays dead until the bridge restarts, reception or not
+                ((AlsaDirectAudio) audio).setOnCaptureEnded(this::captureEnded);
             String r = agoldBridge() ? "USB capture opens at each reception" : audio.startRx(true);
             audioStart = r; log(r); rxAudioOn = true; audioError = r != null && r.startsWith("startRx failed") ? r : null;
         } catch (Throwable t) { audioError = String.valueOf(t) + (t.getCause() != null ? " / " + t.getCause() : ""); log("audio: " + t); }
@@ -1125,6 +1210,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             else parrot.feed(mono, n, open && hearing(), System.currentTimeMillis());
         }
         if (open && current != null && !current.isDigital() && !(current.rxFreq >= 162_400_000 && current.rxFreq <= 162_550_000)) {
+            toneBank.setEnergyMin(profile.toneEnergyMin);
             toneBank.processMono(mono, n);
             int ti = toneBank.detectedIndex();
             if (ti >= 0 && ti != toneAnnounced) {
@@ -1199,7 +1285,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (step == 1) {
                     int band = ch.rxFreq < 300_000_000 ? 1 : ch.band;
                     synchronized (tunes) { tunes.addLast(new Object[] { ch, false }); }
-                    engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, 8, 2);
+                    tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, profile.analogVolume, 2);
                     engine.setMonitor(false); engine.setSquelch(hardwareSq(ch));
                     what[0] = "channel (0x23), monitor 2 (0x2F), squelch " + hardwareSq(ch) + " (0x30)";
                 } else { engine.setMonitorRaw(0); what[0] = "monitor 0 (0x2F)"; }
@@ -1272,12 +1358,20 @@ public class RadioService extends Service implements RadioEngine.Events {
         }
     }
 
-    /** The first bench image whose receive handler admits every call while the flag is on (promiscuous receive, phonedmrapp docs/promiscuous-rx-patch-spec-2026-10-24.md). */
-    static final int PROMISCUOUS_FW = 26;
-    /** True when MON on this channel also means "every call": a digital channel and a module running FW26 or later. */
+    /**
+     * The first bench image proven on the air to admit every call while the flag is on (promiscuous receive, phonedmrapp
+     * docs/promiscuous-rx-patch-spec-2026-10-24.md). None yet: on FW57 (2026-10-30) a real out-of-list TG 99 call was not
+     * admitted with the flag acknowledged, and the flag also changes the colour-code handling of the next channel write.
+     * Owner decision: hidden until an image proves admission (FW58 work); then set this to that image's tag number.
+     */
+    static final int PROMISCUOUS_FW = Integer.MAX_VALUE;
+    /** True when MON on this channel also means "every call": a digital channel and a module running a proven image. */
     public boolean promiscuousCapable() {
         ChannelStore.Channel ch = current;
-        return ch != null && ch.isDigital() && Firmware.stubTag(moduleVersion) && Firmware.tagNumber(moduleVersion) >= PROMISCUOUS_FW;
+        return promiscuousCapable(ch != null && ch.isDigital(), moduleVersion);
+    }
+    static boolean promiscuousCapable(boolean digitalChannel, String moduleVersion) {
+        return digitalChannel && Firmware.stubTag(moduleVersion) && Firmware.tagNumber(moduleVersion) >= PROMISCUOUS_FW;
     }
     /** MON is on and the module is admitting every call (talkgroup, ID and colour code ignored), so the caller line carries CC and slot. */
     public boolean promiscuousOn() { return monitorOn && promiscuousCapable(); }
@@ -1572,9 +1666,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         try {
             int band = ch.rxFreq < 300_000_000 ? 1 : ch.band;
             synchronized (tunes) { tunes.addLast(new Object[] { ch, false }); }   // answered like any channel write
-            engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, 8, 2);
+            tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, profile.analogVolume, 2);
             if (profile.globalSquelch) engine.setSquelch(hardwareSq(ch));
-            if (dataReceive) scheduleDataHold(true);
+            if (dataReceive) scheduleDataHold(true, true);
         } catch (IOException e) { log("squelch rewrite: " + e); }
     }
 
@@ -1592,25 +1686,27 @@ public class RadioService extends Service implements RadioEngine.Events {
             synchronized (tunes) { if (tunes.size() > 8) tunes.clear(); tunes.addLast(new Object[] { ch, fromStore }); }
             tgOverride.onApply(ch);                                          // a talkgroup picked on the intercom lasts until another channel is tuned
             if (ch.isDigital()) {
+                if (dataReceive) endDataHoldForDigital();                          // the hold's WORK_MODE 0x80 kills DMR sync: release it before this write, never after
                 int id = !fromStore && ch.mode > 0 ? ch.mode : localId();          // VFO may transmit under another DMR ID
                 int[] call = tgOverride.call(ch);
-                engine.setDigital(ch.rxFreq, ch.txFreq, id, tgOverride.groups(ch), call[0], call[1], ch.power, ch.cc, ch.inSlot, ch.outSlot, 8, 4);
+                tunedAt = System.currentTimeMillis(); engine.setDigital(ch.rxFreq, ch.txFreq, id, tgOverride.groups(ch), call[0], call[1], ch.power, ch.cc, ch.inSlot, ch.outSlot, 8, 4);
                 engine.setInterrupt(ch.interrupt == 1);
+                if (profile.politeAfterChannel >= 0) engine.setPolite(profile.politeAfterChannel);   // QuickChat follows every channel with 0x37 (0 = off)
             } else if (ch.isM17()) {
-                engine.setAnalog(ch.rxFreq, ch.txFreq, 1, ch.power, hardwareSq(ch), 0, 0, 0, 0, 8, 2);   // wide FM; M17 is layered on top
+                tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, 1, ch.power, hardwareSq(ch), 0, 0, 0, 0, profile.analogVolume, 2);   // wide FM; M17 is layered on top
                 lastChannelWrite = System.currentTimeMillis();
                 if (profile.globalSquelch) {
                     final boolean mon = monitorOn && !moved(ch); final int sq = hardwareSq(ch); final long token = ++postWriteToken;
-                    pendingPostWrite = () -> { if (postWriteToken != token) return; postWriteToken++; worker.execute(() -> { try { engine.setMonitor(mon); engine.setSquelch(sq); } catch (IOException e) { log("monitor/squelch: " + e); } }); };
+                    pendingPostWrite = () -> { if (postWriteToken != token) return; postWriteToken++; worker.execute(() -> { try { engine.setMonitor(mon); engine.setSquelch(sq); politeAfterChannel(); } catch (IOException e) { log("monitor/squelch: " + e); } }); };
                     ui.postDelayed(() -> { Runnable r = pendingPostWrite; if (r != null && postWriteToken == token) { log("no channel acknowledgement in 1.5 s: monitor and squelch sent anyway"); r.run(); } }, 1500);
                 }
             } else {
                 int band = ch.rxFreq < 300_000_000 ? 1 : ch.band;      // VHF must be band=1 (band=0 deafens the RX)
-                engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, 8, 2);
+                tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, profile.analogVolume, 2);
                 lastChannelWrite = System.currentTimeMillis();
                 if (profile.globalSquelch) {                              // this module's squelch follows 0x30; QuickChat sends monitor and squelch 200 ms after the channel's acknowledgement
                     final boolean mon = monitorOn && !moved(ch); final int sq = hardwareSq(ch); final long token = ++postWriteToken;
-                    pendingPostWrite = () -> { if (postWriteToken != token) return; postWriteToken++; worker.execute(() -> { try { engine.setMonitor(mon); engine.setSquelch(sq); } catch (IOException e) { log("monitor/squelch: " + e); } }); };
+                    pendingPostWrite = () -> { if (postWriteToken != token) return; postWriteToken++; worker.execute(() -> { try { engine.setMonitor(mon); engine.setSquelch(sq); politeAfterChannel(); } catch (IOException e) { log("monitor/squelch: " + e); } }); };
                     ui.postDelayed(() -> { Runnable r = pendingPostWrite; if (r != null && postWriteToken == token) { log("no channel acknowledgement in 1.5 s: monitor and squelch sent anyway"); r.run(); } }, 1500);
                 }
             }
@@ -1633,7 +1729,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             pushModes();
             describeLocation(ch);
             updateNotification();
-            if (dataReceive) scheduleDataHold(true);
+            if (dataReceive) scheduleDataHold(true, true);
             followM17Channel(ch);
             return true;
         } catch (IOException e) { log("select: " + e); return false; }
@@ -1666,7 +1762,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     double km = r[0] / 1000.0, mi = km * 0.621371; float b = (r[1] + 360) % 360;
                     String[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
                     String arrow = b < 22.5 || b >= 337.5 ? "\u2191" : b < 67.5 ? "\u2197" : b < 112.5 ? "\u2192" : b < 157.5 ? "\u2198" : b < 202.5 ? "\u2193" : b < 247.5 ? "\u2199" : b < 292.5 ? "\u2190" : "\u2196";
-                    dist = String.format(Locale.US, "\n(%s%s %.1fmi (%.1fkm))", arrow, dirs[(int) Math.round(b / 45.0) % 8], mi, km);
+                    dist = com.macdmr.radio.region.Region.km() ? String.format(Locale.US, "\n(%s%s %.1fkm)", arrow, dirs[(int) Math.round(b / 45.0) % 8], km) : String.format(Locale.US, "\n(%s%s %.1fmi (%.1fkm))", arrow, dirs[(int) Math.round(b / 45.0) % 8], mi, km);
                 }
             } catch (Throwable ignored) { }
             double el = ch.elev;
@@ -1760,7 +1856,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (!isNew && current != null && current.id == ch.id) selectChannel(ch.number);
     }
 
-    private void setLocalIdQuiet(int id) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("dmrId", id).apply(); }
+    private void setLocalIdQuiet(int id) { if (id >= 1 && id <= ChannelStore.MAX_DMR_ID) getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("dmrId", id).apply(); }
 
     public void setLocalId(int id) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("dmrId", id).apply(); if (current != null && current.isDigital()) selectChannel(current.number); }
 
@@ -1858,23 +1954,23 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Stock "areas" (one channel database each): keys like default_uhf, usa, eu … */
     public java.util.List<String> stockAreas() {
-        if ("agold".equals(profile.protocol)) {                         // the Atom XL: areas in the stock app's intercom.db ("1 Default (16 channels)")
+        if (agoldStock()) {                                             // the Atom XL and Armor 3WT: areas in the stock app's intercom.db ("1 Default (16 channels)")
             java.util.List<String> a = ChannelStore.agoldAreas(this, profile.stockApp);
             if (a.isEmpty()) a.add("1 Default");
             return a;
         }
         java.util.List<String> out = new java.util.ArrayList<>();
-        for (String l : RootSetup.run("ls /data/data/" + profile.stockApp + "/databases/ 2>/dev/null").split("\\s+")) { java.util.regex.Matcher m = java.util.regex.Pattern.compile("database_channel_area_(\\w+)\\.db").matcher(l); if (m.matches()) out.add(m.group(1)); }
-        if (out.isEmpty()) out.add("default_uhf");
+        for (String l : RootSetup.run("ls /data/data/" + profile.stockApp + "/databases/ 2>/dev/null").split("\\s+")) { java.util.regex.Matcher m = java.util.regex.Pattern.compile(java.util.regex.Pattern.quote(profile.stockAreaPrefix) + "(\\w+)\\.db").matcher(l); if (m.matches()) out.add(m.group(1)); }
+        if (out.isEmpty()) out.add(profile.stockDefaultArea);
         return out;
     }
-    public String reimportFromStock() { return reimportFromStock("default_uhf"); }
+    public String reimportFromStock() { return reimportFromStock(profile.stockDefaultArea); }
     /** The stock app keeps its channels in areas (the DMR phones' app); the W6's and the Xplore 1's have one list. */
     public boolean stockHasAreas() { return !"sa818".equals(profile.protocol) && !"com.chamsion.quickchat".equals(profile.stockApp) && !flyscaleDmr(); }
     /** The W6Plus DMR's stock app: one channel database (128 slots), the DMR ID in its in-use slot. */
     private boolean flyscaleDmr() { return "com.flyscale.dmr".equals(profile.stockApp); }
     /** The Atom XL's stock app has channels only (no contacts, history or messages SignalDeck imports). */
-    public boolean stockImportsChannelsOnly() { return "agold".equals(profile.protocol); }
+    public boolean stockImportsChannelsOnly() { return agoldStock(); }
     /** The area the Atom XL's stock app is on (its curr_area setting, 1 when unset). */
     int agoldCurrentArea() {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("name=\"curr_area\" value=\"([0-9]+)\"").matcher(RootSetup.run("cat /data/data/" + profile.stockApp + "/shared_prefs/intercom_prefs.xml 2>/dev/null"));
@@ -1891,17 +1987,37 @@ public class RadioService extends Service implements RadioEngine.Events {
             n = store.importFromFlyscaleDmr(this, profile.stockApp, m.find() ? Integer.parseInt(m.group(1)) : 0, id, err);
             if (n >= 0 && id[0] > 0 && !getSharedPreferences("radio", MODE_PRIVATE).contains("dmrId")) { setLocalIdQuiet(id[0]); log("DMR ID from the stock app: " + id[0]); }
         }
-        else if ("agold".equals(profile.protocol)) {                     // areaKey "3 USA FRS (14 channels)", or null for the stock app's current area
+        else if (agoldStock()) {                                         // areaKey "3 USA FRS (14 channels)", or null for the stock app's current area
             java.util.regex.Matcher m = areaKey == null ? null : java.util.regex.Pattern.compile("^(\\d+)").matcher(areaKey.trim());
             n = store.importFromAgold(this, profile.stockApp, m != null && m.find() ? Integer.parseInt(m.group(1)) : agoldCurrentArea(), err);
         }
-        else n = store.importFromStock(this, profile.stockApp, areaKey == null ? "default_uhf" : areaKey, err);
+        else n = store.importFromStock(this, profile.stockApp, profile.stockAreaPrefix, areaKey == null ? profile.stockDefaultArea : areaKey, err);
         if (n >= 0) {
             getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("tgListsImported", true).putBoolean("stockImportDeclined", false).apply();   // imported: an empty list asks again later
             stockImportPending = false; int keep = tunableNumber(store.activeNumber()); selectChannel(keep);
         }
         log(n >= 0 ? "imported " + n + " channels from the stock app" + (err.length() > 0 ? " (" + err + ")" : "") : "stock import failed: " + err);
-        return n >= 0 ? "Imported " + n + " channels" + (err.length() > 0 ? " (" + err + ")" : "") : "Import failed: " + err;
+        String tones = n > 0 ? toneNote(store.all()) : null;
+        if (tones != null) history("warn", "🎵 " + tones);
+        return n >= 0 ? "Imported " + n + " channels" + (err.length() > 0 ? " (" + err + ")" : "") + (tones != null ? ". " + tones : "") : "Import failed: " + err;
+    }
+
+    /**
+     * The imported analog channels that only open for a sub-audible tone, said once: the W6Plus DMR's stock app sets
+     * CTCSS 62.5 Hz on every factory channel without showing it, so a radio sending no tone is never heard there
+     * (owner, 2026-10-29). Nothing is changed; null when no analog channel has a receive tone.
+     */
+    static String toneNote(List<ChannelStore.Channel> chans) {
+        int n = 0, analog = 0; java.util.Map<String, Integer> kinds = new java.util.TreeMap<>();
+        for (ChannelStore.Channel c : chans) {
+            if (c.isDigital() || c.isM17()) continue;
+            analog++;
+            if (c.rxType != 0) { n++; kinds.merge(com.macdmr.radio.dsp.ToneTable.toneLabel(c.rxType, c.rxSubCode), 1, Integer::sum); }
+        }
+        if (n == 0) return null;
+        String which = kinds.size() == 1 ? " (" + kinds.keySet().iterator().next() + ")" : "";
+        return (n == analog ? "All " + n : n + " of " + analog) + " imported analog channels open only for a receive tone" + which
+                + ", as the stock app had them: a radio that sends no tone is not heard there. Set RX tone type to None in the channel editor if you need to";
     }
 
     private volatile boolean stockImportPending;
@@ -1921,12 +2037,18 @@ public class RadioService extends Service implements RadioEngine.Events {
         return reimportFromStock(null);
     }
 
-    public int localId() { return getSharedPreferences("radio", MODE_PRIVATE).getInt("dmrId", 1); }
+    /** This radio's DMR ID; 1 (the stock default) when none is set or the stored one is out of range, which the module refuses and then stops answering (W6Plus DMR, 2026-10-29). */
+    public int localId() { int id = getSharedPreferences("radio", MODE_PRIVATE).getInt("dmrId", 1); return id >= 1 && id <= ChannelStore.MAX_DMR_ID ? id : 1; }
 
     // ---- PTT ----------------------------------------------------------------------------------------
 
+    /** Set by the Transmit test session around each of its keys (a profile with txTestUnverified may key then). */
+    public volatile boolean txTestKeying;
+    /** Whether this profile may transmit now: a verified one, or an untested one that allows the Transmit test session while it keys. */
+    private boolean profileMayTransmit() { return profile.verified || (profile.txTestUnverified && txTestKeying); }
+
     public boolean txInhibited() {
-        if (!profile.verified || ProfileRegistry.transmitBlocked()) return true;   // an untested profile never transmits; an advisory can switch it off (the Xplore 1 keys through a GPIO line)
+        if (!profileMayTransmit() || ProfileRegistry.transmitBlocked()) return true;   // an untested profile never transmits; an advisory can switch it off (the Xplore 1 keys through a GPIO line)
         ChannelStore.Channel ch = current;
         if (ch == null) return true;
         if (ch.isM17() && !m17CanSend()) return true;             // stock firmware: an M17 channel is receive-only
@@ -1940,7 +2062,33 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Key or unkey with a browser's microphone as the audio (SignalDeck Web). */
     public void pttFromWeb(boolean down, AudioBackend.TxFeed feed) { if (down) webFeedNext = feed; ptt(down); }
 
+    /** The last PTT request (set at once, before the worker gets to it): a release during a key's wait cancels the key. */
+    private volatile boolean pttWanted;
+    /** How long a key waits for the module's SEND_START before giving up on the audio (txAudioOnSendStart profiles). */
+    static final long SEND_START_WAIT_MS = 2000;
+    private volatile long sendStartAt;
+    /** Wait until the module reports SEND_START after {@code keyedAt}, at most {@code ms}; false when it did not (or, for {@code voice}, PTT was let go first). */
+    private boolean awaitSendStart(long keyedAt, long ms, boolean voice) {
+        long end = keyedAt + ms;
+        while (sendStartAt < keyedAt && System.currentTimeMillis() < end && pttDown && (!voice || pttWanted)) { try { Thread.sleep(10); } catch (InterruptedException e) { return false; } }
+        return sendStartAt >= keyedAt;
+    }
+
+    /** QuickChat (the Xplore 1) after every channel's acknowledgement: interrupt off (0x35 2), then 0x37 polite at its setting (0). */
+    private void politeAfterChannel() throws IOException {
+        if (profile.politeAfterChannel < 0) return;
+        engine.setInterrupt(false); engine.setPolite(profile.politeAfterChannel);
+    }
+
+    /** Waits {@code ms} on the worker; false as soon as PTT is released meanwhile. */
+    private boolean waitWhilePttWanted(long ms) {
+        long end = System.currentTimeMillis() + ms;
+        while (pttWanted && System.currentTimeMillis() < end) { try { Thread.sleep(20); } catch (InterruptedException e) { return false; } }
+        return pttWanted;
+    }
+
     public void ptt(final boolean down) {
+        pttWanted = down;
         worker.execute(() -> {
             try {
                 if (down) {
@@ -1960,11 +2108,16 @@ public class RadioService extends Service implements RadioEngine.Events {
                     final AudioBackend.TxFeed webFeed = webFeedNext; webFeedNext = null;
                     if (firmwareBusy) { log("PTT blocked: loading firmware"); history("warn", "Radio busy, loading firmware"); return; }
                     if (!isReady()) { log("PTT ignored: radio not ready"); return; }
-                    if (!profile.verified) { log("PTT blocked: untested profile"); history("warn", "⛔ Transmit is off on this phone until its profile has been tested"); return; }
+                    if (!profileMayTransmit()) { log("PTT blocked: untested profile"); history("warn", "⛔ Transmit is off on this phone until its profile has been tested"); return; }
                     if (txInhibited()) { log("PTT blocked: receive-only channel"); history("warn", "⛔ TX blocked on a receive-only channel"); return; }
                     if (pttDown) return;
                     pttDown = true; refreshControls();
-                    txChannel = current; txInCar = inCar; txCharging = charging(); txDropNoted = false; txStartedAt = System.currentTimeMillis();
+                    long gap = profile.minKeyGapMs - (System.currentTimeMillis() - txEndedAt);   // the Armor 20WT's stock app never keys sooner than 2 s after a release
+                    if (profile.minKeyGapMs > 0 && txEndedAt > 0 && gap > 0) {
+                        log("key waits " + gap + " ms (this phone keys no sooner than " + profile.minKeyGapMs + " ms after a release)");
+                        if (!waitWhilePttWanted(gap)) { pttDown = false; refreshControls(); log("released before the key"); return; }
+                    }
+                    txChannel = current; txInCar = inCar; txCharging = charging(); txDropNoted = false; txStartedAt = System.currentTimeMillis(); pcmTxLabel = null;
                     try { ChannelStore.Channel tc = current; int[] tcall = tc != null ? tgOverride.call(tc) : null; if (tc != null && tc.isDigital() && tcall[0] > 0) { ChannelStore.Contact pc = store.contactByNumber(tcall[0], tcall[1] == 0 ? 0 : 1); if (pc != null) store.contactSent(pc.id, txStartedAt, "DMR voice", "on " + tc.name); } } catch (Throwable e) { }
                     idTimerOnKey();
                     if (audio != null) audio.stopRx();              // never play the RX stream while the mic is live (feedback)
@@ -1977,9 +2130,28 @@ public class RadioService extends Service implements RadioEngine.Events {
                         audio.setTxLevel(pk -> { if (vox == v && v.level(pk, System.currentTimeMillis())) { vox = null; log("stopped: quiet for " + VOX_NAMES[vi]); ptt(false); } });
                     } else if (audio != null) { vox = null; audio.setTxLevel(null); }
                     if (carMic) log("TX with the car microphone"); else if (fromWheel && inCar && carMic()) log("TX from the wheel: phone microphone (keeps the wheel's buttons working)");
-                    engine.ptt(true);
-                    if (audio != null) log(audio.startTx());
-                    ui.removeCallbacks(txWatchdog); ui.postDelayed(txWatchdog, 28000);
+                    if (profile.txAudioLeadMs > 0 && audio != null) {          // the Armor 20WT's stock app: audio path first, the key 600 ms later
+                        log(audio.startTx());
+                        if (!waitWhilePttWanted(profile.txAudioLeadMs)) {     // released before the key: nothing went out
+                            audio.stopTx(); stopBluetoothMic(); vox = null; audio.setTxLevel(null);
+                            pttDown = false; refreshControls(); log("released before the key");
+                            if (rxAudioOn && (!agoldBridge() || receiving)) audio.startRx(true);
+                            return;
+                        }
+                        engine.ptt(true);
+                    } else if (profile.txAudioOnSendStart && audio != null) {   // the Xplore 1's QuickChat: the microphone opens at the module's SEND_START
+                        long keyedAt = System.currentTimeMillis();
+                        engine.ptt(true);
+                        if (awaitSendStart(keyedAt, SEND_START_WAIT_MS, true)) log(audio.startTx() + " at SEND_START, " + (sendStartAt - keyedAt) + " ms after the key");
+                        else if (pttWanted) { log("no SEND_START " + SEND_START_WAIT_MS + " ms after the key: no audio sent"); history("warn", "\u26A0\uFE0F The radio did not report transmitting; no audio was sent"); }
+                    } else {
+                        engine.ptt(true);
+                        if (audio != null) log(audio.startTx());
+                    }
+                    long lim = txLimitMs();
+                    ui.removeCallbacks(txWatchdog); if (lim > 0) ui.postDelayed(txWatchdog, lim);      // the transmit limit; none for No limit
+                    final long vk = ++voiceKeys; Thread oldHeat = voiceHeat; if (oldHeat != null) oldHeat.interrupt();
+                    voiceHeat = openKeyHeatWatch("Voice transmission", () -> pttDown && voiceKeys == vk, () -> ptt(false));   // past 30 s the heat guard applies, whatever the limit
                 } else {
                     if (current != null && current.isM17()) {
                         m17Voice(false);
@@ -1992,17 +2164,27 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (com.macdmr.radio.car.RadioCallService.active()) ui.post(com.macdmr.radio.car.RadioCallService::end);   // the talk call ends with the transmission
                     txEndedAt = System.currentTimeMillis();
                     ui.removeCallbacks(txWatchdog);
+                    Thread vh = voiceHeat; voiceHeat = null; if (vh != null) vh.interrupt();
+                    boolean tail = false;
+                    if (profile.txReleaseHoldMs > 0) try { Thread.sleep(profile.txReleaseHoldMs); } catch (InterruptedException ignored) { }   // the 3WT's intercom app: key and microphone run on after the release
                     try {
-                        if (audio != null) audio.stopTx();
-                        stopBluetoothMic();
                         short[] roger = rogerPcm(rogerStyle());
-                        if (roger != null && audio != null) audio.playPcm(roger);    // still keyed: the tone goes out before the carrier drops
                         ChannelStore.Channel tc = current;
-                        short[] id = tc != null && !tc.isDigital() && amateurBand(tc.txFreq) && packet != null && System.currentTimeMillis() - txStartedAt < 25_000 ? packet.cwIdIfDue(System.currentTimeMillis()) : null;
+                        short[] id = tc != null && !tc.isDigital() && amateurBand(tc.txFreq) && packet != null && (txLimitMs() < 0 || System.currentTimeMillis() - txStartedAt < txLimitMs() - 3000) ? packet.cwIdIfDue(System.currentTimeMillis()) : null;
+                        tail = profile.txAudioTailMs > 0 && audio != null && roger == null && id == null;   // the Xplore 1's QuickChat stops the microphone 200 ms after the release
+                        if (!tail) { if (audio != null) audio.stopTx(); stopBluetoothMic(); }
+                        if (roger != null && audio != null) audio.playPcm(roger);    // still keyed: the tone goes out before the carrier drops
                         if (id != null && audio != null) { log("Morse ID after the transmission"); audio.playPcm(id); history("pkt", "\uD83D\uDD24 Morse ID " + packet.callsign()); }   // the station identification every ten minutes
-                    } finally { engine.ptt(false); }
+                    } finally {
+                        unkey();
+                        if (tail) { try { Thread.sleep(profile.txAudioTailMs); } catch (InterruptedException ignored) { } audio.stopTx(); stopBluetoothMic(); }
+                    }
+                    int heldMs = (int) Math.min(Integer.MAX_VALUE, Math.max(0, txEndedAt - txStartedAt));
+                    thermal.after(heldMs);                                                    // a voice key past 30 s starts the cool-down like a long picture
+                    if (heldMs > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(heldMs / 1000.0) + " s (voice); " + thermal.state());
                     if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true);
-                    if (dataReceive) scheduleDataHold(true);   // the unkey path rewrites the voice filter; put the hold back
+                    if (dataReceive) scheduleDataHold(true, true);   // the unkey path rewrites the voice filter; put the hold back
+                    totAfterTx();
                 }
             } catch (Throwable t) { log("ptt: " + t); try { engine.ptt(false); } catch (Throwable ignored) { } pttDown = false; }
         });
@@ -2031,7 +2213,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     private volatile long status4At;
     private volatile short[] m17Script;
     /** Bench: stream a packed-symbol file on command 0x40. Paces on the returned fill.
-     *  eot or forceKey keys once eight chunks are in the ring (no 28 s watchdog, no microphone).
+     *  eot or forceKey keys once eight chunks are in the ring (no voice watchdog, no microphone).
      *  eot sends the last chunk as op 7 so the module drops the carrier. Unless nounkey, eot then sends the unkey after status byte 4. */
     public void diagSym(java.io.File f) { diagSym(f, false, false, false); }
     public void diagSym(java.io.File f, boolean eot) { diagSym(f, eot, false, false); }
@@ -2068,6 +2250,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         catch (IllegalArgumentException e) { return e.getMessage(); }
         int rate = baud == 512 || baud == 2400 ? baud : 1200;
         if (com.macdmr.radio.ham.Pocsag.seconds(bits, rate) > 25) return "That page is longer than 25 seconds";
+        if (com.macdmr.radio.ham.Pocsag.seconds(bits, rate) * 1000 > TxLimit.capMs(txLimitS())) return "That page is longer than the transmit limit (" + TxLimit.name(txLimitS()) + ", Device \u2192 Longest transmission)";
         final int[] packedBits = bits;
         Thread t = new Thread(() -> streamPage(rate, hz, packedBits, rics.length), "pocsag");
         symThread = t;
@@ -2116,6 +2299,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         finally {
             if (keyed) { try { engine.ptt(false); } catch (Throwable ignored) { } holdAfterTx(); }
             if (hopped) exitVfo();
+            totAfterTx();
         }
     }
     private volatile Thread fwThread;
@@ -2187,6 +2371,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (old != null && old.isAlive()) { ui.finished("A load is already running"); return; }
         if (profile == null || !profile.firmwareLoader()) { ui.finished("This phone's radio module cannot be loaded from SignalDeck"); return; }
         fwHalt.set(false);
+        holdActive = false;                                                     // the loader restarts the module; its hold is gone
         setFirmwareBusy(true);
         Thread job = new Thread(() -> {
             try { com.macdmr.radio.fw.FirmwareSession.run(this, row, image, ui, fwHalt, treatTagAsWrong); }
@@ -2359,7 +2544,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** This firmware image has the symbol engine (command 0x40). Stock UV4T does not. */
     public boolean m17CanSend() { return Firmware.stubTag(moduleVersion); }
 
-    /** Hold to talk on the M17 screen. The voice limit stays 28 s. Does nothing on stock firmware. */
+    /** Hold to talk on the M17 screen. The transmit limit and, past 30 s, the heat guard apply as for voice. Does nothing on stock firmware. */
     public void m17Voice(boolean down) {
         if (!down) { m17Down = false; return; }
         if (!m17CanSend()) { log("m17 voice: stock firmware"); history("warn", "⚠️ M17 transmit needs the module firmware with the symbol engine"); return; }
@@ -2411,6 +2596,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         com.macdmr.radio.ham.Codec2 c2 = null;
         boolean keyed = false;
         m17Tx = true;
+        final Thread me = Thread.currentThread();
+        final long runStart = System.currentTimeMillis();
+        Thread heat = openKeyHeatWatch("M17 transmission", () -> m17Tx && symThread == me, () -> m17Down = false);   // a heat stop releases like the key: last frame, end of transmission
         try {
             Frame rst = sym40(new byte[] { 3 });
             if (rst == null || rst.sr != 0) { log("m17 voice: symbol engine did not answer"); history("warn", "⚠️ This firmware did not accept an M17 symbol reset"); return; }
@@ -2446,8 +2634,10 @@ public class RadioService extends Service implements RadioEngine.Events {
             int fn = 0, scriptAt = 0;
             long t0 = System.currentTimeMillis();
             boolean closed = false;
-            while (!closed && fn < 700) {
-                boolean release = !m17Down || System.currentTimeMillis() - t0 > 27500;
+            final long lim = txLimitMs();                                    // the transmit limit, -1 for none
+            final long maxFrames = lim > 0 ? lim / 40 : Long.MAX_VALUE;      // 40 ms per stream frame
+            while (!closed && fn < maxFrames) {
+                boolean release = !m17Down || (lim > 0 && System.currentTimeMillis() - t0 > lim - 500);
                 if (script != null) {
                     int n = Math.min(spf, script.length - scriptAt);
                     if (n <= 0) release = true;
@@ -2467,7 +2657,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 System.arraycopy(half, 0, pay, 0, Math.min(8, half.length));
                 System.arraycopy(enc, 0, pay, 8, Math.min(8, enc.length));
                 half = null;
-                int frameNo = fn | (release ? 0x8000 : 0);
+                int frameNo = (fn & 0x7FFF) | (release ? 0x8000 : 0);     // the 15-bit frame number wraps after about 22 minutes
                 if (script != null) {
                     StringBuilder hx = new StringBuilder(32);
                     for (byte b : pay) hx.append(String.format(java.util.Locale.US, "%02X", b & 0xFF));
@@ -2486,6 +2676,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     paceSym(fill, keyed);
                 }
                 if (release) closed = true;
+                if (sent >= 1 << 16) { byte[] rest = java.util.Arrays.copyOfRange(data, sent, data.length); pending.reset(); pending.write(rest); sent = 0; }   // drop what is sent: a long key must not grow the buffer
             }
             byte[] data = pending.toByteArray();
             if (sent < data.length) {
@@ -2499,7 +2690,10 @@ public class RadioService extends Service implements RadioEngine.Events {
         } catch (Throwable t) { log("m17 voice: " + t); }
         finally {
             if (keyed) { try { engine.ptt(false); } catch (Throwable ignored) { } holdAfterTx(); }
+            if (heat != null) heat.interrupt();
+            if (keyed) { int heldMs = (int) Math.min(Integer.MAX_VALUE, System.currentTimeMillis() - runStart); thermal.after(heldMs); if (heldMs > ThermalGuard.LONG_MS) history("m17", "\uD83D\uDCFB Long transmission " + Math.round(heldMs / 1000.0) + " s (M17); " + thermal.state()); }
             m17Down = false; m17Tx = false; m17Script = null;
+            totAfterTx();
             if (rec != null) { try { rec.stop(); } catch (Throwable ignored) { } rec.release(); }
             if (c2 != null) c2.close();
         }
@@ -2520,7 +2714,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (pttDown || m17Tx) return "Already transmitting";
         if (pairs == null || pairs.isEmpty()) return "Nothing to send";
         final int ms = com.macdmr.radio.ham.ToneQueue.durationMs(pairs);
-        if (ms > TX_MAX_MS) return "Too long for this radio (" + Math.round(ms / 1000.0) + " s; it allows " + (TX_MAX_MS / 1000) + " s)";
+        if (ms > TxLimit.capMs(txLimitS())) return "Longer than the transmit limit (" + Math.round(ms / 1000.0) + " s; Device \u2192 Longest transmission is " + TxLimit.name(txLimitS()) + ")";
         if (ms > ThermalGuard.LONG_MS) { String wait = thermal.gate(ms); if (wait != null) return wait; }
         worker.execute(() -> toneRun(pairs, amplitude, label, done, ms));
         return null;
@@ -2528,12 +2722,14 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     private void toneRun(java.util.List<com.macdmr.radio.ham.ToneQueue.Pair> pairs, int amplitude, String label, Runnable done, int ms) {
         boolean keyed = false;
+        final boolean[] heatStop = { false };
+        Thread heatWatch = null;
         try {
             if (pttDown) { log("tones " + label + " skipped: PTT busy"); return; }
             Frame rst = sym40(new byte[] { 3 });
             if (rst == null || rst.sr != 0) { log("tones: no symbol engine"); history("warn", "\u26A0\uFE0F This firmware did not accept a tone-queue reset"); return; }
-            if (ms > ThermalGuard.LONG_MS) thermal.beforeLong();
-            pttDown = true; txStartedAt = System.currentTimeMillis(); refreshControls();
+            if (ms > ThermalGuard.LONG_MS) { thermal.beforeLong(); heatWatch = heatWatchdog(label, () -> heatStop[0] = true); }   // the in-key heat stops, as for a long picture
+            pttDown = true; txStartedAt = System.currentTimeMillis(); pcmTxLabel = label; refreshControls();
             if (audio != null) audio.stopRx();
             java.util.List<byte[]> bodies = com.macdmr.radio.ham.ToneQueue.bodies(amplitude, pairs);
             for (int i = 0; i < bodies.size(); i++) {
@@ -2544,19 +2740,23 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (!keyed) { engine.ptt(true); keyed = true; log("tone key " + label + " (" + ms + " ms, " + bodies.size() + " bodies)"); }
                 if (i + 1 < bodies.size()) {                                 // top up when the queue is below the mark; the queue only drains while keyed
                     int spins = 0;
-                    while (spins++ < 2400) { Thread.sleep(50); if (queued() <= com.macdmr.radio.ham.ToneQueue.TOP_UP_AT) break; }
+                    while (spins++ < 2400 && !heatStop[0]) { Thread.sleep(50); if (queued() <= com.macdmr.radio.ham.ToneQueue.TOP_UP_AT) break; }
                 }
+                if (heatStop[0]) return;                                     // the finally unkeys
             }
             long deadline = System.currentTimeMillis() + ms + 3000;        // the last pair plays out, then the module drops the carrier itself
-            while (System.currentTimeMillis() < deadline) { Thread.sleep(100); if (queued() == 0) break; }
+            while (System.currentTimeMillis() < deadline && !heatStop[0]) { Thread.sleep(100); if (queued() == 0) break; }
+            if (heatStop[0]) return;
             unkeyAfterStop();
             history("tx", "\uD83D\uDD09 " + label + " through the module's tone generator (" + Math.round(ms / 1000.0) + " s)");
             if (done != null) done.run();
         } catch (Throwable t) { log("tones " + label + ": " + t); }
         finally {
             if (keyed) { try { engine.ptt(false); } catch (Throwable ignored) { } holdAfterTx(); }
+            if (heatWatch != null) heatWatch.interrupt();
             pttDown = false; thermal.after(ms); refreshControls();
             if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true);
+            totAfterTx();
         }
     }
 
@@ -2565,7 +2765,9 @@ public class RadioService extends Service implements RadioEngine.Events {
      * ({@link ThermalGuard#stopNow}) the playback is ended at its next block and the history says why. Interrupted
      * by the sender when the transmission ends.
      */
-    private Thread heatWatchdog(final String label) {
+    private Thread heatWatchdog(final String label) { return heatWatchdog(label, () -> { if (audio != null) audio.abortPlay(); }); }
+    /** As {@link #heatWatchdog(String)}, with the sender's own way to end the key. */
+    private Thread heatWatchdog(final String label, final Runnable stopKey) {
         Thread t = new Thread(() -> {
             double pz = Double.NaN, pb = Double.NaN; int n = 0;
             try {
@@ -2576,13 +2778,55 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (stop != null) {
                         log("heat stop during " + label + ": " + stop);
                         history("warn", "\u26D4 " + label + " ended early: " + stop + ". Let the phone cool before the next long transmission.");
-                        if (audio != null) audio.abortPlay();
+                        stopKey.run();
                         return;
                     }
                     if (++n % 2 == 0) { pz = z; pb = b; }                      // the 10 s comparison
                 }
             } catch (InterruptedException ignored) { }
         }, "heat-watch");
+        t.setDaemon(true); t.start();
+        return t;
+    }
+
+    private interface KeyAlive { boolean alive(); }
+    /**
+     * The heat guard for a key whose length is not known when it starts (voice PTT incl. the car, the widget and the
+     * web, M17 Hold to talk). Such a key always starts (short keys are never held), but when it passes 30 s it must
+     * pass what a long picture passes before it starts, judged on the readings from the key's start: the cool-down
+     * after the last long key and the 60 °C / 45 °C start gate ({@link ThermalGuard#gate}). From then on the in-key
+     * stops apply every 5 s ({@link ThermalGuard#stopNow}: 70 °C radio zone, 48 °C battery, 2 °C in 10 s). A stop
+     * writes the history line and runs {@code stopKey}. Owner rule 2026-10-25, for every limit including No limit.
+     * Ends by itself when {@code alive} turns false or it is interrupted.
+     */
+    private Thread openKeyHeatWatch(final String label, final KeyAlive alive, final Runnable stopKey) {
+        Thread t = new Thread(() -> {
+            long t0 = System.currentTimeMillis();
+            double z0 = thermal.readC(), b0 = ThermalGuard.batteryC(RadioService.this);
+            String held = thermal.gate(ThermalGuard.LONG_MS + 1, b0);          // what a long key starting now would be told
+            double pz = Double.NaN, pb = Double.NaN; int n = 0; boolean longKey = false;
+            try {
+                while (alive.alive()) {
+                    Thread.sleep(1000);
+                    if (!alive.alive()) return;
+                    if (!longKey && System.currentTimeMillis() - t0 > ThermalGuard.LONG_MS) {
+                        longKey = true;
+                        if (held != null) { log("heat: " + label + " ended at 30 s: " + held); history("warn", "\u26D4 " + label + " ended at 30 s: " + held); stopKey.run(); return; }
+                        thermal.beforeLong(z0);                                    // the cool-down after this key is measured from where it started
+                    }
+                    if (++n % 5 != 0) continue;                                   // read every 5 s
+                    double z = thermal.readC(), b = ThermalGuard.batteryC(RadioService.this);
+                    String stop = longKey ? ThermalGuard.stopNow(z, b, pz, pb) : null;
+                    if (stop != null && alive.alive()) {
+                        log("heat stop during " + label + ": " + stop);
+                        history("warn", "\u26D4 " + label + " ended early: " + stop + ". Let the phone cool before the next long transmission.");
+                        stopKey.run();
+                        return;
+                    }
+                    if ((n / 5) % 2 == 0) { pz = z; pb = b; }                     // the 10 s comparison
+                }
+            } catch (InterruptedException ignored) { }
+        }, "heat-watch-key");
         t.setDaemon(true); t.start();
         return t;
     }
@@ -2636,7 +2880,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         holdAfterTx();
     }
     public void diagPowerCycle() { worker.execute(() -> { try { if (audio != null) audio.stopRx(); log("power-cycling the module"); powerCycleOrGiveUp(); if (!engine.waitBooted(12000)) log("no banner after power-cycle"); engine.queryVersion(); if (current != null) applyChannelNow(current, current.id > 0); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); } catch (Throwable t) { log("power-cycle: " + t); } }); }
-    /** Bench (DiagReceiver): transmit an 8 kHz mono 16-bit WAV from the app's cache on the current channel/VFO (at most 28 s). */
+    /** Bench (DiagReceiver): transmit an 8 kHz mono 16-bit WAV from the app's cache on the current channel/VFO (at most 28 s, a bench rule; the transmit limit also applies). */
     public String diagTxWav(java.io.File f) {
         try {
             byte[] b = java.nio.file.Files.readAllBytes(f.toPath()); int n = (b.length - 44) / 2;
@@ -2645,18 +2889,37 @@ public class RadioService extends Service implements RadioEngine.Events {
             transmitPcm(pcm, "bench wav", null); return "transmitting " + n / 8 + " ms";
         } catch (Exception e) { return "txwav: " + e; }
     }
+    /** Bench: the gateway route's sample factor until the next restart (the profile's txAudioScale otherwise). */
+    public String diagTxScale(float v) { return audio instanceof CamcorderAudio ? ((CamcorderAudio) audio).setTxScale(v) : "no gateway route on this phone"; }
     public void diagTestTone(int ms) { diagTestTone(ms, false); }
-    /** lift is one bench run, at most 40 s, past the 28.5 s refusal. The voice watchdog stays 28 s for every other transmission. */
-    public void diagTestTone(int ms, boolean lift) {
+    /** lift is one bench run of at most 40 s (5 s otherwise); the transmit limit and the heat guard still apply. */
+    public void diagTestTone(int ms, boolean lift) { diagTestTone(ms, lift, 1000, 12000); }
+    /** Bench: a test tone of {@code hz} at {@code amp} (of 32767). */
+    public void diagTestTone(int ms, boolean lift, int hz, int amp) {
         if (ms < 200) ms = 200;
         if (lift) ms = Math.min(ms, 40000); else ms = Math.min(ms, 5000);
         short[] pcm = new short[8000 * ms / 1000];
-        for (int i = 0; i < pcm.length; i++) pcm[i] = (short) (12000 * Math.sin(2 * Math.PI * 1000 * i / 8000.0));
-        transmitPcm(pcm, "1 kHz test tone " + ms + " ms", null, lift);
+        for (int i = 0; i < pcm.length; i++) pcm[i] = (short) (amp * Math.sin(2 * Math.PI * hz * i / 8000.0));
+        transmitPcm(pcm, hz + " Hz test tone " + ms + " ms", null, lift);
+    }
+    /** Bench: the transmit path's frequency response in one key, 400 ms per tone at {@code amp}, a 100 ms gap between them. */
+    static final int[] SWEEP_HZ = { 100, 150, 200, 250, 300, 400, 500, 700, 1000, 1500, 2000, 2500, 3000, 3500 };
+    public void diagToneSweep(int amp) {
+        int per = 3200, gap = 800;
+        short[] pcm = new short[SWEEP_HZ.length * (per + gap)];
+        for (int k = 0; k < SWEEP_HZ.length; k++)
+            for (int i = 0; i < per; i++) pcm[k * (per + gap) + i] = (short) (amp * Math.sin(2 * Math.PI * SWEEP_HZ[k] * i / 8000.0));
+        transmitPcm(pcm, "tone sweep 100-3500 Hz", null, true);
     }
 
     /** Ask the module for the signal strength (on the radio worker: never a serial write on the main thread). */
-    public void pollRssi() { if (scope.running() || engine.rawSession()) return; worker.execute(() -> { try { if (engine.isOpen() && !engine.rawSession()) engine.queryRssi(); } catch (IOException ignored) { } }); }
+    /** A signal reading for a display (the S-meter, SignalDeck Web); held on the Atom XL during a reception ({@link AgoldUsb#holdsRxRead}). */
+    public void pollRssi() { pollRssi(false); }
+    /** A signal reading for a measurement (fox hunt, coverage, checks): taken during a reception too, at the cost of a possible capture drop on the Atom XL. */
+    public void pollRssiMeasure() { pollRssi(true); }
+    private void pollRssi(boolean measure) { if (scope.running() || engine.rawSession()) return;
+        if (!measure && AgoldUsb.holdsRxRead(agoldBridge(), receiving, synthRx)) return;
+        worker.execute(() -> { try { if (engine.isOpen() && !engine.rawSession()) engine.queryRssi(); } catch (IOException ignored) { } }); }
 
     // ---- listeners ----------------------------------------------------------------------------------
 
@@ -2682,8 +2945,9 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** {@code chNum} is the channel the line belongs to. A page sent from a temporary VFO still records on the channel the radio left. */
     public void history(int chNum, String kind, String text) {
         text = text.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]", "\u00B7");   // no control characters on screen (they also break screen readers)
-        store.addHistory(chNum, kind, text, rssi, lastCaller);
-        String line = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US).format(new java.util.Date()) + " " + text + (rssi != -999 ? " " + rssi + " dBm" : "");
+        final int level = AgoldUsb.historyLevelFresh(agoldBridge(), rssiAt, rxBeganAt) ? rssi : -999;   // no stale level on the Atom XL
+        store.addHistory(chNum, kind, text, level, lastCaller);
+        String line = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US).format(new java.util.Date()) + " " + text + (level != -999 ? " " + level + " dBm" : "");
         ui.post(() -> { for (Listener l : listeners) l.onHistory(line); });
     }
 
@@ -2720,13 +2984,18 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (uiLog) ui.post(() -> { for (Listener l : listeners) l.onLog(s); });
     }
 
+    /** The transmit test session's view of the module's status replies (Device report → Transmit test session); null otherwise. */
+    public volatile java.util.function.BiConsumer<Integer, String> statusTap;
+
     @Override public void status(int code, String name) {
+        java.util.function.BiConsumer<Integer, String> tap = statusTap; if (tap != null) try { tap.accept(code, name); } catch (Throwable ignored) { }
+        if ((code == 1 || code == 2) && audio instanceof ExtModuleAudio) ((ExtModuleAudio) audio).reception(code == 1);   // the 3WT: extmodule streams receive audio only between these
         switch (code) {
-            case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); } break; }   // already open: an edge after a signal-started reception
+            case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); if (!captureRunning()) bridgeCapture(true); } break; }   // a capture closed for silence reopens   // already open: an edge after a signal-started reception
                 if (agoldBridge() && !synthRx) lineReported();           // an edge from the line itself
-                receiving = true; dmrEvent("start", 0, 0, 0);
+                receiving = true; rxBeganAt = System.currentTimeMillis(); dmrEvent("start", 0, 0, 0);
                 if (current != null && current.isDigital()) {           // a DMR call: forget the last talker, ask who this is now and again a second later
-                    lastCaller = 0; callLogged = false;
+                    lastCaller = 0; lastCallerCc = -1; callLogged = false;
                     if (!agoldBridge()) for (long ms : new long[] { 300, 1200 }) ui.postDelayed(() -> { if (receiving) worker.execute(() -> { try { engine.queryCallerInfo(); } catch (IOException ignored) { } }); }, ms);
                 }
                 bridgeReception(true);
@@ -2746,9 +3015,10 @@ public class RadioService extends Service implements RadioEngine.Events {
                 ui.post(() -> { for (Listener l : listeners) l.onRx(false); });
                 break;
             }
-            case 3: transmitting = true; refreshControls(); if (coverage != null) coverage.onTxStart(); ui.post(() -> { for (Listener l : listeners) l.onTx(true); }); break;
-            case 4: status4At = System.currentTimeMillis(); transmitting = false; refreshControls(); if (coverage != null) coverage.onTxEnd(); history(m17Tx ? "m17" : "tx", m17Tx ? "📻 M17 TX" : "📻 Voice TX");
-                if (pttDown && !m17Tx && System.currentTimeMillis() - txStartedAt > 100_000) history("warn", "\u23F1 The radio ended the transmission itself: its 120 s time-out"); ui.post(() -> { for (Listener l : listeners) l.onTx(false); }); break;
+            case 3: sendStartAt = System.currentTimeMillis(); transmitting = true; refreshControls(); if (coverage != null) coverage.onTxStart(); ui.post(() -> { for (Listener l : listeners) l.onTx(true); }); break;
+            case 4: status4At = System.currentTimeMillis(); transmitting = false; totAfterTx(); refreshControls(); if (coverage != null) coverage.onTxEnd(); String pl = pcmTxLabel; pcmTxLabel = null; history(m17Tx ? "m17" : "tx", m17Tx ? "📻 M17 TX" : pl != null ? "📻 TX: " + pl : "📻 Voice TX");
+                { int tot = moduleTotS; long el = System.currentTimeMillis() - txStartedAt;   // 0 = timer off, but FW19-FW31 bench images still end a key at 120 s
+                  if (pttDown && !m17Tx && !unkeying && (tot > 0 ? el > tot * 1000L - 3000 : el > 100_000)) history("warn", "\u23F1 The radio ended the transmission itself: its " + (tot > 0 ? tot : 120) + " s time-out"); } ui.post(() -> { for (Listener l : listeners) l.onTx(false); }); break;
             case 5: try { engine.fetchSms(); } catch (IOException ignored) { } break;             // SMS_RECEIVED -> ask for it
             case 8: smsResult(true); break;
             case 9: smsResult(false); break;
@@ -2766,6 +3036,15 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (!agoldBridge()) return;
         final AudioBackend a = rxAudioOn && audio instanceof AlsaDirectAudio ? audio : null;
         final boolean dmr = current != null && current.isDigital();
+        if (on && synthRx && !monRx) {                                       // found from the signal only: no capture yet (AgoldUsb.captureOpenDelay)
+            long wait = AgoldUsb.captureOpenDelay(true, false, System.currentTimeMillis() - synthStartAt);
+            if (wait > 0) {
+                if (a != null && ((AlsaDirectAudio) a).capturing()) worker.execute(() -> { try { a.stopRx(); } catch (Throwable ignored) { } });   // the last reception's tail: not this one's, and it would run into the bridge's I/O error
+                log("reception found from the signal: the capture waits " + wait + " ms for the line or for the reception to last");
+                ui.postDelayed(() -> { if (receiving && synthRx && !captureRunning()) bridgeCapture(true); }, wait);
+                return;
+            }
+        }
         worker.execute(() -> {
             try {
                 // while the bridge streams audio it cuts every frame on the port after 12 bytes (measured 2026-10-28), so
@@ -2775,8 +3054,14 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (!dmr && a != null && ((AlsaDirectAudio) a).capturing()) return;
                     if (a != null) a.stopRx(); if (dmr) { engine.queryCallerInfo(); Thread.sleep(150); }
                     if (a != null) {
+                        final long bytes0 = rxAudioBytes();
                         String r = a.startRx(true); log(r);
-                        if (r != null && r.contains("no audio block yet")) recoverBridgeAudio("the USB capture delivered nothing");
+                        if (synthRx) ui.postDelayed(() -> {
+                            if (!receiving || !AgoldUsb.closeSilentSignalOnlyCapture(synthRx, monRx, rxAudioBytes() - bytes0) || !captureRunning()) return;
+                            log("no audio " + AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS + " ms into a reception found from the signal (another transmitter close by, most likely): capture closed before the bridge times out");
+                            worker.execute(() -> { try { a.stopRx(); } catch (Throwable t) { log("capture close: " + t); } });
+                        }, AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS);
+                        if (r != null && r.contains("no audio block yet") && !(synthRx && !monRx)) recoverBridgeAudio("the USB capture delivered nothing");   // a signal-only one is closed for silence above instead
                     } }
                 else { if (a != null) a.stopRx(); if (packet != null && !dmr) packet.streamEnded(); if (dmr) { Thread.sleep(100); engine.queryCallerInfo(); } }
             } catch (Throwable t) { log("bridge capture: " + t); }
@@ -2828,6 +3113,7 @@ public class RadioService extends Service implements RadioEngine.Events {
      * ({@link AgoldUsb#rssiStartDbm}). An edge that arrives meanwhile is merged.
      */
     private volatile boolean synthRx; private volatile int strongCount, lowCount;
+    private volatile long synthStartAt;
     private volatile double idleFloor = Double.NaN;                     // dBm, while nothing is received; reset on a channel write
     private final Runnable rxWatchdog = new Runnable() { @Override public void run() {
         if (!agoldBridge() || exiting) return;
@@ -2838,11 +3124,15 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (!agoldBridge() || isTransmitting()) return;
         if (!receiving) {
             idleFloor = AgoldUsb.nextFloor(idleFloor, dbm);
-            if (dbm > AgoldUsb.rssiStartDbm(idleFloor)) { if (++strongCount >= (lineFallback ? 1 : 2)) { strongCount = 0; lowCount = 0; synthRx = true; log("signal " + Math.round(dbm) + " dBm with no reception reported: treated as a reception"); status(1, RadioEngine.statusName(1)); } }
+            if (dbm > AgoldUsb.rssiStartDbm(idleFloor)) { if (++strongCount >= (lineFallback ? 1 : 2)) { strongCount = 0; lowCount = 0; synthRx = true; synthStartAt = System.currentTimeMillis(); log("signal " + Math.round(dbm) + " dBm with no reception reported: treated as a reception"); status(1, RadioEngine.statusName(1)); } }
             else strongCount = 0;
         } else if (synthRx && !monRx) {                                  // a MON reception ends with MON
-            if (dbm < AgoldUsb.rssiEndDbm(idleFloor)) { if (++lowCount >= 2) { lowCount = 0; final boolean restart = lineMissedOne(); synthRx = false; status(2, RadioEngine.statusName(2));
-                if (current != null) worker.execute(() -> { try { if (restart) powerCycleOrGiveUp(); applyChannelNow(current, current.id > 0); log(restart ? "bridge restarted and channel rewritten: the reception line looked stuck" : "channel rewritten after a reception the line did not report"); } catch (Throwable t) { log("channel rewrite: " + t); } }); } }
+            if (dbm < AgoldUsb.rssiEndDbm(idleFloor)) { if (++lowCount >= 2) { lowCount = 0;
+                long held = System.currentTimeMillis() - synthStartAt;
+                final boolean counts = AgoldUsb.countsAsLineMiss(held);       // a short off-channel blip (source in the cage not identified) read -87 dBm here: not a reception the line missed
+                if (!counts) log("signal reception of " + held + " ms with no line edge: too short to count against the reception line");
+                final boolean restart = counts && lineMissedOne(); synthRx = false; status(2, RadioEngine.statusName(2));
+                if (current != null) worker.execute(() -> { try { boolean cycled = restart && autoCycle("stuck reception line"); if (restart && !cycled) lineRestarts--; /* held back: the restart is still owed */ if (cycled) powerCycleOrGiveUp(); applyChannelNow(current, current.id > 0); log(cycled ? "bridge restarted and channel rewritten: the reception line looked stuck" : "channel rewritten after a reception the line did not report"); } catch (Throwable t) { log("channel rewrite: " + t); } }); } }
             else lowCount = 0;
         }
     }
@@ -2891,12 +3181,41 @@ public class RadioService extends Service implements RadioEngine.Events {
      * then the radio is let go the way a failed bring-up does it (USB routing back, the bridge checked before the stock
      * app returns) and the link shows the error, instead of "ready" with the radio off.
      */
+    /**
+     * Our own bridge power-cycles end the capture too: that end is not a fault and must not queue a recovery of its own
+     * (2026-10-29 17:06: a stuck-line restart killed the capture that had just opened, its "File descriptor in bad state"
+     * queued a second power-cycle, and the two back to back left the module silent for a third).
+     */
+    private volatile long ownCycleUntil;
+    // one minimum gap between automatic bridge power-cycles (stuck line, capture recovery, module watchdog): back to back
+    // they left the module silent (2026-10-29 17:07); the user's own Exit / Take over does not go through these paths
+    private volatile long lastAutoCycleAt; private volatile boolean moduleWatchDeferred;
+    private long autoCycleWait() { return agoldBridge() ? Math.max(0, AgoldUsb.AUTO_CYCLE_GAP_MS - (System.currentTimeMillis() - lastAutoCycleAt)) : 0; }
+    /** True (and the gap starts) when an automatic power-cycle may run now; logs and returns false inside the gap. */
+    private boolean autoCycle(String why) {
+        long w = autoCycleWait();
+        if (w > 0) { log("bridge restart for the " + why + " held back: another automatic restart ran " + (AgoldUsb.AUTO_CYCLE_GAP_MS - w) / 1000 + " s ago"); return false; }
+        lastAutoCycleAt = System.currentTimeMillis(); return true;
+    }
+    private void captureEnded(String err) {
+        if (agoldBridge() && System.currentTimeMillis() < ownCycleUntil) { log("the capture ended with our own bridge restart: no recovery (" + err + ")"); return; }
+        recoverBridgeAudio("the USB capture ended by itself (" + err + ")");
+    }
     private void powerCycleOrGiveUp() throws IOException {
+        if (agoldBridge()) {
+            ownCycleUntil = System.currentTimeMillis() + 30_000;            // until the cycle is done (cleared to a short grace below)
+            try { if (audio != null) audio.stopRx(); } catch (Throwable ignored) { }
+        }
+        try { powerCycleOrGiveUp0(); }
+        finally { if (agoldBridge()) ownCycleUntil = System.currentTimeMillis() + 1500; }
+    }
+    private void powerCycleOrGiveUp0() throws IOException {
         long settle = agoldBridge() ? AgoldUsb.plugSettleWait(System.currentTimeMillis(), lastPlugChangeAt) : 0;
         if (settle > 0) {                                                    // the stock app leaves the bridge alone for 4 s after a charger change
             log("bridge power-up held " + settle + " ms after a charger or USB change");
             try { Thread.sleep(settle); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }
         }
+        holdActive = false;                                                     // a power-cycled module holds nothing
         try { engine.powerCycle(); }
         catch (IOException e) { if (agoldBridge()) bridgeLost(e); throw e; }
         if (agoldBridge()) { ui.removeCallbacks(windowCheck); ui.postDelayed(windowCheck, AgoldUsb.POWER_UP_EDGES_MS + 300); }
@@ -2957,7 +3276,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         recoverBridgeAudio(heldWhy);
     };
     void recoverBridgeAudio(String why) {
-        long wait = 20_000 - (System.currentTimeMillis() - lastBridgeRecoverAt);
+        long wait = Math.max(20_000 - (System.currentTimeMillis() - lastBridgeRecoverAt), autoCycleWait());
         if (agoldBridge() && !exiting && !isTransmitting() && wait > 0 && receiving && !bridgeRecoverDeferred) {
             // inside the 20 s window: try once more when it ends if the reception is still on, instead of leaving the capture dead (MON on a stuck line, 2026-10-29)
             bridgeRecoverDeferred = true;
@@ -2977,7 +3296,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             return;
         }
         recoverHeld = false; captureDeadAt = 0; ui.removeCallbacks(heldRecovery);
-        lastBridgeRecoverAt = System.currentTimeMillis();
+        lastBridgeRecoverAt = System.currentTimeMillis(); lastAutoCycleAt = lastBridgeRecoverAt;
         worker.execute(() -> {
             try {
                 log("bridge recovery: " + why);
@@ -2992,16 +3311,21 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Run all checks' trial: open (or close) the Atom XL's USB capture outside a reception, waiting for it. Other phones: nothing. */
     public void benchCapture(boolean on) {
+        if (audio instanceof ExtModuleAudio) { log("bench capture: " + ((ExtModuleAudio) audio).bench(on)); return; }   // the 3WT: ask extmodule for its receive stream with no reception reported
         if (!agoldBridge() || !rxAudioOn || !(audio instanceof AlsaDirectAudio)) return;
         try { audio.stopRx(); if (on) log("bench capture: " + audio.startRx(true)); } catch (Throwable t) { log("bench capture: " + t); }
     }
 
     /** The Atom XL's USB bridge (protocol agold). */
     private boolean agoldBridge() { return "agold".equals(profile.protocol); }
+    /** The Agold intercom app is the stock app (the Atom XL, and the Armor 3WT through its daemon): its intercom.db and intercom_prefs, same layout on both. */
+    private boolean agoldStock() { return "agold".equals(profile.protocol) || "agold-legacy".equals(profile.protocol); }
+    /** The 3WT's extmodule audio backend, or null on every other phone (the device report reads its counters). */
+    public ExtModuleAudio extModuleAudio() { AudioBackend a = audio; return a instanceof ExtModuleAudio ? (ExtModuleAudio) a : null; }
 
     @Override public void rssi(int raw, double dbm) { if (scope.running()) { scope.onRssi(raw); return; }   // a sweep step's reading: not the channel's signal, not for the coverage log
         rssi0(raw, dbm); }
-    private void rssi0(int raw, double dbm) { agoldRssi(dbm); rssi = (int) Math.round(dbm); if (coverage != null) coverage.onRssi(rssi); if (hearing()) refreshControls(); /* the car screen's signal meter */ ui.post(() -> { for (Listener l : listeners) l.onRssi(rssi); }); }
+    private void rssi0(int raw, double dbm) { agoldRssi(dbm); rssi = (int) Math.round(dbm); rssiAt = System.currentTimeMillis(); if (coverage != null && AgoldUsb.coverageReadingUsable(agoldBridge(), System.currentTimeMillis(), ownCycleUntil)) coverage.onRssi(rssi); if (hearing()) refreshControls(); /* the car screen's signal meter */ ui.post(() -> { for (Listener l : listeners) l.onRssi(rssi); }); }
     private volatile String moduleVersion = "";
     private volatile long versionAt;
     @Override public void version(int v, String text) {
@@ -3048,6 +3372,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         ui.postDelayed(this, 2000);
         boolean stalled = agoldBridge() && engine.writeStalled();          // the bridge stopped taking data: writes fail after their deadline
         if (exiting || engine.rawSession() || !isReady() || recovering || isTransmitting() || (!stalled && engine.unansweredForMs() < 6000) || System.currentTimeMillis() - lastRecoverAt < 120_000) return;
+        if (agoldBridge() && autoCycleWait() > 0) { if (!moduleWatchDeferred) { moduleWatchDeferred = true; log("module restart held " + autoCycleWait() + " ms: another automatic bridge restart ran just before"); } return; }   // re-checked every 2 s
+        moduleWatchDeferred = false;
         recovering = true;
         worker.execute(() -> {
             try {
@@ -3061,7 +3387,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Restart the module for real and put the channel, MON and receive audio back (on the worker thread). */
     void restartModule(String why) {
         try {
-                lastRecoverAt = System.currentTimeMillis();
+                lastRecoverAt = System.currentTimeMillis(); lastAutoCycleAt = lastRecoverAt;
                 log(why + ": restarting it");
                 history("warn", "\u26A0 The radio module stopped answering commands: restarting it (a few seconds without reception)");
                 setLink("booting");
@@ -3090,7 +3416,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (caller <= 0) return;
         dmrEvent("caller", type, caller, target, cc, slot);
         final String ccts = cc >= 0 ? "  CC " + cc + " TS " + (slot + 1) : "";   // appended by the promiscuous firmware while MON is on
-        lastCaller = caller; lastCallType = type; lastTarget = target;
+        lastCaller = caller; lastCallType = type; lastTarget = target; if (cc >= 0) lastCallerCc = cc;
         refreshControls();   // the car screens show who is talking
         if (callLogged && caller == loggedCaller && target == loggedTarget) return;
         callLogged = true; loggedCaller = caller; loggedTarget = target;
@@ -3134,7 +3460,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Channel writes waiting for the module's answer (oldest first) and the last one it accepted. */
     private final java.util.ArrayDeque<Object[]> tunes = new java.util.ArrayDeque<>();
     private volatile ChannelStore.Channel confirmed;
-    @Override public void booted(String banner) { log("module booted: " + banner); }
+    @Override public void booted(String banner) { log("module booted: " + banner); holdActive = false; }   // a booted module holds nothing
 
     private volatile long pendingSmsId = -1;
 
@@ -3507,6 +3833,14 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     public boolean isTransmitting() { return transmitting || pttDown; }
     public int lastRssi() { return rssi; }
+    /** When the last signal reading arrived (ms), and when the module was last retuned (a channel or VFO write): readings need ~0.7 s after it. */
+    public long lastRssiAt() { return rssiAt; }
+    public long lastTunedAt() { return tunedAt; }
+    /** The last DMR caller (kept after the call ends, 0 = none yet) and the colour code the promiscuous firmware reported for it (-1 = not reported: the module passed only the channel's). */
+    public int lastCallerId() { return lastCaller; }
+    public int currentCallerCc() { return dmrCallNow() ? lastCallerCc : -1; }
+    /** The CTCSS tone decoded from the received audio right now (Hz), or 0. */
+    public double heardToneHz() { double hz = toneBank.detectedHz(); return hz > 0 ? hz : 0; }
     /** Who is talking on a DMR channel right now (name from the contacts or RadioID, or the ID), else "". */
     public String currentCaller() {
         if (!dmrCallNow()) return "";
@@ -3561,7 +3895,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 double want = com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode), got = toneBank.detectedHz();
                 return want > 0 && got > 0 && Math.abs(want - got) < 1.5;
             }
-            @Override public void pollRssi() { RadioService.this.pollRssi(); }
+            @Override public void pollRssi() { RadioService.this.pollRssiMeasure(); }
             @Override public void event(String line) { history("cov", line); }
         });
         return coverage;
@@ -3882,13 +4216,13 @@ public class RadioService extends Service implements RadioEngine.Events {
      */
     public synchronized String setM17(boolean on, boolean hold) {
         M17Station s = m17();
-        if (!on) { s.stop(); dataReceive = false; scheduleDataHold(false); pushModes(); return null; }
+        if (!on) { s.stop(); dataReceive = false; scheduleDataHold(false, false); pushModes(); return null; }
         ChannelStore.Channel c = current;
         if (c == null || c.isDigital()) return "M17 needs an analog (FM) channel or the VFO";
         String e = s.start();
         if (e != null) return e;
         dataReceive = hold;
-        scheduleDataHold(hold);
+        scheduleDataHold(hold, false);
         pushModes();
         return null;
     }
@@ -3896,7 +4230,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** After any unkey: the module's unkey path rewrites the voice filter, so a held M17 receive goes deaf until the hold is
      *  sent again (seen 2026-10-27 on the hotspot bench: after an M17 key the signal bar moved but no M17 was decoded until a
      *  channel change). Every transmit path calls this once its carrier is down. */
-    private void holdAfterTx() { if (dataReceive) scheduleDataHold(true); }
+    private void holdAfterTx() { if (dataReceive) scheduleDataHold(true, true); }
 
     /** After a symbol-engine transmission (M17 voice and texts, pages, symbol streams) the module leaves its receive audio
      *  muted: measured 2026-10-27 on FW26, the receive RMS fell from about 5600 to 1.3 after the unkey and stayed there while
@@ -3928,22 +4262,83 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
     private volatile boolean quietRewrite;
 
-    /** Re-send the voice-filter hold after a channel, VFO or tone write. Those writes put the filter back. */
-    private void scheduleDataHold(boolean apply) {
+    /**
+     * Apply or release the voice-filter hold. {@code refresh}: a channel, VFO, tone or unkey write has just put the voice
+     * filter back, so a hold already applied must be put on again (release, then apply; see {@link #holdSteps}).
+     */
+    private void scheduleDataHold(boolean apply, boolean refresh) {
         final int g = dataHoldGen.incrementAndGet();
         final boolean want = apply;
-        worker.execute(() -> { if (g == dataHoldGen.get()) sendDataHold(want && dataReceive); });
+        worker.execute(() -> { if (g == dataHoldGen.get()) sendDataHold(want && dataReceive, refresh); });
     }
 
-    private void sendDataHold(boolean apply) {
+    /**
+     * True while the module holds the voice filter (an apply answered sr=0, no release since, no module boot since). The op 6
+     * variant 3 apply saves the live WORK_MODE at 0x4B000 and writes 0x80 every time, with no check of its own, and the
+     * release writes the saved word back: a second apply while held saves 0x80, the release "restores" 0x80, and DMR stays
+     * deaf until a key (FW57, 2026-10-30, channel 49 control). So the host sends an apply only when nothing is held, a
+     * release only when something is, and a refresh as release-then-apply.
+     */
+    private volatile boolean holdActive;
+
+    /**
+     * Whether a hold is active after one op 6 variant 3 frame ({@code sr} null = no reply). A lost reply counts the worst
+     * way for the next request: after an apply, as held (if it ran, the next step must release first; if not, that
+     * release only writes back the last pre-hold mode); after a release, as still held, and a refresh stops there.
+     */
+    static boolean heldAfter(int action, Integer sr, boolean heldBefore) {
+        if (action == 1) return sr == null || sr == 0 || heldBefore;
+        return sr == null && heldBefore;
+    }
+
+    /** The op 6 variant 3 actions to send (1 apply, 0 release), in order, for a request given whether a hold is active. */
+    static int[] holdSteps(boolean apply, boolean held, boolean refresh) {
+        if (!apply) return held ? new int[] { 0 } : new int[0];
+        if (!held) return new int[] { 1 };
+        return refresh ? new int[] { 0, 1 } : new int[0];
+    }
+
+    /** Whether the voice-filter hold may be applied now: never on a DMR channel (it stores WORK_MODE 0x80, which takes the
+     *  sync off a DMR key and its receive until the next key; FW55 bisect 2026-10-30, F55A/F55B). Releasing is always allowed. */
+    static boolean holdAllowed(boolean apply, boolean digitalChannel) { return !apply || !digitalChannel; }
+
+    /**
+     * Leaving a held analog/M17 receive for a DMR channel: M17 and page receive need an analog channel, so they stop, and the
+     * module's hold is released before the DMR channel is written. The release writes AT1846S 0x58 = 0x8405 (and, on FW44
+     * and later images, puts WORK_MODE back), which is wrong for DMR, so it must come first: the DMR write then sets 0x58 for
+     * itself. Pending re-applies are cancelled.
+     */
+    private void endDataHoldForDigital() {
+        dataHoldGen.incrementAndGet();
+        M17Station m = m17; if (m != null && m.running()) m.stop();
+        PagerStation pg = pager; if (pagerHold && pg != null) { pg.stop(); pagerHold = false; }
+        dataReceive = false;
+        sendDataHold(false, false);
+        log("data hold released before a DMR channel");
+        pushModes();
+    }
+
+    private final Object holdLock = new Object();
+    private void sendDataHold(boolean apply, boolean refresh) {
+        synchronized (holdLock) { sendDataHold0(apply, refresh); }
+    }
+    private void sendDataHold0(boolean apply, boolean refresh) {
         try {
+            ChannelStore.Channel cur = current;
+            if (!holdAllowed(apply, cur != null && cur.isDigital())) { log("data hold: not on a DMR channel"); return; }
             if (!engine.isOpen()) { log("data hold: radio not open"); return; }
             if (moduleVersion.trim().isEmpty()) versionHandshake(1500);
             if (!Firmware.stubTag(moduleVersion)) { log("data hold: stock firmware, not sent"); M17Station s = m17; if (s != null) s.setHeldPath(false); return; }
-            Frame pic = sym40(new byte[] { 6, 3, (byte) (apply ? 1 : 0) }, 1000);
-            log("data hold action=" + (apply ? 1 : 0) + (pic == null ? " missing" : " sr=" + pic.sr));
-            M17Station s = m17;
-            if (s != null) s.setHeldPath(apply && pic != null && pic.sr == 0);
+            int[] steps = holdSteps(apply, holdActive, refresh);
+            if (steps.length == 0) { log("data hold: " + (apply ? "already held" : "nothing held") + ", not sent"); return; }
+            for (int a : steps) {
+                Frame pic = sym40(new byte[] { 6, 3, (byte) a }, 1000);
+                log("data hold action=" + a + (pic == null ? " missing" : " sr=" + pic.sr));
+                holdActive = heldAfter(a, pic == null ? null : (int) pic.sr, holdActive);
+                M17Station s = m17;
+                if (s != null) s.setHeldPath(a == 1 && pic != null && pic.sr == 0);
+                if (a == 0 && pic == null) { log("data hold: release not confirmed, apply not sent"); break; }   // an apply now could save 0x80 again
+            }
         } catch (Throwable t) { log("data hold: " + t); }
     }
 
@@ -4115,7 +4510,7 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     // ---- band scope (BandScope): receive-only sweeps ----
     final BandScope scope = new BandScope(new BandScope.Hooks() {
-        @Override public void tune(int hz) throws Exception { engine.setAnalog(hz, hz, hz < 300_000_000 ? 1 : 0, 0, scopeSq, 0, 0, 0, 0, 8, 2); if (dataReceive) scheduleDataHold(true); }   // low power, nothing keyed
+        @Override public void tune(int hz) throws Exception { tunedAt = System.currentTimeMillis(); engine.setAnalog(hz, hz, hz < 300_000_000 ? 1 : 0, 0, scopeSq, 0, 0, 0, 0, profile.analogVolume, 2); if (dataReceive) scheduleDataHold(true, true); }   // low power, nothing keyed
         @Override public void query() throws Exception { engine.queryRssi(); }
         @Override public void restore() {                                   // inline (Talk waits for it on the worker thread)
             ChannelStore.Channel ch = vfo != null ? vfo : current;
@@ -4124,6 +4519,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         }
         @Override public void sweep(int from, int step, float[] dbm, int n) { ui.post(() -> { for (Listener l : listeners) l.onScope(from, step, dbm); }); }
         @Override public void state(String s) { ui.post(() -> { for (Listener l : listeners) l.onScopeState(s); }); }
+        @Override public double stepDb() { return profile.rssiStepDb; }
+        @Override public double offsetDb() { return profile.rssiOffsetDb; }
+        @Override public int readMs() { return profile.scopeReadMs; }
     });
     public BandScope scope() { return scope; }
     volatile int scopeSq = 9;                                                 // the squelch byte for sweep steps (bench: DIAG scope --ei sq)
@@ -4250,10 +4648,29 @@ public class RadioService extends Service implements RadioEngine.Events {
         Scheduler.arm(this);
     }
 
+    /**
+     * Run all checks' trial: write an analog receive channel at {@code hz} straight to the module, without the app's own
+     * band check, at low power and with nothing keyed. Whether the module took it shows in its answer to 0x23 (the
+     * command statistics): the module itself refuses frequencies it cannot tune (measured on the Armor 26 Ultra).
+     */
+    public void probeTune(final int hz) {
+        worker.execute(() -> {
+            try {
+                ChannelStore.Channel t = new ChannelStore.Channel(); t.type = 1; t.rxFreq = t.txFreq = hz; t.name = "probe";
+                synchronized (tunes) { tunes.addLast(new Object[] { t, false }); }   // its answer is matched like any channel write
+                tunedAt = System.currentTimeMillis(); engine.setAnalog(hz, hz, 1, 0, 0, 0, 0, 0, 0, profile.analogVolume, 2);
+            } catch (Exception e) { log("probe tune: " + e); }
+        });
+    }
+    /** Whether the module reports a reception (status 1 without its status 2 yet), whatever Soft SQ makes of it. */
+    public boolean moduleReceiving() { return receiving; }
+    /** The time of the last channel or VFO write to the module. */
+    public long lastTuneAt() { return tunedAt; }
+
     /** Bench (DiagReceiver): re-send the current analog channel/VFO with another module volume byte (normally 8). */
     public void diagAnalogVolume(final int vol) {
         final ChannelStore.Channel ch = vfo != null ? vfo : current; if (ch == null || ch.isDigital()) return;
-        worker.execute(() -> { try { engine.setAnalog(ch.rxFreq, ch.txFreq, ch.band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, vol, 2); log("bench: module volume " + vol); } catch (Exception e) { log("bench volume: " + e); } });
+        worker.execute(() -> { try { tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, ch.band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, vol, 2); log("bench: module volume " + vol); } catch (Exception e) { log("bench volume: " + e); } });
     }
 
     // ---- bench: play a WAV into the receive path as if the radio heard it (DiagReceiver, adb only) ----

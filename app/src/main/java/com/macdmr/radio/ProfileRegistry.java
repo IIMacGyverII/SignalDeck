@@ -77,7 +77,7 @@ public final class ProfileRegistry {
                 boolean sameId = builtIn.supported && id.equals(builtIn.id);
                 boolean newPhone = !builtIn.supported && matches(o.optJSONObject("match"), env);
                 if ((sameId && rev > builtIn.revision) || (newPhone && rev > (s.profile.supported ? s.profile.revision : -1))) {
-                    try { DeviceProfile p = DeviceProfile.fromJson(o); p.source = "updated"; s.profile = p; s.source = "updated"; } catch (Throwable ignored) { }
+                    try { DeviceProfile p = DeviceProfile.fromJson(o); p.source = "updated"; if (!builtIn.moduleLoader) p.moduleLoader = false; s.profile = p; s.source = "updated"; } catch (Throwable ignored) { }   // a list revision never turns the loader on where this release has it off (e.g. a dmr009 fallback phone)
                 }
             }
         }
@@ -130,7 +130,10 @@ public final class ProfileRegistry {
 
     private static final Env PHONE = new Env() {
         @Override public String manufacturer() { return Build.MANUFACTURER; }
-        @Override public String model() { return Build.MODEL; }
+        @Override public String model() {                                  // a GSI: add the vendor partition's model, which still names the phone
+            String v = DeviceProfile.vendorModel();
+            return v.isEmpty() || v.equalsIgnoreCase(Build.MODEL) ? Build.MODEL : Build.MODEL + " " + v;
+        }
         @Override public String device() { return Build.DEVICE; }
         @Override public boolean exists(String path) { return new File(path).exists(); }
     };

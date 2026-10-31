@@ -178,12 +178,13 @@ public final class Ft8Station {
 
     private String msg(int s) {
         String my = host.callsign(), g = host.grid();
+        String me = Ft8Message.standardCall(my) ? my : "<" + my + ">";    // a non-standard call of ours goes hashed next to a report, as WSJT-X sends it
         switch (s) {
             case 1: return partner + " " + my + (g != null && !g.isEmpty() ? " " + g : "");
-            case 2: return partner + " " + my + " " + rptSent;
-            case 3: return partner + " " + my + " R" + rptSent;
-            case 4: return partner + " " + my + " RR73";
-            case 5: return partner + " " + my + " 73";
+            case 2: return partner + " " + me + " " + rptSent;
+            case 3: return partner + " " + me + " R" + rptSent;
+            case 4: return partner + " " + me + " RR73";
+            case 5: return partner + " " + me + " 73";
             case 6: return "CQ " + my + (g != null && !g.isEmpty() ? " " + g : "");
             default: return null;
         }
@@ -242,6 +243,7 @@ public final class Ft8Station {
             txParity = (int) ((h.slot + 1) & 1);
         }
         if (isGrid(last)) { partnerGrid = last; rptSent = report(h.d.snrDb); go(2); }
+        else if (w.length == 2 && (step == 6 || step == 2)) { if (step == 6) rptSent = report(h.d.snrDb); go(2); }   // the calls only: a non-standard caller cannot add its grid; a repeat keeps the report
         else if (last.matches("[+-]\\d\\d")) { rptRcvd = last; if (rptSent == null) rptSent = report(h.d.snrDb); go(3); }
         else if (last.matches("R[+-]\\d\\d")) { rptRcvd = last.substring(1); go(4); logIt(); }
         else if (last.equals("RRR") || last.equals("RR73")) { go(5); logIt(); }

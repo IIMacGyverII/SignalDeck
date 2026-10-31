@@ -38,7 +38,7 @@ public final class LogbookDialog {
         android.location.Location me = svc.lastKnownLocation();
         java.util.Set<String> grids = lb.gridsWorked();
         body.addView(Neo.label(c, (me != null ? "You are in " + com.macdmr.radio.ham.Maidenhead.grid(me.getLatitude(), me.getLongitude(), 6) + "  \u00B7  " : "") + grids.size() + (grids.size() == 1 ? " grid square" : " grid squares") + " worked", Theme.CYAN, 14, true));
-        body.addView(Neo.sheetHint(c, lb.count(true) + " contacts, " + (lb.count(false) - lb.count(true)) + " stations heard. Heard stations are logged by themselves (DMR callers with a RadioID callsign, APRS stations, Morse IDs); tap one to fill in the reports and mark it a contact. Export ADIF for your logging program or QSL service."));
+        body.addView(Neo.sheetHint(c, lb.count(true) + (lb.count(true) == 1 ? " contact, " : " contacts, ") + (lb.count(false) - lb.count(true)) + (lb.count(false) - lb.count(true) == 1 ? " station heard." : " stations heard.") + " Heard stations are logged by themselves (DMR callers with a RadioID callsign, APRS stations, Morse IDs); tap one to fill in the reports and mark it a contact. Export ADIF for your logging program or QSL service."));
         final AlertDialog[] self = new AlertDialog[1];
         LinearLayout r1 = new LinearLayout(c); r1.setBaselineAligned(false);
         TextView add = Neo.button(c, "Add contact", "plus", Neo.GREEN), exp = Neo.button(c, "Export ADIF", "backup", Neo.CYAN);
@@ -65,7 +65,7 @@ public final class LogbookDialog {
             row.addView(Neo.label(c, f.format(new Date(e.ts)) + "  ·  " + (e.freqHz > 0 ? String.format(Locale.US, "%.4f", e.freqHz / 1e6) + " MHz  ·  " : "") + e.mode + rst + (e.source == null || e.source.isEmpty() ? "" : "  ·  " + e.source), 0xFFBFC8D0, 12, false));
             String where = (e.qth == null || e.qth.isEmpty() ? "" : e.qth) + (e.grid == null || e.grid.isEmpty() ? "" : ((e.qth == null || e.qth.isEmpty()) ? "" : "  \u00B7  ") + e.grid);
             double[] at = e.grid == null ? null : com.macdmr.radio.ham.Maidenhead.centre(e.grid);
-            if (at != null && me != null) { double km = com.macdmr.radio.ham.Maidenhead.km(me.getLatitude(), me.getLongitude(), at[0], at[1]); where += String.format(Locale.US, "  \u00B7  %.0f mi %s", km / 1.609344, com.macdmr.radio.ham.Maidenhead.compass(com.macdmr.radio.ham.Maidenhead.bearing(me.getLatitude(), me.getLongitude(), at[0], at[1]))); }
+            if (at != null && me != null) { double km = com.macdmr.radio.ham.Maidenhead.km(me.getLatitude(), me.getLongitude(), at[0], at[1]); where += String.format(Locale.US, "  \u00B7  %s %s", com.macdmr.radio.region.Region.km() ? String.format(Locale.US, "%.0f km", km) : String.format(Locale.US, "%.0f mi", km / 1.609344), com.macdmr.radio.ham.Maidenhead.compass(com.macdmr.radio.ham.Maidenhead.bearing(me.getLatitude(), me.getLongitude(), at[0], at[1]))); }
             if (!where.isEmpty()) row.addView(Neo.label(c, where, 0xFF9FB4C8, 12, false));
             if (e.notes != null && !e.notes.isEmpty()) row.addView(Neo.label(c, e.notes, 0xFF8A98A6, 12, false));
             row.setClickable(true);

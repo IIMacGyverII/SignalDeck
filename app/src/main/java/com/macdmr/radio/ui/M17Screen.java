@@ -113,7 +113,7 @@ public final class M17Screen extends ModeScreen {
             if (hl.isEmpty()) list.addView(Neo.sheetHint(c, "Nothing yet. Tune the M17 frequency (the channel or the VFO). A transmission is found from its sync and played on the phone's speaker."));
         }
         set(note.getText().length() == 0 ? note : note, (svc.m17CanSend()
-            ? "Hold to talk sends your voice as M17, to everyone (@ALL), for up to 28 seconds. A short tail follows the last word so the ending is not cut off. Your callsign is the one in APRS settings. "
+            ? "Hold to talk sends your voice as M17, to everyone (@ALL), up to the transmit limit (Device \u2192 Longest transmission). A short tail follows the last word so the ending is not cut off. Your callsign is the one in APRS settings. "
             : svc.profile().symbolEngine() ? "Receive only on this firmware: transmitting M17 needs the module firmware with the symbol engine. "
             : "Receive only: this radio's module cannot send M17. ")
             + "The radio's audio path removes the low tones M17 needs, so SignalDeck rebuilds them on receive (" + st.calibration() + ")."

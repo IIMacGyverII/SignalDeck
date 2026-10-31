@@ -2,7 +2,7 @@
 
 # Getting started
 
-*Start here · 1 of 33*
+*Start here · 1 of 34*
 
 Take over the radio, pick a channel, talk.
 
@@ -16,7 +16,7 @@ On the Intercom page the round arrows step through your channels. Or open Channe
 
 ## 3  Talk and listen
 
-Hold the large round key, or the phone's side PTT button, to talk; release it to listen. The key is amber when idle, green while the radio hears someone and red while you transmit. SignalDeck ends a voice transmission after 28 seconds. The radio's own limit is 120 seconds.
+Hold the large round key, or the phone's side PTT button, to talk; release it to listen. The key is amber when idle, green while the radio hears someone and red while you transmit. SignalDeck ends a transmission at the transmit limit (Device → Longest transmission, 2 minutes unless you change it); past 30 seconds the heat guard also applies (Good to know → Transmitting legally → Time limit).
 
 ## The launch screen
 

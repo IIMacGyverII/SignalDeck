@@ -58,6 +58,15 @@ public class TextModesTest {
         }
     }
 
+    @Test public void psk31FirstWordSurvivesALateStart() {
+        // over an FM radio the first ~1.2 s of a transmission is lost to the key-up and the receiver's carrier search
+        short[] full = Psk31.encode("CQ PSK31 BENCH", 1500);
+        short[] late = java.util.Arrays.copyOfRange(full, 8000 * 12 / 10, full.length);
+        StringBuilder got = new StringBuilder();
+        new Psk31(got::append).process(withNoise(late, 400, 2000, 3));
+        assertTrue("[" + got + "]", got.toString().contains("CQ PSK31 BENCH"));
+    }
+
     @Test public void varicodeIsPrefixFree() {
         for (String v : Psk31.VARICODE) { assertTrue(v.startsWith("1") && v.endsWith("1")); assertFalse(v, v.contains("00")); }
         assertEquals('e', Psk31.decode("11")); assertEquals(' ', Psk31.decode("1"));

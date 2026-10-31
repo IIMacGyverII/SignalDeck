@@ -907,7 +907,7 @@ function renderAprsSettings(j) {
     + f('Lead-in length', '<select data-k="leadMs">' + opt(j.leadChoices.map(ms => [ms, ms ? (ms / 1000).toFixed(1) + ' s' : 'None']), s.leadMs) + '</select>')
     + '<div class="sect">RECEIVE AND DECODERS</div>'
     + f('Decode packets on analog channels', '<select data-k="passive">' + opt([[0, 'Off'], [1, 'Flagged channels'], [2, 'Every analog channel']], s.passive) + '</select>')
-    + '<div class="f" style="grid-column:1/-1;flex-direction:row;flex-wrap:wrap;gap:8px 18px">' + chk('autoAck', 'Acknowledge messages to me') + chk('digipeat', 'Fill-in digipeater') + chk('dtmf', 'DTMF decoder') + chk('wx', 'Weather alerts (SAME)') + chk('cw', 'Morse decoder') + chk('cwId', 'Morse ID after packets') + chk('telemetry', 'Telemetry beacon') + chk('weather', 'Weather beacon') + chk('txIgate', 'Transmit iGate') + '</div>'
+    + '<div class="f" style="grid-column:1/-1;flex-direction:row;flex-wrap:wrap;gap:8px 18px">' + (s.autoAckAllowed === false ? '<span class="muted">No auto-ack: this radio has no 2 m band</span>' : chk('autoAck', 'Acknowledge messages to me')) + chk('digipeat', 'Fill-in digipeater') + chk('dtmf', 'DTMF decoder') + chk('wx', 'Weather alerts (SAME)') + chk('cw', 'Morse decoder') + chk('cwId', 'Morse ID after packets') + chk('telemetry', 'Telemetry beacon') + chk('weather', 'Weather beacon') + chk('txIgate', 'Transmit iGate') + '</div>'
     + '<div class="sect">APRS-IS AND KISS</div>'
     + f('APRS-IS server', '<input data-k="isServer" value="' + esc(s.isServer) + '">')
     + f('APRS-IS port', '<input data-k="isPort" inputmode="numeric" value="' + s.isPort + '">')
@@ -1173,7 +1173,7 @@ async function loadSettings() { try { renderSettings(await api('settings')); } c
 function renderSettings(j) {
   S.settings = j.settings;
   const f = (k, v) => '<div><span>' + k + '</span><b>' + esc(v) + '</b></div>';
-  $('radioCard').innerHTML = '<div class="big">' + (j.ready ? 'SIGNALDECK OWNS THE RADIO' : esc(String(j.link || '').toUpperCase())) + '</div><div class="grid">' + f('PHONE', j.profile || '—') + f('VERSION', j.version) + (j.firmwareStock ? f('RADIO FIRMWARE', j.firmware && j.firmware !== j.firmwareStock ? j.firmware + ' (stock ' + j.firmwareStock + ')' : j.firmwareStock + ' (stock)') : '') + '</div>';
+  $('radioCard').innerHTML = '<div class="big">' + (j.ready ? 'SIGNALDECK OWNS THE RADIO' : esc(String(j.link || '').toUpperCase())) + '</div><div class="grid">' + f('PHONE', j.profile || '—') + (j.region ? f('REGION', (j.region.chosen ? j.region.name : 'Not chosen') + ' · APRS ' + (j.region.aprsHz / 1e6).toFixed(3)) : '') + f('VERSION', j.version) + (j.firmwareStock ? f('RADIO FIRMWARE', j.firmware && j.firmware !== j.firmwareStock ? j.firmware + ' (stock ' + j.firmwareStock + ')' : j.firmwareStock + ' (stock)') : '') + '</div>';
   $('webCard').innerHTML = '<div class="grid">' + f('BROWSERS', j.browsers) + f('LISTENING', j.listeners) + f('TRANSMIT FROM WEB', j.webTx ? 'Allowed' : 'Off') + '</div>';
   let html = '', group = null;
   j.settings.forEach((s, i) => {
@@ -1188,7 +1188,7 @@ function renderSettings(j) {
 }
 async function saveSetting(i, value) { const s = S.settings[i]; const j = await act('settings', { key: s.key, value }); if (j) renderSettings(j); else loadSettings(); }
 $('setList').addEventListener('click', e => { const b = e.target.closest('.switch'); if (b) saveSetting(+b.dataset.i, !S.settings[+b.dataset.i].value); });
-$('setList').addEventListener('change', e => { const el = e.target; if (el.tagName === 'SELECT') saveSetting(+el.dataset.i, +el.value); else if (el.tagName === 'INPUT') { const s = S.settings[+el.dataset.i]; saveSetting(+el.dataset.i, s.kind === 'int' ? parseInt(el.value, 10) : el.value); } });
+$('setList').addEventListener('change', e => { const el = e.target; if (el.tagName === 'SELECT') { const w = (S.settings[+el.dataset.i].warn || [])[+el.value]; if (w && !confirm(w)) { loadSettings(); return; } saveSetting(+el.dataset.i, +el.value); } else if (el.tagName === 'INPUT') { const s = S.settings[+el.dataset.i]; saveSetting(+el.dataset.i, s.kind === 'int' ? parseInt(el.value, 10) : el.value); } });
 // backup and restore
 async function loadBackups() {
   try {

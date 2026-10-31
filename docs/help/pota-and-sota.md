@@ -2,7 +2,7 @@
 
 # POTA and SOTA
 
-*Pages · 10 of 33*
+*Pages · 10 of 34*
 
 Parks and summits on the air: activate, or work the activators.
 

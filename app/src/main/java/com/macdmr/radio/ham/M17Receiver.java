@@ -61,6 +61,13 @@ public final class M17Receiver {
     /** Feedback taps a fit on a phone's own reception keeps (the rest held at 0): fewer spread wrong decisions less (W6: 4 decoded another transmission best, 95 and 92 of 100 frames). */
     public static final int LEARN_FEEDBACK = 4;
     static final int SEARCH = 60;                                // symbols either side of the estimated preamble end
+    /**
+     * More symbols searched after it: the end is taken from the last 160-sample window (hop 80) that still reads as the
+     * preamble, and a 40 ms preamble spans three or only two such windows depending on where the grid falls; with two the
+     * estimate is a hop (48 symbols) early, and the sync sat ~82 symbols after it, outside +-60 (W6+ 2026-10-30: a recording
+     * identical to one that decoded 98/100 found no sync at all). The true end is never before the last strong window.
+     */
+    static final int SEARCH_AFTER = SEARCH + 64;
     private State state = State.IDLE;
     private java.util.List<M17.Packet> packets;
     private long next48;                                         // where the next frame's first sync symbol is expected
@@ -91,7 +98,7 @@ public final class M17Receiver {
     private void push(float v) {
         interpolate(v);
         preamble(v);
-        if (state == State.ACQUIRE && n48 > preEnd48 + (SEARCH + 192 + 4) * SPS48 + 5 * L + 60) acquire();
+        if (state == State.ACQUIRE && n48 > preEnd48 + (SEARCH_AFTER + 192 + 4) * SPS48 + 5 * L + 60) acquire();
         while (state == State.STREAM && n48 > next48 + 192 * SPS48 + 5 * L + 60) frame();
         while (state == State.PACKET && n48 > next48 + 192 * SPS48 + 5 * L + 60) packetFrame();
     }
@@ -152,7 +159,7 @@ public final class M17Receiver {
         gain = (float) Math.sqrt(e / Math.max(1, cnt)); if (gain < 1e-3f) { reset("no level"); return; }
         int[] sync = new int[8]; for (int i = 0; i < 8; i++) sync[i] = M17.SYMBOL_MAP[(M17.SYNC_LSF >> (14 - 2 * i)) & 3];
         long bestP = -1; float bestScore = Float.MAX_VALUE; float[] h = new float[FB]; float[] ys = new float[8];
-        for (long p = preEnd48 - SEARCH * SPS48; p <= preEnd48 + SEARCH * SPS48; p++) {
+        for (long p = preEnd48 - SEARCH * SPS48; p <= preEnd48 + SEARCH_AFTER * SPS48; p++) {
             for (int i = 0; i < FB; i++) h[i] = (i % 2 == 0) ? -3 : 3;      // the preamble: ... +3 -3, the last one -3
             float err = run(p, 8, h, ys, 0); int miss = 0;
             for (int i = 0; i < 8; i++) if (slice(ys[i]) != sync[i]) miss++;

@@ -2,7 +2,7 @@
 
 # Nets near you
 
-*Pages · 12 of 33*
+*Pages · 12 of 34*
 
 Nets and get-togethers on your channels: on now, coming up, reminders.
 

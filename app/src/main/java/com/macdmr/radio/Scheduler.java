@@ -30,14 +30,17 @@ import java.util.Locale;
 public final class Scheduler {
     public static final String LISTEN = "listen", SCAN = "scan", APRS = "aprs", SSTV = "sstv", BEACON = "beacon", WINLINK = "winlink", WINLINK_NET = "winlinknet", FINDER = "finder";
     public static final String[] ACTIONS = { LISTEN, SCAN, APRS, SSTV, BEACON, WINLINK, WINLINK_NET, FINDER };
-    public static final String[] ACTION_NAMES = { "Listen to a channel", "Scan the zone", "APRS monitoring (144.390)", "SSTV receive", "Send an APRS beacon", "Check Winlink mail (radio gateway)", "Check Winlink mail (internet)", "Packet finder (listen for BBSs, nodes, gateways)" };
+    public static final String[] ACTION_NAMES = { "Listen to a channel", "Scan the zone", "APRS monitoring", "SSTV receive", "Send an APRS beacon", "Check Winlink mail (radio gateway)", "Check Winlink mail (internet)", "Packet finder (listen for BBSs, nodes, gateways)" };
     /** Actions that use a channel of their own (the rest work on the current one). */
     public static boolean usesChannel(String a) { return LISTEN.equals(a) || SSTV.equals(a) || WINLINK.equals(a); }
     /** Whether the radio of {@code dp} can run the action at all: APRS monitoring parks on 144.390, which a UHF-only radio (the W6) does not tune. */
-    public static boolean available(DeviceProfile dp, String a) { return !APRS.equals(a) || dp.tunable(PacketEngine.APRS_FREQ_HZ); }
+    public static boolean available(DeviceProfile dp, String a) { return available(dp, a, PacketEngine.APRS_FREQ_HZ); }
+    /** {@code aprsHz}: the region's APRS frequency (Device → Region), where APRS monitoring parks the radio. */
+    public static boolean available(DeviceProfile dp, String a, int aprsHz) { return !APRS.equals(a) || dp.tunable(aprsHz); }
     /** Why the radio of {@code dp} cannot run the entry ({@code ch}: its channel, null for none or the current one), or null when it can. */
-    public static String bandProblem(DeviceProfile dp, Entry e, ChannelStore.Channel ch) {
-        if (!available(dp, e.action)) return "This radio tunes " + dp.bandsText() + ", not 144.390 MHz: no APRS monitoring";
+    public static String bandProblem(DeviceProfile dp, Entry e, ChannelStore.Channel ch) { return bandProblem(dp, e, ch, PacketEngine.APRS_FREQ_HZ); }
+    public static String bandProblem(DeviceProfile dp, Entry e, ChannelStore.Channel ch, int aprsHz) {
+        if (!available(dp, e.action, aprsHz)) return "This radio tunes " + dp.bandsText() + ", not " + com.macdmr.radio.region.Region.mhz(aprsHz) + " MHz: no APRS monitoring";
         if (usesChannel(e.action) && ch != null && !ChannelStore.tunable(dp, ch)) return ch.name + " is outside " + dp.bandsText() + ": this radio cannot tune it";
         return null;
     }
@@ -51,6 +54,8 @@ public final class Scheduler {
         static Entry of(JSONObject o) { Entry e = new Entry(); e.id = o.optInt("id"); e.action = o.optString("action", LISTEN); e.label = o.optString("label", ""); e.hour = o.optInt("hour", 19); e.minute = o.optInt("minute"); e.days = o.optInt("days"); e.date = o.optString("date", ""); e.minutes = o.optInt("minutes", 60); e.channel = o.optInt("channel", -1); e.record = o.optBoolean("record"); e.enabled = o.optBoolean("enabled", true); return e; }
         public boolean oneShot() { return days == 0; }
         public boolean hasDuration() { return !BEACON.equals(action) && !WINLINK.equals(action) && !WINLINK_NET.equals(action); }
+        /** The names with the APRS frequency in use, e.g. "APRS monitoring (144.800)". */
+        public static String[] actionNames(int aprsHz) { String[] n = ACTION_NAMES.clone(); n[2] = "APRS monitoring (" + com.macdmr.radio.region.Region.mhz(aprsHz) + ")"; return n; }
         public String actionName() { for (int i = 0; i < ACTIONS.length; i++) if (ACTIONS[i].equals(action)) return ACTION_NAMES[i]; return action; }
         /** "Tue, Thu 19:00 for 60 min" / "23 Oct 19:00". */
         public String when() {

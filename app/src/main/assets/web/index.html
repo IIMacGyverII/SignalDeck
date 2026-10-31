@@ -213,7 +213,7 @@
       <div class="panel">
         <div class="row between wrap">
           <div><span class="label">APRS</span> <span id="aprsState" class="chip"></span></div>
-          <div class="row"><button class="btn aprs144-only" id="aprsToggle">Monitor 144.390</button><button class="btn" id="beaconBtn">Send beacon</button></div>
+          <div class="row"><button class="btn aprs-terr-only" id="aprsToggle">Monitor APRS</button><button class="btn" id="beaconBtn">Send beacon</button></div>
         </div>
         <div class="stats"><div><b id="aprsCount">0</b><span>PACKETS</span></div><div><b id="stationCount">0</b><span>STATIONS</span></div><div><b id="forYou">0</b><span>FOR YOU</span></div></div>
       </div>
@@ -475,7 +475,7 @@
         <p class="muted small">Start something at a set time, once or every week; when the time is up the radio goes back to what it was doing. A satellite pass being tracked comes first.</p>
         <div id="schedList" class="list small"></div>
         <form id="schedForm" class="sched-form hidden">
-          <label>What <select id="sfAction"><option value="listen">Listen to a channel</option><option value="scan">Scan the zone</option><option value="aprs" class="aprs144-only">APRS monitoring (144.390)</option><option value="sstv">SSTV receive</option><option value="beacon">Send an APRS beacon</option><option value="winlink">Check Winlink mail (radio gateway)</option><option value="winlinknet">Check Winlink mail (internet)</option><option value="finder">Packet finder (listen for BBSs, nodes, gateways)</option></select></label>
+          <label>What <select id="sfAction"><option value="listen">Listen to a channel</option><option value="scan">Scan the zone</option><option value="aprs" class="aprs-terr-only">APRS monitoring</option><option value="sstv">SSTV receive</option><option value="beacon">Send an APRS beacon</option><option value="winlink">Check Winlink mail (radio gateway)</option><option value="winlinknet">Check Winlink mail (internet)</option><option value="finder">Packet finder (listen for BBSs, nodes, gateways)</option></select></label>
           <label id="sfChWrap">Channel <select id="sfChannel"></select></label>
           <label id="sfRecWrap" class="chk"><input type="checkbox" id="sfRecord"> Record it</label>
           <div class="sf-days" id="sfDays"></div>

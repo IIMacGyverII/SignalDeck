@@ -88,4 +88,16 @@ public class BandGuardsTest {
         long hz = vhfOnly.listenTestHz();
         assertTrue(vhfOnly.tunable(hz)); assertEquals(155_000_000L, hz); assertEquals(0, hz % 12_500);
     }
+
+    /** The profiles added since the guards (refresh 2026-10-31): the 3WT's 100–174 / 400–470 MHz, the 20WT and Xplore 1 as listed, the W6Plus DMR UHF only. */
+    @Test public void theNewerProfilesKeepTheirBands() {
+        DeviceProfile wt3 = DeviceProfile.ARMOR_3WT, wt20 = DeviceProfile.ARMOR_20WT, xp = DeviceProfile.XPLORE_1, w6d = DeviceProfile.ANYSECU_W6_DMR;
+        ChannelStore.Channel air = ch(1, 120_000_000, 120_000_000), aprs = ch(2, 144_390_000, 144_390_000), u475 = ch(3, 475_000_000, 475_000_000), frs = ch(4, 462_562_500, 462_562_500);
+        assertTrue("the 3WT reaches below 136 MHz", ChannelStore.tunable(wt3, air)); assertTrue(ChannelStore.tunable(wt3, aprs));
+        assertFalse("above the 3WT's 470 MHz", ChannelStore.tunable(wt3, u475)); assertTrue(ChannelStore.tunable(wt3, frs));
+        for (DeviceProfile p : new DeviceProfile[] { wt20, xp }) { assertFalse(ChannelStore.tunable(p, air)); assertTrue(ChannelStore.tunable(p, aprs)); assertTrue(ChannelStore.tunable(p, u475)); }
+        assertFalse(ChannelStore.tunable(w6d, aprs)); assertTrue(ChannelStore.tunable(w6d, u475));
+        assertTrue(Scheduler.available(wt3, Scheduler.APRS)); assertFalse(Scheduler.available(w6d, Scheduler.APRS));
+        assertFalse("a region whose APRS frequency is outside the bands: no APRS monitoring", Scheduler.available(wt3, Scheduler.APRS, 0));
+    }
 }

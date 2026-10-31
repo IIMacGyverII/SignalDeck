@@ -90,17 +90,33 @@ public final class ZonesDialog {
             pickChannels(c, svc, z, () -> { svc.setZone(z.id); finished.run(); });
         }));
         body.addView(own, rowLp(d));
-        body.addView(Neo.sheetSection(c, "Standard lists"));
+        com.macdmr.radio.region.Region region = com.macdmr.radio.region.Region.current(c);
+        body.addView(Neo.sheetSection(c, region.chosen ? "Standard lists for " + region.name : "Standard lists"));
         Set<String> have = new HashSet<>(); for (ChannelStore.Zone z : svc.store().zones()) have.add(z.name);
-        int hidden = 0;
-        for (ChannelPresets.Preset p : ChannelPresets.all()) {
-            int tun = p.tunableCount();
-            if (tun == 0) { hidden++; continue; }                               // NOAA, marine, MURS, 2 m on a UHF-only radio: nothing it could tune
-            LinearLayout r = card(c, p.zone + "  ·  " + (tun < p.channels.size() ? tun + " of " + p.channels.size() + " tunable" : p.channels.size() + " channels"), p.region + "  ·  " + p.licence + (have.contains(p.zone) ? "\nYou have a zone called " + p.zone + ": adds the missing channels to it" : ""), p.receiveOnly() ? Neo.AMBER : Neo.CYAN);
+        List<ChannelPresets.Offer> offers = ChannelPresets.offers(region);           // the region's own first; Device → Region
+        final List<android.view.View> hidden = new ArrayList<>();
+        boolean notLegalShown = false, hiddenShown = false; int outOfBand = 0;
+        for (ChannelPresets.Offer o : offers) {
+            ChannelPresets.Preset p = o.preset;
+            if (o.legal == ChannelPresets.NOT_LEGAL && !notLegalShown) { notLegalShown = true; body.addView(Neo.sheetSection(c, "Not legal here")); body.addView(Neo.sheetHint(c, "Licence-free services " + region.name + " does not list. They stay here because you may need them elsewhere; whether you may transmit on them is your responsibility.")); }
+            String mark = o.legal == ChannelPresets.NOT_LEGAL ? "Not legal here  ·  " : o.legal == ChannelPresets.PARTLY ? "Partly legal here (some channels)  ·  " : "";
+            int usable = ChannelPresets.tunableCount(p, svc.profile()::tunable);    // a UHF-only radio cannot use Marine VHF or a 2 m list
+            if (usable == 0) { outOfBand++; continue; }                          // nothing in it this radio could tune: not offered (band guards)
+            if (usable < p.channels.size()) mark = usable + " of " + p.channels.size() + " in this radio's bands  ·  " + mark;
+            LinearLayout r = card(c, p.zone + "  ·  " + p.channels.size() + " channels", mark + p.region + "  ·  " + p.licence + (have.contains(p.zone) ? "\nYou have a zone called " + p.zone + ": adds the missing channels to it" : ""), o.legal == ChannelPresets.NOT_LEGAL ? Neo.RED : p.receiveOnly() ? Neo.AMBER : Neo.CYAN);
             r.setOnClickListener(v -> presetSheet(c, svc, p, finished));
+            if (o.hidden) {
+                if (!hiddenShown) {
+                    hiddenShown = true;
+                    TextView more = Neo.button(c, "Show all lists", "expand", Neo.CYAN); body.addView(more, rowLp(d));
+                    TextView sec = Neo.sheetSection(c, "Lists for other regions"); sec.setVisibility(android.view.View.GONE); body.addView(sec); hidden.add(sec);
+                    more.setOnClickListener(v -> { more.setVisibility(android.view.View.GONE); for (android.view.View h : hidden) h.setVisibility(android.view.View.VISIBLE); });
+                }
+                r.setVisibility(android.view.View.GONE); hidden.add(r);
+            }
             body.addView(r, rowLp(d));
         }
-        if (hidden > 0) body.addView(Neo.sheetHint(c, hidden + " standard list" + (hidden == 1 ? " is" : "s are") + " not shown: none of " + (hidden == 1 ? "its" : "their") + " channels is inside what this radio tunes (" + com.macdmr.radio.DeviceProfile.detect().bandsText() + ")."));
+        if (outOfBand > 0) body.addView(Neo.sheetHint(c, outOfBand + " standard list" + (outOfBand == 1 ? " is" : "s are") + " not shown: none of " + (outOfBand == 1 ? "its" : "their") + " channels is inside what this radio tunes (" + com.macdmr.radio.DeviceProfile.detect().bandsText() + ")."));
         self[0] = Neo.showSheet(c, body);
     }
 
@@ -140,7 +156,7 @@ public final class ZonesDialog {
         final AlertDialog[] self = new AlertDialog[1];
         add.setOnClickListener(v -> {
             ChannelPresets.Result r;
-            try { r = ChannelPresets.install(svc.store(), p, tone[0]); }
+            try { r = ChannelPresets.install(svc.store(), p, tone[0], svc.profile()::tunable); }
             catch (Throwable t) { Toast.makeText(c, "Could not add " + p.zone + ": " + t.getMessage(), Toast.LENGTH_LONG).show(); return; }
             String ze = svc.setZone(r.zoneId);
             Toast.makeText(c, r.summary + (ze != null ? "\n" + ze : ""), Toast.LENGTH_LONG).show();

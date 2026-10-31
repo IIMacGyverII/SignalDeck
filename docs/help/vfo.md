@@ -2,7 +2,7 @@
 
 # VFO
 
-*On the intercom · 6 of 33*
+*On the intercom · 6 of 34*
 
 Tune any frequency without a saved channel.
 

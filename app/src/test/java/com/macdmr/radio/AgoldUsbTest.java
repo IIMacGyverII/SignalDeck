@@ -118,16 +118,32 @@ public class AgoldUsbTest {
     }
 
     @Test public void theReceptionWatchdogFollowsTheIdleFloor() {
-        assertEquals("floor unknown: the fixed thresholds", -95, AgoldUsb.rssiStartDbm(Double.NaN), 0);
-        assertEquals(-100, AgoldUsb.rssiEndDbm(Double.NaN), 0);
-        assertEquals("a quiet channel (-102) keeps them", -95, AgoldUsb.rssiStartDbm(-102), 0);
-        assertEquals(-100, AgoldUsb.rssiEndDbm(-102), 0);
-        double f = Double.NaN;                                               // the bench channel with the charger in idled at -98 (2026-10-29)
-        for (int i = 0; i < 30; i++) f = AgoldUsb.nextFloor(f, -98);
-        assertEquals(-98, f, 0.01);
-        assertTrue("a reception can end again at -98: end above the floor", AgoldUsb.rssiEndDbm(f) > -98);
-        assertTrue("and the floor alone does not start one", AgoldUsb.rssiStartDbm(f) > -98);
-        assertEquals("a carrier is not idle: the floor stays", f, AgoldUsb.nextFloor(f, -74), 0);
+        assertEquals("floor unknown: the fixed thresholds", -87, AgoldUsb.rssiStartDbm(Double.NaN), 0);
+        assertEquals(-97, AgoldUsb.rssiEndDbm(Double.NaN), 0);
+        assertEquals("a quiet channel (-101) keeps them", -87, AgoldUsb.rssiStartDbm(-101), 0);
+        assertEquals(-97, AgoldUsb.rssiEndDbm(-101), 0);
+        double f = Double.NaN;                                               // the bench channel with the charger in idled 5 dB up (2026-10-29: -93 on this scale)
+        for (int i = 0; i < 30; i++) f = AgoldUsb.nextFloor(f, -93);
+        assertEquals(-93, f, 0.01);
+        assertTrue("a reception can end again at -93: end above the floor", AgoldUsb.rssiEndDbm(f) > -93);
+        assertTrue("and the floor alone does not start one", AgoldUsb.rssiStartDbm(f) > -93);
+        assertEquals("a carrier is not idle: the floor stays", f, AgoldUsb.nextFloor(f, -45), 0);
+    }
+
+    @Test public void theNewScaleKeepsTheWatchdogOnTheSameRawReadings() {
+        // the thresholds tuned on the bench in the half-dB scale (new = 2 x old + 103 for the same raw reading)
+        for (int floorRaw = 20; floorRaw <= 60; floorRaw++) {
+            double oldFloor = -120 + floorRaw / 2.0, newFloor = RadioEngine.rssiDbm(floorRaw, 1.0, -17);
+            double oldStart = Math.max(-95, oldFloor + 6), oldEnd = Math.max(-100, oldFloor + 2);
+            assertEquals(2 * oldStart + 103, AgoldUsb.rssiStartDbm(newFloor), 1e-9);
+            assertEquals(2 * oldEnd + 103, AgoldUsb.rssiEndDbm(newFloor), 1e-9);
+        }
+    }
+
+    @Test public void theSignalReadingFollowsTheProfilesStep() {
+        assertEquals("the Armor: half a dB per step", -88, RadioEngine.rssiDbm(64, 0.5, 0), 1e-9);
+        assertEquals("the Atom XL keeps its idle level", -103, RadioEngine.rssiDbm(0x22, DeviceProfile.ATOM_XL.rssiStepDb, DeviceProfile.ATOM_XL.rssiOffsetDb), 1e-9);
+        assertEquals("and a 10 dB stronger carrier reads 10 dB more", 10, RadioEngine.rssiDbm(0x44, 1.0, -17) - RadioEngine.rssiDbm(0x3A, 1.0, -17), 1e-9);
     }
 
     @Test public void aPowerUpWindowIsSettledByTheDriversFlag() {
@@ -149,6 +165,52 @@ public class AgoldUsbTest {
         assertTrue("off first", off >= 0 && off < pulse);
         assertTrue("then the 0.2 s pulse, out of reset", r.indexOf("echo 0 > " + AgoldUsb.RSTMCU, pulse) > pulse && offAgain > pulse);
         assertTrue("then host mode is left", r.indexOf("echo 0 > " + AgoldUsb.USB_PATH) > offAgain);
+    }
+
+    @Test public void coverageSkipsReadingsWhileTheBridgeRestarts() {
+        assertFalse(AgoldUsb.coverageReadingUsable(true, 1000, 2500));    // inside the restart or its grace
+        assertTrue(AgoldUsb.coverageReadingUsable(true, 2500, 2500));     // the grace is over
+        assertTrue(AgoldUsb.coverageReadingUsable(true, 5000, 0));        // no restart
+        assertTrue(AgoldUsb.coverageReadingUsable(false, 1000, 2500));    // other phones
+    }
+
+    @Test public void aSignalOnlyReceptionOpensItsCaptureOnlyOnceItHasLasted() {
+        assertEquals(0, AgoldUsb.captureOpenDelay(false, false, 0));                         // the line reported it: open at once, as before
+        assertEquals(AgoldUsb.LINE_MISS_MIN_MS, AgoldUsb.captureOpenDelay(true, false, 0));  // found from the signal: wait the full 3 s
+        assertEquals(1000, AgoldUsb.captureOpenDelay(true, false, AgoldUsb.LINE_MISS_MIN_MS - 1000));
+        assertEquals(0, AgoldUsb.captureOpenDelay(true, false, AgoldUsb.LINE_MISS_MIN_MS + 500));   // a stuck line's station: open after 3 s
+        assertEquals(0, AgoldUsb.captureOpenDelay(true, true, 0));                           // MON opens at once
+        assertEquals(0, AgoldUsb.captureOpenDelay(true, false, AgoldUsb.LINE_MISS_MIN_MS - 1));     // a timer that fired 1 ms early opens now
+    }
+
+    @Test public void aSilentSignalOnlyCaptureIsClosedBeforeTheBridgeTimesOut() {
+        assertTrue(AgoldUsb.closeSilentSignalOnlyCapture(true, false, 0));     // found from the signal, no audio: close it cleanly
+        assertFalse(AgoldUsb.closeSilentSignalOnlyCapture(true, false, 640));  // audio came: a real station on a stuck line
+        assertFalse(AgoldUsb.closeSilentSignalOnlyCapture(false, false, 0));   // the line reported it: its own recovery decides
+        assertFalse(AgoldUsb.closeSilentSignalOnlyCapture(true, true, 0));     // MON holds the reception open on purpose
+        assertTrue(AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS < 2000);                  // before the kernel's 2 s I/O error
+    }
+
+    @Test public void historyShowsOnlyALevelReadSinceTheReceptionBegan() {
+        assertFalse(AgoldUsb.historyLevelFresh(true, 1000, 2000));    // read before the reception: the idle level, not shown
+        assertTrue(AgoldUsb.historyLevelFresh(true, 2500, 2000));     // a measured reading during it: shown
+        assertTrue(AgoldUsb.historyLevelFresh(true, 1000, 0));        // no reception yet: the reading stands
+        assertTrue(AgoldUsb.historyLevelFresh(false, 1000, 2000));    // other phones read during receptions
+    }
+
+    @Test public void theSMeterHoldsItsReadingOnlyDuringAReportedAtomXlReception() {
+        assertTrue(AgoldUsb.holdsRxRead(true, true, false));      // the line reported it: no command while the audio streams
+        assertFalse(AgoldUsb.holdsRxRead(true, true, true));      // found from the signal: the watchdog needs the readings to end it
+        assertFalse(AgoldUsb.holdsRxRead(true, false, false));    // idle
+        assertFalse(AgoldUsb.holdsRxRead(false, true, false));    // other phones
+    }
+
+    @Test public void onlyALongUnreportedReceptionCountsAgainstTheLine() {
+        assertFalse("a 1 s blip from a transmitter on another band", AgoldUsb.countsAsLineMiss(220));
+        assertFalse(AgoldUsb.countsAsLineMiss(2999));
+        assertTrue("a carrier the line never reported (the stuck-line repro's 12 s carriers)", AgoldUsb.countsAsLineMiss(12000));
+        assertTrue(AgoldUsb.countsAsLineMiss(3000));
+        assertEquals("two counted misses still restart the bridge", 1, AgoldUsb.stuckLineAction(AgoldUsb.STUCK_LINE_MISSES, 0, false));
     }
 
     @Test public void powerScriptsFollowTheHalsOrder() {

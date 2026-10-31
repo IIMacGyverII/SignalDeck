@@ -18,7 +18,7 @@ import android.util.Log;
  * am broadcast -a com.macdmr.radio.DIAG --es cmd inject --es path /sdcard/Download/x.wav
  * am broadcast -a com.macdmr.radio.DIAG --es cmd isline --es line "SRC>APRS,TCPIP*::DEST     :hi{1"
  * am broadcast -a com.macdmr.radio.DIAG --es cmd heard --es call DEST        (as if DEST was heard on the radio)
- * am broadcast -a com.macdmr.radio.DIAG --es cmd benchIgate --ez on true       (gate to RF without APRS-IS and off 144.390)
+ * am broadcast -a com.macdmr.radio.DIAG --es cmd benchIgate --ez on true       (gate to RF without APRS-IS and off the APRS frequency)
  * am broadcast -a com.macdmr.radio.DIAG --es cmd pkt --es what object|bulletin|telemetry|weather|cwid|beacon|connect|disconnect
  * am broadcast -a com.macdmr.radio.DIAG --es cmd checks --es watch auto --el hosttime 1793000000000   (Run all checks, no screen)
  * </pre>
@@ -36,9 +36,9 @@ public final class DiagReceiver extends BroadcastReceiver {
             case "inject": s.injectWav(new java.io.File(i.getStringExtra("path"))); break;
             case "isline": if (s.packet() != null) s.packet().diagServerLine(i.getStringExtra("line")); break;
             case "heard": if (s.packet() != null) s.packet().diagHeard(i.getStringExtra("call")); break;
-            case "vfo": {                                                       // bench: the VFO on --ei hz (wide; low power unless --ei power 1; nothing is keyed)
+            case "vfo": {                                                       // bench: the VFO on --ei hz (wide; low power unless --ei power 1; --ef ctcss Hz: transmit tone; nothing is keyed)
                 int hz = i.getIntExtra("hz", 0); if (!com.macdmr.radio.DeviceProfile.inBands(hz)) { Log.w("DiagReceiver", "vfo: bad hz " + hz); break; }
-                s.diagVfo(hz, i.getIntExtra("power", 0) == 1 ? 1 : 0); break;
+                s.diagVfo(hz, i.getIntExtra("power", 0) == 1 ? 1 : 0, i.getFloatExtra("ctcss", 0f)); break;
             }
             case "scope": {                                                     // bench: --ei from --ei to --ei step --ei settle (ms) --ei sweeps N: log N sweeps, then stop
                 final int sw = Math.max(1, i.getIntExtra("sweeps", 2));
@@ -227,6 +227,11 @@ public final class DiagReceiver extends BroadcastReceiver {
                 if (i.hasExtra("advance")) com.macdmr.radio.ham.Ft8Station.txAdvanceMs = Math.max(0, Math.min(3000, i.getIntExtra("advance", 1100)));
                 String m = i.getStringExtra("msg"); if (m != null) Log.i("DiagReceiver", "ft8 send: " + f.sendText(m));
                 if (i.getBooleanExtra("cq", false)) Log.i("DiagReceiver", "ft8 cq: " + f.callCq());
+                if (i.getBooleanExtra("reply", false)) {                      // bench: answer the newest CQ heard, as a tap on it would
+                    com.macdmr.radio.ham.Ft8Station.Heard cq = null;
+                    for (com.macdmr.radio.ham.Ft8Station.Heard h : f.heard()) if (h.cq) cq = h;
+                    Log.i("DiagReceiver", "ft8 reply: " + (cq == null ? "no CQ heard" : f.reply(cq)));
+                }
                 if (i.getBooleanExtra("halt", false)) f.haltTx();
                 for (com.macdmr.radio.ham.Ft8Station.Heard h : f.heard()) Log.i("DiagReceiver", "ft8 heard " + h.time() + " " + h.d);
                 Log.i("DiagReceiver", "ft8: " + f.status() + ", running " + f.running() + ", tx " + f.txEnabled() + " " + f.nextMessage() + ", parity " + f.txParity() + ", advance " + com.macdmr.radio.ham.Ft8Station.txAdvanceMs);
@@ -252,7 +257,13 @@ public final class DiagReceiver extends BroadcastReceiver {
             case "testtone": {                                                  // bench: key a 1 kHz tone for --ei ms (≤ 5 s, or ≤ 40 s with --ez lift) on the current channel or VFO
                 boolean lift = i.getBooleanExtra("lift", false);
                 int ms = Math.max(200, Math.min(lift ? 40000 : 5000, i.getIntExtra("ms", 2000)));
-                Log.i("DiagReceiver", "testtone " + ms + " ms" + (lift ? " lift" : "")); s.diagTestTone(ms, lift); break;
+                int hz = Math.max(50, Math.min(3800, i.getIntExtra("hz", 1000))), amp = Math.max(100, Math.min(30000, i.getIntExtra("amp", 12000)));
+                Log.i("DiagReceiver", "testtone " + hz + " Hz amp " + amp + " " + ms + " ms" + (lift ? " lift" : "")); s.diagTestTone(ms, lift, hz, amp); break;
+            }
+            case "txscale": Log.i("DiagReceiver", "txscale: " + s.diagTxScale(i.getFloatExtra("v", 1f))); break;   // bench: the gateway route's sample factor (--ef v)
+            case "tonesweep": {                                                 // bench: 100-3500 Hz, 400 ms each with 100 ms gaps (7 s), --ei amp (default 12000)
+                int amp = Math.max(100, Math.min(30000, i.getIntExtra("amp", 12000)));
+                Log.i("DiagReceiver", "tonesweep amp " + amp); s.diagToneSweep(amp); break;
             }
             case "vfooff": s.diagVfoOff(); break;
             case "audiopath": { String pth = i.getStringExtra("path"); if ("auto".equals(pth) || "vendor".equals(pth) || "direct".equals(pth)) s.diagAudioPath(pth); else Log.w("DiagReceiver", "audiopath: auto | vendor | direct"); break; }   // bench: the receive/transmit audio path
@@ -284,6 +295,33 @@ public final class DiagReceiver extends BroadcastReceiver {
                 com.macdmr.radio.pkt.AFSKDecoderIQ.PREFILTER = !legacy; com.macdmr.radio.pkt.AFSKDecoderIQ.toneFilterSize = legacy ? 32 : 52;
                 Log.i("DiagReceiver", "afsk decoder: " + (legacy ? "legacy" : "new")); break;
             }
+            case "text": if (s.packet() != null) {                              // bench: --ei mode 0 off / 1 RTTY / 2 PSK31 (listen + send mode), --es send TEXT, --ez dump (log what was received), --ez clear
+                com.macdmr.radio.PacketEngine pe = s.packet();
+                if (i.hasExtra("mode")) pe.setTextMode(Math.max(0, Math.min(2, i.getIntExtra("mode", 0))));
+                if (i.getBooleanExtra("clear", false)) pe.textClear();
+                String t = i.getStringExtra("send"); if (t != null) Log.i("DiagReceiver", "text send: " + pe.textSend(t));
+                if (i.getBooleanExtra("dump", false)) for (String l : pe.textReceived().split("\n")) Log.i("DiagReceiver", "text rx: " + l);
+                Log.i("DiagReceiver", "text: mode " + pe.textMode() + ", " + pe.textStatus()); break;
+            } else break;
+            case "term": if (s.packet() != null) {                              // bench: packet terminal: --ez accept, --es connect CALL-N, --es send LINE, --ez disconnect, --ez dump (log the transcript)
+                com.macdmr.radio.PacketEngine pe = s.packet();
+                if (i.hasExtra("accept")) pe.setAcceptConnections(i.getBooleanExtra("accept", false));
+                String to = i.getStringExtra("connect"); if (to != null) Log.i("DiagReceiver", "term connect: " + pe.terminalConnect(to, i.getStringExtra("via")));
+                String line = i.getStringExtra("send"); if (line != null) Log.i("DiagReceiver", "term send: " + pe.terminalSend(line));
+                if (i.getBooleanExtra("disconnect", false)) pe.terminalDisconnect();
+                if (i.getBooleanExtra("dump", false)) for (String l : pe.transcriptText().split("\n")) if (!l.isEmpty()) Log.i("DiagReceiver", "term: " + l);
+                Log.i("DiagReceiver", "term state: " + pe.terminalState() + ", accept " + pe.acceptConnections()); break;
+            } else break;
+            case "aprsmsg": if (s.packet() != null) Log.i("DiagReceiver", "aprsmsg: " + s.packet().sendMessage(i.getStringExtra("to"), i.getStringExtra("text"))); break;   // bench: an APRS message (--es to CALL-N, --es text), acked and retried as from the UI
+            case "dtmfsend": if (s.packet() != null) Log.i("DiagReceiver", "dtmfsend: " + s.packet().sendDtmf(i.getStringExtra("seq"))); break;   // bench: send a DTMF sequence (--es seq 0-9*#ABCD)
+            case "sstvtx": if (s.packet() != null) {                            // bench: send a colour-bar test card marked N0CALL, --ei mode (SSTVEncoder mode, default Robot 24 colour)
+                android.graphics.Bitmap bmp = android.graphics.Bitmap.createBitmap(320, 240, android.graphics.Bitmap.Config.ARGB_8888);
+                android.graphics.Canvas cv = new android.graphics.Canvas(bmp); android.graphics.Paint pt = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+                int[] bars = { 0xFFFFFFFF, 0xFFFFFF00, 0xFF00FFFF, 0xFF00FF00, 0xFFFF00FF, 0xFFFF0000, 0xFF0000FF, 0xFF000000 };
+                for (int k = 0; k < bars.length; k++) { pt.setColor(bars[k]); cv.drawRect(k * 40, 0, k * 40 + 40, 160, pt); }
+                pt.setColor(0xFF202020); cv.drawRect(0, 160, 320, 240, pt); pt.setColor(0xFFFFFFFF); pt.setTextSize(44); cv.drawText("N0CALL", 70, 220, pt);
+                Log.i("DiagReceiver", "sstvtx: " + s.packet().sendSstv(bmp, i.getIntExtra("mode", com.macdmr.radio.pkt.SSTVEncoder.ROBOT_24_COLOR))); break;
+            } else break;
             case "sstv": {                                                      // bench: --ez on, --ez park (144.500), --ez cont (continuous Robot 36)
                 if (s.packet() != null && i.hasExtra("cont")) s.packet().setSstvContinuousMode(i.getBooleanExtra("cont", false));
                 Log.i("DiagReceiver", "sstv: " + s.sstvMonitor(i.getBooleanExtra("on", false), i.getBooleanExtra("park", true))); break;

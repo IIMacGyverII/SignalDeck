@@ -85,10 +85,16 @@ public final class RootSetup {
         } catch (Exception e) { return "Could not build the module zip: " + e; }
     }
 
-    /** Fallback line settings for profiles without a serial library, with a readback so the log shows what the port really ended up at. */
+    /**
+     * Fallback line settings for profiles without a serial library, with a readback so the log shows what the port really ended up at.
+     * Magisk's busybox stty when it is there: toybox stty answers rc=0 but leaves these UARTs' speed unchanged (the W6Plus DMR's
+     * ttyS2 stayed at 9600 after a cold boot, 2026-10-29, so the module never answered; before that the stock app had always set
+     * 57600 first).
+     */
     public static String ensureTty(DeviceProfile p) {
-        String s = run("cat /proc/self/attr/current; echo; stty -F " + p.controlPort + " " + p.baud + " raw -echo -echoe -echok -echoctl -echoke; echo rc=$?; stty -F " + p.controlPort + " -a | head -1");
-        if (p.pcmPort != null) s += " | " + run("stty -F " + p.pcmPort + " " + p.pcmBaud + " raw -echo; stty -F " + p.pcmPort + " -a | head -1");
+        String st = "S=stty; [ -x /data/adb/magisk/busybox ] && S='/data/adb/magisk/busybox stty'; ";
+        String s = run("cat /proc/self/attr/current; echo; " + st + "$S -F " + p.controlPort + " " + p.baud + " raw -echo -echoe -echok -echoctl -echoke; echo rc=$?; stty -F " + p.controlPort + " -a | head -1");
+        if (p.pcmPort != null) s += " | " + run(st + "$S -F " + p.pcmPort + " " + p.pcmBaud + " raw -echo; stty -F " + p.pcmPort + " -a | head -1");
         return s.replace('\n', ' ');
     }
 

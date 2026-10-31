@@ -38,6 +38,7 @@ The same guide the app shows under Device → Help & how-to, one page per topic.
 - [Contacts](contacts.md): People and talkgroups: DMR ID, callsign, pager RICs, notes, locations and history.
 - [Messages](messages.md): DMR texts, M17 texts and pager threads.
 - [Device](device.md): Radio link, settings and tools.
+- [Region](region.md): Your country's APRS frequency and other defaults.
 - [SignalDeck Web](signaldeck-web.md): Use the radio from a browser on your Wi-Fi.
 - [Map](map.md): APRS stations, repeaters and channels around you.
 - [Coverage maps](coverage-maps.md): Where your repeaters really work, measured as you go.

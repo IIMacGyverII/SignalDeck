@@ -81,10 +81,30 @@ HackRF on 446.000 MHz, VFO, module volume 8:
 
   These go into a separate report PR.
 
+## Transmit (owner-authorized test, 2026-10-29)
+
+Setup:
+- A local test build with transmit allowed. The profile stays untested until the owner confirms.
+- 446.000 MHz, low power, bench DMR ID 1234568, keyed through SignalDeck Web PTT.
+- HackRF receive-only captures at 2.4 MS/s, analysed with phonedmrapp `tools/dmr-replay/iqan_tx.py`.
+
+Results:
+- **Keying:** the PTT line gpio188, with the mic lines, keys the module, which reports status 3 SEND_START and 4 SEND_STOP. No 0x26. Every key ended on release.
+- **FM:** carrier 27.5 dB over the HackRF floor. Deviation p99 about 1 kHz with room sound: the microphone is the only transmit audio, so Morse, APRS or tones from the app are not possible on this phone.
+- **DMR:** two 6 s keys decoded identically:
+  - MS-sourced direct mode; 3 voice LC headers 60 ms apart, 16 voice syncs 360 ms apart, a terminator with LC;
+  - colour code 1, group call, destination TG 9, source 1234568;
+  - outer symbol deviation 1815 Hz (nominal 1944).
+- **Watchdog:** PTT held for 30 s; SignalDeck released at 28 s (28.24 s of carrier).
+- **Heat:** battery 42.1 to 42.8 °C over the session, CPU zone 51–53 °C.
+- **Effect on other radios:** a W6 key desensitises a nearby radio on another UHF frequency (the Atom XL on 401.025 MHz read lower RSSI during each key), but does not open it.
+
+**Carrier offset: about +1.6 kHz on every key, FM and DMR alike** (+1598, +1575, +1604 Hz). This is the W6's and the HackRF's crystal errors together. The Armor 26 Ultra with the same HackRF reads +0.8 to 1.0 kHz, so the W6 is probably 0.6 to 0.8 kHz high (about 1.5 ppm), but only a frequency reference can separate the two. It is inside what DMR receivers usually tolerate. **Flag it for narrow or strict DMR receivers and hotspots:** an MMDVM hotspot may need its RX offset adjusted, or show a high BER, for this radio.
+
 ## Still open
 
 - DMR voice and text receive. This needs a DMR source in the cage: the hotspot, or a recorded key replayed by the HackRF.
 - The owner's listening check: the speaker plays FM reception and volume 0 is silent.
 - The side-key capture.
-- Transmit, which is the owner's, in the cage. After that, `verified` and an automatic take-over.
+- The owner's decision on `verified` and an automatic take-over (transmit test above), and a voice key heard by ear on another radio.
 - A Soft SQ level sweep with 3 kHz-filtered speech at several HackRF levels.

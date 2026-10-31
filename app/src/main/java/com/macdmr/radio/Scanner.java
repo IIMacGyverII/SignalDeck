@@ -29,6 +29,8 @@ public final class Scanner {
         void status(boolean scanning, boolean holding, ChannelStore.Channel on);
         /** Listening time per channel (the phone's profile). */
         default long dwellMs() { return DWELL_MS; }
+        /** How long after landing on a channel its reception report is trusted (the phone's profile). */
+        default long settleMs() { return SETTLE_MS; }
     }
 
     static final long DWELL_MS = 1500, DWELL_SOFT_MS = 2000, HANG_MS = 2500, SETTLE_MS = 700, TICK_MS = 150;
@@ -95,7 +97,7 @@ public final class Scanner {
             if (!scanning) return;
             long now = System.currentTimeMillis();
             boolean rx = host.receiving();
-            if ((idx >= 0 || onPriority) && now - landedAt > SETTLE_MS && rx) {              // activity on this channel: hold
+            if ((idx >= 0 || onPriority) && now - landedAt > host.settleMs() && rx) {              // activity on this channel: hold
                 lastActivityAt = now;
                 if (!holding) { holding = true; if (onPriority) peeking = false; host.status(true, true, here()); }
             }

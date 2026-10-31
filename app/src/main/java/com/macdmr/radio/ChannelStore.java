@@ -229,11 +229,13 @@ public final class ChannelStore extends SQLiteOpenHelper {
      * For an install imported before TG lists were read: map the stock rows to our channels by name and receive frequency
      * (numbers may have changed since) and import the module's lists and assignments without touching anything else.
      */
-    public int repairModuleTgLists(Context ctx, String stockPackage, String areaKey, StringBuilder err) {
-        SQLiteDatabase sdb = copyStock(ctx, stockPackage, "database_channel_area_" + areaKey + ".db", "stock_repair.db");
+    public int repairModuleTgLists(Context ctx, String stockPackage, String areaKey, StringBuilder err) { return repairModuleTgLists(ctx, stockPackage, "database_channel_area_", areaKey, err); }
+    /** {@code prefix}: the stock app's per-area file and table name before the area (DeviceProfile.stockAreaPrefix). */
+    public int repairModuleTgLists(Context ctx, String stockPackage, String prefix, String areaKey, StringBuilder err) {
+        SQLiteDatabase sdb = copyStock(ctx, stockPackage, prefix + areaKey + ".db", "stock_repair.db");
         if (sdb == null) { err.append("stock channels not readable"); return -1; }
         java.util.Map<Integer, Integer> map = new java.util.HashMap<>();
-        try (Cursor c = sdb.rawQuery("SELECT _id, channel_name, channel_rxFreq FROM database_channel_area_" + areaKey, null)) {
+        try (Cursor c = sdb.rawQuery("SELECT _id, channel_name, channel_rxFreq FROM " + prefix + areaKey, null)) {
             List<Channel> mine = all();
             while (c.moveToNext()) {
                 String name = c.getString(1); int rx = c.getInt(2);
@@ -737,13 +739,19 @@ public final class ChannelStore extends SQLiteOpenHelper {
     // ---- import from the stock app (root copy of its per-area database) ----------------------------
 
     /** @return number of channels imported, or -1 with the reason in {@code err}. */
-    public int importFromStock(Context ctx, String stockPackage, String areaKey, StringBuilder err) {
+    public int importFromStock(Context ctx, String stockPackage, String areaKey, StringBuilder err) { return importFromStock(ctx, stockPackage, "database_channel_area_", areaKey, err); }
+    /**
+     * {@code prefix}: the stock app's per-area file and table name before the area (DeviceProfile.stockAreaPrefix): the
+     * Armor 26 Ultra's app keeps database_channel_area_&lt;area&gt;, the Armor 20WT's channel_database_&lt;area&gt; (without the
+     * relay and interrupt columns, which take their defaults).
+     */
+    public int importFromStock(Context ctx, String stockPackage, String prefix, String areaKey, StringBuilder err) {
         try {
-            // stock files: databases/database_channel_area_<area>.db holding table database_channel_area_<area>
+            // stock files: databases/<prefix><area>.db holding table <prefix><area>
             File dst = new File(ctx.getCacheDir(), "stock_" + areaKey + ".db");
             String r = "";
             for (String base : new String[] { "/data/user/0/", "/data/data/" }) {        // su may see a different mount view
-                String src = base + stockPackage + "/databases/database_channel_area_" + areaKey + ".db";
+                String src = base + stockPackage + "/databases/" + prefix + areaKey + ".db";
                 r = RootSetup.run("cp " + src + " " + dst.getAbsolutePath() + " && chmod 644 " + dst.getAbsolutePath() + " && chown $(stat -c %u:%g " + ctx.getCacheDir().getAbsolutePath() + ") " + dst.getAbsolutePath());
                 if (dst.exists() && dst.length() > 0) break;
             }
@@ -756,7 +764,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
             java.util.Map<Integer, Integer> stockIdToNumber = new java.util.HashMap<>();   // module side-tables key on the stock row _id
             SQLiteDatabase db = getWritableDatabase();
             db.beginTransaction();
-            try (Cursor c = sdb.query("database_channel_area_" + areaKey, null, null, null, null, null, "_id")) {   // rows in display order
+            try (Cursor c = sdb.query(prefix + areaKey, null, null, null, null, null, "_id")) {   // rows in display order
                 db.delete("channels", null, null);
                 while (c.moveToNext()) {
                     Channel ch = new Channel();
@@ -948,7 +956,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 Channel ch = flyscaleDmrChannel(slot, e.getValue(), analog.get(slot), digital.get(slot));
                 if (ch == null) continue;
                 ch.number = ++n; ch.active = slot == activeSlot;
-                if (ch.active && dmrIdOut != null && dmrIdOut.length > 0) { java.util.Map<String, String> d = digital.get(slot); dmrIdOut[0] = d == null ? 0 : leInt(d.get("LOCAL_ID")); }
+                if (ch.active && dmrIdOut != null && dmrIdOut.length > 0) { java.util.Map<String, String> d = digital.get(slot); dmrIdOut[0] = d == null ? 0 : flyscaleDmrId(d.get("LOCAL_ID")); }
                 db.insert("channels", null, values(ch));
             }
             db.setTransactionSuccessful();
@@ -994,6 +1002,21 @@ public final class ChannelStore extends SQLiteOpenHelper {
         } catch (RuntimeException e) { return null; }
     }
     private static int hx(String s, int d) { if (s == null || s.trim().isEmpty()) return d; try { return Integer.parseInt(s.trim(), 16); } catch (NumberFormatException e) { return d; } }
+    /** The highest DMR ID the module takes (the stock apps' MAX_ID); the W6Plus DMR's module refuses a channel with a higher one and stops answering. */
+    public static final int MAX_DMR_ID = 16776415;
+    /**
+     * The stock app's LOCAL_ID: unlike its call number and talkgroups it is stored most significant byte first (the factory
+     * value "00000001" is ID 1). Read that way, the other way only if that is out of range; 0 for the factory 1 (no ID set)
+     * or anything outside 2..{@link #MAX_DMR_ID}.
+     */
+    static int flyscaleDmrId(String hex) {
+        if (hex == null || hex.trim().length() != 8) return 0;
+        int be;
+        try { be = (int) Long.parseLong(hex.trim(), 16); } catch (NumberFormatException e) { return 0; }
+        if (be >= 1 && be <= MAX_DMR_ID) return be > 1 ? be : 0;
+        int le = leInt(hex);
+        return le > 1 && le <= MAX_DMR_ID ? le : 0;
+    }
     /** Little-endian 32-bit hex ("01000000" = 1), 0 when it does not parse. */
     static int leInt(String s) {
         if (s == null || s.trim().length() != 8) return 0;

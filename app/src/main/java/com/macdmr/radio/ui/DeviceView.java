@@ -34,7 +34,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private final View linkDot;
     private final ImageView heroIcon;
     private final TextView takeOver, handBack, reportNow;
-    private Neo.NeonSwitch customPttSw; private TextView customPttSub;
+    private Neo.NeonSwitch customPttSw; private TextView customPttSub, regionSub;
     private final Neo.NeonSwitch ownAtBoot, voiceSw, hwPttSw, volPttSw, scanSqSw, styleSw, animSw, covSw, carMicSw, carCovSw, wheelSw, carScreenSw, roamSw;
     private TextView nextTalkValue, wheelMicValue, voxValue;
     private final LinearLayout radioIdTile;
@@ -68,12 +68,20 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         profileText.setOnClickListener(v -> profileDialog());
         firmwareText = Neo.text(c, "", 0xFF9FB4C8, 13, Neo.mono(c)); firmwareText.setPadding(0, (int) (3 * d), 0, 0);
         tc.addView(firmwareText);
-        firmwareText.setOnClickListener(v -> { if (host != null && com.macdmr.radio.DeviceProfile.detect().firmwareLoader()) host.openFirmware(); });   // the loader speaks the Armor-family module's YModem path only
+        firmwareText.setOnClickListener(v -> {                               // the loader exists only on phones whose flash process was bench-tested
+            if (host == null) return;
+            if (com.macdmr.radio.DeviceProfile.detect().firmwareLoader()) host.openFirmware();
+            else android.widget.Toast.makeText(getContext(), "Loading module firmware is not certified on this phone yet: its flash process has not been tested. It is offered only on phones where it has been.", android.widget.Toast.LENGTH_LONG).show();
+        });
         variantText = Neo.text(c, "", Neo.AMBER_LIGHT, 13, Neo.ui(c)); variantText.setPadding(0, (int) (5 * d), 0, 0); variantText.setVisibility(GONE);
         tc.addView(variantText);
         variantText.setOnClickListener(v -> { com.macdmr.radio.FirmwareVariantCheck.Finding f = com.macdmr.radio.FirmwareVariantCheck.finding(getContext()); if (f != null) offerVariant(getContext(), f, this::refresh); });
         top.addView(tc, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         hero.addView(top);
+        TextView contributeTop = Neo.button(c, "Contribute", "heart", Neo.VIOLET);
+        LayoutParams ctl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); ctl.topMargin = (int) (12 * d);
+        hero.addView(contributeTop, ctl);
+        contributeTop.setOnClickListener(v -> contributeSheet());
         LinearLayout hb = new LinearLayout(c); hb.setBaselineAligned(false);
         takeOver = Neo.button(c, "Take over", "takeover", Neo.GREEN); handBack = Neo.button(c, "Hand back", "handback", Neo.AMBER);
         LayoutParams hl = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); hl.setMargins(0, (int) (12 * d), (int) (4 * d), 0);
@@ -110,6 +118,10 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         // ---- radio settings ----
         LinearLayout set = card(body, "Radio settings");
         ownAtBoot = sw(); hwPttSw = sw(); volPttSw = sw(); scanSqSw = sw(); voiceSw = sw(); styleSw = sw(); animSw = sw(); covSw = sw(); carMicSw = sw(); carCovSw = sw(); wheelSw = sw(); carScreenSw = sw();
+        LinearLayout regionRow = Neo.switchRow(c, "globe", Neo.CYAN, "Region", "", null);   // the region's defaults: APRS frequency, presets, units (Device → Region)
+        regionSub = (TextView) ((LinearLayout) regionRow.getChildAt(1)).getChildAt(1);
+        regionRow.setOnClickListener(v -> RegionSheet.show(c, svc, this::updateRegion));
+        addRow(set, regionRow); updateRegion();
         addRow(set, Neo.switchRow(c, "power", Neo.GREEN, "Own the radio at boot", "Otherwise the stock app is restored after a reboot", ownAtBoot));
         addRow(set, Neo.switchRow(c, "ptt", Neo.AMBER, "Side PTT key", "The phone's hardware push-to-talk button transmits", hwPttSw));
         addRow(set, Neo.switchRow(c, "volume", Neo.AMBER, "Volume-up transmits", "While the Intercom page is open", volPttSw));
@@ -122,6 +134,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         addRow(set, Neo.switchRow(c, "softsq", Neo.CYAN, "Soft SQ while scanning", "Every analog channel, each at its own level (5 if never set)", scanSqSw));
         addRow(set, Neo.switchRow(c, "voice", Neo.VIOLET, "Voice announcements", "Channel changes, caller names, keyword alerts", voiceSw));
         addRow(set, rogerRow(c));
+        addRow(set, txLimitRow(c));
         addRow(set, Neo.switchRow(c, "intercom", Neo.CYAN, "New intercom look", "Off: the classic intercom page", styleSw));
         addRow(set, layoutRow(c));
         addRow(set, Neo.switchRow(c, "diag", Neo.CYAN, "Animated panel when quiet", "Falling lines on an idle channel (uses a little battery)", animSw));
@@ -209,12 +222,14 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         LinearLayout reimport = Neo.tile(c, "import", Neo.AMBER, "Re-import", "Channels from the stock app");
         radioIdTile = Neo.tile(c, "globe", Neo.CYAN, "RadioID list", "");
         LinearLayout report = Neo.tile(c, "report", Neo.VIOLET, "Device report", "Support reports and checks");
+        LinearLayout about = Neo.tile(c, "module", Neo.GREEN, "About this radio", "Specs and known quirks");
         LinearLayout upd = Neo.tile(c, "update", Neo.CYAN, "Updates", "Release and beta builds");
         LinearLayout help = Neo.tile(c, "help", Neo.GREEN, "Help & how-to", "Every screen explained");
         LinearLayout diag = Neo.tile(c, "diag", Neo.AMBER, "Diagnostics", "Live protocol log");
         LinearLayout widget = Neo.tile(c, "widget", Neo.VIOLET, "Home widget", "Channel, scan and Talk");
         LinearLayout sos = Neo.tile(c, "alert", Neo.RED, "Emergency", "Send your position");
-        java.util.List<LinearLayout> tl = new java.util.ArrayList<>(java.util.Arrays.asList(backup, restore, reimport, radioIdTile, report, upd, help, diag, widget, sos));
+        LinearLayout contribute = Neo.tile(c, "heart", Neo.VIOLET, "Contribute", "Donate, test, add a phone");
+        java.util.List<LinearLayout> tl = new java.util.ArrayList<>(java.util.Arrays.asList(backup, restore, reimport, radioIdTile, report, about, upd, help, diag, widget, sos, contribute));
         if (!com.macdmr.radio.DeviceProfile.detect().dmr()) tl.remove(radioIdTile);   // names for DMR IDs: nothing to look up without DMR
         if (tl.size() % 2 == 1) tl.add(null);
         LinearLayout[] tiles = tl.toArray(new LinearLayout[0]);
@@ -230,11 +245,13 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         reimport.setOnClickListener(v -> doReimport());
         radioIdTile.setOnClickListener(v -> doRadioId());
         report.setOnClickListener(v -> reportMenu());
+        about.setOnClickListener(v -> radioNotesSheet());
         upd.setOnClickListener(v -> com.macdmr.radio.Updater.show(c));
         help.setOnClickListener(v -> { if (host != null) host.openHelp(); });
         diag.setOnClickListener(v -> { if (host != null) host.openDiagnostics(); });
         widget.setOnClickListener(v -> widgetSheet());
         sos.setOnClickListener(v -> EmergencyDialog.show(c, svc));
+        contribute.setOnClickListener(v -> contributeSheet());
 
         TextView foot = Neo.text(c, (com.macdmr.radio.DeviceProfile.detect().dmr()
                 ? "Backups are the five CSV files (Contacts, TG_Lists, Channels, Zones, DTMF) the DMRModHooks module and the OpenGD77 CPS fork use, in Download/DMR/DMR_Backups."
@@ -242,6 +259,75 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
                 + "\n\nSignalDeck " + com.macdmr.radio.BuildConfig.VERSION_NAME + ", the standalone edition of DMRModHooks.", Neo.DIM, 12.5f, Neo.uiMedium(c));
         foot.setLineSpacing(0, 1.1f); foot.setPadding((int) (2 * d), (int) (8 * d), (int) (2 * d), 0);
         body.addView(foot);
+    }
+
+    /** About this radio: the active profile's notes (assets/radios/radios.json, also docs/radios in the repository). */
+    private void radioNotesSheet() {
+        Context c = getContext(); float d = Theme.dp(c);
+        com.macdmr.radio.RadioNotes.Entry e = com.macdmr.radio.RadioNotes.forActive(c);
+        LinearLayout box = Neo.sheetBody(c, "About this radio");
+        if (e == null) { box.addView(Neo.sheetHint(c, "No notes are available for this radio.")); Neo.showSheet(c, box); return; }
+        TextView name = Neo.text(c, e.name + (e.variant != null ? " · " + e.variant : ""), Neo.TEXT, 18, Neo.ui(c));
+        name.setPadding((int) (2 * d), (int) (8 * d), 0, (int) (4 * d)); box.addView(name);
+        int sc = "ok".equals(e.status) ? Neo.GREEN : "beta".equals(e.status) || "prog".equals(e.status) ? Neo.AMBER : Neo.RED;
+        LinearLayout chips = new LinearLayout(c); chips.addView(Neo.chip(c, e.statusText(), sc)); box.addView(chips);
+        box.addView(notesText(c, e.summary, Neo.TEXT, 15));
+        if (e.radio != null) {
+            box.addView(Neo.sheetSection(c, "The radio"));
+            if (e.radio.module != null) box.addView(specRow(c, "Module", e.radio.module));
+            if (!e.radio.modes.isEmpty()) box.addView(specRow(c, "Modes", android.text.TextUtils.join(", ", e.radio.modes)));
+            if (!e.radio.bands.isEmpty()) box.addView(specRow(c, "Bands", com.macdmr.radio.RadioNotes.bandsText(e.radio)));
+            box.addView(specRow(c, "Power", e.radio.txPowerW == null ? "Not measured yet" : android.text.TextUtils.join(" / ", e.radio.txPowerW) + " W"));
+            if (e.radio.link != null) box.addView(specRow(c, "Connection", e.radio.link));
+        }
+        if (e.firmware != null) {
+            if (e.firmware.stock != null) box.addView(specRow(c, "Stock firmware", e.firmware.stock));
+            if (e.firmware.modified != null) box.addView(specRow(c, "Modified firmware", e.firmware.modified));
+            if (e.firmware.note != null) box.addView(notesText(c, e.firmware.note, Neo.MUTED, 13));
+        }
+        if (!e.features.isEmpty()) {
+            box.addView(Neo.sheetSection(c, "What works"));
+            for (com.macdmr.radio.RadioNotes.Feature f : e.features) {
+                int fc = "yes".equals(f.state) ? Neo.GREEN : "partial".equals(f.state) ? Neo.AMBER : "no".equals(f.state) ? Neo.RED : Neo.CYAN;
+                String st = "yes".equals(f.state) ? "Works" : "partial".equals(f.state) ? "Partly" : "no".equals(f.state) ? "No" : "Not tested";
+                box.addView(specRow(c, f.name, st + (f.note != null ? " · " + f.note : ""), fc));
+            }
+        }
+        if (!e.quirks.isEmpty()) {
+            box.addView(Neo.sheetSection(c, "Known quirks"));
+            for (com.macdmr.radio.RadioNotes.Quirk q : e.quirks) noteCard(c, box, q.title, q.text, null);
+        }
+        if (!e.measured.isEmpty()) {
+            box.addView(Neo.sheetSection(c, "Measured on our test unit"));
+            box.addView(Neo.sheetHint(c, "Measured on one test unit; your radio may differ."));
+            for (com.macdmr.radio.RadioNotes.Measured m : e.measured) noteCard(c, box, m.what, m.note, m.value);
+        }
+        for (com.macdmr.radio.RadioNotes.Section s : e.sections) { box.addView(Neo.sheetSection(c, s.head)); box.addView(notesText(c, s.text, Neo.TEXT, 14)); }
+        box.addView(Neo.sheetHint(c, "These notes are built into SignalDeck (" + e.id + ") and also in the project's repository under docs/radios."));
+        Neo.showSheet(c, box);
+    }
+    private static TextView notesText(Context c, String s, int color, float sp) {
+        float d = Theme.dp(c); TextView t = Neo.text(c, s, color, sp, Neo.uiMedium(c));
+        t.setLineSpacing(0, 1.12f); t.setTextIsSelectable(true); t.setPadding((int) (2 * d), (int) (6 * d), (int) (2 * d), (int) (4 * d)); return t;
+    }
+    private static LinearLayout specRow(Context c, String label, String value) { return specRow(c, label, value, Neo.TEXT); }
+    private static LinearLayout specRow(Context c, String label, String value, int accent) {
+        float d = Theme.dp(c);
+        LinearLayout r = new LinearLayout(c); r.setPadding((int) (2 * d), (int) (3 * d), 0, (int) (3 * d));
+        TextView l = Neo.text(c, label, Neo.MUTED, 13.5f, Neo.uiSemi(c)); l.setTextIsSelectable(true);
+        TextView v = Neo.text(c, value, accent == Neo.TEXT ? Neo.TEXT : Neo.light(accent), 13.5f, Neo.uiMedium(c)); v.setTextIsSelectable(true); v.setLineSpacing(0, 1.08f);
+        r.addView(l, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 0.38f)); r.addView(v, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 0.62f));
+        return r;
+    }
+    private static void noteCard(Context c, LinearLayout box, String title, String text, String value) {
+        float d = Theme.dp(c);
+        LinearLayout card = new LinearLayout(c); card.setOrientation(VERTICAL); card.setBackground(Neo.rowCard(c));
+        card.setPadding((int) (12 * d), (int) (9 * d), (int) (12 * d), (int) (9 * d));
+        TextView t = Neo.text(c, title, Neo.TEXT, 15, Neo.ui(c)); t.setTextIsSelectable(true); card.addView(t);
+        if (value != null) { TextView v = Neo.text(c, value, Neo.CYAN_LIGHT, 14.5f, Neo.uiSemi(c)); v.setTextIsSelectable(true); card.addView(v); }
+        if (text != null) { TextView x = Neo.text(c, text, Neo.MUTED, 13.5f, Neo.uiMedium(c)); x.setLineSpacing(0, 1.1f); x.setTextIsSelectable(true); x.setPadding(0, (int) (3 * d), 0, 0); card.addView(x); }
+        LayoutParams cl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); cl.setMargins(0, 0, 0, (int) (8 * d));
+        box.addView(card, cl);
     }
 
     /** The project's mission statement (also at the top of the README). */
@@ -262,11 +348,53 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         Neo.showSheet(c, box);
     }
 
+    /** Where donations go: Ko-fi, and GitHub Sponsors (shown already; the page answers once GitHub approves the account). */
+    static final String DONATE_KOFI = "https://ko-fi.com/iimacgyverii";
+    static final String DONATE_SPONSORS = "https://github.com/sponsors/IIMacGyverII";   // owner 2026-10-30: in place before approval, so the link works the day GitHub approves it
+    static final String SITE = "https://signaldeckradio.com";
+    static final String REPO = "https://github.com/IIMacGyverII/SignalDeck";
+
+    /** Device → Contribute (top of the page and among the tools): the three ways to help the project, each with its link. */
+    private void contributeSheet() {
+        Context c = getContext();
+        LinearLayout box = Neo.sheetBody(c, "Contribute");
+        box.addView(Neo.sheetHint(c, "SignalDeck is a free and open-source project (GPL-3.0): free to use, free to study and free to improve, and it stays that way. If you like it, there are three ways to help it grow."));
+        box.addView(Neo.sheetSection(c, "1  Donate"));
+        box.addView(para(c, "If SignalDeck is useful to you, please consider a donation. Developing and maintaining it is expensive: donations buy more phones to develop for and make compatible, and keep new features coming. Any amount helps, and thank you."));
+        box.addView(linkButton(c, "Donate on Ko-fi", "heart", Neo.VIOLET, DONATE_KOFI));
+        if (DONATE_SPONSORS != null) box.addView(linkButton(c, "GitHub Sponsors", "heart", Neo.VIOLET, DONATE_SPONSORS));
+        box.addView(Neo.sheetSection(c, "2  Take part in the development"));
+        box.addView(para(c, "Test for bugs, come up with feature ideas, and talk with other SignalDeck users. Report a bug or suggest a feature on GitHub, or join the community on the website."));
+        box.addView(linkButton(c, "signaldeckradio.com", "globe", Neo.CYAN, SITE));
+        box.addView(linkButton(c, "Report a bug or an idea", "report", Neo.CYAN, REPO + "/issues"));
+        box.addView(Neo.sheetSection(c, "3  Make your own phone compatible"));
+        box.addView(para(c, "Fork the project and make your phone work with it. When you think your phone is completely compatible, tell us: the work is reviewed and merged in, and everyone with that phone benefits. Help support this phone (under Device report) collects the facts a new phone needs."));
+        box.addView(linkButton(c, "SignalDeck on GitHub", "globe", Neo.GREEN, REPO));
+        Neo.showSheet(c, box);
+    }
+    private static TextView para(Context c, String s) {
+        float d = Theme.dp(c);
+        TextView t = Neo.text(c, s, Neo.TEXT, 14, Neo.uiMedium(c));
+        t.setLineSpacing(0, 1.12f); t.setPadding((int) (4 * d), 0, (int) (4 * d), (int) (8 * d));
+        return t;
+    }
+    private static TextView linkButton(Context c, String label, String icon, int accent, String url) {
+        float d = Theme.dp(c);
+        TextView b = Neo.button(c, label, icon, accent);
+        LayoutParams l = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); l.bottomMargin = (int) (8 * d);
+        b.setLayoutParams(l);
+        b.setOnClickListener(v -> {
+            try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))); }
+            catch (Throwable t) { android.widget.Toast.makeText(c, "No browser to open " + url, android.widget.Toast.LENGTH_LONG).show(); }
+        });
+        return b;
+    }
+
     /** Device → Home widget: the live widget as it will look, and a button that asks the launcher to add it. */
     private void widgetSheet() {
         Context c = getContext(); float d = Theme.dp(c);
         LinearLayout box = Neo.sheetBody(c, "Home widget");
-        box.addView(Neo.sheetHint(c, "The channel, what the radio is doing, and previous / scan / next / Talk buttons on your home screen. Talk is tap to start, tap to stop, and ends by itself after 28 seconds. The notification has the same channel and scan buttons."));
+        box.addView(Neo.sheetHint(c, "The channel, what the radio is doing, and previous / scan / next / Talk buttons on your home screen. Talk is tap to start, tap to stop, and ends by itself at the transmit limit (Longest transmission, 2 minutes unless you change it). The notification has the same channel and scan buttons."));
         android.widget.FrameLayout holder = new android.widget.FrameLayout(c);
         try { holder.addView(com.macdmr.radio.RadioWidget.build(c, com.macdmr.radio.RadioService.running).apply(c.getApplicationContext(), holder)); /* app context: the activity inflater swaps in AppCompat views, which RemoteViews refuses */ } catch (Throwable t) { holder.addView(Neo.sheetHint(c, "Preview unavailable: " + t.getMessage())); }
         LayoutParams hl = new LayoutParams(LayoutParams.MATCH_PARENT, (int) (150 * d)); hl.setMargins(0, (int) (10 * d), 0, (int) (12 * d));
@@ -303,6 +431,47 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
             com.macdmr.radio.RadioService.previewRoger(s);
         });
         return row;
+    }
+
+    private TextView txLimitValue;
+    /**
+     * Longest transmission (owner, 2026-10-30): the presets, No limit and Custom…; anything over 2 minutes asks once with
+     * the heat warning. An admin setting in Restricted mode ({@code svc.setTxLimit} refuses there).
+     */
+    private LinearLayout txLimitRow(final Context c) {
+        LinearLayout row = Neo.switchRow(c, "ptt", Neo.AMBER, "Longest transmission", "SignalDeck ends any transmission after this long; the heat guard still stops a long one if the phone gets hot. Tap to change", null);
+        txLimitValue = Neo.chip(c, com.macdmr.radio.TxLimit.name(svc != null ? svc.txLimitSetting() : com.macdmr.radio.TxLimit.DEFAULT_S), Neo.AMBER); row.addView(txLimitValue);
+        row.setOnClickListener(v -> {
+            if (svc == null) return;
+            if (!svc.adminAllowed("txlimit")) { android.widget.Toast.makeText(c, "The transmit limit is locked in Restricted mode", android.widget.Toast.LENGTH_LONG).show(); return; }
+            final int[] presets = com.macdmr.radio.TxLimit.PRESETS_S;
+            int cur = svc.txLimitSetting(), sel = com.macdmr.radio.TxLimit.presetIndex(cur);
+            String[] names = new String[presets.length + 1];
+            for (int i = 0; i < presets.length; i++) names[i] = com.macdmr.radio.TxLimit.name(presets[i]) + (presets[i] == com.macdmr.radio.TxLimit.DEFAULT_S ? " (default)" : "");
+            names[presets.length] = sel < 0 ? "Custom: " + com.macdmr.radio.TxLimit.name(cur) : "Custom\u2026";
+            new android.app.AlertDialog.Builder(c).setTitle("Longest transmission")
+                    .setSingleChoiceItems(names, sel < 0 ? presets.length : sel, (dd, w) -> {
+                        dd.dismiss();
+                        if (w < presets.length) { confirmTxLimit(c, presets[w]); return; }
+                        final EditText e = new EditText(c); e.setInputType(InputType.TYPE_CLASS_NUMBER); e.setText(String.valueOf(cur == com.macdmr.radio.TxLimit.NONE ? com.macdmr.radio.TxLimit.DEFAULT_S : cur));
+                        new android.app.AlertDialog.Builder(c).setTitle("Custom limit").setMessage("Whole seconds, " + com.macdmr.radio.TxLimit.MIN_CUSTOM_S + " or more.").setView(e)
+                                .setPositiveButton("Save", (d2, w2) -> { int s = com.macdmr.radio.TxLimit.parseCustom(e.getText().toString()); if (s < 0) android.widget.Toast.makeText(c, "Enter " + com.macdmr.radio.TxLimit.MIN_CUSTOM_S + " seconds or more", android.widget.Toast.LENGTH_LONG).show(); else confirmTxLimit(c, s); })
+                                .setNegativeButton("Cancel", null).show();
+                    }).setNegativeButton("Cancel", null).show();
+        });
+        return row;
+    }
+    /** Longer than 2 minutes or No limit: the heat warning once, Continue / Cancel; then save. */
+    private void confirmTxLimit(final Context c, final int s) {
+        if (!com.macdmr.radio.TxLimit.needsWarning(s)) { saveTxLimit(c, s); return; }
+        new android.app.AlertDialog.Builder(c).setTitle(s == com.macdmr.radio.TxLimit.NONE ? "No time limit" : com.macdmr.radio.TxLimit.name(s) + " transmissions").setMessage(com.macdmr.radio.TxLimit.HEAT_WARNING)
+                .setPositiveButton("Continue", (dd, w) -> saveTxLimit(c, s)).setNegativeButton("Cancel", null).show();
+    }
+    private void saveTxLimit(Context c, int s) {
+        if (svc == null) return;
+        String err = svc.setTxLimit(s);
+        if (err != null) { android.widget.Toast.makeText(c, err, android.widget.Toast.LENGTH_LONG).show(); return; }
+        txLimitValue.setText(com.macdmr.radio.TxLimit.name(svc.txLimitSetting()));
     }
 
     private Neo.NeonSwitch sw() { return new Neo.NeonSwitch(getContext()); }
@@ -387,7 +556,8 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private void reportMenu() {
         final Context c = getContext();
         new android.app.AlertDialog.Builder(c).setTitle("Device report")
-                .setItems(new String[] { "Help support this phone (step by step)", "Generate device report", "Share last report", "Capture the PTT key (10 s)", "Radio probe (root)", "Open a GitHub issue with the facts filled in", "What is in it?", "Radio audio check (no sound, DMR or analog)" , "Second radio test (guided)", "Radio firmware files (root, you choose)"}, (dd, w) -> {
+                .setItems(new String[] { "Help support this phone (step by step)", "Generate device report", "Share last report", "Capture the PTT key (10 s)", "Radio probe (root)", "Open a GitHub issue with the facts filled in", "What is in it?", "Radio audio check (no sound, DMR or analog)" , "Second radio test (guided)", "Radio firmware files (root, you choose)", "Transmit test session (transmits)"}, (dd, w) -> {
+                    if (w == 10) { TxTestScreen.open(c, svc, this::shareReport); return; }
                     if (w == 9) { firmwareFilesIntro(); return; }
                     if (w == 7) { dmrAudioCheckIntro(); return; }
                     if (w == 8) { secondRadioIntro(); return; }
@@ -737,7 +907,8 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
                 + "• with root, the stock walkie-talkie app is closed, then opened for 15 s so we can see how it starts the radio and what it sends to it (do not press PTT then), and closed again\n"
                 + "• with Magisk root, the radio probe (asks the module who it is on the serial ports the walkie-talkie app uses: the DMR version query and the SA818 AT handshake; switches the module on if it does not answer"
                 + (dp.supported ? "" : ", only on phones with a profile") + ")\n"
-                + (canTrial ? "• optionally a 30-second trial: SignalDeck takes the radio (receive only, nothing is transmitted), records what the module and the audio do, then gives it back to " + dp.stockApp + "\n" : "")
+                + (canTrial ? "• optionally a trial (30 seconds, about a minute and a half on an untested phone): SignalDeck takes the radio (receive only, nothing is transmitted), records what the module and the audio do"
+                        + (dp.verified ? "" : ", how its squelch, receive level and signal reading behave and which frequencies it tunes at the band edges") + ", then gives it back to " + dp.stockApp + "\n" : "")
                 + (dp.supported && !dp.stockApp.isEmpty() ? "\n" + dp.stockApp + " is closed for the checks; open it again afterwards as usual.\n" : "")
                 + "\nAt the end you get one zip to send us.";
         android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(c).setTitle(firstLaunch ? "Help us support this phone" : "Run all checks").setMessage(msg)
@@ -1014,11 +1185,14 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         dlg[0] = Neo.showSheet(c, box);
     }
 
+    /** The Region row's line (after a change on its sheet or the intercom card). */
+    public void updateRegion() { if (regionSub != null) regionSub.setText(RegionSheet.summary(getContext(), com.macdmr.radio.region.Region.current(getContext()))); }
     private void refresh() {
+        updateRegion();
         if (svc == null) return;
         Context c = getContext(); float d = Theme.dp(c);
         Neo.headerSubtitle(header).setText(svc.profile().name.toUpperCase(java.util.Locale.US));
-        profileText.setText(svc.profile().controlPort + " · " + svc.profile().baud + " · " + (svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.TINY_SERVICE ? "vendor audio" : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.CAMCORDER ? "camcorder input" : "UART PCM") + ("sa818".equals(svc.profile().protocol) ? " · analog AT module" : ""));
+        profileText.setText(svc.profile().controlPort + " · " + svc.profile().baud + " · " + (svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.TINY_SERVICE ? "vendor audio" : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.CAMCORDER ? "camcorder input" : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.EXTMODULE ? "extmodule audio socket" : "UART PCM") + ("sa818".equals(svc.profile().protocol) ? " · analog AT module" : ""));
         com.macdmr.radio.ProfileRegistry.Selection ps = com.macdmr.radio.ProfileRegistry.selection();
         if (ps.profile.supported || !ps.advisories.isEmpty()) profileText.append(" · r" + ps.profile.revision + ("updated".equals(ps.source) ? " updated" : ""));
         for (com.macdmr.radio.ProfileRegistry.Advisory a : ps.advisories) if (!a.overridden) { profileText.append(" · ⚠ advisory"); break; }
@@ -1045,6 +1219,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         takeOver.setAlpha(ready ? 0.55f : 1f); handBack.setAlpha(ready ? 1f : 0.55f);
         idText.setText("ID " + svc.localId());
         if (rogerValue != null) rogerValue.setText(com.macdmr.radio.RadioService.ROGER_NAMES[svc.rogerStyle()]);
+        if (txLimitValue != null) txLimitValue.setText(com.macdmr.radio.TxLimit.name(svc.txLimitSetting()));
         ownAtBoot.setChecked(svc.ownAtBoot()); voiceSw.setChecked(svc.voiceOn()); hwPttSw.setChecked(svc.hwPtt()); scanSqSw.setChecked(svc.scanSoftSq());
         volPttSw.setChecked(c.getSharedPreferences("radio", Context.MODE_PRIVATE).getBoolean("volPtt", false));
         refreshCustomPtt();

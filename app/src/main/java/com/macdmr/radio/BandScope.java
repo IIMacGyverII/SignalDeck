@@ -31,6 +31,13 @@ public final class BandScope {
         new Preset("NOAA weather", 162_400_000, 162_550_000, 25_000),
     };
     public static final int MAX_STEPS = 1200, HISTORY = 120;
+    /** The presets offered for a region (Device → Region): the NOAA weather band only where weather radio exists, the rest under Show all. Indexes into PRESETS. */
+    public static java.util.List<Integer> offered(com.macdmr.radio.region.Region r, boolean all) {
+        java.util.List<Integer> out = new java.util.ArrayList<>();
+        for (int i = 0; i < PRESETS.length; i++) if (all || !weatherPreset(PRESETS[i]) || r.weatherRadio) out.add(i);
+        return out;
+    }
+    static boolean weatherPreset(Preset p) { return p.from >= 162_400_000 && p.to <= 162_550_000; }
 
     public interface Hooks {
         /** Retune for a sweep step (one analog write, squelch closed). */
@@ -41,6 +48,10 @@ public final class BandScope {
         void restore();
         void sweep(int from, int step, float[] dbm, int n);
         void state(String s);
+        /** The phone's reading scale and timing ({@link DeviceProfile#rssiStepDb}, {@link DeviceProfile#scopeReadMs}); the defaults are the Armor's. */
+        default double stepDb() { return 0.5; }
+        default double offsetDb() { return 0; }
+        default int readMs() { return 300; }
     }
 
     private final Hooks hooks;
@@ -76,7 +87,7 @@ public final class BandScope {
         if (sweepMs > 0) return sweepMs;
         int n = steps(from, to, step), done = partialIdx + 1;
         if (thread != null && done >= 3) return (System.currentTimeMillis() - sweepStart) * n / done;
-        return (long) n * (settleMs + 300);
+        return (long) n * (settleMs + hooks.readMs());
     }
     /** "about 5 min", "40 s": for the screens. */
     public static String duration(long ms) { long s = Math.round(ms / 1000.0); return s < 90 ? s + " s" : s < 5400 ? Math.round(s / 60.0) + " min" : String.format(java.util.Locale.US, "%.1f h", s / 3600.0); }
@@ -87,7 +98,9 @@ public final class BandScope {
     public static int steps(int from, int to, int step) { return step <= 0 || to < from ? 0 : (to - from) / step + 1; }
     public static boolean tunable(int hz) { return com.macdmr.radio.DeviceProfile.inBands(hz); }
     /** Raw RSSI byte to dBm, as the module reports it (0 = no reading). */
-    public static float dbm(int raw) { return raw > 0 && raw < 200 ? -(120f - raw / 2f) : Float.NaN; }   // 200+ (above -20 dBm) is the module's "no reading"
+    public static float dbm(int raw) { return dbm(raw, 0.5, 0); }
+    /** A sweep reading in dBm on a module with this step and offset; above -20 dBm is the module's "no reading" (raw 200+ on the Armor). */
+    public static float dbm(int raw, double stepDb, double offsetDb) { if (raw <= 0) return Float.NaN; float d = (float) RadioEngine.rssiDbm(raw, stepDb, offsetDb); return d < -20 ? d : Float.NaN; }
 
     /** Whether {@code from} and {@code to} lie in the same band of the profile. */
     static boolean oneBand(com.macdmr.radio.DeviceProfile dp, long from, long to) {
@@ -150,7 +163,7 @@ public final class BandScope {
                     Thread.sleep(settleMs);
                     replies.clear(); long q = System.currentTimeMillis(); hooks.query();
                     Integer raw = replies.poll(timeoutMs, TimeUnit.MILLISECONDS);      // the module answers after about 0.1 s or 0.55 s (its measuring cycle)
-                    row[i] = raw == null ? Float.NaN : dbm(raw); lat[i] = raw == null ? -1 : (int) (System.currentTimeMillis() - q); partialIdx = i;
+                    row[i] = raw == null ? Float.NaN : dbm(raw, hooks.stepDb(), hooks.offsetDb()); lat[i] = raw == null ? -1 : (int) (System.currentTimeMillis() - q); partialIdx = i;
                 }
                 if (thread != Thread.currentThread()) break;
                 sweepMs = System.currentTimeMillis() - t0; latency = lat.clone();

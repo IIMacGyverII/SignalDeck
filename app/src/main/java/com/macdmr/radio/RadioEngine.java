@@ -20,7 +20,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     // commands (A→M unless noted)
     public static final int CMD_SET_DIGITAL = 0x22, CMD_SET_ANALOG = 0x23, CMD_LAUNCH = 0x26, CMD_QUERY_INIT = 0x27,
             CMD_ENHANCE = 0x28, CMD_MIC = 0x2A, CMD_CALLER_INFO = 0x2B, CMD_SEND_SMS = 0x2C, CMD_FETCH_SMS = 0x2D, CMD_VOLUME = 0x2E, CMD_MONITOR = 0x2F,
-            CMD_SQUELCH = 0x30, CMD_RSSI = 0x32, CMD_VERSION = 0x34, CMD_INTERRUPT = 0x35, CMD_STATUS = 0x36,
+            CMD_SQUELCH = 0x30, CMD_RSSI = 0x32, CMD_VERSION = 0x34, CMD_INTERRUPT = 0x35, CMD_STATUS = 0x36, CMD_POLITE = 0x37,
             CMD_TOT = 0x3B, CMD_SPK_EN = 0x3C, CMD_INIT = 0xAA;
 
     public interface Events {
@@ -40,6 +40,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     private final DeviceProfile profile;
     private final Events ev;
     private final UartPort port;
+    private final FrameCodec codec;
 
     /** Per command: how many were sent, answered, refused, and how long the answers took (the device report's summary). */
     public static final class CommandStats {
@@ -129,8 +130,13 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     /** True while a firmware load owns the port. Ordinary commands are dropped so they cannot land in the bootloader. */
     public boolean rawSession() { return rawHold; }
 
+    private final java.util.Set<Integer> notCarried = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
     private void send(Frame fr) throws IOException {
         if (rawHold) return;
+        if (!codec.carries(fr.cmd)) {                                   // the Armor 3WT's module has no such command: never put it on the wire
+            if (notCarried.add(fr.cmd)) ev.log(String.format(Locale.US, "not sent: this module has no command for 0x%02X", fr.cmd));
+            return;
+        }
         if (fr.rw == 1 && watched(fr.cmd) && firstUnansweredAt == 0) firstUnansweredAt = System.currentTimeMillis();
         if (fr.rw == 1 && fr.cmd != CMD_STATUS) synchronized (stats) { CommandStats c = stats.computeIfAbsent(fr.cmd, k -> new CommandStats()); c.sent++; c.pending.addLast(System.currentTimeMillis()); while (c.pending.size() > 20) c.pending.removeFirst(); }
         port.send(fr);
@@ -156,9 +162,11 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     private final StringBuilder banner = new StringBuilder();
     private volatile java.util.concurrent.CountDownLatch bootLatch = new java.util.concurrent.CountDownLatch(1);
 
+    /** A raw signal reading in dBm on a module with this step and offset ({@link DeviceProfile#rssiStepDb}). */
+    static double rssiDbm(int raw, double stepDb, double offsetDb) { return -120 + raw * stepDb + offsetDb; }
     public RadioEngine(DeviceProfile p, Events ev) {
         this.profile = p; this.ev = ev;
-        FrameCodec codec = "agold".equals(p.protocol) ? new AgoldEnvelope() : FrameCodec.armor();
+        codec = "agold".equals(p.protocol) ? new AgoldEnvelope() : "agold-legacy".equals(p.protocol) ? new AgoldLegacyCodec() : FrameCodec.armor();
         this.port = new UartPort(p.controlPort, this, codec);
         if ("agold".equals(p.protocol)) port.setWriteDeadline(AgoldUsb.WRITE_DEADLINE_MS);   // a write the bridge never takes must not freeze the engine
         this.power = p.power();
@@ -172,8 +180,34 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
 
     /** True on a phone whose module sits behind the Agold USB bridge (Atom XL): power, PTT and the port go through {@link AgoldUsb}. */
     private boolean agold() { return "agold".equals(profile.protocol); }
+    /** True on the Armor 3WT: the same bridge behind its vendor daemon ({@link ExtModuleLink}), the legacy command set ({@link AgoldLegacyCodec}). */
+    private boolean daemon() { return "agold-legacy".equals(profile.protocol); }
+    private volatile java.util.concurrent.CountDownLatch mcuStarted = new java.util.concurrent.CountDownLatch(1);
+    private volatile String bridgeBuild;
+    /** The bridge MCU's firmware build date (route 00, 0x01), once it answered; the Armor 3WT only. */
+    public String bridgeBuild() { return bridgeBuild; }
+
+    /**
+     * The stock app's start order on the daemon (resetMcu, then handleMcuStartFinished): stop, 4 s, MCU start, the bridge's
+     * "MCU started" report (route 00, 0x06), start; then the bridge's build date. Ends with the boot latch released (this
+     * module prints no banner).
+     */
+    private void daemonStart() throws IOException {
+        port.control(ExtModuleLink.CTL_STOP);
+        pause(ExtModuleLink.RESET_WAIT_MS);
+        mcuStarted = new java.util.concurrent.CountDownLatch(1);
+        port.control(ExtModuleLink.CTL_MCU_START);
+        boolean up;
+        try { up = mcuStarted.await(ExtModuleLink.MCU_START_WAIT_MS, java.util.concurrent.TimeUnit.MILLISECONDS); } catch (InterruptedException e) { up = false; }
+        ev.log(up ? "extmodule: the bridge reports the MCU started" : "extmodule: no \"MCU started\" report within " + ExtModuleLink.MCU_START_WAIT_MS / 1000 + " s, continuing");
+        port.control(ExtModuleLink.CTL_START);
+        pause(300);
+        port.writeRaw(AgoldFrames.request(0x00, 0x01, 0x01));          // the bridge's build date, as the stock app asks
+        bootLatch.countDown();
+    }
 
     public void open() throws IOException {
+        if (daemon()) { port.open(0); return; }             // extmodule's command socket; the start order runs in powerOn
         if (agold()) ev.log(AgoldUsb.bridgeUp());          // the port exists only while the bridge is powered
         port.open(profile.serialLib != null && VendorSerial.isLoaded() ? profile.baud : 0);
         if (agold()) startReceiveWatch();
@@ -182,6 +216,9 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     /** Route 00 reports from the Agold bridge: logged; state report 03 ("pcm error, reset mcu" in its stock app) is a fault. */
     @Override public void onBridge(int cmd, byte[] body) {
         ev.log(String.format(Locale.US, "bridge cmd=0x%02X body=%s", cmd, body == null ? "-" : java.util.Arrays.toString(body)));
+        if (daemon() && cmd == 0x06) mcuStarted.countDown();
+        if (daemon() && cmd == 0x08 && body != null && body.length >= 1 && body[0] == 2) pttStopSeen = true;   // state report 02: PTT stop complete
+        if (daemon() && cmd == 0x01 && body != null) { bridgeBuild = new String(body, java.nio.charset.StandardCharsets.US_ASCII).trim(); ev.log("bridge build " + bridgeBuild); }
         if (cmd == 0x08 && body != null && body.length >= 1 && body[0] == 3) ev.bridgeFault("bridge state report 03 (pcm error)");
     }
 
@@ -279,6 +316,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     /** pwd 0→1; the module then prints its banner ("…BF AA <GBK text>\r\n") within ~1 s and accepts commands. */
     /** @return true if the module was off and has just been switched on (caller must {@link #waitBooted}). */
     public boolean powerOn() throws IOException {
+        if (daemon()) { daemonStart(); return false; }
         if (agold()) { ev.log("module powered with the USB bridge (" + power.read() + ")"); return false; }   // open() powered it; the module sends no banner
         if (profile.lineSetup != null) for (String[] l : profile.lineSetup) { SysfsGpio.write(l[0], l[1]); ev.log("line " + l[0].substring(l[0].lastIndexOf('/') + 1) + " -> " + l[1]); }
         if (!power.isOn()) { bootLatch = new java.util.concurrent.CountDownLatch(1); power.set(true); ev.log("module power -> on (" + power.read() + ")"); return true; }
@@ -287,6 +325,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     }
 
     public void powerOff() throws IOException {
+        if (daemon()) { try { port.control(ExtModuleLink.CTL_STOP); ev.log("extmodule: stop (the daemon powers the bridge off)"); } finally { port.close(); } return; }
         if (agold()) { stopReceiveWatch(); port.close(); ev.log(AgoldUsb.bridgeDown()); return; }      // off, the USB port back to the socket, the HAL running
         power.set(false); ev.log("module power -> off (" + power.read() + ")");
     }
@@ -297,6 +336,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      * line cannot be read back, so a module that is already on is never restarted by {@link #powerOn}.
      */
     public void powerCycle() throws IOException {
+        if (daemon()) { bootLatch = new java.util.concurrent.CountDownLatch(1); firstUnansweredAt = 0; daemonStart(); ev.log("module restarted through extmodule"); return; }
         if (agold()) {                                     // the port goes with the bridge's power: close, power-cycle, reopen
             stopReceiveWatch(); port.close(); ev.log(AgoldUsb.bridgeUp()); port.open(0); startReceiveWatch();
             firstUnansweredAt = 0; bootLatch.countDown(); ev.log("module power-cycled with the USB bridge"); return;
@@ -335,6 +375,9 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
         return new int[] { type, caller, target, cc, slot };
     }
     public void setTot(int seconds) throws IOException { send(Frame.request(CMD_TOT, (byte) seconds)); }
+    /** What the boot handshake sends on 0x3B: SignalDeck's transmit limit plus a margin, 0 (off) for none or over 255 s (TxLimit.moduleTot). */
+    private volatile int bootTot = TxLimit.moduleTot(TxLimit.DEFAULT_S);
+    @Override public void setBootTot(int seconds) { bootTot = Math.max(0, Math.min(255, seconds)); }
     public void setVolume(int v) throws IOException { send(Frame.request(CMD_VOLUME, (byte) v)); }
     public void setMic(int gain) throws IOException { send(Frame.request(CMD_MIC, (byte) gain)); }
     /** Monitor: 1 = hear every decodable digital call, 2 = normal filtering (enum 1/2 like the rest). */
@@ -346,19 +389,22 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     public void setSpkEn(boolean on) throws IOException { send(Frame.request(CMD_SPK_EN, (byte) (on ? 1 : 0))); }
 
     public void setInterrupt(boolean on) throws IOException { send(Frame.request(CMD_INTERRUPT, (byte) (on ? 1 : 2))); }
+    /** 0x37 "polite" (busy-channel rule): QuickChat sends 0 = off, 1 = on after every channel (the Xplore 1's module). */
+    public void setPolite(int v) throws IOException { send(Frame.request(CMD_POLITE, (byte) v)); }
     public void queryInit() throws IOException { send(Frame.request(CMD_QUERY_INIT, (byte) 1)); }
 
     /**
      * The OEM's cold-start handshake after the module boots (docs/deep-dive/03 §7a): version → channel →
      * interrupt (digital) / mic (analog) → TOT. Each step is acked; we just fire them in order with short gaps.
+     * Profiles whose stock app never sends interrupt or mic ({@link DeviceProfile#bootMicInterrupt} false) skip that step.
      */
     public void bootHandshake(Runnable setChannel, boolean digital) throws IOException {
         if (!waitBooted(10000)) ev.log("no boot banner within 10 s — sending the handshake anyway");
         pause(200);
         queryVersion(); pause(150);
         setChannel.run(); pause(250);
-        if (digital) setInterrupt(false); else setMic(4); pause(150);
-        setTot(120); pause(150);   // 0 turns the module timer off; 120 is its own default and FW19's ceiling
+        if (profile.bootMicInterrupt) { if (digital) setInterrupt(false); else setMic(4); pause(150); }
+        setTot(bootTot); pause(150);   // 0 turns the module timer off (its own start-up value is 120); FW19 to FW31 bench images raise 0 and anything over 120 to 120
         ev.log("boot handshake sent");
     }
 
@@ -369,7 +415,9 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      * UTF-16LE text. Success/failure comes back as status 8/9.
      */
     public void sendSms(int msgType, int callNumber, int groupNumber, String text) throws IOException {
+        if (daemon()) { send(Frame.request(CMD_SEND_SMS, AgoldLegacyCodec.textBody(msgType == 3, callNumber, text))); return; }
         if (agold()) { send(Frame.request(CMD_SEND_SMS, agoldSmsBody(msgType, callNumber, text))); return; }
+        if (profile.smsUtf8) { send(Frame.request(CMD_SEND_SMS, utf8SmsBody(msgType, callNumber, text))); return; }
         byte[] t = text.getBytes(java.nio.charset.StandardCharsets.UTF_16LE);
         // Body: type, callNumber, [second id], UTF-16LE text. The stock app writes the second int only for
         // group texts, but the firmware reads a 9-byte header for private texts too: a private text sent with the
@@ -394,17 +442,52 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
         return b.array();
     }
 
+    /** QuickChat's text body (DmrManager.sendMsg, the Xplore 1): type, the target little-endian, the text in UTF-8; no second ID. */
+    static byte[] utf8SmsBody(int msgType, int callNumber, String text) {
+        byte[] t = text.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        ByteBuffer b = ByteBuffer.allocate(5 + t.length).order(ByteOrder.LITTLE_ENDIAN);
+        b.put((byte) msgType).putInt(callNumber).put(t);
+        return b.array();
+    }
+
+    /**
+     * A received text's bytes: UTF-16LE (the Armor 26 Ultra's module, most DMR radios) or, when {@code utf8} is set and
+     * the bytes do not look like UTF-16LE, UTF-8 (QuickChat reads every text as UTF-8). UTF-16LE text from a Latin script
+     * has a zero in most odd bytes; UTF-8 text never contains a zero.
+     */
+    static String smsText(byte[] b, int off, boolean utf8) {
+        int n = b.length - off, zeros = 0;
+        for (int i = off + 1; i < b.length; i += 2) if (b[i] == 0) zeros++;
+        boolean wide = !utf8 || (n >= 2 && zeros * 4 >= n);   // at least half the odd bytes are zero
+        return new String(b, off, n, wide ? java.nio.charset.StandardCharsets.UTF_16LE : java.nio.charset.StandardCharsets.UTF_8).replace("\u0000", "").trim();
+    }
+
     public void fetchSms() throws IOException { send(Frame.request(CMD_FETCH_SMS, (byte) 1)); }
 
     /** PTT: launch=1 keys the transmitter, 2 releases (enum 1/2 again — 0 is NAKed and the TX keeps running; firmware caps a keyed TX at 30 s). */
     public void ptt(boolean down) throws IOException {
+        if (daemon()) {                                     // the daemon's PTT line; the module has no key command
+            if (!down) { pttStopSeen = false; pttOffAt = System.currentTimeMillis(); }
+            port.control(down ? ExtModuleLink.CTL_PTT_ON : ExtModuleLink.CTL_PTT_OFF);
+            return;
+        }
         if (agold()) {                                     // the HAL's startPtt / stopPtt: the bridge's PTT line, active low; no 0x26
             SysfsGpio.write(AgoldUsb.HANDLE_PTT, down ? "0" : "1");
             RootSetup.run("setprop vendor.agui.extmodule.start " + (down ? 1 : 0));
             return;
         }
-        if (phoneLines()) { lines(down ? profile.txLinesOn : profile.txLinesOff); return; }
+        if (phoneLines() || keyLines()) { lines(down ? profile.txLinesOn : profile.txLinesOff); return; }
         send(Frame.request(CMD_LAUNCH, (byte) (down ? 1 : 2)));
+    }
+
+    /** A phone that keys its module with its own lines and never with 0x26 (the Xplore 1: intercom_ptt_control 0 = transmit). */
+    private boolean keyLines() { return profile.txLinesOn != null && !agold(); }
+    /** How this engine keys the module, for the device report. */
+    public String keyPath() {
+        if (daemon()) return "extmodule's PTT control (3 / 4)";
+        if (agold()) return "the USB bridge's PTT line";
+        if (phoneLines() || keyLines()) return "phone lines";
+        return "module command 0x26";
     }
 
     /**
@@ -413,8 +496,28 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      * relay 2 = normal, sq 0 = squelch open (soft squelch is done in software).
      * Enum bytes are 1 = on / 2 = off — the MCU answers sr=1 (fail) to a 0 in pwrSave/monitor (measured 2026-10-17).
      */
+    // ---- the Armor 3WT: no channel write until the bridge has finished the unkey ----
+    /** Its intercom app refuses a channel write after a release until the bridge's state report 02 or 2 s (mIsPTTStopComplete). */
+    static final long PTT_STOP_WAIT_MS = 2000;
+    private volatile boolean pttStopSeen = true;
+    private volatile long pttOffAt;
+    /** How long a channel write must still wait: 0 once the bridge reported the stop or the wait has run out. */
+    static long pttStopWait(boolean stopSeen, long offAt, long now) {
+        return stopSeen || offAt == 0 ? 0 : Math.max(0, offAt + PTT_STOP_WAIT_MS - now);
+    }
+    /** Only the Armor 3WT (its extmodule daemon) holds channel writes after an unkey; every other phone writes at once. */
+    static boolean holdsWritesAfterUnkey(DeviceProfile p) { return "agold-legacy".equals(p.protocol); }
+    private void awaitPttStop() {
+        if (!holdsWritesAfterUnkey(profile)) return;
+        long w = pttStopWait(pttStopSeen, pttOffAt, System.currentTimeMillis());
+        if (w <= 0) return;
+        ev.log("channel write held until the bridge finishes the unkey (" + w + " ms at most)");
+        while ((w = pttStopWait(pttStopSeen, pttOffAt, System.currentTimeMillis())) > 0) pause(Math.min(50, w));
+    }
+
     public void setAnalog(int rxHz, int txHz, int band, int power, int sq, int rxType, int rxSub, int txType, int txSub,
                           int volume, int monitor) throws IOException {
+        awaitPttStop();
         ByteBuffer b = ByteBuffer.allocate(19).order(ByteOrder.LITTLE_ENDIAN);
         b.putInt(rxHz).putInt(txHz).put((byte) band).put((byte) power).put((byte) sq).put((byte) rxType).put((byte) rxSub)
                 .put((byte) txType).put((byte) txSub).put((byte) 2 /* pwrSave: 1 on, 2 off (OEM default 2; 0 is NAKed) */)
@@ -429,6 +532,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      */
     public void setDigital(int rxHz, int txHz, int localId, int[] groups, int txContact, int contactType, int power, int cc,
                            int inSlot, int outSlot, int volume, int mic) throws IOException {
+        awaitPttStop();
         ByteBuffer b = ByteBuffer.allocate(163).order(ByteOrder.LITTLE_ENDIAN);
         b.putInt(rxHz).putInt(txHz).putInt(localId);
         int[] g = new int[32]; int n = 0;
@@ -469,14 +573,14 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
         switch (f.cmd) {
             case CMD_STATUS: {
                 int code = b.length > 0 ? b[0] & 0xFF : -1;
-                if (!agold()) try { send(new Frame(CMD_STATUS, 1, 1, new byte[] { 1 })); } catch (IOException ignored) { }   // the OEM acks every push; the Agold stock app does not
+                if (!agold() && !daemon()) try { send(new Frame(CMD_STATUS, 1, 1, new byte[] { 1 })); } catch (IOException ignored) { }   // the OEM acks every push; the Agold stock app does not
                 if (phoneLines() && code == 1) { lines(profile.rxLinesOn); if (profile.appPlayback) lines(profile.muteLines); }   // app playback: the module's speaker route stays off
                 else if (phoneLines() && code == 2) lines(profile.rxLinesOff);
                 ev.status(code, statusName(code));
                 break;
             }
             case CMD_RSSI:
-                if (f.rw == 0 && b.length >= 1) { int raw = b[0] & 0xFF; double dbm = raw > 0 ? -(120 - raw / 2.0) : -999; rssiReadings++; if (dbm > -20) { dbm = -999; rssiNoReading++; } ev.rssi(raw, dbm); }   // above -20 dBm is not a reading (the Xplore 1 reports raw 226, "-7")
+                if (f.rw == 0 && b.length >= 1) { int raw = b[0] & 0xFF; double dbm = raw > 0 ? rssiDbm(raw, profile.rssiStepDb, profile.rssiOffsetDb) : -999; rssiReadings++; if (dbm > -20) { dbm = -999; rssiNoReading++; } ev.rssi(raw, dbm); }   // above -20 dBm is not a reading (the Xplore 1 reports raw 226, "-7")
                 break;
             case CMD_VERSION:
                 if (b.length >= 4) ev.version(ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt(), new String(b).trim());
@@ -490,7 +594,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
                 if (b.length >= 5) {
                     ByteBuffer bb = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN);
                     int type = bb.get() & 0xFF; int from = bb.getInt() & 0xFFFFFF;   // a DMR ID is 24 bits (the Agold stock app reads three bytes)
-                    String text = new String(b, 5, b.length - 5, java.nio.charset.StandardCharsets.UTF_16LE).replace("\u0000", "").trim();
+                    String text = smsText(b, 5, profile.smsUtf8);
                     ev.sms(type, from, text);
                 }
                 break;

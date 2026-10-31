@@ -2,7 +2,7 @@
 
 # FT8 over FM
 
-*Pages · 17 of 33*
+*Pages · 17 of 34*
 
 The WSJT-X digital mode, on an FM channel, with automatic QSOs.
 
@@ -20,10 +20,10 @@ The bar at the top is the slot clock: the time in the current 15 s slot and its 
 
 ## Making contacts
 
-Tap a CQ in the list to answer it: the app transmits in the other period and runs the exchange the way WSJT-X does (your grid, their report, R and your report, RR73, 73), logging the contact in the Logbook (mode FT8) as soon as the reports are exchanged. Call CQ calls until someone answers, then does the same with them. Halt TX stops transmitting; if nobody answers, it stops by itself after 8 tries (RR73 after 2). Send text sends one message of your own: any standard message, or up to 13 characters of free text (A-Z, 0-9, space and + - . / ?). Your callsign comes from APRS settings. A callsign FT8 counts as non-standard (more than three letters after the digit, or an unusual prefix) can only be sent in a message type that has no room for a grid or report, as in WSJT-X; the history says so once when you start, and your CQ then goes out without the grid.
+Tap a CQ in the list to answer it: the app transmits in the other period and runs the exchange the way WSJT-X does (your grid, their report, R and your report, RR73, 73), logging the contact in the Logbook (mode FT8) as soon as the reports are exchanged. Call CQ calls until someone answers, then does the same with them. Halt TX stops transmitting; if nobody answers, it stops by itself after 8 tries (RR73 after 2). Send text sends one message of your own: any standard message, or up to 13 characters of free text (A-Z, 0-9, space and + - . / ?). Your callsign comes from APRS settings. A callsign FT8 counts as non-standard (more than three letters after the digit, or an unusual prefix) can only be sent in full in a message type that has no room for a grid or report, as in WSJT-X; the history says so once when you start, and your CQ then goes out without the grid. In the reports that follow it goes as a short code the other station learned from that first message (shown as \<CALL\>), so a contact still completes, and a caller with such a call is answered even though its first reply carries no grid.
 
 ## Settings and clock
 
-FT8 settings: the grid sent with your messages (4 characters, about 100 by 200 km: empty uses the phone's location, a typed one is fixed, - sends none) and Clear list. FT8 needs both stations' clocks within about a second: the phone sets its clock from the network, and the settings show the average DT of recent decodes, which tells how far apart the clocks are. Each transmission is 14 seconds with the lead-in this radio needs, under its 30-second limit. Stop FT8 ends it; the back arrow keeps it running, with a bar on the intercom to come back. SignalDeck Web has the same on its Packet page.
+FT8 settings: the grid sent with your messages (4 characters, about 100 by 200 km: empty uses the phone's location, a typed one is fixed, - sends none) and Clear list. FT8 needs both stations' clocks within about a second: the phone sets its clock from the network, and the settings show the average DT of recent decodes, which tells how far apart the clocks are. Each transmission is 14 seconds with the lead-in this radio needs. Stop FT8 ends it; the back arrow keeps it running, with a bar on the intercom to come back. SignalDeck Web has the same on its Packet page.
 
 [All topics](README.md)

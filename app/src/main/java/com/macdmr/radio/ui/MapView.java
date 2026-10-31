@@ -145,6 +145,23 @@ public class MapView extends View {
         zoom = clampZoom(Math.min(z, 14)); invalidate();
     }
     public void shutdown() { pool.shutdownNow(); }
+    /** Fit a box (degrees) on screen, at most zoom 17. */
+    public void fitBox(double s, double w, double n, double e) {
+        if (getWidth() == 0) return;
+        double minX = lonToX(w), maxX = lonToX(e), minY = latToY(n), maxY = latToY(s);
+        cx = (minX + maxX) / 2; cy = clampY((minY + maxY) / 2);
+        double z = Math.min(Math.log(getWidth() * 0.9 / (256 * k * Math.max(maxX - minX, 1e-7))), Math.log(getHeight() * 0.9 / (256 * k * Math.max(maxY - minY, 1e-7)))) / Math.log(2);
+        zoom = clampZoom(Math.min(z, 17)); invalidate();
+    }
+    /** Something drawn over the tiles and coverage, under the markers (the fox hunt's heat map, lines and marks). */
+    public interface Overlay { void draw(Canvas cv, MapView m); }
+    private Overlay overlay;
+    public void setOverlay(Overlay o) { overlay = o; invalidate(); }
+    /** Screen position of a longitude / latitude, for overlays. */
+    public float screenX(double lon) { return sx(lon); }
+    public float screenY(double lat) { return sy(lat); }
+    /** Whether any map tile has loaded (from the cache or the network). */
+    public boolean anyTile() { return mem.size() > 0; }
 
     @Override public boolean onTouchEvent(MotionEvent e) {
         getParent().requestDisallowInterceptTouchEvent(true);
@@ -175,6 +192,7 @@ public class MapView extends View {
             }
         }
         if (layer != LAYER_NONE) drawCells(cv, w, h);
+        if (overlay != null) overlay.draw(cv, this);
         for (Marker m : markers) {
             if (!visible[m.kind]) continue;
             float sx = sx(m.lon), sy = sy(m.lat);

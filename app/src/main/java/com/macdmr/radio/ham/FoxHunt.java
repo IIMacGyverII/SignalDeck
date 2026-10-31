@@ -20,13 +20,16 @@ import java.util.List;
 public final class FoxHunt {
     public static final class Mark {
         public final double lat, lon, bearing; public final int dbm; public final long ts;   // bearing in degrees true, NaN = none
-        public Mark(double lat, double lon, int dbm, double bearing, long ts) { this.lat = lat; this.lon = lon; this.dbm = dbm; this.bearing = bearing; this.ts = ts; }
+        /** How far off the bearing may be (degrees, one sigma) when the reading says so (a spin's quality); NaN = the usual 15. */
+        public final double bearingSigma;
+        public Mark(double lat, double lon, int dbm, double bearing, long ts) { this(lat, lon, dbm, bearing, ts, Double.NaN); }
+        public Mark(double lat, double lon, int dbm, double bearing, long ts, double bearingSigma) { this.lat = lat; this.lon = lon; this.dbm = dbm; this.bearing = bearing; this.ts = ts; this.bearingSigma = bearingSigma; }
         public boolean hasBearing() { return !Double.isNaN(bearing); }
     }
 
     public static final class Estimate {
         public final double lat, lon; public final boolean fromBearings; public final int used;
-        Estimate(double lat, double lon, boolean fromBearings, int used) { this.lat = lat; this.lon = lon; this.fromBearings = fromBearings; this.used = used; }
+        public Estimate(double lat, double lon, boolean fromBearings, int used) { this.lat = lat; this.lon = lon; this.fromBearings = fromBearings; this.used = used; }
     }
 
     private final List<Mark> marks = new ArrayList<>();
@@ -39,7 +42,10 @@ public final class FoxHunt {
     private static final double R = 6371000;
 
     /** Where the fox probably is, or null with no marks. */
-    public synchronized Estimate estimate() {
+    public synchronized Estimate estimate() { return estimate(marks); }
+
+    /** The bearing crossing of these marks (the Bearings layer's estimate), or null with none. */
+    public static Estimate estimate(List<Mark> marks) {
         if (marks.isEmpty()) return null;
         Mark ref = marks.get(0);
         double cos = Math.cos(Math.toRadians(ref.lat));
@@ -68,7 +74,7 @@ public final class FoxHunt {
             }
             if (ahead * 2 > total) return new Estimate(ref.lat + Math.toDegrees(y / R), ref.lon + Math.toDegrees(x / (R * cos)), true, used);
         }
-        Mark s = strongest();
+        Mark s = null; for (Mark m : marks) if (s == null || m.dbm > s.dbm) s = m;
         return new Estimate(s.lat, s.lon, false, 1);
     }
 

@@ -23,7 +23,8 @@ public final class Parrot {
     }
 
     public static final int MAX_MS = 26_000, MIN_MS = 700, HANG_MS = 700, REPLY_DELAY_MS = 1000;
-    public static final long ID_EVERY_MS = 10 * 60_000L;
+    /** The station-ID interval: the region's (Device → Region), else 10 minutes. */
+    public static long idEveryMs() { return com.macdmr.radio.region.Region.cached().idEveryMs(); }
     private static final int SR = 8000;
 
     private final Host host;
@@ -61,7 +62,7 @@ public final class Parrot {
         int ms = len / 8;
         if (ms < MIN_MS) return;                       // a kerchunk: nothing to repeat
         String call = host.idCallsign();
-        boolean id = call != null && !call.isEmpty() && (lastIdMs == 0 || now - lastIdMs >= ID_EVERY_MS);
+        boolean id = call != null && !call.isEmpty() && (lastIdMs == 0 || now - lastIdMs >= idEveryMs());
         short[] voice = normalize(buf, len);
         short[] morse = id ? com.macdmr.radio.coverage.Morse.pcm(call, 20, 800) : new short[0];
         int lead = SR * 3 / 2, gap = id ? SR * 3 / 10 : 0;          // the radio passes audio only ~1.5 s after keying (measured 2026-10-20)

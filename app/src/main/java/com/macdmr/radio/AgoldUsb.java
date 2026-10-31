@@ -137,12 +137,14 @@ final class AgoldUsb {
 
     /**
      * Signal-reading thresholds of the reception watchdog, given the channel's idle noise floor (NaN until it is known):
-     * a reception starts above the higher of -95 dBm and floor + 6 dB and ends below the higher of -100 dBm and
-     * floor + 2 dB. With a charger on the USB socket the bench channel idled at -98 dBm (2026-10-29, -101 to -103 without
-     * it), so a fixed -100 dBm end never came and a reception the watchdog had opened stayed open for good.
+     * a reception starts above the higher of -87 dBm and floor + 12 dB and ends below the higher of -97 dBm and
+     * floor + 4 dB. In the module's own steps these are the values tuned on the bench (2026-10-29: -95 / +6 and -100 / +2
+     * on the half-dB scale SignalDeck used for this module until 2026-10-30, when its reading was measured at one dB per
+     * step: new = 2 x old + 103). With a charger on the USB socket the bench channel idled 5 dB higher, so a fixed end
+     * never came and a reception the watchdog had opened stayed open for good.
      */
-    static double rssiStartDbm(double floor) { return Double.isNaN(floor) ? -95 : Math.max(-95, floor + 6); }
-    static double rssiEndDbm(double floor) { return Double.isNaN(floor) ? -100 : Math.max(-100, floor + 2); }
+    static double rssiStartDbm(double floor) { return Double.isNaN(floor) ? -87 : Math.max(-87, floor + 12); }
+    static double rssiEndDbm(double floor) { return Double.isNaN(floor) ? -97 : Math.max(-97, floor + 4); }
     /** The idle floor: a slow running mean of readings taken while nothing is received (a reading above the start threshold is not idle). */
     static double nextFloor(double floor, double dbm) {
         if (dbm > rssiStartDbm(floor)) return floor;
@@ -151,6 +153,58 @@ final class AgoldUsb {
 
     /** Receptions in a row that the line never reported (found from the signal, or opened by MON) before the line counts as stuck. */
     static final int STUCK_LINE_MISSES = 2;
+    /**
+     * A reception found from the signal reading counts against the reception line only when it lasted this long: on
+     * 2026-10-29 a short off-channel blip (its source in the cage was not identified; a HackRF on 446 MHz, even at full
+     * power, did not reproduce it) read -87 dBm on the Atom XL's 401.025 MHz for about a second, the line rightly stayed
+     * silent, and that blip was counted as a missed reception and restarted the bridge.
+     */
+    static final long LINE_MISS_MIN_MS = 3000;
+    /**
+     * No signal reading for the S-meter while the line reports a reception: a command crossing the bridge's USB link while
+     * it streams audio breaks the stream (2026-10-29, RTTY/speech from a HackRF on 401.025 MHz: 12 of 12 receptions clean
+     * with no 0x32 during them, against 1 drop in 6 with a reading every 0.5 to 2 s). The watchdog's own receptions (found
+     * from the signal) keep reading, they end on it; measurement tools read anyway.
+     */
+    /**
+     * A signal reading for the coverage log: not while SignalDeck restarts the bridge, nor in the grace after it
+     * ({@code ownCycleUntil}, 1.5 s, past the ~0.7 s the module's reading needs after a power-up). 2026-10-29 21:51 a
+     * reading taken 24 ms after the power-cycle was stored as -109 dBm beside two of -74 from the same carrier.
+     */
+    static boolean coverageReadingUsable(boolean agold, long now, long ownCycleUntil) { return !agold || now >= ownCycleUntil; }
+    /**
+     * A capture opened for a reception found only from the signal is closed by SignalDeck when no audio came within this
+     * long and the line still has not reported it: energy from another transmitter close by makes the module play
+     * nothing, the bridge streams only while the module plays, and a capture left open hits the kernel's 2 s I/O error,
+     * after which the bridge streams nothing until it is power-cycled (2026-10-29 21:41 and 22:12: about 12 s without
+     * the radio each time; skipping that restart instead left the next real reception silent). A clean close, as at the
+     * end of every reception, keeps the bridge healthy; the capture reopens if the line reports the reception after all.
+     */
+    static final long SIGNAL_ONLY_AUDIO_WAIT_MS = 1500;
+    /**
+     * How long a reception waits before its capture opens: none when the line reported it (or MON opened it), and for a
+     * reception found only from the signal until it has lasted {@link #LINE_MISS_MIN_MS}, so a short burst from another
+     * transmitter never opens one. A station the line really missed loses only its first seconds, and the line's own
+     * catching up opens the capture at once.
+     */
+    static long captureOpenDelay(boolean signalOnly, boolean mon, long heldMs) {
+        if (!signalOnly || mon) return 0;
+        long left = LINE_MISS_MIN_MS - heldMs;
+        return left < CAPTURE_WAIT_SLACK_MS ? 0 : left;               // the re-check timer can fire a few ms early: open then, not after another 1 ms wait
+    }
+    static final long CAPTURE_WAIT_SLACK_MS = 100;
+    static boolean closeSilentSignalOnlyCapture(boolean signalOnly, boolean mon, long audioBytes) { return signalOnly && !mon && audioBytes == 0; }
+    /**
+     * Whether a history line may carry the last signal reading: on the Atom XL only when it was taken after the current
+     * (or last) reception began. The S-meter holds still during a reception ({@link #holdsRxRead}), so a line written
+     * then or right after it would show the idle level from before (2026-10-30: "Received 8 s -102 dBm" for a station
+     * that read 30 dB stronger). A measured reading during the reception (fox hunt, coverage) is fresh and is shown.
+     */
+    static boolean historyLevelFresh(boolean agold, long readAt, long rxBeganAt) { return !agold || readAt >= rxBeganAt; }
+    static boolean holdsRxRead(boolean agold, boolean lineReception, boolean synthetic) { return agold && lineReception && !synthetic; }
+    static boolean countsAsLineMiss(long heldMs) { return heldMs >= LINE_MISS_MIN_MS; }
+    /** At least this long between two automatic bridge power-cycles of any kind. */
+    static final long AUTO_CYCLE_GAP_MS = 20_000;
     /**
      * What to do after {@code missed} receptions in a row that the reception line never reported: 0 nothing (yet), 1 restart
      * the bridge (once per bring-up), 2 stop trusting the line (receptions come from the signal; the phone needs a restart).

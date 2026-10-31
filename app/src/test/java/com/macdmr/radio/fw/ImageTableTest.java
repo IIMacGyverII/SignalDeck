@@ -68,4 +68,13 @@ public class ImageTableTest {
         System.arraycopy(tag, 0, image, ImageTable.TAG_AT, tag.length);
         assertEquals("DMR003.UV4T.V022", ImageTable.tagOf(image));
     }
+
+    @Test public void loaderModelUsesTheVendorModelOnAGsi() {
+        assertEquals("Armor 26 Ultra", ImageTable.loaderModel("Armor 26 Ultra", "Armor 26 Ultra"));
+        assertEquals("Armor 26 Ultra", ImageTable.loaderModel("TrebleDroid vanilla", "Armor 26 Ultra"));
+        assertEquals("TrebleDroid vanilla", ImageTable.loaderModel("TrebleDroid vanilla", ""));
+        assertEquals("TrebleDroid vanilla", ImageTable.loaderModel("TrebleDroid vanilla", null));
+        assertEquals("Atom_XL", ImageTable.loaderModel("Atom_XL", "Some Other Phone"));
+        assertFalse(ImageTable.modelMatches(ImageTable.loaderModel("TrebleDroid vanilla", "Armor 20WT")));
+    }
 }

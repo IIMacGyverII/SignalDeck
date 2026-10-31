@@ -2,7 +2,7 @@
 
 # Channels
 
-*Pages · 23 of 33*
+*Pages · 23 of 34*
 
 Your channel list, favourites and repeaters.
 
@@ -20,7 +20,7 @@ Long-press a channel in the list (or tap it and choose Select several) to start 
 
 ## Zones and standard lists
 
-The zone button lists your zones; tap one to use it. Add a zone starts with Your own: New zone from your channels names a zone and lets you tick its channels. Under it are ready-made lists, each added as its own zone: FRS (22 channels, no licence), GMRS (the 22 channels plus repeater channels 15R to 22R, US licence needed; pick your repeater's CTCSS tone before adding), NOAA Weather (7, receive-only), MURS (5 licence-free VHF channels), Marine VHF (10, receive-only), Ham simplex (2 m and 70 cm calling and simplex channels and APRS), DMR simplex (6 channels, colour code 1, slot 1, talkgroup 99, with a Simplex contact), Business (12 US itinerant dot and star channels, licence needed), Railroad (the 96 AAR channels, receive-only), ISS and satellites (ISS voice, APRS on 437.825, SSTV on 437.550 and the cross-band repeater, SO-50, with Doppler + and - channels and the 67 Hz access tone), UHF CB (Australia and NZ, with the repeater R channels) and PMR446 (16, Europe and UK). A channel you already have on the same frequency and tones is reused rather than added twice, and adding a list again only adds what is missing. Licence-free lists are set to low power. The ⋮ on a zone: Use, Choose its channels, Rename, Delete the zone (its channels stay), or Delete the zone and its channels (only those in no other zone).
+The zone button lists your zones; tap one to use it. Add a zone starts with Your own: New zone from your channels names a zone and lets you tick its channels. Under it are ready-made lists, each added as its own zone, in your region's order (Device → Region): its own licence-free services first (a list only partly allowed says so), then the lists of use everywhere, then licence-free services your region does not list, marked "not legal here" (they stay because you may need them elsewhere; whether you may transmit is your responsibility); lists that exist only elsewhere (NOAA Weather where there is no weather radio, the US Business and Railroad channels) are under Show all. The lists: FRS (22 channels, no licence), GMRS (the 22 channels plus repeater channels 15R to 22R, US licence needed; pick your repeater's CTCSS tone before adding), NOAA Weather (7, receive-only), MURS (5 licence-free VHF channels), Marine VHF (10, receive-only), Ham simplex (your region's 2 m and 70 cm calling channels, its APRS and FM SSTV frequencies, and in North America the common simplex channels), DMR simplex (6 channels, colour code 1, slot 1, talkgroup 99, with a Simplex contact), Business (12 US itinerant dot and star channels, licence needed), Railroad (the 96 AAR channels, receive-only), ISS and satellites (ISS voice, APRS on 437.825, SSTV on 437.550 and the cross-band repeater, SO-50, with Doppler + and - channels and the 67 Hz access tone), UHF CB (Australia and NZ, with the repeater R channels) and PMR446 (16, Europe and UK). A channel you already have on the same frequency and tones is reused rather than added twice, and adding a list again only adds what is missing. Licence-free lists are set to low power. The ⋮ on a zone: Use, Choose its channels, Rename, Delete the zone (its channels stay), or Delete the zone and its channels (only those in no other zone). A list this radio cannot use at all (Marine VHF on a UHF-only phone) is marked Outside this radio's bands, one it can use in part says how many of its channels it can; adding a list leaves out the channels outside the radio's bands and says how many.
 
 ## Favourites
 
@@ -60,6 +60,6 @@ Every field in the channel editor has an info button that explains what it does 
 
 ## Nearby repeaters
 
-The dish button lists DMR repeaters from BrandMeister and RadioID and FM repeaters from hearham around you, nearest first, within 15, 30, 60 or 120 miles. The two rows under the distances show only FM or only DMR repeaters, and only VHF (136 to 174 MHz) or only UHF (400 to 480 MHz); the app remembers your choice. One tap adds a repeater with its channels, talkgroup contacts and a zone, and it can be undone.
+The dish button lists DMR repeaters from BrandMeister and RadioID and FM repeaters from hearham around you, nearest first, within 15, 30, 60 or 120 miles (25, 50, 100 or 200 km where your region uses kilometres). The two rows under the distances show only FM or only DMR repeaters, and only VHF (136 to 174 MHz) or only UHF (400 to 480 MHz); the app remembers your choice. One tap adds a repeater with its channels, talkgroup contacts and a zone, and it can be undone.
 
 [All topics](README.md)

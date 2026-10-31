@@ -15,7 +15,7 @@ import java.util.List;
 
 public class Ft8StationTest {
     /** A fake radio: a settable clock, transmissions recorded and decoded back to text. */
-    static final class FakeHost implements Ft8Station.Host {
+    static class FakeHost implements Ft8Station.Host {
         long now = 1_700_000_000_000L - 1_700_000_000_000L % 15000;     // a slot boundary
         final List<String> tx = new ArrayList<>(), events = new ArrayList<>(), logged = new ArrayList<>();
         final List<Long> txAt = new ArrayList<>();
@@ -117,6 +117,46 @@ public class Ft8StationTest {
         assertEquals("[G4ABC IO91 -15 -03]", h.logged.toString());
         st.onDecoded(h.now / 15000, java.util.Collections.singletonList(d("W9XYZ G4ABC 73", -14)));
         assertFalse(st.txEnabled());
+    }
+
+    @Test public void cqAnsweredByANonStandardCaller() {
+        // a caller with a non-standard call cannot add a grid next to the hashed CQ call: its first reply is the two calls only
+        FakeHost h = new FakeHost(); Ft8Station st = new Ft8Station(h);
+        assertNull(st.callCq());
+        assertEquals("CQ W9XYZ DM79", nextTx(h, st));
+        Ft8.Decode raw = d("<W9XYZ> DMRTST", -12);                   // the station's own call resolves its hash: the text as it decodes on the air
+        st.onDecoded(h.now / 15000, java.util.Collections.singletonList(new Ft8.Decode(raw.freqHz, raw.dtS, -12, raw.payload, "<W9XYZ> DMRTST")));
+        assertEquals("DMRTST", st.partner());
+        assertEquals("<...> W9XYZ -12", nextTx(h, st));              // the caller's call goes out hashed (this test's decoder has not heard it)
+        st.onDecoded(h.now / 15000, java.util.Collections.singletonList(new Ft8.Decode(raw.freqHz, raw.dtS, -20, raw.payload, "<W9XYZ> DMRTST")));
+        assertEquals("a repeated call keeps the report first sent", "<...> W9XYZ -12", nextTx(h, st));
+        Ft8.Decode r = d("W9XYZ <DMRTST> R-05", -11);
+        st.onDecoded(h.now / 15000, java.util.Collections.singletonList(new Ft8.Decode(r.freqHz, r.dtS, -11, r.payload, "W9XYZ <DMRTST> R-05")));
+        assertEquals("<...> W9XYZ RR73", nextTx(h, st));
+        assertEquals("[DMRTST null -12 -05]", h.logged.toString());
+    }
+
+    @Test public void aNonStandardCallAnswersACqAndCompletesTheQso() {
+        FakeHost h = new FakeHost() { @Override public String callsign() { return "DMRTST"; } @Override public String grid() { return null; } };
+        Ft8Station st = new Ft8Station(h); st.start();
+        st.onDecoded(h.now / 15000, java.util.Collections.singletonList(d("CQ W9XYZ DM79", -9)));
+        Ft8Station.Heard cq = st.heard().get(st.heard().size() - 1);
+        assertNull(st.reply(cq));
+        assertEquals("<...> DMRTST", nextTx(h, st));                  // type 4: our call in full, theirs hashed
+        Ft8.Decode r = d("<DMRTST> W9XYZ -10", -8);
+        st.onDecoded(h.now / 15000, java.util.Collections.singletonList(new Ft8.Decode(r.freqHz, r.dtS, -8, r.payload, "<DMRTST> W9XYZ -10")));
+        assertEquals("W9XYZ <...> R-09", nextTx(h, st));             // our call hashed next to the report
+        Ft8.Decode e = d("<DMRTST> W9XYZ RR73", -8);
+        st.onDecoded(h.now / 15000, java.util.Collections.singletonList(new Ft8.Decode(e.freqHz, e.dtS, -8, e.payload, "<DMRTST> W9XYZ RR73")));
+        assertEquals("W9XYZ <...> 73", nextTx(h, st));
+        assertEquals("[W9XYZ DM79 -09 -10]", h.logged.toString());
+    }
+
+    @Test public void bracketedCallsPackAsHashes() {
+        assertNotNull(Ft8Message.pack("W9XYZ <DMRTST> R-05", null));
+        assertNotNull(Ft8Message.pack("<DMRTST> W9XYZ -12", null));
+        assertNull("a bare non-standard sender with a report still does not fit", Ft8Message.pack("W9XYZ DMRTST R-05", null));
+        assertTrue(Ft8Message.standardCall("W9XYZ")); assertTrue(Ft8Message.standardCall("Q0AAA")); assertFalse(Ft8Message.standardCall("DMRTST"));
     }
 
     @Test public void ignoresOthersDuringAQsoAndStopsWhenUnanswered() {

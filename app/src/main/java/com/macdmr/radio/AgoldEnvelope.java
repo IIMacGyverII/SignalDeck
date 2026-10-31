@@ -36,6 +36,11 @@ public final class AgoldEnvelope implements FrameCodec {
     private BridgeListener bridge;
     private Consumer<String> log;
     private final Set<Integer> logged = new HashSet<>();
+    /** True: every module frame is handed on as it came (cmd, rw, body), for a codec that translates another command set ({@link AgoldLegacyCodec}). */
+    private final boolean raw;
+
+    public AgoldEnvelope() { this(false); }
+    AgoldEnvelope(boolean raw) { this.raw = raw; }
 
     @Override public void setBridge(BridgeListener listener) { bridge = listener; }
     @Override public void setLog(Consumer<String> log) { this.log = log; }
@@ -76,7 +81,7 @@ public final class AgoldEnvelope implements FrameCodec {
     }
 
     private Frame moduleFrame(int cmd, int rw, byte[] body) {
-        if (listed(DATA, cmd)) return new Frame(cmd, rw, 0, body);
+        if (raw || listed(DATA, cmd)) return new Frame(cmd, rw, 0, body);
         boolean reply = rw == 0;
         if (listed(SET, cmd)) {
             if (reply && body.length >= 1) return new Frame(cmd, rw, body[0] & 0xFF, new byte[0]);

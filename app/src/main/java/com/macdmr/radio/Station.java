@@ -30,7 +30,7 @@ public final class Station {
     /** "CALL-7", or "CALL" when the SSID is 0; "" when no callsign is set. */
     public static String withSsid(Context c) { String b = callsign(c); int s = ssid(c); return b.isEmpty() ? "" : s == 0 ? b : b + "-" + s; }
     public static boolean callsignSet(Context c) { return !callsign(c).isEmpty(); }
-    public static int dmrId(Context c) { return c.getSharedPreferences("radio", Context.MODE_PRIVATE).getInt("dmrId", 1); }
+    public static int dmrId(Context c) { int id = c.getSharedPreferences("radio", Context.MODE_PRIVATE).getInt("dmrId", 1); return id >= 1 && id <= ChannelStore.MAX_DMR_ID ? id : 1; }
     /** Your pager RICs, as typed (the POCSAG page listens for them). */
     public static int[] rics(Context c) { return ChannelStore.parseRics(packet(c).getString("myRics", "")); }
     public static String ricText(Context c) { return ChannelStore.ricText(rics(c)); }

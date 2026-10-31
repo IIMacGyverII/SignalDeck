@@ -606,7 +606,8 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
             readLabel[2].setText("CAN"); squelch.setText(String.valueOf(ch.can())); power.setTextColor(Neo.TEXT);
             readLabel[3].setText("DEST"); power.setText(ch.m17Dest());
         } else if (ch.isDigital()) {
-            readLabel[2].setText("CC · TS"); squelch.setText(ch.cc + " · " + (ch.inSlot + 1));
+            if (com.macdmr.radio.DeviceProfile.detect().timeSlots) { readLabel[2].setText("CC · TS"); squelch.setText(ch.cc + " · " + (ch.inSlot + 1)); }
+            else { readLabel[2].setText("CC"); squelch.setText(String.valueOf(ch.cc)); }      // the Armor 3WT: no slot setting
             int picked = svc != null && !isVfo ? svc.talkgroupOverride() : 0;          // a talkgroup picked here (long-press) shows in amber
             readLabel[3].setText(picked > 0 ? "CALL · PICKED" : "CALL");
             power.setText(picked > 0 ? "TG " + picked : (ch.contactType == 1 ? "TG " : ch.contactType == 2 ? "ALL " : "ID ") + ch.txContact);

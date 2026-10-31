@@ -369,6 +369,11 @@ public final class WebHost {
         JSONArray d = new JSONArray(); for (int i = 0; i < com.macdmr.radio.dsp.ToneTable.DCS_COUNT; i++) d.put("DCS D" + com.macdmr.radio.dsp.ToneTable.dcsCode(i));   // the index the MCU gets; N/I comes from the type
         return new JSONObject().put("ctcss", c).put("dcs", d);
     }
+    /** The region's values the pages use (Device → Region on the phone; it is not changed from the web). */
+    static JSONObject regionJson(com.macdmr.radio.region.Region r) throws Exception {
+        return new JSONObject().put("id", r.id).put("name", r.name).put("chosen", r.chosen).put("aprsHz", r.aprsHz).put("call2mHz", r.call2mHz).put("call70Hz", r.call70Hz)
+                .put("sstvHz", r.sstvHz).put("weatherRadio", r.weatherRadio).put("units", r.km ? "km" : "mi").put("stationIdMinutes", r.stationIdMinutes);
+    }
     private JSONObject statusJson() throws Exception {
         JSONObject o = new JSONObject();
         o.put("link", svc.link()).put("ready", svc.isReady()).put("channel", channelObj(svc.current())).put("stockImport", svc.stockImportPending());
@@ -376,7 +381,7 @@ public final class WebHost {
         JSONArray bands = new JSONArray(); for (long hz : prof.bandsHz) bands.put(hz);
         o.put("radio", new JSONObject().put("dmr", prof.dmr()).put("messages", prof.hasMessages()).put("contacts", prof.hasContacts())
                 .put("rssi", prof.rssi).put("bands", bands).put("bandsText", prof.bandsText()).put("symbolEngine", prof.symbolEngine())
-                .put("aprs144", prof.tunable(com.macdmr.radio.PacketEngine.APRS_FREQ_HZ)).put("weather", prof.tunable(162_400_000L)).put("sstv144", prof.tunable(com.macdmr.radio.PacketEngine.SSTV_FREQ_HZ)));
+                .put("aprsTerrestrial", svc.aprsTunable()).put("aprsHz", svc.aprsHz()).put("weather", prof.tunable(162_400_000L)).put("sstv144", prof.tunable(com.macdmr.radio.PacketEngine.SSTV_FREQ_HZ)).put("region", regionJson(com.macdmr.radio.region.Region.current(svc))));
         o.put("transmitting", svc.isTransmitting()).put("firmwareLoad", svc.firmwareLoading()).put("hearing", svc.hearing()).put("rssi", svc.lastRssi()).put("caller", svc.currentCaller());
         o.put("softSq", svc.softSqOn()).put("softSqLevel", svc.softSqLevel()).put("monitor", svc.monitorOn()).put("promiscuous", svc.promiscuousOn()).put("record", svc.recordOn())
                 .put("scanning", svc.scanning()).put("vfo", svc.vfoActive()).put("zone", svc.zoneName()).put("zoneId", svc.zoneId())
@@ -477,17 +482,38 @@ public final class WebHost {
     private interface Set { void set(JSONObject b) throws Exception; }
     private static final class Setting {
         final String key, group, label, sub, kind; final String[] choices; final Get get; final Set set;
+        /** Per choice, a warning the browser confirms before saving it (null: none). */
+        String[] warn;
         Setting(String key, String group, String label, String sub, String kind, String[] choices, Get get, Set set) { this.key = key; this.group = group; this.label = label; this.sub = sub; this.kind = kind; this.choices = choices; this.get = get; this.set = set; }
+        Setting warn(String[] w) { warn = w; return this; }
+    }
+    /**
+     * Longest transmission, as on the phone: the presets and No limit (a custom value set on the phone shows as one
+     * more choice and stays when chosen); the heat warning is confirmed in the browser; locked in Restricted mode.
+     */
+    private Setting txLimitSetting() {
+        final int[] p = com.macdmr.radio.TxLimit.PRESETS_S;
+        final int cur = svc.txLimitSetting(), at = com.macdmr.radio.TxLimit.presetIndex(cur);
+        String[] names = new String[p.length + (at < 0 ? 1 : 0)], warn = new String[names.length];
+        for (int i = 0; i < p.length; i++) { names[i] = com.macdmr.radio.TxLimit.name(p[i]) + (p[i] == com.macdmr.radio.TxLimit.DEFAULT_S ? " (default)" : ""); warn[i] = com.macdmr.radio.TxLimit.needsWarning(p[i]) ? com.macdmr.radio.TxLimit.HEAT_WARNING : null; }
+        if (at < 0) { names[p.length] = "Custom: " + com.macdmr.radio.TxLimit.name(cur); warn[p.length] = null; }
+        return new Setting("txLimit", "Radio", "Longest transmission", "SignalDeck ends any transmission after this long; the heat guard still stops a long one if the phone gets hot", "choice", names,
+                () -> at < 0 ? p.length : at, b -> {
+                    int i = b.getInt("value");
+                    if (i < 0 || i >= p.length) return;                              // the custom value: kept as it is
+                    String err = svc.setTxLimit(p[i]); if (err != null) throw new IllegalArgumentException(err);
+                }).warn(warn);
     }
     private java.util.List<Setting> settings() {
         java.util.List<Setting> l = new java.util.ArrayList<>();
         android.content.SharedPreferences rp = svc.getSharedPreferences("radio", Context.MODE_PRIVATE);
         if (svc.profile().dmr()) l.add(new Setting("dmrId", "Identity", "Your DMR ID", "What other radios see when you talk on DMR channels", "int", null, svc::localId, b -> {
-            int v = b.getInt("value"); if (v < 1 || v > 0xFFFFFF) throw new IllegalArgumentException("A DMR ID is 1 to 16777215"); svc.setLocalId(v); }));
+            int v = b.getInt("value"); if (v < 1 || v > com.macdmr.radio.ChannelStore.MAX_DMR_ID) throw new IllegalArgumentException("A DMR ID is 1 to 16776415"); svc.setLocalId(v); }));
         l.add(new Setting("hwPtt", "Radio", "Side PTT key", "The phone's hardware push-to-talk button transmits", "bool", null, svc::hwPtt, b -> svc.setHwPtt(b.getBoolean("value"))));
         l.add(new Setting("volPtt", "Radio", "Volume-up transmits", "While the Intercom page is open on the phone", "bool", null, () -> rp.getBoolean("volPtt", false), b -> rp.edit().putBoolean("volPtt", b.getBoolean("value")).apply()));
         l.add(new Setting("customPtt", "Radio", "Custom PTT key", "The button learned on the phone (Device → Custom PTT key) transmits; learning needs the phone in hand", "bool", null, () -> com.macdmr.radio.CustomPttKey.enabled(svc), b -> { if (com.macdmr.radio.CustomPttKey.saved(svc) != null) { com.macdmr.radio.CustomPttKey.setEnabled(svc, b.getBoolean("value")); svc.customPttChanged(); } }));
         l.add(new Setting("scanSoftSq", "Radio", "Soft SQ while scanning", "Every analog channel, each at its own level (5 if never set)", "bool", null, svc::scanSoftSq, b -> svc.setScanSoftSq(b.getBoolean("value"))));
+        l.add(txLimitSetting());
         l.add(new Setting("roger", "Radio", "Roger beep", "A short sound at the end of each transmission", "choice", RadioService.ROGER_NAMES, svc::rogerStyle, b -> svc.setRogerStyle(Math.max(0, Math.min(RadioService.ROGER_NAMES.length - 1, b.getInt("value"))))));
         l.add(new Setting("voice", "Radio", "Voice announcements", "Channel changes, caller names, keyword alerts", "bool", null, svc::voiceOn, b -> svc.setVoiceOn(b.getBoolean("value"))));
         l.add(new Setting("keywords", "Radio", "Keyword alerts", "Words in live captions that raise an alert, separated by commas", "text", null, svc::keywords, b -> svc.setKeywords(b.getString("value"))));
@@ -509,11 +535,13 @@ public final class WebHost {
         for (Setting s : settings()) {
             JSONObject o = new JSONObject().put("key", s.key).put("group", s.group).put("label", s.label).put("sub", s.sub).put("kind", s.kind).put("value", s.get.get());
             if (s.choices != null) o.put("choices", new JSONArray(java.util.Arrays.asList(s.choices)));
+            if (s.warn != null) { JSONArray w = new JSONArray(); for (String x : s.warn) w.put(x == null ? JSONObject.NULL : x); o.put("warn", w); }
             a.put(o);
         }
         return new JSONObject().put("settings", a).put("link", svc.link()).put("ready", svc.isReady()).put("profile", svc.profile() == null ? "" : svc.profile().name)
                 .put("firmware", svc.moduleVersion().trim()).put("firmwareStock", svc.stockFirmware())
-                .put("version", com.macdmr.radio.BuildConfig.VERSION_NAME).put("webTx", allowTx()).put("browsers", clients()).put("listeners", listeners());
+                .put("version", com.macdmr.radio.BuildConfig.VERSION_NAME).put("webTx", allowTx()).put("browsers", clients()).put("listeners", listeners())
+                .put("region", regionJson(com.macdmr.radio.region.Region.current(svc)));
     }
 
     // ---- the API ----
@@ -846,7 +874,7 @@ public final class WebHost {
                     e.days = b.optInt("days", 0) & 0x7F; e.date = b.optString("date", ""); e.minutes = Math.max(1, Math.min(1440, b.optInt("minutes", 60))); e.channel = b.optInt("channel", -1);
                     e.record = b.optBoolean("record", false); e.label = b.optString("label", "").trim(); e.enabled = b.optBoolean("enabled", true);
                     if (!java.util.Arrays.asList(com.macdmr.radio.Scheduler.ACTIONS).contains(e.action)) return WebServer.Response.error(400, "Unknown action");
-                    { String bp = com.macdmr.radio.Scheduler.bandProblem(svc.profile(), e, e.channel >= 0 ? svc.store().byNumber(e.channel) : null); if (bp != null) return WebServer.Response.error(400, bp); }   // APRS on a UHF-only radio, a channel outside its bands
+                    { String bp = com.macdmr.radio.Scheduler.bandProblem(svc.profile(), e, e.channel >= 0 ? svc.store().byNumber(e.channel) : null, svc.aprsHz()); if (bp != null) return WebServer.Response.error(400, bp); }   // APRS on a UHF-only radio, a channel outside its bands
                     if (e.days != 0) e.date = ""; else if (!e.date.matches("\\d{4}-\\d{2}-\\d{2}")) return WebServer.Response.error(400, "Choose days or a date");
                     if (e.enabled && com.macdmr.radio.Scheduler.nextStart(e, System.currentTimeMillis(), java.util.TimeZone.getDefault()) < 0) return WebServer.Response.error(400, "That time has already passed");
                     com.macdmr.radio.Scheduler.put(svc, e);
@@ -874,7 +902,7 @@ public final class WebHost {
             case "/api/scope/start": if (!post) break; {
                 String bad = com.macdmr.radio.BandScope.problem(b.optInt("from"), b.optInt("to"), b.optInt("step", 25_000));
                 if (bad != null) return WebServer.Response.error(400, bad);
-                String e = svc.scopeStart(b.optInt("from"), b.optInt("to"), b.optInt("step", 25_000), com.macdmr.radio.BandScope.DEFAULT_SETTLE_MS);
+                String e = svc.scopeStart(b.optInt("from"), b.optInt("to"), b.optInt("step", 25_000), svc.profile().scopeSettleMs);
                 return e == null ? ok("Sweeping") : WebServer.Response.error(409, e);
             }
             case "/api/scope/stop": if (!post) break; { new Thread(svc::scopeStop, "scope-stop").start(); return ok("Stopping"); }
@@ -1123,7 +1151,7 @@ public final class WebHost {
                         .put("callsignSet", pe.callsignSet()).put("ssid", pe.ssid()).put("comment", pe.comment()).put("path", pp.getString("path", "WIDE1-1,WIDE2-1"))
                         .put("symbol", pp.getString("symTable", "/") + pp.getString("symCode", "[")).put("autoBeacon", pe.autoBeacon()).put("beaconMin", pe.beaconMin())
                         .put("txPower", pe.dataTxPower()).put("leadKind", pe.packetLeadKind()).put("leadMs", pe.packetLeadMs()).put("passive", pe.passiveMode())
-                        .put("autoAck", pp.getBoolean("autoAck", true)).put("digipeat", pp.getBoolean("digipeat", false)).put("dtmf", pp.getBoolean("dtmf", true))
+                        .put("autoAck", pp.getBoolean("autoAck", false)).put("autoAckAllowed", pe.autoAckAllowed()).put("digipeat", pp.getBoolean("digipeat", false)).put("dtmf", pp.getBoolean("dtmf", true))
                         .put("wx", pp.getBoolean("wx", true)).put("cw", pp.getBoolean("cw", true)).put("cwId", pp.getBoolean("cwId", false))
                         .put("telemetry", pp.getBoolean("telemetry", false)).put("weather", pp.getBoolean("weather", false)).put("txIgate", pp.getBoolean("txIgate", false))
                         .put("groups", pp.getString("groups", "")).put("kissPort", pp.getInt("kissPort", 8001))
@@ -1161,7 +1189,7 @@ public final class WebHost {
                     if (b.has("leadKind")) ed.putInt("txLeadKind", Math.max(0, Math.min(com.macdmr.radio.PacketEngine.LEAD_KINDS.length - 1, b.getInt("leadKind"))));
                     if (b.has("leadMs")) { int ms = b.getInt("leadMs"); boolean okMs = false; for (int c : com.macdmr.radio.PacketEngine.LEAD_CHOICES) okMs |= c == ms; if (!okMs) return WebServer.Response.error(400, "Lead-in length must be one of the listed choices"); ed.putInt("txLeadMs", ms); }
                     if (b.has("passive")) ed.putInt("passive", Math.max(0, Math.min(2, b.getInt("passive"))));
-                    for (String k : new String[] { "autoAck", "digipeat", "dtmf", "wx", "cw", "cwId", "telemetry", "weather", "txIgate" }) if (b.has(k)) ed.putBoolean(k, b.getBoolean(k));
+                    for (String k : new String[] { (svc.packet() == null || svc.packet().autoAckAllowed()) ? "autoAck" : "-", "digipeat", "dtmf", "wx", "cw", "cwId", "telemetry", "weather", "txIgate" }) if (b.has(k)) ed.putBoolean(k, b.getBoolean(k));
                     if (b.has("kissPort")) { int v = b.getInt("kissPort"); if (v < 1024 || v > 65535) return WebServer.Response.error(400, "KISS port is 1024 to 65535"); ed.putInt("kissPort", v); }
                     if (b.has("isServer")) ed.putString("isServer", b.getString("isServer").trim());
                     if (b.has("isPort")) ed.putInt("isPort", b.getInt("isPort"));

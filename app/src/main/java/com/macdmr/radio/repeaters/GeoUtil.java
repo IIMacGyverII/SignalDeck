@@ -60,9 +60,27 @@ public final class GeoUtil {
         return "↖NW";
     }
 
-    /** Distance only, metric under 10 km then miles, matching the intercom chip's old format. */
+    // ---- units: kilometres or miles from the region (Device → Region, the user's own choice on top) ----
+
+    /** "12.3 mi" / "19.8 km" (under 1 km: metres) in the region's units. */
+    public static String dist(double meters) { return dist(meters, com.macdmr.radio.region.Region.km()); }
+    public static String dist(double meters, boolean km) {
+        if (km) return meters < 1000 ? String.format(Locale.US, "%.0f m", meters) : String.format(Locale.US, meters < 10_000 ? "%.2f km" : "%.1f km", meters / 1000);
+        return String.format(Locale.US, "%.1f mi", meters / 1609.344);
+    }
+    /** "35 mph" / "56 km/h". */
+    public static String speed(double kmh) { return com.macdmr.radio.region.Region.km() ? String.format(Locale.US, "%.0f km/h", kmh) : String.format(Locale.US, "%.0f mph", kmh * 0.621371); }
+    /** "1200 ft" / "366 m". */
+    public static String alt(double m) { return com.macdmr.radio.region.Region.km() ? Math.round(m) + " m" : Math.round(m * 3.28084) + " ft"; }
+    /** The repeater search radii (15/30/60/120 mi): in kilometres the chips read 25/50/100/200 km and that is the radius used. */
+    private static final int[] RADII_MI = { 15, 30, 60, 120 }, RADII_KM = { 25, 50, 100, 200 };
+    public static double radiusKm(int mi) { if (com.macdmr.radio.region.Region.km()) for (int i = 0; i < RADII_MI.length; i++) if (RADII_MI[i] == mi) return RADII_KM[i]; return mi * 1.609344; }
+    public static String radiusText(int mi) { if (com.macdmr.radio.region.Region.km()) { double k = radiusKm(mi); return String.format(Locale.US, "%.0f km", k); } return mi + " mi"; }
+
+    /** Distance only: metric under 10 km then miles (the intercom chip's old format); kilometres throughout in a km region. */
     public static String formatDistance(double meters) {
         if (meters < 1000)  return String.format(Locale.US, "%.0fm", meters);
+        if (com.macdmr.radio.region.Region.km()) return String.format(Locale.US, "%.1fkm", meters / 1000);
         if (meters < 10000) return String.format(Locale.US, "%.1fkm", meters / 1000);
         return String.format(Locale.US, "%.1fmi", meters * 0.000621371);
     }
@@ -72,7 +90,7 @@ public final class GeoUtil {
         double meters = haversineMeters(fromLat, fromLon, toLat, toLon);
         String arrow = directionArrow(bearingDegrees(fromLat, fromLon, toLat, toLon));
         if (meters < 1000)  return String.format(Locale.US, "%s %.0fm", arrow, meters);
-        if (meters < 10000) return String.format(Locale.US, "%s %.1fkm", arrow, meters / 1000);
+        if (meters < 10000 || com.macdmr.radio.region.Region.km()) return String.format(Locale.US, "%s %.1fkm", arrow, meters / 1000);
         return String.format(Locale.US, "%s %.1fmi (%.1fkm)", arrow, meters * 0.000621371, meters / 1000);
     }
 

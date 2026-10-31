@@ -10,6 +10,33 @@ if (localProps.exists()) localProps.withInputStream { signingProps.load(it) }
 def signingValue = { String key, String env -> signingProps.getProperty(key) ?: System.getenv(env) }
 def releaseStore = signingValue('signaldeck.storeFile', 'SIGNALDECK_STORE_FILE')
 
+// Build identity for device and transmit-test reports (BuildIdentity.java): which commit, branch and repository a build
+// came from, so a fork tester's report says what was tested. Never fails the build: "unknown" when git is not there.
+// The remote URL loses any user name, password or token here, so none can reach the APK (BuildIdentity.sanitizeRemote
+// does the same again at run time; keep the two in step).
+def gitOut = { List<String> args ->
+    try {
+        def p = (['git'] + args).execute(null, rootProject.projectDir)
+        def out = p.inputStream.text.trim(); p.waitFor()
+        p.exitValue() == 0 ? out : null
+    } catch (Throwable ignored) { null }
+}
+def sanitizeRemote = { String u ->
+    if (!u) return 'unknown'
+    u = u.trim().replaceAll('(?i)^([a-z][a-z0-9+.-]*://)[^/@]*@', '$1')                      // scheme://user:token@host -> scheme://host
+    u = u.replaceAll('^(?!git@)[^@/:]+@([^:/]+):', '$1:')                                 // other-user@host:path (scp form) -> host:path
+    u = u.replaceAll('[?#].*$', '')
+    u.replaceAll('(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|glpat-[A-Za-z0-9_-]{20,})', '<token>')
+}
+def gitCommitFull = gitOut(['rev-parse', 'HEAD']) ?: 'unknown'
+def gitCommit = gitOut(['rev-parse', '--short=10', 'HEAD']) ?: 'unknown'
+def gitBranch = gitOut(['rev-parse', '--abbrev-ref', 'HEAD']) ?: 'unknown'
+def gitRemote = sanitizeRemote(gitOut(['remote', 'get-url', 'origin']))
+def gitStatus = gitOut(['status', '--porcelain', '--untracked-files=no'])
+def gitDirty = gitStatus == null ? 'unknown' : (gitStatus.isEmpty() ? 'false' : 'true')
+def buildTimeUtc = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'", TimeZone.getTimeZone('UTC'))
+def javaString = { String v -> '"' + v.replace('\\', '\\\\').replace('"', '\\"') + '"' }
+
 def sdalsaAssets = layout.buildDirectory.dir('generated/sdalsa-assets').get().asFile
 
 android {
@@ -21,8 +48,14 @@ android {
         applicationId "com.macdmr.radio"
         minSdk 29
         targetSdk 34
-        versionCode 119
-        versionName "1.0.0-beta.20"
+        versionCode 123
+        versionName "1.0.0-beta.24"
+        buildConfigField 'String', 'GIT_COMMIT', javaString(gitCommit)
+        buildConfigField 'String', 'GIT_COMMIT_FULL', javaString(gitCommitFull)
+        buildConfigField 'String', 'GIT_BRANCH', javaString(gitBranch)
+        buildConfigField 'String', 'GIT_REMOTE', javaString(gitRemote)
+        buildConfigField 'String', 'GIT_DIRTY', javaString(gitDirty)
+        buildConfigField 'String', 'BUILD_TIME_UTC', javaString(buildTimeUtc)
         ndk { abiFilters 'arm64-v8a', 'armeabi-v7a' }   // the phones this radio family ships in are ARM; keeps the Vosk natives to two ABIs
     }
 
@@ -79,6 +112,7 @@ dependencies {
 // -PexportHelp=true makes HelpExportTest write docs/help from the in-app guide instead of checking it
 tasks.withType(Test).configureEach {
     systemProperty 'signaldeck.exportHelp', (project.findProperty('exportHelp') ?: 'false').toString()
+    systemProperty 'signaldeck.exportRadios', (project.findProperty('exportRadios') ?: 'false').toString()   // RadioNotesExportTest writes docs/radios
 }
 
 configurations.all {

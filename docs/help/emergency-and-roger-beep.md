@@ -2,7 +2,7 @@
 
 # Emergency and roger beep
 
-*Good to know · 32 of 33*
+*Good to know · 33 of 34*
 
 Send your position; an end-of-talk tone.
 
@@ -16,7 +16,7 @@ The red key must be held for two seconds, so a stray tap never sends. Lifting ea
 
 ## Pick the right channel
 
-Switch to the channel where someone will hear you first: your repeater or talkgroup for DMR, the local APRS frequency (144.390 MHz in North America) for APRS. Only use it for a real emergency.
+Switch to the channel where someone will hear you first: your repeater or talkgroup for DMR, the local APRS frequency (Device → Region shows yours) for APRS. Only use it for a real emergency.
 
 ## Roger beep
 

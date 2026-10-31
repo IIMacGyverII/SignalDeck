@@ -363,7 +363,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_toolong_title">Troppo lungo da trasmettere</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_toolong_text">Il firmware di questa radio chiude ogni trasmissione dopo 30 secondi, quindi l’app rifiuta l’audio più lungo di circa 28,5 secondi (per esempio una registrazione lunga o un modo SSTV che richiede più tempo).</string>
+    <string name="intercom_lastheard_ex_toolong_text">Quello che doveva essere trasmesso superava il limite di trasmissione della radio (Dispositivo → Trasmissione più lunga), quindi SignalDeck l’ha rifiutato invece di troncarlo a metà (per esempio una registrazione lunga o un modo SSTV che richiede più tempo). Alcune funzioni di invio hanno un proprio massimo, più breve; la riga dice quale limite è stato raggiunto.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_busy_title">Canale occupato</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->

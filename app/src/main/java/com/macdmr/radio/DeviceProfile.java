@@ -180,6 +180,11 @@ public final class DeviceProfile {
     public boolean txAudioOnSendStart;
     /** Voice transmit: the microphone keeps feeding the module this long after the release (QuickChat: 200 ms; 0 = stop first). */
     public long txAudioTailMs;
+    /**
+     * Voice transmit: after the release the transmitter stays keyed and the microphone keeps running this long, then both
+     * stop (the Armor 3WT's intercom app: 500 ms, then PTT off; 0 = none).
+     */
+    public long txReleaseHoldMs;
     /** After each channel's acknowledgement send 0x35 2 (interrupt off) and then 0x37 with this value (QuickChat: 0); -1 = neither. */
     public int politeAfterChannel = -1;
     /**
@@ -504,6 +509,8 @@ public final class DeviceProfile {
         // what the intercom app sends, in the engine's (Armor) numbers: channels, version, volume, call info, texts
         ARMOR_3WT.stockCommands = new int[] { 0x22, 0x23, 0x2B, 0x2C, 0x2D, 0x2E, 0x34 };
         ARMOR_3WT.pttKey = new String[] { "mtk-kpd", "00f9" };                  // scancode 249 at getevent; no keycode reached an app in the report
+        ARMOR_3WT.txReleaseHoldMs = 500;                                        // its intercom app: microphone and key run on 500 ms after the release (stopRecord)
+        ARMOR_3WT.txTestUnverified = true;                                      // owner, 2026-10-30: transmit unlocked for the device report's Transmit test session
     }
 
     public static final DeviceProfile UNKNOWN = new DeviceProfile(
@@ -610,7 +617,7 @@ public final class DeviceProfile {
         p.id = id; p.revision = revision; p.source = source; p.txBlocked = txBlocked; p.restrictedBy = restrictedBy; p.globalSquelch = globalSquelch; p.lineSetup = lineSetup; p.scanDwellMs = scanDwellMs; p.protocol = protocol; p.bandsHz = bandsHz.clone(); p.rssi = rssi; p.softSqInModule = softSqInModule; p.appPlayback = appPlayback; p.fixedModuleVolume = fixedModuleVolume; p.subaudible = subaudible; p.dataSquelch = dataSquelch; p.moduleLoader = moduleLoader; p.camcorderGain = camcorderGain; p.softSqThresholds = softSqThresholds; p.softSqCloseCap = softSqCloseCap; p.rxDetectNode = rxDetectNode; p.rxLinesOn = rxLinesOn; p.muteLines = muteLines; p.rxLinesOff = rxLinesOff; p.txLinesOn = txLinesOn; p.txLinesOff = txLinesOff; p.gatewayLinesOn = gatewayLinesOn; p.gatewayLinesOff = gatewayLinesOff; p.txAudioScale = txAudioScale; p.toneEnergyMin = toneEnergyMin; p.gatewayVolume = gatewayVolume; p.minWriteGapMs = minWriteGapMs; p.directAudio = directAudio;
         p.bootMicInterrupt = bootMicInterrupt; p.txAudioLeadMs = txAudioLeadMs; p.minKeyGapMs = minKeyGapMs; p.analogVolume = analogVolume; p.stockAreaPrefix = stockAreaPrefix; p.stockDefaultArea = stockDefaultArea; p.stockCommands = stockCommands; p.txTestUnverified = txTestUnverified;
         p.txAudioOnSendStart = txAudioOnSendStart; p.txAudioTailMs = txAudioTailMs; p.politeAfterChannel = politeAfterChannel; p.smsUtf8 = smsUtf8;
-        p.timeSlots = timeSlots; p.pttKey = pttKey;
+        p.timeSlots = timeSlots; p.pttKey = pttKey; p.txReleaseHoldMs = txReleaseHoldMs;
         return p;
     }
 
@@ -646,6 +653,7 @@ public final class DeviceProfile {
         p.txAudioOnSendStart = o.optBoolean("txAudioOnSendStart", false); p.txAudioTailMs = Math.max(0, Math.min(1000, o.optLong("txAudioTailMs", 0)));
         p.politeAfterChannel = Math.max(-1, Math.min(1, o.optInt("politeAfterChannel", -1))); p.smsUtf8 = o.optBoolean("smsUtf8", false);
         p.timeSlots = o.optBoolean("timeSlots", true);
+        p.txReleaseHoldMs = Math.max(0, Math.min(1000, o.optLong("txReleaseHoldMs", 0)));
         org.json.JSONArray pk = o.optJSONArray("pttKey");                    // {input device name, key code}: compared with getevent output, never on a command line
         if (pk != null) {
             String[] k = strings(pk);

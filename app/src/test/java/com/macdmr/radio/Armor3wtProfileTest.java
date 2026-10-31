@@ -27,7 +27,9 @@ public class Armor3wtProfileTest {
         assertEquals("agold-legacy", p.protocol);
         assertTrue(p.supported);
         assertFalse("written from the app and one report: no transmit", p.verified);
-        assertFalse("transmit test session only with the owner's OK", p.txTestUnverified);
+        assertTrue("owner, 2026-10-30: the guided Transmit test session only", p.txTestUnverified);
+        assertEquals("its intercom app holds key and microphone 500 ms past the release", 500, p.txReleaseHoldMs);
+        assertTrue(TxTestSession.pttPath(p).contains("held 500 ms past the release"));
         assertFalse(p.firmwareLoader());
         assertFalse(p.symbolEngine());
         assertFalse("no RSSI command known on this module", p.rssi);
@@ -43,13 +45,14 @@ public class Armor3wtProfileTest {
         assertFalse(p.tunable(470_000_001L));
         assertFalse(p.tunable(300_000_000L));
         DeviceProfile c = p.copy(true, false);
-        assertFalse(c.timeSlots); assertArrayEquals(p.pttKey, c.pttKey); assertEquals("agold-legacy", c.protocol);
+        assertFalse(c.timeSlots); assertArrayEquals(p.pttKey, c.pttKey); assertEquals(500, c.txReleaseHoldMs); assertTrue(c.txTestUnverified); assertEquals("agold-legacy", c.protocol);
     }
 
     @Test public void noOtherPhoneChanged() {
         for (DeviceProfile p : new DeviceProfile[] { DeviceProfile.ARMOR_26_ULTRA, DeviceProfile.ARMOR_20WT, DeviceProfile.XPLORE_1, DeviceProfile.ATOM_XL, DeviceProfile.ANYSECU_W6, DeviceProfile.ANYSECU_W6_DMR, DeviceProfile.UNKNOWN }) {
             assertTrue(p.name, p.timeSlots);
             assertNull(p.name, p.pttKey);
+            assertEquals(p.name, 0, p.txReleaseHoldMs);
             assertNotEquals(p.name, DeviceProfile.Audio.EXTMODULE, p.audio);
             assertFalse(p.name, ExtModuleLink.isSocket(p.controlPort));
             assertNotEquals(p.name, "agold-legacy", p.protocol);

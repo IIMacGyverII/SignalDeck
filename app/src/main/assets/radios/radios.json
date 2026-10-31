@@ -876,7 +876,7 @@
           "id": "fm_tx",
           "name": "FM transmit",
           "state": "untested",
-          "note": "Locked until the profile is tested"
+          "note": "Only in the guided Transmit test session until the profile is tested"
         },
         {
           "id": "dmr_rx",
@@ -888,13 +888,13 @@
           "id": "dmr_tx",
           "name": "DMR transmit",
           "state": "untested",
-          "note": "Locked until the profile is tested"
+          "note": "Only in the guided Transmit test session until the profile is tested"
         }
       ],
       "quirks": [
         {
           "title": "Untested profile",
-          "text": "This profile comes from an owner's device report, the phone's intercom app and its radio daemon. It has not run on the phone yet, so SignalDeck does not take over the radio by itself and never transmits on it. Owners can help with Device, Run all checks."
+          "text": "This profile comes from an owner's device report, the phone's intercom app and its radio daemon. It has not run on the phone yet, so SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session."
         },
         {
           "title": "Needs the radio daemon",
@@ -914,7 +914,7 @@
         },
         {
           "title": "Side key",
-          "text": "The side key reaches only the kernel, not apps, on the custom ROM in the report. SignalDeck reads it with root as its default custom PTT key; it does nothing until transmit is unlocked."
+          "text": "The side key reaches only the kernel, not apps, on the custom ROM in the report. SignalDeck reads it with root as its default custom PTT key; until the profile is tested it keys nothing outside the Transmit test session."
         }
       ],
       "measured": [],

@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +38,11 @@ public final class FoxSignalGate {
         public int cc = -1;             // DMR: its colour code, -1 = any
         /** A short description for the sheet. */
         public String describe() {
-            if (!only) return "Any signal";
-            if (digital) return (id > 0 ? "DMR ID " + id : "any DMR caller") + (cc >= 0 ? ", CC " + cc : "");
-            if (dcs) return "the channel's DCS";
-            return toneHz > 0 ? String.format(java.util.Locale.US, "CTCSS %.1f Hz", toneHz) : "no tone set (any reception)";
+            if (!only) return Txt.s(R.string.modes_fox_any_signal);
+            if (digital) return id > 0 ? (cc >= 0 ? Txt.s(R.string.modes_fox_dmr_id_cc, String.valueOf(id), String.valueOf(cc)) : Txt.s(R.string.modes_fox_dmr_id, String.valueOf(id)))
+                : (cc >= 0 ? Txt.s(R.string.modes_fox_dmr_any_cc, String.valueOf(cc)) : Txt.s(R.string.modes_fox_dmr_any));
+            if (dcs) return Txt.s(R.string.modes_fox_dcs);
+            return toneHz > 0 ? Txt.s(R.string.modes_fox_ctcss, Txt.decimal(toneHz, 1)) : Txt.s(R.string.modes_fox_no_tone);
         }
     }
 

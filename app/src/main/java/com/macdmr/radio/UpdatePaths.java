@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -88,7 +89,7 @@ public final class UpdatePaths {
         StringBuilder b = new StringBuilder();
         for (Updater.Release r : p.since) {
             String n = plain(ownNotes(r.notes));
-            b.append("▸ ").append(r.version).append(r.published.isEmpty() ? "" : "  (" + r.published + ")").append('\n').append(n.isEmpty() ? "(no notes)" : n).append("\n\n");
+            b.append("▸ ").append(r.version).append(r.published.isEmpty() ? "" : "  (" + r.published + ")").append('\n').append(n.isEmpty() ? Txt.s(R.string.device_paths_no_notes) : n).append("\n\n");
             if (b.length() > maxChars) { b.setLength(maxChars); b.append("…"); break; }
         }
         return b.toString().trim();

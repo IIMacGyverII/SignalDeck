@@ -63,8 +63,8 @@ public final class CoverageStore extends SQLiteOpenHelper {
     public synchronized List<Repeater> repeaters() {
         List<Repeater> out = new ArrayList<>();
         try (Cursor c = getReadableDatabase().rawQuery("SELECT r.rkey, r.name, r.rxHz, r.txHz, r.lat, r.lon,"
-                + " (SELECT COUNT(*) FROM rx WHERE rx.rkey = r.rkey), (SELECT COUNT(*) FROM tx WHERE tx.rkey = r.rkey),"
-                + " (SELECT COUNT(*) FROM tx WHERE tx.rkey = r.rkey AND tx.result = 1) FROM repeaters r", null)) {
+                + " (SELECT COUNT(*) FROM rx WHERE rx.rkey = r.rkey), (SELECT COUNT(*) FROM tx WHERE tx.rkey = r.rkey),"   // i18n: SQL
+                + " (SELECT COUNT(*) FROM tx WHERE tx.rkey = r.rkey AND tx.result = 1) FROM repeaters r", null)) {   // i18n: SQL
             while (c.moveToNext()) {
                 Repeater r = new Repeater(); r.key = c.getString(0); r.name = c.getString(1); r.rxHz = c.getInt(2); r.txHz = c.getInt(3);
                 r.lat = c.getDouble(4); r.lon = c.getDouble(5); r.rxCount = c.getInt(6); r.txCount = c.getInt(7); r.keyed = c.getInt(8);

@@ -35,6 +35,22 @@ public class MsgTest {
         assertNull(Msg.from("", "{}"));
     }
 
+    /** An error a method returned in the app language (Txt.s) goes into a history Msg as its own Msg, so english() is all English. */
+    @Test public void aReturnedLocalisedTextBecomesItsMessage() {
+        try {
+            Txt.recordForTest(true);
+            String german = Txt.noteForTest("Noch kein Standort", R.string.service_no_fix_location);   // as Txt.s returns it in German
+            Object arg = Msg.shown(german);
+            assertTrue(arg instanceof Msg);
+            Msg line = Msg.of(R.string.service_iss_resume_failed, arg);
+            assertEquals(Txt.en(R.string.service_iss_resume_failed, Txt.en(R.string.service_no_fix_location)), line.english());
+            assertEquals(Txt.en(R.string.service_no_fix_location), Txt.english(german));
+            assertEquals("a received text", Msg.shown("a received text"));                              // not ours: stays as it is
+            assertEquals("a received text", Txt.english("a received text"));
+        } finally { Txt.recordForTest(false); }
+        assertNull(Txt.madeBy("Noch kein Standort"));                                                    // English: nothing kept
+    }
+
     @Test public void controlCharactersNeverReachTheScreen() {
         assertEquals("Phone's language (A·B)", Msg.of(R.string.device_language_phone, "A\u0007B").english());
     }

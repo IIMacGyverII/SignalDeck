@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.content.Context;
 
 import org.json.JSONArray;
@@ -44,8 +45,8 @@ public final class RadioNotes {
         /** In plain words for the sheet. */
         public String statusText() {
             switch (status) {
-                case "ok": return "Tested"; case "beta": return "In testing"; case "prog": return "Being brought up";
-                case "disc": return "Discontinued"; default: return "Untested";
+                case "ok": return Txt.s(R.string.device_notes_status_tested); case "beta": return Txt.s(R.string.device_notes_status_testing); case "prog": return Txt.s(R.string.device_notes_status_bringup);
+                case "disc": return Txt.s(R.string.device_notes_status_discontinued); default: return Txt.s(R.string.device_notes_status_untested);
             }
         }
     }
@@ -109,7 +110,7 @@ public final class RadioNotes {
     /** Band list as text: "VHF 136–174 MHz, UHF 400–480 MHz". */
     public static String bandsText(Radio r) {
         StringBuilder b = new StringBuilder();
-        for (Band x : r.bands) b.append(b.length() > 0 ? ", " : "").append(x.name).append(' ').append(mhz(x.lowMHz)).append('–').append(mhz(x.highMHz)).append(" MHz");
+        for (Band x : r.bands) b.append(b.length() > 0 ? ", " : "").append(x.name).append(' ').append(mhz(x.lowMHz)).append('–').append(mhz(x.highMHz)).append(" MHz");   // i18n: unit (band names and ranges are data)
         return b.toString();
     }
     static String mhz(double v) { return v == Math.rint(v) ? String.valueOf((long) v) : String.valueOf(v); }

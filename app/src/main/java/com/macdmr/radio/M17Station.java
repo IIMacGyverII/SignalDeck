@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioFormat;
@@ -28,7 +30,10 @@ import java.util.Locale;
  * Receive only: this radio's transmit path cannot produce M17 that M17 radios decode.
  */
 public final class M17Station {
-    public interface Host { void event(String line); void heard(String call); void changed(); default void voice(short[] pcm) { } default int meter() { return -999; } default void text(String line) { event(line); } default void sms(String src, String dst, String body, boolean sent) { } }
+    public interface Host { void event(String line); void heard(String call); void changed(); default void voice(short[] pcm) { } default int meter() { return -999; } default void text(String line) { event(line); } default void sms(String src, String dst, String body, boolean sent) { }
+        /** {@link #event} and {@link #text} kept as messages, so the history can show them in the app's language; by default their English. */
+        default void event(Msg m) { event(m.english()); }
+        default void text(Msg m) { text(m.english()); } }
 
     /** One M17 text, sent or received. */
     public static final class Text {
@@ -45,7 +50,7 @@ public final class M17Station {
     private final Context ctx; private final Host host; private final String profileId;
     private volatile M17Receiver rx;                                     // swapped by the self-calibration thread
     private HeldPathReceiver held; private M17Receiver.Listener dfeEar; private HeldPathReceiver.Listener heldEar;
-    private String dfeNote = "";
+    private Msg dfeNote;
     private Codec2 codec;
     private AudioTrack track;
     private volatile boolean running;
@@ -55,7 +60,7 @@ public final class M17Station {
     private volatile float quality;
     /** Bench: also append the decoded voice to cache/m17_out.raw (8 kHz 16-bit mono). */
     public static volatile boolean benchDump;
-    private volatile String calibration = "";
+    private volatile Msg calibration;                                  // null: none yet
     private final HeldCal cal;
     private final DfeCal dfeCal;
     private float[] dfeCoef;
@@ -75,7 +80,9 @@ public final class M17Station {
     public synchronized List<Text> texts() { return new ArrayList<>(texts); }
     public synchronized void noteSent(String src, String dst, String body) { remember(new Text(System.currentTimeMillis(), true, src, dst, body)); host.sms(src, dst, body, true); host.changed(); }
     public float quality() { return quality; }
-    public String calibration() { return calibration; }
+    public String calibration() { Msg c = calibration; return c == null ? "" : c.text(); }
+    /** The calibration line in English, for DIAG. */
+    public String calibrationEnglish() { Msg c = calibration; return c == null ? "" : c.english(); }
     public void resetCalibration() {
         if (cal != null) cal.reset();
         dfeCal.reset();
@@ -88,12 +95,12 @@ public final class M17Station {
     public synchronized String start() {
         if (running) return null;
         float[] coef = shippedTable();
-        if (coef == null) return "M17 calibration missing";
+        if (coef == null) return Txt.s(R.string.modes_m17_err_calibration);
         dfeNote = calibration;
         float[] own = dfeCal.accepted();
-        if (own != null) { coef = own; calibration = "fitted on this phone from its own receptions"; }
+        if (own != null) { coef = own; calibration = Msg.of(R.string.modes_m17_cal_fitted); }
         dfeCoef = coef;
-        try { codec = new Codec2(Codec2.MODE_3200); } catch (Throwable t) { return "Codec 2 not available: " + t.getMessage(); }
+        try { codec = new Codec2(Codec2.MODE_3200); } catch (Throwable t) { return Txt.s(R.string.modes_m17_err_codec, String.valueOf(t.getMessage())); }
         dfeEar = new M17Receiver.Listener() {
             @Override public void started(M17.Lsf l) { begin(l); }
             @Override public void frame(M17.Stream s, float q) { onFrame(s, q); }
@@ -129,7 +136,7 @@ public final class M17Station {
         if (taps == null) { Log.i("M17Station", "held path: no taps for " + profileId); return; }
         heldTaps = taps;
         held = new HeldPathReceiver(taps, heldEar);
-        calibration = cal.line().isEmpty() ? "fixed taps for this phone; the module's voice filter is held open" : cal.line();
+        calibration = cal.lineMsg() == null ? Msg.of(R.string.modes_m17_cal_held) : cal.lineMsg();
         host.changed();
     }
 
@@ -169,8 +176,8 @@ public final class M17Station {
     /** The table shipped for this phone model (sets the calibration line), else the Armor's with a warning. */
     private float[] shippedTable() {
         float[] coef = load("m17/eq_" + profileId + ".txt");
-        if (coef == null) { coef = load("m17/eq_ulefone-armor26ultra.txt"); calibration = "calibrated on the Ulefone Armor 26 Ultra (not on this phone: it may not decode)"; }
-        else calibration = profileId.startsWith("ulefone-armor26") ? "calibrated on this phone model" : "calibrated for this phone";
+        if (coef == null) { coef = load("m17/eq_ulefone-armor26ultra.txt"); calibration = Msg.of(R.string.modes_m17_cal_armor); }
+        else calibration = Msg.of(profileId.startsWith("ulefone-armor26") ? R.string.modes_m17_cal_model : R.string.modes_m17_cal_phone);
         dfeNote = calibration;
         return coef;
     }
@@ -195,21 +202,22 @@ public final class M17Station {
     private void onLink(M17.Lsf l) {
         Heard h = current; if (h == null) return;
         fill(h, l);
-        host.event("📻 M17: " + h.src + " → " + h.dst + (h.meta != null ? "  “" + h.meta + "”" : ""));
+        host.event(h.meta != null ? Msg.of(R.string.modes_m17_event_call_meta, h.src, h.dst, h.meta) : Msg.of(R.string.modes_m17_event_call, h.src, h.dst));
         host.heard(h.src); host.changed();
     }
     private void remember(Text t) { synchronized (this) { texts.add(t); while (texts.size() > 100) texts.remove(0); } }
     private void onPacket(M17.Lsf l, byte[] body) {
         String src = l == null ? "" : l.src(), dst = l == null ? "" : l.dst();
         String sms = M17.smsText(body);
-        String shown = sms != null ? sms : M17.protocolName(body.length == 0 ? -1 : body[0] & 0xFF) + ", " + Math.max(0, body.length - 1) + " bytes";
+        Msg what = sms != null ? null : Msg.plural(R.plurals.modes_m17_packet, Math.max(0, body.length - 1), M17.protocolName(body.length == 0 ? -1 : body[0] & 0xFF), Math.max(0, body.length - 1));
+        String shown = sms != null ? sms : what.text();                             // the M17 screen's list, in the app language
         remember(new Text(System.currentTimeMillis(), false, src, dst, shown));
-        Log.i("M17Station", "sms " + src + " -> " + dst + " " + shown);
-        host.text((sms != null ? "✉ " : "") + src + " → " + dst + ": " + shown);
+        Log.i("M17Station", "sms " + src + " -> " + dst + " " + (sms != null ? sms : what.english()));
+        host.text(sms != null ? Msg.of(R.string.modes_m17_event_sms, src, dst, sms) : Msg.of(R.string.modes_m17_event_packet, src, dst, what));   // history: English text, shown localized
         if (sms != null) host.sms(src, dst, sms, false);
         host.heard(src); host.changed();
     }
-    private void noteLost() { host.text("✉ M17: frames lost"); host.changed(); }
+    private void noteLost() { host.text(Msg.of(R.string.modes_m17_frames_lost)); host.changed(); }
     private void begin(M17.Lsf l) {
         if (held == null) {                                               // the decision-feedback receiver: record this call for the self-calibration
             short[] c = new short[8000 * 10]; int k = 0;
@@ -221,9 +229,10 @@ public final class M17Station {
         current = h;
         synchronized (this) { heard.add(h); while (heard.size() > 100) heard.remove(0); }
         if (l.crcOk) {
-            host.event("📻 M17: " + h.src + " → " + h.dst + (h.meta != null ? "  “" + h.meta + "”" : "") + (h.encrypted ? "  (encrypted: not played)" : ""));
+            host.event(h.meta != null ? Msg.of(h.encrypted ? R.string.modes_m17_event_call_meta_enc : R.string.modes_m17_event_call_meta, h.src, h.dst, h.meta)
+                : Msg.of(h.encrypted ? R.string.modes_m17_event_call_enc : R.string.modes_m17_event_call, h.src, h.dst));
             host.heard(h.src);
-        } else host.event("📻 M17: a transmission (its header was damaged; the caller follows from the frames)");
+        } else host.event(Msg.of(R.string.modes_m17_event_damaged));
         openTrack();
         host.changed();
     }
@@ -249,7 +258,7 @@ public final class M17Station {
         if (hr != null) {
             try {
                 boolean kept = cal.onCall(hr.takeFrames(), hr.takeAudio(), h != null ? h.src : "", host.meter(), heldTaps);
-                calibration = cal.line().isEmpty() ? calibration : cal.line();
+                calibration = cal.lineMsg() == null ? calibration : cal.lineMsg();
                 if (kept) { swapping = true; stopHeld(); setHeldPath(true); swapping = false; }
             } catch (Throwable t) { Log.w("M17Station", "fit: " + t); }
         }
@@ -263,7 +272,7 @@ public final class M17Station {
                 try {
                     boolean kept = dfeCal.onCall(learned, learnedN, audio, src, dbm, live);
                     synchronized (M17Station.this) {
-                        if (!dfeCal.line().isEmpty()) calibration = dfeCal.line();
+                        if (dfeCal.lineMsg() != null) calibration = dfeCal.lineMsg();
                         float[] own = kept ? dfeCal.accepted() : null;
                         if (own != null && running && held == null) { dfeCoef = own; rx = new M17Receiver(own, dfeEar); }
                     }
@@ -273,8 +282,9 @@ public final class M17Station {
         }
         if (h != null) {
             h.end = System.currentTimeMillis();
-            host.event(String.format(Locale.US, "📻 M17 %s ended: %.1f s, %d frames%s", h.src.isEmpty() ? "transmission" : "from " + h.src, (h.end - h.start) / 1000.0, frames,
-                frames > 0 && good < frames ? String.format(Locale.US, " (%d %% clean)", 100 * good / frames) : ""));
+            String secs = String.format(Locale.US, "%.1f", (h.end - h.start) / 1000.0); boolean clean = !(frames > 0 && good < frames); int pct = frames > 0 ? 100 * good / frames : 0;
+            host.event(h.src.isEmpty() ? (clean ? Msg.of(R.string.modes_m17_event_ended, secs, frames) : Msg.of(R.string.modes_m17_event_ended_lossy, secs, frames, pct))
+                : (clean ? Msg.of(R.string.modes_m17_event_ended_from, h.src, secs, frames) : Msg.of(R.string.modes_m17_event_ended_from_lossy, h.src, secs, frames, pct)));
         }
         AudioTrack t = track; if (t != null) { try { t.stop(); } catch (Throwable ignored) { } }   // plays out what is queued, then quiet
         host.changed();

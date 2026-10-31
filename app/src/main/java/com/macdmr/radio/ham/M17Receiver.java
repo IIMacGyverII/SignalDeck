@@ -16,6 +16,7 @@ package com.macdmr.radio.ham;
  * correction confirms it (re-encoded). Without that, one burst of wrong decisions fed back spreads into the next frames
  * (ANYSECU W6+, 2026-10-27: a table fitted on one transmission lost the stream after 11-14 frames).
  * A transmission is found by its preamble (a 40 ms 2400 Hz tone, which the radio passes), then the LSF sync word.
+ * <p>i18n: stays English (the end and reset reasons are diagnostic labels; no screen shows them).
  */
 public final class M17Receiver {
     public interface Listener {

@@ -91,7 +91,7 @@ public final class GeoUtil {
         String arrow = directionArrow(bearingDegrees(fromLat, fromLon, toLat, toLon));
         if (meters < 1000)  return String.format(Locale.US, "%s %.0fm", arrow, meters);
         if (meters < 10000 || com.macdmr.radio.region.Region.km()) return String.format(Locale.US, "%s %.1fkm", arrow, meters / 1000);
-        return String.format(Locale.US, "%s %.1fmi (%.1fkm)", arrow, meters * 0.000621371, meters / 1000);
+        return String.format(Locale.US, "%s %.1fmi (%.1fkm)", arrow, meters * 0.000621371, meters / 1000);   // i18n: units
     }
 
     // ---------------------------------------------------------------- band classification

@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
  * Reads what sdtrace (the report's serial sniffer, src/main/cpp/sdtrace) printed while the stock walkie-talkie app
  * started: which port it opened, the line settings it set, and the bytes both ways. Gives the report a short decoded
  * view (protocol family, line, the command sequence with answers) and a copy with radio IDs blanked for sharing.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class SerialTrace {
     private SerialTrace() { }

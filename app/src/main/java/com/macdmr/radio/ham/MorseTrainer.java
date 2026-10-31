@@ -16,7 +16,7 @@ import java.util.Random;
 public final class MorseTrainer {
     private MorseTrainer() { }
 
-    public static final String KOCH = "KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X";
+    public static final String KOCH = "KMURESNAPTLWI.JZ=FOY,VG5/Q92H38B?47C1D60X";   // i18n: Morse characters (Koch order)
     public static final int LESSONS = KOCH.length() - 1;          // lesson 1 = K and M
 
     private static final String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/=?.,";

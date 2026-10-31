@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -26,12 +27,12 @@ import java.util.zip.Inflater;
  * Never shared: encryption keys (an encrypted channel arrives with encryption off) and anything but the channels.
  */
 public final class Codeplug {
-    public String name = "Channels";
+    public String name = "Channels";   // i18n: default name, stored as the zone name
     public final List<ChannelStore.Channel> channels = new ArrayList<>();
     /** What could not be read, for the import preview. */
     public final List<String> skipped = new ArrayList<>();
     /** Where it came from ("SignalDeck", "CHIRP"). */
-    public String format = "SignalDeck";
+    public String format = "SignalDeck";   // i18n: format key
     /** The nets held on each channel (the net's channel fields are filled in on import). */
     public final java.util.IdentityHashMap<ChannelStore.Channel, List<com.macdmr.radio.ham.NetFinder.Manual>> nets = new java.util.IdentityHashMap<>();
     public List<com.macdmr.radio.ham.NetFinder.Manual> netsOf(ChannelStore.Channel c) { List<com.macdmr.radio.ham.NetFinder.Manual> l = nets.get(c); return l == null ? new ArrayList<>() : l; }
@@ -98,10 +99,10 @@ public final class Codeplug {
                     if (!ns.isEmpty()) p.nets.put(c, ns);
                 }
                 c.encryptSw = 2; c.encryptKey = "";
-                if (c.isDigital() && !com.macdmr.radio.DeviceProfile.detect().dmr()) { p.skipped.add(c.name + ": DMR (this radio has no DMR)"); continue; }
-                if (!ChannelStore.inBand(c.rxFreq) || (c.txFreq != 0 && !ChannelStore.inBand(c.txFreq))) { p.skipped.add(c.name + ": outside " + com.macdmr.radio.DeviceProfile.detect().bandsText()); continue; }   // the transmit frequency too, receive-only ones included: the module refuses a channel with either outside its bands
+                if (c.isDigital() && !com.macdmr.radio.DeviceProfile.detect().dmr()) { p.skipped.add(Txt.s(R.string.channels_codeplug_skip_dmr, c.name)); continue; }
+                if (!ChannelStore.inBand(c.rxFreq) || (c.txFreq != 0 && !ChannelStore.inBand(c.txFreq))) { p.skipped.add(Txt.s(R.string.channels_codeplug_skip_outside, c.name, com.macdmr.radio.DeviceProfile.detect().bandsText())); continue; }   // the transmit frequency too, receive-only ones included: the module refuses a channel with either outside its bands
                 p.channels.add(c);
-            } catch (RuntimeException e) { p.skipped.add("A channel line could not be read"); }
+            } catch (RuntimeException e) { p.skipped.add(Txt.s(R.string.channels_codeplug_skip_line)); }
         }
         return p;
     }
@@ -149,36 +150,38 @@ public final class Codeplug {
     public static String shareText(Codeplug p, boolean withLocations) { return shareText(p, withLocations, false, false); }
     public static String shareText(Codeplug p, boolean withLocations, boolean withNotes, boolean withNets) {
         StringBuilder b = new StringBuilder();
-        b.append(p.name).append(" · ").append(p.channels.size()).append(p.channels.size() == 1 ? " channel" : " channels").append("\n\n");
+        b.append(Txt.p(R.plurals.channels_codeplug_share_head, p.channels.size(), p.name, p.channels.size())).append("\n\n");
+        String sep = Txt.s(R.string.channels_codeplug_sep);
         int n = 1;
         for (ChannelStore.Channel c : p.channels) {
             b.append(n++).append(". ").append(c.name).append("  ").append(String.format(Locale.US, "%.4f", c.rxFreq / 1e6)).append(" MHz");
             long off = (long) c.txFreq - c.rxFreq;
-            if (ChannelStore.receiveOnly(c.txFreq) || c.txFreq == 0) b.append(", receive only");
-            else if (off != 0) b.append(String.format(Locale.US, ", %s%.4f MHz offset (TX %.4f)", off > 0 ? "+" : "−", Math.abs(off) / 1e6, c.txFreq / 1e6));
+            if (ChannelStore.receiveOnly(c.txFreq) || c.txFreq == 0) b.append(sep).append(Txt.s(R.string.channels_codeplug_rx_only));
+            else if (off != 0) b.append(sep).append(Txt.s(R.string.channels_codeplug_offset, String.format(Locale.US, "%s%.4f", off > 0 ? "+" : "−", Math.abs(off) / 1e6), String.format(Locale.US, "%.4f", c.txFreq / 1e6)));
             if (c.isDigital()) {
-                b.append(", DMR CC").append(c.cc).append(" TS").append(c.inSlot + 1);
-                if (c.txContact > 0) b.append(c.contactType == 0 ? ", private call " : ", TG ").append(c.txContact);
+                b.append(sep).append("DMR CC").append(c.cc).append(" TS").append(c.inSlot + 1);   // i18n: protocol words (CC, TS)
+                if (c.txContact > 0) b.append(sep).append(c.contactType == 0 ? Txt.s(R.string.channels_codeplug_private_call, c.txContact) : "TG " + c.txContact);   // i18n: protocol word (TG)
             } else {
                 String tt = tone(c.txType, c.txSubCode), rt = tone(c.rxType, c.rxSubCode);
-                b.append(", FM").append(c.band == 0 ? " narrow" : "");
-                if (!tt.isEmpty()) b.append(", tone ").append(tt);
-                if (!rt.isEmpty() && !rt.equals(tt)) b.append(", RX tone ").append(rt);
+                b.append(sep).append(c.band == 0 ? Txt.s(R.string.channels_codeplug_fm_narrow) : "FM");
+                if (!tt.isEmpty()) b.append(sep).append(Txt.s(R.string.channels_codeplug_tone, tt));
+                if (!rt.isEmpty() && !rt.equals(tt)) b.append(sep).append(Txt.s(R.string.channels_codeplug_rx_tone, rt));
             }
             if (withLocations && (c.lat != 0 || c.lon != 0)) b.append(String.format(Locale.US, " (%.4f, %.4f)", c.lat, c.lon));
             b.append('\n');
-            if (withNotes && !c.notes.isEmpty()) b.append("   Notes: ").append(c.notes.replace("\n", "\n   ")).append('\n');
+            if (withNotes && !c.notes.isEmpty()) b.append(Txt.s(R.string.channels_codeplug_notes, c.notes.replace("\n", "\n   "))).append('\n');
             if (withNets) for (com.macdmr.radio.ham.NetFinder.Manual m : p.netsOf(c))
-                b.append("   Net: ").append(m.name).append(", ").append(com.macdmr.radio.ham.NetFinder.when(m)).append(", ").append(m.durationMin).append(" min").append(m.notes.isEmpty() ? "" : " (" + m.notes + ")").append('\n');
+                b.append(m.notes.isEmpty() ? Txt.s(R.string.channels_codeplug_net, m.name, com.macdmr.radio.ham.NetFinder.when(m), m.durationMin)
+                        : Txt.s(R.string.channels_codeplug_net_notes, m.name, com.macdmr.radio.ham.NetFinder.when(m), m.durationMin, m.notes)).append('\n');
         }
-        b.append("\nTo import into SignalDeck: share this to SignalDeck, or copy all of it and use Channels → Share → Import.\n");
+        b.append('\n').append(Txt.s(R.string.channels_codeplug_share_footer)).append('\n');
         b.append(code(p, withLocations, withNotes, withNets)).append('\n');
         return b.toString();
     }
 
     // ---- CHIRP CSV (analog channels, for other radios) ----
 
-    static final String CHIRP_HEADER = "Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE";
+    static final String CHIRP_HEADER = "Location,Name,Frequency,Duplex,Offset,Tone,rToneFreq,cToneFreq,DtcsCode,DtcsPolarity,RxDtcsCode,CrossMode,Mode,TStep,Skip,Power,Comment,URCALL,RPT1CALL,RPT2CALL,DVCODE";   // i18n: CHIRP CSV format
 
     public static String chirpCsv(Codeplug p) {
         StringBuilder b = new StringBuilder(CHIRP_HEADER).append("\r\n");
@@ -189,17 +192,17 @@ public final class Codeplug {
             boolean rxOnly = c.txFreq == 0 || ChannelStore.receiveOnly(c.txFreq);
             String duplex = rxOnly ? "off" : off == 0 ? "" : Math.abs(off) > 20_000_000 ? "split" : off > 0 ? "+" : "-";
             String offset = rxOnly || off == 0 ? "0.000000" : duplex.equals("split") ? mhz(c.txFreq) : mhz(Math.abs(off));
-            String tone = "", rTone = "88.5", cTone = "88.5", dtcs = "023", rxDtcs = "023", cross = "Tone->Tone";
+            String tone = "", rTone = "88.5", cTone = "88.5", dtcs = "023", rxDtcs = "023", cross = "Tone->Tone";   // i18n: CHIRP CSV format
             boolean tC = c.txType == 1, rC = c.rxType == 1, tD = (c.txType == 2 || c.txType == 3) && dcsOk(c.txSubCode), rD = (c.rxType == 2 || c.rxType == 3) && dcsOk(c.rxSubCode);
             String pol = (c.txType == 3 ? "R" : "N") + (c.rxType == 3 ? "R" : "N");
-            if (tC && !rC && !rD) { tone = "Tone"; rTone = tone(c.txType, c.txSubCode); }
+            if (tC && !rC && !rD) { tone = "Tone"; rTone = tone(c.txType, c.txSubCode); }   // i18n: CHIRP CSV format
             else if (tC && rC && c.txSubCode == c.rxSubCode) { tone = "TSQL"; rTone = cTone = tone(c.txType, c.txSubCode); }
             else if (tD && rD && c.txSubCode == c.rxSubCode) { tone = "DTCS"; dtcs = rxDtcs = com.macdmr.radio.dsp.ToneTable.dcsCode(c.txSubCode); }
             else if (tC || rC || tD || rD) {
-                tone = "Cross";
+                tone = "Cross";   // i18n: CHIRP CSV format
                 if (tC) rTone = tone(c.txType, c.txSubCode); if (rC) cTone = tone(c.rxType, c.rxSubCode);
                 if (tD) dtcs = com.macdmr.radio.dsp.ToneTable.dcsCode(c.txSubCode); if (rD) rxDtcs = com.macdmr.radio.dsp.ToneTable.dcsCode(c.rxSubCode);
-                cross = (tC ? "Tone" : tD ? "DTCS" : "") + "->" + (rC ? "Tone" : rD ? "DTCS" : "");
+                cross = (tC ? "Tone" : tD ? "DTCS" : "") + "->" + (rC ? "Tone" : rD ? "DTCS" : "");   // i18n: CHIRP CSV format
             }
             b.append(loc++).append(',').append(csv(c.name)).append(',').append(mhz(c.rxFreq)).append(',').append(duplex).append(',').append(offset).append(',')
              .append(tone).append(',').append(rTone).append(',').append(cTone).append(',').append(dtcs).append(',').append(pol).append(',').append(rxDtcs).append(',').append(cross).append(',')
@@ -218,41 +221,42 @@ public final class Codeplug {
         int h = -1; for (int k = 0; k < rows.length && k < 5; k++) if (rows[k].startsWith("Location,") && rows[k].contains("Frequency")) { h = k; break; }
         if (h < 0) return null;
         List<String> head = splitCsv(rows[h]);
-        Codeplug p = new Codeplug(); p.name = name == null || name.isEmpty() ? "CHIRP import" : name; p.format = "CHIRP";
+        Codeplug p = new Codeplug(); p.name = name == null || name.isEmpty() ? "CHIRP import" : name; p.format = "CHIRP";   // i18n: default name (stored as the zone name), format key
         for (int k = h + 1; k < rows.length; k++) {
             if (rows[k].trim().isEmpty()) continue;
             List<String> f = splitCsv(rows[k]);
             java.util.function.Function<String, String> g = col -> { int ix = head.indexOf(col); return ix >= 0 && ix < f.size() ? f.get(ix).trim() : ""; };
             try {
                 ChannelStore.Channel c = new ChannelStore.Channel();
-                c.type = 1; c.name = g.apply("Name"); if (c.name.isEmpty()) c.name = "CH " + g.apply("Location");
-                c.rxFreq = (int) Math.round(Double.parseDouble(g.apply("Frequency")) * 1e6);
-                String duplex = g.apply("Duplex"); double offMhz = g.apply("Offset").isEmpty() ? 0 : Double.parseDouble(g.apply("Offset"));
+                c.type = 1; c.name = g.apply("Name"); if (c.name.isEmpty()) c.name = "CH " + g.apply("Location");   // i18n: CHIRP CSV format
+                c.rxFreq = (int) Math.round(Double.parseDouble(g.apply("Frequency")) * 1e6);   // i18n: CHIRP CSV format
+                String duplex = g.apply("Duplex"); double offMhz = g.apply("Offset").isEmpty() ? 0 : Double.parseDouble(g.apply("Offset"));   // i18n: CHIRP CSV format
                 long tx = duplex.equals("+") ? c.rxFreq + Math.round(offMhz * 1e6) : duplex.equals("-") ? c.rxFreq - Math.round(offMhz * 1e6) : duplex.equals("split") ? Math.round(offMhz * 1e6) : duplex.equals("off") ? 0 : c.rxFreq;
                 c.txFreq = (int) tx;
-                c.band = g.apply("Mode").equalsIgnoreCase("NFM") ? 0 : 1;
-                String pw = g.apply("Power"); c.power = pw.isEmpty() || pw.matches("(?i)^(high|[3-9].*|[1-9][0-9].*)") ? 1 : 0;
-                String tone = g.apply("Tone"), cross = g.apply("CrossMode"), pol = g.apply("DtcsPolarity");
+                c.band = g.apply("Mode").equalsIgnoreCase("NFM") ? 0 : 1;   // i18n: CHIRP CSV format
+                String pw = g.apply("Power"); c.power = pw.isEmpty() || pw.matches("(?i)^(high|[3-9].*|[1-9][0-9].*)") ? 1 : 0;   // i18n: CHIRP CSV format
+                String tone = g.apply("Tone"), cross = g.apply("CrossMode"), pol = g.apply("DtcsPolarity");   // i18n: CHIRP CSV format
                 boolean tR = pol.length() > 0 && pol.charAt(0) == 'R', rR = pol.length() > 1 && pol.charAt(1) == 'R';
-                int rT = ctcssIndex(g.apply("rToneFreq")), cT = ctcssIndex(g.apply("cToneFreq")), dt = dcs(g.apply("DtcsCode")), rdt = dcs(g.apply("RxDtcsCode").isEmpty() ? g.apply("DtcsCode") : g.apply("RxDtcsCode"));
+                int rT = ctcssIndex(g.apply("rToneFreq")), cT = ctcssIndex(g.apply("cToneFreq")), dt = dcs(g.apply("DtcsCode")), rdt = dcs(g.apply("RxDtcsCode").isEmpty() ? g.apply("DtcsCode") : g.apply("RxDtcsCode"));   // i18n: CHIRP CSV format
                 if (tone.equals("Tone")) { c.txType = 1; c.txSubCode = rT; }
                 else if (tone.equals("TSQL")) { c.txType = c.rxType = 1; c.txSubCode = c.rxSubCode = cT >= 0 ? cT : rT; }
                 else if (tone.equals("DTCS")) { c.txType = tR ? 3 : 2; c.rxType = rR ? 3 : 2; c.txSubCode = dt; c.rxSubCode = rdt >= 0 ? rdt : dt; }
                 else if (tone.equals("Cross")) {
-                    String[] ab = (cross.isEmpty() ? "Tone->Tone" : cross).split("->", -1);
+                    String[] ab = (cross.isEmpty() ? "Tone->Tone" : cross).split("->", -1);   // i18n: CHIRP CSV format
                     String a = ab[0], z = ab.length > 1 ? ab[1] : "";
                     if (a.equals("Tone")) { c.txType = 1; c.txSubCode = rT; } else if (a.equals("DTCS")) { c.txType = tR ? 3 : 2; c.txSubCode = dt; }
                     if (z.equals("Tone")) { c.rxType = 1; c.rxSubCode = cT; } else if (z.equals("DTCS")) { c.rxType = rR ? 3 : 2; c.rxSubCode = rdt; }
                 }
                 if (c.txType == 1 && c.txSubCode < 0 || c.rxType == 1 && c.rxSubCode < 0) { c.txType = c.txType == 1 && c.txSubCode < 0 ? 0 : c.txType; c.rxType = c.rxType == 1 && c.rxSubCode < 0 ? 0 : c.rxType; }
                 if (c.txType >= 2 && c.txSubCode < 0) c.txType = 0; if (c.rxType >= 2 && c.rxSubCode < 0) c.rxType = 0;
-                c.location = g.apply("Comment");
+                c.location = g.apply("Comment");   // i18n: CHIRP CSV format
                 c.sq = 2; c.relay = 2; c.encryptSw = 2;
-                if (!ChannelStore.inBand(c.rxFreq)) { p.skipped.add(c.name + " (" + g.apply("Frequency") + " MHz): outside " + com.macdmr.radio.DeviceProfile.detect().bandsText()); continue; }
-                if (c.txFreq != 0 && !ChannelStore.inBand(c.txFreq)) { p.skipped.add(c.name + ": transmit frequency outside the radio's bands"); continue; }
-                if (g.apply("Mode").matches("(?i)AM|DV|USB|LSB|CW|DMR|DN")) { p.skipped.add(c.name + ": " + g.apply("Mode") + " is not FM"); continue; }
+                if (!ChannelStore.inBand(c.rxFreq)) { p.skipped.add(Txt.s(R.string.channels_codeplug_skip_outside_mhz, c.name, g.apply("Frequency"), com.macdmr.radio.DeviceProfile.detect().bandsText())); continue; }   // i18n: CSV column
+                if (c.txFreq != 0 && !ChannelStore.inBand(c.txFreq)) { p.skipped.add(Txt.s(R.string.channels_codeplug_skip_tx_outside, c.name)); continue; }
+                if (g.apply("Mode").matches("(?i)AM|DV|USB|LSB|CW|DMR|DN")) { p.skipped.add(Txt.s(R.string.channels_codeplug_skip_not_fm, c.name, g.apply("Mode"))); continue; }   // i18n: CSV column
                 p.channels.add(c);
-            } catch (RuntimeException e) { p.skipped.add("Row " + (k - h) + " could not be read"); }
+            } catch (RuntimeException e) { p.skipped.add(Txt.s(R.string.channels_codeplug_skip_row, k - h)); }
+
         }
         return p;
     }
@@ -267,7 +271,7 @@ public final class Codeplug {
         List<String> out = new ArrayList<>(); StringBuilder cur = new StringBuilder(); boolean q = false;
         for (int k = 0; k < line.length(); k++) {
             char ch = line.charAt(k);
-            if (q) { if (ch == '"') { if (k + 1 < line.length() && line.charAt(k + 1) == '"') { cur.append('"'); k++; } else q = false; } else cur.append(ch); }
+            if (q) { if (ch == '"') { if (k + 1 < line.length() && line.charAt(k + 1) == '"') { cur.append('"'); k++; } else q = false; } else cur.append(ch); }   // i18n: CSV parser
             else if (ch == '"') q = true; else if (ch == ',') { out.add(cur.toString()); cur.setLength(0); } else cur.append(ch);
         }
         out.add(cur.toString());

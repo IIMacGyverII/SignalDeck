@@ -24,14 +24,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * Reads {@code res/values*}/strings*.xml the way aapt2 compiles them (whitespace collapsed outside double quotes,
  * {@code \n \t \' \" \\ \@ \? \\uXXXX} escapes). Used by host tests only: {@link Txt}'s English table without a
  * Context, and the guard tests that compare every language with English. The app itself reads compiled resources.
+ * <p>i18n: stays English (exception messages and preference keys only; the user-facing text is in the resources).
  */
 public final class StringsXml {
     private StringsXml() { }
 
     public static final class Entry {
         public final String name, text, comment; public final Map<String, String> plural; public final boolean translatable;
-        Entry(String name, String text, Map<String, String> plural, String comment, boolean translatable) {
-            this.name = name; this.text = text; this.plural = plural; this.comment = comment; this.translatable = translatable;
+        /** False for {@code formatted="false"}: a string read without arguments whose "%" is plain text ("50 %, faint"). */
+        public final boolean formatted;
+        Entry(String name, String text, Map<String, String> plural, String comment, boolean translatable) { this(name, text, plural, comment, translatable, true); }
+        Entry(String name, String text, Map<String, String> plural, String comment, boolean translatable, boolean formatted) {
+            this.name = name; this.text = text; this.plural = plural; this.comment = comment; this.translatable = translatable; this.formatted = formatted;
         }
     }
 
@@ -59,12 +63,12 @@ public final class StringsXml {
                     if (n.getNodeType() == Node.COMMENT_NODE) { comment = n.getNodeValue().trim(); continue; }
                     if (n.getNodeType() != Node.ELEMENT_NODE) continue;
                     Element e = (Element) n; String name = e.getAttribute("name");
-                    boolean tr = !"false".equals(e.getAttribute("translatable"));
-                    if ("string".equals(e.getTagName())) out.add(new Entry(name, compile(e.getTextContent()), null, comment, tr));
+                    boolean tr = !"false".equals(e.getAttribute("translatable")), fmt = !"false".equals(e.getAttribute("formatted"));
+                    if ("string".equals(e.getTagName())) out.add(new Entry(name, compile(e.getTextContent()), null, comment, tr, fmt));
                     else if ("plurals".equals(e.getTagName())) {
                         Map<String, String> q = new LinkedHashMap<>(); NodeList items = e.getElementsByTagName("item");
                         for (int i = 0; i < items.getLength(); i++) { Element it = (Element) items.item(i); q.put(it.getAttribute("quantity"), compile(it.getTextContent())); }
-                        out.add(new Entry(name, null, q, comment, tr));
+                        out.add(new Entry(name, null, q, comment, tr, fmt));
                     }
                     comment = null;
                 }

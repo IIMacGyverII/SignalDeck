@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +21,21 @@ import java.util.concurrent.TimeUnit;
  * stops by itself for Talk and for a scheduled operation.
  */
 public final class BandScope {
-    public static final class Preset { public final String name; public final int from, to, step; Preset(String n, int f, int t, int s) { name = n; from = f; to = t; step = s; } }
+    public static final class Preset {
+        public final String name; public final int from, to, step; final int nameId;
+        Preset(String n, int f, int t, int s) { this(n, 0, f, t, s); }
+        Preset(String n, int id, int f, int t, int s) { name = n; nameId = id; from = f; to = t; step = s; }
+        /** The name shown: {@link #name} in the app's language. */
+        public String label() { return nameId == 0 ? name : Txt.s(nameId); }
+    }
     public static final Preset[] PRESETS = {
         new Preset("2 m", 144_000_000, 148_000_000, 25_000),
-        new Preset("2 m FM simplex", 146_400_000, 147_600_000, 15_000),
+        new Preset("2 m FM simplex", R.string.modes_scope_preset_2m_simplex, 146_400_000, 147_600_000, 15_000),   // i18n: English key name, label() is shown
         new Preset("70 cm", 420_000_000, 450_000_000, 100_000),
-        new Preset("70 cm FM", 440_000_000, 450_000_000, 25_000),
-        new Preset("GMRS / FRS", 462_500_000, 467_750_000, 12_500),
-        new Preset("Marine VHF", 156_000_000, 162_025_000, 25_000),
-        new Preset("NOAA weather", 162_400_000, 162_550_000, 25_000),
+        new Preset("70 cm FM", 440_000_000, 450_000_000, 25_000),   // i18n: band and mode name
+        new Preset("GMRS / FRS", 462_500_000, 467_750_000, 12_500),   // i18n: service names
+        new Preset("Marine VHF", R.string.modes_scope_preset_marine, 156_000_000, 162_025_000, 25_000),   // i18n: English key name, label() is shown
+        new Preset("NOAA weather", R.string.modes_scope_preset_noaa, 162_400_000, 162_550_000, 25_000),   // i18n: English key name, label() is shown
     };
     public static final int MAX_STEPS = 1200, HISTORY = 120;
     /** The presets offered for a region (Device → Region): the NOAA weather band only where weather radio exists, the rest under Show all. Indexes into PRESETS. */
@@ -116,14 +123,14 @@ public final class BandScope {
 
     /** Why a range cannot be swept, or null. Pure. */
     public static String problem(int from, int to, int step) {
-        if (from <= 0 || to <= 0 || step <= 0) return "Enter the frequencies in MHz and the step in kHz";
-        if (step < 2_500) return "Use a step of at least 2.5 kHz";
-        if (to <= from) return "The end must be above the start";
+        if (from <= 0 || to <= 0 || step <= 0) return Txt.s(R.string.modes_scope_err_enter);
+        if (step < 2_500) return Txt.s(R.string.modes_scope_err_step);
+        if (to <= from) return Txt.s(R.string.modes_scope_err_order);
         com.macdmr.radio.DeviceProfile dp = com.macdmr.radio.DeviceProfile.detect();
-        if (!tunable(from) || !tunable(to) || !oneBand(dp, from, to)) return "The radio tunes " + dp.bandsText() + ": keep the range inside one of them";
+        if (!tunable(from) || !tunable(to) || !oneBand(dp, from, to)) return Txt.s(R.string.modes_scope_err_band, dp.bandsText());
         int n = steps(from, to, step);
-        if (n < 2) return "Choose a range with at least two steps";
-        if (n > MAX_STEPS) return n + " steps is too many (up to " + MAX_STEPS + "): use a larger step";
+        if (n < 2) return Txt.s(R.string.modes_scope_err_few);
+        if (n > MAX_STEPS) return Txt.s(R.string.modes_scope_err_many, n, MAX_STEPS);
         return null;
     }
 
@@ -175,7 +182,7 @@ public final class BandScope {
                 hooks.sweep(from, step, copy, n);
             }
         } catch (InterruptedException ignored) {
-        } catch (Throwable x) { hooks.state("stopped: " + x.getMessage()); }
+        } catch (Throwable x) { hooks.state(Txt.s(R.string.modes_scope_state_failed, String.valueOf(x.getMessage()))); }
     }
 
     public float[] last() { synchronized (history) { return last == null ? null : last.clone(); } }

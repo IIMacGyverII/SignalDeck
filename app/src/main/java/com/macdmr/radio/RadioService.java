@@ -18,6 +18,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
 
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +31,7 @@ import java.util.Locale;
  * Activities bind and register a {@link Listener}; everything the UI shows comes through it.
  */
 public class RadioService extends Service implements RadioEngine.Events {
-    private static final String TAG = "RadioService";
+    private static final String TAG = "RadioService";   // i18n: log tag
 
     public interface Listener {
         void onChannel(ChannelStore.Channel ch);
@@ -97,7 +100,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public ChannelStore.Channel priority() { int n = scanPriority(); ChannelStore.Channel p = n > 0 ? store.byNumber(n) : null; return ChannelStore.tunable(p) ? p : null; }
         @Override public void status(boolean s, boolean h, ChannelStore.Channel on) {
             if (voiceOn()) {
-                if (s && h && on != null) sayChannel("Holding " + channelWords(on));                       // the scan stopped on activity
+                if (s && h && on != null) sayChannel("Holding " + channelWords(on));                       // the scan stopped on activity  // i18n: spoken by the English TTS voice
                 else if (s && !h) { ui.removeCallbacks(channelSay); pendingChannelSay = null; if (speakingChannel && tts != null) try { tts.stop(); } catch (Throwable ignored) { } }   // moving on: drop it
                 else if (!s && current != null) sayChannel(channelWords(current));                          // scan off: where you are
             }
@@ -107,7 +110,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     private final java.util.concurrent.ExecutorService worker = java.util.concurrent.Executors.newSingleThreadExecutor(r -> new Thread(r, "radio-worker"));
     private volatile boolean pttDown;
     /** Ends a voice key at the transmit limit (Device → Longest transmission, {@link TxLimit}); not posted for No limit. */
-    private final Runnable txWatchdog = () -> { if (pttDown) { String n = TxLimit.name(txLimitS()); log("TX watchdog: releasing PTT after " + n); history("tx", "\u23F1 Transmission ended at the " + n + " limit"); ptt(false); } };
+    private final Runnable txWatchdog = () -> { if (pttDown) { Msg n = TxLimit.nameMsg(txLimitS()); log("TX watchdog: releasing PTT after " + n.english()); history("tx", Msg.of(R.string.service_tx_limit_ended, n)); ptt(false); } };
     /** The heat watch of the voice key in progress, and a count of voice keys so a late watch never ends the next key. */
     private volatile Thread voiceHeat;
     private volatile long voiceKeys;
@@ -122,6 +125,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         }
         @Override public String idCallsign() { ChannelStore.Channel ch = current; return ch != null && amateurBand(ch.txFreq) && packet != null && packet.callsignSet() ? packet.callsign() : null; }
         @Override public void event(String line) { history("pkt", line); }
+        @Override public void event(Msg m) { history("pkt", m); }
     });
     private volatile int parrotChannel = -1;
     private volatile long txStartedAt;
@@ -137,10 +141,10 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Transmit a recorded keyer message (with the Morse ID after it when set and on an amateur channel). Error or null. */
     public String sendKeyer(int slot) {
         short[] p = keyer.pcm(slot);
-        if (p == null || p.length == 0) return "Nothing recorded in " + keyer.name(slot);
+        if (p == null || p.length == 0) return Txt.s(R.string.service_keyer_nothing_recorded, keyer.name(slot));
         ChannelStore.Channel c = current;
-        if (c == null || c.isDigital()) return "The voice keyer needs an analog FM channel";
-        if (txInhibited()) return "This channel is receive-only";
+        if (c == null || c.isDigital()) return Txt.s(R.string.service_keyer_needs_fm);
+        if (txInhibited()) return Txt.s(R.string.service_tx_receive_only);
         boolean id = keyer.addId(slot) && amateurBand(c.txFreq) && packet != null && packet.callsignSet();
         short[] m = id ? com.macdmr.radio.coverage.Morse.pcm(packet.callsign(), 20, 800) : new short[0];
         int lead = 12000, gap = id ? 2400 : 0;                                   // 1.5 s: the radio passes audio only ~1.5 s after keying
@@ -148,7 +152,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         short[] out = new short[lead + voiceN + gap + m.length];
         System.arraycopy(p, 0, out, lead, voiceN); System.arraycopy(m, 0, out, lead + voiceN + gap, m.length);
         final String nm = keyer.name(slot); final boolean sentId = id;
-        transmitPcm(out, "voice keyer: " + nm, () -> { history("pkt", "\uD83C\uDF99 Voice keyer sent: " + nm + (sentId ? " + Morse ID" : "")); if (sentId) markIdentified(); });
+        transmitPcm(out, "voice keyer: " + nm, () -> { history("pkt", sentId ? Msg.of(R.string.service_keyer_sent_id, nm) : Msg.of(R.string.service_keyer_sent, nm)); if (sentId) markIdentified(); });   // i18n: transmission label (log tag)
         return null;
     }
     /** The station-ID interval: the region's (Device → Region), else 10 minutes. */
@@ -166,8 +170,8 @@ public class RadioService extends Service implements RadioEngine.Events {
             lastIdReminder = now;
             try { android.os.Vibrator v = (android.os.Vibrator) getSystemService(VIBRATOR_SERVICE); if (v != null) v.vibrate(android.os.VibrationEffect.createWaveform(new long[] { 0, 120, 80, 120 }, -1)); } catch (Throwable ignored) { }
             final long min = idEveryMs() / 60_000L;
-            ui.post(() -> android.widget.Toast.makeText(this, "Give your callsign: it has been " + min + " minutes since you identified", android.widget.Toast.LENGTH_LONG).show());
-            history("pkt", "\u23F0 Time to identify: " + min + " minutes since your last ID");
+            ui.post(() -> android.widget.Toast.makeText(this, Txt.s(R.string.service_id_due_toast, min), android.widget.Toast.LENGTH_LONG).show());
+            history("pkt", Msg.of(R.string.service_id_due_history, min));
         }
     }
 
@@ -191,8 +195,8 @@ public class RadioService extends Service implements RadioEngine.Events {
      * action in Restricted mode. The module's own timer follows at once when the radio is idle, else after the key.
      */
     public String setTxLimit(int s) {
-        if (!adminAllowed("txlimit")) return "The transmit limit is locked in Restricted mode";
-        if (s != TxLimit.NONE && s < TxLimit.MIN_CUSTOM_S) return "The limit is at least " + TxLimit.MIN_CUSTOM_S + " seconds";
+        if (!adminAllowed("txlimit")) return Txt.s(R.string.service_txlimit_locked);
+        if (s != TxLimit.NONE && s < TxLimit.MIN_CUSTOM_S) return Txt.s(R.string.service_txlimit_minimum, TxLimit.MIN_CUSTOM_S);
         getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("txLimitS", s).apply();
         log("transmit limit: " + TxLimit.name(s));
         applyModuleTot();
@@ -251,18 +255,18 @@ public class RadioService extends Service implements RadioEngine.Events {
     void diagVfo(int hz, int power) { diagVfo(hz, power, 0); }
     /** {@code ctcssHz} > 0: the bench VFO transmits that tone (a fox for the fox hunt tests); power 0 = low, 1 = high. */
     void diagVfo(int hz, int power, double ctcssHz) {
-        ChannelStore.Channel a = new ChannelStore.Channel(); a.type = 1; a.rxFreq = a.txFreq = hz; a.band = 1; a.power = power; a.name = "Bench";
+        ChannelStore.Channel a = new ChannelStore.Channel(); a.type = 1; a.rxFreq = a.txFreq = hz; a.band = 1; a.power = power; a.name = "Bench";   // i18n: bench VFO name (diagnostics)
         int t = ctcssHz > 0 ? ChannelPresets.ctcssIndex(ctcssHz) : -1; if (t >= 0) { a.txType = 1; a.txSubCode = t; }
         applyVfo(a, false);
     }
-    void diagVfoOff() { if (vfo != null && "Bench".equals(vfo.name)) exitVfo(); }
+    void diagVfoOff() { if (vfo != null && "Bench".equals(vfo.name)) exitVfo(); }   // i18n: bench VFO name (diagnostics)
     /** Record whole passes (AOS to LOS, below the squelch too) as WAV in Download/DMR/Audio/<satellite>/…_pass.wav. */
     public boolean satRecord() { return getSharedPreferences("radio", MODE_PRIVATE).getBoolean("satRecord", true); }
     public void setSatRecord(boolean on) { getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("satRecord", on).apply(); }
     private volatile WavRecorder passRec;
     private void finishPassRecording() {
         WavRecorder r = passRec; passRec = null; if (r == null) return;
-        try { java.io.File f = r.stop(); if (f != null) history("rec", "\uD83C\uDFA7 Pass recorded: " + f.getName()); } catch (Throwable t) { log("pass record stop: " + t); }
+        try { java.io.File f = r.stop(); if (f != null) history("rec", Msg.of(R.string.service_sat_pass_recorded, f.getName())); } catch (Throwable t) { log("pass record stop: " + t); }
     }
     /**
      * Fresh orbits for a pass: elements older than a day are downloaded again (call off the main thread). Returns the
@@ -284,8 +288,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Track a pass: at AOS minus a minute the VFO takes the satellite's channel, corrected for Doppler every 2 s, until LOS. */
     public String trackSat(final com.macdmr.radio.ham.Satellites.Sat sat, final com.macdmr.radio.ham.Sgp4 el, final com.macdmr.radio.ham.SatTrack.Pass pass) {
         final android.location.Location me = lastKnownLocation();
-        if (me == null) return "No position fix: turn on location";
-        if (!profile.tunable(sat.downHz)) return "This radio tunes " + profile.bandsText() + ": " + sat.name + " sends on " + String.format(java.util.Locale.US, "%.3f", sat.downHz / 1e6) + " MHz";
+        if (me == null) return Txt.s(R.string.service_no_fix_location);
+        if (!profile.tunable(sat.downHz)) return Txt.s(R.string.service_sat_out_of_band, profile.bandsText(), sat.name, Txt.freqMhz(sat.downHz, 3));
         stopSatTrack();
         final SatState st = new SatState(); st.name = sat.name; st.aos = pass.aos; st.los = pass.los; st.maxEl = pass.maxEl; st.waiting = true;
         final boolean listenOnly = sat.listenOnly() || !profile.tunable(sat.upHz);   // a 2 m uplink on a UHF-only radio (the W6): hear it, never key
@@ -303,8 +307,8 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (System.currentTimeMillis() >= P.aos - 60_000) break;
                     Thread.sleep(1000);
                 }
-                if (scope.running()) { scope.stop(); history("pkt", "\u2702 Band scope stopped for the satellite pass"); }
-                history("pkt", "\uD83D\uDEF0 Tracking " + sat.name + ": tuning for the pass");
+                if (scope.running()) { scope.stop(); history("pkt", Msg.of(R.string.service_scope_stopped_pass)); }
+                history("pkt", Msg.of(R.string.service_sat_tracking, sat.name));
                 ChannelStore.Channel v = new ChannelStore.Channel(); v.type = 1; v.band = 1; v.power = 1; v.name = sat.name; dataModeSquelch(v);   // satellites arrive far below the radio's squelch
                 int tone = sat.toneHz > 0 ? com.macdmr.radio.ChannelPresets.ctcssIndex(sat.toneHz) : -1;
                 if (tone >= 0) { v.txType = 1; v.txSubCode = tone; }
@@ -326,7 +330,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         if (sat.mode == com.macdmr.radio.ham.Satellites.APRS) { aprsMonitorHz = (int) sat.downHz; packet.setMonitoring(true); pushModes(); }
                         else if (sat.mode == com.macdmr.radio.ham.Satellites.SSTV) { packet.setSstvForceContinuous(true); packet.setSstvRx(true); pushModes(); }   // ISS events are Robot 36: no VIS needed, partial pictures kept
                         if (sat.mode != com.macdmr.radio.ham.Satellites.VOICE && satRecord()) {      // the whole pass, so a missed picture can be decoded again later
-                            try { WavRecorder r = new WavRecorder(sat.name); r.start("pass"); passRec = r; history("pkt", "\uD83D\uDEF0 Recording the pass (" + r.file().getName() + ")"); }
+                            try { WavRecorder r = new WavRecorder(sat.name); r.start("pass"); passRec = r; history("pkt", Msg.of(R.string.service_sat_recording, r.file().getName())); }
                             catch (Throwable x) { log("pass record: " + x); }
                         }
                     }
@@ -344,9 +348,9 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (tuned && vfo != null && sat.name.equals(vfo.name)) exitVfo();
                 if (satState == st) satState = null;
                 if (natural && sat.catalog == com.macdmr.radio.ham.Satellites.ISS_CATALOG && issRepeatMode == sat.mode)   // following every pass: the next one
-                    ui.postDelayed(() -> { if (issRepeatMode == sat.mode && satState == null) { String e = startIssMode(sat.mode); if (e != null) { history("pkt", "\uD83D\uDEF0 " + e); setIssRepeat(-1); } } }, 5000);
+                    ui.postDelayed(() -> { if (issRepeatMode == sat.mode && satState == null) { String e = startIssMode(sat.mode); if (e != null) { history("pkt", Msg.of(R.string.service_sat_repeat_failed_history, Msg.shown(e))); setIssRepeat(-1); } } }, 5000);
                 pushModes();
-                history("pkt", "\uD83D\uDEF0 " + sat.name + " pass over");
+                history("pkt", Msg.of(R.string.service_sat_pass_over, sat.name));
             }
         }, "sat-track");
         satThread = t; t.setDaemon(true); t.start();
@@ -379,34 +383,34 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Start or stop the fox beacon (5 s of beeps every minute on the current channel). Returns a message. */
     public String setFoxTx(boolean on) {
         Thread t = foxThread; foxThread = null; if (t != null) t.interrupt();
-        if (!on) { if (t != null) history("pkt", "\uD83E\uDD8A Fox beacon off"); pushModes(); return "Fox beacon off"; }
+        if (!on) { if (t != null) history("pkt", Msg.of(R.string.service_fox_off_history)); pushModes(); return Txt.s(R.string.service_fox_off); }
         ChannelStore.Channel ch = current;
-        if (ch == null || ch.isDigital()) return "The fox beacon needs an analog FM channel";
-        if (txInhibited()) return "This channel is receive-only";
+        if (ch == null || ch.isDigital()) return Txt.s(R.string.service_fox_needs_fm);
+        if (txInhibited()) return Txt.s(R.string.service_tx_receive_only);
         foxChannel = ch.number;
         final Thread nt = new Thread(() -> {
             while (foxThread == Thread.currentThread()) {
                 ChannelStore.Channel c = current;
-                if (c == null || c.number != foxChannel) { foxThread = null; history("pkt", "\uD83E\uDD8A Fox beacon stopped: the channel changed"); pushModes(); break; }
+                if (c == null || c.number != foxChannel) { foxThread = null; history("pkt", Msg.of(R.string.service_fox_stopped_channel)); pushModes(); break; }
                 if (isReady() && !pttDown && !scanner.isScanning() && !txInhibited()) {
                     String id = amateurBand(c.txFreq) && packet != null && packet.callsignSet() ? packet.callsign() : null;
-                    transmitPcm(com.macdmr.radio.ham.FoxHunt.beacon(5, id), "fox beacon", null);
+                    transmitPcm(com.macdmr.radio.ham.FoxHunt.beacon(5, id), "fox beacon", null);   // i18n: transmission label (log tag)
                 }
                 try { Thread.sleep(60_000); } catch (InterruptedException e) { break; }
             }
         }, "fox-beacon");
         foxThread = nt; nt.setDaemon(true); nt.start();
-        history("pkt", "\uD83E\uDD8A Fox beacon on " + ch.name + " (every minute)");
+        history("pkt", Msg.of(R.string.service_fox_on_history, ch.name));
         pushModes();
-        return "Fox beacon on " + ch.name + ": 5 s of beeps every minute";
+        return Txt.s(R.string.service_fox_on, ch.name);
     }
     private ChannelStore.Channel foxHome;
     /** Listen {@code hz} above the channel (0 = back on it): close to the fox, an off-frequency signal is weaker and easier to judge. Error or null. */
     public String foxOffset(int hz) {
         if (hz == 0) { if (foxHome != null) { foxHome = null; exitVfo(); } return null; }
         ChannelStore.Channel base = foxHome != null ? foxHome : current;
-        if (base == null || base.isDigital()) return "Needs an analog channel";
-        if (!profile.tunable((long) base.rxFreq + hz)) return "This radio tunes " + profile.bandsText() + ": " + String.format(Locale.US, "%.3f", (base.rxFreq + hz) / 1e6) + " MHz is outside it";   // the top of a band: the VFO would be refused
+        if (base == null || base.isDigital()) return Txt.s(R.string.service_needs_analog);
+        if (!profile.tunable((long) base.rxFreq + hz)) return Txt.s(R.string.service_freq_outside, profile.bandsText(), Txt.freqMhz((long) base.rxFreq + hz, 3));   // the top of a band: the VFO would be refused
         if (foxHome == null) foxHome = base;
         ChannelStore.Channel v = vfoCopy(base); v.rxFreq = base.rxFreq + hz; v.txFreq = base.txFreq; v.name = base.name + " +" + (hz / 1000) + " kHz";
         applyVfo(v, false);
@@ -415,15 +419,15 @@ public class RadioService extends Service implements RadioEngine.Events {
     public com.macdmr.radio.ham.Parrot parrot() { return parrot; }
     /** Turn the parrot on for the current channel (or off). Returns what happened, for a toast. */
     public String setParrot(boolean on) {
-        if (!on) { if (parrot.enabled()) history("pkt", "\uD83E\uDD9C Parrot off (" + parrot.played() + " repeated)"); parrot.setEnabled(false); parrotChannel = -1; pushModes(); return "Parrot off"; }
+        if (!on) { if (parrot.enabled()) history("pkt", Msg.of(R.string.service_parrot_off_history, parrot.played())); parrot.setEnabled(false); parrotChannel = -1; pushModes(); return Txt.s(R.string.service_parrot_off); }
         ChannelStore.Channel ch = current;
-        if (ch == null || ch.isDigital()) return "The parrot needs an analog FM channel";
-        if (txInhibited()) return "This channel is receive-only";
-        if (!softSq.isEnabled() && hardwareSq(ch) == 0) return "Turn the channel's squelch up (or Soft SQ on) first: with squelch 0 the parrot would repeat static";
+        if (ch == null || ch.isDigital()) return Txt.s(R.string.service_parrot_needs_fm);
+        if (txInhibited()) return Txt.s(R.string.service_tx_receive_only);
+        if (!softSq.isEnabled() && hardwareSq(ch) == 0) return Txt.s(R.string.service_parrot_needs_squelch);
         parrotChannel = ch.number; modeSince = System.currentTimeMillis(); parrot.setEnabled(true);
-        history("pkt", "\uD83E\uDD9C Parrot on: repeating what is heard on " + ch.name);
+        history("pkt", Msg.of(R.string.service_parrot_on_history, ch.name));
         pushModes();
-        return "Parrot on " + ch.name + ": transmissions are repeated a second after they end";
+        return Txt.s(R.string.service_parrot_on, ch.name);
     }
     /** Inside the region's amateur bands (Device → Region; before one is chosen, the US 2 m, 1.25 m and 70 cm bands). */
     public static boolean amateurBand(int hz) { return com.macdmr.radio.region.Region.cached().amateur(hz); }
@@ -433,7 +437,9 @@ public class RadioService extends Service implements RadioEngine.Events {
     public RadioIdStore radioId() { return radioId; }
 
     /** A talkgroup's contact name, or "TG 91". */
-    public String talkgroupName(int tg) { String n = store.contactName(tg, 1); return n != null && !n.isEmpty() ? n : "TG " + tg; }
+    public String talkgroupName(int tg) { String n = store.contactName(tg, 1); return n != null && !n.isEmpty() ? n : Txt.s(R.string.service_tg_number, tg); }
+    /** {@link #talkgroupName} as a history argument: the contact name, or "TG n" as a message (English in the stored text). */
+    private Object talkgroupLabel(int tg) { String n = store.contactName(tg, 1); return n != null && !n.isEmpty() ? n : Msg.of(R.string.service_tg_number, tg); }
     /** Conversations with a name for everyone: contacts, then RadioID for radios, "TG n" for talkgroups. */
     public java.util.List<ChannelStore.Conversation> conversations() {
         java.util.List<ChannelStore.Conversation> l = store.conversations();
@@ -461,7 +467,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     // ---- voice announcements + keyword alerts ----
     private android.speech.tts.TextToSpeech tts; private volatile boolean ttsReady;
     public boolean voiceOn() { return getSharedPreferences("radio", MODE_PRIVATE).getBoolean("voice", false); }
-    public void setVoiceOn(boolean on) { getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("voice", on).apply(); if (on) say("Voice announcements on"); }
+    public void setVoiceOn(boolean on) { getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("voice", on).apply(); if (on) say("Voice announcements on"); }   // i18n: spoken by the English TTS voice
     /** True while the speech queue holds only a channel announcement, which a newer one may cut off. */
     private volatile boolean speakingChannel;
     private String pendingChannelSay;
@@ -486,7 +492,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     private static String channelWords(ChannelStore.Channel ch) {
-        return "Channel " + ch.number + ", " + ch.name.replaceAll("[_]+", " ").replaceAll("\\((UHF|VHF)\\)", "").trim() + (ch.isM17() ? ", M 17" : ch.isDigital() ? ", digital" : "");
+        return "Channel " + ch.number + ", " + ch.name.replaceAll("[_]+", " ").replaceAll("\\((UHF|VHF)\\)", "").trim() + (ch.isM17() ? ", M 17" : ch.isDigital() ? ", digital" : "");   // i18n: spoken by the English TTS voice
     }
 
     public void say(final String text) {
@@ -507,11 +513,11 @@ public class RadioService extends Service implements RadioEngine.Events {
             for (String w : raw.toLowerCase(Locale.US).split("[,;\n]+")) {
                 w = w.trim(); if (w.isEmpty() || !low.contains(" " + w + " ")) continue;
                 synchronized (keywordLastHit) { Long last = keywordLastHit.get(w); if (last != null && now - last < 15000) continue; keywordLastHit.put(w, now); }
-                final String word = w, chan = current != null ? current.name : "the radio";
+                final String word = w, chan = current != null ? current.name : "the radio";   // i18n: spoken by the English TTS voice (the notification has its own text)
                 try { android.os.Vibrator vib = (android.os.Vibrator) getSystemService(VIBRATOR_SERVICE); if (vib != null) vib.vibrate(android.os.VibrationEffect.createWaveform(new long[] { 0, 250, 120, 250, 120, 400 }, -1)); } catch (Throwable ignored) { }
-                history("alert", "\uD83D\uDD14 Keyword \"" + word + "\" heard");
-                notifyUser("Keyword \"" + word + "\" heard on " + chan, sentence, true);
-                if (voiceOn()) say("Keyword " + word + " on " + chan);
+                history("alert", Msg.of(R.string.service_keyword_heard, word));
+                notifyUser(current != null ? Txt.s(R.string.service_keyword_notify_title, word, chan) : Txt.s(R.string.service_keyword_notify_title_radio, word), sentence, true);
+                if (voiceOn()) say("Keyword " + word + " on " + chan);   // i18n: spoken by the English TTS voice
                 return;
             }
         } catch (Throwable t) { log("keywords: " + t); }
@@ -554,22 +560,22 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** SSTV receive: on the SSTV calling frequency (through the VFO) or on the current channel. */
     public String sstvMonitor(boolean on, boolean park) {
-        if (packet == null) return "not ready";
+        if (packet == null) return Txt.s(R.string.service_packet_not_ready);
         if (on) {
-            if (park && !profile.tunable(PacketEngine.SSTV_FREQ_HZ)) return "This radio tunes " + profile.bandsText() + ", not 144.500 MHz: use Receive here";
+            if (park && !profile.tunable(PacketEngine.SSTV_FREQ_HZ)) return Txt.s(R.string.service_sstv_out_of_band, profile.bandsText());
             if (park) {
                 ChannelStore.Channel a = new ChannelStore.Channel();
-                a.type = 1; a.rxFreq = a.txFreq = PacketEngine.SSTV_FREQ_HZ; a.band = 1; a.power = 1; a.name = "SSTV 144.500"; dataModeSquelch(a);
+                a.type = 1; a.rxFreq = a.txFreq = PacketEngine.SSTV_FREQ_HZ; a.band = 1; a.power = 1; a.name = "SSTV 144.500"; dataModeSquelch(a);   // i18n: mode name (VFO name)
                 applyVfo(a, false);
             }
             if (!packet.sstvRx()) modeSince = System.currentTimeMillis();
             packet.setSstvRx(true); pushModes();
-            return park ? "SSTV receive on 144.500 MHz" : "SSTV receive on this channel";
+            return park ? Txt.s(R.string.service_sstv_on_park) : Txt.s(R.string.service_sstv_on_channel);
         }
         packet.setSstvRx(false);
         if (vfo != null && vfo.rxFreq == PacketEngine.SSTV_FREQ_HZ) exitVfo();
         pushModes();
-        return "SSTV receive off";
+        return Txt.s(R.string.service_sstv_off);
     }
 
     private final PacketEngine.Host packetHost = new PacketEngine.Host() {
@@ -593,6 +599,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         @Override public void sentTo(String call, String source, String detail) { ChannelStore.Contact pc = store.contactByCallsign(call); if (pc != null) store.contactSent(pc.id, System.currentTimeMillis(), source, detail); }
         @Override public void event(String line) { history("pkt", line); }
         @Override public void notifyUser(String title, String text, boolean alert) { RadioService.this.notifyUser(title, text, alert); }
+        @Override public void notifyMessage(String from, String text, boolean internet) { RadioService.this.notifyMessage(from, text, internet); }
+        @Override public void event(Msg m) { history("pkt", m); }
         @Override public int rssiDbm() { return rssi; }
         @Override public void wantLocation(boolean on) { ui.post(() -> aprsLocation(on)); }
         @Override public void logHeard(String call, String mode, String note) { RadioService.this.logHeardStation(call, mode, note); }
@@ -605,21 +613,22 @@ public class RadioService extends Service implements RadioEngine.Events {
     private final com.macdmr.radio.ham.DtmfRemote remote = new com.macdmr.radio.ham.DtmfRemote(new com.macdmr.radio.ham.DtmfRemote.Actions() {
         @Override public void speakPosition() {
             android.location.Location l = lastKnownLocation();
-            if (l == null) { voiceTx("No position fix."); return; }
+            if (l == null) { voiceTx("No position fix."); return; }   // i18n: sent on air (spoken reply)
             String place = "";
-            try { java.util.List<android.location.Address> a = new android.location.Geocoder(RadioService.this, Locale.US).getFromLocation(l.getLatitude(), l.getLongitude(), 1); if (a != null && !a.isEmpty() && a.get(0).getLocality() != null) place = "Near " + a.get(0).getLocality() + (a.get(0).getAdminArea() != null ? ", " + a.get(0).getAdminArea() : "") + ". "; } catch (Throwable ignored) { }
-            voiceTx("Position. " + place + String.format(Locale.US, "%.3f %s, %.3f %s.", Math.abs(l.getLatitude()), l.getLatitude() >= 0 ? "north" : "south", Math.abs(l.getLongitude()), l.getLongitude() >= 0 ? "east" : "west"));
+            try { java.util.List<android.location.Address> a = new android.location.Geocoder(RadioService.this, Locale.US).getFromLocation(l.getLatitude(), l.getLongitude(), 1); if (a != null && !a.isEmpty() && a.get(0).getLocality() != null) place = "Near " + a.get(0).getLocality() + (a.get(0).getAdminArea() != null ? ", " + a.get(0).getAdminArea() : "") + ". "; } catch (Throwable ignored) { }   // i18n: sent on air (spoken reply)
+            voiceTx("Position. " + place + String.format(Locale.US, "%.3f %s, %.3f %s.", Math.abs(l.getLatitude()), l.getLatitude() >= 0 ? "north" : "south", Math.abs(l.getLongitude()), l.getLongitude() >= 0 ? "east" : "west"));   // i18n: sent on air (spoken reply)
         }
         @Override public void speakStatus() {
             android.content.Intent b = registerReceiver(null, new android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED));
             int level = b == null ? -1 : b.getIntExtra(android.os.BatteryManager.EXTRA_LEVEL, 0) * 100 / Math.max(1, b.getIntExtra(android.os.BatteryManager.EXTRA_SCALE, 100));
             ChannelStore.Channel c = current;
-            voiceTx("Status. " + (level >= 0 ? "Battery " + level + " percent. " : "") + (c != null ? "Channel " + c.name + ". " : "") + (rssi != -999 ? "Signal minus " + Math.abs(rssi) + " dBm." : ""));
+            voiceTx("Status. " + (level >= 0 ? "Battery " + level + " percent. " : "") + (c != null ? "Channel " + c.name + ". " : "") + (rssi != -999 ? "Signal minus " + Math.abs(rssi) + " dBm." : ""));   // i18n: sent on air (spoken reply)
         }
-        @Override public void beacon() { if (packet != null) { String e = packet.sendBeacon(); if (e != null) history("pkt", "\u26D4 Remote beacon not sent: " + e); } }
-        @Override public void parrot(boolean on) { ui.post(() -> history("pkt", "\uD83D\uDCDF " + setParrot(on))); }
-        @Override public void morseId() { if (packet != null) { String e = packet.sendCwId(); if (e != null) history("pkt", "\u26D4 " + e); } }
+        @Override public void beacon() { if (packet != null) { String e = packet.sendBeacon(); if (e != null) history("pkt", Msg.of(R.string.service_remote_beacon_failed, Msg.shown(e))); } }
+        @Override public void parrot(boolean on) { ui.post(() -> history("pkt", Msg.of(R.string.service_remote_parrot_history, Msg.shown(setParrot(on))))); }
+        @Override public void morseId() { if (packet != null) { String e = packet.sendCwId(); if (e != null) history("pkt", Msg.of(R.string.service_remote_morse_failed_history, Msg.shown(e))); } }
         @Override public void event(String line) { history("pkt", line); }
+        @Override public void event(Msg m) { history("pkt", m); }
     });
     /** Speak {@code text} on the channel 1.5 s after the caller unkeys; on amateur channels the Morse ID follows. */
     private void voiceTx(String text) {
@@ -631,7 +640,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             int voiceN = Math.min(pcm.length, max - lead - id.length);
             short[] out = new short[lead + voiceN + id.length];
             System.arraycopy(pcm, 0, out, lead, voiceN); System.arraycopy(id, 0, out, lead + voiceN, id.length);
-            transmitPcm(out, "remote reply", () -> history("pkt", "\uD83D\uDDE3 Remote reply sent: " + text));
+            transmitPcm(out, "remote reply", () -> history("pkt", Msg.of(R.string.service_remote_reply_sent, text)));   // i18n: transmission label (log tag)
         });
     }
     private android.location.LocationListener aprsGps;
@@ -651,55 +660,55 @@ public class RadioService extends Service implements RadioEngine.Events {
      *  Only while the ISS is above the horizon: during a tracked ISS APRS pass it uses that tuning, otherwise it tunes
      *  for the moment, beacons and comes back. */
     public String issBeacon() {
-        if (packet == null) return "not ready";
-        if (!packet.callsignSet()) return "Set your callsign first (PKT \u2192 Settings)";
+        if (packet == null) return Txt.s(R.string.service_packet_not_ready);
+        if (!packet.callsignSet()) return Txt.s(R.string.service_iss_need_callsign);
         { long f = com.macdmr.radio.ham.Satellites.issHz(this, "issAprs", com.macdmr.radio.ham.Satellites.ISS_APRS_HZ);   // a 2 m ISS APRS on a UHF-only radio: the VFO would be refused and the beacon go out on the channel
-          if (!profile.tunable(f - 10_000) || !profile.tunable(f + 10_000)) return "This radio tunes " + profile.bandsText() + ": the ISS APRS frequency (" + String.format(Locale.US, "%.3f", f / 1e6) + " MHz) is outside it"; }
+          if (!profile.tunable(f - 10_000) || !profile.tunable(f + 10_000)) return Txt.s(R.string.service_iss_out_of_band, profile.bandsText(), Txt.freqMhz(f, 3)); }
         final android.location.Location me = lastKnownLocation();
-        if (me == null) return "No position fix yet";
+        if (me == null) return Txt.s(R.string.service_no_fix_yet);
         SatState st = satState;
         if (st != null && st.mode == com.macdmr.radio.ham.Satellites.APRS && !st.waiting && st.look != null) {
-            if (st.look.el < 0) return "The ISS is below the horizon";
+            if (st.look.el < 0) return Txt.s(R.string.service_iss_below_horizon);
             new Thread(() -> {
                 try { long wait = RETUNE_SETTLE_MS - (System.currentTimeMillis() - lastSatRetune); if (wait > 0) Thread.sleep(wait); } catch (InterruptedException ignored) { }
                 String e = packet.sendBeaconVia(new String[] { "ARISS" });
-                if (e != null) history("pkt", "\u26D4 ISS beacon not sent: " + e);
+                if (e != null) history("pkt", Msg.of(R.string.service_iss_beacon_failed, Msg.shown(e)));
             }, "iss-beacon").start();
-            return "Beaconing via the ISS (ARISS)";
+            return Txt.s(R.string.service_iss_beaconing);
         }
         com.macdmr.radio.ham.Sgp4 el = satellites().elements().get(com.macdmr.radio.ham.Satellites.ISS_CATALOG);
-        if (el == null) return "No ISS orbit yet: open Satellite passes once to download it";
+        if (el == null) return Txt.s(R.string.service_iss_no_orbit);
         long now = System.currentTimeMillis();
         com.macdmr.radio.ham.SatTrack.Look l = com.macdmr.radio.ham.SatTrack.look(el, now, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0);
         if (l.el < 5) {
             String next = nextIssPassText(el, me);
-            return "The ISS is not in view" + (next != null ? ": next pass " + next : "");
+            return next != null ? Txt.s(R.string.service_iss_not_in_view_next, next) : Txt.s(R.string.service_iss_not_in_view);
         }
         long hz = com.macdmr.radio.ham.Satellites.issHz(this, "issAprs", com.macdmr.radio.ham.Satellites.ISS_APRS_HZ);
-        ChannelStore.Channel a = new ChannelStore.Channel(); a.type = 1; a.band = 1; a.power = 1; a.name = "ISS APRS"; dataModeSquelch(a);
+        ChannelStore.Channel a = new ChannelStore.Channel(); a.type = 1; a.band = 1; a.power = 1; a.name = "ISS APRS"; dataModeSquelch(a);   // i18n: mode name (VFO name)
         // the beacon goes out about 5 s from now: aim for the Doppler then
         com.macdmr.radio.ham.SatTrack.Look l5 = com.macdmr.radio.ham.SatTrack.look(el, now + 5000, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0);
         a.rxFreq = (int) (Math.round(com.macdmr.radio.ham.SatTrack.downlink(hz, l5.rangeRateKmS) / 500.0) * 500);
         a.txFreq = (int) (Math.round(com.macdmr.radio.ham.SatTrack.uplink(hz, l5.rangeRateKmS) / 500.0) * 500);
-        if (!profile.tunable(a.rxFreq) || !profile.tunable(a.txFreq)) return "This radio tunes " + profile.bandsText() + ": not the ISS APRS downlink or uplink";
+        if (!profile.tunable(a.rxFreq) || !profile.tunable(a.txFreq)) return Txt.s(R.string.service_iss_link_out_of_band, profile.bandsText());
         applyVfo(a, false);
         final int rxHz = a.rxFreq;
         new Thread(() -> {
             try { Thread.sleep(RETUNE_SETTLE_MS); } catch (InterruptedException ignored) { }       // the retune settles before keying
-            if (vfo == null || vfo.rxFreq != rxHz) { history("pkt", "⛔ ISS beacon not sent: the radio did not tune the ISS APRS frequency"); return; }   // a refused tune: never key on the channel instead
+            if (vfo == null || vfo.rxFreq != rxHz) { history("pkt", Msg.of(R.string.service_iss_beacon_not_tuned)); return; }   // a refused tune: never key on the channel instead
             String e = packet.sendBeaconVia(new String[] { "ARISS" });
-            if (e != null) history("pkt", "\u26D4 ISS beacon not sent: " + e);
+            if (e != null) history("pkt", Msg.of(R.string.service_iss_beacon_failed, Msg.shown(e)));
             try { Thread.sleep(12000); } catch (InterruptedException ignored) { }
             if (vfo != null && vfo.rxFreq == rxHz && satState == null) exitVfo();
         }, "iss-beacon").start();
-        return String.format(Locale.US, "ISS at %.0f\u00B0: beaconing on %.4f MHz (Doppler-corrected) via ARISS", l.el, a.txFreq / 1e6);
+        return Txt.s(R.string.service_iss_beaconing_at, String.format(Locale.US, "%.0f", l.el), Txt.freqMhz(a.txFreq, 4));
     }
 
     /** The next ISS pass above 10\u00B0 as "Tue 15:42 (highest 48\u00B0)", or null. */
     public String nextIssPassText(com.macdmr.radio.ham.Sgp4 el, android.location.Location me) {
         java.util.List<com.macdmr.radio.ham.SatTrack.Pass> ps = com.macdmr.radio.ham.SatTrack.passes(el, System.currentTimeMillis(), 24, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0, 10);
         for (com.macdmr.radio.ham.SatTrack.Pass p : ps) if (p.aos > System.currentTimeMillis())
-            return new java.text.SimpleDateFormat("EEE HH:mm", Locale.US).format(new java.util.Date(p.aos)) + String.format(Locale.US, " (highest %.0f\u00B0)", p.maxEl);
+            return Txt.s(R.string.service_iss_pass_when, Txt.dates("EEE HH:mm", "EEEHHmm").format(new java.util.Date(p.aos)), String.format(Locale.US, "%.0f", p.maxEl));
         return null;
     }
 
@@ -707,14 +716,14 @@ public class RadioService extends Service implements RadioEngine.Events {
      *  shows the countdown and the decoding. Returns an error, or null when tracking starts. */
     public String startIssMode(int mode) {
         android.location.Location me = lastKnownLocation();
-        if (me == null) return "No position fix: turn on location";
+        if (me == null) return Txt.s(R.string.service_no_fix_location);
         com.macdmr.radio.ham.Sgp4 el = satellites().elements().get(com.macdmr.radio.ham.Satellites.ISS_CATALOG);
-        if (el == null) return "No ISS orbit yet: open Satellite passes once to download it";
+        if (el == null) return Txt.s(R.string.service_iss_no_orbit);
         com.macdmr.radio.ham.Satellites.Sat sat = com.macdmr.radio.ham.Satellites.byKey(this, mode == com.macdmr.radio.ham.Satellites.SSTV ? "iss-sstv" : "iss-aprs");
         long now = System.currentTimeMillis();
         for (com.macdmr.radio.ham.SatTrack.Pass p : com.macdmr.radio.ham.SatTrack.passes(el, now - 15 * 60_000L, 24, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0, 10))
             if (p.los > now + 60_000) return trackSat(sat, el, p);
-        return "No ISS pass above 10\u00B0 in the next 24 hours";
+        return Txt.s(R.string.service_iss_no_pass);
     }
     /** Keep tracking the ISS pass after pass (for an SSTV event or a day of APRS): restarted at each LOS. */
     private volatile int issRepeatMode = -1;
@@ -726,8 +735,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         ui.postDelayed(() -> {
             if (satState != null) return;
             String e = startIssMode(m);
-            if (e == null) { issRepeatMode = m; history("pkt", "\uD83D\uDEF0 Following the ISS again after a restart (" + (m == com.macdmr.radio.ham.Satellites.SSTV ? "SSTV" : "APRS") + ")"); }
-            else { history("pkt", "\uD83D\uDEF0 Could not resume ISS tracking: " + e); }
+            if (e == null) { issRepeatMode = m; history("pkt", Msg.of(R.string.service_iss_resumed, m == com.macdmr.radio.ham.Satellites.SSTV ? "SSTV" : "APRS")); }
+            else { history("pkt", Msg.of(R.string.service_iss_resume_failed, Msg.shown(e))); }
         }, 4000);
     }
     public int issRepeat() { return issRepeatMode; }
@@ -749,15 +758,15 @@ public class RadioService extends Service implements RadioEngine.Events {
         worker.execute(() -> {
             try {
                 if (!isReady()) { log("TX " + label + " skipped: radio not ready"); return; }
-                if (txInhibited()) { log("TX " + label + " blocked: receive-only channel"); history("warn", "\u26D4 TX blocked on a receive-only channel"); return; }
+                if (txInhibited()) { log("TX " + label + " blocked: receive-only channel"); history("warn", Msg.of(R.string.service_tx_blocked_receive_only)); return; }
                 if (pttDown) { log("TX " + label + " skipped: PTT busy"); return; }
                 int ms = pcm.length / 8;
                 int limit = TxLimit.capMs(txLimitS()), cap = Math.min(maxMs, limit);
-                if (ms > cap) { log("TX " + label + " refused: " + ms + " ms over " + cap); history("warn", "\u26D4 Too long to send (" + label + ", " + Math.round(ms / 1000.0) + " s; " + (cap == limit ? "the transmit limit is " + TxLimit.name(txLimitS()) + ", Device \u2192 Longest transmission" : "this sender allows " + (cap / 1000) + " s") + ")"); return; }
+                if (ms > cap) { log("TX " + label + " refused: " + ms + " ms over " + cap); history("warn", cap == limit ? Msg.of(R.string.service_tx_too_long_limit, label, Math.round(ms / 1000.0), TxLimit.nameMsg(txLimitS())) : Msg.of(R.string.service_tx_too_long_sender, label, Math.round(ms / 1000.0), cap / 1000)); return; }
                 Thread heatWatch = null;
                 if (ms > ThermalGuard.LONG_MS) {
-                    String wait = thermal.gate(ms, ThermalGuard.batteryC(this));
-                    if (wait != null) { log("TX " + label + " held: " + wait); history("warn", "\u23F3 " + wait); return; }
+                    Msg wait = thermal.gateMsg(ms, ThermalGuard.batteryC(this));
+                    if (wait != null) { log("TX " + label + " held: " + wait.english()); history("warn", Msg.of(R.string.service_tx_held, wait)); return; }
                     thermal.beforeLong();
                     heatWatch = heatWatchdog(label);
                 }
@@ -768,12 +777,12 @@ public class RadioService extends Service implements RadioEngine.Events {
                 log("TX " + label + " (" + ms + " ms)");
                 try {
                     if (profile.txAudioOnSendStart) {                    // the Xplore 1: audio only once the module reports SEND_START
-                        if (!awaitSendStart(keyedAt, SEND_START_WAIT_MS, false)) { log("TX " + label + ": no SEND_START, nothing sent"); history("warn", "\u26A0\uFE0F " + label + " not sent: the radio did not report transmitting"); }
+                        if (!awaitSendStart(keyedAt, SEND_START_WAIT_MS, false)) { log("TX " + label + ": no SEND_START, nothing sent"); history("warn", Msg.of(R.string.service_tx_not_reported, label)); }
                         else if (audio != null) log(audio.playPcm(pcm));
                     } else { Thread.sleep(200); if (audio != null) log(audio.playPcm(pcm)); }
                 }
                 finally { if (heatWatch != null) heatWatch.interrupt(); unkey(); pttDown = false; thermal.after(ms); if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true); holdAfterTx(); totAfterTx(); }
-                if (ms > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(ms / 1000.0) + " s (" + label + "); " + thermal.state());
+                if (ms > ThermalGuard.LONG_MS) history("tx", Msg.of(R.string.service_tx_long, Math.round(ms / 1000.0), label, thermal.state()));
                 if (onDone != null) onDone.run();
             } catch (Throwable t) { log("TX " + label + ": " + t); try { engine.ptt(false); } catch (Throwable ignored) { } pttDown = false; }
         });
@@ -791,16 +800,17 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     private int notifyId = 100;
+    /** An APRS message for this station (over the air, or APRS-IS when {@code internet}): a conversation, so Android Auto reads it aloud and offers a reply. */
+    public void notifyMessage(String from, String text, boolean internet) { CarMessages.aprs(this, from, text, internet); }
+
     public void notifyUser(String title, String text, boolean alert) {
-        // messages and weather alerts as conversations, so Android Auto reads them aloud (and offers a reply)
-        if (title != null && title.startsWith("APRS-IS message from ")) { CarMessages.aprs(this, title.substring("APRS-IS message from ".length()), text, true); return; }
-        if (title != null && title.startsWith("APRS message from ")) { CarMessages.aprs(this, title.substring("APRS message from ".length()), text, false); return; }
+        // weather alerts as conversations, so Android Auto reads them aloud (APRS messages come through notifyMessage)
         if (alert && title != null && title.startsWith("\u26C8")) { CarMessages.alert(this, title.replaceFirst("^\\S+\\s*", ""), text); return; }
         try {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             if (nm == null) return;
             String ch = alert ? "alerts" : "packet";
-            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(new NotificationChannel(ch, alert ? "Weather alerts" : "APRS messages", alert ? NotificationManager.IMPORTANCE_HIGH : NotificationManager.IMPORTANCE_DEFAULT));
+            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(new NotificationChannel(ch, alert ? Txt.s(R.string.service_channel_alerts) : Txt.s(R.string.service_channel_packet), alert ? NotificationManager.IMPORTANCE_HIGH : NotificationManager.IMPORTANCE_DEFAULT));
             Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(this, ch) : new Notification.Builder(this);
             b.setSmallIcon(alert ? android.R.drawable.ic_dialog_alert : android.R.drawable.ic_dialog_email).setContentTitle(title).setContentText(text)
                     .setStyle(new Notification.BigTextStyle().bigText(text)).setAutoCancel(true)
@@ -810,7 +820,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     /** APRS monitoring: park on the region's APRS frequency (through the VFO, so the channel comes back) and decode. */
-    public String aprsMonitor(boolean on) { int hz = aprsHz(); return aprsMonitorAt(on, hz, "APRS " + com.macdmr.radio.region.Region.mhz(hz)); }
+    public String aprsMonitor(boolean on) { int hz = aprsHz(); return aprsMonitorAt(on, hz, "APRS " + com.macdmr.radio.region.Region.mhz(hz)); }   // i18n: mode name (VFO name)
     /** The terrestrial APRS frequency: the region's (Device → Region) or the user's own; 144.390 before a region is chosen. */
     public int aprsHz() { return com.macdmr.radio.region.Region.current(this).aprsHz; }
     /** This radio tunes the region's APRS frequency (else APRS monitoring is hidden, as on a UHF-only radio). */
@@ -819,8 +829,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     public int aprsMonitorHz() { return aprsMonitorHz; }
     /** APRS monitoring on another frequency (the ISS digipeater on 145.825). */
     public String aprsMonitorAt(boolean on, int hz, String name) {
-        if (packet == null) return "not ready";
-        if (on && !profile.tunable(hz)) return "This radio tunes " + profile.bandsText() + ", not " + String.format(java.util.Locale.US, "%.3f", hz / 1e6) + " MHz";
+        if (packet == null) return Txt.s(R.string.service_packet_not_ready);
+        if (on && !profile.tunable(hz)) return Txt.s(R.string.service_aprs_out_of_band, profile.bandsText(), Txt.freqMhz(hz, 3));
         if (on) {
             aprsMonitorHz = hz;
             ChannelStore.Channel a = new ChannelStore.Channel();
@@ -829,12 +839,12 @@ public class RadioService extends Service implements RadioEngine.Events {
             packet.setMonitoring(true);
             applyVfo(a, false);
             pushModes();
-            return "APRS monitoring on " + String.format(Locale.US, "%.3f", hz / 1e6) + " MHz";
+            return Txt.s(R.string.service_aprs_monitor_on, Txt.freqMhz(hz, 3));
         }
         packet.setMonitoring(false);
         if (vfo != null && vfo.rxFreq == aprsMonitorHz) exitVfo();
         pushModes();
-        return "APRS monitoring off";
+        return Txt.s(R.string.service_aprs_monitor_off);
     }
 
     @Override public void onCreate() {
@@ -865,7 +875,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         // developer bench tools: adb only (the sender must hold DUMP, which the shell has and apps cannot get)
         try {
             android.content.IntentFilter df = new android.content.IntentFilter(DiagReceiver.ACTION);
-            if (Build.VERSION.SDK_INT >= 33) registerReceiver(diag, df, "android.permission.DUMP", null, RECEIVER_EXPORTED); else registerReceiver(diag, df, "android.permission.DUMP", null);
+            if (Build.VERSION.SDK_INT >= 33) registerReceiver(diag, df, "android.permission.DUMP", null, RECEIVER_EXPORTED); else registerReceiver(diag, df, "android.permission.DUMP", null);   // i18n: permission name
         } catch (Throwable t) { log("diag receiver: " + t); }
         radioId = new RadioIdStore(this);
         if (!getSharedPreferences("radio", MODE_PRIVATE).getBoolean("smsStatusMigrated", false)) {     // texts marked failed before 2026-10-17 were only unacknowledged
@@ -969,7 +979,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (!root) {
                     boolean stockRunning = !RootSetup.run("pidof " + profile.stockApp + " || true").trim().replaceAll("[^0-9]", "").isEmpty();
                     if (stockRunning || !new java.io.File(profile.controlPort).canRead()) {
-                        setLink("no root");
+                        setLink("no root");   // i18n: link state code
                         log("Root was not granted. Open the Magisk app → Superuser → allow \"SignalDeck\", then tap Bring radio up. (Without root the stock app keeps the radio and the UART stays locked.)");
                         return;
                     }
@@ -1028,7 +1038,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (agold) {                                  // Agold's App block would stop SignalDeck a few minutes after the screen goes off
                     String blocked = AgoldUsb.appBlockProblem(getPackageName());
                     if (blocked != null) {
-                        history("warn", "⚠ Agold App block will stop SignalDeck with the screen off (" + blocked + " on): switch them off in Settings → App block → SignalDeck");
+                        history("warn", Msg.of(R.string.service_agold_app_block, blocked));
                         if (!getSharedPreferences("radio", MODE_PRIVATE).getBoolean("appBlockOpened", false)) {
                             getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("appBlockOpened", true).apply();
                             log("App block page: " + AgoldUsb.openAppBlock(getPackageName()));
@@ -1050,7 +1060,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     try { engine.close(); } catch (Throwable ignored) { }
                     log("stock app on again: " + RootSetup.stockApp(profile, true));
                 }
-                setLink("error: " + t.getMessage());
+                setLink("error: " + t.getMessage());   // i18n: link state code
             } finally { bringUpRunning.set(false); }
         }, "radio-bringup").start();
     }
@@ -1068,7 +1078,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         bringUpRunning.set(false);                                       // a Take over after this Exit starts afresh
         new Thread(() -> {
             StringBuilder r = new StringBuilder();
-            try { if (pttDown) { if (audio != null) audio.stopTx(); engine.ptt(false); pttDown = false; r.append("transmission ended; "); } } catch (Throwable t) { r.append("unkey: ").append(t.getMessage()).append("; "); }
+            try { if (pttDown) { if (audio != null) audio.stopTx(); engine.ptt(false); pttDown = false; r.append("transmission ended; "); } } catch (Throwable t) { r.append("unkey: ").append(t.getMessage()).append("; "); }   // i18n: exit report (diagnostics)
             try { if (scanner != null && scanner.isScanning()) scanner.stop(); } catch (Throwable ignored) { }
             try { if (scope.running()) scope.stop(); } catch (Throwable ignored) { }
             try { if (ft8Running()) setFt8(false); } catch (Throwable ignored) { }
@@ -1082,13 +1092,13 @@ public class RadioService extends Service implements RadioEngine.Events {
                 restoreUsbRouting();
                 if (restoreStock) {
                     String g = AgoldUsb.giveBack(profile, getFilesDir()); r.append(g.replace('\n', ' ')).append("; ");
-                    if (!AgoldUsb.bridgeAnswered(g)) history("warn", "\u26A0 The radio's USB bridge did not answer: restart the phone before opening the stock radio app");
-                    if (g.contains(AgoldUsb.STOCK_FIRMWARE_WARNING)) history("warn", "\u26A0 " + AgoldUsb.STOCK_FIRMWARE_DIR + " holds radio firmware files: the stock app loads them into the module when it starts. Remove them unless you mean to.");
+                    if (!AgoldUsb.bridgeAnswered(g)) history("warn", Msg.of(R.string.service_bridge_no_answer_handback));
+                    if (g.contains(AgoldUsb.STOCK_FIRMWARE_WARNING)) history("warn", Msg.of(R.string.service_stock_firmware_files, AgoldUsb.STOCK_FIRMWARE_DIR));
                 } else r.append(AgoldUsb.bridgeDown()).append("; ");
-            } else if (restoreStock) r.append("stock app: ").append(RootSetup.stockApp(profile, true)).append("; ");
+            } else if (restoreStock) r.append("stock app: ").append(RootSetup.stockApp(profile, true)).append("; ");   // i18n: exit report (diagnostics)
             else {
-                try { engine.powerOff(); r.append("radio module power off (").append(engine.powerState()).append("); "); }
-                catch (Throwable t) { r.append("power off failed: ").append(t.getMessage()).append("; "); }
+                try { engine.powerOff(); r.append("radio module power off (").append(engine.powerState()).append("); "); }   // i18n: exit report (diagnostics)
+                catch (Throwable t) { r.append("power off failed: ").append(t.getMessage()).append("; "); }   // i18n: exit report (diagnostics)
             }
             try { engine.close(); } catch (Throwable ignored) { }
             setLink("stopped");
@@ -1143,7 +1153,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             }
             if (agoldBridge() && audio instanceof AlsaDirectAudio)        // the bridge's stream stops after 20-70 s of capture: open it per reception, as the stock app does
                 ((AlsaDirectAudio) audio).setOnCaptureEnded(this::captureEnded);
-            String r = agoldBridge() ? "USB capture opens at each reception" : audio.startRx(true);
+            String r = agoldBridge() ? "USB capture opens at each reception" : audio.startRx(true);   // i18n: audio start diagnostics
             audioStart = r; log(r); rxAudioOn = true; audioError = r != null && r.startsWith("startRx failed") ? r : null;
         } catch (Throwable t) { audioError = String.valueOf(t) + (t.getCause() != null ? " / " + t.getCause() : ""); log("audio: " + t); }
     }
@@ -1206,7 +1216,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (f8 != null && f8.running() && current != null && !current.isDigital()) f8.feed(mono, n);   // every slot, squelch or not: noise fails FT8's CRC
         if (parrot.enabled()) {
             ChannelStore.Channel pc = current;
-            if (pc == null || pc.number != parrotChannel) { ui.post(() -> { if (parrot.enabled()) { setParrot(false); history("pkt", "\uD83E\uDD9C Parrot stopped: the channel changed"); } }); }
+            if (pc == null || pc.number != parrotChannel) { ui.post(() -> { if (parrot.enabled()) { setParrot(false); history("pkt", Msg.of(R.string.service_parrot_stopped_channel)); } }); }
             else parrot.feed(mono, n, open && hearing(), System.currentTimeMillis());
         }
         if (open && current != null && !current.isDigital() && !(current.rxFreq >= 162_400_000 && current.rxFreq <= 162_550_000)) {
@@ -1217,7 +1227,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 toneAnnounced = ti;
                 if (!(current.rxType == 1 && current.rxSubCode == ti)) {          // not already programmed on this channel
                     pendingTone = ti; pendingToneMs = System.currentTimeMillis();
-                    history("tone", "\uD83C\uDFB5 CTCSS " + toneBank.detectedLabel() + " Hz heard \u2014 tap this box to use it");
+                    history("tone", Msg.of(R.string.service_tone_heard, toneBank.detectedLabel()));
                 }
             }
         }
@@ -1247,18 +1257,18 @@ public class RadioService extends Service implements RadioEngine.Events {
     public void dismissPendingTone() { pendingTone = -1; }
     /** Program the heard tone as RX and TX CTCSS on the current channel (VFO included). */
     public String applyPendingTone() {
-        int t = pendingTone; if (t < 0 || current == null) return "Nothing to apply";
+        int t = pendingTone; if (t < 0 || current == null) return Txt.s(R.string.service_tone_nothing);
         ChannelStore.Channel ch = current;
         ch.rxType = 1; ch.rxSubCode = t; ch.txType = 1; ch.txSubCode = t;
         pendingTone = -1;
         if (ch.id < 0) applyVfo(ch, true); else { store.update(ch); selectChannel(ch.number); }
-        return "CTCSS " + com.macdmr.radio.dsp.ToneConverter.ctcssLabelAt(t) + " Hz set on " + ch.name;
+        return Txt.s(R.string.service_tone_applied, com.macdmr.radio.dsp.ToneConverter.ctcssLabelAt(t), ch.name);
     }
 
     private void finishRecording() {
         WavRecorder r = recorder; recorder = null;
         if (r == null) return;
-        try { java.io.File f = r.stop(); if (f != null) { history("rec", "\uD83C\uDFA7 Recorded " + f.getName()); } } catch (Throwable t) { log("record stop: " + t); }
+        try { java.io.File f = r.stop(); if (f != null) { history("rec", Msg.of(R.string.service_recorded, f.getName())); } } catch (Throwable t) { log("record stop: " + t); }
     }
 
     // ---- modes ----------------------------------------------------------------------------------------
@@ -1278,7 +1288,7 @@ public class RadioService extends Service implements RadioEngine.Events {
      * (channel, monitor off, squelch); step 2 sends monitor 0. Receive only. Returns what was sent.
      */
     public String squelchCloseAttempt(int step) {
-        final ChannelStore.Channel ch = current; if (ch == null || ch.isDigital()) return "no analog channel";
+        final ChannelStore.Channel ch = current; if (ch == null || ch.isDigital()) return "no analog channel";   // i18n: radio audio check (bench text)
         final java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1); final String[] what = { "" };
         worker.execute(() -> {
             try {
@@ -1287,11 +1297,11 @@ public class RadioService extends Service implements RadioEngine.Events {
                     synchronized (tunes) { tunes.addLast(new Object[] { ch, false }); }
                     tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, band, ch.power, hardwareSq(ch), ch.rxType, ch.rxSubCode, ch.txType, ch.txSubCode, profile.analogVolume, 2);
                     engine.setMonitor(false); engine.setSquelch(hardwareSq(ch));
-                    what[0] = "channel (0x23), monitor 2 (0x2F), squelch " + hardwareSq(ch) + " (0x30)";
-                } else { engine.setMonitorRaw(0); what[0] = "monitor 0 (0x2F)"; }
+                    what[0] = "channel (0x23), monitor 2 (0x2F), squelch " + hardwareSq(ch) + " (0x30)";   // i18n: radio audio check (bench text)
+                } else { engine.setMonitorRaw(0); what[0] = "monitor 0 (0x2F)"; }   // i18n: radio audio check (bench text)
                 if (monitorOn && promiscuousCapable()) sendPromiscuousNow(false);
                 monitorOn = false;
-            } catch (Throwable t) { what[0] = "failed: " + t; }
+            } catch (Throwable t) { what[0] = "failed: " + t; }   // i18n: radio audio check (bench text)
             done.countDown();
         });
         try { done.await(3, java.util.concurrent.TimeUnit.SECONDS); } catch (InterruptedException ignored) { }
@@ -1381,7 +1391,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         try {
             Frame f = engine.diag40(new byte[] { 15, (byte) (on ? 1 : 0) }, 1000);
             log("promiscuous " + (on ? "on" : "off") + (f == null ? ": no answer" : ": sr=" + f.sr + (f.body != null && f.body.length > 0 ? " flag=" + (f.body[0] & 0xFF) : "")));
-            if (f == null || f.sr != 0) history("warn", "WARN The module did not take the promiscuous flag (MON is the radio's own monitor only)".replace("WARN", String.valueOf(WARN_CHAR)));
+            if (f == null || f.sr != 0) history("warn", Msg.of(R.string.service_mon_flag_refused));
         } catch (java.io.IOException e) { log("promiscuous: " + e); }
     }
     private static final char WARN_CHAR = (char) 0x26A0;
@@ -1397,7 +1407,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         ui.postDelayed(() -> {
             if (monitorOn != want || monAckAt >= asked) return;            // answered (or MON changed meanwhile)
             if (monRetries < 3) { monRetries++; log("MON not answered, sending again (" + monRetries + ")"); sendMonitor(want); }
-            else { monRefusedAt = System.currentTimeMillis(); history("warn", "\u26A0 The radio did not answer MON: switch it again in a few seconds"); }
+            else { monRefusedAt = System.currentTimeMillis(); history("warn", Msg.of(R.string.service_mon_no_answer)); }
         }, 1500);
     }
 
@@ -1427,17 +1437,17 @@ public class RadioService extends Service implements RadioEngine.Events {
     private void googleFlush() {
         final byte[] pcm; synchronized (googleBuf) { if (googleBuf.size() < 16000) { googleBuf.reset(); return; } pcm = googleBuf.toByteArray(); googleBuf.reset(); }
         if (googleBusy) return; googleBusy = true;
-        ui.post(() -> { for (Listener l : listeners) l.onCaption(captionsOn, "\u2601 transcribing\u2026", null); });
+        ui.post(() -> { for (Listener l : listeners) l.onCaption(captionsOn, Txt.s(R.string.service_caption_transcribing), null); });
         new Thread(() -> {
             try {
                 String text = TranscriptionClient.transcribe(pcm, 16000, googleKey());
                 if (text != null && !text.trim().isEmpty()) {
                     String line = captionPrefix() + text.trim();
-                    store.addHistory(current != null ? current.number : 0, "txt", "\uD83D\uDCDD " + line, -999, lastCaller);
+                    store.addHistory(current != null ? current.number : 0, "txt", "\uD83D\uDCDD " + line, -999, lastCaller);   // i18n: emoji prefix of a caption line (recognised speech is data)
                     checkKeywords(text);
                     ui.post(() -> { for (Listener l : listeners) l.onCaption(captionsOn, "", line); });
                 } else ui.post(() -> { for (Listener l : listeners) l.onCaption(captionsOn, "", null); });
-            } catch (Throwable t) { log("google stt: " + t.getClass().getSimpleName()); ui.post(() -> { for (Listener l : listeners) l.onCaption(captionsOn, "\u26A0 cloud transcription failed", null); }); }
+            } catch (Throwable t) { log("google stt: " + t.getClass().getSimpleName()); ui.post(() -> { for (Listener l : listeners) l.onCaption(captionsOn, Txt.s(R.string.service_caption_cloud_failed), null); }); }
             finally { googleBusy = false; }
         }, "google-stt").start();
     }
@@ -1459,7 +1469,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             @Override public void partial(String text) { ui.post(() -> { for (Listener l : listeners) l.onCaption(captionsOn, text + " \u2026", null); }); }
             @Override public void sentence(String text) {
                 String line = captionPrefix() + text;
-                store.addHistory(current != null ? current.number : 0, "txt", "\uD83D\uDCDD " + line, -999, lastCaller);
+                store.addHistory(current != null ? current.number : 0, "txt", "\uD83D\uDCDD " + line, -999, lastCaller);   // i18n: emoji prefix of a caption line (recognised speech is data)
                 checkKeywords(text);
                 ui.post(() -> { for (Listener l : listeners) l.onCaption(captionsOn, "\u2026", line); });
             }
@@ -1471,7 +1481,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     private String captionPrefix() {
-        if (current != null && current.isDigital() && lastCaller > 0) { String n = callerName(lastCaller); return (n.isEmpty() ? "ID " + lastCaller : n) + ": "; }
+        if (current != null && current.isDigital() && lastCaller > 0) { String n = callerName(lastCaller); return Txt.s(R.string.service_caption_speaker, n.isEmpty() ? Txt.s(R.string.service_caller_id, lastCaller) : n); }
         return "";
     }
 
@@ -1483,10 +1493,10 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     public String toggleScan() {
-        if (scanner.isScanning()) { scanner.stop(); return "Scan stopped"; }
-        if (vfo != null) return "Turn VFO off to scan channels";
+        if (scanner.isScanning()) { scanner.stop(); return Txt.s(R.string.service_scan_stopped); }
+        if (vfo != null) return Txt.s(R.string.service_scan_vfo_on);
         String err = scanner.start(); pushModes();      // the scanner tunes its first channel at once, which applies the scan-time Soft SQ
-        return err == null ? "Scanning " + zoneName() : err;
+        return err == null ? Txt.s(R.string.service_scanning_zone, zoneName()) : err;
     }
     public String skipScanChannel() { return scanner.skipCurrent(); }
 
@@ -1497,8 +1507,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (id != zoneId && id > 0) {
             ChannelStore.Zone z = store.zone(id);
             if (z != null && z.numbers.length > 0 && ChannelStore.tunable(zoneChannelsOf(id)).isEmpty()) {
-                String why = "Zone " + z.name + " has no channel this radio can tune (" + profile.bandsText() + ")";
-                history("warn", "⚠ " + why); return why;
+                String why = Txt.s(R.string.service_zone_untunable, z.name, profile.bandsText());
+                history("warn", Msg.of(R.string.service_zone_untunable_history, z.name, profile.bandsText())); return why;
             }
         }
         zoneId = id; getSharedPreferences("radio", MODE_PRIVATE).edit().putLong("zone", id).apply(); pushModes();
@@ -1542,12 +1552,12 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Transmit to (and hear) {@code tg} on the current DMR channel until another channel is tuned; 0 or the channel's own talkgroup goes back to it. Null when done, else why not. */
     public String pickTalkgroup(final int tg) {
         final ChannelStore.Channel ch = current;
-        if (ch == null || !ch.isDigital() || ch.id <= 0 || vfo != null) return "Pick a talkgroup on a saved DMR channel";
-        if (pttDown) return "Not while transmitting";
+        if (ch == null || !ch.isDigital() || ch.id <= 0 || vfo != null) return Txt.s(R.string.service_tg_needs_dmr);
+        if (pttDown) return Txt.s(R.string.service_not_while_tx);
         tgOverride.set(ch, tg);
         worker.execute(() -> {
             if (current != ch) return;
-            if (applyChannelNow(ch, true)) { int t = tgOverride.talkgroup(ch); history("tg", t > 0 ? "Talkgroup " + t + " on " + ch.name + " until you change channel (the channel keeps " + ch.txContact + ")" : "Back to " + ch.name + "'s own call " + ch.txContact); }
+            if (applyChannelNow(ch, true)) { int t = tgOverride.talkgroup(ch); history("tg", t > 0 ? Msg.of(R.string.service_tg_override, t, ch.name, ch.txContact) : Msg.of(R.string.service_tg_back, ch.name, ch.txContact)); }
         });
         return null;
     }
@@ -1567,7 +1577,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         for (int k = 0; k < Math.max(1, Math.abs(delta)); k++) {                // a channel this radio cannot tune is stepped over (else the arrows stop behind it)
             int tries = 0;
             do { next = ((next + dir) % n + n) % n; } while (!ChannelStore.tunable(list.get(next)) && ++tries < n);
-            if (!ChannelStore.tunable(list.get(next))) { history("warn", "⚠ No channel here this radio can tune (" + profile.bandsText() + ")"); return; }
+            if (!ChannelStore.tunable(list.get(next))) { history("warn", Msg.of(R.string.service_no_tunable_channel, profile.bandsText())); return; }
         }
         selectChannel(list.get(next).number);
     }
@@ -1575,8 +1585,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Tune a stored channel the user picked; null when it is being tuned, else why not (no such channel, or one outside this radio's bands). */
     public String trySelectChannel(int number) {
         ChannelStore.Channel ch = store.byNumber(number);
-        if (ch == null) return "No channel " + number;
-        if (!ChannelStore.tunable(ch)) return ch.name + " (" + ch.freqText(ch.rxFreq) + " MHz) is outside " + profile.bandsText() + ": this radio cannot tune it";
+        if (ch == null) return Txt.s(R.string.service_no_channel_number, number);
+        if (!ChannelStore.tunable(ch)) return Txt.s(R.string.service_channel_untunable, ch.name, ch.freqText(ch.rxFreq), profile.bandsText());
         selectChannel(number); return null;
     }
     private final java.util.concurrent.atomic.AtomicInteger selectSeq = new java.util.concurrent.atomic.AtomicInteger();
@@ -1679,8 +1689,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         { ChannelStore.Channel was = current; if (was == null || was.rxFreq != ch.rxFreq) idleFloor = Double.NaN; }   // another frequency: its own idle floor
         if (!ChannelStore.tunable(ch)) {         // the module refuses these and stays where it is: never show them as tuned
             ChannelStore.Channel on = current;
-            history("warn", "⚠ " + ch.name + " (" + ch.freqText(ch.rxFreq) + (ch.txFreq != ch.rxFreq ? " / " + ch.freqText(ch.txFreq) : "") + " MHz) is outside what this radio can tune (" + com.macdmr.radio.DeviceProfile.detect().bandsText() + ")"
-                    + (on != null ? "; still on " + on.name + ", " + on.freqText(on.rxFreq) + " MHz" : ""));
+            String fq = ch.freqText(ch.rxFreq) + (ch.txFreq != ch.rxFreq ? " / " + ch.freqText(ch.txFreq) : "");   // i18n: frequencies
+            history("warn", on != null ? Msg.of(R.string.service_channel_outside_still, ch.name, fq, com.macdmr.radio.DeviceProfile.detect().bandsText(), on.name, on.freqText(on.rxFreq))
+                    : Msg.of(R.string.service_channel_outside, ch.name, fq, com.macdmr.radio.DeviceProfile.detect().bandsText()));
             if (!fromStore && vfo == ch) vfo = on != null && on.number == 0 ? on : null;
             return false;
         }
@@ -1765,7 +1776,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     double km = r[0] / 1000.0, mi = km * 0.621371; float b = (r[1] + 360) % 360;
                     String[] dirs = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
                     String arrow = b < 22.5 || b >= 337.5 ? "\u2191" : b < 67.5 ? "\u2197" : b < 112.5 ? "\u2192" : b < 157.5 ? "\u2198" : b < 202.5 ? "\u2193" : b < 247.5 ? "\u2199" : b < 292.5 ? "\u2190" : "\u2196";
-                    dist = com.macdmr.radio.region.Region.km() ? String.format(Locale.US, "\n(%s%s %.1fkm)", arrow, dirs[(int) Math.round(b / 45.0) % 8], km) : String.format(Locale.US, "\n(%s%s %.1fmi (%.1fkm))", arrow, dirs[(int) Math.round(b / 45.0) % 8], mi, km);
+                    dist = com.macdmr.radio.region.Region.km() ? String.format(Locale.US, "\n(%s%s %.1fkm)", arrow, dirs[(int) Math.round(b / 45.0) % 8], km) : String.format(Locale.US, "\n(%s%s %.1fmi (%.1fkm))", arrow, dirs[(int) Math.round(b / 45.0) % 8], mi, km);   // i18n: units and compass points
                 }
             } catch (Throwable ignored) { }
             double el = ch.elev;
@@ -1775,7 +1786,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (ep.contains(k)) el = ep.getFloat(k, 0);
                 else {
                     try {
-                        java.net.HttpURLConnection cn = (java.net.HttpURLConnection) new java.net.URL(String.format(Locale.US, "https://api.open-elevation.com/api/v1/lookup?locations=%.6f,%.6f", ch.lat, ch.lon)).openConnection();
+                        java.net.HttpURLConnection cn = (java.net.HttpURLConnection) new java.net.URL(String.format(Locale.US, "https://api.open-elevation.com/api/v1/lookup?locations=%.6f,%.6f", ch.lat, ch.lon)).openConnection();   // i18n: URL
                         cn.setConnectTimeout(5000); cn.setReadTimeout(8000);
                         if (cn.getResponseCode() == 200) {
                             java.io.BufferedReader br = new java.io.BufferedReader(new java.io.InputStreamReader(cn.getInputStream()));
@@ -1786,7 +1797,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     } catch (Throwable ignored) { }
                 }
             }
-            String elev = el > 0 ? String.format(Locale.US, "\n%dft (%.0fm) ", (int) (el * 3.28084), el) : "\n";
+            String elev = el > 0 ? String.format(Locale.US, "\n%dft (%.0fm) ", (int) (el * 3.28084), el) : "\n";   // i18n: units
             final String text = place + dist + elev + "\uD83D\uDCCD";
             ui.post(() -> { for (Listener l : listeners) l.onLocation(text); });
         }, "geocode").start();
@@ -1809,8 +1820,8 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Delete several channels (highest number first: the renumbering never moves one still to go). Refused while transmitting or loading firmware. */
     public String deleteChannels(java.util.Collection<Integer> numbers) {
-        if (firmwareLoading()) return "Radio busy, loading firmware";
-        if (isTransmitting()) return "Not while transmitting";
+        if (firmwareLoading()) return Txt.s(R.string.service_fw_busy);
+        if (isTransmitting()) return Txt.s(R.string.service_not_while_tx);
         ChannelStore.Channel cur = current; long curId = cur != null ? cur.id : -1; int curNum = cur != null ? cur.number : -1;
         boolean curGone = false; int n = 0;
         for (int num : ChannelStore.deleteOrder(numbers)) {
@@ -1820,37 +1831,37 @@ public class RadioService extends Service implements RadioEngine.Events {
         }
         if (curGone) { current = null; int left = store.count(); if (left > 0) selectChannel(tunableNumber(Math.min(curNum, left))); else noChannel(); }
         else if (cur != null) for (ChannelStore.Channel c : store.all()) if (c.id == curId) { cur.number = c.number; break; }   // its number may have moved down: same channel, nothing re-tuned
-        return n == 0 ? "No channels deleted" : "Deleted " + n + (n == 1 ? " channel" : " channels");
+        return n == 0 ? Txt.s(R.string.service_channels_none_deleted) : Txt.p(R.plurals.service_channels_deleted, n, n);
     }
 
     /** Add several channels to a zone: an existing one ({@code zoneId} > 0) or a new one named {@code newName}. */
     public String addChannelsToZone(long zoneId, String newName, java.util.Collection<Integer> numbers) {
         ChannelStore.Zone z;
-        if (zoneId > 0) { z = store.zone(zoneId); if (z == null) return "No such zone"; }
-        else { if (newName == null || newName.trim().isEmpty()) return "A new zone needs a name"; z = new ChannelStore.Zone(); z.name = newName.trim(); }
+        if (zoneId > 0) { z = store.zone(zoneId); if (z == null) return Txt.s(R.string.service_zone_missing); }
+        else { if (newName == null || newName.trim().isEmpty()) return Txt.s(R.string.service_zone_needs_name); z = new ChannelStore.Zone(); z.name = newName.trim(); }
         java.util.List<Integer> ok = new java.util.ArrayList<>(); for (Integer n : numbers) if (n != null && store.byNumber(n) != null) ok.add(n);
-        if (ok.isEmpty()) return "No channels selected";
+        if (ok.isEmpty()) return Txt.s(R.string.service_channels_none_selected);
         int before = z.numbers.length; z.numbers = ChannelStore.withNumbers(z.numbers, ok);
         long id = store.saveZone(z);
         if (zoneId() == id) setZone(id);                                     // the active zone changed: scan and arrows follow it
         int added = z.numbers.length - before;
-        return (zoneId > 0 ? "Added " + added + (added == 1 ? " channel" : " channels") + " to zone " : "New zone ") + z.name + (zoneId > 0 ? "" : " with " + z.numbers.length + (z.numbers.length == 1 ? " channel" : " channels"));
+        return zoneId > 0 ? Txt.p(R.plurals.service_zone_added, added, added, z.name) : Txt.p(R.plurals.service_zone_new, z.numbers.length, z.name, z.numbers.length);
     }
 
     /** Take several channels out of a zone (the channels themselves stay). A zone is never left empty: delete it instead. */
     public String removeChannelsFromZone(long zoneId, java.util.Collection<Integer> numbers) {
-        ChannelStore.Zone z = store.zone(zoneId); if (z == null) return "No such zone";
+        ChannelStore.Zone z = store.zone(zoneId); if (z == null) return Txt.s(R.string.service_zone_missing);
         int[] left = ChannelStore.withoutNumbers(z.numbers, numbers);
-        if (left.length == 0) return "That would leave zone " + z.name + " empty: delete the zone instead (Zones)";
+        if (left.length == 0) return Txt.s(R.string.service_zone_would_empty, z.name);
         int removed = z.numbers.length - left.length; z.numbers = left; store.saveZone(z);
         if (zoneId() == zoneId) setZone(zoneId);
-        return "Took " + removed + (removed == 1 ? " channel" : " channels") + " out of zone " + z.name;
+        return Txt.p(R.plurals.service_zone_removed, removed, removed, z.name);
     }
 
     /** Star or unstar several channels (the ★ Favourites zone). */
     public String favouriteChannels(java.util.Collection<Integer> numbers, boolean on) {
         int n = 0; for (Integer num : numbers) if (num != null && store.byNumber(num) != null) { store.setFavourite(num, on); n++; }
-        return (on ? "Starred " : "Unstarred ") + n + (n == 1 ? " channel" : " channels");
+        return on ? Txt.p(R.plurals.service_channels_starred, n, n) : Txt.p(R.plurals.service_channels_unstarred, n, n);
     }
 
     /** Save an edited or new channel; if it is the active one, re-program the radio. */
@@ -1921,7 +1932,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     public void applyVfo(final ChannelStore.Channel in, boolean remember) {
         final ChannelStore.Channel v = vfoCopy(in);
         v.id = -1; v.number = 0;
-        if (v.name == null || v.name.isEmpty()) v.name = "VFO " + String.format(Locale.US, "%.4f", v.rxFreq / 1e6) + (v.isDigital() ? " DMR" : " FM");
+        if (v.name == null || v.name.isEmpty()) v.name = "VFO " + String.format(Locale.US, "%.4f", v.rxFreq / 1e6) + (v.isDigital() ? " DMR" : " FM");   // i18n: mode names (VFO name)
         if (remember) saveVfoPrefs(v);
         worker.execute(() -> {
             if (pttDown) return;
@@ -2000,9 +2011,11 @@ public class RadioService extends Service implements RadioEngine.Events {
             stockImportPending = false; int keep = tunableNumber(store.activeNumber()); selectChannel(keep);
         }
         log(n >= 0 ? "imported " + n + " channels from the stock app" + (err.length() > 0 ? " (" + err + ")" : "") : "stock import failed: " + err);
-        String tones = n > 0 ? toneNote(store.all()) : null;
-        if (tones != null) history("warn", "🎵 " + tones);
-        return n >= 0 ? "Imported " + n + " channels" + (err.length() > 0 ? " (" + err + ")" : "") + (tones != null ? ". " + tones : "") : "Import failed: " + err;
+        Msg toneMsg = n > 0 ? toneNoteMsg(store.all()) : null; String tones = toneMsg != null ? toneMsg.text() : null;
+        if (toneMsg != null) history("warn", Msg.of(R.string.service_tone_note_history, toneMsg));
+        if (n < 0) return Txt.s(R.string.service_import_failed, err);
+        if (err.length() > 0) return tones != null ? Txt.p(R.plurals.service_imported_err_tones, n, n, err, tones) : Txt.p(R.plurals.service_imported_err, n, n, err);
+        return tones != null ? Txt.p(R.plurals.service_imported_tones, n, n, tones) : Txt.p(R.plurals.service_imported, n, n);
     }
 
     /**
@@ -2010,7 +2023,9 @@ public class RadioService extends Service implements RadioEngine.Events {
      * CTCSS 62.5 Hz on every factory channel without showing it, so a radio sending no tone is never heard there
      * (owner, 2026-10-29). Nothing is changed; null when no analog channel has a receive tone.
      */
-    static String toneNote(List<ChannelStore.Channel> chans) {
+    static String toneNote(List<ChannelStore.Channel> chans) { Msg m = toneNoteMsg(chans); return m == null ? null : m.text(); }
+
+    static Msg toneNoteMsg(List<ChannelStore.Channel> chans) {
         int n = 0, analog = 0; java.util.Map<String, Integer> kinds = new java.util.TreeMap<>();
         for (ChannelStore.Channel c : chans) {
             if (c.isDigital() || c.isM17()) continue;
@@ -2018,9 +2033,9 @@ public class RadioService extends Service implements RadioEngine.Events {
             if (c.rxType != 0) { n++; kinds.merge(com.macdmr.radio.dsp.ToneTable.toneLabel(c.rxType, c.rxSubCode), 1, Integer::sum); }
         }
         if (n == 0) return null;
-        String which = kinds.size() == 1 ? " (" + kinds.keySet().iterator().next() + ")" : "";
-        return (n == analog ? "All " + n : n + " of " + analog) + " imported analog channels open only for a receive tone" + which
-                + ", as the stock app had them: a radio that sends no tone is not heard there. Set RX tone type to None in the channel editor if you need to";
+        String which = kinds.size() == 1 ? kinds.keySet().iterator().next() : null;
+        if (n == analog) return which != null ? Msg.of(R.string.service_tone_note_all_kind, n, which) : Msg.of(R.string.service_tone_note_all, n);
+        return which != null ? Msg.of(R.string.service_tone_note_some_kind, n, analog, which) : Msg.of(R.string.service_tone_note_some, n, analog);
     }
 
     private volatile boolean stockImportPending;
@@ -2035,7 +2050,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (!importThem) {
             getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("stockImportDeclined", true).apply();
             log("stock import declined: starting with no channels"); ui.post(channelsChanged);
-            return "Starting with no channels";
+            return Txt.s(R.string.service_import_declined);
         }
         return reimportFromStock(null);
     }
@@ -2096,10 +2111,10 @@ public class RadioService extends Service implements RadioEngine.Events {
             try {
                 if (down) {
                     if (current != null && current.isM17()) {
-                        if (firmwareBusy) { log("PTT blocked: loading firmware"); history("warn", "Radio busy, loading firmware"); return; }
+                        if (firmwareBusy) { log("PTT blocked: loading firmware"); history("warn", Msg.of(R.string.service_fw_busy)); return; }
                         if (!isReady()) { log("PTT ignored: radio not ready"); return; }
-                        if (!m17CanSend()) { log("PTT blocked: M17 receive only"); history("warn", "⚠️ M17 is receive-only until the module firmware has the symbol engine"); return; }
-                        if (txInhibited()) { log("PTT blocked: receive-only channel"); history("warn", "⛔ TX blocked on a receive-only channel"); return; }
+                        if (!m17CanSend()) { log("PTT blocked: M17 receive only"); history("warn", Msg.of(R.string.service_m17_receive_only)); return; }
+                        if (txInhibited()) { log("PTT blocked: receive-only channel"); history("warn", Msg.of(R.string.service_tx_blocked_receive_only)); return; }
                         if (pttDown) return;
                         wheelPtt = false; callPtt = false; webFeedNext = null;
                         pttDown = true; refreshControls();
@@ -2109,10 +2124,10 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (scope.running()) { scope.stop(); log("band scope stopped for Talk"); }   // back on the channel before keying
                     final boolean fromWheel = wheelPtt, fromCall = callPtt; wheelPtt = false; callPtt = false;      // read once, whatever happens next
                     final AudioBackend.TxFeed webFeed = webFeedNext; webFeedNext = null;
-                    if (firmwareBusy) { log("PTT blocked: loading firmware"); history("warn", "Radio busy, loading firmware"); return; }
+                    if (firmwareBusy) { log("PTT blocked: loading firmware"); history("warn", Msg.of(R.string.service_fw_busy)); return; }
                     if (!isReady()) { log("PTT ignored: radio not ready"); return; }
-                    if (!profileMayTransmit()) { log("PTT blocked: untested profile"); history("warn", "⛔ Transmit is off on this phone until its profile has been tested"); return; }
-                    if (txInhibited()) { log("PTT blocked: receive-only channel"); history("warn", "⛔ TX blocked on a receive-only channel"); return; }
+                    if (!profileMayTransmit()) { log("PTT blocked: untested profile"); history("warn", Msg.of(R.string.service_tx_untested_profile)); return; }
+                    if (txInhibited()) { log("PTT blocked: receive-only channel"); history("warn", Msg.of(R.string.service_tx_blocked_receive_only)); return; }
                     if (pttDown) return;
                     pttDown = true; refreshControls();
                     long gap = profile.minKeyGapMs - (System.currentTimeMillis() - txEndedAt);   // the Armor 20WT's stock app never keys sooner than 2 s after a release
@@ -2121,7 +2136,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         if (!waitWhilePttWanted(gap)) { pttDown = false; refreshControls(); log("released before the key"); return; }
                     }
                     txChannel = current; txInCar = inCar; txCharging = charging(); txDropNoted = false; txStartedAt = System.currentTimeMillis(); pcmTxLabel = null;
-                    try { ChannelStore.Channel tc = current; int[] tcall = tc != null ? tgOverride.call(tc) : null; if (tc != null && tc.isDigital() && tcall[0] > 0) { ChannelStore.Contact pc = store.contactByNumber(tcall[0], tcall[1] == 0 ? 0 : 1); if (pc != null) store.contactSent(pc.id, txStartedAt, "DMR voice", "on " + tc.name); } } catch (Throwable e) { }
+                    try { ChannelStore.Channel tc = current; int[] tcall = tc != null ? tgOverride.call(tc) : null; if (tc != null && tc.isDigital() && tcall[0] > 0) { ChannelStore.Contact pc = store.contactByNumber(tcall[0], tcall[1] == 0 ? 0 : 1); if (pc != null) store.contactSent(pc.id, txStartedAt, "DMR voice", "on " + tc.name); } } catch (Throwable e) { }   // i18n: stored with the contact as recorded
                     idTimerOnKey();
                     if (audio != null) audio.stopRx();              // never play the RX stream while the mic is live (feedback)
                     boolean carMic = webFeed == null && (fromCall || (inCar && carMic() && !fromWheel && startBluetoothMic()));   // a talk call: Telecom has opened the car's link   // not for the wheel's Next: the hands-free link turns the wheel into call controls and the stop press never arrives   // in the car: its microphone, through the hands-free link
@@ -2130,7 +2145,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     int vi = voxStop();
                     if ((fromWheel || fromCall) && vi > 0 && vi < VOX_MS.length && audio != null) {          // stop when the talking stops
                         final com.macdmr.radio.ham.VoxStop v = new com.macdmr.radio.ham.VoxStop(VOX_MS[vi], System.currentTimeMillis()); vox = v;
-                        audio.setTxLevel(pk -> { if (vox == v && v.level(pk, System.currentTimeMillis())) { vox = null; log("stopped: quiet for " + VOX_NAMES[vi]); ptt(false); } });
+                        audio.setTxLevel(pk -> { if (vox == v && v.level(pk, System.currentTimeMillis())) { vox = null; log("stopped: quiet for " + voxNames()[vi]); ptt(false); } });
                     } else if (audio != null) { vox = null; audio.setTxLevel(null); }
                     if (carMic) log("TX with the car microphone"); else if (fromWheel && inCar && carMic()) log("TX from the wheel: phone microphone (keeps the wheel's buttons working)");
                     if (profile.txAudioLeadMs > 0 && audio != null) {          // the Armor 20WT's stock app: audio path first, the key 600 ms later
@@ -2146,7 +2161,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         long keyedAt = System.currentTimeMillis();
                         engine.ptt(true);
                         if (awaitSendStart(keyedAt, SEND_START_WAIT_MS, true)) log(audio.startTx() + " at SEND_START, " + (sendStartAt - keyedAt) + " ms after the key");
-                        else if (pttWanted) { log("no SEND_START " + SEND_START_WAIT_MS + " ms after the key: no audio sent"); history("warn", "\u26A0\uFE0F The radio did not report transmitting; no audio was sent"); }
+                        else if (pttWanted) { log("no SEND_START " + SEND_START_WAIT_MS + " ms after the key: no audio sent"); history("warn", Msg.of(R.string.service_tx_no_send_start)); }
                     } else {
                         engine.ptt(true);
                         if (audio != null) log(audio.startTx());
@@ -2154,7 +2169,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     long lim = txLimitMs();
                     ui.removeCallbacks(txWatchdog); if (lim > 0) ui.postDelayed(txWatchdog, lim);      // the transmit limit; none for No limit
                     final long vk = ++voiceKeys; Thread oldHeat = voiceHeat; if (oldHeat != null) oldHeat.interrupt();
-                    voiceHeat = openKeyHeatWatch("Voice transmission", () -> pttDown && voiceKeys == vk, () -> ptt(false));   // past 30 s the heat guard applies, whatever the limit
+                    voiceHeat = openKeyHeatWatch("Voice transmission", () -> pttDown && voiceKeys == vk, () -> ptt(false));   // past 30 s the heat guard applies, whatever the limit  // i18n: transmission label (log tag)
                 } else {
                     if (current != null && current.isM17()) {
                         m17Voice(false);
@@ -2177,14 +2192,14 @@ public class RadioService extends Service implements RadioEngine.Events {
                         tail = profile.txAudioTailMs > 0 && audio != null && roger == null && id == null;   // the Xplore 1's QuickChat stops the microphone 200 ms after the release
                         if (!tail) { if (audio != null) audio.stopTx(); stopBluetoothMic(); }
                         if (roger != null && audio != null) audio.playPcm(roger);    // still keyed: the tone goes out before the carrier drops
-                        if (id != null && audio != null) { log("Morse ID after the transmission"); audio.playPcm(id); history("pkt", "\uD83D\uDD24 Morse ID " + packet.callsign()); }   // the station identification every ten minutes
+                        if (id != null && audio != null) { log("Morse ID after the transmission"); audio.playPcm(id); history("pkt", Msg.of(R.string.service_morse_id, packet.callsign())); }   // the station identification every ten minutes
                     } finally {
                         unkey();
                         if (tail) { try { Thread.sleep(profile.txAudioTailMs); } catch (InterruptedException ignored) { } audio.stopTx(); stopBluetoothMic(); }
                     }
                     int heldMs = (int) Math.min(Integer.MAX_VALUE, Math.max(0, txEndedAt - txStartedAt));
                     thermal.after(heldMs);                                                    // a voice key past 30 s starts the cool-down like a long picture
-                    if (heldMs > ThermalGuard.LONG_MS) history("tx", "\uD83D\uDCFB Long transmission " + Math.round(heldMs / 1000.0) + " s (voice); " + thermal.state());
+                    if (heldMs > ThermalGuard.LONG_MS) history("tx", Msg.of(R.string.service_tx_long_voice, Math.round(heldMs / 1000.0), thermal.state()));
                     if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true);
                     if (dataReceive) scheduleDataHold(true, true);   // the unkey path rewrites the voice filter; put the hold back
                     totAfterTx();
@@ -2235,16 +2250,16 @@ public class RadioService extends Service implements RadioEngine.Events {
      * out the retune.
      */
     public String sendPage(int baud, int hz, int[] rics, int func, String text, boolean sign) {
-        if (rics == null || rics.length == 0) return "Add at least one RIC";
-        if (text == null || text.trim().isEmpty()) return "Write the message";
-        if (!ChannelStore.inBand(hz)) return "Frequency must be inside " + com.macdmr.radio.DeviceProfile.detect().bandsText();
-        if (firmwareBusy) return "Radio busy, loading firmware";
-        if (!isReady()) return "Radio not ready";
-        if (txInhibited()) return "Transmit is off on this channel";
+        if (rics == null || rics.length == 0) return Txt.s(R.string.service_page_need_ric);
+        if (text == null || text.trim().isEmpty()) return Txt.s(R.string.service_write_message);
+        if (!ChannelStore.inBand(hz)) return Txt.s(R.string.service_page_out_of_band, com.macdmr.radio.DeviceProfile.detect().bandsText());
+        if (firmwareBusy) return Txt.s(R.string.service_fw_busy);
+        if (!isReady()) return Txt.s(R.string.service_radio_not_ready);
+        if (txInhibited()) return Txt.s(R.string.service_tx_off_channel);
         if (!(com.macdmr.radio.Firmware.stubTag(moduleVersion) && com.macdmr.radio.Firmware.tagNumber(moduleVersion) >= 21))
-            return "Pages send only when the module firmware has the symbol engine (FW21 or later)";
+            return Txt.s(R.string.service_page_needs_fw);
         Thread old = symThread;
-        if (old != null && old.isAlive()) return "The symbol engine is busy";
+        if (old != null && old.isAlive()) return Txt.s(R.string.service_symbol_engine_busy);
         String body = sign ? com.macdmr.radio.ham.Pocsag.sign(com.macdmr.radio.Station.callsign(this), text.trim()) : text.trim();
         java.util.List<com.macdmr.radio.ham.Pocsag.Page> pages = new java.util.ArrayList<>();
         for (int ric : rics) pages.add(new com.macdmr.radio.ham.Pocsag.Page(ric, func, body));
@@ -2252,8 +2267,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         try { bits = com.macdmr.radio.ham.Pocsag.bits(pages); }
         catch (IllegalArgumentException e) { return e.getMessage(); }
         int rate = baud == 512 || baud == 2400 ? baud : 1200;
-        if (com.macdmr.radio.ham.Pocsag.seconds(bits, rate) > 25) return "That page is longer than 25 seconds";
-        if (com.macdmr.radio.ham.Pocsag.seconds(bits, rate) * 1000 > TxLimit.capMs(txLimitS())) return "That page is longer than the transmit limit (" + TxLimit.name(txLimitS()) + ", Device \u2192 Longest transmission)";
+        if (com.macdmr.radio.ham.Pocsag.seconds(bits, rate) > 25) return Txt.s(R.string.service_page_too_long);
+        if (com.macdmr.radio.ham.Pocsag.seconds(bits, rate) * 1000 > TxLimit.capMs(txLimitS())) return Txt.s(R.string.service_page_over_limit, TxLimit.name(txLimitS()));
         final int[] packedBits = bits;
         Thread t = new Thread(() -> streamPage(rate, hz, packedBits, rics.length), "pocsag");
         symThread = t;
@@ -2272,19 +2287,19 @@ public class RadioService extends Service implements RadioEngine.Events {
                     && Math.abs(cur.rxFreq - hz) < 500 && Math.abs(cur.txFreq - hz) < 500;
             if (!same) {
                 ChannelStore.Channel v = new ChannelStore.Channel();
-                v.type = 1; v.rxFreq = v.txFreq = hz; v.band = 1; v.power = 0; v.sq = 2; v.name = "Pager";
+                v.type = 1; v.rxFreq = v.txFreq = hz; v.band = 1; v.power = 0; v.sq = 2; v.name = Txt.s(R.string.service_vfo_pager);
                 applyVfo(v, false);
                 hopped = true;
                 Thread.sleep(3500);
             }
             Frame rst = sym40(new byte[] { 3 });
-            if (rst == null || rst.sr != 0) { log("page: no symbol engine"); history("warn", "⚠️ This firmware did not accept the pager waveform"); return; }
+            if (rst == null || rst.sr != 0) { log("page: no symbol engine"); history("warn", Msg.of(R.string.service_page_waveform_refused)); return; }
             Frame setup = null;
             for (int t = 0; t < 8 && (setup == null || setup.sr != 0); t++) {
                 if (t > 0) Thread.sleep(40);
                 setup = sym40(com.macdmr.radio.ham.Pocsag.waveform(baud));
             }
-            if (setup == null || setup.sr != 0) { log("page: waveform not accepted"); history("warn", "⚠️ This firmware did not accept the pager waveform"); return; }
+            if (setup == null || setup.sr != 0) { log("page: waveform not accepted"); history("warn", Msg.of(R.string.service_page_waveform_refused)); return; }
             byte[] packed = com.macdmr.radio.ham.Pocsag.pack(bits);
             int sent = 0;
             while (sent < packed.length) {
@@ -2296,9 +2311,9 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (!keyed && (sent >= 48 * 8 || last)) { engine.ptt(true); keyed = true; log("page key"); }
                 paceSym(fill, keyed);
             }
-            history(home, "pkt", "📟 Page sent to " + nRic + (nRic == 1 ? " RIC" : " RICs") + " at " + baud + " baud");
+            history(home, "pkt", Msg.plural(R.plurals.service_page_sent, nRic, nRic, baud));
             if (keyed) { unkeyAfterStop(); rxAfterSym(); }
-        } catch (Throwable t) { log("page: " + t); history("warn", "⚠️ Page failed: " + t.getMessage()); }
+        } catch (Throwable t) { log("page: " + t); history("warn", Msg.of(R.string.service_page_failed, String.valueOf(t.getMessage()))); }
         finally {
             if (keyed) { try { engine.ptt(false); } catch (Throwable ignored) { } holdAfterTx(); }
             if (hopped) exitVfo();
@@ -2371,8 +2386,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** The firmware page: load one known image. {@code treatTagAsWrong} forces the factory restore after a good transfer. */
     public void loadFirmware(com.macdmr.radio.fw.ImageTable.Row row, byte[] image, com.macdmr.radio.fw.FirmwareSession.Ui ui, boolean treatTagAsWrong) {
         Thread old = fwThread;
-        if (old != null && old.isAlive()) { ui.finished("A load is already running"); return; }
-        if (profile == null || !profile.firmwareLoader()) { ui.finished("This phone's radio module cannot be loaded from SignalDeck"); return; }
+        if (old != null && old.isAlive()) { ui.finished(Txt.s(R.string.service_fw_load_running)); return; }
+        if (profile == null || !profile.firmwareLoader()) { ui.finished(Txt.s(R.string.service_fw_no_loader)); return; }
         fwHalt.set(false);
         holdActive = false;                                                     // the loader restarts the module; its hold is gone
         setFirmwareBusy(true);
@@ -2392,8 +2407,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         catch (java.io.IOException e) {
             java.io.File dst = new java.io.File(getCacheDir(), "fwload.bin");
             String r = RootSetup.run("cp '" + f.getAbsolutePath() + "' '" + dst.getAbsolutePath()
-                    + "' && chown " + android.os.Process.myUid() + ":" + android.os.Process.myUid()
-                    + " '" + dst.getAbsolutePath() + "' && echo ok");
+                    + "' && chown " + android.os.Process.myUid() + ":" + android.os.Process.myUid()   // i18n: shell
+                    + " '" + dst.getAbsolutePath() + "' && echo ok");   // i18n: shell
             if (!r.endsWith("ok")) throw new java.io.IOException(r);
             return java.nio.file.Files.readAllBytes(dst.toPath());
         }
@@ -2550,8 +2565,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Hold to talk on the M17 screen. The transmit limit and, past 30 s, the heat guard apply as for voice. Does nothing on stock firmware. */
     public void m17Voice(boolean down) {
         if (!down) { m17Down = false; return; }
-        if (!m17CanSend()) { log("m17 voice: stock firmware"); history("warn", "⚠️ M17 transmit needs the module firmware with the symbol engine"); return; }
-        if (current != null && current.isDigital()) { log("m17 voice: digital channel"); history("warn", "⚠️ M17 transmit needs an analog channel"); return; }
+        if (!m17CanSend()) { log("m17 voice: stock firmware"); history("warn", Msg.of(R.string.service_m17_needs_fw_history)); return; }
+        if (current != null && current.isDigital()) { log("m17 voice: digital channel"); history("warn", Msg.of(R.string.service_m17_needs_analog_history)); return; }
         if (symThread != null && symThread.isAlive()) { log("m17 voice: busy"); return; }
         m17Down = true;
         Thread t = new Thread(this::m17VoiceRun, "m17-voice");
@@ -2564,11 +2579,11 @@ public class RadioService extends Service implements RadioEngine.Events {
      * Stock firmware and a digital channel get the same refusal voice does. The text is protocol 0x05.
      */
     public String sendM17Sms(String dest, String text) {
-        if (!m17CanSend()) return "M17 transmit needs the module firmware with the symbol engine";
-        if (current != null && current.isDigital()) return "M17 transmit needs an analog channel";
+        if (!m17CanSend()) return Txt.s(R.string.service_m17_needs_fw);
+        if (current != null && current.isDigital()) return Txt.s(R.string.service_m17_needs_analog);
         String body = text == null ? "" : text.trim();
-        if (body.isEmpty()) return "Write the message";
-        if (symThread != null && symThread.isAlive()) return "M17 is already sending";
+        if (body.isEmpty()) return Txt.s(R.string.service_write_message);
+        if (symThread != null && symThread.isAlive()) return Txt.s(R.string.service_m17_busy);
         String src = com.macdmr.radio.ham.M17.voiceCall(m17Call());
         ChannelStore.Channel mc = current;
         String raw = dest != null && dest.trim().length() > 0 ? dest.trim() : (mc != null && mc.isM17() ? mc.m17Dest() : "@ALL");
@@ -2580,9 +2595,9 @@ public class RadioService extends Service implements RadioEngine.Events {
             java.nio.file.Files.write(f.toPath(), com.macdmr.radio.ham.M17.packSymbols(syms));
             diagSym(f, true);
             M17Station st = m17; if (st != null) st.noteSent(src, dst, body);
-            history("m17", "✉ " + src + " → " + dst + ": " + body);
+            history("m17", Msg.of(R.string.service_m17_text_sent, src, dst, body));
             return null;
-        } catch (java.io.IOException e) { return "Could not send the text"; }
+        } catch (java.io.IOException e) { return Txt.s(R.string.service_m17_text_failed); }
     }
 
     /** Bench: one short Codec 2 tone through the symbol engine. Not a long key. */
@@ -2604,7 +2619,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         Thread heat = openKeyHeatWatch("M17 transmission", () -> m17Tx && symThread == me, () -> m17Down = false);   // a heat stop releases like the key: last frame, end of transmission
         try {
             Frame rst = sym40(new byte[] { 3 });
-            if (rst == null || rst.sr != 0) { log("m17 voice: symbol engine did not answer"); history("warn", "⚠️ This firmware did not accept an M17 symbol reset"); return; }
+            if (rst == null || rst.sr != 0) { log("m17 voice: symbol engine did not answer"); history("warn", Msg.of(R.string.service_m17_reset_refused)); return; }
             String src = com.macdmr.radio.ham.M17.voiceCall(m17Call());
             ChannelStore.Channel mc = current;
             String dst = mc != null && mc.isM17() ? mc.m17Dest() : "@ALL";
@@ -2694,7 +2709,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         finally {
             if (keyed) { try { engine.ptt(false); } catch (Throwable ignored) { } holdAfterTx(); }
             if (heat != null) heat.interrupt();
-            if (keyed) { int heldMs = (int) Math.min(Integer.MAX_VALUE, System.currentTimeMillis() - runStart); thermal.after(heldMs); if (heldMs > ThermalGuard.LONG_MS) history("m17", "\uD83D\uDCFB Long transmission " + Math.round(heldMs / 1000.0) + " s (M17); " + thermal.state()); }
+            if (keyed) { int heldMs = (int) Math.min(Integer.MAX_VALUE, System.currentTimeMillis() - runStart); thermal.after(heldMs); if (heldMs > ThermalGuard.LONG_MS) history("m17", Msg.of(R.string.service_tx_long_m17, Math.round(heldMs / 1000.0), thermal.state())); }
             m17Down = false; m17Tx = false; m17Script = null;
             totAfterTx();
             if (rec != null) { try { rec.stop(); } catch (Throwable ignored) { } rec.release(); }
@@ -2711,13 +2726,13 @@ public class RadioService extends Service implements RadioEngine.Events {
      * (FW20) and the host unkey. Returns the reason it cannot start, or null; {@code done} runs after the unkey.
      */
     public String transmitTones(final java.util.List<com.macdmr.radio.ham.ToneQueue.Pair> pairs, final int amplitude, final String label, final Runnable done) {
-        if (!tonePath()) return "The module's tone generator needs the bench firmware (FW22 or later)";
-        if (!isReady()) return "Radio not ready";
-        if (txInhibited()) return "Receive-only channel";
-        if (pttDown || m17Tx) return "Already transmitting";
-        if (pairs == null || pairs.isEmpty()) return "Nothing to send";
+        if (!tonePath()) return Txt.s(R.string.service_tones_need_fw);
+        if (!isReady()) return Txt.s(R.string.service_radio_not_ready);
+        if (txInhibited()) return Txt.s(R.string.service_receive_only_channel);
+        if (pttDown || m17Tx) return Txt.s(R.string.service_already_tx);
+        if (pairs == null || pairs.isEmpty()) return Txt.s(R.string.service_nothing_to_send);
         final int ms = com.macdmr.radio.ham.ToneQueue.durationMs(pairs);
-        if (ms > TxLimit.capMs(txLimitS())) return "Longer than the transmit limit (" + Math.round(ms / 1000.0) + " s; Device \u2192 Longest transmission is " + TxLimit.name(txLimitS()) + ")";
+        if (ms > TxLimit.capMs(txLimitS())) return Txt.s(R.string.service_tones_over_limit, Math.round(ms / 1000.0), TxLimit.name(txLimitS()));
         if (ms > ThermalGuard.LONG_MS) { String wait = thermal.gate(ms); if (wait != null) return wait; }
         worker.execute(() -> toneRun(pairs, amplitude, label, done, ms));
         return null;
@@ -2730,7 +2745,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         try {
             if (pttDown) { log("tones " + label + " skipped: PTT busy"); return; }
             Frame rst = sym40(new byte[] { 3 });
-            if (rst == null || rst.sr != 0) { log("tones: no symbol engine"); history("warn", "\u26A0\uFE0F This firmware did not accept a tone-queue reset"); return; }
+            if (rst == null || rst.sr != 0) { log("tones: no symbol engine"); history("warn", Msg.of(R.string.service_tones_reset_refused)); return; }
             if (ms > ThermalGuard.LONG_MS) { thermal.beforeLong(); heatWatch = heatWatchdog(label, () -> heatStop[0] = true); }   // the in-key heat stops, as for a long picture
             pttDown = true; txStartedAt = System.currentTimeMillis(); pcmTxLabel = label; refreshControls();
             if (audio != null) audio.stopRx();
@@ -2739,7 +2754,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 byte[] b = bodies.get(i);
                 Frame ack = sym40(b); int tries = 0;
                 while ((ack == null || ack.sr != 0) && tries < 8) { Thread.sleep(40); ack = sym40(b); tries++; }
-                if (ack == null || ack.sr != 0) { log("tones refused at body " + i + " of " + bodies.size()); history("warn", "\u26A0\uFE0F The module refused the tone queue (" + label + ")"); return; }
+                if (ack == null || ack.sr != 0) { log("tones refused at body " + i + " of " + bodies.size()); history("warn", Msg.of(R.string.service_tones_refused, label)); return; }
                 if (!keyed) { engine.ptt(true); keyed = true; log("tone key " + label + " (" + ms + " ms, " + bodies.size() + " bodies)"); }
                 if (i + 1 < bodies.size()) {                                 // top up when the queue is below the mark; the queue only drains while keyed
                     int spins = 0;
@@ -2751,7 +2766,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             while (System.currentTimeMillis() < deadline && !heatStop[0]) { Thread.sleep(100); if (queued() == 0) break; }
             if (heatStop[0]) return;
             unkeyAfterStop();
-            history("tx", "\uD83D\uDD09 " + label + " through the module's tone generator (" + Math.round(ms / 1000.0) + " s)");
+            history("tx", Msg.of(R.string.service_tones_sent, label, Math.round(ms / 1000.0)));
             if (done != null) done.run();
         } catch (Throwable t) { log("tones " + label + ": " + t); }
         finally {
@@ -2777,10 +2792,10 @@ public class RadioService extends Service implements RadioEngine.Events {
                 while (!Thread.currentThread().isInterrupted()) {
                     Thread.sleep(5000);
                     double z = thermal.readC(), b = ThermalGuard.batteryC(RadioService.this);
-                    String stop = ThermalGuard.stopNow(z, b, pz, pb);
+                    Msg stopM = ThermalGuard.stopNowMsg(z, b, pz, pb); String stop = stopM == null ? null : stopM.english();
                     if (stop != null) {
                         log("heat stop during " + label + ": " + stop);
-                        history("warn", "\u26D4 " + label + " ended early: " + stop + ". Let the phone cool before the next long transmission.");
+                        history("warn", Msg.of(R.string.service_heat_stop, label, stopM));
                         stopKey.run();
                         return;
                     }
@@ -2806,7 +2821,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         Thread t = new Thread(() -> {
             long t0 = System.currentTimeMillis();
             double z0 = thermal.readC(), b0 = ThermalGuard.batteryC(RadioService.this);
-            String held = thermal.gate(ThermalGuard.LONG_MS + 1, b0);          // what a long key starting now would be told
+            Msg heldM = thermal.gateMsg(ThermalGuard.LONG_MS + 1, b0); String held = heldM == null ? null : heldM.english();          // what a long key starting now would be told
             double pz = Double.NaN, pb = Double.NaN; int n = 0; boolean longKey = false;
             try {
                 while (alive.alive()) {
@@ -2814,15 +2829,15 @@ public class RadioService extends Service implements RadioEngine.Events {
                     if (!alive.alive()) return;
                     if (!longKey && System.currentTimeMillis() - t0 > ThermalGuard.LONG_MS) {
                         longKey = true;
-                        if (held != null) { log("heat: " + label + " ended at 30 s: " + held); history("warn", "\u26D4 " + label + " ended at 30 s: " + held); stopKey.run(); return; }
+                        if (held != null) { log("heat: " + label + " ended at 30 s: " + held); history("warn", Msg.of(R.string.service_heat_cap, label, heldM)); stopKey.run(); return; }
                         thermal.beforeLong(z0);                                    // the cool-down after this key is measured from where it started
                     }
                     if (++n % 5 != 0) continue;                                   // read every 5 s
                     double z = thermal.readC(), b = ThermalGuard.batteryC(RadioService.this);
-                    String stop = longKey ? ThermalGuard.stopNow(z, b, pz, pb) : null;
+                    Msg stopM = longKey ? ThermalGuard.stopNowMsg(z, b, pz, pb) : null; String stop = stopM == null ? null : stopM.english();
                     if (stop != null && alive.alive()) {
                         log("heat stop during " + label + ": " + stop);
-                        history("warn", "\u26D4 " + label + " ended early: " + stop + ". Let the phone cool before the next long transmission.");
+                        history("warn", Msg.of(R.string.service_heat_stop, label, stopM));
                         stopKey.run();
                         return;
                     }
@@ -2887,13 +2902,13 @@ public class RadioService extends Service implements RadioEngine.Events {
     public String diagTxWav(java.io.File f) {
         try {
             byte[] b = java.nio.file.Files.readAllBytes(f.toPath()); int n = (b.length - 44) / 2;
-            if (n <= 0 || n > 8000 * 28) return "bad length";
+            if (n <= 0 || n > 8000 * 28) return "bad length";   // i18n: bench reply
             short[] pcm = new short[n]; for (int i = 0; i < n; i++) pcm[i] = (short) ((b[44 + 2 * i] & 0xFF) | (b[45 + 2 * i] << 8));
-            transmitPcm(pcm, "bench wav", null); return "transmitting " + n / 8 + " ms";
-        } catch (Exception e) { return "txwav: " + e; }
+            transmitPcm(pcm, "bench wav", null); return "transmitting " + n / 8 + " ms";   // i18n: bench reply
+        } catch (Exception e) { return "txwav: " + e; }   // i18n: bench reply
     }
     /** Bench: the gateway route's sample factor until the next restart (the profile's txAudioScale otherwise). */
-    public String diagTxScale(float v) { return audio instanceof CamcorderAudio ? ((CamcorderAudio) audio).setTxScale(v) : "no gateway route on this phone"; }
+    public String diagTxScale(float v) { return audio instanceof CamcorderAudio ? ((CamcorderAudio) audio).setTxScale(v) : "no gateway route on this phone"; }   // i18n: bench reply
     public void diagTestTone(int ms) { diagTestTone(ms, false); }
     /** lift is one bench run of at most 40 s (5 s otherwise); the transmit limit and the heat guard still apply. */
     public void diagTestTone(int ms, boolean lift) { diagTestTone(ms, lift, 1000, 12000); }
@@ -2903,7 +2918,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (lift) ms = Math.min(ms, 40000); else ms = Math.min(ms, 5000);
         short[] pcm = new short[8000 * ms / 1000];
         for (int i = 0; i < pcm.length; i++) pcm[i] = (short) (amp * Math.sin(2 * Math.PI * hz * i / 8000.0));
-        transmitPcm(pcm, hz + " Hz test tone " + ms + " ms", null, lift);
+        transmitPcm(pcm, hz + " Hz test tone " + ms + " ms", null, lift);   // i18n: transmission label (log tag)
     }
     /** Bench: the transmit path's frequency response in one key, 400 ms per tone at {@code amp}, a 100 ms gap between them. */
     static final int[] SWEEP_HZ = { 100, 150, 200, 250, 300, 400, 500, 700, 1000, 1500, 2000, 2500, 3000, 3500 };
@@ -2912,7 +2927,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         short[] pcm = new short[SWEEP_HZ.length * (per + gap)];
         for (int k = 0; k < SWEEP_HZ.length; k++)
             for (int i = 0; i < per; i++) pcm[k * (per + gap) + i] = (short) (amp * Math.sin(2 * Math.PI * SWEEP_HZ[k] * i / 8000.0));
-        transmitPcm(pcm, "tone sweep 100-3500 Hz", null, true);
+        transmitPcm(pcm, "tone sweep 100-3500 Hz", null, true);   // i18n: transmission label (log tag)
     }
 
     /** Ask the module for the signal strength (on the radio worker: never a serial write on the main thread). */
@@ -2940,13 +2955,15 @@ public class RadioService extends Service implements RadioEngine.Events {
         long now = System.currentTimeMillis();
         if (open) { softOpenAt = now; return; }
         long len = softOpenAt > 0 ? now - softOpenAt : 0; softOpenAt = 0;
-        if (current != null && !current.isDigital() && len >= 700) history("rx", "📻 Received " + Math.round(len / 1000.0) + " s");
+        if (current != null && !current.isDigital() && len >= 700) history("rx", Msg.of(R.string.service_rx_received, Math.round(len / 1000.0)));
     }
 
     public void history(String kind, String text) { history(current != null ? current.number : 0, kind, text); }
 
     /** {@code chNum} is the channel the line belongs to. A page sent from a temporary VFO still records on the channel the radio left. */
     public void history(int chNum, String kind, String text) {
+        com.macdmr.radio.i18n.Msg made = Txt.madeBy(text);                                 // a line some method returned in the app language: store its English
+        if (made != null) { history(chNum, kind, made); return; }
         text = text.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]", "\u00B7");   // no control characters on screen (they also break screen readers)
         final int level = AgoldUsb.historyLevelFresh(agoldBridge(), rssiAt, rxBeganAt) ? rssi : -999;   // no stale level on the Atom XL
         store.addHistory(chNum, kind, text, level, lastCaller);
@@ -2988,7 +3005,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (a instanceof UartPcmAudio) return ((UartPcmAudio) a).capture(f, ms);
         long before = rxPcmBytes;
         try { Thread.sleep(ms); } catch (InterruptedException ignored) { }
-        return (rxPcmBytes - before) + " bytes in " + ms + " ms from the vendor audio service (not saved)";
+        return (rxPcmBytes - before) + " bytes in " + ms + " ms from the vendor audio service (not saved)";   // i18n: first-run check (bench text)
     }
 
     @Override public void log(String s) {
@@ -3022,7 +3039,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (softSq.isEnabled() && squelchOpen) { softSq.closeNow(); softGateHistory(false); squelchOpen = false; log("soft squelch closed (carrier gone)"); }
                 softSq.awaitRxStart();                                   // with the module squelch held open a RECEIVE_STOP only happens while the receiver re-settles
                 if (current != null && current.isDigital() && !agoldBridge()) { try { engine.queryCallerInfo(); } catch (IOException ignored) { } }   // who was that (0x2B); the Atom XL asks after its capture closes
-                if (current != null && !current.isDigital() && !softSq.isEnabled() && rxCounts && len >= 700) history("rx", "📻 Received " + Math.round(len / 1000.0) + " s");   // with Soft SQ on the soft gate writes this line
+                if (current != null && !current.isDigital() && !softSq.isEnabled() && rxCounts && len >= 700) history("rx", Msg.of(R.string.service_rx_received, Math.round(len / 1000.0)));   // with Soft SQ on the soft gate writes this line
                 finishRecording();
                 toneBank.reset(); toneAnnounced = -1;
                 if (captions != null) captions.stop();
@@ -3031,13 +3048,13 @@ public class RadioService extends Service implements RadioEngine.Events {
                 break;
             }
             case 3: sendStartAt = System.currentTimeMillis(); transmitting = true; refreshControls(); if (coverage != null) coverage.onTxStart(); ui.post(() -> { for (Listener l : listeners) l.onTx(true); }); break;
-            case 4: status4At = System.currentTimeMillis(); transmitting = false; totAfterTx(); refreshControls(); if (coverage != null) coverage.onTxEnd(); String pl = pcmTxLabel; pcmTxLabel = null; history(m17Tx ? "m17" : "tx", m17Tx ? "📻 M17 TX" : pl != null ? "📻 TX: " + pl : "📻 Voice TX");
+            case 4: status4At = System.currentTimeMillis(); transmitting = false; totAfterTx(); refreshControls(); if (coverage != null) coverage.onTxEnd(); String pl = pcmTxLabel; pcmTxLabel = null; history(m17Tx ? "m17" : "tx", m17Tx ? Msg.of(R.string.service_tx_m17_done) : pl != null ? Msg.of(R.string.service_tx_label_done, pl) : Msg.of(R.string.service_tx_voice_done));
                 { int tot = moduleTotS; long el = System.currentTimeMillis() - txStartedAt;   // 0 = timer off, but FW19-FW31 bench images still end a key at 120 s
-                  if (pttDown && !m17Tx && !unkeying && (tot > 0 ? el > tot * 1000L - 3000 : el > 100_000)) history("warn", "\u23F1 The radio ended the transmission itself: its " + (tot > 0 ? tot : 120) + " s time-out"); } ui.post(() -> { for (Listener l : listeners) l.onTx(false); }); break;
+                  if (pttDown && !m17Tx && !unkeying && (tot > 0 ? el > tot * 1000L - 3000 : el > 100_000)) history("warn", Msg.of(R.string.service_tx_module_timeout, tot > 0 ? tot : 120)); } ui.post(() -> { for (Listener l : listeners) l.onTx(false); }); break;
             case 5: try { engine.fetchSms(); } catch (IOException ignored) { } break;             // SMS_RECEIVED -> ask for it
             case 8: smsResult(true); break;
             case 9: smsResult(false); break;
-            case 7: history("busy", "⚠ Channel busy"); break;
+            case 7: history("busy", Msg.of(R.string.service_channel_busy)); break;
             default: log("status " + name);
         }
     }
@@ -3076,7 +3093,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                             log("no audio " + AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS + " ms into a reception found from the signal (another transmitter close by, most likely): capture closed before the bridge times out");
                             worker.execute(() -> { try { a.stopRx(); } catch (Throwable t) { log("capture close: " + t); } });
                         }, AgoldUsb.SIGNAL_ONLY_AUDIO_WAIT_MS);
-                        if (r != null && r.contains("no audio block yet") && !(synthRx && !monRx)) recoverBridgeAudio("the USB capture delivered nothing");   // a signal-only one is closed for silence above instead
+                        if (r != null && r.contains("no audio block yet") && !(synthRx && !monRx)) recoverBridgeAudio("the USB capture delivered nothing");   // a signal-only one is closed for silence above instead   // i18n: log reason
                     } }
                 else { if (a != null) a.stopRx(); if (packet != null && !dmr) packet.streamEnded(); if (dmr) { Thread.sleep(100); engine.queryCallerInfo(); } }
             } catch (Throwable t) { log("bridge capture: " + t); }
@@ -3116,7 +3133,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             return;
         }
         log("reception line still silent: receptions come from the signal reading (RSSI) until it reports again");
-        history("warn", "\u26A0 The radio's reception signal is not working: SignalDeck detects calls from the signal strength (a little later), and the sound may drop out. Restart the phone to fix it");
+        history("warn", Msg.of(R.string.service_rx_line_dead));
         lineFallback = true;
     } };
 
@@ -3165,15 +3182,15 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (a == 2) {
             lineFallback = true;
             log("reception line still misses receptions after a bridge restart: receptions come from the signal reading (RSSI)");
-            history("warn", "⚠ The radio's reception signal is stuck: SignalDeck detects calls from the signal strength (a little later). Restart the phone to fix it");
+            history("warn", Msg.of(R.string.service_rx_line_stuck));
         }
         return false;
     }
     /** For the Device report: how the Atom XL's reception line is doing; null on other phones. */
     public String receptionLineState() {
         if (!agoldBridge()) return null;
-        return (lineFallback ? "stuck (receptions from the signal reading)" : "reporting") + " · " + engine.receptionLineBytes() + " bytes since the bridge came up · "
-                + lineMissed + " unreported in a row · " + lineRestarts + " bridge restart" + (lineRestarts == 1 ? "" : "s") + " for it";
+        return (lineFallback ? "stuck (receptions from the signal reading)" : "reporting") + " · " + engine.receptionLineBytes() + " bytes since the bridge came up · "   // i18n: device report
+                + lineMissed + " unreported in a row · " + lineRestarts + " bridge restart" + (lineRestarts == 1 ? "" : "s") + " for it";   // i18n: device report
     }
 
     /** Atom XL: put "Disable USB audio routing" back as take-over found it. */
@@ -3214,7 +3231,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
     private void captureEnded(String err) {
         if (agoldBridge() && System.currentTimeMillis() < ownCycleUntil) { log("the capture ended with our own bridge restart: no recovery (" + err + ")"); return; }
-        recoverBridgeAudio("the USB capture ended by itself (" + err + ")");
+        recoverBridgeAudio("the USB capture ended by itself (" + err + ")");   // i18n: log reason
     }
     private void powerCycleOrGiveUp() throws IOException {
         if (agoldBridge()) {
@@ -3266,8 +3283,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         try { engine.close(); } catch (Throwable ignored) { }
         restoreUsbRouting();
         log("hand-back after the lost bridge: " + AgoldUsb.giveBack(profile, getFilesDir()).replace('\n', ' '));
-        history("warn", "⚠ The radio's USB bridge did not come back after a restart: the radio is off and back with the stock app. Take over again, or restart the phone if it keeps happening");
-        setLink("error: the USB bridge did not come back (" + t.getMessage() + ")");
+        history("warn", Msg.of(R.string.service_bridge_lost));
+        setLink("error: the USB bridge did not come back (" + t.getMessage() + ")");   // i18n: link state (compared by its error prefix)
     }
 
     // A bridge power-up right at a charger change left the Atom XL's bridge taking no serial data (2026-10-29 10:11,
@@ -3372,9 +3389,9 @@ public class RadioService extends Service implements RadioEngine.Events {
             engine.powerCycle();
             if (!engine.waitBooted(12000)) log("no boot banner after the restart");
             Thread.sleep(300);
-            if (versionHandshake(3000)) { history("warn", "\u26A0 The radio module did not answer at start-up and was restarted: it works now"); return; }
+            if (versionHandshake(3000)) { history("warn", Msg.of(R.string.service_module_restarted_startup)); return; }
         }
-        history("warn", "\u26A0 The radio module does not answer commands (channel, MON, squelch). Restarting the phone usually fixes this; please send a device report");
+        history("warn", Msg.of(R.string.service_module_no_commands));
     }
 
     /**
@@ -3392,9 +3409,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         recovering = true;
         worker.execute(() -> {
             try {
-                if (stalled) { restartModule("the radio's USB bridge stopped taking commands (a write did not finish in " + AgoldUsb.WRITE_DEADLINE_MS / 1000 + " s)"); return; }
+                if (stalled) { restartModule("the radio's USB bridge stopped taking commands (a write did not finish in " + AgoldUsb.WRITE_DEADLINE_MS / 1000 + " s)"); return; }   // i18n: log reason
                 if (versionHandshake(2500)) { log("the module was slow but answered the version query"); return; }
-                restartModule("the module stopped answering commands for " + engine.unansweredForMs() / 1000 + " s");
+                restartModule("the module stopped answering commands for " + engine.unansweredForMs() / 1000 + " s");   // i18n: log reason
             } catch (Throwable t) { log("module restart: " + t); setLink("ready"); }
             finally { recovering = false; }
         });
@@ -3404,7 +3421,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         try {
                 lastRecoverAt = System.currentTimeMillis(); lastAutoCycleAt = lastRecoverAt;
                 log(why + ": restarting it");
-                history("warn", "\u26A0 The radio module stopped answering commands: restarting it (a few seconds without reception)");
+                history("warn", Msg.of(R.string.service_module_restarting));
                 setLink("booting");
                 if (audio != null) audio.stopRx();
                 powerCycleOrGiveUp();
@@ -3415,7 +3432,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (monitorOn) { sendMonitor(true); if (promiscuousCapable()) sendPromiscuous(true); }
                 if (rxAudioOn && audio != null && (!agoldBridge() || receiving)) audio.startRx(true);   // the Atom XL opens its capture per reception
                 setLink("ready");
-                history("warn", ok ? "\u2714 The radio module was restarted and answers again" : "\u26A0 The radio module still does not answer after a restart. Restarting the phone usually fixes this; please send a device report");
+                history("warn", ok ? Msg.of(R.string.service_module_restart_ok) : Msg.of(R.string.service_module_restart_failed));
         } catch (Throwable t) { log("module restart: " + t); setLink("ready"); }
     }
     /** Bench: the watchdog's restart, by hand (DIAG restartmodule). */
@@ -3476,18 +3493,19 @@ public class RadioService extends Service implements RadioEngine.Events {
             dmrAdmitted = a;                                         // logged for the bench; the gate itself follows the module's reception
         }
         dmrEvent("caller", type, caller, target, cc, slot);
-        final String ccts = cc >= 0 ? "  CC " + cc + " TS " + (slot + 1) : "";   // appended by the promiscuous firmware while MON is on
+        final String ccts = cc >= 0 ? "  CC " + cc + " TS " + (slot + 1) : "";   // appended by the promiscuous firmware while MON is on   // i18n: DMR colour code and timeslot (protocol words)
         lastCaller = caller; lastCallType = type; lastTarget = target; if (cc >= 0) lastCallerCc = cc;
         refreshControls();   // the car screens show who is talking
         if (callLogged && caller == loggedCaller && target == loggedTarget) return;
         callLogged = true; loggedCaller = caller; loggedTarget = target;
-        String t = (type == 1 ? "TG " + target : type == 2 ? "All call" : "Private") ;
+        String t = (type == 1 ? "TG " + target : type == 2 ? "All call" : "Private") ;   // i18n: stored with the contact and the logbook as recorded
+        Msg tm = type == 1 ? Msg.of(R.string.service_tg_number, target) : type == 2 ? Msg.of(R.string.service_dmr_all_call) : Msg.of(R.string.service_dmr_private);
         String who = callerName(caller);
-        history("dmr", "📻 Voice RX " + t + " from " + (who.isEmpty() ? String.valueOf(caller) : who + " (" + caller + ")") + ccts);
-        try { ChannelStore.Contact pc = store.contactByNumber(caller, 0); if (pc != null) store.contactHeard(pc.id, System.currentTimeMillis(), "DMR voice", t + (current != null ? " on " + current.name : ""), Double.NaN, Double.NaN); } catch (Throwable e) { }
+        history("dmr", Msg.of(R.string.service_dmr_voice_rx, tm, who.isEmpty() ? String.valueOf(caller) : Msg.of(R.string.service_dmr_who, who, caller), ccts));
+        try { ChannelStore.Contact pc = store.contactByNumber(caller, 0); if (pc != null) store.contactHeard(pc.id, System.currentTimeMillis(), "DMR voice", t + (current != null ? " on " + current.name : ""), Double.NaN, Double.NaN); } catch (Throwable e) { }   // i18n: stored with the contact as recorded
         if (logHeard()) { RadioIdStore.Record rr = radioId != null ? radioId.lookup(caller) : null; ChannelStore.Channel lc = current; if (rr != null && rr.callsign != null && !rr.callsign.isEmpty()) try { logbook().heard(rr.callsign, lc != null ? lc.rxFreq : 0, "DMR", rr.first, t + ", DMR ID " + caller); enrichCall(rr.callsign, null); } catch (Throwable x) { log("logbook: " + x); } }
-        ui.post(() -> { for (Listener l : listeners) l.onCaller((who.isEmpty() ? "ID " + caller : who + "  " + caller) + "  " + t + ccts); });
-        if (voiceOn() && !who.isEmpty()) say(who.split(" ")[0]);
+        ui.post(() -> { for (Listener l : listeners) l.onCaller((who.isEmpty() ? Txt.s(R.string.service_caller_id, caller) : who + "  " + caller) + "  " + tm.text() + ccts); });
+        if (voiceOn() && !who.isEmpty()) say(who.split(" ")[0]);   // i18n: spoken by the English TTS voice
     }
     @Override public void ack(int cmd, boolean ok) {
         if (!ok) log(String.format(Locale.US, "MCU rejected 0x%02X", cmd));
@@ -3495,7 +3513,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (cmd == RadioEngine.CMD_MONITOR && !ok) {                          // seen on the Xplore 1 right after a burst of channel changes: try again
             monAckAt = System.currentTimeMillis();                            // an answer (a refusal): the no-answer check stands down
             if (monRetries < 3) { monRetries++; final boolean want = monitorOn; ui.postDelayed(() -> { if (monitorOn == want) sendMonitor(want); }, 1500); log("MON refused, retry " + monRetries); }
-            else { monRefusedAt = System.currentTimeMillis(); history("warn", "\u26A0 The radio refused MON (busy after channel changes?): wait a few seconds and switch it again"); }
+            else { monRefusedAt = System.currentTimeMillis(); history("warn", Msg.of(R.string.service_mon_refused)); }
         }
         if (cmd == RadioEngine.CMD_SET_ANALOG && ok && pendingPostWrite != null) { final Runnable r = pendingPostWrite; ui.postDelayed(r, 200); }
         if (cmd != RadioEngine.CMD_SET_ANALOG && cmd != RadioEngine.CMD_SET_DIGITAL) return;
@@ -3507,9 +3525,9 @@ public class RadioService extends Service implements RadioEngine.Events {
         final ChannelStore.Channel was = confirmed;
         worker.execute(() -> {
             if (current != ch) return;                                      // something else was tuned since
-            String why = ch.isDigital() && ch.txContact <= 0 ? " (a DMR channel needs a call number)" : "";
-            history("warn", "⚠ The radio refused " + ch.name + " (" + ch.freqText(ch.rxFreq) + " MHz)" + why
-                    + (was != null && was != ch ? "; it is still on " + was.name + ", " + was.freqText(was.rxFreq) + " MHz" : ""));
+            boolean why = ch.isDigital() && ch.txContact <= 0, still = was != null && was != ch;
+            history("warn", still ? Msg.of(why ? R.string.service_channel_refused_call_still : R.string.service_channel_refused_still, ch.name, ch.freqText(ch.rxFreq), was.name, was.freqText(was.rxFreq))
+                    : Msg.of(why ? R.string.service_channel_refused_call : R.string.service_channel_refused, ch.name, ch.freqText(ch.rxFreq)));
             if (was == null || was == ch) return;
             current = was;
             vfo = was.number == 0 ? was : null;
@@ -3535,11 +3553,11 @@ public class RadioService extends Service implements RadioEngine.Events {
         else if (group) t = 1;                                                // no talkgroup to file it under: the sender, marked as a group text
         log("text received: type " + type + (group ? " (talkgroup " + peer + ")" : " (private)") + " from " + fromId);
         store.addMessage(peer, t, false, text, 1, sender);
-        try { ChannelStore.Contact pc = store.contactByNumber(fromId, 0); if (pc != null) store.contactHeard(pc.id, System.currentTimeMillis(), "DMR text", text, Double.NaN, Double.NaN); } catch (Throwable e) { }
+        try { ChannelStore.Contact pc = store.contactByNumber(fromId, 0); if (pc != null) store.contactHeard(pc.id, System.currentTimeMillis(), "DMR text", text, Double.NaN, Double.NaN); } catch (Throwable e) { }   // i18n: mode name
         String who = callerName(fromId); if (who == null || who.isEmpty()) who = String.valueOf(fromId);
         String nm = t == 1 ? talkgroupName(peer) + (sender > 0 ? " \u00B7 " + who : "") : who;
         CarMessages.dmr(this, peer, t, nm, text);   // the phone and Android Auto (read aloud, voice reply to the thread)
-        history("sms", "✉ Text from " + who + (sender > 0 ? " on " + talkgroupName(peer) : "") + ": " + (text.length() > 40 ? text.substring(0, 40) + "…" : text));
+        history("sms", sender > 0 ? Msg.of(R.string.service_sms_from_on, who, talkgroupLabel(peer), text.length() > 40 ? text.substring(0, 40) + "…" : text) : Msg.of(R.string.service_sms_from, who, text.length() > 40 ? text.substring(0, 40) + "…" : text));
         onFormText(nm == null || nm.isEmpty() ? String.valueOf(fromId) : nm, text, "DMR");
         final int threadPeer = peer, threadType = t;                         // the open thread (the talkgroup for a group text) refreshes
         ui.post(() -> { for (Listener l : listeners) l.onSms(threadPeer, threadType, text); });
@@ -3555,9 +3573,9 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     /** Send a DMR text to a contact (private / group / all) over the current digital channel. */
     public void sendSms(final ChannelStore.Contact to, final String text) {
-        if (txInhibited()) { history("warn", "⛔ Text not sent: transmitting is off on this phone or channel"); ui.post(() -> { for (Listener l : listeners) l.onSmsResult(false); }); return; }   // an untested profile never transmits, texts included
+        if (txInhibited()) { history("warn", Msg.of(R.string.service_sms_tx_off)); ui.post(() -> { for (Listener l : listeners) l.onSmsResult(false); }); return; }   // an untested profile never transmits, texts included
         final long id = store.addMessage(to.number, to.type, true, text, 0);
-        try { ChannelStore.Contact pc = to.id > 0 ? to : store.contactByNumber(to.number, to.type); if (pc != null) store.contactSent(pc.id, System.currentTimeMillis(), "DMR text", text); } catch (Throwable e) { }
+        try { ChannelStore.Contact pc = to.id > 0 ? to : store.contactByNumber(to.number, to.type); if (pc != null) store.contactSent(pc.id, System.currentTimeMillis(), "DMR text", text); } catch (Throwable e) { }   // i18n: mode name
         worker.execute(() -> {
             try {
                 int msgType = to.type == 1 ? 3 : to.type == 2 ? 2 : 1;
@@ -3571,18 +3589,18 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     private Notification notification(String text) {
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        if (Build.VERSION.SDK_INT >= 26 && nm != null) nm.createNotificationChannel(new NotificationChannel("radio", "Radio", NotificationManager.IMPORTANCE_LOW));
+        if (Build.VERSION.SDK_INT >= 26 && nm != null) nm.createNotificationChannel(new NotificationChannel("radio", Txt.s(R.string.service_channel_radio), NotificationManager.IMPORTANCE_LOW));
         Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(this, "radio") : new Notification.Builder(this);
         ChannelStore.Channel ch = current;
-        b.setContentTitle(ch != null ? "Ch " + ch.number + " · " + ch.name : "SignalDeck").setContentText(text)
+        b.setContentTitle(ch != null ? Txt.s(R.string.service_notif_title, ch.number, ch.name) : "SignalDeck").setContentText(text)   // i18n: product name
                 .setSmallIcon(R.drawable.ic_stat_radio).setColor(0xFF19D3FF).setOngoing(true).setOnlyAlertOnce(true).setShowWhen(false)
                 .setContentIntent(RadioWidget.openApp(this));
         if (isReady()) {
             boolean scanning = scanner != null && scanner.isScanning();
-            b.addAction(new Notification.Action.Builder(android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_w_left), "Ch −", RadioWidget.command(this, RadioWidget.CMD_PREV, 1)).build());
-            b.addAction(new Notification.Action.Builder(android.graphics.drawable.Icon.createWithResource(this, scanning ? R.drawable.ic_w_stop : R.drawable.ic_w_scan), scanning ? "Stop scan" : "Scan", RadioWidget.command(this, RadioWidget.CMD_SCAN, 3)).build());
-            b.addAction(new Notification.Action.Builder(android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_w_right), "Ch +", RadioWidget.command(this, RadioWidget.CMD_NEXT, 2)).build());
-            b.addAction(new Notification.Action.Builder(android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_w_stop), "Exit", RadioWidget.command(this, RadioWidget.CMD_EXIT, 4)).build());   // expanded view: radio off and exit
+            b.addAction(new Notification.Action.Builder(android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_w_left), Txt.s(R.string.service_notif_prev), RadioWidget.command(this, RadioWidget.CMD_PREV, 1)).build());
+            b.addAction(new Notification.Action.Builder(android.graphics.drawable.Icon.createWithResource(this, scanning ? R.drawable.ic_w_stop : R.drawable.ic_w_scan), scanning ? Txt.s(R.string.service_notif_stop_scan) : Txt.s(R.string.service_notif_scan), RadioWidget.command(this, RadioWidget.CMD_SCAN, 3)).build());
+            b.addAction(new Notification.Action.Builder(android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_w_right), Txt.s(R.string.service_notif_next), RadioWidget.command(this, RadioWidget.CMD_NEXT, 2)).build());
+            b.addAction(new Notification.Action.Builder(android.graphics.drawable.Icon.createWithResource(this, R.drawable.ic_w_stop), Txt.s(R.string.service_notif_exit), RadioWidget.command(this, RadioWidget.CMD_EXIT, 4)).build());   // expanded view: radio off and exit
             Notification.MediaStyle ms = new Notification.MediaStyle().setShowActionsInCompactView(0, 1, 2);
             try { ms.setMediaSession((android.media.session.MediaSession.Token) com.macdmr.radio.media.RadioMedia.get(this).session().getSessionToken().getToken()); } catch (Throwable ignored) { }
             b.setStyle(ms);
@@ -3595,7 +3613,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     private final Runnable controlsRefresh = () -> {
         try {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            String t = isReady() ? RadioWidget.status(this) : "Radio " + link;
+            String t = isReady() ? RadioWidget.status(this) : Txt.s(R.string.service_radio_link, link);
             if (nm != null) nm.notify(1, notification(t));
         } catch (Throwable ignored) { }
         RadioWidget.refresh(this, this);
@@ -3629,13 +3647,14 @@ public class RadioService extends Service implements RadioEngine.Events {
     private void carCoverage(boolean car) {
         try {
             com.macdmr.radio.coverage.CoverageLogger cl = coverage();
-            if (car && coverageInCar() && !cl.running()) { cl.start(); coverageForDrive = true; startForegroundTyped(true); log("coverage logging on for the drive"); history("cov", "\uD83D\uDCF6 Coverage logging on while Android Auto is connected"); }
+            if (car && coverageInCar() && !cl.running()) { cl.start(); coverageForDrive = true; startForegroundTyped(true); log("coverage logging on for the drive"); history("cov", Msg.of(R.string.service_cov_car_on)); }
             else if (!car && coverageForDrive) { coverageForDrive = false; if (!cl.enabled()) { cl.stop(); startForegroundTyped(false); log("coverage logging off (car disconnected)"); } }
             refreshControls();
         } catch (Throwable t) { log("car coverage: " + t); }
     }
     // ---- the wheel's Next as a talk key (hold, or double-press) ----
-    public static final String[] NEXT_TALK_NAMES = { "Off", "Hold", "Double-press" };
+    /** The choices' names in the app's language now (read again on each use, so a language change shows at once). */
+    public static String[] nextTalkNames() { return new String[] { Txt.s(R.string.common_off), Txt.s(R.string.service_next_talk_hold), Txt.s(R.string.service_next_talk_double) }; }
     public int nextTalkMode() {
         android.content.SharedPreferences p = getSharedPreferences("radio", MODE_PRIVATE);
         return p.contains("nextTalk") ? p.getInt("nextTalk", 0) : !p.contains("holdNextTalk") ? com.macdmr.radio.ham.WheelNext.DOUBLE      // default: double-press (only presses, works with every car)
@@ -3650,14 +3669,14 @@ public class RadioService extends Service implements RadioEngine.Events {
     private volatile boolean callPtt, talkCallPending;
 
     // wheel microphone: 0 phone, 1 car through a talk call; stop on silence: 0 off, else the quiet gap in ms
-    public static final String[] WHEEL_MIC_NAMES = { "Phone", "Car (as a call)" };
+    public static String[] wheelMicNames() { return new String[] { Txt.s(R.string.service_wheel_mic_phone), Txt.s(R.string.service_wheel_mic_car) }; }
     public static final int[] VOX_MS = { 0, 1500, 2500, 4000 };
-    public static final String[] VOX_NAMES = { "Off", "1.5 s", "2.5 s", "4 s" };
+    public static String[] voxNames() { return new String[] { Txt.s(R.string.common_off), Txt.s(R.string.service_vox_seconds, Txt.decimal(1.5, 1)), Txt.s(R.string.service_vox_seconds, Txt.decimal(2.5, 1)), Txt.s(R.string.service_vox_seconds, "4") }; }
     public int wheelMic() { return getSharedPreferences("radio", MODE_PRIVATE).getInt("wheelMic", 1); }
     public void setWheelMic(int m) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("wheelMic", m).apply(); }
     public int voxStop() { return getSharedPreferences("radio", MODE_PRIVATE).getInt("voxStop", 1); }   // default 1.5 s
     public void setVoxStop(int i) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("voxStop", i).apply(); }
-    private final Runnable talkCallTimeout = () -> { if (talkCallPending) { talkCallPending = false; log("talk call: no car audio route in 4 s, using the phone microphone"); history("car", "\u26A0\uFE0F The car did not open its microphone for the talk call: this transmission uses the phone microphone"); com.macdmr.radio.car.RadioCallService.end(); wheelPtt = true; ptt(true); } };
+    private final Runnable talkCallTimeout = () -> { if (talkCallPending) { talkCallPending = false; log("talk call: no car audio route in 4 s, using the phone microphone"); history("car", Msg.of(R.string.service_car_no_mic)); com.macdmr.radio.car.RadioCallService.end(); wheelPtt = true; ptt(true); } };
     /** A steering-wheel start: with the car microphone as a call when set, else the phone microphone. */
     private void wheelTalkStart() {
         if (carMic() && wheelMic() == 1) {
@@ -3677,7 +3696,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
     public void talkCallFailed() { if (talkCallPending) { ui.removeCallbacks(talkCallTimeout); talkCallTimeout.run(); } }
     /** Hang-up or End in the car: stop transmitting. */
-    public void talkCallHungUp() { talkCallPending = false; history("car", "\uD83D\uDCDE Hung up in the car: transmission stopped"); if (pttDown) ptt(false); }
+    public void talkCallHungUp() { talkCallPending = false; history("car", Msg.of(R.string.service_car_hung_up)); if (pttDown) ptt(false); }
     private volatile com.macdmr.radio.ham.VoxStop vox;
     private final com.macdmr.radio.ham.WheelNext wheel = new com.macdmr.radio.ham.WheelNext(new com.macdmr.radio.ham.WheelNext.Out() {
         @Override public void talk(boolean on) {
@@ -3711,17 +3730,18 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** The first few raw wheel events of each drive go to the history, so what this car sends can be seen afterwards. */
     public void wheelKeySeen(android.view.KeyEvent ev) {
         lastWheelKeyAt = System.currentTimeMillis();
-        String k = android.view.KeyEvent.keyCodeToString(ev.getKeyCode()).replace("KEYCODE_", "") + (ev.getAction() == android.view.KeyEvent.ACTION_DOWN ? " down" : " up") + " repeat " + ev.getRepeatCount() + " (event time " + ev.getEventTime() + ", now " + android.os.SystemClock.uptimeMillis() + ")";
+        String k = android.view.KeyEvent.keyCodeToString(ev.getKeyCode()).replace("KEYCODE_", "") + (ev.getAction() == android.view.KeyEvent.ACTION_DOWN ? " down" : " up") + " repeat " + ev.getRepeatCount() + " (event time " + ev.getEventTime() + ", now " + android.os.SystemClock.uptimeMillis() + ")";   // i18n: wheel key log
         log("wheel key " + k); wheelLog(k);
         if (holdNextTalk() && wheelKeysLogged < 6) {
             wheelKeysLogged++;
-            carEvent("\uD83C\uDF9B Wheel: " + android.view.KeyEvent.keyCodeToString(ev.getKeyCode()).replace("KEYCODE_", "") + (ev.getAction() == android.view.KeyEvent.ACTION_DOWN ? " pressed" + (ev.getRepeatCount() > 0 ? " (repeat " + ev.getRepeatCount() + ")" : "") : " released"));
+            String key = android.view.KeyEvent.keyCodeToString(ev.getKeyCode()).replace("KEYCODE_", "");
+            carEvent(ev.getAction() != android.view.KeyEvent.ACTION_DOWN ? Msg.of(R.string.service_wheel_released, key) : ev.getRepeatCount() > 0 ? Msg.of(R.string.service_wheel_repeat, key, ev.getRepeatCount()) : Msg.of(R.string.service_wheel_pressed, key));
         }
     }
     /** Android Auto sent Next as a command (no button events): holding cannot be told from tapping in this car. */
     public void wheelSkipCommand() {
         if (holdNextTalk() && inCar && System.currentTimeMillis() - lastWheelKeyAt > 2000)
-            carEvent("\u26A0\uFE0F Android Auto sends the wheel's Next as a command, not a button press: hold Next to talk cannot work in this car");
+            carEvent(Msg.of(R.string.service_car_next_command));
     }
 
     /** Steering-wheel play/pause (a media button) while in the car with the setting on: start or stop talking. */
@@ -3751,6 +3771,13 @@ public class RadioService extends Service implements RadioEngine.Events {
         lastCarEvent = line; lastCarEventAt = now;
         log(line); history("car", line);
     }
+    /** As {@link #carEvent(String)}, kept as its message (stored in English, shown in the app's language). */
+    public void carEvent(Msg m) {
+        long now = System.currentTimeMillis(); String line = m.english();
+        if (line.equals(lastCarEvent) && now - lastCarEventAt < 60_000) return;
+        lastCarEvent = line; lastCarEventAt = now;
+        log(line); history("car", m);
+    }
 
     // ---- the transmission knocking out the USB cable ---------------------------------------------------
     // Measured 2026-10-19 in the owner's car: on one 2 m channel (TX 144.770 MHz, high power) every transmission reset
@@ -3776,9 +3803,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         ChannelStore.Channel ch = txChannel;
         if (ch == null || (car && !txInCar)) return;
         txDropNoted = true;
-        String freq = String.format(java.util.Locale.US, "%.3f MHz", ch.txFreq / 1e6);
-        String what = car || txInCar ? "Android Auto dropped" : "The USB cable dropped (charging stopped)";
-        carEvent("⚠️ " + what + " while transmitting on " + ch.name + " (" + freq + "): the transmission is disturbing the USB cable");
+        String freq = String.format(java.util.Locale.US, "%.3f MHz", ch.txFreq / 1e6);   // i18n: unit
+        carEvent(Msg.of(car || txInCar ? R.string.service_car_dropped_tx : R.string.service_usb_dropped_tx, ch.name, freq));
         com.macdmr.radio.car.AutoTrust.notifyUsbDrop(this, ch.name, freq, car || txInCar);
     }
 
@@ -3793,7 +3819,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (!inCar || System.currentTimeMillis() - carMediaBoundAt < 60_000) return;
         com.macdmr.radio.car.AutoTrust.State st = com.macdmr.radio.car.AutoTrust.last();
         if (st == com.macdmr.radio.car.AutoTrust.State.OFF || st == com.macdmr.radio.car.AutoTrust.State.LOCKED) return;   // that alert already explains it
-        carEvent("⚠️ Android Auto did not load SignalDeck on this connection: unplug the cable and plug it in again");
+        carEvent(Msg.of(R.string.service_car_not_loaded));
         com.macdmr.radio.car.AutoTrust.notifyNotLoaded(this);
     };
 
@@ -3804,13 +3830,13 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (car == inCar) return;
                 inCar = car; log(car ? "Android Auto connected" : "Android Auto disconnected"); if (car) wheelKeysLogged = 0;
                 if (!car && txJustNow()) usbDropDuringTx(true);
-                carEvent(car ? "🚗 Android Auto connected (" + (carControlsScreen() ? "Radio controls screen" : "media app") + ")" : "🚗 Android Auto disconnected");
+                carEvent(car ? Msg.of(carControlsScreen() ? R.string.service_car_connected_controls : R.string.service_car_connected_media) : Msg.of(R.string.service_car_disconnected));
                 carCoverage(car);
                 ui.removeCallbacks(carBindCheck); if (car) ui.postDelayed(carBindCheck, 30_000);
                 if (car) new Thread(() -> {   // a sideloaded app stays off the car's app list unless Unknown sources is on
                     com.macdmr.radio.car.AutoTrust.State st = com.macdmr.radio.car.AutoTrust.check(this);
                     if (st == com.macdmr.radio.car.AutoTrust.State.OFF || st == com.macdmr.radio.car.AutoTrust.State.LOCKED) {
-                        ui.post(() -> carEvent("⚠️ Android Auto is hiding SignalDeck: Unknown sources is off (Device page shows how to fix it)"));
+                        ui.post(() -> carEvent(Msg.of(R.string.service_car_unknown_sources)));
                         com.macdmr.radio.car.AutoTrust.notifyHidden(this, st);
                     } else if (st == com.macdmr.radio.car.AutoTrust.State.OK) com.macdmr.radio.car.AutoTrust.clearNotice(this);
                 }, "autotrust").start();
@@ -3845,7 +3871,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         ui.post(() -> {
             boolean wasMuted = muted;
             muted = !play; mediaMode = play;
-            if (wasMuted != muted) history("media", muted ? "\uD83D\uDD07 Radio sound paused (media controls); still receiving" : "\uD83D\uDD0A Radio sound playing");
+            if (wasMuted != muted) history("media", muted ? Msg.of(R.string.service_media_paused) : Msg.of(R.string.service_media_playing));
             if (focusHeld) { ui.removeCallbacks(focusRelease); focusRelease.run(); }   // re-take the right kind of focus
             updateAudioFocus(); refreshControls();
         });
@@ -3861,7 +3887,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         log("media focus change " + ch);
                         if (ch == android.media.AudioManager.AUDIOFOCUS_LOSS) {   // another player took over: pause, as media apps do
                             mediaFocusHeld = false; mediaPlay(false);
-                            if (inCar) carEvent("🚗 Android Auto took the sound away (another source played)");
+                            if (inCar) carEvent(Msg.of(R.string.service_car_sound_taken));
                         }
                     }, ui).build();
             mediaFocusHeld = am.requestAudioFocus(mediaFocusRequest) == android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
@@ -3905,7 +3931,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Who is talking on a DMR channel right now (name from the contacts or RadioID, or the ID), else "". */
     public String currentCaller() {
         if (!dmrCallNow()) return "";
-        String n = callerName(lastCaller); return n.isEmpty() ? "ID " + lastCaller : n;
+        String n = callerName(lastCaller); return n.isEmpty() ? Txt.s(R.string.service_caller_id, lastCaller) : n;
     }
     private boolean dmrCallNow() { return current != null && current.isDigital() && hearing() && lastCaller > 0; }
     /** The talker's DMR ID during a call, else 0. */
@@ -3919,9 +3945,9 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** What the call goes to: "TG 11904 Ontario" (the talkgroup's contact name when known), "Private call", "All call", or "". */
     public String currentTarget() {
         if (!dmrCallNow()) return "";
-        if (lastCallType == 1) { String n = store.contactName(lastTarget, 1); return "TG " + lastTarget + (n == null || n.isEmpty() || n.equals(String.valueOf(lastTarget)) ? "" : " " + n); }
-        if (lastCallType == 2) return "All call";
-        return "Private call";
+        if (lastCallType == 1) { String n = store.contactName(lastTarget, 1); return n == null || n.isEmpty() || n.equals(String.valueOf(lastTarget)) ? Txt.s(R.string.service_tg_number, lastTarget) : Txt.s(R.string.service_tg_named, lastTarget, n); }
+        if (lastCallType == 2) return Txt.s(R.string.service_dmr_all_call);
+        return Txt.s(R.string.service_dmr_private_call);
     }
     /**
      * The zone to show with a channel: the selected zone when it holds the channel; otherwise the first other zone
@@ -3939,8 +3965,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** The car's subtitle: during a DMR call who is talking and to what; otherwise frequency and state. */
     public String carStatus() {
         String who = currentCaller();
-        if (!who.isEmpty()) { int id = currentCallerId(); String t = currentTarget(); return who + (who.startsWith("ID ") ? "" : " \u00b7 " + id) + (t.isEmpty() ? "" : " \u00b7 " + t); }
-        return isReady() ? RadioWidget.status(this).replace("Mapping coverage \u00b7 ", "") : "Radio " + link;
+        if (!who.isEmpty()) { int id = currentCallerId(); String t = currentTarget(); return who + (who.equals(Txt.s(R.string.service_caller_id, id)) ? "" : " \u00b7 " + id) + (t.isEmpty() ? "" : " \u00b7 " + t); }
+        return isReady() ? RadioWidget.status(this, false) : Txt.s(R.string.service_radio_link, link);
     }
 
     // ---- coverage mapping ---------------------------------------------------------------------------
@@ -3958,6 +3984,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             }
             @Override public void pollRssi() { RadioService.this.pollRssiMeasure(); }
             @Override public void event(String line) { history("cov", line); }
+            @Override public void event(Msg m) { history("cov", m); }
         });
         return coverage;
     }
@@ -4013,21 +4040,21 @@ public class RadioService extends Service implements RadioEngine.Events {
      */
     public String keyupTest() {
         ChannelStore.Channel ch = current;
-        if (!isReady() || ch == null) return "The radio is not on";
-        if (!coverageLogging()) return "Turn on coverage logging first: the result is stored with your position";
-        if (ch.isDigital()) return "On DMR use the Parrot instead: a private call to 9990 on BrandMeister plays your call back";
-        if (ch.txFreq == ch.rxFreq || (ch.lat == 0 && ch.lon == 0)) return "Choose an FM repeater channel that has a location";
-        if (txInhibited()) return "This channel is receive-only";
-        if (packet == null || !packet.callsignSet()) return "Set your callsign first (PKT \u2192 APRS settings): the test sends it as your identification";
-        if (pttDown) return "Already transmitting";
+        if (!isReady() || ch == null) return Txt.s(R.string.service_radio_not_on);
+        if (!coverageLogging()) return Txt.s(R.string.service_keyup_needs_coverage);
+        if (ch.isDigital()) return Txt.s(R.string.service_keyup_dmr);
+        if (ch.txFreq == ch.rxFreq || (ch.lat == 0 && ch.lon == 0)) return Txt.s(R.string.service_keyup_needs_repeater);
+        if (txInhibited()) return Txt.s(R.string.service_tx_receive_only);
+        if (packet == null || !packet.callsignSet()) return Txt.s(R.string.service_keyup_needs_callsign);
+        if (pttDown) return Txt.s(R.string.service_already_tx);
         String id = packet.callsign();
-        transmitPcm(com.macdmr.radio.coverage.Morse.pcm(id, 20, 800), "key-up test (Morse ID)", null);
+        transmitPcm(com.macdmr.radio.coverage.Morse.pcm(id, 20, 800), "key-up test (Morse ID)", null);   // i18n: transmission label (log tag)
         return null;
     }
 
     /** The foreground service: microphone always, plus location while coverage logging is on (allowed only while the app is in front). */
     private void startForegroundTyped(boolean location) {
-        Notification n = notification(isReady() ? RadioWidget.status(this) : "Radio idle");
+        Notification n = notification(isReady() ? RadioWidget.status(this) : Txt.s(R.string.service_notif_idle));
         if (Build.VERSION.SDK_INT >= 30) {
             int t = android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE;
             if (location) {
@@ -4040,8 +4067,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     }
 
     // ---- roger beep ---------------------------------------------------------------------------------
-    public static final String[] ROGER_NAMES = { "Off", "Beep", "Two-tone", "Morse K" };
-    public int rogerStyle() { int s = getSharedPreferences("radio", MODE_PRIVATE).getInt("roger", 0); return s >= 0 && s < ROGER_NAMES.length ? s : 0; }
+    public static String[] rogerNames() { return new String[] { Txt.s(R.string.common_off), Txt.s(R.string.service_roger_beep), Txt.s(R.string.service_roger_two_tone), Txt.s(R.string.service_roger_morse_k) }; }
+    public int rogerStyle() { int s = getSharedPreferences("radio", MODE_PRIVATE).getInt("roger", 0); return s >= 0 && s < rogerNames().length ? s : 0; }
     public void setRogerStyle(int s) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("roger", s).apply(); }
     /** The end-of-transmission tone at 8 kHz (null = off): 40 ms lead, soft 6 ms edges, about a third of full scale. */
     public static short[] rogerPcm(int style) {
@@ -4092,27 +4119,30 @@ public class RadioService extends Service implements RadioEngine.Events {
         } catch (Throwable t) { log("media volume: " + t); }
     }
 
-    public String emergency(String text, int toNumber, int toType, String toName) {
+    /** What an emergency send did: {@code sent} decides the dialog's colour and button, {@code text} is shown. */
+    public static final class Sos { public final boolean sent; public final String text; Sos(boolean sent, String text) { this.sent = sent; this.text = text; } }
+
+    public Sos emergency(String text, int toNumber, int toType, String toName) {
         ChannelStore.Channel ch = current;
-        if (!isReady() || ch == null) return "Not sent: the radio is not on";
-        if (txInhibited()) return "Not sent: this channel is receive-only";
-        String m = text == null || text.trim().isEmpty() ? "Need help" : text.trim();
+        if (!isReady() || ch == null) return new Sos(false, Txt.s(R.string.service_sos_radio_off));
+        if (txInhibited()) return new Sos(false, Txt.s(R.string.service_sos_receive_only));
+        String m = text == null || text.trim().isEmpty() ? "Need help" : text.trim();   // i18n: sent on air
         if (ch.isDigital()) {
-            if (toNumber <= 0) return "Not sent: choose who receives the emergency text";
+            if (toNumber <= 0) return new Sos(false, Txt.s(R.string.service_sos_choose_recipient));
             android.location.Location l = lastKnownLocation();
-            String pos = l == null ? "position unknown" : String.format(Locale.US, "%.5f,%.5f", l.getLatitude(), l.getLongitude()) + (l.hasAccuracy() ? " +-" + Math.round(l.getAccuracy()) + "m" : "");
-            String body = "EMERGENCY " + m + " @ " + pos;
+            String pos = l == null ? "position unknown" : String.format(Locale.US, "%.5f,%.5f", l.getLatitude(), l.getLongitude()) + (l.hasAccuracy() ? " +-" + Math.round(l.getAccuracy()) + "m" : "");   // i18n: sent on air
+            String body = "EMERGENCY " + m + " @ " + pos;   // i18n: sent on air
             if (body.length() > 120) body = body.substring(0, 120);
             ChannelStore.Contact to = new ChannelStore.Contact(); to.number = toNumber; to.type = toType; to.name = toName == null ? "" : toName;
             sendSms(to, body);
             String who = to.name.isEmpty() ? String.valueOf(toNumber) : to.name;
-            history("tx", "🆘 Emergency text to " + who + ": " + body);
-            return "Emergency text sent to " + who + (l == null ? " (no position fix)" : "");
+            history("tx", Msg.of(R.string.service_sos_history, who, body));
+            return new Sos(true, Txt.s(l == null ? R.string.service_sos_text_sent_no_fix : R.string.service_sos_text_sent, who));
         }
-        if (packet == null) return "Not sent: packet radio is not available";
+        if (packet == null) return new Sos(false, Txt.s(R.string.service_sos_no_packet));
         String e = packet.sendEmergency(m);
-        if (e != null) return "Not sent: " + e;
-        return "Emergency APRS " + (lastKnownLocation() != null ? "position" : "status (no position fix)") + " sent on " + ch.name;
+        if (e != null) return new Sos(false, Txt.s(R.string.service_sos_not_sent, e));
+        return new Sos(true, Txt.s(lastKnownLocation() != null ? R.string.service_sos_aprs_position_sent : R.string.service_sos_aprs_status_sent, ch.name));
     }
     public boolean pttHeld() { return pttDown; }
     public boolean isScanning() { return scanner != null && scanner.isScanning(); }
@@ -4141,12 +4171,14 @@ public class RadioService extends Service implements RadioEngine.Events {
     public synchronized M17Station m17() {
         if (m17 == null) m17 = new M17Station(this, profile != null ? profile.id : "unknown", new M17Station.Host() {
             @Override public void event(String line) { history("pkt", line); }
+            @Override public void event(Msg m) { history("pkt", m); }
             @Override public void text(String line) { history("m17", line); }
+            @Override public void text(Msg m) { history("m17", m); }
             @Override public void sms(String src, String dst, String body, boolean sent) { fileM17(src, dst, body, sent); }
             @Override public void heard(String call) {
                 if (call == null || call.isEmpty() || call.startsWith("@") || call.startsWith("#")) return;
                 logHeardStation(call, "M17", "M17");
-                try { ChannelStore.Contact pc = store.contactByCallsign(call); if (pc != null) store.contactHeard(pc.id, System.currentTimeMillis(), "M17", current != null ? "on " + current.name : "", Double.NaN, Double.NaN); } catch (Throwable e) { }
+                try { ChannelStore.Contact pc = store.contactByCallsign(call); if (pc != null) store.contactHeard(pc.id, System.currentTimeMillis(), "M17", current != null ? "on " + current.name : "", Double.NaN, Double.NaN); } catch (Throwable e) { }   // i18n: stored with the contact as recorded
             }
             @Override public void changed() { ui.post(() -> { pushModes(); publishM17Line(); }); }
             @Override public int meter() { return rssi; }
@@ -4166,7 +4198,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             @Override public void tune(int hz) {
                 log("pager tune " + hz);
                 ChannelStore.Channel v = new ChannelStore.Channel();
-                v.type = 1; v.rxFreq = v.txFreq = hz; v.band = 1; v.power = 0; v.sq = 2; v.name = "Pager";
+                v.type = 1; v.rxFreq = v.txFreq = hz; v.band = 1; v.power = 0; v.sq = 2; v.name = Txt.s(R.string.service_vfo_pager);
                 applyVfo(v, false);
             }
             @Override public int currentHz() { ChannelStore.Channel c = current; return c == null ? 0 : c.rxFreq; }
@@ -4189,9 +4221,9 @@ public class RadioService extends Service implements RadioEngine.Events {
     public synchronized String setPager(boolean on, boolean hold) {
         PagerStation p = pager();
         if (!on) { p.stop(); if (pagerHold) { pagerHold = false; setM17(false); } return null; }
-        if (current == null || current.isDigital()) return "Pages need an analog channel";
+        if (current == null || current.isDigital()) return Txt.s(R.string.service_pages_need_analog);
         boolean stub = com.macdmr.radio.Firmware.stubTag(moduleVersion);
-        if (!stub) return "Page receive needs the bench firmware";
+        if (!stub) return Txt.s(R.string.service_pages_need_fw);
         if (hold && stub && !m17Running()) { String e = setM17(true, true); if (e != null) return e; pagerHold = true; }
         else if (hold && stub) m17().setHeldPath(true);
         p.start(hold && stub);
@@ -4228,11 +4260,12 @@ public class RadioService extends Service implements RadioEngine.Events {
     private void filePage(ChannelStore.PageRow row) {
         if (row.threadKey == null || row.threadKey.isEmpty()) return;
         store.addPage(row);
-        String who = row.ric < 0 ? "RIC unreadable" : (row.signer == null || row.signer.isEmpty() ? ("RIC " + row.ric) : row.signer);
-        String line = ("m17".equals(row.transport) ? "✉ " : "📟 ") + who + ": " + row.text;
-        if ("page".equals(row.transport)) { history("page", line); log("page ric " + (row.ric < 0 ? "unreadable" : row.ric) + " thread " + row.threadKey + " baud " + row.baud + " corrected " + row.corrected + " " + row.text); }
+        Object who = row.ric < 0 ? Msg.of(R.string.service_ric_unreadable) : (row.signer == null || row.signer.isEmpty() ? Msg.of(R.string.service_ric_number, row.ric) : row.signer);
+        Msg lineMsg = Msg.of("m17".equals(row.transport) ? R.string.service_page_line_m17 : R.string.service_page_line, who, row.text);
+        String line = lineMsg.text();
+        if ("page".equals(row.transport)) { history("page", lineMsg); log("page ric " + (row.ric < 0 ? "unreadable" : row.ric) + " thread " + row.threadKey + " baud " + row.baud + " corrected " + row.corrected + " " + row.text); }
         if ("page".equals(row.transport) && !row.outgoing && com.macdmr.radio.Station.isMyRic(this, row.ric) && !mutedRic(row.ric))
-            notifyUser("Page for you", row.text, false);
+            notifyUser(Txt.s(R.string.service_page_for_you), row.text, false);
         final String key = row.threadKey, shown = line;
         ui.post(() -> { for (Listener l : listeners) l.onPage(key, shown); });
     }
@@ -4264,8 +4297,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         M17Station s = m17;
         M17Station.Heard h = s == null ? null : s.current();
         String line = h != null
-                ? h.src + " → " + h.dst + "  " + h.frames + " frames"
-                : (m17CanSend() ? "M17 " : "M17 receive only ") + current.m17Dest() + "  CAN " + current.can();
+                ? Txt.s(R.string.service_m17_heard_line, h.src, h.dst, String.valueOf(h.frames))
+                : Txt.s(m17CanSend() ? R.string.service_m17_idle_line : R.string.service_m17_idle_line_rx, current.m17Dest(), String.valueOf(current.can()));
         for (Listener l : listeners) l.onCaller(line);
     }
     /** M17 receive on or off (null = done, else why not). A stub-tagged module holds the voice filter open. */
@@ -4279,7 +4312,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         M17Station s = m17();
         if (!on) { s.stop(); dataReceive = false; scheduleDataHold(false, false); pushModes(); return null; }
         ChannelStore.Channel c = current;
-        if (c == null || c.isDigital()) return "M17 needs an analog (FM) channel or the VFO";
+        if (c == null || c.isDigital()) return Txt.s(R.string.service_m17_needs_fm);
         String e = s.start();
         if (e != null) return e;
         dataReceive = hold;
@@ -4424,6 +4457,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 @Override public String callsign() { return packet != null && packet.callsignSet() ? packet.callsign() : null; }
                 @Override public String grid() { return ft8Grid(); }
                 @Override public void event(String line) { history("pkt", line); }
+                @Override public void event(Msg m) { history("pkt", m); }
                 @Override public void heard(String call, String grid, int snr) {
                     logHeardStation(call, "FT8", "FT8 over FM, " + snr + " dB");
                     if (grid != null) try { logbook().enrich(call, null, grid, null); } catch (Throwable t) { log("logbook: " + t); }
@@ -4433,7 +4467,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         com.macdmr.radio.ham.Logbook.Entry e = new com.macdmr.radio.ham.Logbook.Entry();
                         ChannelStore.Channel c = current;
                         e.ts = System.currentTimeMillis(); e.call = call; e.freqHz = c != null ? c.rxFreq : 0; e.mode = "FT8"; e.qso = true;
-                        e.rstSent = sent == null ? "" : sent; e.rstRcvd = rcvd == null ? "" : rcvd; e.grid = grid == null ? "" : grid; e.source = "FT8 over FM";
+                        e.rstSent = sent == null ? "" : sent; e.rstRcvd = rcvd == null ? "" : rcvd; e.grid = grid == null ? "" : grid; e.source = "FT8 over FM";   // i18n: logbook source (stored)
                         logbook().save(e); enrichCall(call, null);
                     } catch (Throwable t) { log("logbook: " + t); }
                 }
@@ -4479,7 +4513,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             @Override public void frameLog(java.util.function.Consumer<String> l) { PacketEngine pe = packet(); if (pe != null) pe.setFrameLog(l); }
             @Override public String describe() {
                 ChannelStore.Channel ch = vfo != null ? vfo : current;
-                return "profile " + profile.id + (ch == null ? "" : ", on " + ch.freqText(ch.rxFreq) + " MHz") + (packet != null ? ", packet lead-in " + packet.packetLeadMs() + " ms" : "");
+                return "profile " + profile.id + (ch == null ? "" : ", on " + ch.freqText(ch.rxFreq) + " MHz") + (packet != null ? ", packet lead-in " + packet.packetLeadMs() + " ms" : "");   // i18n: Winlink session diagnostics
             }
             @Override public double[] position() { android.location.Location l = lastKnownLocation(); return l == null ? null : new double[] { l.getLatitude(), l.getLongitude() }; }
         });
@@ -4493,11 +4527,11 @@ public class RadioService extends Service implements RadioEngine.Events {
             if (com.macdmr.radio.ham.Forms.part(text) == null) return;
             com.macdmr.radio.ham.Forms.Form f = formParts.add(from, text, System.currentTimeMillis());
             if (f == null) { int[] p = formParts.progress(from, text); if (p != null) log("form part " + p[0] + "/" + p[1] + " from " + from); return; }
-            com.macdmr.radio.ham.FormStore.Row r = new com.macdmr.radio.ham.FormStore.Row(); r.ts = System.currentTimeMillis(); r.outgoing = false; r.peer = from; r.via = via; r.status = "received"; r.form = f;
+            com.macdmr.radio.ham.FormStore.Row r = new com.macdmr.radio.ham.FormStore.Row(); r.ts = System.currentTimeMillis(); r.outgoing = false; r.peer = from; r.via = via; r.status = "received"; r.form = f;   // i18n: stored with the form as recorded
             forms().save(r);
-            String subj = f.f.containsKey("SU") ? f.f.get("SU") : f.f.containsKey("NR") ? "number " + f.f.get("NR") : "";
-            history("sms", "\uD83D\uDCCB " + com.macdmr.radio.ham.Forms.title(f.kind) + " from " + from + (subj.isEmpty() ? "" : ": " + subj));
-            notifyUser(com.macdmr.radio.ham.Forms.title(f.kind) + " from " + from, subj.isEmpty() ? "Open PKT \u2192 Message forms" : subj, false);
+            String subj = f.f.containsKey("SU") ? f.f.get("SU") : f.f.containsKey("NR") ? Txt.s(R.string.service_form_number, f.f.get("NR")) : "";
+            history("sms", subj.isEmpty() ? Msg.of(R.string.service_form_from, com.macdmr.radio.ham.Forms.title(f.kind), from) : Msg.of(R.string.service_form_from_subject, com.macdmr.radio.ham.Forms.title(f.kind), from, subj));
+            notifyUser(Txt.s(R.string.service_form_notify_title, com.macdmr.radio.ham.Forms.title(f.kind), from), subj.isEmpty() ? Txt.s(R.string.service_form_open) : subj, false);
         } catch (Throwable t) { log("form: " + t); }
     }
     /** Send a form: "aprs" to a callsign (67-character parts, one every 12 s) or "dmr" to a contact (120-character parts). Null or an error. */
@@ -4505,24 +4539,24 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (f.id == null || f.id.isEmpty()) f.id = com.macdmr.radio.ham.Forms.newId(new java.util.Random());
         final com.macdmr.radio.ham.FormStore.Row r = new com.macdmr.radio.ham.FormStore.Row(); r.ts = System.currentTimeMillis(); r.outgoing = true; r.form = f;
         if ("aprs".equals(via)) {
-            if (packet == null) return "The packet engine is not running";
-            if (toCall == null || toCall.trim().isEmpty()) return "Enter the callsign to send it to";
+            if (packet == null) return Txt.s(R.string.service_packet_not_running);
+            if (toCall == null || toCall.trim().isEmpty()) return Txt.s(R.string.service_form_need_callsign);
             final java.util.List<String> parts = com.macdmr.radio.ham.Forms.split(f, 67);
             String first = packet.sendMessage(toCall, parts.get(0)); if (first != null) return first;
             for (int k = 1; k < parts.size(); k++) { final String p = parts.get(k); ui.postDelayed(() -> { String e = packet.sendMessage(toCall, p); if (e != null) log("form part: " + e); }, k * 12_000L); }
-            r.peer = toCall.trim().toUpperCase(Locale.US); r.via = "APRS"; r.status = "sent in " + parts.size() + " message" + (parts.size() == 1 ? "" : "s");
+            r.peer = toCall.trim().toUpperCase(Locale.US); r.via = "APRS"; r.status = "sent in " + parts.size() + " message" + (parts.size() == 1 ? "" : "s");   // i18n: stored with the form as recorded
         } else if ("dmr".equals(via)) {
-            if (toContact == null) return "Choose the contact or talkgroup";
-            ChannelStore.Channel cur = current; if (cur == null || !cur.isDigital()) return "DMR texts need a DMR channel";
+            if (toContact == null) return Txt.s(R.string.service_form_need_contact);
+            ChannelStore.Channel cur = current; if (cur == null || !cur.isDigital()) return Txt.s(R.string.service_form_needs_dmr);
             final java.util.List<String> parts = com.macdmr.radio.ham.Forms.split(f, 120);
             for (int k = 0; k < parts.size(); k++) { final String p = parts.get(k); ui.postDelayed(() -> sendSms(toContact, p), k * 4_000L); }
-            r.peer = toContact.name.isEmpty() ? String.valueOf(toContact.number) : toContact.name; r.via = "DMR"; r.status = "sent in " + parts.size() + " text" + (parts.size() == 1 ? "" : "s");
+            r.peer = toContact.name.isEmpty() ? String.valueOf(toContact.number) : toContact.name; r.via = "DMR"; r.status = "sent in " + parts.size() + " text" + (parts.size() == 1 ? "" : "s");   // i18n: stored with the form as recorded
         } else if ("winlink".equals(via)) {
-            if (toCall == null || toCall.trim().isEmpty()) return "Enter the callsign or e-mail address to send it to";
+            if (toCall == null || toCall.trim().isEmpty()) return Txt.s(R.string.service_form_need_address);
             String[] m = com.macdmr.radio.ham.Forms.winlink(f);
             String e = winlink().compose(toCall, "", m[0], m[1]); if (e != null) return e;
-            r.peer = toCall.trim(); r.via = "Winlink"; r.status = "in the Winlink outbox";
-        } else { r.peer = ""; r.via = "saved"; r.status = "saved"; }
+            r.peer = toCall.trim(); r.via = "Winlink"; r.status = "in the Winlink outbox";   // i18n: stored with the form as recorded
+        } else { r.peer = ""; r.via = "saved"; r.status = "saved"; }   // i18n: stored with the form as recorded
         forms().save(r);
         return null;
     }
@@ -4553,20 +4587,20 @@ public class RadioService extends Service implements RadioEngine.Events {
     private void roamCheck0() {
         long now = System.currentTimeMillis();
         ChannelStore.Channel cur = current;
-        if (cur == null || vfo != null || !cur.isDigital()) { lastRoamNote = "waiting: the radio is not on a DMR repeater channel"; return; }
-        if (cur.lat == 0 && cur.lon == 0) { lastRoamNote = "waiting: " + cur.name + " has no location (Nearby Repeaters adds one)"; return; }
+        if (cur == null || vfo != null || !cur.isDigital()) { lastRoamNote = Txt.s(R.string.service_roam_not_dmr); return; }
+        if (cur.lat == 0 && cur.lon == 0) { lastRoamNote = Txt.s(R.string.service_roam_no_location, cur.name); return; }
         if (pttDown || receiving || scanning() || scope.running() || satBusy(now, now + 60_000)) return;      // never during a call, a scan, the scope or a pass
         if (now - lastRoam < 120_000) return;                                 // at most one switch every two minutes
         android.location.Location me = lastKnownLocation();
-        if (me == null || now - me.getTime() > 3 * 60_000L) { lastRoamNote = "waiting for a GPS fix"; return; }
+        if (me == null || now - me.getTime() > 3 * 60_000L) { lastRoamNote = Txt.s(R.string.service_roam_no_fix); return; }
         ChannelStore.Channel to = Roaming.choose(cur, zoneChannels(), me.getLatitude(), me.getLongitude());
         double here = Roaming.km(me.getLatitude(), me.getLongitude(), cur.lat, cur.lon);
-        if (to == null) { lastRoamNote = String.format(Locale.US, "on the nearest repeater for this talkgroup (%s, %.0f km)", cur.name, here); return; }
+        if (to == null) { lastRoamNote = Txt.s(R.string.service_roam_nearest, cur.name, String.format(Locale.US, "%.0f", here)); return; }
         double there = Roaming.km(me.getLatitude(), me.getLongitude(), to.lat, to.lon);
         lastRoam = now;
         selectChannel(to.number);
-        lastRoamNote = String.format(Locale.US, "switched to %s (%.0f km; %s was %.0f km)", to.name, there, cur.name, here);
-        history("chan", "\uD83D\uDE97 Roaming: " + lastRoamNote);
+        lastRoamNote = Txt.s(R.string.service_roam_switched, to.name, String.format(Locale.US, "%.0f", there), cur.name, String.format(Locale.US, "%.0f", here));
+        history("chan", Msg.of(R.string.service_roam_history, Msg.of(R.string.service_roam_switched, to.name, String.format(Locale.US, "%.0f", there), cur.name, String.format(Locale.US, "%.0f", here))));
     }
 
     // ---- band scope (BandScope): receive-only sweeps ----
@@ -4588,10 +4622,10 @@ public class RadioService extends Service implements RadioEngine.Events {
     volatile int scopeSq = 9;                                                 // the squelch byte for sweep steps (bench: DIAG scope --ei sq)
     /** Start a sweep (null) or why not: never around a tracked satellite pass or while talking. */
     public String scopeStart(int from, int to, int step, int settleMs) {
-        if (!isReady()) return "The radio is not ready";
-        if (pttDown) return "Not while transmitting";
+        if (!isReady()) return Txt.s(R.string.service_radio_not_ready_long);
+        if (pttDown) return Txt.s(R.string.service_not_while_tx);
         long now = System.currentTimeMillis();
-        if (satBusy(now, now + 15 * 60_000L)) return "A satellite pass is being tracked (or starts within 15 minutes): the scope would retune the radio away from it";
+        if (satBusy(now, now + 15 * 60_000L)) return Txt.s(R.string.service_scope_sat_busy);
         if (scanning()) toggleScan();
         String e = scope.start(from, to, step, settleMs);
         if (e == null) log(String.format(Locale.US, "band scope %.3f\u2013%.3f MHz, %d kHz steps, %d ms settle", from / 1e6, to / 1e6, step / 1000, settleMs));
@@ -4602,81 +4636,82 @@ public class RadioService extends Service implements RadioEngine.Events {
     // ---- scheduled operations (Scheduler): start, then put the radio back when the time is up ----
     public void runSchedule(int id) { ui.post(() -> runScheduleNow(id, 0)); }
     public void endSchedule(int id) { ui.post(() -> endScheduleNow(id)); }
-    private String outOfBandSkip(int number) { return "skipped: channel " + number + " is outside " + profile.bandsText() + " (this radio cannot tune it)"; }
+    private String outOfBandSkip(int number) { return Txt.s(R.string.service_sched_skip_band, number, profile.bandsText()); }
     private void runScheduleNow(final int id, final int tries) {
         Scheduler.Entry e = Scheduler.byId(this, id); if (e == null) return;
-        String what = "\u23F0 Scheduled: " + e.actionName() + (e.label.isEmpty() ? "" : " (" + e.label + ")");
+        Msg what = e.label.isEmpty() ? Msg.of(R.string.service_sched_what, e.actionMsg()) : Msg.of(R.string.service_sched_what_label, e.actionMsg(), e.label);
         long t0 = System.currentTimeMillis(), t1 = t0 + (e.hasDuration() ? e.minutes * 60_000L : 60_000L);
-        if (satBusy(t0, t1)) { history("pkt", what + " skipped: it overlaps the satellite pass being tracked"); return; }
-        if (pttDown) { if (tries < 6) ui.postDelayed(() -> runScheduleNow(id, tries + 1), 20_000); else history("pkt", what + " skipped: the radio was transmitting"); return; }
-        if (scope.running()) { scope.stop(); history("pkt", "\u2702 Band scope stopped for a scheduled operation"); }
+        if (satBusy(t0, t1)) { history("pkt", Msg.of(R.string.service_sched_skipped_sat, what)); return; }
+        if (pttDown) { if (tries < 6) ui.postDelayed(() -> runScheduleNow(id, tries + 1), 20_000); else history("pkt", Msg.of(R.string.service_sched_skipped_tx, what)); return; }
+        if (scope.running()) { scope.stop(); history("pkt", Msg.of(R.string.service_scope_stopped_sched)); }
         if (Scheduler.runningEnd(this) > 0) endScheduleNow(Scheduler.runningId(this));          // one at a time
         ChannelStore.Channel cur = current;
         int prevCh = cur != null && vfo == null ? cur.number : -1;
         boolean wasRec = recordOn, wasScan = scanning(), wasAprs = packet != null && packet.monitoring(), wasSstv = packet != null && packet.sstvRx();
-        String r = null;
+        Object r = null;   // a Msg where the result is SignalDeck's own, so the history text stays English; a String from the mode it started
         switch (e.action) {
             case Scheduler.LISTEN:
-                if (e.channel >= 0 && store.byNumber(e.channel) == null) { history("pkt", what + " skipped: channel " + e.channel + " no longer exists"); return; }
-                if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { history("pkt", what + " " + outOfBandSkip(e.channel)); return; }
+                if (e.channel >= 0 && store.byNumber(e.channel) == null) { history("pkt", Msg.of(R.string.service_sched_skipped_missing, what, e.channel)); return; }
+                if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { history("pkt", Msg.of(R.string.service_sched_skipped_band, what, e.channel, profile.bandsText())); return; }
                 if (wasScan) toggleScan();
                 if (e.channel >= 0) selectChannel(e.channel);
                 if (e.record && !wasRec) setRecord(true);
-                r = (e.channel >= 0 ? "channel " + e.channel : "this channel") + (e.record ? ", recording" : "");
+                r = e.channel >= 0 ? Msg.of(e.record ? R.string.service_sched_r_channel_rec : R.string.service_sched_r_channel, e.channel) : Msg.of(e.record ? R.string.service_sched_r_this_rec : R.string.service_sched_r_this);
                 break;
-            case Scheduler.SCAN: r = wasScan ? "already scanning" : toggleScan(); break;
-            case Scheduler.APRS: r = wasAprs ? "already monitoring" : aprsMonitor(true); break;
+            case Scheduler.SCAN: r = wasScan ? Msg.of(R.string.service_sched_r_scanning) : toggleScan(); break;
+            case Scheduler.APRS: r = wasAprs ? Msg.of(R.string.service_sched_r_monitoring) : aprsMonitor(true); break;
             case Scheduler.SSTV:
-                if (wasSstv) { r = "already receiving"; break; }
-                if (e.channel >= 0 && store.byNumber(e.channel) == null) { history("pkt", what + " skipped: channel " + e.channel + " no longer exists"); return; }
-                if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { history("pkt", what + " " + outOfBandSkip(e.channel)); return; }
-                if (e.channel >= 0) { selectChannel(e.channel); ui.postDelayed(() -> sstvMonitor(true, false), RETUNE_SETTLE_MS); r = "on channel " + e.channel; }
+                if (wasSstv) { r = Msg.of(R.string.service_sched_r_receiving); break; }
+                if (e.channel >= 0 && store.byNumber(e.channel) == null) { history("pkt", Msg.of(R.string.service_sched_skipped_missing, what, e.channel)); return; }
+                if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { history("pkt", Msg.of(R.string.service_sched_skipped_band, what, e.channel, profile.bandsText())); return; }
+                if (e.channel >= 0) { selectChannel(e.channel); ui.postDelayed(() -> sstvMonitor(true, false), RETUNE_SETTLE_MS); r = Msg.of(R.string.service_sched_r_on_channel, e.channel); }
                 else r = sstvMonitor(true, profile.tunable(PacketEngine.SSTV_FREQ_HZ));   // 144.500, or the channel the radio is on when it cannot tune 144.500 (the W6)
                 break;
-            case Scheduler.BEACON: r = packet == null ? "the packet engine is not running" : packet.sendBeacon(); if (r == null) r = "sent"; break;
-            case Scheduler.FINDER: r = finder().start(e.minutes); if (r == null) r = "listening"; break;
+            case Scheduler.BEACON: r = packet == null ? Msg.of(R.string.service_sched_r_no_packet) : packet.sendBeacon(); if (r == null) r = Msg.of(R.string.service_sched_r_sent); break;
+            case Scheduler.FINDER: r = finder().start(e.minutes); if (r == null) r = Msg.of(R.string.service_sched_r_listening); break;
             case Scheduler.WINLINK_NET: {
                 final com.macdmr.radio.winlink.Winlink w = winlink();
                 r = w.connectInternet();
                 if (r == null) {
-                    r = "connecting to the CMS";
+                    r = Msg.of(R.string.service_sched_r_cms);
                     final long until = System.currentTimeMillis() + 10 * 60_000L;
                     ui.postDelayed(new Runnable() { @Override public void run() {
                         if (w.busy() && System.currentTimeMillis() < until) { ui.postDelayed(this, 5_000); return; }
                         if (w.busy()) w.cancel();
-                        history("pkt", "\u23F0 Scheduled Winlink check: " + w.lastResult());
+                        history("pkt", Msg.of(R.string.service_sched_winlink, Msg.shown(w.lastResult())));
                     } }, 5_000);
                 }
                 break;
             }
             case Scheduler.WINLINK: {
                 final com.macdmr.radio.winlink.Winlink w = winlink();
-                if (w.gateway().isEmpty()) { r = "skipped: no gateway yet (connect once with Winlink \u2192 Connect: radio)"; break; }
-                if (w.busy()) { r = "skipped: a Winlink session is already running"; break; }
-                if (e.channel >= 0 && store.byNumber(e.channel) == null) { r = "skipped: channel " + e.channel + " no longer exists"; break; }
+                if (w.gateway().isEmpty()) { r = Msg.of(R.string.service_sched_r_no_gateway); break; }
+                if (w.busy()) { r = Msg.of(R.string.service_sched_r_winlink_busy); break; }
+                if (e.channel >= 0 && store.byNumber(e.channel) == null) { r = Msg.of(R.string.service_sched_r_missing, e.channel); break; }
                 if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { r = outOfBandSkip(e.channel); break; }   // the select would be refused and the call go out on the channel the radio is on
                 final boolean move = e.channel >= 0 && e.channel != prevCh; final int back = prevCh;
                 if (wasScan) toggleScan();
                 if (move) selectChannel(e.channel);
                 ui.postDelayed(() -> {
                     ChannelStore.Channel on = current;
-                    if (move && (vfo != null || on == null || on.number != e.channel)) { history("pkt", "⏰ Scheduled Winlink check: not sent, the radio did not move to channel " + e.channel); return; }   // never transmit on another channel
+                    if (move && (vfo != null || on == null || on.number != e.channel)) { history("pkt", Msg.of(R.string.service_sched_winlink_not_moved, e.channel)); return; }   // never transmit on another channel
                     String err = w.connectRadio(w.gateway(), w.via());
-                    if (err != null) { history("pkt", "\u23F0 Scheduled Winlink check: " + err); if (move && back >= 0) selectChannel(back); return; }
+                    if (err != null) { history("pkt", Msg.of(R.string.service_sched_winlink, Msg.shown(err))); if (move && back >= 0) selectChannel(back); return; }
                     final long until = System.currentTimeMillis() + 20 * 60_000L;   // never hold the radio longer than 20 minutes
                     ui.postDelayed(new Runnable() { @Override public void run() {
                         if (w.busy() && System.currentTimeMillis() < until) { ui.postDelayed(this, 5_000); return; }
                         if (w.busy()) w.cancel();
-                        history("pkt", "\u23F0 Scheduled Winlink check: " + w.lastResult() + (move && back >= 0 ? ", back to channel " + back : ""));
+                        history("pkt", move && back >= 0 ? Msg.of(R.string.service_sched_winlink_back, Msg.shown(w.lastResult()), back) : Msg.of(R.string.service_sched_winlink, Msg.shown(w.lastResult())));
                         if (move && back >= 0 && store.byNumber(back) != null) selectChannel(back);
                         if (wasScan) ui.postDelayed(RadioService.this::toggleScan, RETUNE_SETTLE_MS);
                     } }, 5_000);
                 }, move ? RETUNE_SETTLE_MS : 0);
-                r = "calling " + w.gateway() + (move ? " on channel " + e.channel : "");
+                r = move ? Msg.of(R.string.service_sched_r_calling_on, w.gateway(), e.channel) : Msg.of(R.string.service_sched_r_calling, w.gateway());
                 break;
             }
         }
-        history("pkt", what + (r == null ? "" : ": " + r) + (e.hasDuration() ? " for " + e.minutes + " min" : ""));
+        if (r instanceof String) r = Msg.shown((String) r);   // an error or status the mode returned in the app language: its English for the text column
+        history("pkt", r == null ? (e.hasDuration() ? Msg.of(R.string.service_sched_started_for, what, e.minutes) : what) : e.hasDuration() ? Msg.of(R.string.service_sched_result_for, what, r, e.minutes) : Msg.of(R.string.service_sched_result, what, r));
         if (!e.hasDuration()) return;
         getSharedPreferences("schedules", MODE_PRIVATE).edit().putInt("prevCh", prevCh).putBoolean("startedRec", e.record && !wasRec)
                 .putBoolean("startedScan", Scheduler.SCAN.equals(e.action) && !wasScan).putBoolean("startedAprs", Scheduler.APRS.equals(e.action) && !wasAprs)
@@ -4705,7 +4740,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         boolean moved = e != null && e.channel >= 0 && (Scheduler.LISTEN.equals(e.action) || Scheduler.SSTV.equals(e.action)) && p.getInt("prevCh", -1) != e.channel;
         if (moved && prev >= 0 && !satOn) { ChannelStore.Channel cur = current; if (cur != null && cur.number == e.channel && store.byNumber(prev) != null) selectChannel(prev); }
         if (p.getBoolean("stoppedScan", false) && !scanning()) ui.postDelayed(this::toggleScan, RETUNE_SETTLE_MS);
-        history("pkt", "\u23F0 Scheduled: " + (e == null ? "operation" : e.actionName()) + " ended" + (moved && prev >= 0 ? ": back to channel " + prev : ""));
+        Object op = e == null ? Msg.of(R.string.service_sched_operation) : e.actionMsg();
+        history("pkt", moved && prev >= 0 ? Msg.of(R.string.service_sched_ended_back, op, prev) : Msg.of(R.string.service_sched_ended, op));
         Scheduler.arm(this);
     }
 

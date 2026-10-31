@@ -20,6 +20,7 @@ import java.util.Locale;
  * the other radio transmits without a tone (must stay silent here), then with 100.0 Hz (must be heard).</li>
  * </ol>
  * The result is one section of the device report with a verdict per part and the profile values it suggests.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class SecondRadioTest {
     private SecondRadioTest() { }

@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.coverage.Predictor;
 import com.macdmr.radio.coverage.Propagation;
 
@@ -104,14 +105,16 @@ public final class FoxPredictor {
         public float thr50, thr90;
         public boolean hasMap() { return p != null; }
         /** rough / fair / good from the 50 % region's size; null without a map. */
-        public String confidence() { return Double.isNaN(r50M) ? null : r50M <= 100 ? "good" : r50M <= 300 ? "fair" : "rough"; }
+        public String confidence() { return Double.isNaN(r50M) ? null : r50M <= 100 ? "good" : r50M <= 300 ? "fair" : "rough"; }   // i18n: key, see confidenceText
+        /** {@link #confidence} in the app's language; null without a map. */
+        public String confidenceText() { return Double.isNaN(r50M) ? null : Txt.s(r50M <= 100 ? com.macdmr.radio.R.string.modes_fox_conf_good : r50M <= 300 ? com.macdmr.radio.R.string.modes_fox_conf_fair : com.macdmr.radio.R.string.modes_fox_conf_rough); }
         /** "bearings + heat map" and so on. */
         public String layerNames() {
-            StringBuilder sb = new StringBuilder();
-            if ((layers & BEARINGS) != 0) sb.append("bearings");
-            if ((layers & HEAT) != 0) sb.append(sb.length() > 0 ? " + " : "").append("heat map");
-            if ((layers & TERRAIN) != 0) sb.append(sb.length() > 0 ? " + " : "").append("terrain");
-            return sb.length() == 0 ? "strongest mark" : sb.toString();
+            List<String> names = new java.util.ArrayList<>();
+            if ((layers & BEARINGS) != 0) names.add(Txt.s(com.macdmr.radio.R.string.modes_fox_layer_bearings));
+            if ((layers & HEAT) != 0) names.add(Txt.s(com.macdmr.radio.R.string.modes_fox_layer_heat));
+            if ((layers & TERRAIN) != 0) names.add(Txt.s(com.macdmr.radio.R.string.modes_fox_layer_terrain));
+            return names.isEmpty() ? Txt.s(com.macdmr.radio.R.string.modes_fox_layer_strongest) : String.join(Txt.s(com.macdmr.radio.R.string.modes_fox_layer_separator), names);
         }
         public double cellLat(int iy) { return south + (iy + 0.5) * (north - south) / ny; }
         public double cellLon(int ix) { return west + (ix + 0.5) * (east - west) / nx; }
@@ -121,12 +124,12 @@ public final class FoxPredictor {
 
     /** Why the heat map cannot run on these marks, or null when it can. */
     public static String heatBlocker(List<FoxHunt.Mark> marks, double floorDbm) {
-        if (marks.size() < 3) return "the heat map needs 3 marks";
+        if (marks.size() < 3) return Txt.s(com.macdmr.radio.R.string.modes_fox_block_marks);
         int above = 0; for (FoxHunt.Mark m : marks) if (m.dbm > floorDbm) above++;
-        if (above < 2) return "the heat map needs 2 marks above the noise floor";
+        if (above < 2) return Txt.s(com.macdmr.radio.R.string.modes_fox_block_floor);
         double spread = 0;
         for (FoxHunt.Mark a : marks) for (FoxHunt.Mark b : marks) spread = Math.max(spread, metres(a.lat, a.lon, b.lat, b.lon));
-        return spread < MIN_SPREAD_M ? "the heat map needs marks at least 100 m apart" : null;
+        return spread < MIN_SPREAD_M ? Txt.s(com.macdmr.radio.R.string.modes_fox_block_spread) : null;
     }
 
     /** The prediction for these marks, or null with none. */
@@ -138,11 +141,13 @@ public final class FoxPredictor {
         boolean bear = o.bearings && nb > 0;
         String block = o.heat ? heatBlocker(marks, o.floorDbm) : null;
         boolean heat = o.heat && block == null;
-        if (o.bearings && nb == 0) r.note = o.noCompass ? "this phone has no compass, so its marks carry no bearing: the heat map works from their strength" : "no marks with a bearing yet";
-        if (block != null) r.note = r.note == null ? block : r.note + "; " + block;
+        List<String> notes = new java.util.ArrayList<>();
+        if (o.bearings && nb == 0) notes.add(Txt.s(o.noCompass ? com.macdmr.radio.R.string.modes_fox_note_no_compass : com.macdmr.radio.R.string.modes_fox_note_no_bearing));
+        if (block != null) notes.add(block);
         boolean terr = heat && o.terrain && o.elevation != null;
-        if (o.terrain && !o.heat) r.note = (r.note == null ? "" : r.note + "; ") + "terrain refines the heat map, which is off";
-        else if (o.terrain && heat && o.elevation == null) r.note = (r.note == null ? "" : r.note + "; ") + "no terrain for this area yet";
+        if (o.terrain && !o.heat) notes.add(Txt.s(com.macdmr.radio.R.string.modes_fox_note_terrain_off));
+        else if (o.terrain && heat && o.elevation == null) notes.add(Txt.s(com.macdmr.radio.R.string.modes_fox_note_no_terrain));
+        if (!notes.isEmpty()) r.note = String.join(Txt.s(com.macdmr.radio.R.string.modes_clause_separator), notes);
         r.lat = be.lat; r.lon = be.lon; r.layers = bear && be.fromBearings ? BEARINGS : 0;
         if (!bear && !heat) return r;
 

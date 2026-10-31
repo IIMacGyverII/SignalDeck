@@ -3007,7 +3007,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             case 2: {
                 synthRx = false; monRx = false;
                 dmrEvent("stop", 0, 0, 0);
-                receiving = false; bridgeReception(false); refreshControls(); long len = rxStart > 0 ? System.currentTimeMillis() - rxStart : 0; rxStart = 0;
+                receiving = false; dmrAdmitted = false; bridgeReception(false); refreshControls();   // a call outside the list starts no reception: it must never inherit the last one's admission long len = rxStart > 0 ? System.currentTimeMillis() - rxStart : 0; rxStart = 0;
                 if (softSq.isEnabled() && squelchOpen) { softSq.closeNow(); softGateHistory(false); squelchOpen = false; log("soft squelch closed (carrier gone)"); }
                 softSq.awaitRxStart();                                   // with the module squelch held open a RECEIVE_STOP only happens while the receiver re-settles
                 if (current != null && current.isDigital() && !agoldBridge()) { try { engine.queryCallerInfo(); } catch (IOException ignored) { } }   // who was that (0x2B); the Atom XL asks after its capture closes

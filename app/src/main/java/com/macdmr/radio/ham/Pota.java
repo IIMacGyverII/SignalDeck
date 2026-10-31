@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 
 import org.json.JSONArray;
@@ -38,8 +40,8 @@ public final class Pota {
     /** POTA spots (frequency in kHz) and SOTA spots (in MHz), workable first, newest first within each. */
     public static List<Spot> spots(List<String> problems) {
         List<Spot> out = new ArrayList<>();
-        try { out.addAll(parsePota(new JSONArray(get("https://api.pota.app/spot/activator")))); } catch (Throwable t) { problems.add("POTA spots unreachable"); }
-        try { out.addAll(parseSota(new JSONArray(get("https://api2.sota.org.uk/api/spots/40/all")))); } catch (Throwable t) { problems.add("SOTA spots unreachable"); }
+        try { out.addAll(parsePota(new JSONArray(get("https://api.pota.app/spot/activator")))); } catch (Throwable t) { problems.add(Txt.s(R.string.modes_pota_unreachable)); }
+        try { out.addAll(parseSota(new JSONArray(get("https://api2.sota.org.uk/api/spots/40/all")))); } catch (Throwable t) { problems.add(Txt.s(R.string.modes_sota_unreachable)); }
         out.sort((a, b) -> a.workable() != b.workable() ? (a.workable() ? -1 : 1) : Long.compare(b.time, a.time));
         return out;
     }
@@ -75,7 +77,7 @@ public final class Pota {
     /** Parks within about 50 km: POTA's map is asked for a box rounded to half a degree; distances are worked out here. */
     public static List<Park> parksNear(double lat, double lon) throws Exception {
         double la0 = Math.floor(lat * 2) / 2 - 0.5, lo0 = Math.floor(lon * 2) / 2 - 0.5;
-        JSONObject fc = new JSONObject(get(String.format(Locale.US, "https://api.pota.app/park/grids/%.1f/%.1f/%.1f/%.1f/0", la0, lo0, la0 + 1.5, lo0 + 1.5)));
+        JSONObject fc = new JSONObject(get(String.format(Locale.US, "https://api.pota.app/park/grids/%.1f/%.1f/%.1f/%.1f/0", la0, lo0, la0 + 1.5, lo0 + 1.5)));   // i18n: URL
         List<Park> out = new ArrayList<>(); JSONArray f = fc.optJSONArray("features"); if (f == null) return out;
         for (int i = 0; i < f.length(); i++) {
             JSONObject o = f.optJSONObject(i); if (o == null) continue;

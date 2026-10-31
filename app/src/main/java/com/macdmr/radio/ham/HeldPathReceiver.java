@@ -36,7 +36,7 @@ public final class HeldPathReceiver {
         default void framesLost() { }
     }
 
-    private static final Logger LOG = Logger.getLogger("HeldPath");
+    private static final Logger LOG = Logger.getLogger("HeldPath");   // i18n: logger name
     private static final int CAP = 20 * 8000;
     private static final int KEEP = 800;
     /** 8 kHz samples a frame must end before the newest audio while it is still arriving: the equaliser's 20 symbols past the frame (200 samples at 48 kHz) and the pulse span, with room. */
@@ -121,7 +121,7 @@ public final class HeldPathReceiver {
             else { snap = Arrays.copyOf(buf, len); from = ignore; }
         }
         if (snap == null) {
-            if (open && System.currentTimeMillis() - lastEmit > QUIET_MS) finish("signal lost");
+            if (open && System.currentTimeMillis() - lastEmit > QUIET_MS) finish("signal lost");   // i18n: internal end reason, not shown
             return;
         }
         HeldPath.Live live = HeldPath.live(snap, snap.length, taps, from, open);
@@ -186,9 +186,9 @@ public final class HeldPathReceiver {
         if (!open) { advance(live.resume8, n); return; }
         // The end bit closes the call once nothing more of it is waiting: a bad frame can set the bit mid-call,
         // and the rest of that transmission is still audio.
-        if (endBit && !heldBack) { finish("last frame"); return; }
+        if (endBit && !heldBack) { finish("last frame"); return; }   // i18n: internal end reason, not shown
         if (lastEnd8 > 0) { consumed(lastEnd8); return; }                  // the call goes on: drop what the listener already has
-        if (added == 0 && now - lastEmit > QUIET_MS) finish("signal lost");  // a lost sync alone does not end the call; silence does
+        if (added == 0 && now - lastEmit > QUIET_MS) finish("signal lost");  // a lost sync alone does not end the call; silence does   // i18n: internal end reason, not shown
     }
 
     /** Keep a frame whose re-encoded symbols agree with the equalised slice. The raw window is what a later fit uses. */
@@ -261,7 +261,7 @@ public final class HeldPathReceiver {
         LOG.log(Level.WARNING, "decode", t);
         try {
             Class.forName("android.util.Log").getMethod("w", String.class, String.class, Throwable.class)
-                .invoke(null, "HeldPath", "decode", t);
+                .invoke(null, "HeldPath", "decode", t);   // i18n: log tag
         } catch (Throwable ignored) { }
     }
 }

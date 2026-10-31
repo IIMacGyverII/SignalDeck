@@ -101,7 +101,7 @@ final class PhoneStats {
         int status = b.getIntExtra(BatteryManager.EXTRA_STATUS, -1), plugged = b.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
         o.put("ok", true).put("level", pct < 0 ? -1 : Math.round(pct));
         o.put("state", status == BatteryManager.BATTERY_STATUS_FULL ? "full" : status == BatteryManager.BATTERY_STATUS_CHARGING ? "charging"
-                : plugged != 0 ? "plugged, not charging" : "on battery");
+                : plugged != 0 ? "plugged, not charging" : "on battery");   // i18n: state code: the page translates it (and compares charging, full)
         o.put("plug", plugged == BatteryManager.BATTERY_PLUGGED_AC ? "charger" : plugged == BatteryManager.BATTERY_PLUGGED_USB ? "USB"
                 : plugged == BatteryManager.BATTERY_PLUGGED_WIRELESS ? "wireless" : plugged == 8 ? "dock" : "");
         int t = b.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, Integer.MIN_VALUE); if (t != Integer.MIN_VALUE) o.put("tempC", t / 10.0);
@@ -136,7 +136,7 @@ final class PhoneStats {
             case BatteryManager.BATTERY_HEALTH_OVERHEAT: return "overheating";
             case BatteryManager.BATTERY_HEALTH_COLD: return "cold";
             case BatteryManager.BATTERY_HEALTH_DEAD: return "dead";
-            case BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE: return "over voltage";
+            case BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE: return "over voltage";   // i18n: health code: the page translates it (and compares good)
             default: return "";
         }
     }

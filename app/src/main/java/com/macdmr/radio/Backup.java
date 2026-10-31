@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 
@@ -36,11 +37,11 @@ import java.util.Map;
  * 36-column OpenGD77 exports) and replaces channels, contacts and zones.
  */
 public final class Backup {
-    public static final String CHANNELS_HEADER = "_id,Channel Number,Channel Name,Channel Type,Rx Frequency,Tx Frequency,Bandwidth (kHz),"
-            + "Colour Code,Timeslot,Contact,TG List,DMR ID,TS1_TA_Tx,TS2_TA_Tx ID,RX Tone,TX Tone,"
-            + "Squelch,Power,Rx Only,Zone Skip,All Skip,TOT,VOX,No Beep,No Eco,APRS,Latitude,Longitude,Use Location,"
-            + "Encrypt Switch,Encrypt Key,Relay,Interrupt,Active,Outbound Slot,Channel Mode,Contact Type,SoftSQ,SoftSQLevel,M17 Dest";
-    private static final String CONTACTS_HEADER = "Contact Name,ID,ID Type,TS Override";
+    public static final String CHANNELS_HEADER = "_id,Channel Number,Channel Name,Channel Type,Rx Frequency,Tx Frequency,Bandwidth (kHz),"   // i18n: file format (backup CSV)
+            + "Colour Code,Timeslot,Contact,TG List,DMR ID,TS1_TA_Tx,TS2_TA_Tx ID,RX Tone,TX Tone,"   // i18n: file format (backup CSV)
+            + "Squelch,Power,Rx Only,Zone Skip,All Skip,TOT,VOX,No Beep,No Eco,APRS,Latitude,Longitude,Use Location,"   // i18n: file format (backup CSV)
+            + "Encrypt Switch,Encrypt Key,Relay,Interrupt,Active,Outbound Slot,Channel Mode,Contact Type,SoftSQ,SoftSQLevel,M17 Dest";   // i18n: file format (backup CSV)
+    private static final String CONTACTS_HEADER = "Contact Name,ID,ID Type,TS Override";   // i18n: file format (backup CSV)
 
     private Backup() { }
 
@@ -76,7 +77,7 @@ public final class Backup {
             java.util.HashSet<String> seen = new java.util.HashSet<>();
             for (ChannelStore.Contact c : contacts) {
                 if (c.number <= 0) continue;                                 // callsign- or pager-only contacts: SignalDeck_Extras.csv carries them
-                String row = q(c.name) + "," + c.number + "," + (c.type == 0 ? "Private" : c.type == 1 ? "Group" : "All Call") + ",-";
+                String row = q(c.name) + "," + c.number + "," + (c.type == 0 ? "Private" : c.type == 1 ? "Group" : "All Call") + ",-";   // i18n: file format (backup CSV)
                 if (seen.add(row)) w.write(row + "\r\n");
             }
         }
@@ -88,11 +89,11 @@ public final class Backup {
             if (!ch.isDigital() || ch.groups.length == 0) continue;
             String key = Arrays.toString(ch.groups); String name = null;
             for (Map.Entry<String, int[]> e : lists.entrySet()) if (Arrays.toString(e.getValue()).equals(key)) { name = e.getKey(); break; }
-            if (name == null) { name = ch.name + " TGs"; int k = 2; while (lists.containsKey(name)) name = ch.name + " TGs " + k++; lists.put(name, ch.groups); }
+            if (name == null) { name = ch.name + " TGs"; int k = 2; while (lists.containsKey(name)) name = ch.name + " TGs " + k++; lists.put(name, ch.groups); }   // i18n: file format (backup CSV)
             listOf.put(ch.id, name);
         }
         try (Writer w = writer(new File(dir, "TG_Lists.csv"))) {
-            StringBuilder h = new StringBuilder("TG List Name"); for (int i = 1; i <= 32; i++) h.append(",Contact").append(i);
+            StringBuilder h = new StringBuilder("TG List Name"); for (int i = 1; i <= 32; i++) h.append(",Contact").append(i);   // i18n: file format (backup CSV)
             w.write(h + "\r\n");
             for (Map.Entry<String, int[]> e : lists.entrySet()) {
                 StringBuilder r = new StringBuilder(q(e.getKey()));
@@ -112,25 +113,25 @@ public final class Backup {
                     r.append(m17ToneCells(ch));
                 } else if (dig) {
                     r.append(ch.cc).append(',').append(ch.inSlot + 1).append(',');
-                    String cn = contactName.get(ch.txContact); r.append(q(cn != null ? cn : (ch.txContact > 0 ? "TG " + ch.txContact : "None"))).append(',');
-                    String ln = listOf.get(ch.id); r.append(q(ln != null ? ln : "None")).append(',');
-                    r.append(ch.txContact > 0 ? String.valueOf(ch.txContact) : "None").append(",Off,Off,,,Disabled,");
+                    String cn = contactName.get(ch.txContact); r.append(q(cn != null ? cn : (ch.txContact > 0 ? "TG " + ch.txContact : "None"))).append(',');   // i18n: file format (backup CSV)
+                    String ln = listOf.get(ch.id); r.append(q(ln != null ? ln : "None")).append(',');   // i18n: file format (backup CSV)
+                    r.append(ch.txContact > 0 ? String.valueOf(ch.txContact) : "None").append(",Off,Off,,,Disabled,");   // i18n: file format (backup CSV)
                 } else {
                     r.append(",,,,,,,").append(ToneConverter.toCSVFormat(ch.rxType, ch.rxSubCode)).append(',').append(ToneConverter.toCSVFormat(ch.txType, ch.txSubCode)).append(',');
-                    r.append(ch.sq == 0 ? "Disabled" : String.valueOf(ch.sq * 10 - 5)).append(',');
+                    r.append(ch.sq == 0 ? "Disabled" : String.valueOf(ch.sq * 10 - 5)).append(',');   // i18n: file format (backup CSV)
                 }
-                r.append(ch.power == 0 ? "P1" : "P9").append(",No,No,No,0,Off,No,No,None,");
+                r.append(ch.power == 0 ? "P1" : "P9").append(",No,No,No,0,Off,No,No,None,");   // i18n: file format (backup CSV)
                 if (ch.lat != 0 || ch.lon != 0) r.append(String.format(Locale.US, "%.6f,%.6f,No", ch.lat, ch.lon)); else r.append("0.128,0.008,No");
                 r.append(',').append(dig && ch.encryptSw == 1 ? 1 : 0).append(',').append(dig ? q(ch.encryptKey) : "");
                 r.append(',').append(ch.relay == 0 || ch.relay == 1 || ch.relay == 2 ? ch.relay : 2).append(',').append(dig ? (ch.interrupt == 1 ? 1 : 2) : 0).append(',').append(ch.active ? 1 : 0);
                 r.append(',').append(ch.outSlot).append(',').append(ch.mode == 4 ? 3 : ch.mode).append(',').append(ch.contactType);
-                r.append(',').append(ch.softSq ? "On" : "Off").append(',').append(ch.softSqLevel >= 1 ? ch.softSqLevel : 5);
+                r.append(',').append(ch.softSq ? "On" : "Off").append(',').append(ch.softSqLevel >= 1 ? ch.softSqLevel : 5);   // i18n: file format (backup CSV)
                 r.append(',').append(ch.isM17() ? q(ch.m17Dest()) : "");
                 w.write(r + "\r\n");
             }
         }
         try (Writer w = writer(new File(dir, "Zones.csv"))) {
-            StringBuilder h = new StringBuilder("Zone Name"); for (int i = 1; i <= 80; i++) h.append(",Channel").append(i);
+            StringBuilder h = new StringBuilder("Zone Name"); for (int i = 1; i <= 80; i++) h.append(",Channel").append(i);   // i18n: file format (backup CSV)
             w.write(h + "\r\n");
             Map<Integer, String> byNumber = new HashMap<>(); for (ChannelStore.Channel ch : channels) byNumber.put(ch.number, ch.name);
             for (ChannelStore.Zone z : store.zones()) {
@@ -142,28 +143,28 @@ public final class Backup {
         }
         try (Writer w = writer(new File(dir, EXTRAS))) {             // SignalDeck's own: channel notes, receive-only channels and nets (other tools ignore the file)
             w.write(EXTRAS_HEADER + "\r\n");
-            for (ChannelStore.Channel ch : channels) if (ch.notes != null && !ch.notes.isEmpty()) w.write(ch.number + "," + q(ch.name) + ",notes,,,,," + q(line(ch.notes)) + "\r\n");
-            for (ChannelStore.Channel ch : channels) if (ch.rxOnly) w.write(ch.number + "," + q(ch.name) + ",rxonly,,,,,\r\n");
+            for (ChannelStore.Channel ch : channels) if (ch.notes != null && !ch.notes.isEmpty()) w.write(ch.number + "," + q(ch.name) + ",notes,,,,," + q(line(ch.notes)) + "\r\n");   // i18n: file format (backup CSV)
+            for (ChannelStore.Channel ch : channels) if (ch.rxOnly) w.write(ch.number + "," + q(ch.name) + ",rxonly,,,,,\r\n");   // i18n: file format (backup CSV)
             for (ChannelStore.Zone z : store.zones()) {                  // Zones.csv lists channels by name; two channels with one name need the exact numbers
                 StringBuilder nums = new StringBuilder(); for (int n : z.numbers) { if (nums.length() > 0) nums.append(';'); nums.append(n); }
-                w.write(",," + "zone," + q(line(z.name)) + ",,,," + nums + "\r\n");
+                w.write(",," + "zone," + q(line(z.name)) + ",,,," + nums + "\r\n");   // i18n: file format (backup CSV)
             }
             for (com.macdmr.radio.ham.NetFinder.Manual m : store.nets())
-                w.write(m.channel + "," + q(nameOf(channels, m.channel)) + ",net," + q(line(m.name)) + "," + m.days + "," + String.format(Locale.US, "%02d:%02d", m.minute / 60, m.minute % 60) + "," + m.durationMin + "," + q(line(m.notes)) + "\r\n");
+                w.write(m.channel + "," + q(nameOf(channels, m.channel)) + ",net," + q(line(m.name)) + "," + m.days + "," + String.format(Locale.US, "%02d:%02d", m.minute / 60, m.minute % 60) + "," + m.durationMin + "," + q(line(m.notes)) + "\r\n");   // i18n: file format (backup CSV)
             for (ChannelStore.Contact ct : contacts) if (hasExtras(ct)) w.write(contactRow(ct) + "\r\n");   // callsign, RICs, notes, home location (never the module's table)
         }
-        try (Writer w = writer(new File(dir, "DTMF.csv"))) { w.write("Contact Name,Code\r\n"); if (dtmf != null) for (Map.Entry<String, String> e : dtmf.entrySet()) w.write(q(e.getKey()) + "," + q(e.getValue()) + "\r\n"); }
+        try (Writer w = writer(new File(dir, "DTMF.csv"))) { w.write("Contact Name,Code\r\n"); if (dtmf != null) for (Map.Entry<String, String> e : dtmf.entrySet()) w.write(q(e.getKey()) + "," + q(e.getValue()) + "\r\n"); }   // i18n: file format (backup CSV)
         return dir;
     }
 
     /** SignalDeck's extra file in a backup folder: channel notes and the nets held on channels, by channel number. */
-    public static final String EXTRAS = "SignalDeck_Extras.csv";
+    public static final String EXTRAS = "SignalDeck_Extras.csv";   // i18n: file format (backup CSV)
     /** A contact needs an extras row when it carries anything the CPS layout cannot: no DMR ID, a callsign, RICs, notes or a home location. */
     static boolean hasExtras(ChannelStore.Contact ct) { return ct.number <= 0 || !ct.callsign.isEmpty() || !ct.rics.isEmpty() || !ct.notes.isEmpty() || ct.hasHome() || !ct.homeLabel.isEmpty(); }
     /** Extras row of a contact: number, name, "contact", callsign, RICs, home (lat|lon|label), type, notes. */
     static String contactRow(ChannelStore.Contact ct) {
         String home = (ct.hasHome() ? String.format(Locale.US, "%.6f|%.6f|", ct.homeLat, ct.homeLon) : "||") + line(ct.homeLabel);
-        return ct.number + "," + q(ct.name) + ",contact," + q(ct.callsign) + "," + q(ct.rics) + "," + q(home) + "," + ct.type + "," + q(line(ct.notes));
+        return ct.number + "," + q(ct.name) + ",contact," + q(ct.callsign) + "," + q(ct.rics) + "," + q(home) + "," + ct.type + "," + q(line(ct.notes));   // i18n: file format (backup CSV)
     }
     /** The identity fields of an extras row onto a contact (number, name and type are matched by the caller). */
     static void applyContactRow(ChannelStore.Contact ct, List<String> r) {
@@ -174,7 +175,7 @@ public final class Backup {
         if (h.length >= 3) { try { if (!h[0].isEmpty() && !h[1].isEmpty()) { ct.homeLat = Double.parseDouble(h[0]); ct.homeLon = Double.parseDouble(h[1]); } } catch (Exception e) { } ct.homeLabel = unline(h[2]); }
         else ct.homeLabel = unline(col(r, 5));
     }
-    static final String EXTRAS_HEADER = "Channel Number,Channel Name,Kind,Name,Days,Start,Minutes,Notes";
+    static final String EXTRAS_HEADER = "Channel Number,Channel Name,Kind,Name,Days,Start,Minutes,Notes";   // i18n: file format (backup CSV)
     /** One CSV line per value: newlines become \\n (the reader is line based). */
     private static String line(String s) { return s == null ? "" : s.replace("\\", "\\\\").replace("\r", "").replace("\n", "\\n"); }
     private static String unline(String s) {
@@ -209,11 +210,11 @@ public final class Backup {
      * the destination, off the header.
      */
     static String m17ToneCells(ChannelStore.Channel ch) {
-        return ch.can() + ",,,,,,,Disabled,Disabled," + (ch.sq == 0 ? "Disabled" : String.valueOf(ch.sq * 10 - 5)) + ",";
+        return ch.can() + ",,,,,,,Disabled,Disabled," + (ch.sq == 0 ? "Disabled" : String.valueOf(ch.sq * 10 - 5)) + ",";   // i18n: file format (backup CSV)
     }
 
     /** Channel Type cell: M17, Digital, or Analogue. */
-    static String typeCell(ChannelStore.Channel ch) { return ch.isM17() ? "M17" : ch.isDigital() ? "Digital" : "Analogue"; }
+    static String typeCell(ChannelStore.Channel ch) { return ch.isM17() ? "M17" : ch.isDigital() ? "Digital" : "Analogue"; }   // i18n: file format (backup CSV)
     /** 2 M17, 0 digital, 1 analog. Anything else is analog, which is what an OpenGD77 file is. */
     static int channelKind(String cell) {
         String k = cell == null ? "" : cell.trim().toLowerCase(Locale.US);
@@ -237,11 +238,11 @@ public final class Backup {
             scratch = new ChannelStore(ctx, "backup_selftest.db"); scratch.getWritableDatabase();
             restore(scratch, dir);
             List<ChannelStore.Channel> a = live.all(), b = scratch.all();
-            r.append(a.size()).append(" channels exported, ").append(b.size()).append(" restored\n");
+            r.append(a.size()).append(" channels exported, ").append(b.size()).append(" restored\n");   // i18n: diagnostic (backup self-test, Diagnostics)
             int bad = 0;
             for (ChannelStore.Channel x : a) {
                 ChannelStore.Channel y = null; for (ChannelStore.Channel z : b) if (z.number == x.number) y = z;
-                if (y == null) { r.append("  Ch ").append(x.number).append(" missing\n"); bad++; continue; }
+                if (y == null) { r.append("  Ch ").append(x.number).append(" missing\n"); bad++; continue; }   // i18n: diagnostic (backup self-test, Diagnostics)
                 List<String> d = new ArrayList<>();
                 cmp(d, "name", x.name, y.name); cmp(d, "type", x.type, y.type); cmp(d, "rx", x.rxFreq, y.rxFreq); cmp(d, "tx", x.txFreq, y.txFreq);
                 cmp(d, "power", x.power, y.power); cmp(d, "relay", x.relay, y.relay); cmp(d, "lat", Math.round(x.lat * 1e5), Math.round(y.lat * 1e5)); cmp(d, "lon", Math.round(x.lon * 1e5), Math.round(y.lon * 1e5));
@@ -258,28 +259,28 @@ public final class Backup {
                     cmp(d, "rxTone", x.rxType + "/" + (x.rxType == 0 ? 0 : x.rxSubCode), y.rxType + "/" + (y.rxType == 0 ? 0 : y.rxSubCode));
                     cmp(d, "txTone", x.txType + "/" + (x.txType == 0 ? 0 : x.txSubCode), y.txType + "/" + (y.txType == 0 ? 0 : y.txSubCode));
                 }
-                if (!d.isEmpty()) { bad++; r.append("  Ch ").append(x.number).append(" ").append(x.name).append(": ").append(String.join(", ", d)).append('\n'); }
+                if (!d.isEmpty()) { bad++; r.append("  Ch ").append(x.number).append(" ").append(x.name).append(": ").append(String.join(", ", d)).append('\n'); }   // i18n: diagnostic (backup self-test, Diagnostics)
             }
             int ca = live.contacts().size(), cb = scratch.contacts().size(), za = live.zones().size(), zb = scratch.zones().size();
-            r.append(ca == cb ? "contacts match (" + ca + ")" : "contacts " + ca + " \u2192 " + cb).append('\n');
+            r.append(ca == cb ? "contacts match (" + ca + ")" : "contacts " + ca + " \u2192 " + cb).append('\n');   // i18n: diagnostic (backup self-test, Diagnostics)
             int zbad = 0;
-            for (ChannelStore.Zone z : live.zones()) { boolean ok = false; for (ChannelStore.Zone w : scratch.zones()) if (w.name.equals(z.name) && Arrays.equals(w.numbers, z.numbers)) ok = true; if (!ok) { zbad++; r.append("  zone ").append(z.name).append(" differs\n"); } }
-            r.append(za == zb && zbad == 0 ? "zones match (" + za + ")" : "zones " + za + " \u2192 " + zb).append('\n');
+            for (ChannelStore.Zone z : live.zones()) { boolean ok = false; for (ChannelStore.Zone w : scratch.zones()) if (w.name.equals(z.name) && Arrays.equals(w.numbers, z.numbers)) ok = true; if (!ok) { zbad++; r.append("  zone ").append(z.name).append(" differs\n"); } }   // i18n: diagnostic (backup self-test, Diagnostics)
+            r.append(za == zb && zbad == 0 ? "zones match (" + za + ")" : "zones " + za + " \u2192 " + zb).append('\n');   // i18n: diagnostic (backup self-test, Diagnostics)
             int tbad = 0;
-            for (ChannelStore.TgList t : live.tgLists()) { if (t.tgs.length == 0) continue; boolean ok = false; for (ChannelStore.TgList u : scratch.tgLists()) if (u.name.equals(t.name) && Arrays.equals(u.tgs, t.tgs)) ok = true; if (!ok) { tbad++; r.append("  TG list ").append(t.name).append(" missing\n"); } }
-            r.append(tbad == 0 ? "talkgroup lists kept" : tbad + " talkgroup lists not kept").append('\n');
+            for (ChannelStore.TgList t : live.tgLists()) { if (t.tgs.length == 0) continue; boolean ok = false; for (ChannelStore.TgList u : scratch.tgLists()) if (u.name.equals(t.name) && Arrays.equals(u.tgs, t.tgs)) ok = true; if (!ok) { tbad++; r.append("  TG list ").append(t.name).append(" missing\n"); } }   // i18n: diagnostic (backup self-test, Diagnostics)
+            r.append(tbad == 0 ? "talkgroup lists kept" : tbad + " talkgroup lists not kept").append('\n');   // i18n: diagnostic (backup self-test, Diagnostics)
             int notesBad = 0, netsBad = 0;
-            for (ChannelStore.Channel x : a) { ChannelStore.Channel y = scratch.byNumber(x.number); if (y != null && (!x.notes.equals(y.notes) || x.rxOnly != y.rxOnly)) { notesBad++; r.append("  Ch ").append(x.number).append(" notes or receive only not kept\n"); } }
+            for (ChannelStore.Channel x : a) { ChannelStore.Channel y = scratch.byNumber(x.number); if (y != null && (!x.notes.equals(y.notes) || x.rxOnly != y.rxOnly)) { notesBad++; r.append("  Ch ").append(x.number).append(" notes or receive only not kept\n"); } }   // i18n: diagnostic (backup self-test, Diagnostics)
             List<com.macdmr.radio.ham.NetFinder.Manual> na = live.nets(), nb = scratch.nets();
             for (com.macdmr.radio.ham.NetFinder.Manual m : na) {
                 boolean ok = false;
                 for (com.macdmr.radio.ham.NetFinder.Manual k : nb) if (k.channel == m.channel && k.name.equals(m.name) && k.days == m.days && k.minute == m.minute && k.durationMin == m.durationMin && k.notes.equals(m.notes)) ok = true;
-                if (!ok) { netsBad++; r.append("  net ").append(m.name).append(" not kept\n"); }
+                if (!ok) { netsBad++; r.append("  net ").append(m.name).append(" not kept\n"); }   // i18n: diagnostic (backup self-test, Diagnostics)
             }
             if (na.size() != nb.size()) netsBad++;
-            r.append(notesBad == 0 && netsBad == 0 ? "notes and nets kept (" + na.size() + " nets)" : notesBad + " notes and " + netsBad + " nets not kept").append('\n');
+            r.append(notesBad == 0 && netsBad == 0 ? "notes and nets kept (" + na.size() + " nets)" : notesBad + " notes and " + netsBad + " nets not kept").append('\n');   // i18n: diagnostic (backup self-test, Diagnostics)
             r.insert(0, bad == 0 && zbad == 0 && tbad == 0 && notesBad == 0 && netsBad == 0 && ca == cb ? "ROUND TRIP OK\n" : "ROUND TRIP: " + bad + " channels differ\n");
-        } catch (Throwable t) { r.append("self-test failed: ").append(t); }
+        } catch (Throwable t) { r.append("self-test failed: ").append(t); }   // i18n: diagnostic (backup self-test, Diagnostics)
         finally {
             try { if (scratch != null) scratch.close(); ctx.deleteDatabase("backup_selftest.db"); } catch (Throwable ignored) { }
             if (dir != null) { File[] fs = dir.listFiles(); if (fs != null) for (File f : fs) f.delete(); dir.delete(); }
@@ -458,7 +459,8 @@ public final class Backup {
             }
             db.setTransactionSuccessful();
         } finally { db.endTransaction(); }
-        return out.size() + " channels, " + cts.size() + " contacts, " + zs.size() + " zones" + (extras.size() > 1 ? ", " + extraNotes + " channel notes, " + extraNets + " nets, " + extraContacts + " contact identities" : "") + " restored from " + dir.getName()
-                + (outOfBand.isEmpty() ? "" : "\n" + outOfBand.size() + " skipped: outside what this radio can tune (" + com.macdmr.radio.DeviceProfile.detect().bandsText() + "): " + String.join(", ", outOfBand.subList(0, Math.min(5, outOfBand.size()))) + (outOfBand.size() > 5 ? " …" : ""));
+        return (extras.size() > 1 ? Txt.s(R.string.channels_backup_restored_extras, out.size(), cts.size(), zs.size(), dir.getName(), extraNotes, extraNets, extraContacts) : Txt.s(R.string.channels_backup_restored, out.size(), cts.size(), zs.size(), dir.getName()))
+                + (outOfBand.isEmpty() ? "" : "\n" + Txt.s(R.string.channels_backup_skipped, outOfBand.size(), com.macdmr.radio.DeviceProfile.detect().bandsText(), String.join(", ", outOfBand.subList(0, Math.min(5, outOfBand.size()))) + (outOfBand.size() > 5 ? " …" : "")));
+
     }
 }

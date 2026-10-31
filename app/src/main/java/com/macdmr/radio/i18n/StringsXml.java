@@ -24,6 +24,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
  * Reads {@code res/values*}/strings*.xml the way aapt2 compiles them (whitespace collapsed outside double quotes,
  * {@code \n \t \' \" \\ \@ \? \\uXXXX} escapes). Used by host tests only: {@link Txt}'s English table without a
  * Context, and the guard tests that compare every language with English. The app itself reads compiled resources.
+ * <p>i18n: stays English (exception messages and preference keys only; the user-facing text is in the resources).
  */
 public final class StringsXml {
     private StringsXml() { }

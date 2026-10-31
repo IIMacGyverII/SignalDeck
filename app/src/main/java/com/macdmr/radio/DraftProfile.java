@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  * The draft profile at the end of Run all checks (W6 plan item 8): every {@link DeviceProfile} field the report can
  * speak to, with a value or "unknown", how sure it is and what says so. Built from the finished report text only, so
  * the same report gives the same draft on a host. A maintainer reads it to write the profile; nothing here is applied.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 final class DraftProfile {
     private DraftProfile() { }

@@ -4,6 +4,9 @@
  */
 package com.macdmr.radio.fw;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -74,7 +77,7 @@ public final class FirmwareVault {
         for (String name : listed.split("\\s+")) {
             if (!name.endsWith(".bin")) continue;
             String r = RootSetup.run("cp '/sdcard/Download/DMR/Firmware/" + name + "' '" + dst.getAbsolutePath()
-                    + "' && chown " + uid + ":" + uid + " '" + dst.getAbsolutePath() + "' && echo ok");
+                    + "' && chown " + uid + ":" + uid + " '" + dst.getAbsolutePath() + "' && echo ok");   // i18n: shell command
             if (r == null || !r.endsWith("ok")) continue;
             try {
                 byte[] b = java.nio.file.Files.readAllBytes(dst.toPath());
@@ -88,12 +91,12 @@ public final class FirmwareVault {
         byte[] asset = readStockAsset(c, ImageTable.FACTORY.stockPackage);
         if (asset != null && ImageTable.FACTORY.sha256.equals(sha256(asset)) && ImageTable.FACTORY.tag.equals(ImageTable.tagOf(asset))) {
             save(c, asset);
-            return new Copy(asset, ImageTable.FACTORY.sha256, ImageTable.FACTORY.tag, "stock app", true);
+            return new Copy(asset, ImageTable.FACTORY.sha256, ImageTable.FACTORY.tag, Txt.s(R.string.device_fw_source_stock), true);
         }
         byte[] kept = readPrivate(c);
         if (kept != null && ImageTable.FACTORY.sha256.equals(sha256(kept)) && ImageTable.FACTORY.tag.equals(ImageTable.tagOf(kept)))
-            return new Copy(kept, ImageTable.FACTORY.sha256, ImageTable.FACTORY.tag, "saved copy", true);
-        return new Copy(null, asset == null ? "" : sha256(asset), asset == null ? "" : ImageTable.tagOf(asset), asset == null ? "" : "stock app", false);
+            return new Copy(kept, ImageTable.FACTORY.sha256, ImageTable.FACTORY.tag, Txt.s(R.string.device_fw_source_saved), true);
+        return new Copy(null, asset == null ? "" : sha256(asset), asset == null ? "" : ImageTable.tagOf(asset), asset == null ? "" : Txt.s(R.string.device_fw_source_stock), false);
     }
 
     private static File privateFile(Context c) {
@@ -121,7 +124,7 @@ public final class FirmwareVault {
             File f = downloaded(c, tag, sha256);
             java.nio.file.Files.write(f.toPath(), image);
             String mirror = "/sdcard/Download/DMR/Firmware/" + f.getName();
-            RootSetup.run("mkdir -p /sdcard/Download/DMR/Firmware && cp '" + f.getAbsolutePath() + "' '" + mirror + "' && chmod 644 '" + mirror + "'");
+            RootSetup.run("mkdir -p /sdcard/Download/DMR/Firmware && cp '" + f.getAbsolutePath() + "' '" + mirror + "' && chmod 644 '" + mirror + "'");   // i18n: shell command
             return true;
         } catch (Exception e) { return false; }
     }
@@ -140,7 +143,7 @@ public final class FirmwareVault {
             File side = new File(f.getAbsolutePath() + ".sha256");
             java.nio.file.Files.write(side.toPath(), (ImageTable.FACTORY.sha256 + " " + ImageTable.FACTORY.tag + "\n").getBytes(StandardCharsets.US_ASCII));
             String mirror = "/sdcard/Download/DMR/Firmware/" + f.getName();
-            RootSetup.run("mkdir -p /sdcard/Download/DMR/Firmware && cp '" + f.getAbsolutePath() + "' '" + mirror + "' && chmod 644 '" + mirror + "'");
+            RootSetup.run("mkdir -p /sdcard/Download/DMR/Firmware && cp '" + f.getAbsolutePath() + "' '" + mirror + "' && chmod 644 '" + mirror + "'");   // i18n: shell command
         } catch (Exception ignored) { }
     }
 
@@ -166,7 +169,7 @@ public final class FirmwareVault {
             if (n != 1) continue;
             String uid = String.valueOf(android.os.Process.myUid());
             String r = RootSetup.run("unzip -p '" + apk + "' '" + one + "' > '" + out.getAbsolutePath()
-                    + "' && chown " + uid + ":" + uid + " '" + out.getAbsolutePath() + "' && echo ok");
+                    + "' && chown " + uid + ":" + uid + " '" + out.getAbsolutePath() + "' && echo ok");   // i18n: shell command
             if (r != null && r.endsWith("ok")) {
                 try { return java.nio.file.Files.readAllBytes(out.toPath()); }
                 catch (Exception e) { return null; }

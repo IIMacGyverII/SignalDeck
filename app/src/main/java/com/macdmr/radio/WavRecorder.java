@@ -24,7 +24,7 @@ public final class WavRecorder {
     private final String folder;
 
     public WavRecorder(String channelName) {
-        folder = channelName == null ? "Unknown" : channelName.replaceAll("[\\\\/:*?\"<>|]", "");
+        folder = channelName == null ? "Unknown" : channelName.replaceAll("[\\\\/:*?\"<>|]", "");   // i18n: folder name on the phone's storage
     }
 
     public synchronized void start(String callerSuffix) throws IOException {

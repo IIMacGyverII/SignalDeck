@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.media.MediaBrowserServiceCompat;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.RadioService;
 
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
     @Override public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, Bundle rootHints) {
         android.util.Log.i("RadioMediaService", "root for " + clientPackageName);
         RadioService rs = RadioService.running;
-        if (rs != null && clientPackageName != null && clientPackageName.contains("gearhead")) { rs.carMediaBound(); rs.carEvent("🚗 Android Auto opened the media app"); }
+        if (rs != null && clientPackageName != null && clientPackageName.contains("gearhead")) { rs.carMediaBound(); rs.carEvent(com.macdmr.radio.i18n.Msg.of(R.string.intercom_car_history_opened_media)); }
         Bundle extras = new Bundle();
         extras.putBoolean("android.media.browse.CONTENT_STYLE_SUPPORTED", true);
         extras.putBoolean("android.media.browse.SEARCH_SUPPORTED", true);
@@ -53,10 +55,10 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
         if (ROOT.equals(parentId)) {
             List<ChannelStore.Zone> zones = new ArrayList<>(store.zones());
             zones.sort((a, b) -> Boolean.compare(!com.macdmr.radio.ui.ChannelsView.FAV_ZONE.equals(a.name), !com.macdmr.radio.ui.ChannelsView.FAV_ZONE.equals(b.name)));   // Favourites first
-            out.add(folder(HEARD, "Last heard", "Who and what was received, newest first", CarArt.zoneTile(this, "last heard")));
+            out.add(folder(HEARD, Txt.s(R.string.intercom_car_last_heard), Txt.s(R.string.intercom_car_last_heard_sub), CarArt.zoneTile(this, "last heard")));   // i18n: icon key (CarArt.zoneTile)
             for (ChannelStore.Zone z : zones)
-                out.add(folder(ZONE + z.id, z.name, z.numbers.length + (z.numbers.length == 1 ? " channel" : " channels"), CarArt.zoneTile(this, z.name)));
-            out.add(folder(ALL, "All channels", store.all().size() + " channels", CarArt.zoneTile(this, "all")));
+                out.add(folder(ZONE + z.id, z.name, Txt.p(R.plurals.intercom_car_zone_count, z.numbers.length, z.numbers.length), CarArt.zoneTile(this, z.name)));
+            out.add(folder(ALL, Txt.s(R.string.intercom_car_all_channels), Txt.p(R.plurals.intercom_car_all_count, store.all().size(), store.all().size()), CarArt.zoneTile(this, "all")));
         } else if (HEARD.equals(parentId)) {
             if (s != null) {
                 int i = 0;
@@ -97,7 +99,7 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
     }
 
     private static MediaBrowserCompat.MediaItem channel(android.content.Context ctx, ChannelStore.Channel c) {
-        String sub = String.format(Locale.US, "Ch %d · %s MHz · %s", c.number, c.freqText(c.rxFreq), c.isDigital() ? "DMR" : "FM");
+        String sub = Txt.s(R.string.intercom_media_channel_sub, c.number, c.freqText(c.rxFreq), c.isDigital() ? "DMR" : "FM");
         return new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder().setMediaId(CHANNEL + c.number).setTitle(c.name).setSubtitle(sub).setIconBitmap(CarArt.channelTile(ctx, c)).build(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE);
     }
 }

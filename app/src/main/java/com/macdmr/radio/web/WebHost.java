@@ -12,9 +12,12 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
 import com.macdmr.radio.TranscriptionClient;
 import com.macdmr.radio.VoskCaptions;
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.pkt.PacketStore;
 
 import org.json.JSONArray;
@@ -42,7 +45,7 @@ import java.util.concurrent.TimeUnit;
 public final class WebHost {
     public static final int DEFAULT_PORT = 8080, TLS_PORT = 8443;
     private static final int[] VFO_STEPS = { 5000, 6250, 10000, 12500, 25000 };     // VfoDialog.STEPS
-    private static final String TX_OFF = "Transmit from the web is off (phone: Device → SignalDeck Web)";
+    private static String txOff() { return Txt.s(R.string.web_tx_off); }
     private final RadioService svc;
     private final Handler ui = new Handler(Looper.getMainLooper());
     private volatile WebServer server;
@@ -90,7 +93,7 @@ public final class WebHost {
             }
             @Override public void save(java.util.Map<String, Long> m) { prefs().edit().putString("sessions", new JSONObject(m).toString()).apply(); }
         });
-        try { s.start(); } catch (Exception e) { lastError = "Port " + port() + ": " + e.getMessage(); return lastError; }
+        try { s.start(); } catch (Exception e) { lastError = Txt.s(R.string.web_server_port_error, port(), String.valueOf(e.getMessage())); return lastError; }
         server = s; lastError = null;
         s.webSocket("/api/ws/talk", (req, peer) -> new TalkSession(req, peer));
         try { s.startTls(TLS_PORT, WebTls.serverFactory()); tlsError = null; }                 // HTTPS: the browser microphone needs it
@@ -153,23 +156,23 @@ public final class WebHost {
         }
         private synchronized void down() {
             if (feed != null) return;
-            if (!allowTx()) { peer.sendText(state("rx", TX_OFF)); return; }
+            if (!allowTx()) { peer.sendText(state("rx", txOff())); return; }
             RadioService.SatState sat = svc.satState();
-            if (sat != null && sat.listenOnly && !sat.waiting) { peer.sendText(state("rx", "Receive only during this satellite pass")); return; }
-            if (svc.txInhibited()) { peer.sendText(state("rx", "This channel is receive-only")); return; }
-            if (svc.firmwareLoading()) { peer.sendText(state("rx", "Radio busy, loading firmware")); return; }
-            if (!svc.isReady()) { peer.sendText(state("rx", "The radio is not ready")); return; }
+            if (sat != null && sat.listenOnly && !sat.waiting) { peer.sendText(state("rx", Txt.s(R.string.web_sat_receive_only))); return; }
+            if (svc.txInhibited()) { peer.sendText(state("rx", Txt.s(R.string.web_channel_receive_only))); return; }
+            if (svc.firmwareLoading()) { peer.sendText(state("rx", Txt.s(R.string.web_firmware_busy))); return; }
+            if (!svc.isReady()) { peer.sendText(state("rx", Txt.s(R.string.web_radio_not_ready))); return; }
             TalkSession other = talker;
-            if ((other != null && other != this) || svc.isTransmitting()) { peer.sendText(state("rx", "Someone is already transmitting")); return; }
+            if ((other != null && other != this) || svc.isTransmitting()) { peer.sendText(state("rx", Txt.s(R.string.web_talk_busy))); return; }
             talker = this;
             final WebTxFeed f = new WebTxFeed(); feed = f;
-            svc.history("warn", "\uD83C\uDF10 Talking from the web with the browser microphone (" + req.remote + ")");
+            svc.history("warn", Msg.of(R.string.web_history_talk_mic, req.remote));
             ui.post(() -> svc.pttFromWeb(true, f));
             peer.sendText(state("tx", null));
             Thread w = new Thread(() -> {                                 // watchdog: no audio for 1.5 s (tab hidden, network gone) unkeys
                 while (feed == f) {
                     try { Thread.sleep(200); } catch (InterruptedException e) { return; }
-                    if (feed == f && f.idleNanos() > 1_500_000_000L) { release("no audio from the browser"); return; }
+                    if (feed == f && f.idleNanos() > 1_500_000_000L) { release(Txt.s(R.string.web_talk_no_audio)); return; }
                 }
             }, "web-talk-watchdog");
             w.setDaemon(true); w.start();
@@ -179,10 +182,10 @@ public final class WebHost {
             feed = null; f.close();
             if (talker == this) talker = null;
             ui.post(() -> svc.ptt(false));
-            peer.sendText(state("rx", "released".equals(why) ? null : "Stopped: " + why));
+            peer.sendText(state("rx", "released".equals(why) ? null : Txt.s(R.string.web_talk_stopped, why)));
         }
         @Override public void binary(byte[] b, int n) { WebTxFeed f = feed; if (f != null) f.push(b, 0, n); }
-        @Override public void closed() { release("the connection closed"); }
+        @Override public void closed() { release(Txt.s(R.string.web_talk_closed)); }
     }
 
     // ---- live events ----
@@ -274,10 +277,10 @@ public final class WebHost {
             int asked = b.optInt("type", ch.type);
             ch.type = asked == ChannelStore.Channel.TYPE_M17 ? ChannelStore.Channel.TYPE_M17 : asked == 0 ? 0 : 1;
             double rxm = b.optDouble("rxMHz", Double.NaN), txm = b.optDouble("txMHz", Double.NaN);   // an empty field arrives as null or NaN
-            if (Double.isNaN(rxm)) return "Enter the receive frequency (MHz)";
+            if (Double.isNaN(rxm)) return Txt.s(R.string.web_ch_rx_needed);
             if (Double.isNaN(txm)) txm = rxm;                                                       // empty send frequency: simplex
             ch.rxFreq = (int) Math.round(rxm * 1e6); ch.txFreq = (int) Math.round(txm * 1e6);
-            if (!ChannelStore.inBand(ch.rxFreq) || !ChannelStore.inBand(ch.txFreq)) return "Frequencies must be inside " + com.macdmr.radio.DeviceProfile.detect().bandsText();
+            if (!ChannelStore.inBand(ch.rxFreq) || !ChannelStore.inBand(ch.txFreq)) return Txt.s(R.string.web_ch_band, com.macdmr.radio.DeviceProfile.detect().bandsText());
             ch.power = b.optInt("power", ch.power) == 1 ? 1 : 0;
             ch.relay = b.optInt("relay", ch.relay) == 1 ? 1 : 2;
             if (b.has("notes")) ch.notes = b.optString("notes", "").trim();
@@ -286,7 +289,7 @@ public final class WebHost {
             if (la.isEmpty() && lo.isEmpty()) { ch.lat = 0; ch.lon = 0; }
             else {
                 ch.lat = Double.parseDouble(la); ch.lon = Double.parseDouble(lo);
-                if (Math.abs(ch.lat) > 90 || Math.abs(ch.lon) > 180) return "Latitude must be within ±90 and longitude within ±180";
+                if (Math.abs(ch.lat) > 90 || Math.abs(ch.lon) > 180) return Txt.s(R.string.web_ch_latlon);
             }
             if (ch.isDigital()) {
                 ch.cc = Math.max(0, Math.min(15, b.optInt("cc", ch.cc)));
@@ -295,16 +298,16 @@ public final class WebHost {
                 ch.contactType = Math.max(0, Math.min(2, b.optInt("contactType", ch.contactType)));
                 String call = b.optString("txContact", "").trim();
                 ch.txContact = call.isEmpty() ? 0 : Integer.parseInt(call);
-                if (ch.txContact < 0 || ch.txContact > 0xFFFFFF) return "The call number must be a DMR ID or talkgroup (1 to 16777215)";
+                if (ch.txContact < 0 || ch.txContact > 0xFFFFFF) return Txt.s(R.string.web_ch_call_number);
                 java.util.List<Integer> g = new java.util.ArrayList<>();
                 for (String s : b.optString("groups", "").split("[,; ]+")) { s = s.trim(); if (!s.isEmpty()) g.add(Integer.parseInt(s)); }
                 // the radio passes a group call only if its talkgroup is in this list (measured on air 2026-10-15): include the call target
                 if (ch.contactType == 1 && ch.txContact > 0 && !g.contains(ch.txContact)) g.add(0, ch.txContact);
-                if (g.size() > 32) return "At most 32 talkgroups in the RX list (including the call number)";
+                if (g.size() > 32) return Txt.s(R.string.web_ch_groups_max);
                 ch.groups = new int[g.size()]; for (int i = 0; i < g.size(); i++) ch.groups[i] = g.get(i);
                 ch.encryptSw = b.optInt("encryptSw", ch.encryptSw) == 1 ? 1 : 2;
                 if (b.has("encryptKey")) ch.encryptKey = b.getString("encryptKey");            // absent: keep the stored key
-                if (ch.encryptSw == 1 && (ch.encryptKey == null || ch.encryptKey.length() != 8)) return "Encrypt key must be exactly 8 characters";
+                if (ch.encryptSw == 1 && (ch.encryptKey == null || ch.encryptKey.length() != 8)) return Txt.s(R.string.web_ch_key_len);
                 ch.interrupt = b.optInt("interrupt", ch.interrupt) == 1 ? 1 : 2;
             } else if (ch.isM17()) {
                 ch.band = 1;
@@ -327,7 +330,7 @@ public final class WebHost {
             if (ch.rxFreq < 300_000_000) ch.band = 1;                                  // VHF must be wide on this radio
             return null;
         } catch (NumberFormatException e) {
-            return "Check the numbers: " + e.getMessage();
+            return Txt.s(R.string.web_check_numbers_detail, String.valueOf(e.getMessage()));
         } catch (Exception e) {
             return e.getMessage() == null ? e.toString() : e.getMessage();
         }
@@ -343,7 +346,7 @@ public final class WebHost {
     }
 
     /** One terrain prediction at a time, run in the background (it can download terrain); the browser polls for it. Same settings as the phone's map. */
-    private static final class PredJob { String id; volatile String status = "starting\u2026"; volatile com.macdmr.radio.coverage.Prediction.Result res; volatile String err; volatile boolean done; volatile long doneAt; }
+    private static final class PredJob { String id; volatile String status = Txt.s(R.string.web_coverage_predict_starting); volatile com.macdmr.radio.coverage.Prediction.Result res; volatile String err; volatile boolean done; volatile long doneAt; }
     private volatile PredJob predJob;
     private synchronized PredJob prediction(String key, double lat, double lon, double hz) {
         android.content.SharedPreferences cp = svc.getSharedPreferences("coverage", Context.MODE_PRIVATE);
@@ -388,6 +391,7 @@ public final class WebHost {
                 .put("txInhibited", svc.txInhibited()).put("webTx", allowTx()).put("tls", tlsRunning()).put("tlsPort", TLS_PORT);
         o.put("mode", modeJson()).put("sat", satJson()).put("sstv", sstvJson());
         o.put("version", com.macdmr.radio.BuildConfig.VERSION_NAME).put("captions", svc.captionsOn());
+        o.put("lang", Txt.locale().toLanguageTag());                         // the app's language: the pages' default when the browser asks for none they have
         return o;
     }
     private JSONObject modeJson() throws Exception {
@@ -413,7 +417,7 @@ public final class WebHost {
         JSONObject o = new JSONObject();
         if (p == null) return o;
         android.graphics.Bitmap b = p.sstvLast();
-        o.put("on", p.sstvRx()).put("status", p.sstvStatus()).put("picture", b != null).put("stamp", b == null ? "" : System.identityHashCode(b) + "_" + b.getGenerationId());
+        o.put("on", p.sstvRx()).put("status", p.sstvStatusText()).put("picture", b != null).put("stamp", b == null ? "" : System.identityHashCode(b) + "_" + b.getGenerationId());
         File[] fs = sstvDir().listFiles((d, n) -> n.endsWith(".png") || n.endsWith(".jpg"));   // changes when a picture is saved, combined or deleted
         long newest = 0; if (fs != null) for (File f : fs) newest = Math.max(newest, f.lastModified());
         o.put("gallery", (fs == null ? 0 : fs.length) + "_" + newest);
@@ -428,14 +432,14 @@ public final class WebHost {
     private JSONObject scopeRow(int from, int step, float[] dbm) throws Exception { return new JSONObject().put("from", from).put("step", step).put("dbm", arr(dbm)).put("sweepMs", svc.scope().sweepMs()); }
     private String channelNameAt(int hz, int step) { for (ChannelStore.Channel ch : svc.store().all()) if (!ch.isDigital() && Math.abs(ch.rxFreq - hz) <= step / 2) return ch.name; return ""; }
     private static WebServer.Response ok(JSONObject o) { return WebServer.Response.json(200, o.toString()); }
-    private static WebServer.Response ok(String msg) { return WebServer.Response.json(200, "{\"ok\":true,\"message\":" + WebServer.quote(msg) + "}"); }
+    private static WebServer.Response ok(String msg) { return WebServer.Response.json(200, "{\"ok\":true,\"message\":" + WebServer.quote(msg) + "}"); }   // i18n: JSON
     /** The owner's callsign never reaches a browser: whole-word occurrences become "(you)". */
     static String hideCall(String s, String call) {
         if (s == null || call == null || call.isEmpty()) return s;
-        return s.replaceAll("(?<![A-Z0-9/])<?" + java.util.regex.Pattern.quote(call) + "(/[A-Z0-9]+)?>?(?![A-Z0-9])", "(you)");
+        return s.replaceAll("(?<![A-Z0-9/])<?" + java.util.regex.Pattern.quote(call) + "(/[A-Z0-9]+)?>?(?![A-Z0-9])", "(you)");   // i18n: the marker the pages explain ("Your callsign shows as (you)")
     }
     private static JSONObject body(WebServer.Request r) { try { return r.body.length == 0 ? new JSONObject() : new JSONObject(r.bodyText()); } catch (Exception e) { return new JSONObject(); } }
-    private static final String DEFAULT_QUICK = "QSL\nCopy, I will call you back\nOn my way\nWhere are you?\nSwitch to the other channel\nAll OK here";
+    private static final String DEFAULT_QUICK = "QSL\nCopy, I will call you back\nOn my way\nWhere are you?\nSwitch to the other channel\nAll OK here";   // i18n: default texts sent on air, the same as MessagesView's
     private List<String> quickReplies() {
         java.util.ArrayList<String> out = new java.util.ArrayList<>();
         for (String q : svc.getSharedPreferences("radio", Context.MODE_PRIVATE).getString("quickReplies", DEFAULT_QUICK).split("\n")) if (!q.trim().isEmpty()) out.add(q.trim());
@@ -495,9 +499,9 @@ public final class WebHost {
         final int[] p = com.macdmr.radio.TxLimit.PRESETS_S;
         final int cur = svc.txLimitSetting(), at = com.macdmr.radio.TxLimit.presetIndex(cur);
         String[] names = new String[p.length + (at < 0 ? 1 : 0)], warn = new String[names.length];
-        for (int i = 0; i < p.length; i++) { names[i] = com.macdmr.radio.TxLimit.name(p[i]) + (p[i] == com.macdmr.radio.TxLimit.DEFAULT_S ? " (default)" : ""); warn[i] = com.macdmr.radio.TxLimit.needsWarning(p[i]) ? com.macdmr.radio.TxLimit.HEAT_WARNING : null; }
-        if (at < 0) { names[p.length] = "Custom: " + com.macdmr.radio.TxLimit.name(cur); warn[p.length] = null; }
-        return new Setting("txLimit", "Radio", "Longest transmission", "SignalDeck ends any transmission after this long; the heat guard still stops a long one if the phone gets hot", "choice", names,
+        for (int i = 0; i < p.length; i++) { names[i] = com.macdmr.radio.TxLimit.name(p[i]); if (p[i] == com.macdmr.radio.TxLimit.DEFAULT_S) names[i] = Txt.s(R.string.web_set_txlimit_default, names[i]); warn[i] = com.macdmr.radio.TxLimit.needsWarning(p[i]) ? com.macdmr.radio.TxLimit.heatWarning() : null; }
+        if (at < 0) { names[p.length] = Txt.s(R.string.web_set_txlimit_custom, com.macdmr.radio.TxLimit.name(cur)); warn[p.length] = null; }
+        return new Setting("txLimit", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_txlimit_label), Txt.s(R.string.web_set_txlimit_sub), "choice", names,
                 () -> at < 0 ? p.length : at, b -> {
                     int i = b.getInt("value");
                     if (i < 0 || i >= p.length) return;                              // the custom value: kept as it is
@@ -507,27 +511,27 @@ public final class WebHost {
     private java.util.List<Setting> settings() {
         java.util.List<Setting> l = new java.util.ArrayList<>();
         android.content.SharedPreferences rp = svc.getSharedPreferences("radio", Context.MODE_PRIVATE);
-        if (svc.profile().dmr()) l.add(new Setting("dmrId", "Identity", "Your DMR ID", "What other radios see when you talk on DMR channels", "int", null, svc::localId, b -> {
-            int v = b.getInt("value"); if (v < 1 || v > com.macdmr.radio.ChannelStore.MAX_DMR_ID) throw new IllegalArgumentException("A DMR ID is 1 to 16776415"); svc.setLocalId(v); }));
-        l.add(new Setting("hwPtt", "Radio", "Side PTT key", "The phone's hardware push-to-talk button transmits", "bool", null, svc::hwPtt, b -> svc.setHwPtt(b.getBoolean("value"))));
-        l.add(new Setting("volPtt", "Radio", "Volume-up transmits", "While the Intercom page is open on the phone", "bool", null, () -> rp.getBoolean("volPtt", false), b -> rp.edit().putBoolean("volPtt", b.getBoolean("value")).apply()));
-        l.add(new Setting("customPtt", "Radio", "Custom PTT key", "The button learned on the phone (Device → Custom PTT key) transmits; learning needs the phone in hand", "bool", null, () -> com.macdmr.radio.CustomPttKey.enabled(svc), b -> { if (com.macdmr.radio.CustomPttKey.saved(svc) != null) { com.macdmr.radio.CustomPttKey.setEnabled(svc, b.getBoolean("value")); svc.customPttChanged(); } }));
-        l.add(new Setting("scanSoftSq", "Radio", "Soft SQ while scanning", "Every analog channel, each at its own level (5 if never set)", "bool", null, svc::scanSoftSq, b -> svc.setScanSoftSq(b.getBoolean("value"))));
+        if (svc.profile().dmr()) l.add(new Setting("dmrId", Txt.s(R.string.web_set_group_identity), Txt.s(R.string.web_set_dmrid_label), Txt.s(R.string.web_set_dmrid_sub), "int", null, svc::localId, b -> {
+            int v = b.getInt("value"); if (v < 1 || v > com.macdmr.radio.ChannelStore.MAX_DMR_ID) throw new IllegalArgumentException(Txt.s(R.string.web_set_dmrid_range)); svc.setLocalId(v); }));
+        l.add(new Setting("hwPtt", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_hwptt_label), Txt.s(R.string.web_set_hwptt_sub), "bool", null, svc::hwPtt, b -> svc.setHwPtt(b.getBoolean("value"))));
+        l.add(new Setting("volPtt", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_volptt_label), Txt.s(R.string.web_set_volptt_sub), "bool", null, () -> rp.getBoolean("volPtt", false), b -> rp.edit().putBoolean("volPtt", b.getBoolean("value")).apply()));
+        l.add(new Setting("customPtt", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_customptt_label), Txt.s(R.string.web_set_customptt_sub), "bool", null, () -> com.macdmr.radio.CustomPttKey.enabled(svc), b -> { if (com.macdmr.radio.CustomPttKey.saved(svc) != null) { com.macdmr.radio.CustomPttKey.setEnabled(svc, b.getBoolean("value")); svc.customPttChanged(); } }));
+        l.add(new Setting("scanSoftSq", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_scansoftsq_label), Txt.s(R.string.web_set_scansoftsq_sub), "bool", null, svc::scanSoftSq, b -> svc.setScanSoftSq(b.getBoolean("value"))));
         l.add(txLimitSetting());
-        l.add(new Setting("roger", "Radio", "Roger beep", "A short sound at the end of each transmission", "choice", RadioService.ROGER_NAMES, svc::rogerStyle, b -> svc.setRogerStyle(Math.max(0, Math.min(RadioService.ROGER_NAMES.length - 1, b.getInt("value"))))));
-        l.add(new Setting("voice", "Radio", "Voice announcements", "Channel changes, caller names, keyword alerts", "bool", null, svc::voiceOn, b -> svc.setVoiceOn(b.getBoolean("value"))));
-        l.add(new Setting("keywords", "Radio", "Keyword alerts", "Words in live captions that raise an alert, separated by commas", "text", null, svc::keywords, b -> svc.setKeywords(b.getString("value"))));
-        l.add(new Setting("logHeard", "Logbook", "Log stations heard", "DMR callers and APRS stations go into the logbook as Heard", "bool", null, svc::logHeard, b -> svc.setLogHeard(b.getBoolean("value"))));
-        l.add(new Setting("lookupOnline", "Logbook", "Look up names online", "RadioID / callsign lookups for callers and stations", "bool", null, svc::lookupOnline, b -> svc.setLookupOnline(b.getBoolean("value"))));
-        if (svc.profile().dmr()) l.add(new Setting("roaming", "Radio", "DMR roaming", "While you travel, switch to the nearest repeater in this zone with the same talkgroup (needs repeater channels with a location)", "bool", null, svc::roaming, b -> svc.setRoaming(b.getBoolean("value"))));
-        l.add(new Setting("coverage", "Coverage", "Coverage logging", "Records signal and key-ups with GPS for the coverage maps", "bool", null, () -> svc.coverage().enabled(), b -> svc.setCoverageLogging(b.getBoolean("value"))));
-        l.add(new Setting("covInCar", "Coverage", "Log coverage in the car", "Coverage logging while Android Auto is connected", "bool", null, svc::coverageInCar, b -> svc.setCoverageInCar(b.getBoolean("value"))));
-        l.add(new Setting("carMic", "Car", "Car microphone in Android Auto", "Talk uses the car's microphone through its hands-free link", "bool", null, svc::carMic, b -> svc.setCarMic(b.getBoolean("value"))));
-        l.add(new Setting("wheelTalk", "Car", "Steering-wheel play/pause talks", "In Android Auto: play/pause starts and stops transmitting", "bool", null, svc::wheelTalk, b -> svc.setWheelTalk(b.getBoolean("value"))));
-        l.add(new Setting("nextTalk", "Car", "Steering-wheel Next talks", "Hold Next to talk, or press it twice", "choice", RadioService.NEXT_TALK_NAMES, svc::nextTalkMode, b -> svc.setNextTalkMode(Math.max(0, Math.min(RadioService.NEXT_TALK_NAMES.length - 1, b.getInt("value"))))));
-        l.add(new Setting("wheelMic", "Car", "Steering-wheel microphone", "Car (as a call) or the phone's microphone", "choice", RadioService.WHEEL_MIC_NAMES, svc::wheelMic, b -> svc.setWheelMic(Math.max(0, Math.min(1, b.getInt("value"))))));
-        l.add(new Setting("voxStop", "Car", "Stop when I stop talking", "For transmissions started from the wheel", "choice", RadioService.VOX_NAMES, svc::voxStop, b -> svc.setVoxStop(Math.max(0, Math.min(RadioService.VOX_NAMES.length - 1, b.getInt("value"))))));
-        l.add(new Setting("carScreen", "Car", "Full-screen Radio controls in the car", "Off: a media app; on: a big Talk screen (reconnect the car after changing)", "bool", null, svc::carControlsScreen, b -> svc.setCarControlsScreen(b.getBoolean("value"))));
+        l.add(new Setting("roger", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_roger_label), Txt.s(R.string.web_set_roger_sub), "choice", RadioService.rogerNames(), svc::rogerStyle, b -> svc.setRogerStyle(Math.max(0, Math.min(RadioService.rogerNames().length - 1, b.getInt("value"))))));
+        l.add(new Setting("voice", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_voice_label), Txt.s(R.string.web_set_voice_sub), "bool", null, svc::voiceOn, b -> svc.setVoiceOn(b.getBoolean("value"))));
+        l.add(new Setting("keywords", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_keywords_label), Txt.s(R.string.web_set_keywords_sub), "text", null, svc::keywords, b -> svc.setKeywords(b.getString("value"))));
+        l.add(new Setting("logHeard", Txt.s(R.string.web_set_group_logbook), Txt.s(R.string.web_set_logheard_label), Txt.s(R.string.web_set_logheard_sub), "bool", null, svc::logHeard, b -> svc.setLogHeard(b.getBoolean("value"))));
+        l.add(new Setting("lookupOnline", Txt.s(R.string.web_set_group_logbook), Txt.s(R.string.web_set_lookup_label), Txt.s(R.string.web_set_lookup_sub), "bool", null, svc::lookupOnline, b -> svc.setLookupOnline(b.getBoolean("value"))));
+        if (svc.profile().dmr()) l.add(new Setting("roaming", Txt.s(R.string.web_set_group_radio), Txt.s(R.string.web_set_roaming_label), Txt.s(R.string.web_set_roaming_sub), "bool", null, svc::roaming, b -> svc.setRoaming(b.getBoolean("value"))));
+        l.add(new Setting("coverage", Txt.s(R.string.web_set_group_coverage), Txt.s(R.string.web_set_coverage_label), Txt.s(R.string.web_set_coverage_sub), "bool", null, () -> svc.coverage().enabled(), b -> svc.setCoverageLogging(b.getBoolean("value"))));
+        l.add(new Setting("covInCar", Txt.s(R.string.web_set_group_coverage), Txt.s(R.string.web_set_covincar_label), Txt.s(R.string.web_set_covincar_sub), "bool", null, svc::coverageInCar, b -> svc.setCoverageInCar(b.getBoolean("value"))));
+        l.add(new Setting("carMic", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_carmic_label), Txt.s(R.string.web_set_carmic_sub), "bool", null, svc::carMic, b -> svc.setCarMic(b.getBoolean("value"))));
+        l.add(new Setting("wheelTalk", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_wheeltalk_label), Txt.s(R.string.web_set_wheeltalk_sub), "bool", null, svc::wheelTalk, b -> svc.setWheelTalk(b.getBoolean("value"))));
+        l.add(new Setting("nextTalk", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_nexttalk_label), Txt.s(R.string.web_set_nexttalk_sub), "choice", RadioService.nextTalkNames(), svc::nextTalkMode, b -> svc.setNextTalkMode(Math.max(0, Math.min(RadioService.nextTalkNames().length - 1, b.getInt("value"))))));
+        l.add(new Setting("wheelMic", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_wheelmic_label), Txt.s(R.string.web_set_wheelmic_sub), "choice", RadioService.wheelMicNames(), svc::wheelMic, b -> svc.setWheelMic(Math.max(0, Math.min(1, b.getInt("value"))))));
+        l.add(new Setting("voxStop", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_voxstop_label), Txt.s(R.string.web_set_voxstop_sub), "choice", RadioService.voxNames(), svc::voxStop, b -> svc.setVoxStop(Math.max(0, Math.min(RadioService.voxNames().length - 1, b.getInt("value"))))));
+        l.add(new Setting("carScreen", Txt.s(R.string.web_set_group_car), Txt.s(R.string.web_set_carscreen_label), Txt.s(R.string.web_set_carscreen_sub), "bool", null, svc::carControlsScreen, b -> svc.setCarControlsScreen(b.getBoolean("value"))));
         return l;
     }
     private JSONObject settingsJson() throws Exception {
@@ -557,22 +561,22 @@ public final class WebHost {
                 JSONArray a = new JSONArray();
                 for (Object[] row : svc.store().captions(lim, r.param("q"))) {
                     int n = (Integer) row[1];
-                    String name = names.get(n); if (name == null) { ChannelStore.Channel ch = svc.store().byNumber(n); name = ch != null ? ch.name : "channel " + n; names.put(n, name); }
+                    String name = names.get(n); if (name == null) { ChannelStore.Channel ch = svc.store().byNumber(n); name = ch != null ? ch.name : Txt.s(R.string.web_captions_channel, n); names.put(n, name); }
                     a.put(new JSONObject().put("ts", row[0]).put("channel", n).put("channelName", name).put("text", ((String) row[2]).replaceFirst("^\uD83D\uDCDD\\s*", "")));
                 }
                 return ok(new JSONObject().put("captions", a).put("on", svc.captionsOn()).put("available", svc.captionsAvailable()).put("engine", svc.captionEngine()));
             }
             case "/api/captions/set": if (!post) break; {                        // TXT on/off, as the phone's TXT key
                 boolean on = b.optBoolean("on", !svc.captionsOn());
-                if (on && !svc.captionsAvailable()) return WebServer.Response.error(409, "Captions need a Google Cloud key for the Google engine: set one on the phone, or switch to the on-device engine (long-press TXT)");
+                if (on && !svc.captionsAvailable()) return WebServer.Response.error(409, Txt.s(R.string.web_captions_need_key));
                 onMain(() -> { svc.setCaptions(on); return null; });
-                return ok(on ? "Captions on" + ("vosk".equals(svc.captionEngine()) ? " (the on-device model downloads on first use)" : "") : "Captions off");
+                return ok(on ? ("vosk".equals(svc.captionEngine()) ? Txt.s(R.string.web_captions_on_vosk) : Txt.s(R.string.web_captions_on)) : Txt.s(R.string.web_captions_off));
             }
             case "/api/captions/models": {                                      // engine, the on-device models (size, downloaded, in use), the recognizer's state
-                JSONArray a = new JSONArray(); String sel = svc.captionModel(), loaded = svc.captionLoadedModel();
+                JSONArray a = new JSONArray(); String sel = svc.captionModel(), loaded = svc.captionLoadedModel(); String[] labels = VoskCaptions.modelLabels();
                 for (int i = 0; i < VoskCaptions.MODELS.length; i++) {
                     String n = VoskCaptions.MODELS[i]; boolean present = VoskCaptions.modelPresent(svc, n);
-                    a.put(new JSONObject().put("name", n).put("label", VoskCaptions.MODEL_LABELS[i]).put("present", present).put("selected", n.equals(sel)).put("loaded", n.equals(loaded))
+                    a.put(new JSONObject().put("name", n).put("label", labels[i]).put("present", present).put("selected", n.equals(sel)).put("loaded", n.equals(loaded))
                             .put("bytes", present ? VoskCaptions.modelBytes(svc, n) : 0));
                 }
                 return ok(new JSONObject().put("engine", svc.captionEngine()).put("models", a).put("status", svc.captionStatus()).put("busy", svc.captionModelBusy())
@@ -580,27 +584,27 @@ public final class WebHost {
                         .put("freeBytes", svc.getFilesDir().getUsableSpace()));
             }
             case "/api/captions/model": if (!post) break; {                     // use a model: downloaded first if it is not on the phone yet, then loaded
-                String n = b.optString("name", ""); if (!java.util.Arrays.asList(VoskCaptions.MODELS).contains(n)) return WebServer.Response.error(400, "Unknown model");
+                String n = b.optString("name", ""); if (!java.util.Arrays.asList(VoskCaptions.MODELS).contains(n)) return WebServer.Response.error(400, Txt.s(R.string.web_model_unknown));
                 if (!VoskCaptions.modelPresent(svc, n)) {
                     long need = n.contains("gigaspeech") ? 2_600_000_000L * 2 : n.contains("0.22-lgraph") ? 140_000_000L * 2 : n.contains("small") ? 45_000_000L * 2 : 1_900_000_000L * 2;   // the zip and its unpacked copy
-                    if (svc.getFilesDir().getUsableSpace() < need) return WebServer.Response.error(507, "Not enough free space on the phone for this model (needs about " + (need / 1_000_000_000.0 > 1 ? String.format(java.util.Locale.US, "%.1f GB", need / 1e9) : (need / 1_000_000) + " MB") + " while downloading)");
+                    if (svc.getFilesDir().getUsableSpace() < need) return WebServer.Response.error(507, Txt.s(R.string.web_model_no_space, (need / 1_000_000_000.0 > 1 ? String.format(java.util.Locale.US, "%.1f GB", need / 1e9) : (need / 1_000_000) + " MB")));
                 }
                 onMain(() -> { svc.setCaptionModel(n); return null; });
-                return ok(VoskCaptions.modelPresent(svc, n) ? "Loading the model" : "Downloading the model on the phone");
+                return ok(VoskCaptions.modelPresent(svc, n) ? Txt.s(R.string.web_model_loading) : Txt.s(R.string.web_model_downloading));
             }
             case "/api/captions/model/delete": if (!post) break; {
-                String n = b.optString("name", ""); if (!java.util.Arrays.asList(VoskCaptions.MODELS).contains(n)) return WebServer.Response.error(400, "Unknown model");
-                if (n.equals(svc.captionModel()) || n.equals(svc.captionLoadedModel())) return WebServer.Response.error(409, "That model is in use: choose another one first");
-                if (svc.captionModelBusy()) return WebServer.Response.error(409, "A model is being downloaded or loaded: try again when it is done");
-                return VoskCaptions.deleteModel(svc, n) ? ok("Deleted") : WebServer.Response.error(500, "Could not delete it");
+                String n = b.optString("name", ""); if (!java.util.Arrays.asList(VoskCaptions.MODELS).contains(n)) return WebServer.Response.error(400, Txt.s(R.string.web_model_unknown));
+                if (n.equals(svc.captionModel()) || n.equals(svc.captionLoadedModel())) return WebServer.Response.error(409, Txt.s(R.string.web_model_in_use));
+                if (svc.captionModelBusy()) return WebServer.Response.error(409, Txt.s(R.string.web_model_busy));
+                return VoskCaptions.deleteModel(svc, n) ? ok(Txt.s(R.string.web_deleted)) : WebServer.Response.error(500, Txt.s(R.string.web_model_delete_failed));
             }
             case "/api/captions/engine": if (!post) break; {                    // vosk (on the phone) or google (your key; write-only here)
-                String e = b.optString("engine", svc.captionEngine()); if (!"vosk".equals(e) && !"google".equals(e)) return WebServer.Response.error(400, "Unknown engine");
+                String e = b.optString("engine", svc.captionEngine()); if (!"vosk".equals(e) && !"google".equals(e)) return WebServer.Response.error(400, Txt.s(R.string.web_engine_unknown));
                 String k = b.optString("googleKey", "").trim();
                 if (!k.isEmpty()) svc.setGoogleKey(k);
-                if ("google".equals(e) && TranscriptionClient.isPlaceholderKey(svc.googleKey())) return WebServer.Response.error(409, "Set a Google Cloud Speech API key first");
+                if ("google".equals(e) && TranscriptionClient.isPlaceholderKey(svc.googleKey())) return WebServer.Response.error(409, Txt.s(R.string.web_engine_need_key));
                 svc.setCaptionEngine(e);
-                return ok("google".equals(e) ? "Captions use Google Cloud Speech" : "Captions are made on the phone");
+                return ok("google".equals(e) ? Txt.s(R.string.web_engine_google) : Txt.s(R.string.web_engine_phone));
             }
             case "/api/mission": return ok(new JSONObject().put("text", com.macdmr.radio.ui.DeviceView.MISSION).put("by", "IIMacGyverII, SignalDeck").put("legal", com.macdmr.radio.About.legal()));   // the same words as the phone's button and the README
             case "/api/history": {
@@ -617,17 +621,17 @@ public final class WebHost {
             }
             case "/api/channel/star": if (!post) break; {                    // star / unstar: the ★ Favourites zone
                 int n = b.optInt("number", 0); boolean on = b.optBoolean("on", true);
-                if (svc.store().byNumber(n) == null) return WebServer.Response.error(404, "No channel " + n);
+                if (svc.store().byNumber(n) == null) return WebServer.Response.error(404, Txt.s(R.string.web_no_channel, n));
                 onMain(() -> { svc.store().setFavourite(n, on); return null; });
-                return ok(on ? "Starred channel " + n : "Channel " + n + " is no longer a favourite");
+                return ok(on ? Txt.s(R.string.web_star_on, n) : Txt.s(R.string.web_star_off, n));
             }
             case "/api/channel/select": if (!post) break; {
-                int n = b.optInt("number", -1); if (n < 0) return WebServer.Response.error(400, "number needed");
+                int n = b.optInt("number", -1); if (n < 0) return WebServer.Response.error(400, "number needed");   // i18n: API usage error (the pages always send it)
                 ChannelStore.Channel sel = svc.store().byNumber(n);
-                if (sel != null && !ChannelStore.tunable(sel)) return WebServer.Response.error(409, sel.name + " is outside " + svc.profile().bandsText() + ": this radio cannot tune it");
-                onMain(() -> { svc.selectChannel(n); return null; }); return ok("Channel " + n);
+                if (sel != null && !ChannelStore.tunable(sel)) return WebServer.Response.error(409, Txt.s(R.string.web_channel_untunable, sel.name, svc.profile().bandsText()));
+                onMain(() -> { svc.selectChannel(n); return null; }); return ok(Txt.s(R.string.web_channel_selected, n));
             }
-            case "/api/channel/step": if (!post) break; { int d = b.optInt("delta", 1); onMain(() -> { svc.stepChannel(d >= 0 ? 1 : -1); return null; }); return ok("stepped"); }
+            case "/api/channel/step": if (!post) break; { int d = b.optInt("delta", 1); onMain(() -> { svc.stepChannel(d >= 0 ? 1 : -1); return null; }); return ok(Txt.s(R.string.web_channel_stepped)); }
             case "/api/zone": if (!post) break; { long id = b.optLong("id", 0); String ze = onMain(() -> svc.setZone(id)); if (ze != null) return WebServer.Response.error(409, ze); return ok(svc.zoneName()); }
             case "/api/scan": if (!post) break; return ok(onMain(svc::toggleScan));
             case "/api/softsq": if (!post) break;
@@ -637,12 +641,12 @@ public final class WebHost {
             case "/api/record": if (!post) break; onMain(() -> { svc.setRecord(b.optBoolean("on", !svc.recordOn())); return null; }); return ok(statusJson());
             case "/api/ptt": if (!post) break; {
                 boolean down = b.optBoolean("down", false);
-                if (down && !allowTx()) return WebServer.Response.error(403, TX_OFF);
+                if (down && !allowTx()) return WebServer.Response.error(403, txOff());
                 RadioService.SatState s = svc.satState();
-                if (down && s != null && s.listenOnly) return WebServer.Response.error(409, "Receive only during this satellite pass");
-                if (down) svc.history("warn", "🌐 Transmitting from the web (" + r.remote + ")");
+                if (down && s != null && s.listenOnly) return WebServer.Response.error(409, Txt.s(R.string.web_sat_receive_only));
+                if (down) svc.history("warn", Msg.of(R.string.web_history_web_tx, r.remote));
                 onMain(() -> { svc.ptt(down); return null; });
-                return ok(down ? "PTT down" : "PTT up");
+                return ok(down ? Txt.s(R.string.web_ptt_down) : Txt.s(R.string.web_ptt_up));
             }
             case "/api/aprs/log": {
                 JSONArray a = new JSONArray();
@@ -665,22 +669,22 @@ public final class WebHost {
             }
             case "/api/aprs/monitor": if (!post) break; return ok(onMain(() -> svc.aprsMonitor(b.optBoolean("on", true))));
             case "/api/aprs/message": if (!post) break; {
-                if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                if (!allowTx()) return WebServer.Response.error(403, txOff());
                 String to = b.optString("to", "").trim(), text = b.optString("text", "").trim();
-                if (to.isEmpty() || text.isEmpty()) return WebServer.Response.error(400, "To and text are needed");
+                if (to.isEmpty() || text.isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_aprs_to_text_needed));
                 String e = onMain(() -> svc.packet().sendMessage(to, text));
-                return e == null ? ok("Message to " + to + " queued") : WebServer.Response.error(409, e);
+                return e == null ? ok(Txt.s(R.string.web_aprs_message_queued, to)) : WebServer.Response.error(409, e);
             }
             case "/api/aprs/beacon": if (!post) break; {
-                if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                if (!allowTx()) return WebServer.Response.error(403, txOff());
                 String e = onMain(() -> svc.packet().sendBeacon());
-                return e == null ? ok("Beacon sent") : WebServer.Response.error(409, e);
+                return e == null ? ok(Txt.s(R.string.web_aprs_beacon_sent)) : WebServer.Response.error(409, e);
             }
             case "/api/sstv": return ok(sstvJson());
             case "/api/sstv/monitor": if (!post) break; return ok(String.valueOf(onMain(() -> svc.sstvMonitor(b.optBoolean("on", true), false))));
             case "/api/sstv/live.png": {
                 android.graphics.Bitmap bm = svc.packet() == null ? null : svc.packet().sstvLast();
-                if (bm == null) return WebServer.Response.error(404, "No picture yet");
+                if (bm == null) return WebServer.Response.error(404, Txt.s(R.string.web_sstv_no_picture));
                 ByteArrayOutputStream o = new ByteArrayOutputStream(); bm.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, o);
                 WebServer.Response x = WebServer.Response.bytes("image/png", o.toByteArray()); x.headers.put("Cache-Control", "no-store"); return x;
             }
@@ -693,9 +697,9 @@ public final class WebHost {
             case "/api/decode": {                                               // POST {folder, name, mode: sstv|aprs} starts; GET reports the job
                 if (post) {
                     File f = com.macdmr.radio.RecordingDecodeJob.recording(b.optString("folder", null), b.optString("name", null));
-                    if (f == null) return WebServer.Response.error(404, "Recording not found");
+                    if (f == null) return WebServer.Response.error(404, Txt.s(R.string.web_decode_not_found));
                     String e = com.macdmr.radio.RecordingDecodeJob.start(b.optString("mode", "sstv"), f, svc);
-                    return e == null ? ok("Decoding " + f.getName()) : WebServer.Response.error(409, e);
+                    return e == null ? ok(Txt.s(R.string.web_decode_started, f.getName())) : WebServer.Response.error(409, e);
                 }
                 com.macdmr.radio.RecordingDecodeJob j = com.macdmr.radio.RecordingDecodeJob.current();
                 if (j == null) return ok(new JSONObject().put("job", JSONObject.NULL));
@@ -705,14 +709,14 @@ public final class WebHost {
                 return ok(new JSONObject().put("job", o.put("pictures", pics).put("packets", pk)));
             }
             case "/api/decode/upload": if (!post) break; {                     // body: the recording's bytes; ?name=file.mp3&mode=sstv|aprs
-                if (r.body == null || r.body.length < 100) return WebServer.Response.error(400, "Empty file");
+                if (r.body == null || r.body.length < 100) return WebServer.Response.error(400, Txt.s(R.string.web_decode_empty));
                 File f;
                 try { f = com.macdmr.radio.RecordingDecodeJob.saveUpload(r.param("name"), new java.io.ByteArrayInputStream(r.body)); }
                 catch (java.io.IOException e) { return WebServer.Response.error(400, e.getMessage()); }
                 String e = com.macdmr.radio.RecordingDecodeJob.start(r.param("mode") == null ? "sstv" : r.param("mode"), f, svc);
-                return e == null ? ok("Uploaded " + f.getName() + "; decoding") : WebServer.Response.error(409, "Uploaded " + f.getName() + ", but: " + e);
+                return e == null ? ok(Txt.s(R.string.web_decode_uploaded, f.getName())) : WebServer.Response.error(409, Txt.s(R.string.web_decode_uploaded_failed, f.getName(), e));
             }
-            case "/api/decode/stop": if (!post) break; { com.macdmr.radio.RecordingDecodeJob j = com.macdmr.radio.RecordingDecodeJob.current(); if (j != null) j.cancel(); return ok("Stopping"); }
+            case "/api/decode/stop": if (!post) break; { com.macdmr.radio.RecordingDecodeJob j = com.macdmr.radio.RecordingDecodeJob.current(); if (j != null) j.cancel(); return ok(Txt.s(R.string.web_stopping)); }
             case "/api/sstv/pictures": {
                 File[] fs = sstvDir().listFiles((d, n) -> n.endsWith(".png") || n.endsWith(".jpg"));
                 JSONArray a = new JSONArray();
@@ -723,12 +727,12 @@ public final class WebHost {
                 return ok(new JSONObject().put("pictures", a));
             }
             case "/api/sstv/combine": if (!post) break; {                        // {names, dy?, dx?, use?, save?}: line-up + preview, or save it
-                JSONArray names = b.optJSONArray("names"); if (names == null || names.length() < 2) return WebServer.Response.error(400, "Select two or more pictures");
+                JSONArray names = b.optJSONArray("names"); if (names == null || names.length() < 2) return WebServer.Response.error(400, Txt.s(R.string.web_sstv_select_two));
                 java.util.List<File> fs = new java.util.ArrayList<>();
                 for (int i = 0; i < names.length(); i++) {
                     String n = names.optString(i, "");
-                    if (n.isEmpty() || n.contains("/") || n.contains("\\") || n.contains("..")) return WebServer.Response.error(400, "Bad name");
-                    File f = new File(sstvDir(), n); if (!f.isFile()) return WebServer.Response.error(404, "Not found: " + n); fs.add(f);
+                    if (n.isEmpty() || n.contains("/") || n.contains("\\") || n.contains("..")) return WebServer.Response.error(400, Txt.s(R.string.web_bad_name));
+                    File f = new File(sstvDir(), n); if (!f.isFile()) return WebServer.Response.error(404, Txt.s(R.string.web_sstv_not_found_name, n)); fs.add(f);
                 }
                 String[] err = { null };
                 com.macdmr.radio.SstvCombine.Plan pl = com.macdmr.radio.SstvCombine.plan(fs, err);
@@ -747,7 +751,7 @@ public final class WebHost {
                         .put("png", android.util.Base64.encodeToString(com.macdmr.radio.SstvCombine.png(pl), android.util.Base64.NO_WRAP)));
             }
             case "/api/sstv/delete": if (!post) break; {                         // {names: [...]}: received pictures in Download/DMR/SSTV only
-                JSONArray names = b.optJSONArray("names"); if (names == null || names.length() == 0) return WebServer.Response.error(400, "No pictures given");
+                JSONArray names = b.optJSONArray("names"); if (names == null || names.length() == 0) return WebServer.Response.error(400, Txt.s(R.string.web_sstv_none_given));
                 int gone = 0;
                 for (int i = 0; i < names.length(); i++) {
                     String n = names.optString(i, "");
@@ -758,23 +762,23 @@ public final class WebHost {
             }
             case "/api/sstv/picture": {
                 String n = r.param("name");
-                if (n == null || n.contains("/") || n.contains("\\") || n.contains("..")) return WebServer.Response.error(400, "Bad name");
-                File f = new File(sstvDir(), n); if (!f.isFile()) return WebServer.Response.error(404, "Not found");
+                if (n == null || n.contains("/") || n.contains("\\") || n.contains("..")) return WebServer.Response.error(400, Txt.s(R.string.web_bad_name));
+                File f = new File(sstvDir(), n); if (!f.isFile()) return WebServer.Response.error(404, Txt.s(R.string.web_not_found));
                 byte[] data; try (InputStream in = new java.io.FileInputStream(f)) { data = readAll(in); }
                 return WebServer.Response.bytes(n.endsWith(".png") ? "image/png" : "image/jpeg", data);
             }
             case "/api/iss": if (!post) break; {
                 String m = b.optString("mode", "");
-                if (m.equals("stop")) { onMain(() -> { svc.endSatTracking(); return null; }); return ok("Stopped tracking"); }
+                if (m.equals("stop")) { onMain(() -> { svc.endSatTracking(); return null; }); return ok(Txt.s(R.string.web_iss_stopped)); }
                 int mode = m.equals("sstv") ? com.macdmr.radio.ham.Satellites.SSTV : m.equals("aprs") ? com.macdmr.radio.ham.Satellites.APRS : -1;
-                if (mode < 0) return WebServer.Response.error(400, "mode: aprs, sstv or stop");
+                if (mode < 0) return WebServer.Response.error(400, "mode: aprs, sstv or stop");   // i18n: API usage error (the pages always send it)
                 String e = onMain(() -> { String err = svc.startIssMode(mode); if (err == null) svc.setIssRepeat(mode); return err; });
-                return e == null ? ok("Tracking the ISS (" + m + ")") : WebServer.Response.error(409, e);
+                return e == null ? ok(Txt.s(R.string.web_iss_tracking, m)) : WebServer.Response.error(409, e);
             }
             case "/api/channel": {                                              // one channel with everything the editor needs (number 0: a new one)
                 int n = parse(r.param("number"), 0);
                 ChannelStore.Channel ch = n > 0 ? svc.store().byNumber(n) : null;
-                if (n > 0 && ch == null) return WebServer.Response.error(404, "No channel " + n);
+                if (n > 0 && ch == null) return WebServer.Response.error(404, Txt.s(R.string.web_no_channel, n));
                 if (ch == null) {
                     ch = new ChannelStore.Channel(); ChannelStore.Channel cur = svc.current();
                     if (cur != null) { ch.type = cur.type; ch.rxFreq = cur.rxFreq; ch.txFreq = cur.txFreq; }
@@ -786,13 +790,13 @@ public final class WebHost {
             case "/api/channel/save": if (!post) break; {
                 int n = b.optInt("number", 0);
                 ChannelStore.Channel ch = n > 0 ? svc.store().byNumber(n) : new ChannelStore.Channel();
-                if (ch == null) return WebServer.Response.error(404, "No channel " + n);
+                if (ch == null) return WebServer.Response.error(404, Txt.s(R.string.web_no_channel, n));
                 String err = applyChannel(ch, b);
                 if (err != null) return WebServer.Response.error(400, err);
-                if (n <= 0 && ch.isDigital() && !svc.profile().dmr()) return WebServer.Response.error(400, "This radio has no DMR: add an analog channel");
+                if (n <= 0 && ch.isDigital() && !svc.profile().dmr()) return WebServer.Response.error(400, Txt.s(R.string.web_ch_no_dmr));
                 final ChannelStore.Channel c = ch; final boolean isNew = n <= 0;
                 onMain(() -> { svc.saveChannel(c, isNew); return null; });
-                return WebServer.Response.json(200, new JSONObject().put("ok", true).put("message", "Saved " + (c.name.isEmpty() ? "channel " + c.number : c.name)).put("number", c.number).toString());
+                return WebServer.Response.json(200, new JSONObject().put("ok", true).put("message", c.name.isEmpty() ? Txt.s(R.string.web_ch_saved_number, c.number) : Txt.s(R.string.web_saved_item, c.name)).put("number", c.number).toString());
             }
             case "/api/vfo": {                                                  // GET: the VFO's settings; POST: tune it (enters VFO mode)
                 if (!post) {
@@ -801,29 +805,29 @@ public final class WebHost {
                     return ok(new JSONObject().put("channel", channelFull(svc.vfoChannel())).put("active", svc.vfoActive()).put("step", svc.vfoStepHz()).put("steps", steps)
                             .put("help", help).put("tones", toneLists()));
                 }
-                if (svc.firmwareLoading()) return WebServer.Response.error(409, "Radio busy, loading firmware");
-                if (svc.isTransmitting()) return WebServer.Response.error(409, "Not while transmitting");
+                if (svc.firmwareLoading()) return WebServer.Response.error(409, Txt.s(R.string.web_firmware_busy));
+                if (svc.isTransmitting()) return WebServer.Response.error(409, Txt.s(R.string.web_not_while_tx));
                 ChannelStore.Channel v = svc.vfoChannel();
                 if (!b.has("lat")) b.put("lat", ""); if (!b.has("lon")) b.put("lon", "");
                 String err = applyChannel(v, b);
                 if (err != null) return WebServer.Response.error(400, err);
-                if (v.isDigital() && v.contactType != 2 && v.txContact <= 0) return WebServer.Response.error(400, "A call number is needed for a private or group call");
+                if (v.isDigital() && v.contactType != 2 && v.txContact <= 0) return WebServer.Response.error(400, Txt.s(R.string.web_vfo_call_needed));
                 v.name = ""; v.lat = 0; v.lon = 0;
                 int step = b.optInt("step", svc.vfoStepHz()); boolean stepOk = false; for (int s : VFO_STEPS) stepOk |= s == step;
                 final boolean setStep = stepOk;
                 onMain(() -> { if (setStep) svc.setVfoStepHz(step); svc.applyVfo(v); return null; });
-                return ok(String.format(java.util.Locale.US, "VFO %.4f MHz", v.rxFreq / 1e6));
+                return ok(Txt.s(R.string.web_vfo_tuned, String.format(java.util.Locale.US, "%.4f", v.rxFreq / 1e6)));
             }
-            case "/api/vfo/exit": if (!post) break; onMain(() -> { svc.exitVfo(); return null; }); return ok("Back to the channel");
+            case "/api/vfo/exit": if (!post) break; onMain(() -> { svc.exitVfo(); return null; }); return ok(Txt.s(R.string.web_vfo_back));
             case "/api/channels/stockimport": if (!post) break; {              // the empty-list question: {import: true | false}
                 final boolean yes = b.optBoolean("import", false);
                 String msg = yes ? svc.answerStockImport(true) : onMain(() -> svc.answerStockImport(false));
-                return msg == null ? WebServer.Response.error(409, "Already answered") : ok(msg);
+                return msg == null ? WebServer.Response.error(409, Txt.s(R.string.web_stock_answered)) : ok(msg);
             }
             case "/api/channels/bulk": if (!post) break; {                    // the channel list's selection: {action: delete | zone | unzone | star | unstar, numbers[], zoneId, zoneName}
                 JSONArray ns = b.optJSONArray("numbers"); java.util.List<Integer> nums = new java.util.ArrayList<>();
                 if (ns != null) for (int i = 0; i < ns.length(); i++) nums.add(ns.optInt(i, 0));
-                if (nums.isEmpty()) return WebServer.Response.error(400, "Select at least one channel");
+                if (nums.isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_bulk_none));
                 final String action = b.optString("action", ""); final long zid = b.optLong("zoneId", 0); final String zname = b.optString("zoneName", "");
                 String msg;
                 switch (action) {
@@ -831,17 +835,17 @@ public final class WebHost {
                     case "zone": msg = onMain(() -> svc.addChannelsToZone(zid, zname, nums)); break;
                     case "unzone": msg = onMain(() -> svc.removeChannelsFromZone(zid, nums)); break;
                     case "star": case "unstar": msg = onMain(() -> svc.favouriteChannels(nums, action.equals("star"))); break;
-                    default: return WebServer.Response.error(400, "Unknown action " + action);
+                    default: return WebServer.Response.error(400, Txt.s(R.string.web_unknown_action_named, action));
                 }
                 return ok(msg);
             }
             case "/api/channel/delete": if (!post) break; {
                 ChannelStore.Channel ch = svc.store().byNumber(b.optInt("number", 0));
-                if (ch == null) return WebServer.Response.error(404, "No such channel");
-                if (svc.firmwareLoading()) return WebServer.Response.error(409, "Radio busy, loading firmware");
-                if (svc.isTransmitting()) return WebServer.Response.error(409, "Not while transmitting");
+                if (ch == null) return WebServer.Response.error(404, Txt.s(R.string.web_no_such_channel));
+                if (svc.firmwareLoading()) return WebServer.Response.error(409, Txt.s(R.string.web_firmware_busy));
+                if (svc.isTransmitting()) return WebServer.Response.error(409, Txt.s(R.string.web_not_while_tx));
                 onMain(() -> { svc.deleteChannel(ch); return null; });
-                return ok("Deleted " + (ch.name.isEmpty() ? "channel " + ch.number : ch.name));
+                return ok(ch.name.isEmpty() ? Txt.s(R.string.web_ch_deleted_number, ch.number) : Txt.s(R.string.web_deleted_item, ch.name));
             }
             case "/api/sat/passes": {                                           // every satellite's next passes over the phone (no position sent)
                 android.location.Location me = svc.lastKnownLocation();
@@ -855,7 +859,7 @@ public final class WebHost {
                             .put("toneHz", s.toneHz).put("mode", s.mode).put("listenOnly", s.listenOnly());
                     String an = com.macdmr.radio.ham.FmSats.amsatName(s); if (an != null && !(s.catalog == com.macdmr.radio.ham.Satellites.ISS_CATALOG && s.mode == com.macdmr.radio.ham.Satellites.APRS)) o.put("amsat", an);
                     JSONArray ps = new JSONArray(); com.macdmr.radio.ham.Sgp4 e = el.get(s.catalog);
-                    if (e == null) o.put("problem", "No orbit for it in the download");
+                    if (e == null) o.put("problem", Txt.s(R.string.web_sat_no_orbit_it));
                     else if (me != null) {
                         for (com.macdmr.radio.ham.SatTrack.Pass pa : com.macdmr.radio.ham.SatTrack.passes(e, now - 15 * 60_000L, 24, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0, 10)) {
                             if (pa.los < now) continue;
@@ -873,17 +877,17 @@ public final class WebHost {
                     e.id = b.optInt("id", 0); e.action = b.optString("action", "listen"); e.hour = Math.max(0, Math.min(23, b.optInt("hour", 19))); e.minute = Math.max(0, Math.min(59, b.optInt("minute", 0)));
                     e.days = b.optInt("days", 0) & 0x7F; e.date = b.optString("date", ""); e.minutes = Math.max(1, Math.min(1440, b.optInt("minutes", 60))); e.channel = b.optInt("channel", -1);
                     e.record = b.optBoolean("record", false); e.label = b.optString("label", "").trim(); e.enabled = b.optBoolean("enabled", true);
-                    if (!java.util.Arrays.asList(com.macdmr.radio.Scheduler.ACTIONS).contains(e.action)) return WebServer.Response.error(400, "Unknown action");
+                    if (!java.util.Arrays.asList(com.macdmr.radio.Scheduler.ACTIONS).contains(e.action)) return WebServer.Response.error(400, Txt.s(R.string.web_unknown_action));
                     { String bp = com.macdmr.radio.Scheduler.bandProblem(svc.profile(), e, e.channel >= 0 ? svc.store().byNumber(e.channel) : null, svc.aprsHz()); if (bp != null) return WebServer.Response.error(400, bp); }   // APRS on a UHF-only radio, a channel outside its bands
-                    if (e.days != 0) e.date = ""; else if (!e.date.matches("\\d{4}-\\d{2}-\\d{2}")) return WebServer.Response.error(400, "Choose days or a date");
-                    if (e.enabled && com.macdmr.radio.Scheduler.nextStart(e, System.currentTimeMillis(), java.util.TimeZone.getDefault()) < 0) return WebServer.Response.error(400, "That time has already passed");
+                    if (e.days != 0) e.date = ""; else if (!e.date.matches("\\d{4}-\\d{2}-\\d{2}")) return WebServer.Response.error(400, Txt.s(R.string.web_sched_days));
+                    if (e.enabled && com.macdmr.radio.Scheduler.nextStart(e, System.currentTimeMillis(), java.util.TimeZone.getDefault()) < 0) return WebServer.Response.error(400, Txt.s(R.string.web_sched_past));
                     com.macdmr.radio.Scheduler.put(svc, e);
-                    return ok("Saved");
+                    return ok(Txt.s(R.string.web_saved));
                 }
                 long now = System.currentTimeMillis();
                 return ok(new JSONObject().put("schedules", com.macdmr.radio.Scheduler.json(svc)).put("running", com.macdmr.radio.Scheduler.runningEnd(svc) > now ? com.macdmr.radio.Scheduler.runningId(svc) : 0).put("runningEnd", com.macdmr.radio.Scheduler.runningEnd(svc)));
             }
-            case "/api/schedules/delete": if (!post) break; { com.macdmr.radio.Scheduler.remove(svc, b.optInt("id")); return ok("Deleted"); }
+            case "/api/schedules/delete": if (!post) break; { com.macdmr.radio.Scheduler.remove(svc, b.optInt("id")); return ok(Txt.s(R.string.web_deleted)); }
             case "/api/conditions": {                                           // tropo / aurora / meteors (the phone fetches; the browser gets the result)
                 android.location.Location me = svc.lastKnownLocation();
                 com.macdmr.radio.ham.Conditions.Report rep = com.macdmr.radio.ham.Conditions.get(me == null ? 0 : me.getLatitude(), me == null ? 0 : me.getLongitude(), me != null);
@@ -903,34 +907,34 @@ public final class WebHost {
                 String bad = com.macdmr.radio.BandScope.problem(b.optInt("from"), b.optInt("to"), b.optInt("step", 25_000));
                 if (bad != null) return WebServer.Response.error(400, bad);
                 String e = svc.scopeStart(b.optInt("from"), b.optInt("to"), b.optInt("step", 25_000), svc.profile().scopeSettleMs);
-                return e == null ? ok("Sweeping") : WebServer.Response.error(409, e);
+                return e == null ? ok(Txt.s(R.string.web_scope_sweeping)) : WebServer.Response.error(409, e);
             }
-            case "/api/scope/stop": if (!post) break; { new Thread(svc::scopeStop, "scope-stop").start(); return ok("Stopping"); }
+            case "/api/scope/stop": if (!post) break; { new Thread(svc::scopeStop, "scope-stop").start(); return ok(Txt.s(R.string.web_stopping)); }
             case "/api/scope/listen": if (!post) break; {                       // stop and listen on {hz} with the VFO
-                final int hz = b.optInt("hz"); if (!com.macdmr.radio.BandScope.tunable(hz)) return WebServer.Response.error(400, "Not a frequency this radio can tune");
+                final int hz = b.optInt("hz"); if (!com.macdmr.radio.BandScope.tunable(hz)) return WebServer.Response.error(400, Txt.s(R.string.web_scope_untunable));
                 new Thread(() -> { svc.scopeStop(); ChannelStore.Channel v = new ChannelStore.Channel(); v.type = 1; v.rxFreq = v.txFreq = hz; v.band = 1; v.power = 0; v.sq = 2; v.name = ""; svc.applyVfo(v); }, "scope-listen").start();
-                return ok(String.format(java.util.Locale.US, "Listening on %.4f MHz (VFO)", hz / 1e6));
+                return ok(Txt.s(R.string.web_scope_listening, String.format(java.util.Locale.US, "%.4f", hz / 1e6)));
             }
             case "/api/sat/status": {                                           // AMSAT's reports of the last 4 days for one satellite (?name=SO-50_[FM])
-                String n = r.param("name"); if (n == null || !n.matches("[A-Za-z0-9 -]+_\\[[A-Z]+\\]")) return WebServer.Response.error(400, "Bad name");
+                String n = r.param("name"); if (n == null || !n.matches("[A-Za-z0-9 -]+_\\[[A-Z]+\\]")) return WebServer.Response.error(400, Txt.s(R.string.web_bad_name));
                 com.macdmr.radio.ham.FmSats.Status st = com.macdmr.radio.ham.FmSats.status(n, 96);
                 return ok(new JSONObject().put("line", com.macdmr.radio.ham.FmSats.describe(st, System.currentTimeMillis())).put("heard", st == null ? -1 : st.heard + st.crew).put("telemetry", st == null ? 0 : st.telemetry));
             }
-            case "/api/sat/update": if (!post) break; { String e = svc.satellites().updateAll(); return e == null ? ok("Orbits and the FM satellite list updated") : WebServer.Response.error(502, e); }
+            case "/api/sat/update": if (!post) break; { String e = svc.satellites().updateAll(); return e == null ? ok(Txt.s(R.string.web_sat_updated)) : WebServer.Response.error(502, e); }
             case "/api/sat/track": if (!post) break; {                          // track one pass {key, aos}
-                android.location.Location me = svc.lastKnownLocation(); if (me == null) return WebServer.Response.error(409, "No position fix on the phone yet");
+                android.location.Location me = svc.lastKnownLocation(); if (me == null) return WebServer.Response.error(409, Txt.s(R.string.web_no_fix_yet));
                 String key = b.optString("key", ""); long aos = b.optLong("aos", 0);
                 for (com.macdmr.radio.ham.Satellites.Sat s : com.macdmr.radio.ham.Satellites.all(svc)) {
                     if (!s.key.equals(key)) continue;
-                    com.macdmr.radio.ham.Sgp4 e = svc.satellites().elements().get(s.catalog); if (e == null) return WebServer.Response.error(409, "No orbit for " + s.name);
+                    com.macdmr.radio.ham.Sgp4 e = svc.satellites().elements().get(s.catalog); if (e == null) return WebServer.Response.error(409, Txt.s(R.string.web_sat_no_orbit, s.name));
                     for (com.macdmr.radio.ham.SatTrack.Pass pa : com.macdmr.radio.ham.SatTrack.passes(e, System.currentTimeMillis() - 15 * 60_000L, 24, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0, 10)) {
                         if (Math.abs(pa.aos - aos) > 120_000) continue;
                         String err = onMain(() -> { svc.setIssRepeat(-1); return svc.trackSat(s, e, pa); });
-                        return err == null ? ok("Tracking " + s.name) : WebServer.Response.error(409, err);
+                        return err == null ? ok(Txt.s(R.string.web_sat_tracking, s.name)) : WebServer.Response.error(409, err);
                     }
-                    return WebServer.Response.error(404, "That pass is no longer ahead");
+                    return WebServer.Response.error(404, Txt.s(R.string.web_sat_pass_gone));
                 }
-                return WebServer.Response.error(404, "No such satellite");
+                return WebServer.Response.error(404, Txt.s(R.string.web_sat_none));
             }
             case "/api/recordings": {                                           // REC files: Download/DMR/Audio/<channel>/*.wav
                 java.util.List<File> files = new java.util.ArrayList<>();
@@ -943,8 +947,8 @@ public final class WebHost {
             }
             case "/api/recording": case "/api/recording/delete": {
                 File f = recording(post ? b.optString("id", "") : r.param("id"));
-                if (f == null) return WebServer.Response.error(404, "No such recording");
-                if (post) return f.delete() ? ok("Deleted " + f.getName()) : WebServer.Response.error(500, "Could not delete " + f.getName());
+                if (f == null) return WebServer.Response.error(404, Txt.s(R.string.web_rec_none));
+                if (post) return f.delete() ? ok(Txt.s(R.string.web_deleted_item, f.getName())) : WebServer.Response.error(500, Txt.s(R.string.web_delete_failed_item, f.getName()));
                 byte[] data; try (InputStream in = new java.io.FileInputStream(f)) { data = readAll(in); }
                 WebServer.Response x = WebServer.Response.bytes("audio/wav", data);
                 if ("1".equals(r.param("download"))) x.headers.put("Content-Disposition", "attachment; filename=\"" + f.getName().replace("\"", "") + "\"");
@@ -958,18 +962,18 @@ public final class WebHost {
                     if (id > 0) for (com.macdmr.radio.ham.Logbook.Entry x : lb.list(5000, false)) if (x.id == id) e = x;
                     if (e == null) { e = new com.macdmr.radio.ham.Logbook.Entry(); e.ts = System.currentTimeMillis(); e.qso = true; e.source = "web"; }
                     String call = b.optString("call", "").trim().toUpperCase(java.util.Locale.US);
-                    if (call.isEmpty()) return WebServer.Response.error(400, "A callsign is needed");
+                    if (call.isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_log_call_needed));
                     e.call = call; e.mode = b.optString("mode", e.mode); e.rstSent = b.optString("rstSent", e.rstSent); e.rstRcvd = b.optString("rstRcvd", e.rstRcvd);
                     e.name = b.optString("name", e.name); e.notes = b.optString("notes", e.notes); e.qso = b.optBoolean("qso", e.qso);
                     if (b.has("freqMHz")) e.freqHz = Math.round(b.getDouble("freqMHz") * 1e6);
                     if (b.has("ts")) e.ts = b.getLong("ts");
                     lb.save(e);
-                    return ok("Logged " + e.call);
+                    return ok(Txt.s(R.string.web_log_logged, e.call));
                 }
                 boolean qsoOnly = "1".equals(r.param("qso"));
                 java.util.List<com.macdmr.radio.ham.Logbook.Entry> list = lb.list(Math.min(2000, parse(r.param("limit"), 500)), qsoOnly);
                 if ("adif".equals(r.param("format"))) {
-                    WebServer.Response x = WebServer.Response.bytes("text/plain; charset=utf-8", com.macdmr.radio.ham.Logbook.adif(list, com.macdmr.radio.BuildConfig.VERSION_NAME).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                    WebServer.Response x = WebServer.Response.bytes("text/plain; charset=utf-8", com.macdmr.radio.ham.Logbook.adif(list, com.macdmr.radio.BuildConfig.VERSION_NAME).getBytes(java.nio.charset.StandardCharsets.UTF_8));   // i18n: MIME type
                     x.headers.put("Content-Disposition", "attachment; filename=\"signaldeck_log.adi\""); return x;
                 }
                 JSONArray a = new JSONArray();
@@ -984,28 +988,28 @@ public final class WebHost {
                     String a0 = b.optString("action");
                     if (a0.equals("start")) {
                         String ref = b.optString("ref", "").trim().toUpperCase(java.util.Locale.US);
-                        if (com.macdmr.radio.ham.Pota.programOf(ref) == null) return WebServer.Response.error(400, "Not a POTA (US-1234) or SOTA (W0C/FR-001) reference");
+                        if (com.macdmr.radio.ham.Pota.programOf(ref) == null) return WebServer.Response.error(400, Txt.s(R.string.web_pota_bad_ref));
                         String name = com.macdmr.radio.ham.Pota.lookup(ref); com.macdmr.radio.ham.Pota.start(svc, ref, name == null ? "" : name);
-                        return ok(name == null ? "Activating " + ref + " (not found in the programme's list)" : "Activating " + ref + ": " + name);
+                        return ok(name == null ? Txt.s(R.string.web_pota_activating_unknown, ref) : Txt.s(R.string.web_pota_activating, ref, name));
                     }
-                    if (a0.equals("end")) { com.macdmr.radio.ham.Pota.end(svc); return ok("Activation ended"); }
+                    if (a0.equals("end")) { com.macdmr.radio.ham.Pota.end(svc); return ok(Txt.s(R.string.web_pota_ended)); }
                     if (a0.equals("parks")) {
-                        android.location.Location me = svc.lastKnownLocation(); if (me == null) return WebServer.Response.error(409, "No position fix on the phone");
+                        android.location.Location me = svc.lastKnownLocation(); if (me == null) return WebServer.Response.error(409, Txt.s(R.string.web_no_fix));
                         JSONArray pa = new JSONArray(); for (com.macdmr.radio.ham.Pota.Park p0 : com.macdmr.radio.ham.Pota.parksNear(me.getLatitude(), me.getLongitude())) { if (pa.length() >= 25) break; pa.put(new JSONObject().put("ref", p0.ref).put("name", p0.name).put("km", Math.round(p0.km * 10) / 10.0)); }
                         return ok(new JSONObject().put("parks", pa));
                     }
                     if (a0.equals("log")) {
-                        String call = b.optString("call", "").trim().toUpperCase(java.util.Locale.US); if (com.macdmr.radio.ham.Logbook.baseCall(call) == null) return WebServer.Response.error(400, "Enter a callsign");
+                        String call = b.optString("call", "").trim().toUpperCase(java.util.Locale.US); if (com.macdmr.radio.ham.Logbook.baseCall(call) == null) return WebServer.Response.error(400, Txt.s(R.string.web_enter_callsign));
                         ChannelStore.Channel cur = svc.current(); long f = b.optLong("freqHz", cur != null ? cur.rxFreq : 0);
-                        if (act != null && !b.optBoolean("force") && svc.logbook().isDupe(call, f, System.currentTimeMillis(), act.ref)) return WebServer.Response.error(409, "DUPE: " + call + " is already logged on this band today under " + act.ref);
+                        if (act != null && !b.optBoolean("force") && svc.logbook().isDupe(call, f, System.currentTimeMillis(), act.ref)) return WebServer.Response.error(409, Txt.s(R.string.web_pota_dupe, call, act.ref));
                         com.macdmr.radio.ham.Logbook.Entry e = new com.macdmr.radio.ham.Logbook.Entry(); e.ts = System.currentTimeMillis(); e.call = call; e.freqHz = f; e.mode = "FM"; e.qso = true;
-                        e.rstSent = b.optString("sent", "59"); e.rstRcvd = b.optString("rcvd", "59"); e.notes = b.optString("notes", ""); e.source = act != null ? act.program + " activation" : "POTA/SOTA hunting";
+                        e.rstSent = b.optString("sent", "59"); e.rstRcvd = b.optString("rcvd", "59"); e.notes = b.optString("notes", ""); e.source = act != null ? act.program + " activation" : "POTA/SOTA hunting";   // i18n: logbook source field (stored, exported in ADIF)
                         String tr = b.optString("theirRef", "").trim().toUpperCase(java.util.Locale.US); if (com.macdmr.radio.ham.Pota.programOf(tr) != null) { e.sig = com.macdmr.radio.ham.Pota.programOf(tr); e.sigInfo = tr; }
                         if (act != null) { e.mySig = act.program; e.mySigInfo = act.ref; }
                         svc.logbook().save(e);
-                        return ok(call + " logged");
+                        return ok(Txt.s(R.string.web_pota_logged, call));
                     }
-                    return WebServer.Response.error(400, "Unknown action");
+                    return WebServer.Response.error(400, Txt.s(R.string.web_unknown_action));
                 }
                 JSONObject o = new JSONObject();
                 if (act != null) { int today = svc.logbook().activation(act.ref, com.macdmr.radio.ham.Pota.utcDay(System.currentTimeMillis())).size(); o.put("activation", new JSONObject().put("program", act.program).put("ref", act.ref).put("name", act.name).put("since", act.since).put("today", today).put("needed", com.macdmr.radio.ham.Pota.needed(act.program)).put("total", svc.logbook().activation(act.ref, null).size())); }
@@ -1015,7 +1019,7 @@ public final class WebHost {
                 return ok(o.put("spots", sp).put("problems", pr));
             }
             case "/api/pota/adif": {                                            // the activation's ADIF (POTA's file name)
-                com.macdmr.radio.ham.Pota.Activation act = com.macdmr.radio.ham.Pota.active(svc); if (act == null) return WebServer.Response.error(409, "No activation");
+                com.macdmr.radio.ham.Pota.Activation act = com.macdmr.radio.ham.Pota.active(svc); if (act == null) return WebServer.Response.error(409, Txt.s(R.string.web_pota_none));
                 String me = svc.packet() == null ? "" : svc.packet().callsign();
                 String adif = com.macdmr.radio.ham.Logbook.adif(svc.logbook().activation(act.ref, null), com.macdmr.radio.BuildConfig.VERSION_NAME, me);
                 WebServer.Response resp = WebServer.Response.bytes("application/octet-stream", adif.getBytes(java.nio.charset.StandardCharsets.UTF_8));
@@ -1025,16 +1029,16 @@ public final class WebHost {
             case "/api/forms": {                                                // GET: the forms log and the field lists; POST {action: send|delete, ...}
                 if (post) {
                     String a0 = b.optString("action");
-                    if (a0.equals("delete")) { svc.forms().delete(b.optLong("id")); return ok("Deleted"); }
+                    if (a0.equals("delete")) { svc.forms().delete(b.optLong("id")); return ok(Txt.s(R.string.web_deleted)); }
                     com.macdmr.radio.ham.Forms.Form f = new com.macdmr.radio.ham.Forms.Form(); f.kind = com.macdmr.radio.ham.Forms.RADIOGRAM.equals(b.optString("kind")) ? com.macdmr.radio.ham.Forms.RADIOGRAM : com.macdmr.radio.ham.Forms.ICS213;
                     JSONObject fv = b.optJSONObject("fields"); if (fv != null) for (String[] k : com.macdmr.radio.ham.Forms.fields(f.kind)) f.f.put(k[0], fv.optString(k[0], "").trim());
                     if (com.macdmr.radio.ham.Forms.RADIOGRAM.equals(f.kind)) f.f.put("CK", String.valueOf(com.macdmr.radio.ham.Forms.words(f.f.get("MS"))));
                     String via = b.optString("via", "save"); ChannelStore.Contact to = null;
                     if (via.equals("dmr")) { long cid = b.optLong("contact", -1); for (ChannelStore.Contact ct : svc.store().contacts()) if (ct.id == cid) to = ct; }
-                    if (via.equals("winlink")) { String e0 = svc.sendForm(f, "winlink", b.optString("to", ""), null); return e0 == null ? ok("In the Winlink outbox") : WebServer.Response.error(409, e0); }
+                    if (via.equals("winlink")) { String e0 = svc.sendForm(f, "winlink", b.optString("to", ""), null); return e0 == null ? ok(Txt.s(R.string.web_form_winlink_outbox)) : WebServer.Response.error(409, e0); }
                     final ChannelStore.Contact toF = to; final String via0 = via;
                     String e = onMain(() -> svc.sendForm(f, via0, b.optString("to", ""), toF));
-                    return e == null ? ok(via.equals("save") ? "Saved" : "Sending") : WebServer.Response.error(409, e);
+                    return e == null ? ok(via.equals("save") ? Txt.s(R.string.web_saved) : Txt.s(R.string.web_sending)) : WebServer.Response.error(409, e);
                 }
                 JSONArray rows = new JSONArray();
                 for (com.macdmr.radio.ham.FormStore.Row r0 : svc.forms().list(100)) { JSONObject fo = new JSONObject(); for (java.util.Map.Entry<String, String> e : r0.form.f.entrySet()) fo.put(e.getKey(), e.getValue()); rows.put(new JSONObject().put("id", r0.id).put("ts", r0.ts).put("outgoing", r0.outgoing).put("peer", r0.peer).put("via", r0.via).put("status", r0.status).put("kind", r0.form.kind).put("title", com.macdmr.radio.ham.Forms.title(r0.form.kind)).put("fields", fo).put("text", com.macdmr.radio.ham.Forms.text(r0.form))); }
@@ -1047,32 +1051,32 @@ public final class WebHost {
                 com.macdmr.radio.winlink.Winlink w = svc.winlink(); com.macdmr.radio.winlink.WinlinkStore st = w.store();
                 if (post) {
                     switch (b.optString("action")) {
-                        case "compose": { String e = w.compose(b.optString("to"), b.optString("cc"), b.optString("subject"), b.optString("text")); return e == null ? ok("In the outbox") : WebServer.Response.error(400, e); }
+                        case "compose": { String e = w.compose(b.optString("to"), b.optString("cc"), b.optString("subject"), b.optString("text")); return e == null ? ok(Txt.s(R.string.web_wl_outbox)) : WebServer.Response.error(400, e); }
                         case "connect": {
                             String e = "radio".equals(b.optString("how")) ? onMain(() -> w.connectRadio(b.optString("gateway"), b.optString("via"))) : w.connectInternet();
-                            return e == null ? ok("Connecting") : WebServer.Response.error(409, e);
+                            return e == null ? ok(Txt.s(R.string.web_wl_connecting)) : WebServer.Response.error(409, e);
                         }
-                        case "cancel": w.cancel(); return ok("Stopping");
-                        case "delete": st.delete(b.optString("folder"), b.optString("mid")); return ok("Deleted");
+                        case "cancel": w.cancel(); return ok(Txt.s(R.string.web_stopping));
+                        case "delete": st.delete(b.optString("folder"), b.optString("mid")); return ok(Txt.s(R.string.web_deleted));
                         case "read": st.markRead(b.optString("mid")); return ok("ok");
                         case "gateways": { try { return ok(w.importGateways(b.optString("csv"))); } catch (IllegalArgumentException e) { return WebServer.Response.error(400, e.getMessage()); } }
-                        case "cleargateways": w.clearGateways(); return ok("Removed");
+                        case "cleargateways": w.clearGateways(); return ok(Txt.s(R.string.web_removed));
                         case "tuneconnect": {
                             String call = b.optString("call"); int hz = b.optInt("hz");
-                            if (!com.macdmr.radio.DeviceProfile.inBands(hz)) return WebServer.Response.error(400, "Bad frequency");
+                            if (!com.macdmr.radio.DeviceProfile.inBands(hz)) return WebServer.Response.error(400, Txt.s(R.string.web_bad_frequency));
                             onMain(() -> { ChannelStore.Channel ch = new ChannelStore.Channel(); ch.type = 1; ch.rxFreq = ch.txFreq = hz; ch.band = 1; ch.power = 1; ch.sq = 2; ch.name = call; svc.applyVfo(ch, true); w.setGateway(call, ""); return null; });
                             new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> w.connectRadio(call, ""), 4500);
-                            return ok("Tuning " + String.format(java.util.Locale.US, "%.4f MHz", hz / 1e6) + ", connecting in a few seconds");
+                            return ok(Txt.s(R.string.web_wl_tuning, String.format(java.util.Locale.US, "%.4f", hz / 1e6)));
                         }
                         case "settings": {
                             String g = b.optString("grid", "").trim();
-                            if (!g.isEmpty() && !g.matches("(?i)[A-R]{2}[0-9]{2}([A-X]{2})?")) return WebServer.Response.error(400, "Grid square like JO01 or JO01ab");
+                            if (!g.isEmpty() && !g.matches("(?i)[A-R]{2}[0-9]{2}([A-X]{2})?")) return WebServer.Response.error(400, Txt.s(R.string.web_wl_grid));
                             if (b.has("password") && !b.optString("password").isEmpty()) w.setPassword(b.optString("password"));   // write-only
                             if (b.has("diag")) w.setDiag(b.optBoolean("diag")); if (b.has("diagContents")) w.setDiagContents(b.optBoolean("diagContents"));
-                            w.setGrid(g); return ok("Saved");
+                            w.setGrid(g); return ok(Txt.s(R.string.web_saved));
                         }
                         case "diagasked": w.setDiagAsked(); if (b.has("diag")) w.setDiag(b.optBoolean("diag")); return ok("ok");
-                        default: return WebServer.Response.error(400, "Unknown action");
+                        default: return WebServer.Response.error(400, Txt.s(R.string.web_unknown_action));
                     }
                 }
                 JSONObject fo = new JSONObject();
@@ -1097,17 +1101,17 @@ public final class WebHost {
                 com.macdmr.radio.PacketFinder pf = svc.finder();
                 if (post) {
                     switch (b.optString("action")) {
-                        case "start": { String e = onMain(() -> pf.start(0)); return e == null ? ok("Listening") : WebServer.Response.error(409, e); }
-                        case "stop": pf.stop(); return ok("Stopping");
-                        case "clear": pf.clear(); return ok("Cleared");
-                        case "settings": { String e = pf.setSettings(b.optString("freqs", ""), b.optInt("dwell", 3), b.optInt("hours", 2)); return e == null ? ok("Saved") : WebServer.Response.error(400, e); }
-                        default: return WebServer.Response.error(400, "Unknown action");
+                        case "start": { String e = onMain(() -> pf.start(0)); return e == null ? ok(Txt.s(R.string.web_listening)) : WebServer.Response.error(409, e); }
+                        case "stop": pf.stop(); return ok(Txt.s(R.string.web_stopping));
+                        case "clear": pf.clear(); return ok(Txt.s(R.string.web_cleared));
+                        case "settings": { String e = pf.setSettings(b.optString("freqs", ""), b.optInt("dwell", 3), b.optInt("hours", 2)); return e == null ? ok(Txt.s(R.string.web_saved)) : WebServer.Response.error(400, e); }
+                        default: return WebServer.Response.error(400, Txt.s(R.string.web_unknown_action));
                     }
                 }
                 return ok(pf.json());
             }
             case "/api/winlink/log": {                                           // GET: the session log as a text file
-                WebServer.Response x = WebServer.Response.bytes("text/plain; charset=utf-8", svc.winlink().logText().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                WebServer.Response x = WebServer.Response.bytes("text/plain; charset=utf-8", svc.winlink().logText().getBytes(java.nio.charset.StandardCharsets.UTF_8));   // i18n: MIME type
                 x.headers.put("Content-Disposition", "attachment; filename=\"signaldeck_winlink_log.txt\""); x.headers.put("Cache-Control", "no-store"); return x;
             }
             case "/api/winlink/file": {                                         // GET ?folder=&mid=&i=: an attachment
@@ -1121,31 +1125,31 @@ public final class WebHost {
                     x.headers.put("Content-Disposition", ("1".equals(r.param("download")) ? "attachment" : "inline") + "; filename=\"" + at.name.replaceAll("[\"\\\\\r\n]", "_") + "\"");
                     x.headers.put("Cache-Control", "no-store"); return x;
                 }
-                return WebServer.Response.error(404, "No such attachment");
+                return WebServer.Response.error(404, Txt.s(R.string.web_wl_no_attachment));
             }
-            case "/api/logbook/delete": if (!post) break; { svc.logbook().delete(b.optLong("id", 0)); return ok("Deleted"); }
+            case "/api/logbook/delete": if (!post) break; { svc.logbook().delete(b.optLong("id", 0)); return ok(Txt.s(R.string.web_deleted)); }
             case "/api/settings": {
                 if (post) {
                     String key = b.optString("key", "");
                     for (Setting s : settings()) if (s.key.equals(key)) {
                         try { onMain(() -> { s.set.set(b); return null; }); }
                         catch (java.util.concurrent.ExecutionException e) { return WebServer.Response.error(400, e.getCause() == null ? String.valueOf(e) : String.valueOf(e.getCause().getMessage())); }
-                        return ok(settingsJson().put("message", s.label + " saved"));
+                        return ok(settingsJson().put("message", Txt.s(R.string.web_set_saved, s.label)));
                     }
-                    return WebServer.Response.error(404, "No such setting");
+                    return WebServer.Response.error(404, Txt.s(R.string.web_set_none));
                 }
                 return ok(settingsJson());
             }
             case "/api/radio": if (!post) break; {                              // take over / hand back the radio
                 String a = b.optString("action", "");
-                if (svc.firmwareLoading()) return WebServer.Response.error(409, "Radio busy, loading firmware");
-                if (svc.isTransmitting()) return WebServer.Response.error(409, "Not while transmitting");
-                if (a.equals("takeover")) { svc.bringUp(); return ok("Taking over the radio"); }
-                if (a.equals("handback")) { svc.shutDown(true); return ok("Handing the radio back to the stock app"); }
-                return WebServer.Response.error(400, "action: takeover or handback");
+                if (svc.firmwareLoading()) return WebServer.Response.error(409, Txt.s(R.string.web_firmware_busy));
+                if (svc.isTransmitting()) return WebServer.Response.error(409, Txt.s(R.string.web_not_while_tx));
+                if (a.equals("takeover")) { svc.bringUp(); return ok(Txt.s(R.string.web_radio_takeover)); }
+                if (a.equals("handback")) { svc.shutDown(true); return ok(Txt.s(R.string.web_radio_handback)); }
+                return WebServer.Response.error(400, "action: takeover or handback");   // i18n: API usage error (the pages always send it)
             }
             case "/api/packet": {                                               // packet settings + tool states + DTMF log + weather alerts
-                com.macdmr.radio.PacketEngine pe = svc.packet(); if (pe == null) return WebServer.Response.error(409, "Packet engine not ready");
+                com.macdmr.radio.PacketEngine pe = svc.packet(); if (pe == null) return WebServer.Response.error(409, Txt.s(R.string.web_pkt_not_ready));
                 android.content.SharedPreferences pp = svc.getSharedPreferences("packet", Context.MODE_PRIVATE);
                 JSONObject st = new JSONObject()
                         .put("callsignSet", pe.callsignSet()).put("ssid", pe.ssid()).put("comment", pe.comment()).put("path", pp.getString("path", "WIDE1-1,WIDE2-1"))
@@ -1157,7 +1161,7 @@ public final class WebHost {
                         .put("groups", pp.getString("groups", "")).put("kissPort", pp.getInt("kissPort", 8001))
                         .put("isServer", pe.isServer()).put("isPort", pe.isPort()).put("isPasscodeSet", !"-1".equals(pp.getString("isPasscode", "-1")))
                         .put("isBeaconMin", pe.isBeaconMin()).put("isComment", pp.getString("isComment", pe.comment()));
-                JSONArray lk = new JSONArray(); for (String k : com.macdmr.radio.PacketEngine.LEAD_KINDS) lk.put(k);
+                JSONArray lk = new JSONArray(); for (String k : com.macdmr.radio.PacketEngine.leadKindNames()) lk.put(k);
                 JSONArray lc = new JSONArray(); for (int ms : com.macdmr.radio.PacketEngine.LEAD_CHOICES) lc.put(ms);
                 JSONArray dt = new JSONArray();
                 for (PacketStore.Dtmf d : pe.store().dtmfLog(50)) dt.put(new JSONObject().put("ts", d.ts).put("digits", d.digits).put("channel", d.channel).put("channelName", d.channelName));
@@ -1175,10 +1179,10 @@ public final class WebHost {
                     if (b.has("callsign") && !b.getString("callsign").trim().isEmpty()) {         // write-only: absent or empty keeps the stored one
                         String cs = b.getString("callsign").trim().toUpperCase(java.util.Locale.US);
                         int dash = cs.indexOf('-'); if (dash > 0) { b.put("ssid", Integer.parseInt(cs.substring(dash + 1).trim())); cs = cs.substring(0, dash).trim(); }
-                        if (!cs.matches("[A-Z0-9]{1,6}")) return WebServer.Response.error(400, "Callsign: 1 to 6 letters and digits; the SSID goes in its own box");
+                        if (!cs.matches("[A-Z0-9]{1,6}")) return WebServer.Response.error(400, Txt.s(R.string.web_aprs_call_format));
                         ed.putString("callsign", cs);
                     }
-                    if (b.has("ssid")) { int v = b.getInt("ssid"); if (v < 0 || v > 15) return WebServer.Response.error(400, "SSID is 0 to 15"); ed.putInt("ssid", v); }
+                    if (b.has("ssid")) { int v = b.getInt("ssid"); if (v < 0 || v > 15) return WebServer.Response.error(400, Txt.s(R.string.web_aprs_ssid)); ed.putInt("ssid", v); }
                     if (b.has("symbol")) { String s = b.getString("symbol").trim(); ed.putString("symTable", s.length() >= 1 ? s.substring(0, 1) : "/").putString("symCode", s.length() >= 2 ? s.substring(1, 2) : "["); }
                     if (b.has("comment")) ed.putString("comment", b.getString("comment").trim());
                     if (b.has("path")) ed.putString("path", b.getString("path").trim().toUpperCase(java.util.Locale.US));
@@ -1187,54 +1191,54 @@ public final class WebHost {
                     if (b.has("beaconMin")) ed.putInt("beaconMin", Math.max(1, b.getInt("beaconMin")));
                     if (b.has("txPower")) ed.putInt("txPower", b.getInt("txPower") == 0 ? 0 : 1);
                     if (b.has("leadKind")) ed.putInt("txLeadKind", Math.max(0, Math.min(com.macdmr.radio.PacketEngine.LEAD_KINDS.length - 1, b.getInt("leadKind"))));
-                    if (b.has("leadMs")) { int ms = b.getInt("leadMs"); boolean okMs = false; for (int c : com.macdmr.radio.PacketEngine.LEAD_CHOICES) okMs |= c == ms; if (!okMs) return WebServer.Response.error(400, "Lead-in length must be one of the listed choices"); ed.putInt("txLeadMs", ms); }
+                    if (b.has("leadMs")) { int ms = b.getInt("leadMs"); boolean okMs = false; for (int c : com.macdmr.radio.PacketEngine.LEAD_CHOICES) okMs |= c == ms; if (!okMs) return WebServer.Response.error(400, Txt.s(R.string.web_aprs_lead)); ed.putInt("txLeadMs", ms); }
                     if (b.has("passive")) ed.putInt("passive", Math.max(0, Math.min(2, b.getInt("passive"))));
                     for (String k : new String[] { (svc.packet() == null || svc.packet().autoAckAllowed()) ? "autoAck" : "-", "digipeat", "dtmf", "wx", "cw", "cwId", "telemetry", "weather", "txIgate" }) if (b.has(k)) ed.putBoolean(k, b.getBoolean(k));
-                    if (b.has("kissPort")) { int v = b.getInt("kissPort"); if (v < 1024 || v > 65535) return WebServer.Response.error(400, "KISS port is 1024 to 65535"); ed.putInt("kissPort", v); }
+                    if (b.has("kissPort")) { int v = b.getInt("kissPort"); if (v < 1024 || v > 65535) return WebServer.Response.error(400, Txt.s(R.string.web_aprs_kiss_port)); ed.putInt("kissPort", v); }
                     if (b.has("isServer")) ed.putString("isServer", b.getString("isServer").trim());
                     if (b.has("isPort")) ed.putInt("isPort", b.getInt("isPort"));
                     if (b.has("isPasscode") && !b.getString("isPasscode").trim().isEmpty()) ed.putString("isPasscode", b.getString("isPasscode").trim());   // write-only
                     if (b.has("isBeaconMin")) ed.putInt("isBeaconMin", Math.max(0, b.getInt("isBeaconMin")));
                     if (b.has("isComment")) ed.putString("isComment", b.getString("isComment").trim());
-                } catch (Exception e) { return WebServer.Response.error(400, "Check the numbers"); }
+                } catch (Exception e) { return WebServer.Response.error(400, Txt.s(R.string.web_check_numbers)); }
                 ed.apply();
                 onMain(() -> { svc.packet().applySettings(); return null; });
-                return ok("APRS settings saved");
+                return ok(Txt.s(R.string.web_aprs_saved));
             }
             case "/api/packet/tool": if (!post) break; {                       // {tool: is|kiss|parrot, on}
                 com.macdmr.radio.PacketEngine pe = svc.packet(); String tool = b.optString("tool", ""); boolean on = b.optBoolean("on", false);
-                if (on && (tool.equals("parrot") || tool.equals("fox")) && !allowTx()) return WebServer.Response.error(403, TX_OFF);     // both transmit
+                if (on && (tool.equals("parrot") || tool.equals("fox")) && !allowTx()) return WebServer.Response.error(403, txOff());     // both transmit
                 String msg = onMain(() -> {
                     switch (tool) {
-                        case "is": if (on) { String e = pe.isStart(); return e == null ? "APRS-IS starting" : e; } pe.isStop(); return "APRS-IS off";
-                        case "kiss": if (on) { String e = pe.kissStart(); return e == null ? "KISS TNC on" : e; } pe.kissStop(); return "KISS TNC off";
+                        case "is": if (on) { String e = pe.isStart(); return e == null ? Txt.s(R.string.web_tool_is_start) : e; } pe.isStop(); return Txt.s(R.string.web_tool_is_off);
+                        case "kiss": if (on) { String e = pe.kissStart(); return e == null ? Txt.s(R.string.web_tool_kiss_on) : e; } pe.kissStop(); return Txt.s(R.string.web_tool_kiss_off);
                         case "parrot": return svc.setParrot(on);
                         case "fox": return svc.setFoxTx(on);
                         default: return null;
                     }
                 });
-                return msg == null ? WebServer.Response.error(400, "tool: is, kiss, parrot or fox") : ok(msg);
+                return msg == null ? WebServer.Response.error(400, "tool: is, kiss, parrot or fox") : ok(msg);   // i18n: API usage error (the pages always send it)
             }
             case "/api/dtmf": if (!post) break; {
-                if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                if (!allowTx()) return WebServer.Response.error(403, txOff());
                 String seq = b.optString("seq", "").trim().toUpperCase(java.util.Locale.US);
-                if (!seq.matches("[0-9A-D*#]{1,32}")) return WebServer.Response.error(400, "DTMF: 1 to 32 of 0-9, A-D, * and #");
+                if (!seq.matches("[0-9A-D*#]{1,32}")) return WebServer.Response.error(400, Txt.s(R.string.web_dtmf_format));
                 String e = onMain(() -> svc.packet().sendDtmf(seq));
-                return e == null ? ok("Sending DTMF " + seq) : WebServer.Response.error(409, e);
+                return e == null ? ok(Txt.s(R.string.web_dtmf_sending, seq)) : WebServer.Response.error(409, e);
             }
             case "/api/cwid": if (!post) break; {
-                if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                if (!allowTx()) return WebServer.Response.error(403, txOff());
                 String e = onMain(() -> svc.packet().sendCwId());
-                return e == null ? ok("Sending the Morse ID") : WebServer.Response.error(409, e);
+                return e == null ? ok(Txt.s(R.string.web_cwid_sending)) : WebServer.Response.error(409, e);
             }
             case "/api/sstv/send": if (!post) break; {                          // body: the picture's bytes (PNG/JPEG); ?mode=0..2
-                if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                if (!allowTx()) return WebServer.Response.error(403, txOff());
                 int[] modes = com.macdmr.radio.pkt.SSTVEncoder.MODES;                 // the page's select lists them in this order
-                int m = parse(r.param("mode"), 2); if (m < 0 || m >= modes.length) return WebServer.Response.error(400, "mode: 0 Robot 8 BW, 1 Robot 12 BW, 2 Robot 24 Color, 3 Robot 36, 4 Martin M2, 5 Scottie S2, 6 PD 90, 7 Scottie S1, 8 Martin M1");
+                int m = parse(r.param("mode"), 2); if (m < 0 || m >= modes.length) return WebServer.Response.error(400, "mode: 0 Robot 8 BW, 1 Robot 12 BW, 2 Robot 24 Color, 3 Robot 36, 4 Martin M2, 5 Scottie S2, 6 PD 90, 7 Scottie S1, 8 Martin M1");   // i18n: API usage error (the pages always send it)
                 android.graphics.Bitmap bmp = android.graphics.BitmapFactory.decodeByteArray(r.body, 0, r.body.length);
-                if (bmp == null) return WebServer.Response.error(400, "That is not a picture this phone can read (use PNG or JPEG)");
+                if (bmp == null) return WebServer.Response.error(400, Txt.s(R.string.web_sstv_bad_picture));
                 String e = onMain(() -> svc.packet().sendSstv(bmp, modes[m]));
-                return e == null ? ok("Sending the picture as " + com.macdmr.radio.pkt.SSTVEncoder.name(modes[m])) : WebServer.Response.error(409, e);
+                return e == null ? ok(Txt.s(R.string.web_sstv_sending, com.macdmr.radio.pkt.SSTVEncoder.name(modes[m]))) : WebServer.Response.error(409, e);
             }
             case "/api/trainer": {                                              // the Morse trainer's lesson and speeds (shared with the phone's trainer)
                 android.content.SharedPreferences tp = svc.getSharedPreferences("trainer", Context.MODE_PRIVATE);
@@ -1258,7 +1262,7 @@ public final class WebHost {
             }
             case "/api/exam/answer": if (!post) break; {                       // {element, id, right}: keeps the missed list like the phone
                 String key = b.optString("element", ""), id = b.optString("id", "");
-                if (!key.matches("tech|general|extra") || !id.matches("[A-Z][0-9][A-Z][0-9]{2}")) return WebServer.Response.error(400, "element and id");
+                if (!key.matches("tech|general|extra") || !id.matches("[A-Z][0-9][A-Z][0-9]{2}")) return WebServer.Response.error(400, "element and id");   // i18n: API usage error (the pages always send it)
                 android.content.SharedPreferences ep = svc.getSharedPreferences("exam", Context.MODE_PRIVATE);
                 java.util.Set<String> miss = new java.util.HashSet<>(ep.getStringSet("missed_" + key, new java.util.HashSet<>()));
                 if (b.optBoolean("right", false)) miss.remove(id); else miss.add(id);
@@ -1267,7 +1271,7 @@ public final class WebHost {
             }
             case "/api/exam/result": if (!post) break; {                       // {element, right}: a full practice exam's score
                 String key = b.optString("element", ""); int right = b.optInt("right", -1);
-                if (!key.matches("tech|general|extra") || right < 0) return WebServer.Response.error(400, "element and right");
+                if (!key.matches("tech|general|extra") || right < 0) return WebServer.Response.error(400, "element and right");   // i18n: API usage error (the pages always send it)
                 android.content.SharedPreferences ep = svc.getSharedPreferences("exam", Context.MODE_PRIVATE);
                 boolean best = right > ep.getInt("best_" + key, -1); if (best) ep.edit().putInt("best_" + key, right).apply();
                 return ok(new JSONObject().put("best", best));
@@ -1289,64 +1293,64 @@ public final class WebHost {
                 return ok(o.put("past", past).put("lastName", svc.getSharedPreferences("nets", Context.MODE_PRIVATE).getString("last", "")));
             }
             case "/api/nets/start": if (!post) break; {
-                if (svc.nets().running() != null) return WebServer.Response.error(409, "A net is already running");
-                String nm = b.optString("name", "").trim(); if (nm.isEmpty()) nm = "Net";
+                if (svc.nets().running() != null) return WebServer.Response.error(409, Txt.s(R.string.web_net_running));
+                String nm = b.optString("name", "").trim(); if (nm.isEmpty()) nm = Txt.s(R.string.web_net_default_name);
                 svc.getSharedPreferences("nets", Context.MODE_PRIVATE).edit().putString("last", nm).apply();
                 ChannelStore.Channel cur = svc.current();
                 svc.nets().start(nm, cur == null ? "" : cur.name, cur == null ? 0 : cur.rxFreq);
-                final String name = nm; onMain(() -> { svc.history("pkt", "📋 Net started: " + name); return null; });
-                return ok("Net started: " + nm);
+                final String name = nm; onMain(() -> { svc.history("pkt", Msg.of(R.string.web_history_net_started, name)); return null; });
+                return ok(Txt.s(R.string.web_net_started, nm));
             }
             case "/api/nets/end": if (!post) break; {
-                com.macdmr.radio.ham.NetStore.Net n = svc.nets().running(); if (n == null) return WebServer.Response.error(409, "No net is running");
+                com.macdmr.radio.ham.NetStore.Net n = svc.nets().running(); if (n == null) return WebServer.Response.error(409, Txt.s(R.string.web_net_none));
                 svc.nets().end(n); int c = svc.nets().checkIns(n.id).size();
-                onMain(() -> { svc.history("pkt", "📋 Net ended: " + n.name + " (" + c + " check-ins)"); return null; });
-                return ok("Net ended: " + c + " check-ins");
+                onMain(() -> { svc.history("pkt", Msg.plural(R.plurals.web_history_net_ended, c, n.name, c)); return null; });
+                return ok(Txt.p(R.plurals.web_net_ended, c, c));
             }
             case "/api/nets/checkin": if (!post) break; {
-                com.macdmr.radio.ham.NetStore.Net n = svc.nets().running(); if (n == null) return WebServer.Response.error(409, "No net is running");
+                com.macdmr.radio.ham.NetStore.Net n = svc.nets().running(); if (n == null) return WebServer.Response.error(409, Txt.s(R.string.web_net_none));
                 String cs = b.optString("call", "").trim().toUpperCase(java.util.Locale.US), nm = b.optString("name", "").trim();
-                if (!cs.matches("[A-Z0-9/]{3,12}")) return WebServer.Response.error(400, "That does not look like a callsign");
+                if (!cs.matches("[A-Z0-9/]{3,12}")) return WebServer.Response.error(400, Txt.s(R.string.web_net_bad_call));
                 com.macdmr.radio.ham.NetStore.CheckIn k = svc.nets().checkIn(n, cs, nm);
                 if (nm.isEmpty()) svc.enrichCall(cs, i -> { if (k.name == null || k.name.isEmpty()) { k.name = i.name; svc.nets().save(k); pub("net", "{}"); } });   // the name from the callsign lookup
-                return ok("Checked in " + cs);
+                return ok(Txt.s(R.string.web_net_checked_in, cs));
             }
             case "/api/nets/update": if (!post) break; {                        // {id, traffic?, late?, out?, notes?, remove?}
-                com.macdmr.radio.ham.NetStore.Net n = svc.nets().running(); if (n == null) return WebServer.Response.error(409, "No net is running");
+                com.macdmr.radio.ham.NetStore.Net n = svc.nets().running(); if (n == null) return WebServer.Response.error(409, Txt.s(R.string.web_net_none));
                 long id = b.optLong("id", 0);
                 for (com.macdmr.radio.ham.NetStore.CheckIn k : svc.nets().checkIns(n.id)) if (k.id == id) {
-                    if (b.optBoolean("remove", false)) { svc.nets().remove(k); return ok("Removed " + k.call); }
+                    if (b.optBoolean("remove", false)) { svc.nets().remove(k); return ok(Txt.s(R.string.web_removed_item, k.call)); }
                     if (b.has("traffic")) k.traffic = b.getBoolean("traffic"); if (b.has("late")) k.late = b.getBoolean("late"); if (b.has("out")) k.out = b.getBoolean("out");
                     if (b.has("notes")) k.notes = b.getString("notes"); if (b.has("name")) k.name = b.getString("name");
-                    svc.nets().save(k); return ok(k.call + " updated");
+                    svc.nets().save(k); return ok(Txt.s(R.string.web_net_checkin_updated, k.call));
                 }
-                return WebServer.Response.error(404, "No such check-in");
+                return WebServer.Response.error(404, Txt.s(R.string.web_net_no_checkin));
             }
             case "/api/nets/report": {                                          // the net's report text (the phone's NetStore.report)
                 long id = r.param("id") == null ? -1 : Long.parseLong(r.param("id"));
                 com.macdmr.radio.ham.NetStore.Net n = null;
                 com.macdmr.radio.ham.NetStore.Net run = svc.nets().running(); if (run != null && (id < 0 || run.id == id)) n = run;
                 if (n == null) for (com.macdmr.radio.ham.NetStore.Net p0 : svc.nets().past(200)) if (p0.id == id) n = p0;
-                if (n == null) return WebServer.Response.error(404, "No such net");
+                if (n == null) return WebServer.Response.error(404, Txt.s(R.string.web_net_no_net));
                 String text = com.macdmr.radio.ham.NetStore.report(n, svc.nets().checkIns(n.id), svc.packet() != null && svc.packet().callsignSet() ? svc.packet().callsign() : "");
-                WebServer.Response x = WebServer.Response.bytes("text/plain; charset=utf-8", text.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                WebServer.Response x = WebServer.Response.bytes("text/plain; charset=utf-8", text.getBytes(java.nio.charset.StandardCharsets.UTF_8));   // i18n: MIME type
                 if ("1".equals(r.param("download"))) x.headers.put("Content-Disposition", "attachment; filename=\"net_report.txt\"");
                 return x;
             }
             case "/api/nets/delete": if (!post) break; {
                 long id = b.optLong("id", 0); com.macdmr.radio.ham.NetStore.Net run = svc.nets().running();
-                if (run != null && run.id == id) return WebServer.Response.error(409, "End the net first");
-                svc.nets().deleteNet(id); return ok("Net deleted");
+                if (run != null && run.id == id) return WebServer.Response.error(409, Txt.s(R.string.web_net_end_first));
+                svc.nets().deleteNet(id); return ok(Txt.s(R.string.web_net_deleted));
             }
             case "/api/keyer": {                                                // the voice keyer's three messages and the station-ID timer
                 com.macdmr.radio.ham.VoiceKeyer k = svc.keyer();
                 if (post) {
-                    int slot = b.optInt("slot", -1); if (slot < 0 || slot >= com.macdmr.radio.ham.VoiceKeyer.SLOTS) return WebServer.Response.error(400, "slot 0 to 2");
+                    int slot = b.optInt("slot", -1); if (slot < 0 || slot >= com.macdmr.radio.ham.VoiceKeyer.SLOTS) return WebServer.Response.error(400, "slot 0 to 2");   // i18n: API usage error (the pages always send it)
                     if (b.has("name")) k.setName(slot, b.getString("name").trim());
                     if (b.has("addId")) k.setAddId(slot, b.getBoolean("addId"));
                     if (b.optBoolean("delete", false)) k.delete(slot);
                     if (b.optBoolean("send", false)) {
-                        if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                        if (!allowTx()) return WebServer.Response.error(403, txOff());
                         String e = onMain(() -> svc.sendKeyer(slot)); if (e != null) return WebServer.Response.error(409, e);
                     }
                 }
@@ -1356,28 +1360,28 @@ public final class WebHost {
                 return ok(new JSONObject().put("slots", a).put("idDueMs", due == Long.MAX_VALUE ? null : due).put("webTx", allowTx()));
             }
             case "/api/keyer/audio": {                                          // GET ?slot= : the message as WAV; POST ?slot= : raw 8 kHz mono s16le body
-                int slot = parse(r.param("slot"), -1); if (slot < 0 || slot >= com.macdmr.radio.ham.VoiceKeyer.SLOTS) return WebServer.Response.error(400, "slot 0 to 2");
+                int slot = parse(r.param("slot"), -1); if (slot < 0 || slot >= com.macdmr.radio.ham.VoiceKeyer.SLOTS) return WebServer.Response.error(400, "slot 0 to 2");   // i18n: API usage error (the pages always send it)
                 if (post) {
-                    if (r.body.length < 1600) return WebServer.Response.error(400, "That recording is too short");
+                    if (r.body.length < 1600) return WebServer.Response.error(400, Txt.s(R.string.web_keyer_short));
                     short[] pcm = new short[r.body.length / 2]; java.nio.ByteBuffer.wrap(r.body).order(java.nio.ByteOrder.LITTLE_ENDIAN).asShortBuffer().get(pcm);
                     svc.keyer().save(slot, pcm);
-                    return ok("Saved " + svc.keyer().name(slot) + String.format(java.util.Locale.US, " (%.1f s)", Math.min(pcm.length, 200_000) / 8000.0));
+                    return ok(Txt.s(R.string.web_keyer_saved, svc.keyer().name(slot), String.format(java.util.Locale.US, "%.1f", Math.min(pcm.length, 200_000) / 8000.0)));
                 }
-                short[] p0 = svc.keyer().pcm(slot); if (p0 == null || p0.length == 0) return WebServer.Response.error(404, "Nothing recorded");
+                short[] p0 = svc.keyer().pcm(slot); if (p0 == null || p0.length == 0) return WebServer.Response.error(404, Txt.s(R.string.web_keyer_empty));
                 return WebServer.Response.bytes("audio/wav", wav(p0));
             }
             case "/api/ft8": {                                                  // FT8 over FM: GET state + decodes; POST {on} | {cq} | {reply:{slot,text}} | {halt} | {send} | {parity} | {txHz} | {grid} | {clear}
                 final com.macdmr.radio.ham.Ft8Station f8 = svc.ft8();
                 if (post) {
                     boolean tx = b.optBoolean("cq", false) || b.has("reply") || b.has("send");
-                    if (tx && !allowTx()) return WebServer.Response.error(403, TX_OFF);
+                    if (tx && !allowTx()) return WebServer.Response.error(403, txOff());
                     String e = onMain(() -> {
                         if (b.has("on")) svc.setFt8(b.getBoolean("on"));
                         if (b.has("parity")) f8.setTxParity(b.getInt("parity"));
                         if (b.has("txHz")) f8.setTxHz(b.getDouble("txHz"));
                         if (b.has("grid")) {
                             String g = b.getString("grid").trim().toUpperCase(java.util.Locale.US);
-                            if (!g.isEmpty() && !g.equals("-") && !g.matches("[A-R]{2}[0-9]{2}([A-X]{2})?")) return "A grid is two letters A-R and two digits, like FN42";
+                            if (!g.isEmpty() && !g.equals("-") && !g.matches("[A-R]{2}[0-9]{2}([A-X]{2})?")) return Txt.s(R.string.web_ft8_grid);
                             svc.setFt8Grid(g);
                         }
                         if (b.optBoolean("clear", false)) f8.clear();
@@ -1387,7 +1391,7 @@ public final class WebHost {
                         if (b.has("reply")) {
                             JSONObject rp = b.getJSONObject("reply");
                             com.macdmr.radio.ham.Ft8Station.Heard h = f8.find(rp.getLong("slot"), rp.getString("text"));
-                            return h == null ? "That decode is no longer in the list" : f8.reply(h);
+                            return h == null ? Txt.s(R.string.web_ft8_gone) : f8.reply(h);
                         }
                         return null;
                     });
@@ -1436,7 +1440,7 @@ public final class WebHost {
                 com.macdmr.radio.PacketEngine pe = svc.packet();
                 if (post) {
                     if (b.has("send")) {
-                        if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                        if (!allowTx()) return WebServer.Response.error(403, txOff());
                         String e = onMain(() -> pe.textSend(b.getString("send")));
                         if (e != null) return WebServer.Response.error(409, e);
                     }
@@ -1447,14 +1451,14 @@ public final class WebHost {
                         return null;
                     });
                 }
-                JSONArray modes = new JSONArray(); for (String m : com.macdmr.radio.PacketEngine.TEXT_MODES) modes.put(m);
+                JSONArray modes = new JSONArray(); for (String m : com.macdmr.radio.PacketEngine.textModeNames()) modes.put(m);
                 return ok(new JSONObject().put("mode", pe.textMode()).put("txMode", pe.textTxMode()).put("status", pe.textStatus()).put("text", pe.textReceived()).put("modes", modes).put("webTx", allowTx()));
             }
             case "/api/terminal": {                                             // AX.25 connected-mode terminal: GET transcript; POST {connect, via} | {send} | {disconnect} | {accept}
                 com.macdmr.radio.PacketEngine pe = svc.packet();
                 if (post) {
                     boolean tx = b.has("connect") || b.has("send") || (b.has("accept") && b.getBoolean("accept"));
-                    if (tx && !allowTx()) return WebServer.Response.error(403, TX_OFF);
+                    if (tx && !allowTx()) return WebServer.Response.error(403, txOff());
                     String e = onMain(() -> {
                         if (b.has("connect")) return pe.terminalConnect(b.getString("connect"), b.optString("via", ""));
                         if (b.has("send")) return pe.terminalSend(b.getString("send"));
@@ -1496,7 +1500,7 @@ public final class WebHost {
             case "/api/repeaters": {                                            // nearby repeaters (RadioID / BrandMeister / Hearham, cached by the phone)
                 double cLat = parseD(r.param("lat"), Double.NaN), cLon = parseD(r.param("lon"), Double.NaN);       // lat/lon: around that point (the map's centre); otherwise around the phone
                 boolean atPoint = !Double.isNaN(cLat) && !Double.isNaN(cLon) && Math.abs(cLat) <= 90 && Math.abs(cLon) <= 180;
-                android.location.Location me = svc.lastKnownLocation(); if (!atPoint && me == null) return WebServer.Response.error(409, "No position fix on the phone yet");
+                android.location.Location me = svc.lastKnownLocation(); if (!atPoint && me == null) return WebServer.Response.error(409, Txt.s(R.string.web_no_fix_yet));
                 double mi = Math.max(5, Math.min(150, parse(r.param("radiusMi"), svc.getSharedPreferences("repeaters", Context.MODE_PRIVATE).getInt("radiusMi", 30))));
                 StringBuilder st = new StringBuilder();
                 java.util.List<com.macdmr.radio.repeaters.RepeaterModels.Repeater> found = repeaters().nearby(atPoint ? cLat : me.getLatitude(), atPoint ? cLon : me.getLongitude(), mi * 1.609344, "1".equals(r.param("force")), st);
@@ -1512,16 +1516,16 @@ public final class WebHost {
                 return ok(new JSONObject().put("repeaters", a).put("status", st.toString()).put("radiusMi", mi).put("around", atPoint ? "map" : "phone"));
             }
             case "/api/repeaters/talkgroups": {
-                com.macdmr.radio.repeaters.RepeaterModels.Repeater x = lastRepeaters.get(r.param("key")); if (x == null) return WebServer.Response.error(404, "Search again: that repeater is not in the last list");
+                com.macdmr.radio.repeaters.RepeaterModels.Repeater x = lastRepeaters.get(r.param("key")); if (x == null) return WebServer.Response.error(404, Txt.s(R.string.web_rpt_search_again));
                 JSONArray a = new JSONArray();
                 for (com.macdmr.radio.repeaters.RepeaterModels.Talkgroup t : repeaters().talkgroups(x)) a.put(new JSONObject().put("id", t.id).put("slot", t.slot).put("name", t.name).put("kind", t.kind));
                 return ok(new JSONObject().put("talkgroups", a));
             }
             case "/api/repeaters/add": if (!post) break; {                      // {key, talk: [tg…], confirm}: without confirm only the preview
-                com.macdmr.radio.repeaters.RepeaterModels.Repeater x = lastRepeaters.get(b.optString("key", "")); if (x == null) return WebServer.Response.error(404, "Search again: that repeater is not in the last list");
+                com.macdmr.radio.repeaters.RepeaterModels.Repeater x = lastRepeaters.get(b.optString("key", "")); if (x == null) return WebServer.Response.error(404, Txt.s(R.string.web_rpt_search_again));
                 java.util.Set<Integer> talk = new java.util.HashSet<>(); JSONArray ta = b.optJSONArray("talk"); if (ta != null) for (int i = 0; i < ta.length(); i++) talk.add(ta.getInt(i));
                 com.macdmr.radio.repeaters.RepeaterPlanner.Plan plan = repeaters().plan(x, talk);
-                if (plan.channels.isEmpty()) return WebServer.Response.error(409, plan.warnings.isEmpty() ? "Nothing to program" : plan.warnings.get(0));
+                if (plan.channels.isEmpty()) return WebServer.Response.error(409, plan.warnings.isEmpty() ? Txt.s(R.string.web_rpt_nothing) : plan.warnings.get(0));
                 if (!b.optBoolean("confirm", false)) return ok(new JSONObject().put("preview", com.macdmr.radio.repeaters.RepeaterService.preview(plan)));
                 String res = repeaters().program(x, plan);
                 return ok(res);
@@ -1529,14 +1533,14 @@ public final class WebHost {
             case "/api/zones": {
                 if (post) {                                                     // save {id?, name, numbers[]}
                     ChannelStore.Zone z = new ChannelStore.Zone(); z.id = b.optLong("id", 0); z.name = b.optString("name", "").trim();
-                    if (z.name.isEmpty()) return WebServer.Response.error(400, "A zone needs a name");
+                    if (z.name.isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_zone_name_needed));
                     JSONArray ns = b.optJSONArray("numbers"); java.util.List<Integer> keep = new java.util.ArrayList<>();
                     if (ns != null) for (int i = 0; i < ns.length(); i++) { int n = ns.getInt(i); if (svc.store().byNumber(n) != null && !keep.contains(n)) keep.add(n); }
-                    if (keep.isEmpty()) return WebServer.Response.error(400, "Pick at least one channel for the zone");
+                    if (keep.isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_zone_pick));
                     java.util.Collections.sort(keep); z.numbers = new int[keep.size()]; for (int i = 0; i < keep.size(); i++) z.numbers[i] = keep.get(i);
                     long id = svc.store().saveZone(z);
                     if (svc.zoneId() == id) onMain(() -> { svc.setZone(id); return null; });   // the active zone changed: scan and arrows follow it
-                    return WebServer.Response.json(200, new JSONObject().put("ok", true).put("message", "Saved zone " + z.name).put("id", id).toString());
+                    return WebServer.Response.json(200, new JSONObject().put("ok", true).put("message", Txt.s(R.string.web_zone_saved, z.name)).put("id", id).toString());
                 }
                 JSONArray zs = new JSONArray();
                 for (ChannelStore.Zone z : svc.store().zones()) { JSONArray ns = new JSONArray(); for (int n : z.numbers) ns.put(n); zs.put(new JSONObject().put("id", z.id).put("name", z.name).put("numbers", ns)); }
@@ -1544,9 +1548,9 @@ public final class WebHost {
                 return ok(new JSONObject().put("zones", zs).put("channels", all).put("active", svc.zoneId()));
             }
             case "/api/zones/delete": if (!post) break; {
-                long id = b.optLong("id", 0); ChannelStore.Zone z = svc.store().zone(id); if (z == null) return WebServer.Response.error(404, "No such zone");
+                long id = b.optLong("id", 0); ChannelStore.Zone z = svc.store().zone(id); if (z == null) return WebServer.Response.error(404, Txt.s(R.string.web_zone_none));
                 onMain(() -> { if (svc.zoneId() == id) svc.setZone(0); svc.store().deleteZone(id); return null; });
-                return ok("Deleted zone " + z.name);
+                return ok(Txt.s(R.string.web_zone_deleted, z.name));
             }
             case "/api/backups": {                                              // the backups in Download/DMR/DMR_Backups
                 JSONArray a = new JSONArray();
@@ -1558,10 +1562,10 @@ public final class WebHost {
             }
             case "/api/backup": if (!post) break; {
                 File dir = com.macdmr.radio.Backup.export(svc.store(), svc.packet() != null ? svc.packet().dtmfSaved() : null);
-                return WebServer.Response.json(200, new JSONObject().put("ok", true).put("message", "Backed up to Download/DMR/DMR_Backups/" + dir.getName()).put("name", dir.getName()).toString());
+                return WebServer.Response.json(200, new JSONObject().put("ok", true).put("message", Txt.s(R.string.web_backup_done, dir.getName())).put("name", dir.getName()).toString());
             }
             case "/api/backup/zip": {                                           // one backup as a .zip download
-                File dir = backupDir(r.param("name")); if (dir == null) return WebServer.Response.error(404, "No such backup");
+                File dir = backupDir(r.param("name")); if (dir == null) return WebServer.Response.error(404, Txt.s(R.string.web_backup_none));
                 ByteArrayOutputStream bo = new ByteArrayOutputStream();
                 try (java.util.zip.ZipOutputStream z = new java.util.zip.ZipOutputStream(bo)) {
                     File[] l = dir.listFiles(); if (l != null) for (File f : l) if (f.isFile() && f.getName().endsWith(".csv")) {
@@ -1574,27 +1578,27 @@ public final class WebHost {
                 x.headers.put("Content-Disposition", "attachment; filename=\"" + dir.getName() + ".zip\""); return x;
             }
             case "/api/restore": if (!post) break; {                            // {name} an existing backup, or {files: {"Channels.csv": text, …}} uploaded from the computer
-                if (svc.firmwareLoading()) return WebServer.Response.error(409, "Radio busy, loading firmware");
-                if (svc.isTransmitting()) return WebServer.Response.error(409, "Not while transmitting");
+                if (svc.firmwareLoading()) return WebServer.Response.error(409, Txt.s(R.string.web_firmware_busy));
+                if (svc.isTransmitting()) return WebServer.Response.error(409, Txt.s(R.string.web_not_while_tx));
                 File dir;
                 if (b.has("files")) {
                     JSONObject fs = b.getJSONObject("files");
-                    java.util.Set<String> allowed = new java.util.HashSet<>(java.util.Arrays.asList("Contacts.csv", "TG_Lists.csv", "Channels.csv", "Zones.csv", "DTMF.csv"));
-                    if (!fs.has("Channels.csv")) return WebServer.Response.error(400, "Channels.csv is needed (with Contacts.csv, TG_Lists.csv and Zones.csv from the same backup)");
+                    java.util.Set<String> allowed = new java.util.HashSet<>(java.util.Arrays.asList("Contacts.csv", "TG_Lists.csv", "Channels.csv", "Zones.csv", "DTMF.csv"));   // i18n: file names
+                    if (!fs.has("Channels.csv")) return WebServer.Response.error(400, Txt.s(R.string.web_restore_need_channels));
                     dir = new File(svc.getCacheDir(), "web_restore"); deleteTree(dir); dir.mkdirs();
                     for (java.util.Iterator<String> it = fs.keys(); it.hasNext(); ) {
                         String n = it.next(); if (!allowed.contains(n)) continue;
                         try (java.io.FileOutputStream o = new java.io.FileOutputStream(new File(dir, n))) { o.write(fs.getString(n).getBytes(java.nio.charset.StandardCharsets.UTF_8)); }
                     }
                 } else {
-                    dir = backupDir(b.optString("name", "")); if (dir == null) return WebServer.Response.error(404, "No such backup");
+                    dir = backupDir(b.optString("name", "")); if (dir == null) return WebServer.Response.error(404, Txt.s(R.string.web_backup_none));
                 }
                 final File from = dir;
                 String res;
                 try {
                     res = com.macdmr.radio.Backup.restore(svc.store(), from);
                     if (svc.packet() != null) for (java.util.Map.Entry<String, String> e : com.macdmr.radio.Backup.readDtmf(from).entrySet()) svc.packet().dtmfSave(e.getKey(), e.getValue());
-                } catch (Exception e) { return WebServer.Response.error(400, "Restore failed: " + e.getMessage()); }
+                } catch (Exception e) { return WebServer.Response.error(400, Txt.s(R.string.web_restore_failed, String.valueOf(e.getMessage()))); }
                 onMain(() -> { svc.selectChannel(svc.store().activeNumber()); return null; });
                 return ok(res);
             }
@@ -1611,7 +1615,7 @@ public final class WebHost {
                     JSONObject e = rows.get(key);
                     if (e != null) { e.put("count", e.getInt("count") + 1); continue; }
                     ChannelStore.Channel c = svc.store().byNumber(ch);
-                    rows.put(key, new JSONObject().put("ts", ts).put("channel", ch).put("channelName", c != null ? c.name : ch == 0 ? "VFO" : "channel " + ch)
+                    rows.put(key, new JSONObject().put("ts", ts).put("channel", ch).put("channelName", c != null ? c.name : ch == 0 ? "VFO" /* i18n: mode name */ : Txt.s(R.string.web_heard_channel, ch))
                             .put("kind", kind).put("text", text).put("dmrId", id).put("name", id > 0 ? svc.callerName(id) : "").put("count", 1));
                 }
                 JSONArray a = new JSONArray(); for (JSONObject o : rows.values()) a.put(o);
@@ -1631,19 +1635,19 @@ public final class WebHost {
             case "/api/contacts": {
                 if (post) {                                                     // create or update {id?, name, number, type}
                     ChannelStore.Contact ct = b.optLong("id", 0) > 0 ? svc.store().contactById(b.optLong("id", 0)) : new ChannelStore.Contact();
-                    if (ct == null) return WebServer.Response.error(404, "No such contact");
+                    if (ct == null) return WebServer.Response.error(404, Txt.s(R.string.web_contact_none));
                     ct.name = b.optString("name", "").trim(); ct.number = b.optInt("number", 0); ct.type = b.optInt("type", 0);
                     String cs = b.optString("callsign", ct.callsign).trim().toUpperCase(java.util.Locale.US);
-                    if (!cs.isEmpty() && !cs.matches("[A-Z0-9]{1,9}(-[0-9]{1,2})?")) return WebServer.Response.error(400, "Callsign: letters and digits, an optional -SSID");
+                    if (!cs.isEmpty() && !cs.matches("[A-Z0-9]{1,9}(-[0-9]{1,2})?")) return WebServer.Response.error(400, Txt.s(R.string.web_contact_call_format));
                     if (!cs.equals(ct.callsign)) ct.callsignAuto = 2;
                     ct.callsign = cs; ct.rics = ChannelStore.ricText(ChannelStore.parseRics(b.optString("rics", ct.rics))); ct.notes = b.optString("notes", ct.notes).trim(); ct.homeLabel = b.optString("homeLabel", ct.homeLabel).trim();
-                    if (b.has("home")) { String h = b.optString("home", "").trim(); double[] hp = h.isEmpty() ? null : com.macdmr.radio.ui.ContactEditor.parseLocation(h); if (!h.isEmpty() && hp == null) return WebServer.Response.error(400, "Home: a grid square or latitude, longitude"); ct.homeLat = hp == null ? Double.NaN : hp[0]; ct.homeLon = hp == null ? Double.NaN : hp[1]; }
-                    if (ct.number < 0 || ct.number > 0xFFFFFF) return WebServer.Response.error(400, "The DMR ID must be 1 to 16777215");
-                    if (ct.number == 0 && ct.callsign.isEmpty() && ct.rics.isEmpty()) return WebServer.Response.error(400, "A contact needs a DMR ID, a callsign or a pager RIC");
-                    if (ct.type < 0 || ct.type > 2) return WebServer.Response.error(400, "type: 0 private, 1 group, 2 all");
-                    if (ct.name.isEmpty()) ct.name = !ct.callsign.isEmpty() ? ct.callsign : ct.number > 0 ? "ID " + ct.number : "RIC " + ct.rics;
+                    if (b.has("home")) { String h = b.optString("home", "").trim(); double[] hp = h.isEmpty() ? null : com.macdmr.radio.ui.ContactEditor.parseLocation(h); if (!h.isEmpty() && hp == null) return WebServer.Response.error(400, Txt.s(R.string.web_contact_home)); ct.homeLat = hp == null ? Double.NaN : hp[0]; ct.homeLon = hp == null ? Double.NaN : hp[1]; }
+                    if (ct.number < 0 || ct.number > 0xFFFFFF) return WebServer.Response.error(400, Txt.s(R.string.web_contact_id_range));
+                    if (ct.number == 0 && ct.callsign.isEmpty() && ct.rics.isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_contact_needs_id));
+                    if (ct.type < 0 || ct.type > 2) return WebServer.Response.error(400, "type: 0 private, 1 group, 2 all");   // i18n: API usage error (the pages always send it)
+                    if (ct.name.isEmpty()) ct.name = !ct.callsign.isEmpty() ? ct.callsign : ct.number > 0 ? "ID " + ct.number : "RIC " + ct.rics;   // i18n: stored contact name, as the phone names it
                     if (ct.id > 0) svc.store().updateContact(ct); else svc.store().insertContact(ct);
-                    return ok("Saved " + (ct.name.isEmpty() ? String.valueOf(ct.number) : ct.name));
+                    return ok(Txt.s(R.string.web_saved_item, (ct.name.isEmpty() ? String.valueOf(ct.number) : ct.name)));
                 }
                 JSONArray a = new JSONArray();
                 for (ChannelStore.Contact ct : svc.store().contacts()) {
@@ -1663,8 +1667,8 @@ public final class WebHost {
             }
             case "/api/contacts/delete": if (!post) break; {
                 long id = b.optLong("id", 0);
-                for (ChannelStore.Contact ct : svc.store().contacts()) if (ct.id == id) { svc.store().deleteContact(ct); return ok("Deleted " + (ct.name.isEmpty() ? String.valueOf(ct.number) : ct.name)); }
-                return WebServer.Response.error(404, "No such contact");
+                for (ChannelStore.Contact ct : svc.store().contacts()) if (ct.id == id) { svc.store().deleteContact(ct); return ok(Txt.s(R.string.web_deleted_item, (ct.name.isEmpty() ? String.valueOf(ct.number) : ct.name))); }
+                return WebServer.Response.error(404, Txt.s(R.string.web_contact_none));
             }
             case "/api/conversations": {
                 JSONArray a = new JSONArray();
@@ -1676,20 +1680,20 @@ public final class WebHost {
             }
             case "/api/messages": {
                 if (post) {                                                     // DMR {peer, type, text}; a page or M17 thread sends on that transport
-                    if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                    if (!allowTx()) return WebServer.Response.error(403, txOff());
                     String transport = b.optString("transport", "dmr");
                     String text = b.optString("text", "").trim();
                     if ("page".equals(transport)) return sendWebPage(b, text);
                     if ("m17".equals(transport)) return sendWebM17(b, text);
                     WebServer.Response denied = gate("/api/messages"); if (denied != null) return denied;
-                    if (text.isEmpty() || b.optInt("peer", 0) <= 0) return WebServer.Response.error(400, "A recipient and a text are needed");
-                    if (text.length() > 140) return WebServer.Response.error(400, "Texts are at most 140 characters");
-                    if (!svc.isReady()) return WebServer.Response.error(409, "The radio is not ready");
+                    if (text.isEmpty() || b.optInt("peer", 0) <= 0) return WebServer.Response.error(400, Txt.s(R.string.web_msg_need));
+                    if (text.length() > 140) return WebServer.Response.error(400, Txt.s(R.string.web_msg_too_long));
+                    if (!svc.isReady()) return WebServer.Response.error(409, Txt.s(R.string.web_radio_not_ready));
                     int peer = b.optInt("peer", 0), type = b.optInt("type", 0);
                     ChannelStore.Contact to = new ChannelStore.Contact(); to.number = peer; to.type = type;
                     String nm = svc.store().contactName(peer, type); to.name = nm == null ? "" : nm;
                     onMain(() -> { svc.sendSms(to, text); return null; });
-                    return ok("Sending to " + (to.name.isEmpty() ? String.valueOf(peer) : to.name));
+                    return ok(Txt.s(R.string.web_sending_to, (to.name.isEmpty() ? String.valueOf(peer) : to.name)));
                 }
                 String thread = r.param("thread");
                 if (thread != null && !thread.isEmpty()) {
@@ -1728,28 +1732,28 @@ public final class WebHost {
                 boolean on = b.optBoolean("on", false);
                 String err = onMain(() -> on ? svc.setPagerMonitor(true, pagerScanHz(), b.optInt("baud", 1200)) : stopPagerMonitor());
                 if (err != null) return WebServer.Response.error(409, err);
-                return ok(on ? "Pager monitor on" : "Pager monitor off");
+                return ok(on ? Txt.s(R.string.web_pager_monitor_on) : Txt.s(R.string.web_pager_monitor_off));
             }
             case "/api/pager/send": if (!post) break; {
                 WebServer.Response denied = gate("/api/pager/send"); if (denied != null) return denied;
-                if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                if (!allowTx()) return WebServer.Response.error(403, txOff());
                 return sendWebPage(b, b.optString("text", "").trim());
             }
             case "/api/m17/sms": if (!post) break; {
                 WebServer.Response denied = gate("/api/m17/sms"); if (denied != null) return denied;
-                if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+                if (!allowTx()) return WebServer.Response.error(403, txOff());
                 return sendWebM17(b, b.optString("text", "").trim());
             }
             case "/api/device": return ok(deviceJson());
             case "/api/device/restart": if (!post) break; {
                 WebServer.Response denied = gateAdmin("/api/device/restart"); if (denied != null) return denied;
-                if (!b.optBoolean("confirm", false)) return WebServer.Response.error(400, "Confirm on the page first");
+                if (!b.optBoolean("confirm", false)) return WebServer.Response.error(400, Txt.s(R.string.web_confirm_first));
                 onMain(() -> { svc.diagRestartModule(); return null; });
-                return ok("Restarting the radio module");
+                return ok(Txt.s(R.string.web_device_restarting));
             }
             case "/api/device/update": if (!post) break; {
                 WebServer.Response denied = gateAdmin("/api/device/update"); if (denied != null) return denied;
-                if (!b.optBoolean("confirm", false)) return WebServer.Response.error(400, "Confirm on the page first");
+                if (!b.optBoolean("confirm", false)) return WebServer.Response.error(400, Txt.s(R.string.web_confirm_first));
                 return deviceUpdate(b.optBoolean("install", false));
             }
             default: break;
@@ -1760,17 +1764,16 @@ public final class WebHost {
     /** One modeAllowed or adminAllowed call, from the part-B route tables. */
     static final String[][] ROUTE_MODES = WebRoutes.ROUTE_MODES;
     static final String[][] ROUTE_ADMIN = WebRoutes.ROUTE_ADMIN;
-    private static final String RESTRICTED = "That is turned off in Restricted mode";
     private WebServer.Response gate(String path) {
         String id = null;
         for (String[] m : ROUTE_MODES) if (path.equals(m[0])) id = m[1];
-        if (id != null && !svc.modeAllowed(id)) return WebServer.Response.error(403, RESTRICTED);
+        if (id != null && !svc.modeAllowed(id)) return WebServer.Response.error(403, Txt.s(R.string.web_restricted));
         return null;
     }
     private WebServer.Response gateAdmin(String path) {
         String id = null;
         for (String[] a : ROUTE_ADMIN) if (path.equals(a[0])) id = a[1];
-        if (id != null && !svc.adminAllowed(id)) return WebServer.Response.error(403, RESTRICTED);
+        if (id != null && !svc.adminAllowed(id)) return WebServer.Response.error(403, Txt.s(R.string.web_restricted));
         return null;
     }
     private int[] ricsOf(String token) {
@@ -1800,14 +1803,14 @@ public final class WebHost {
     }
     private WebServer.Response sendWebPage(JSONObject b, String text) throws Exception {
         WebServer.Response denied = gate("/api/pager/send"); if (denied != null) return denied;
-        if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
-        if (text == null || text.trim().isEmpty()) return WebServer.Response.error(400, "Write the message");
+        if (!allowTx()) return WebServer.Response.error(403, txOff());
+        if (text == null || text.trim().isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_pager_write));
         int hz = b.optInt("hz", 0);
         if (hz <= 0 && svc.current() != null) hz = svc.current().rxFreq;
         int[] rics;
         if (b.has("ric") && !b.has("to")) {
             int ric = b.optInt("ric", -1);
-            if (ric < 0 || ric > 0x1FFFFF) return WebServer.Response.error(400, "Add a RIC");
+            if (ric < 0 || ric > 0x1FFFFF) return WebServer.Response.error(400, Txt.s(R.string.web_pager_add_ric));
             rics = new int[] { ric };
         } else {
             try { rics = PagerTargets.resolve(b.optString("to", ""), this::ricsOf); }
@@ -1817,15 +1820,15 @@ public final class WebHost {
         final int[] fr = rics; final boolean sign = b.optBoolean("sign", true); final String body = text.trim();
         String err = onMain(() -> svc.sendPage(baud, fhz, fr, func, body, sign));
         if (err != null) return WebServer.Response.error(409, err);
-        return ok("Sending to " + rics.length + (rics.length == 1 ? " RIC" : " RICs"));
+        return ok(Txt.p(R.plurals.web_pager_sending, rics.length, rics.length));
     }
     private WebServer.Response sendWebM17(JSONObject b, String text) throws Exception {
         WebServer.Response denied = gate("/api/m17/sms"); if (denied != null) return denied;
-        if (!allowTx()) return WebServer.Response.error(403, TX_OFF);
+        if (!allowTx()) return WebServer.Response.error(403, txOff());
         final String dest = b.optString("dest", ""); final String body = text == null ? "" : text.trim();
         String err = onMain(() -> svc.sendM17Sms(dest, body));
         if (err != null) return WebServer.Response.error(409, err);
-        return ok("Sending");
+        return ok(Txt.s(R.string.web_sending));
     }
     private JSONObject deviceJson() throws Exception {
         String tag = svc.moduleVersion() == null ? "" : svc.moduleVersion().trim();
@@ -1849,30 +1852,31 @@ public final class WebHost {
         try {
             com.macdmr.radio.Updater.Release rel = com.macdmr.radio.Updater.fetchLatest();
             String have = com.macdmr.radio.BuildConfig.VERSION_NAME;
-            if (rel == null) return ok(new JSONObject().put("ok", true).put("message", "No SignalDeck release is published yet").put("installed", have).put("newer", false));
+            if (rel == null) return ok(new JSONObject().put("ok", true).put("message", Txt.s(R.string.web_update_none)).put("installed", have).put("newer", false));
             boolean newer = com.macdmr.radio.Updater.compareVersions(rel.version, have) > 0;
             if (!newer || !install) {
-                String msg = newer ? ("Update " + rel.version + " is available") : ("You are on the latest version (" + have + ")");
+                String msg = newer ? Txt.s(R.string.web_update_available, rel.version) : Txt.s(R.string.web_update_latest, have);
                 return ok(new JSONObject().put("ok", true).put("message", msg).put("installed", have).put("latest", rel.version == null ? "" : rel.version).put("newer", newer).put("notes", rel.notes == null ? "" : rel.notes));
             }
-            String name = rel.apkName == null ? "SignalDeck-update.apk" : rel.apkName.replaceAll("[^A-Za-z0-9._-]", "_");
+            String name = rel.apkName == null ? "SignalDeck-update.apk" :   // i18n: file name
+                    rel.apkName.replaceAll("[^A-Za-z0-9._-]", "_");
             if (!name.endsWith(".apk")) name = name + ".apk";
             java.io.File dest = new java.io.File(svc.getCacheDir(), name);
             downloadTo(rel.apkUrl, dest);
             String result = com.macdmr.radio.Updater.rootInstall(dest.getAbsolutePath());
-            return ok(new JSONObject().put("ok", true).put("message", "Installing " + rel.version).put("installed", have).put("latest", rel.version).put("newer", true).put("install", result == null ? "" : result));
+            return ok(new JSONObject().put("ok", true).put("message", Txt.s(R.string.web_update_installing, rel.version)).put("installed", have).put("latest", rel.version).put("newer", true).put("install", result == null ? "" : result));
         } catch (Exception e) {
-            String m = e.getMessage() == null ? "Update check failed" : e.getMessage();
+            String m = e.getMessage() == null ? Txt.s(R.string.web_update_failed) : e.getMessage();
             return WebServer.Response.error(502, m);
         }
     }
     private static void downloadTo(String url, java.io.File dest) throws Exception {
-        if (url == null || !url.startsWith("https://")) throw new IllegalArgumentException("The update has no download address");
+        if (url == null || !url.startsWith("https://")) throw new IllegalArgumentException(Txt.s(R.string.web_update_no_url));
         java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(url).openConnection();
         c.setInstanceFollowRedirects(true); c.setConnectTimeout(15000); c.setReadTimeout(120000);
         try (java.io.InputStream in = c.getInputStream(); java.io.OutputStream out = new java.io.FileOutputStream(dest)) {
             byte[] buf = new byte[65536]; int n; long total = 0;
-            while ((n = in.read(buf)) > 0) { total += n; if (total > 80L * 1024 * 1024) throw new IllegalStateException("The update is larger than 80 MB"); out.write(buf, 0, n); }
+            while ((n = in.read(buf)) > 0) { total += n; if (total > 80L * 1024 * 1024) throw new IllegalStateException(Txt.s(R.string.web_update_too_big)); out.write(buf, 0, n); }
         } finally { c.disconnect(); }
     }
 }

@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
+
 /**
  * The radio module's firmware as SignalDeck has seen it: the stock version (the first one the module ever reported
  * on this phone, kept for good) and the one it reports now, so an owner who loads other firmware can tell what the
@@ -44,6 +46,6 @@ public final class Firmware {
     /** The Device page line: the stock version, and the current one only when it differs; "" before the first report. */
     public static String line(String stock, String current) {
         if (stock == null || stock.isEmpty()) return "";
-        return differs(stock, current) ? "firmware " + current + "\nstock " + stock : "firmware " + stock + " (stock)";
+        return differs(stock, current) ? Txt.s(R.string.device_firmware_line_changed, current, stock) : Txt.s(R.string.device_firmware_line_stock, stock);
     }
 }

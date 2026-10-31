@@ -78,7 +78,10 @@ android {
         }
     }
     buildTypes {
-        debug { if (releaseStore) signingConfig signingConfigs.release }
+        debug {
+            if (releaseStore) signingConfig signingConfigs.release
+            pseudoLocalesEnabled true   // en-XA (accented, longer) and ar-XB (right to left) for the translation layout check
+        }
         release {
             minifyEnabled false
             signingConfig releaseStore ? signingConfigs.release : signingConfigs.debug
@@ -113,6 +116,7 @@ dependencies {
 tasks.withType(Test).configureEach {
     systemProperty 'signaldeck.exportHelp', (project.findProperty('exportHelp') ?: 'false').toString()
     systemProperty 'signaldeck.exportRadios', (project.findProperty('exportRadios') ?: 'false').toString()   // RadioNotesExportTest writes docs/radios
+    systemProperty 'signaldeck.exportI18n', (project.findProperty('exportI18n') ?: 'false').toString()   // I18nLiteralGuardTest rewrites its baseline
 }
 
 configurations.all {

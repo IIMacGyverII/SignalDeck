@@ -150,7 +150,7 @@ public final class UartPcmAudio implements AudioBackend {
                 }
             }, "uart-pcm-tx-pace");
             txThread.start(); txWriter.start();
-            return "UART PCM TX started (paced, " + TX_PREBUFFER * 10 + " ms buffer)";
+            return "UART PCM TX started (paced, " + TX_PREBUFFER * 10 + " ms buffer)";   // i18n: log line
         } catch (Throwable t) { return "startTx failed: " + t; }
     }
 
@@ -163,7 +163,7 @@ public final class UartPcmAudio implements AudioBackend {
         try { if (txThread != null) txThread.join(500); if (txWriter != null) txWriter.join(500); } catch (InterruptedException ignored) { }
         try { if (rec != null) { rec.stop(); rec.release(); rec = null; } } catch (Throwable ignored) { }
         PcmPacer p = txPacer; txPacer = null;
-        return "UART PCM TX stopped" + (p != null ? " (" + p.stats() + ")" : "");
+        return "UART PCM TX stopped" + (p != null ? " (" + p.stats() + ")" : "");   // i18n: log line
     }
 
     private volatile boolean abortPlay;

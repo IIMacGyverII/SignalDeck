@@ -10,9 +10,13 @@ before touching radio behaviour; it wins over guesses.
 - Build + host tests: `JAVA_HOME=<JDK 17> ./gradlew assembleRelease testReleaseUnitTest`.
 - Install the **release** build on the owner's phone: `adb install -r app/build/outputs/apk/release/app-release.apk`.
   Never `adb uninstall` (loses the Magisk grant and the app data).
-- Update the in-app help in the same change (`ui/HelpView.java` TOPICS, `ChannelEditorView` `H_*` texts).
-  After changing TOPICS, regenerate the guide the website shows: `./gradlew testReleaseUnitTest --tests
-  '*HelpExportTest' -PexportHelp=true` (writes `docs/help/`; `HelpExportTest` fails while it is out of date).
+- Update the in-app help in the same change (`app/src/main/assets/guide/en.json`, `ChannelEditorView` `H_*` texts).
+  Then regenerate the guide the website shows: `./gradlew testReleaseUnitTest --tests '*HelpExportTest'
+  -PexportHelp=true` (writes `docs/help/`; `HelpExportTest` fails while it is out of date).
+- New user-facing text goes in `res/values/strings_<group>.xml` with a context note, read with `Txt.s(R.string.…)`;
+  text that must stay English is marked `// i18n: <reason>`. `I18nLiteralGuardTest` fails on new English literals;
+  when a file's count drops, rewrite its baseline (`-PexportI18n=true`).
+- Translations: change the English text only; the other languages are marked for translation by the key test.
 - Log it in `CHANGELOG.md` (newest first, dated section, `| Backlog | Change | Files | Test |` row, say whether it was
   device-tested).
 - Never commit signing keys or their passwords (`local.properties` holds them), the profile-signing key

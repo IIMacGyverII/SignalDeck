@@ -8,6 +8,8 @@ package com.macdmr.radio;
 
 import android.content.Context;
 
+import com.macdmr.radio.i18n.Txt;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -206,7 +208,7 @@ public final class TxTestSession {
         // 5 DMR group call
         s = r.step("dmr");
         if (s != null) {
-            int a = needChannel(s, true, "This step needs a DMR channel whose talkgroup the other DMR radio listens to (same colour code and time slot).");
+            int a = needChannel(s, true, Txt.s(R.string.txtest_need_dmr_call));
             if (stopped) { finish(); return; }
             ChannelStore.Channel ch = svc.current();
             if (a == GO && (ch == null || !ch.isDigital())) { s.result = TxReport.SKIPPED; s.auto = "no DMR channel selected"; }
@@ -221,7 +223,7 @@ public final class TxTestSession {
         // 5b DMR text (phones whose text body is QuickChat's, not the Armor's)
         s = r.step("text");
         if (s != null && !stopped) {
-            int a = needChannel(s, true, "This step needs a DMR channel whose call number the other DMR radio receives texts on (its own ID for a private text, or a talkgroup it listens to).");
+            int a = needChannel(s, true, Txt.s(R.string.txtest_need_dmr_text));
             if (stopped) { finish(); return; }
             ChannelStore.Channel ch = svc.current();
             if (a == GO && (ch == null || !ch.isDigital())) { s.result = TxReport.SKIPPED; s.auto = "no DMR channel selected"; }
@@ -282,7 +284,7 @@ public final class TxTestSession {
     /** An FM channel is needed: ask the tester to choose one, or skip. */
     private boolean fmChannel(TxReport.Step s) throws InterruptedException {
         if (stopped) return false;
-        return needChannel(s, false, "This step needs an FM (analog) channel: a simplex frequency you may use, at low power.") == GO;
+        return needChannel(s, false, Txt.s(R.string.txtest_need_fm)) == GO;
     }
 
     /**
@@ -297,16 +299,16 @@ public final class TxTestSession {
             java.util.List<ChannelStore.Channel> fit = channelsOfKind(svc.store().all(), dmr);
             String none = dmr ? "no DMR channel selected" : "no FM channel selected";
             if (fit.isEmpty()) {
-                int a = ui.choose(s.title, why + (dmr ? " Your channel list has no DMR channel." : " Your channel list has no FM channel."), "Skip this step", "Stop the session");
+                int a = ui.choose(s.title, why + " " + Txt.s(dmr ? R.string.txtest_no_dmr_channel : R.string.txtest_no_fm_channel), "Skip this step", "Stop the session");
                 if (a == 0) { s.result = TxReport.SKIPPED; s.auto = none; return SKIP; }
                 stopped = true; return -1;
             }
-            int a = ui.choose(s.title, why, "Choose a channel", "Skip this step", "Stop the session");
+            int a = ui.choose(s.title, why, Txt.s(R.string.txtest_choose_channel), "Skip this step", "Stop the session");
             if (a == 1) { s.result = TxReport.SKIPPED; s.auto = none; return SKIP; }
             if (a != 0) { stopped = true; return -1; }
             String[] rows = new String[fit.size() + 1];
             for (int i = 0; i < fit.size(); i++) rows[i] = channelRow(fit.get(i));
-            rows[fit.size()] = "Back";
+            rows[fit.size()] = Txt.s(R.string.common_back);
             int p = ui.choose(s.title, why, rows);
             if (p < 0) { stopped = true; return -1; }
             if (p >= fit.size()) continue;
@@ -327,7 +329,7 @@ public final class TxTestSession {
         for (ChannelStore.Channel c : all) if (dmr ? c.isDigital() : !c.isDigital() && !c.isM17()) out.add(c);
         return out;
     }
-    static String channelRow(ChannelStore.Channel c) { return c.number + " · " + c.name + " · " + c.freqText(c.txFreq) + " MHz"; }
+    static String channelRow(ChannelStore.Channel c) { return Txt.s(R.string.txtest_channel_row, c.number, c.name, c.freqText(c.txFreq)); }
 
     /** The step's instruction with the current channel; false when skipped or stopped. */
     private boolean ask(TxReport.Step s, String go, String text) throws InterruptedException {

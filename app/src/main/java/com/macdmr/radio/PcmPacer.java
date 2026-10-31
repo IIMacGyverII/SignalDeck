@@ -49,5 +49,5 @@ final class PcmPacer {
     /** How long the writer may sleep before the next block can be due. */
     synchronized long waitNs(long nowNs) { return nextNs < 0 ? 2_000_000L : Math.max(0, Math.min(nextNs - nowNs, PERIOD_NS)); }
 
-    synchronized String stats() { return sent + " blocks, " + underruns + " underruns, " + dropped + " dropped"; }
+    synchronized String stats() { return sent + " blocks, " + underruns + " underruns, " + dropped + " dropped"; }   // i18n: log line
 }

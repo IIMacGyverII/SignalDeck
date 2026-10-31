@@ -3000,8 +3000,24 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** The transmit test session's view of the module's status replies (Device report → Transmit test session); null otherwise. */
     public volatile java.util.function.BiConsumer<Integer, String> statusTap;
 
+    /**
+     * FW57 (firmware reading 2026-10-31): the module's speaker switch posts 0x36 1 on every open and 2 on every close, byte-identical
+     * to a call's start and end, and a channel write, squelch or monitor command moves that switch. On the Armor (dmrAppAdmission)
+     * a 1 / 2 on a digital channel within SPEAKER_EDGE_MS of such a command is the app's own edge, not a reception (bench: an
+     * idle channel played hiss after the speaker reopen took its 1 for a call), and a 2 with no reception counted ends nothing.
+     */
+    static boolean ownSpeakerEdge(int code, boolean flagged, boolean digital, boolean receiving, long now, long lastSpeakerCmdAt) {
+        if (!flagged || !digital || (code != 1 && code != 2)) return false;
+        if (code == 2 && !receiving) return true;
+        return now - lastSpeakerCmdAt < SPEAKER_EDGE_MS;
+    }
+    static final long SPEAKER_EDGE_MS = 1500;   // the switch repeats its frame every 100 ms until acknowledged; the open edge came 0.45-0.78 s after 0x2F
+
     @Override public void status(int code, String name) {
         java.util.function.BiConsumer<Integer, String> tap = statusTap; if (tap != null) try { tap.accept(code, name); } catch (Throwable ignored) { }
+        if (ownSpeakerEdge(code, profile.dmrAppAdmission, current != null && current.isDigital(), receiving, System.currentTimeMillis(), engine.lastSpeakerCmdAt())) {
+            log("speaker edge " + code + " after the app's own command: not a reception"); return;
+        }
         if ((code == 1 || code == 2) && audio instanceof ExtModuleAudio) ((ExtModuleAudio) audio).reception(code == 1);   // the 3WT: extmodule streams receive audio only between these
         switch (code) {
             case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); if (!captureRunning()) bridgeCapture(true); } break; }   // a capture closed for silence reopens   // already open: an edge after a signal-started reception

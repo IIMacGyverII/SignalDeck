@@ -130,6 +130,10 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     /** True while a firmware load owns the port. Ordinary commands are dropped so they cannot land in the bootloader. */
     public boolean rawSession() { return rawHold; }
 
+    /** When a command that moves the module's speaker switch (channel write, squelch, monitor) last went out: the switch posts 0x36 1 / 2 on its own edges. */
+    private volatile long lastSpeakerCmdAt;
+    @Override public long lastSpeakerCmdAt() { return lastSpeakerCmdAt; }
+
     private final java.util.Set<Integer> notCarried = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
     private void send(Frame fr) throws IOException {
         if (rawHold) return;
@@ -138,6 +142,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
             return;
         }
         if (fr.rw == 1 && watched(fr.cmd) && firstUnansweredAt == 0) firstUnansweredAt = System.currentTimeMillis();
+        if (fr.rw == 1 && (fr.cmd == CMD_SET_DIGITAL || fr.cmd == CMD_SET_ANALOG || fr.cmd == CMD_SQUELCH || fr.cmd == CMD_MONITOR)) lastSpeakerCmdAt = System.currentTimeMillis();
         if (fr.rw == 1 && fr.cmd != CMD_STATUS) synchronized (stats) { CommandStats c = stats.computeIfAbsent(fr.cmd, k -> new CommandStats()); c.sent++; c.pending.addLast(System.currentTimeMillis()); while (c.pending.size() > 20) c.pending.removeFirst(); }
         port.send(fr);
     }

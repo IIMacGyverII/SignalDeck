@@ -1148,7 +1148,7 @@ public final class WebHost {
                         .put("callsignSet", pe.callsignSet()).put("ssid", pe.ssid()).put("comment", pe.comment()).put("path", pp.getString("path", "WIDE1-1,WIDE2-1"))
                         .put("symbol", pp.getString("symTable", "/") + pp.getString("symCode", "[")).put("autoBeacon", pe.autoBeacon()).put("beaconMin", pe.beaconMin())
                         .put("txPower", pe.dataTxPower()).put("leadKind", pe.packetLeadKind()).put("leadMs", pe.packetLeadMs()).put("passive", pe.passiveMode())
-                        .put("autoAck", pp.getBoolean("autoAck", true)).put("autoAckAllowed", pe.autoAckAllowed()).put("digipeat", pp.getBoolean("digipeat", false)).put("dtmf", pp.getBoolean("dtmf", true))
+                        .put("autoAck", pp.getBoolean("autoAck", false)).put("autoAckAllowed", pe.autoAckAllowed()).put("digipeat", pp.getBoolean("digipeat", false)).put("dtmf", pp.getBoolean("dtmf", true))
                         .put("wx", pp.getBoolean("wx", true)).put("cw", pp.getBoolean("cw", true)).put("cwId", pp.getBoolean("cwId", false))
                         .put("telemetry", pp.getBoolean("telemetry", false)).put("weather", pp.getBoolean("weather", false)).put("txIgate", pp.getBoolean("txIgate", false))
                         .put("groups", pp.getString("groups", "")).put("kissPort", pp.getInt("kissPort", 8001))

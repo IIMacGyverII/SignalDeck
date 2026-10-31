@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — APRS: auto-ack starts off
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Owner decision 2026-10-30 ("this should not start enabled. it should be a simple toggle to turn on") | Automatic acknowledgement of APRS messages addressed to your callsign now starts **off** on every phone (it was on). Turn it on with the Auto-ack chip on the APRS page, in APRS settings, or in SignalDeck Web. A phone where the setting was already saved (by turning it on or off, or by saving APRS settings, which wrote the old default) keeps that value. UHF-only radios still never auto-ack. Help updated. | PacketEngine, PktDialog, WebHost, HelpView | Host suite; build. Not device-tested |
+
 ## 2026-10-30 — APRS: no automatic acknowledgements on UHF-only radios
 
 | Backlog | Change | Files | Test |

@@ -665,9 +665,9 @@ public final class PacketEngine {
     public String comment() { return prefs.getString("comment", "SignalDeck"); }
     public String[] path() { String p = prefs.getString("path", "WIDE1-1,WIDE2-1").trim(); return p.isEmpty() ? new String[0] : p.split("\\s*,\\s*"); }
     public int passiveMode() { return prefs.getInt("passive", 2); }       // 0 off, 1 flagged channels, 2 every analog channel
-    /** Auto-ack is off on a UHF-only radio whatever the setting says (owner, 2026-10-30); the setting is kept for a phone with 2 m. */
+    /** Auto-ack starts off (a simple toggle turns it on) and is off on a UHF-only radio whatever the setting says (owner, 2026-10-30); the setting is kept for a phone with 2 m. */
     public boolean autoAckAllowed() { return host.hasVhf(); }
-    public boolean autoAck() { return autoAckAllowed() && prefs.getBoolean("autoAck", true); }
+    public boolean autoAck() { return autoAckAllowed() && prefs.getBoolean("autoAck", false); }
     public boolean digipeat() { return prefs.getBoolean("digipeat", false); }
     public int kissPort() { return prefs.getInt("kissPort", 8001); }
     public boolean dtmfEnabled() { return prefs.getBoolean("dtmf", true); }

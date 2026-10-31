@@ -255,7 +255,7 @@ public final class WebHost {
                 .put("rxType", ch.rxType).put("rxSubCode", ch.rxSubCode).put("txType", ch.txType).put("txSubCode", ch.txSubCode).put("location", ch.location);
         if (ch.lat != 0 || ch.lon != 0) o.put("lat", ch.lat).put("lon", ch.lon);
         o.put("notes", ch.notes == null ? "" : ch.notes);
-        o.put("rxOnly", ch.rxOnly).put("receiveOnly", ChannelStore.receiveOnly(ch));
+        o.put("rxOnly", ch.rxOnly).put("receiveOnly", ChannelStore.receiveOnly(ch)).put("tunable", ChannelStore.tunable(ch));   // false: outside this radio's bands (dimmed, never selected)
         return o;
     }
     /** Every field the channel editor has (the encrypt key itself stays on the phone: only whether one is set). */
@@ -381,7 +381,7 @@ public final class WebHost {
         JSONArray bands = new JSONArray(); for (long hz : prof.bandsHz) bands.put(hz);
         o.put("radio", new JSONObject().put("dmr", prof.dmr()).put("messages", prof.hasMessages()).put("contacts", prof.hasContacts())
                 .put("rssi", prof.rssi).put("bands", bands).put("bandsText", prof.bandsText()).put("symbolEngine", prof.symbolEngine())
-                .put("aprsTerrestrial", svc.aprsTunable()).put("aprsHz", svc.aprsHz()).put("weather", prof.tunable(162_400_000L)).put("region", regionJson(com.macdmr.radio.region.Region.current(svc))));
+                .put("aprsTerrestrial", svc.aprsTunable()).put("aprsHz", svc.aprsHz()).put("weather", prof.tunable(162_400_000L)).put("sstv144", prof.tunable(com.macdmr.radio.PacketEngine.SSTV_FREQ_HZ)).put("region", regionJson(com.macdmr.radio.region.Region.current(svc))));
         o.put("transmitting", svc.isTransmitting()).put("firmwareLoad", svc.firmwareLoading()).put("hearing", svc.hearing()).put("rssi", svc.lastRssi()).put("caller", svc.currentCaller());
         o.put("softSq", svc.softSqOn()).put("softSqLevel", svc.softSqLevel()).put("monitor", svc.monitorOn()).put("promiscuous", svc.promiscuousOn()).put("record", svc.recordOn())
                 .put("scanning", svc.scanning()).put("vfo", svc.vfoActive()).put("zone", svc.zoneName()).put("zoneId", svc.zoneId())
@@ -623,10 +623,12 @@ public final class WebHost {
             }
             case "/api/channel/select": if (!post) break; {
                 int n = b.optInt("number", -1); if (n < 0) return WebServer.Response.error(400, "number needed");
+                ChannelStore.Channel sel = svc.store().byNumber(n);
+                if (sel != null && !ChannelStore.tunable(sel)) return WebServer.Response.error(409, sel.name + " is outside " + svc.profile().bandsText() + ": this radio cannot tune it");
                 onMain(() -> { svc.selectChannel(n); return null; }); return ok("Channel " + n);
             }
             case "/api/channel/step": if (!post) break; { int d = b.optInt("delta", 1); onMain(() -> { svc.stepChannel(d >= 0 ? 1 : -1); return null; }); return ok("stepped"); }
-            case "/api/zone": if (!post) break; { long id = b.optLong("id", 0); onMain(() -> { svc.setZone(id); return null; }); return ok(svc.zoneName()); }
+            case "/api/zone": if (!post) break; { long id = b.optLong("id", 0); String ze = onMain(() -> svc.setZone(id)); if (ze != null) return WebServer.Response.error(409, ze); return ok(svc.zoneName()); }
             case "/api/scan": if (!post) break; return ok(onMain(svc::toggleScan));
             case "/api/softsq": if (!post) break;
                 onMain(() -> { if (b.has("on")) svc.setSoftSq(b.getBoolean("on")); if (b.has("level")) svc.setSoftSqLevel(b.getInt("level")); return null; });
@@ -872,6 +874,7 @@ public final class WebHost {
                     e.days = b.optInt("days", 0) & 0x7F; e.date = b.optString("date", ""); e.minutes = Math.max(1, Math.min(1440, b.optInt("minutes", 60))); e.channel = b.optInt("channel", -1);
                     e.record = b.optBoolean("record", false); e.label = b.optString("label", "").trim(); e.enabled = b.optBoolean("enabled", true);
                     if (!java.util.Arrays.asList(com.macdmr.radio.Scheduler.ACTIONS).contains(e.action)) return WebServer.Response.error(400, "Unknown action");
+                    { String bp = com.macdmr.radio.Scheduler.bandProblem(svc.profile(), e, e.channel >= 0 ? svc.store().byNumber(e.channel) : null, svc.aprsHz()); if (bp != null) return WebServer.Response.error(400, bp); }   // APRS on a UHF-only radio, a channel outside its bands
                     if (e.days != 0) e.date = ""; else if (!e.date.matches("\\d{4}-\\d{2}-\\d{2}")) return WebServer.Response.error(400, "Choose days or a date");
                     if (e.enabled && com.macdmr.radio.Scheduler.nextStart(e, System.currentTimeMillis(), java.util.TimeZone.getDefault()) < 0) return WebServer.Response.error(400, "That time has already passed");
                     com.macdmr.radio.Scheduler.put(svc, e);
@@ -888,7 +891,7 @@ public final class WebHost {
             }
             case "/api/scope": {                                                // GET: presets, state, the last sweep, peak hold and the waterfall (newest last)
                 com.macdmr.radio.BandScope s = svc.scope();
-                JSONArray pr = new JSONArray(); for (com.macdmr.radio.BandScope.Preset p0 : com.macdmr.radio.BandScope.PRESETS) pr.put(new JSONObject().put("name", p0.name).put("from", p0.from).put("to", p0.to).put("step", p0.step));
+                JSONArray pr = new JSONArray(); for (com.macdmr.radio.BandScope.Preset p0 : com.macdmr.radio.BandScope.PRESETS) if (com.macdmr.radio.BandScope.fits(p0)) pr.put(new JSONObject().put("name", p0.name).put("from", p0.from).put("to", p0.to).put("step", p0.step));   // only bands this radio tunes
                 JSONObject o = new JSONObject().put("presets", pr).put("running", s.running()).put("from", s.from()).put("to", s.to()).put("step", s.step()).put("sweepMs", s.sweepMs()).put("settleMs", s.settleMs()).put("estimateMs", s.estimateMs()).put("currentHz", s.currentHz()).put("maxSteps", com.macdmr.radio.BandScope.MAX_STEPS);
                 float[] last = s.last(), peak = s.peak(), part = s.partial();
                 if (last != null) o.put("last", arr(last)); if (peak != null) o.put("peak", arr(peak)); if (part != null && s.partialIndex() >= 0) o.put("partial", arr(part)).put("partialIndex", s.partialIndex());
@@ -1537,7 +1540,7 @@ public final class WebHost {
                 }
                 JSONArray zs = new JSONArray();
                 for (ChannelStore.Zone z : svc.store().zones()) { JSONArray ns = new JSONArray(); for (int n : z.numbers) ns.put(n); zs.put(new JSONObject().put("id", z.id).put("name", z.name).put("numbers", ns)); }
-                JSONArray all = new JSONArray(); for (ChannelStore.Channel ch : svc.store().all()) all.put(new JSONObject().put("number", ch.number).put("name", ch.name).put("rxFreq", ch.rxFreq).put("digital", ch.isDigital()));
+                JSONArray all = new JSONArray(); for (ChannelStore.Channel ch : svc.store().all()) all.put(new JSONObject().put("number", ch.number).put("name", ch.name).put("rxFreq", ch.rxFreq).put("digital", ch.isDigital()).put("tunable", ChannelStore.tunable(ch)));
                 return ok(new JSONObject().put("zones", zs).put("channels", all).put("active", svc.zoneId()));
             }
             case "/api/zones/delete": if (!post) break; {

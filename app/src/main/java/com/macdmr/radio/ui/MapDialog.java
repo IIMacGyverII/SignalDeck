@@ -309,7 +309,7 @@ public final class MapDialog {
             cardTitle.setText(x.name); cardTitle.setTextColor(Neo.AMBER);
             cardSub.setText("Channel " + x.number + " · " + (x.isDigital() ? "DMR" : "Analog") + " · " + dist(x.lat, x.lon)); cardSub.setTextColor(Neo.AMBER);
             cardBody.setText(String.format(Locale.US, "RX %.4f MHz, TX %.4f MHz", x.rxFreq / 1e6, x.txFreq / 1e6));
-            action("Use channel", "channels", Neo.AMBER, v -> { svc.selectChannel(x.number); Toast.makeText(c, "Channel " + x.number + ": " + x.name, Toast.LENGTH_SHORT).show(); });
+            action("Use channel", "channels", Neo.AMBER, v -> { String e = svc.trySelectChannel(x.number); Toast.makeText(c, e != null ? e : "Channel " + x.number + ": " + x.name, e != null ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show(); });
             action("Coverage", "signal", Neo.VIOLET, v -> { focus(com.macdmr.radio.coverage.CoverageMath.repeaterKey(x.rxFreq, x.lat, x.lon), x.name, x.lat, x.lon, x.rxFreq); setLayer(layer == MapView.LAYER_NONE ? MapView.LAYER_RX : layer); card.setVisibility(View.GONE); });
         }
         if (!(m.data instanceof ChannelStore.Channel) && !(m.data instanceof Repeater)) action("Open in Maps", "map", Neo.CYAN, v -> { try { c.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(geo))); } catch (Throwable t) { Toast.makeText(c, "No maps app", Toast.LENGTH_SHORT).show(); } });

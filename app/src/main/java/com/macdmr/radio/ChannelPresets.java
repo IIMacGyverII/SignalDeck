@@ -42,6 +42,9 @@ public final class ChannelPresets {
         Preset(String zone, String region, String about, String licence) { this.zone = zone; this.region = region; this.about = about; this.licence = licence; }
         public boolean hasRepeaters() { for (Ch c : channels) if (c.repeater) return true; return false; }
         public boolean receiveOnly() { for (Ch c : channels) if (!ChannelStore.receiveOnly(c.tx)) return false; return true; }
+        /** How many of its channels this phone's radio can tune (receive and transmit frequency inside the profile's bands). */
+        public int tunableCount() { return tunableCount(DeviceProfile.detect()); }
+        public int tunableCount(DeviceProfile dp) { int n = 0; for (Ch c : channels) if (tunable(dp, c)) n++; return n; }
         Preset fm(String name, double mhz, boolean high, boolean wide) { channels.add(new Ch(name, mhz, mhz, false, high, wide, false)); return this; }
         Preset split(String name, double rxMhz, double txMhz, boolean high, boolean wide, double txTone) { channels.add(new Ch(name, rxMhz, txMhz, false, high, wide, false, txTone)); return this; }
     }
@@ -50,6 +53,8 @@ public final class ChannelPresets {
     public static final int DMR_SIMPLEX_TG = 99;
 
     private static int hz(double mhz) { return (int) Math.round(mhz * 1e6); }
+    /** Whether the radio of {@code dp} tunes the channel: both frequencies inside its bands (NOAA, marine and 2 m lists on a UHF-only radio: no). */
+    public static boolean tunable(DeviceProfile dp, Ch c) { return dp.tunable(c.rx) && dp.tunable(c.tx); }
 
     public static List<Preset> all() { return all(com.macdmr.radio.region.Region.cached()); }
     /** The lists, with the region's calling, APRS and SSTV frequencies (Device → Region) in the ham list. */
@@ -195,6 +200,8 @@ public final class ChannelPresets {
     /** The same, leaving out the channels this radio cannot tune ({@code tunable}: the profile's bands). */
     public static Result install(ChannelStore store, Preset p, int repeaterTone, java.util.function.LongPredicate tunable) {
         Result r = new Result();
+        DeviceProfile dp = DeviceProfile.detect();
+        if (tunableCount(p, tunable) == 0) throw new IllegalStateException("none of its channels is inside what this radio tunes (" + dp.bandsText() + ")");
         ChannelStore.Zone zone = null; for (ChannelStore.Zone z : store.zones()) if (z.name.equals(p.zone)) zone = z;
         if (zone == null) { zone = new ChannelStore.Zone(); zone.name = p.zone; zone.numbers = new int[0]; }
         List<Integer> nums = new ArrayList<>(); for (int n : zone.numbers) nums.add(n);
@@ -242,9 +249,11 @@ public final class ChannelPresets {
     }
 
     /** One line per channel for the preview: name, frequency (and repeater input), power. */
-    public static String preview(Preset p) {
+    public static String preview(Preset p) { return preview(p, DeviceProfile.detect()); }
+    static String preview(Preset p, DeviceProfile dp) {
         StringBuilder sb = new StringBuilder();
         for (Ch c : p.channels) {
+            if (!tunable(dp, c)) { sb.append(String.format(Locale.US, "%-13s %9.4f", c.name, c.rx / 1e6)).append("  not tunable here\n"); continue; }   // skipped by Add
             sb.append(String.format(Locale.US, "%-13s %9.4f", c.name, c.rx / 1e6));
             if (c.tx != c.rx) sb.append(String.format(Locale.US, " TX %.4f", c.tx / 1e6));
             if (c.txTone > 0) sb.append(String.format(Locale.US, " %.1f", c.txTone));

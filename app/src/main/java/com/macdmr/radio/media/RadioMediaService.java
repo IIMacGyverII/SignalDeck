@@ -63,19 +63,20 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
                 for (com.macdmr.radio.car.LastHeard.Item it : com.macdmr.radio.car.LastHeard.items(s, 30)) {
                     if (!it.known) continue;
                     ChannelStore.Channel c = store.byNumber(it.channel);
+                    if (c != null && !ChannelStore.tunable(c)) continue;          // outside this radio's bands: not offered
                     // unique ids (one channel can appear on several lines); the part after '#' is ignored when playing
                     out.add(new MediaBrowserCompat.MediaItem(new MediaDescriptionCompat.Builder().setMediaId(CHANNEL + it.channel + "#" + (i++))
                             .setTitle(it.title).setSubtitle(it.sub).setIconBitmap(c != null ? CarArt.channelTile(this, c) : null).build(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
                 }
             }
         } else if (ALL.equals(parentId)) {
-            for (ChannelStore.Channel c : store.all()) out.add(channel(this, c));
+            for (ChannelStore.Channel c : ChannelStore.tunable(store.all())) out.add(channel(this, c));   // only channels this radio can tune
         } else if (parentId.startsWith(ZONE)) {
             long id; try { id = Long.parseLong(parentId.substring(ZONE.length())); } catch (NumberFormatException e) { id = -1; }
             ChannelStore.Zone z = store.zone(id);
             if (z != null) {
                 java.util.Set<Integer> in = new java.util.HashSet<>(); for (int n : z.numbers) in.add(n);
-                for (ChannelStore.Channel c : store.all()) if (in.contains(c.number)) out.add(channel(this, c));
+                for (ChannelStore.Channel c : ChannelStore.tunable(store.all())) if (in.contains(c.number)) out.add(channel(this, c));
             }
         }
         result.sendResult(out);
@@ -86,7 +87,7 @@ public class RadioMediaService extends MediaBrowserServiceCompat {
         RadioService s = RadioService.running;
         ChannelStore store = s != null ? s.store() : new ChannelStore(this);
         String q = query.toLowerCase(Locale.US).trim();
-        for (ChannelStore.Channel c : store.all())
+        for (ChannelStore.Channel c : ChannelStore.tunable(store.all()))
             if (c.name.toLowerCase(Locale.US).contains(q) || String.valueOf(c.number).equals(q) || c.freqText(c.rxFreq).startsWith(q)) out.add(channel(this, c));
         result.sendResult(out);
     }

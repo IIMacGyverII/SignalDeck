@@ -151,6 +151,8 @@ public final class ProfileRegistry {
 
     /** The profile this phone uses now (built-in until {@link #init} has run). */
     public static DeviceProfile active() { Selection s = current; return s != null ? s.profile : DeviceProfile.detectBuiltIn(); }
+    /** Host tests: make {@code p} the active profile (null: back to the built-in one). */
+    static void useForTest(DeviceProfile p) { if (p == null) { current = null; return; } Selection s = new Selection(); s.profile = p; current = s; }
     public static Selection selection() { Selection s = current; if (s == null) { s = new Selection(); s.profile = DeviceProfile.detectBuiltIn(); } return s; }
     /** Transmit switched off by an advisory (checked live, so it applies without a restart). */
     public static boolean transmitBlocked() { return active().txBlocked; }

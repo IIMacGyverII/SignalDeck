@@ -74,7 +74,7 @@ public final class RadioMedia {
             @Override public void onSkipToPrevious() { RadioService s = service(); if (s != null) s.stepChannel(-1); }
             @Override public void onPlayFromMediaId(String id, Bundle extras) {
                 RadioService s = service(); if (s == null) return;
-                if (id != null && id.startsWith(RadioMediaService.CHANNEL)) { try { s.selectChannel(Integer.parseInt(id.substring(RadioMediaService.CHANNEL.length()).replaceFirst("#.*$", ""))); } catch (NumberFormatException ignored) { } }
+                if (id != null && id.startsWith(RadioMediaService.CHANNEL)) { try { int n = Integer.parseInt(id.substring(RadioMediaService.CHANNEL.length()).replaceFirst("#.*$", "")); if (ChannelStore.tunable(s.store().byNumber(n))) s.selectChannel(n); } catch (NumberFormatException ignored) { } }   // never a channel outside this radio's bands
                 s.mediaPlay(true);
             }
             @Override public void onPlayFromSearch(String query, Bundle extras) {
@@ -110,7 +110,7 @@ public final class RadioMedia {
     static ChannelStore.Channel find(RadioService s, String query) {
         if (query == null || query.trim().isEmpty()) return s.current();
         String q = query.toLowerCase(Locale.US).replaceAll("^(channel|ch)\\s+", "").trim();
-        List<ChannelStore.Channel> all = s.store().all();
+        List<ChannelStore.Channel> all = ChannelStore.tunable(s.store().all());   // a spoken request never lands on a channel this radio cannot tune
         try { int n = Integer.parseInt(q); for (ChannelStore.Channel c : all) if (c.number == n) return c; } catch (NumberFormatException ignored) { }
         try { double mhz = Double.parseDouble(q); for (ChannelStore.Channel c : all) if (Math.abs(c.rxFreq / 1e6 - mhz) < 0.0026) return c; } catch (NumberFormatException ignored) { }
         String flat = q.replaceAll("[^a-z0-9]", "");

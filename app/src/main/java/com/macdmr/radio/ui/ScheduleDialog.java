@@ -32,7 +32,7 @@ public final class ScheduleDialog {
     public static void show(Context c, RadioService svc) {
         float d = Theme.dp(c);
         LinearLayout body = Neo.sheetBody(c, "Scheduled operations");
-        body.addView(Neo.sheetHint(c, "Start something at a set time, once or every week: listen to a channel (and record it), scan the zone, APRS monitoring, SSTV receive, or send an APRS beacon. When the time is up the radio goes back to what it was doing. It runs with the screen off; a satellite pass being tracked always comes first."));
+        body.addView(Neo.sheetHint(c, "Start something at a set time, once or every week: listen to a channel (and record it), scan the zone, " + (com.macdmr.radio.DeviceProfile.inBands(com.macdmr.radio.PacketEngine.APRS_FREQ_HZ) ? "APRS monitoring, " : "") + "SSTV receive, or send an APRS beacon. When the time is up the radio goes back to what it was doing. It runs with the screen off; a satellite pass being tracked always comes first."));
         final AlertDialog[] self = { null };
         List<Scheduler.Entry> l = Scheduler.list(c);
         SimpleDateFormat f = new SimpleDateFormat("EEE d MMM, HH:mm", Locale.getDefault());
@@ -75,19 +75,23 @@ public final class ScheduleDialog {
         final Neo.NeonSwitch rec = new Neo.NeonSwitch(c); rec.setChecked(e.record);
         final LinearLayout recRow = Neo.switchRow(c, "rec", Neo.RED, "Record it", "REC for the whole time (Download/DMR/Audio/<channel>)", rec);
         body.addView(recRow);
-        final List<ChannelStore.Channel> chans = svc.store().all();
+        final List<ChannelStore.Channel> chans = ChannelStore.tunable(svc.store().all());   // only channels this radio can tune
+        final boolean sstv144 = svc.profile().tunable(com.macdmr.radio.PacketEngine.SSTV_FREQ_HZ);   // the W6 tunes UHF only: SSTV then runs on the channel the radio is on
+        final List<String> acts = new java.util.ArrayList<>(), actNames = new java.util.ArrayList<>();
+        final String[] allNames = Scheduler.Entry.actionNames(svc.aprsHz());     // APRS monitoring names the region's frequency
+        for (int i = 0; i < Scheduler.ACTIONS.length; i++) if (Scheduler.available(svc.profile(), Scheduler.ACTIONS[i], svc.aprsHz()) || Scheduler.ACTIONS[i].equals(e.action)) { acts.add(Scheduler.ACTIONS[i]); actNames.add(allNames[i]); }
         final Runnable showCh = () -> {
             boolean need = Scheduler.usesChannel(e.action);
             chRow.setVisibility(need ? android.view.View.VISIBLE : android.view.View.GONE);
             recRow.setVisibility(Scheduler.LISTEN.equals(e.action) ? android.view.View.VISIBLE : android.view.View.GONE);
             ChannelStore.Channel ch = e.channel >= 0 ? svc.store().byNumber(e.channel) : null;
-            chV.setText((ch != null ? ch.number + "  " + ch.name : Scheduler.SSTV.equals(e.action) ? "144.500 MHz (the SSTV calling frequency)" : "The channel the radio is on") + "  ·  tap to change");
+            chV.setText((ch != null ? ch.number + "  " + ch.name : Scheduler.SSTV.equals(e.action) && sstv144 ? "144.500 MHz (the SSTV calling frequency)" : "The channel the radio is on") + "  ·  tap to change");
             act.setText(e.actionName() + "  ·  tap to change");
         };
-        act.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle("What should happen?").setItems(Scheduler.Entry.actionNames(svc.aprsHz()), (dd, w) -> { e.action = Scheduler.ACTIONS[w]; showCh.run(); }).show());
+        act.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle("What should happen?").setItems(actNames.toArray(new String[0]), (dd, w) -> { e.action = acts.get(w); showCh.run(); }).show());
         chV.setOnClickListener(v -> {
             String[] names = new String[chans.size() + 1];
-            names[0] = Scheduler.SSTV.equals(e.action) ? "144.500 MHz (SSTV calling frequency)" : "The channel the radio is on";
+            names[0] = Scheduler.SSTV.equals(e.action) && sstv144 ? "144.500 MHz (SSTV calling frequency)" : "The channel the radio is on";
             for (int i = 0; i < chans.size(); i++) names[i + 1] = chans.get(i).number + "  " + chans.get(i).name;
             new AlertDialog.Builder(c).setTitle("Which channel?").setItems(names, (dd, w) -> { e.channel = w == 0 ? -1 : chans.get(w - 1).number; showCh.run(); }).show();
         });
@@ -133,6 +137,7 @@ public final class ScheduleDialog {
             e.label = label.getText().toString().trim(); e.record = rec.isChecked() && Scheduler.LISTEN.equals(e.action); e.enabled = true;
             if (!Scheduler.usesChannel(e.action)) e.channel = -1;
             if (e.days != 0) e.date = "";
+            { String bp = Scheduler.bandProblem(svc.profile(), e, e.channel >= 0 ? svc.store().byNumber(e.channel) : null, svc.aprsHz()); if (bp != null) { Toast.makeText(c, bp, Toast.LENGTH_LONG).show(); return; } }
             long next = Scheduler.nextStart(e, System.currentTimeMillis(), java.util.TimeZone.getDefault());
             if (next < 0) { Toast.makeText(c, "That time has already passed: choose a later date or tick some days", Toast.LENGTH_LONG).show(); return; }
             Scheduler.put(c, e);

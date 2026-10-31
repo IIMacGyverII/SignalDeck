@@ -99,7 +99,7 @@ public final class Codeplug {
                 }
                 c.encryptSw = 2; c.encryptKey = "";
                 if (c.isDigital() && !com.macdmr.radio.DeviceProfile.detect().dmr()) { p.skipped.add(c.name + ": DMR (this radio has no DMR)"); continue; }
-                if (!ChannelStore.inBand(c.rxFreq) || (c.txFreq != 0 && !ChannelStore.inBand(c.txFreq) && !ChannelStore.receiveOnly(c.txFreq))) { p.skipped.add(c.name + ": outside " + com.macdmr.radio.DeviceProfile.detect().bandsText()); continue; }
+                if (!ChannelStore.inBand(c.rxFreq) || (c.txFreq != 0 && !ChannelStore.inBand(c.txFreq))) { p.skipped.add(c.name + ": outside " + com.macdmr.radio.DeviceProfile.detect().bandsText()); continue; }   // the transmit frequency too, receive-only ones included: the module refuses a channel with either outside its bands
                 p.channels.add(c);
             } catch (RuntimeException e) { p.skipped.add("A channel line could not be read"); }
         }

@@ -12,8 +12,8 @@
 22 com/macdmr/radio/BuildIdentity.java
 14 com/macdmr/radio/CamcorderAudio.java
 17 com/macdmr/radio/CarMessages.java
-92 com/macdmr/radio/ChannelPresets.java
-47 com/macdmr/radio/ChannelStore.java
+93 com/macdmr/radio/ChannelPresets.java
+48 com/macdmr/radio/ChannelStore.java
 1 com/macdmr/radio/ClipRecorder.java
 49 com/macdmr/radio/Codeplug.java
 44 com/macdmr/radio/CustomPttKey.java
@@ -27,7 +27,7 @@
 4 com/macdmr/radio/Firmware.java
 38 com/macdmr/radio/FirmwareFinder.java
 18 com/macdmr/radio/FirmwareVariantCheck.java
-177 com/macdmr/radio/FirstRunCheck.java
+179 com/macdmr/radio/FirstRunCheck.java
 8 com/macdmr/radio/HeldCal.java
 2 com/macdmr/radio/ImportCodeplugActivity.java
 13 com/macdmr/radio/M17Station.java
@@ -42,14 +42,14 @@
 6 com/macdmr/radio/RadioIdStore.java
 5 com/macdmr/radio/RadioNotes.java
 85 com/macdmr/radio/RadioProbe.java
-394 com/macdmr/radio/RadioService.java
+414 com/macdmr/radio/RadioService.java
 16 com/macdmr/radio/RadioWidget.java
 21 com/macdmr/radio/RecordingDecodeJob.java
 1 com/macdmr/radio/ReportJson.java
 10 com/macdmr/radio/RootSetup.java
 1 com/macdmr/radio/RootShell.java
 8 com/macdmr/radio/Scanner.java
-22 com/macdmr/radio/Scheduler.java
+27 com/macdmr/radio/Scheduler.java
 61 com/macdmr/radio/SecondRadioTest.java
 22 com/macdmr/radio/SerialTrace.java
 1 com/macdmr/radio/ShareLocationActivity.java
@@ -148,7 +148,7 @@
 33 com/macdmr/radio/ui/BandScopeScreen.java
 157 com/macdmr/radio/ui/ChannelEditorView.java
 21 com/macdmr/radio/ui/ChannelHistoryDialog.java
-67 com/macdmr/radio/ui/ChannelsView.java
+69 com/macdmr/radio/ui/ChannelsView.java
 57 com/macdmr/radio/ui/CodeplugDialog.java
 30 com/macdmr/radio/ui/ConditionsDialog.java
 51 com/macdmr/radio/ui/ContactEditor.java
@@ -159,7 +159,7 @@
 31 com/macdmr/radio/ui/ExamDialog.java
 69 com/macdmr/radio/ui/FirmwareScreen.java
 49 com/macdmr/radio/ui/FormsDialog.java
-132 com/macdmr/radio/ui/FoxHuntDialog.java
+133 com/macdmr/radio/ui/FoxHuntDialog.java
 44 com/macdmr/radio/ui/Ft8Screen.java
 13 com/macdmr/radio/ui/HelpView.java
 110 com/macdmr/radio/ui/IntercomView.java
@@ -185,8 +185,8 @@
 19 com/macdmr/radio/ui/RecordingsDialog.java
 55 com/macdmr/radio/ui/RegionSheet.java
 38 com/macdmr/radio/ui/RepeatersDialog.java
-48 com/macdmr/radio/ui/SatelliteDialog.java
-44 com/macdmr/radio/ui/ScheduleDialog.java
+51 com/macdmr/radio/ui/SatelliteDialog.java
+46 com/macdmr/radio/ui/ScheduleDialog.java
 8 com/macdmr/radio/ui/SplashView.java
 67 com/macdmr/radio/ui/SstvScreen.java
 15 com/macdmr/radio/ui/TerminalDialog.java
@@ -194,13 +194,13 @@
 31 com/macdmr/radio/ui/TxTestScreen.java
 45 com/macdmr/radio/ui/VfoDialog.java
 100 com/macdmr/radio/ui/WinlinkDialog.java
-64 com/macdmr/radio/ui/ZonesDialog.java
+70 com/macdmr/radio/ui/ZonesDialog.java
 3 com/macdmr/radio/web/PhoneStats.java
-305 com/macdmr/radio/web/WebHost.java
+307 com/macdmr/radio/web/WebHost.java
 32 com/macdmr/radio/web/WebServer.java
 3 com/macdmr/radio/web/WebTls.java
 8 com/macdmr/radio/winlink/B2Message.java
 14 com/macdmr/radio/winlink/B2fClient.java
 6 com/macdmr/radio/winlink/RmsList.java
 48 com/macdmr/radio/winlink/Winlink.java
-# total 6874
+# total 6919

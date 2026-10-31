@@ -63,7 +63,7 @@ public final class ActivityDialog {
             LinearLayout r = new LinearLayout(c); r.setOrientation(LinearLayout.VERTICAL); r.setBackground(Neo.rowCard(c)); r.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d));
             r.addView(Neo.text(c, a.number + "  " + nm, Neo.TEXT, 15.5f, Neo.ui(c)));
             r.addView(Neo.text(c, a.receptions + (a.receptions == 1 ? " reception" : " receptions") + (a.seconds > 0 ? ", " + (a.seconds >= 120 ? Math.round(a.seconds / 60.0) + " min" : a.seconds + " s") : "") + "  ·  last " + f.format(new Date(a.lastTs)), Neo.MUTED, 12.5f, Neo.uiMedium(c)));
-            if (ch != null) { r.setClickable(true); r.setOnClickListener(v -> { svc.selectChannel(ch.number); if (self[0] != null) self[0].dismiss(); }); }
+            if (ch != null) { r.setClickable(true); r.setOnClickListener(v -> { String e = svc.trySelectChannel(ch.number); if (e != null) { Toast.makeText(c, e, Toast.LENGTH_LONG).show(); return; } if (self[0] != null) self[0].dismiss(); }); }
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d);
             body.addView(r, lp);
         }

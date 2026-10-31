@@ -528,7 +528,7 @@ async function loadScope() {
     const j = await api('scope'); S.scope = j;
     if (!$('scPreset').options.length) {
       $('scPreset').innerHTML = j.presets.map((p, i) => '<option value="' + i + '">' + esc(p.name) + ' (' + (p.from / 1e6).toFixed(3) + '–' + (p.to / 1e6).toFixed(3) + ', ' + p.step / 1000 + ' kHz, about ' + scDur(scSteps(p.from, p.to, p.step) * (j.settleMs + 300)) + ')</option>').join('') + '<option value="c">Custom range…</option>';
-      try { $('scPreset').value = localStorage.getItem('scPreset') || 0; const c = JSON.parse(localStorage.getItem('scCustom') || 'null'); if (c) { $('scFrom').value = c.from; $('scTo').value = c.to; $('scStep').value = c.step; } } catch (e) { }
+      try { $('scPreset').value = localStorage.getItem('scPreset') || 0; if ($('scPreset').selectedIndex < 0) $('scPreset').value = j.presets.length ? 0 : 'c'; const c = JSON.parse(localStorage.getItem('scCustom') || 'null'); if (c) { $('scFrom').value = c.from; $('scTo').value = c.to; $('scStep').value = c.step; } } catch (e) { }
       if (!$('scFrom').value) { $('scFrom').value = '446.0000'; $('scTo').value = '446.2000'; $('scStep').value = '12.5'; }
       $('scCustom').classList.toggle('hidden', $('scPreset').value !== 'c');
     }
@@ -589,7 +589,7 @@ function sfShow() {
   const a = $('sfAction').value;
   $('sfChWrap').classList.toggle('hidden', !(a === 'listen' || a === 'sstv' || a === 'winlink')); $('sfRecWrap').classList.toggle('hidden', a !== 'listen');
   $('sfMinWrap').classList.toggle('hidden', a === 'beacon' || a === 'winlink' || a === 'winlinknet');   // the packet finder keeps its minutes $('sfDateWrap').classList.toggle('hidden', sfMask() !== 0);
-  const first = $('sfChannel').options[0]; if (first) first.text = a === 'sstv' ? '144.500 MHz (SSTV calling frequency)' : 'The channel the radio is on';
+  const first = $('sfChannel').options[0]; if (first) first.text = a === 'sstv' && S.sstv144 !== false ? '144.500 MHz (SSTV calling frequency)' : 'The channel the radio is on';
 }
 $('sfAction').onchange = sfShow;
 async function loadSchedules() {
@@ -601,7 +601,7 @@ async function loadSchedules() {
 }
 async function sfOpen(s) {
   if (!S.chList) { try { S.chList = (await api('zones')).channels; } catch (e) { S.chList = []; } }
-  $('sfChannel').innerHTML = '<option value="-1">The channel the radio is on</option>' + S.chList.map(ch => '<option value="' + ch.number + '">' + ch.number + '  ' + esc(ch.name) + '</option>').join('');
+  $('sfChannel').innerHTML = '<option value="-1">The channel the radio is on</option>' + S.chList.filter(ch => ch.tunable !== false).map(ch => '<option value="' + ch.number + '">' + ch.number + '  ' + esc(ch.name) + '</option>').join('');
   S.sfId = s ? s.id : 0;
   $('sfAction').value = s ? s.action : 'listen'; $('sfChannel').value = s ? s.channel : -1; $('sfRecord').checked = !!(s && s.record);
   [...$('sfDays').children].forEach((b, i) => { const on = !!(s && (s.days & (1 << i))); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });

@@ -67,7 +67,8 @@ public final class VfoDialog {
         body.addView(bandPlanLine(c, rx, tx));
         body.addView(hint("Repeater offset shortcuts set Transmit from Receive:"));
         LinearLayout off = pillRow();
-        pill(off, "Simplex", false, x -> offset(0)); pill(off, "−0.600", false, x -> offset(-600_000)); pill(off, "+0.600", false, x -> offset(600_000));
+        pill(off, "Simplex", false, x -> offset(0));
+        if (svc.profile().tunable(146_000_000L)) { pill(off, "−0.600", false, x -> offset(-600_000)); pill(off, "+0.600", false, x -> offset(600_000)); }   // the 2 m repeater shift: only on a radio with the 136–174 MHz band
         pill(off, "−5.000", false, x -> offset(-5_000_000)); pill(off, "+5.000", false, x -> offset(5_000_000)); body.addView(off);
         for (int i = 0; i < off.getChildCount(); i++) ((TextView) off.getChildAt(i)).setTextSize(12);
 

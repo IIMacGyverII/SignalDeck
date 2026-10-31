@@ -32,7 +32,7 @@ public final class Roaming {
         double here = km(lat, lon, cur.lat, cur.lon);
         ChannelStore.Channel best = null; double bestKm = Double.MAX_VALUE;
         for (ChannelStore.Channel c : candidates) {
-            if (c.number == cur.number || !c.isDigital() || (c.lat == 0 && c.lon == 0) || !sameTalkgroup(cur, c)) continue;
+            if (c.number == cur.number || !c.isDigital() || (c.lat == 0 && c.lon == 0) || !sameTalkgroup(cur, c) || !ChannelStore.tunable(c)) continue;   // never roam to a repeater this radio cannot tune
             double d = km(lat, lon, c.lat, c.lon);
             if (d < bestKm) { bestKm = d; best = c; }
         }

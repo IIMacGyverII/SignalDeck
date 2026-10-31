@@ -609,6 +609,8 @@ public final class DeviceProfile {
         }
         return best;
     }
+    /** Where the first-run trial listens: PMR446 channel 1 (446.00625 MHz) when the radio tunes it, else the middle of its first band on a 12.5 kHz step. */
+    public long listenTestHz() { if (tunable(446_006_250L)) return 446_006_250L; long mid = (bandsHz[0] + bandsHz[1]) / 2; return mid / 12_500L * 12_500L; }
     /** The bands for people: "136–174 and 400–480 MHz". */
     public String bandsText() {
         StringBuilder b = new StringBuilder();

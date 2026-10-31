@@ -12,7 +12,7 @@ VFO lets you set mode, receive and transmit frequency (with repeater-offset shor
 
 ## Frequency range
 
-The radio tunes 136–174 MHz and 400–480 MHz only; it refuses anything else (220 MHz included) and stays where it was, so the app never sends it. If the radio does refuse a channel (for example a DMR channel without a call number), the history says so and the display goes back to the frequency the radio is really on.
+The radio tunes 136–174 MHz and 400–480 MHz only (some phones' radios tune less: see Radios that do less on the Device topic); it refuses anything else (220 MHz included) and stays where it was, so the app never sends it. If the radio does refuse a channel (for example a DMR channel without a call number), the history says so and the display goes back to the frequency the radio is really on.
 
 ## While VFO is on
 

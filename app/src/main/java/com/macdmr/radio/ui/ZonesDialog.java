@@ -70,7 +70,7 @@ public final class ZonesDialog {
             more.setOnClickListener(v -> zoneMenu(c, svc, z, done));
         }
         row.setClickable(true);
-        row.setOnClickListener(v -> { svc.setZone(z == null ? 0 : z.id); done.run(); });
+        row.setOnClickListener(v -> { String e = svc.setZone(z == null ? 0 : z.id); if (e != null) Toast.makeText(c, e, Toast.LENGTH_LONG).show(); done.run(); });
         return row;
     }
 
@@ -95,13 +95,14 @@ public final class ZonesDialog {
         Set<String> have = new HashSet<>(); for (ChannelStore.Zone z : svc.store().zones()) have.add(z.name);
         List<ChannelPresets.Offer> offers = ChannelPresets.offers(region);           // the region's own first; Device → Region
         final List<android.view.View> hidden = new ArrayList<>();
-        boolean notLegalShown = false, hiddenShown = false;
+        boolean notLegalShown = false, hiddenShown = false; int outOfBand = 0;
         for (ChannelPresets.Offer o : offers) {
             ChannelPresets.Preset p = o.preset;
             if (o.legal == ChannelPresets.NOT_LEGAL && !notLegalShown) { notLegalShown = true; body.addView(Neo.sheetSection(c, "Not legal here")); body.addView(Neo.sheetHint(c, "Licence-free services " + region.name + " does not list. They stay here because you may need them elsewhere; whether you may transmit on them is your responsibility.")); }
             String mark = o.legal == ChannelPresets.NOT_LEGAL ? "Not legal here  ·  " : o.legal == ChannelPresets.PARTLY ? "Partly legal here (some channels)  ·  " : "";
             int usable = ChannelPresets.tunableCount(p, svc.profile()::tunable);    // a UHF-only radio cannot use Marine VHF or a 2 m list
-            if (usable == 0) mark = "Outside this radio's bands  ·  " + mark; else if (usable < p.channels.size()) mark = usable + " of " + p.channels.size() + " in this radio's bands  ·  " + mark;
+            if (usable == 0) { outOfBand++; continue; }                          // nothing in it this radio could tune: not offered (band guards)
+            if (usable < p.channels.size()) mark = usable + " of " + p.channels.size() + " in this radio's bands  ·  " + mark;
             LinearLayout r = card(c, p.zone + "  ·  " + p.channels.size() + " channels", mark + p.region + "  ·  " + p.licence + (have.contains(p.zone) ? "\nYou have a zone called " + p.zone + ": adds the missing channels to it" : ""), o.legal == ChannelPresets.NOT_LEGAL ? Neo.RED : p.receiveOnly() ? Neo.AMBER : Neo.CYAN);
             r.setOnClickListener(v -> presetSheet(c, svc, p, finished));
             if (o.hidden) {
@@ -115,6 +116,7 @@ public final class ZonesDialog {
             }
             body.addView(r, rowLp(d));
         }
+        if (outOfBand > 0) body.addView(Neo.sheetHint(c, outOfBand + " standard list" + (outOfBand == 1 ? " is" : "s are") + " not shown: none of " + (outOfBand == 1 ? "its" : "their") + " channels is inside what this radio tunes (" + com.macdmr.radio.DeviceProfile.detect().bandsText() + ")."));
         self[0] = Neo.showSheet(c, body);
     }
 
@@ -147,7 +149,8 @@ public final class ZonesDialog {
                 new AlertDialog.Builder(c).setTitle("Repeater tone").setItems(names, (dd, w) -> { tone[0] = w - 1; tb.setText(w == 0 ? "Tone: None" : "Tone: " + names[w]); }).show();
             });
         }
-        body.addView(Neo.sheetSection(c, p.channels.size() + " channels"));
+        { int tun = p.tunableCount(); body.addView(Neo.sheetSection(c, tun < p.channels.size() ? tun + " of " + p.channels.size() + " channels tunable here" : p.channels.size() + " channels"));
+          if (tun < p.channels.size()) body.addView(Neo.sheetHint(c, "This radio tunes " + com.macdmr.radio.DeviceProfile.detect().bandsText() + ": Add leaves out the channels marked not tunable here.")); }
         TextView list = Neo.label(c, ChannelPresets.preview(p), 0xFFBFC8D0, 12, false); list.setTypeface(Neo.mono(c)); body.addView(list);
         TextView add = Neo.button(c, "Add " + p.zone, "plus", Neo.GREEN); body.addView(add, new LinearLayout.LayoutParams(bl));
         final AlertDialog[] self = new AlertDialog[1];
@@ -155,8 +158,8 @@ public final class ZonesDialog {
             ChannelPresets.Result r;
             try { r = ChannelPresets.install(svc.store(), p, tone[0], svc.profile()::tunable); }
             catch (Throwable t) { Toast.makeText(c, "Could not add " + p.zone + ": " + t.getMessage(), Toast.LENGTH_LONG).show(); return; }
-            svc.setZone(r.zoneId);
-            Toast.makeText(c, r.summary, Toast.LENGTH_LONG).show();
+            String ze = svc.setZone(r.zoneId);
+            Toast.makeText(c, r.summary + (ze != null ? "\n" + ze : ""), Toast.LENGTH_LONG).show();
             if (self[0] != null) self[0].dismiss();
             finished.run();
         });
@@ -175,7 +178,7 @@ public final class ZonesDialog {
         Runnable close = () -> { if (self[0] != null) self[0].dismiss(); done.run(); };
         LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); bl.topMargin = (int) (8 * d);
         TextView use = Neo.button(c, "Use this zone", "zone", Neo.CYAN); body.addView(use, new LinearLayout.LayoutParams(bl));
-        use.setOnClickListener(v -> { svc.setZone(z.id); close.run(); });
+        use.setOnClickListener(v -> { String e = svc.setZone(z.id); if (e != null) Toast.makeText(c, e, Toast.LENGTH_LONG).show(); close.run(); });
         TextView pick = Neo.button(c, "Choose its channels", "channels", Neo.CYAN); body.addView(pick, new LinearLayout.LayoutParams(bl));
         pick.setOnClickListener(v -> pickChannels(c, svc, z, close));
         if (!fav) {

@@ -117,7 +117,7 @@ public final class AgoldFrames {
                     ? new int[][] { { 8, 11 }, { 140, 143 }, { 151, 158 } } : new int[][] { { 8, TO_END } };
             case 0x36: return declaredLen == 156                                 // older set's digital channel: own ID, call number, encryption key
                     ? new int[][] { { 9, 12 }, { 15, 18 }, { 20, 27 } } : new int[][] { { 9, TO_END } };
-            case 0x29: case 0x2B: case 0x2C: case 0x2D: case 0x10: case 0x11:    // encryption, caller info, texts; older set's call info and message content
+            case 0x29: case 0x2B: case 0x2C: case 0x2D: case 0x10: case 0x11: case 0x07:   // encryption, caller info, texts; older set's call info, message content and text sent
                 return new int[][] { { 0, TO_END } };
             default: return null;
         }

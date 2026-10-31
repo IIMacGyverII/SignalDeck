@@ -27,6 +27,12 @@ public interface FrameCodec {
     /** Where route-00 reports go. The Armor codec never calls it. */
     default void setBridge(BridgeListener listener) { }
 
+    /**
+     * False for a command this codec cannot put on the wire (a module with another command set has no equivalent):
+     * {@link RadioEngine} then does not send it at all. Every command for the Armor framing and the Agold envelope.
+     */
+    default boolean carries(int cmd) { return true; }
+
     /** One line when an unlisted module command is seen. The Armor codec never calls it. */
     default void setLog(java.util.function.Consumer<String> log) { }
 

@@ -1192,7 +1192,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         if (svc == null) return;
         Context c = getContext(); float d = Theme.dp(c);
         Neo.headerSubtitle(header).setText(svc.profile().name.toUpperCase(java.util.Locale.US));
-        profileText.setText(svc.profile().controlPort + " · " + svc.profile().baud + " · " + (svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.TINY_SERVICE ? "vendor audio" : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.CAMCORDER ? "camcorder input" : "UART PCM") + ("sa818".equals(svc.profile().protocol) ? " · analog AT module" : ""));
+        profileText.setText(svc.profile().controlPort + " · " + svc.profile().baud + " · " + (svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.TINY_SERVICE ? "vendor audio" : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.CAMCORDER ? "camcorder input" : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.EXTMODULE ? "extmodule audio socket" : "UART PCM") + ("sa818".equals(svc.profile().protocol) ? " · analog AT module" : ""));
         com.macdmr.radio.ProfileRegistry.Selection ps = com.macdmr.radio.ProfileRegistry.selection();
         if (ps.profile.supported || !ps.advisories.isEmpty()) profileText.append(" · r" + ps.profile.revision + ("updated".equals(ps.source) ? " updated" : ""));
         for (com.macdmr.radio.ProfileRegistry.Advisory a : ps.advisories) if (!a.overridden) { profileText.append(" · ⚠ advisory"); break; }

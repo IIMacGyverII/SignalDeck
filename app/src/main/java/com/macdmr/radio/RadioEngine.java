@@ -40,6 +40,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     private final DeviceProfile profile;
     private final Events ev;
     private final UartPort port;
+    private final FrameCodec codec;
 
     /** Per command: how many were sent, answered, refused, and how long the answers took (the device report's summary). */
     public static final class CommandStats {
@@ -129,8 +130,13 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     /** True while a firmware load owns the port. Ordinary commands are dropped so they cannot land in the bootloader. */
     public boolean rawSession() { return rawHold; }
 
+    private final java.util.Set<Integer> notCarried = java.util.Collections.synchronizedSet(new java.util.HashSet<>());
     private void send(Frame fr) throws IOException {
         if (rawHold) return;
+        if (!codec.carries(fr.cmd)) {                                   // the Armor 3WT's module has no such command: never put it on the wire
+            if (notCarried.add(fr.cmd)) ev.log(String.format(Locale.US, "not sent: this module has no command for 0x%02X", fr.cmd));
+            return;
+        }
         if (fr.rw == 1 && watched(fr.cmd) && firstUnansweredAt == 0) firstUnansweredAt = System.currentTimeMillis();
         if (fr.rw == 1 && fr.cmd != CMD_STATUS) synchronized (stats) { CommandStats c = stats.computeIfAbsent(fr.cmd, k -> new CommandStats()); c.sent++; c.pending.addLast(System.currentTimeMillis()); while (c.pending.size() > 20) c.pending.removeFirst(); }
         port.send(fr);
@@ -160,7 +166,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     static double rssiDbm(int raw, double stepDb, double offsetDb) { return -120 + raw * stepDb + offsetDb; }
     public RadioEngine(DeviceProfile p, Events ev) {
         this.profile = p; this.ev = ev;
-        FrameCodec codec = "agold".equals(p.protocol) ? new AgoldEnvelope() : FrameCodec.armor();
+        codec = "agold".equals(p.protocol) ? new AgoldEnvelope() : "agold-legacy".equals(p.protocol) ? new AgoldLegacyCodec() : FrameCodec.armor();
         this.port = new UartPort(p.controlPort, this, codec);
         if ("agold".equals(p.protocol)) port.setWriteDeadline(AgoldUsb.WRITE_DEADLINE_MS);   // a write the bridge never takes must not freeze the engine
         this.power = p.power();
@@ -174,8 +180,34 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
 
     /** True on a phone whose module sits behind the Agold USB bridge (Atom XL): power, PTT and the port go through {@link AgoldUsb}. */
     private boolean agold() { return "agold".equals(profile.protocol); }
+    /** True on the Armor 3WT: the same bridge behind its vendor daemon ({@link ExtModuleLink}), the legacy command set ({@link AgoldLegacyCodec}). */
+    private boolean daemon() { return "agold-legacy".equals(profile.protocol); }
+    private volatile java.util.concurrent.CountDownLatch mcuStarted = new java.util.concurrent.CountDownLatch(1);
+    private volatile String bridgeBuild;
+    /** The bridge MCU's firmware build date (route 00, 0x01), once it answered; the Armor 3WT only. */
+    public String bridgeBuild() { return bridgeBuild; }
+
+    /**
+     * The stock app's start order on the daemon (resetMcu, then handleMcuStartFinished): stop, 4 s, MCU start, the bridge's
+     * "MCU started" report (route 00, 0x06), start; then the bridge's build date. Ends with the boot latch released (this
+     * module prints no banner).
+     */
+    private void daemonStart() throws IOException {
+        port.control(ExtModuleLink.CTL_STOP);
+        pause(ExtModuleLink.RESET_WAIT_MS);
+        mcuStarted = new java.util.concurrent.CountDownLatch(1);
+        port.control(ExtModuleLink.CTL_MCU_START);
+        boolean up;
+        try { up = mcuStarted.await(ExtModuleLink.MCU_START_WAIT_MS, java.util.concurrent.TimeUnit.MILLISECONDS); } catch (InterruptedException e) { up = false; }
+        ev.log(up ? "extmodule: the bridge reports the MCU started" : "extmodule: no \"MCU started\" report within " + ExtModuleLink.MCU_START_WAIT_MS / 1000 + " s, continuing");
+        port.control(ExtModuleLink.CTL_START);
+        pause(300);
+        port.writeRaw(AgoldFrames.request(0x00, 0x01, 0x01));          // the bridge's build date, as the stock app asks
+        bootLatch.countDown();
+    }
 
     public void open() throws IOException {
+        if (daemon()) { port.open(0); return; }             // extmodule's command socket; the start order runs in powerOn
         if (agold()) ev.log(AgoldUsb.bridgeUp());          // the port exists only while the bridge is powered
         port.open(profile.serialLib != null && VendorSerial.isLoaded() ? profile.baud : 0);
         if (agold()) startReceiveWatch();
@@ -184,6 +216,8 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     /** Route 00 reports from the Agold bridge: logged; state report 03 ("pcm error, reset mcu" in its stock app) is a fault. */
     @Override public void onBridge(int cmd, byte[] body) {
         ev.log(String.format(Locale.US, "bridge cmd=0x%02X body=%s", cmd, body == null ? "-" : java.util.Arrays.toString(body)));
+        if (daemon() && cmd == 0x06) mcuStarted.countDown();
+        if (daemon() && cmd == 0x01 && body != null) { bridgeBuild = new String(body, java.nio.charset.StandardCharsets.US_ASCII).trim(); ev.log("bridge build " + bridgeBuild); }
         if (cmd == 0x08 && body != null && body.length >= 1 && body[0] == 3) ev.bridgeFault("bridge state report 03 (pcm error)");
     }
 
@@ -281,6 +315,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     /** pwd 0→1; the module then prints its banner ("…BF AA <GBK text>\r\n") within ~1 s and accepts commands. */
     /** @return true if the module was off and has just been switched on (caller must {@link #waitBooted}). */
     public boolean powerOn() throws IOException {
+        if (daemon()) { daemonStart(); return false; }
         if (agold()) { ev.log("module powered with the USB bridge (" + power.read() + ")"); return false; }   // open() powered it; the module sends no banner
         if (profile.lineSetup != null) for (String[] l : profile.lineSetup) { SysfsGpio.write(l[0], l[1]); ev.log("line " + l[0].substring(l[0].lastIndexOf('/') + 1) + " -> " + l[1]); }
         if (!power.isOn()) { bootLatch = new java.util.concurrent.CountDownLatch(1); power.set(true); ev.log("module power -> on (" + power.read() + ")"); return true; }
@@ -289,6 +324,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     }
 
     public void powerOff() throws IOException {
+        if (daemon()) { try { port.control(ExtModuleLink.CTL_STOP); ev.log("extmodule: stop (the daemon powers the bridge off)"); } finally { port.close(); } return; }
         if (agold()) { stopReceiveWatch(); port.close(); ev.log(AgoldUsb.bridgeDown()); return; }      // off, the USB port back to the socket, the HAL running
         power.set(false); ev.log("module power -> off (" + power.read() + ")");
     }
@@ -299,6 +335,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      * line cannot be read back, so a module that is already on is never restarted by {@link #powerOn}.
      */
     public void powerCycle() throws IOException {
+        if (daemon()) { bootLatch = new java.util.concurrent.CountDownLatch(1); firstUnansweredAt = 0; daemonStart(); ev.log("module restarted through extmodule"); return; }
         if (agold()) {                                     // the port goes with the bridge's power: close, power-cycle, reopen
             stopReceiveWatch(); port.close(); ev.log(AgoldUsb.bridgeUp()); port.open(0); startReceiveWatch();
             firstUnansweredAt = 0; bootLatch.countDown(); ev.log("module power-cycled with the USB bridge"); return;
@@ -377,6 +414,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
      * UTF-16LE text. Success/failure comes back as status 8/9.
      */
     public void sendSms(int msgType, int callNumber, int groupNumber, String text) throws IOException {
+        if (daemon()) { send(Frame.request(CMD_SEND_SMS, AgoldLegacyCodec.textBody(msgType == 3, callNumber, text))); return; }
         if (agold()) { send(Frame.request(CMD_SEND_SMS, agoldSmsBody(msgType, callNumber, text))); return; }
         if (profile.smsUtf8) { send(Frame.request(CMD_SEND_SMS, utf8SmsBody(msgType, callNumber, text))); return; }
         byte[] t = text.getBytes(java.nio.charset.StandardCharsets.UTF_16LE);
@@ -427,6 +465,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
 
     /** PTT: launch=1 keys the transmitter, 2 releases (enum 1/2 again — 0 is NAKed and the TX keeps running; firmware caps a keyed TX at 30 s). */
     public void ptt(boolean down) throws IOException {
+        if (daemon()) { port.control(down ? ExtModuleLink.CTL_PTT_ON : ExtModuleLink.CTL_PTT_OFF); return; }   // the daemon's PTT line; the module has no key command
         if (agold()) {                                     // the HAL's startPtt / stopPtt: the bridge's PTT line, active low; no 0x26
             SysfsGpio.write(AgoldUsb.HANDLE_PTT, down ? "0" : "1");
             RootSetup.run("setprop vendor.agui.extmodule.start " + (down ? 1 : 0));
@@ -440,6 +479,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
     private boolean keyLines() { return profile.txLinesOn != null && !agold(); }
     /** How this engine keys the module, for the device report. */
     public String keyPath() {
+        if (daemon()) return "extmodule's PTT control (3 / 4)";
         if (agold()) return "the USB bridge's PTT line";
         if (phoneLines() || keyLines()) return "phone lines";
         return "module command 0x26";
@@ -507,7 +547,7 @@ public final class RadioEngine implements UartPort.Listener, ModuleEngine {
         switch (f.cmd) {
             case CMD_STATUS: {
                 int code = b.length > 0 ? b[0] & 0xFF : -1;
-                if (!agold()) try { send(new Frame(CMD_STATUS, 1, 1, new byte[] { 1 })); } catch (IOException ignored) { }   // the OEM acks every push; the Agold stock app does not
+                if (!agold() && !daemon()) try { send(new Frame(CMD_STATUS, 1, 1, new byte[] { 1 })); } catch (IOException ignored) { }   // the OEM acks every push; the Agold stock app does not
                 if (phoneLines() && code == 1) { lines(profile.rxLinesOn); if (profile.appPlayback) lines(profile.muteLines); }   // app playback: the module's speaker route stays off
                 else if (phoneLines() && code == 2) lines(profile.rxLinesOff);
                 ev.status(code, statusName(code));

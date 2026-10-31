@@ -67,6 +67,7 @@ public class ChannelEditorView extends LinearLayout {
     private static final String H_RELAY = "The radio's relay-disconnection setting. Normal (recommended): the radio stays connected to the repeater and transmits normally. Disconnect: the radio waits for repeater confirmation and may not transmit at all; use it only if your network asks for it.";
     private static final String H_CC = "DMR's equivalent of a squelch tone, 0 to 15. Your radio and the repeater (or the other radios on a simplex channel) must use the same colour code, or you will not hear each other.";
     private static final String H_MODE = "Direct: radio to radio (simplex). Double slot: through a DMR repeater, which carries two time slots at once. Use Double slot for repeater channels.";
+    private static final String H_NOSLOT = "Time slot: chosen by this phone's radio module. Its channel setting has no slot, so SignalDeck cannot pick TS1 or TS2 here, and repeater (double slot) channels may not work. Simplex DMR with other radios is the safe use.";
     private static final String H_SLOT = "A DMR repeater carries two separate conversations, time slot 1 and 2. Use the slot your talkgroup is on (the repeater's listing says). On a simplex channel every radio must use the same slot, usually TS1.";
     private static final String H_CTYPE = "Who you call: Private (one DMR ID), Group (a talkgroup) or All (every radio). On this radio a channel set to All reports callers as ID 16777215 and does not pass received audio, so use Group for normal talkgroup traffic.";
     private static final String H_CALLFROM = "Type the call number yourself, or pick it from your contacts: group contacts (talkgroups) for a group call, private contacts (DMR IDs) for a private call. Either way the channel stores the number; add talkgroups on the Contacts page with type Group. On the intercom, a long-press on CALL picks another talkgroup for a while without editing the channel.";
@@ -130,8 +131,13 @@ public class ChannelEditorView extends LinearLayout {
         digitalGroup = new LinearLayout(c); digitalGroup.setOrientation(VERTICAL); form.addView(digitalGroup);
         section(digitalGroup, "DMR");
         choiceInto(digitalGroup, "Color code", H_CC, names(0, 15), ch.cc, v -> ch.cc = v);
-        choiceInto(digitalGroup, "Mode", H_MODE, new String[] { "Direct", "Double slot" }, ch.mode == 4 ? 1 : 0, v -> ch.mode = v == 1 ? 4 : 0);
-        choiceInto(digitalGroup, "Time slot", H_SLOT, new String[] { "TS1", "TS2" }, ch.inSlot, v -> { ch.inSlot = v; ch.outSlot = v; });
+        if (com.macdmr.radio.DeviceProfile.detect().timeSlots) {
+            choiceInto(digitalGroup, "Mode", H_MODE, new String[] { "Direct", "Double slot" }, ch.mode == 4 ? 1 : 0, v -> ch.mode = v == 1 ? 4 : 0);
+            choiceInto(digitalGroup, "Time slot", H_SLOT, new String[] { "TS1", "TS2" }, ch.inSlot, v -> { ch.inSlot = v; ch.outSlot = v; });
+        } else {                                                     // the Armor 3WT: its module's channel has no slot field
+            TextView noSlot = Neo.text(c, H_NOSLOT, Neo.DIM, 13, Neo.uiMedium(c)); noSlot.setPadding((int) (4 * d), (int) (6 * d), (int) (4 * d), (int) (6 * d));
+            digitalGroup.addView(noSlot);
+        }
         choiceInto(digitalGroup, "Contact type", H_CTYPE, new String[] { "Private", "Group", "All" }, ch.contactType, v -> { ch.contactType = v; showCallSource(); });
         callFromContacts = contactFor(ch.txContact, ch.contactType) != null;
         choiceInto(digitalGroup, "Call number from", H_CALLFROM, new String[] { "Typed number", "Contacts" }, callFromContacts ? 1 : 0, v -> { callFromContacts = v == 1; showCallSource(); });

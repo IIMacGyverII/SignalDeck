@@ -51,21 +51,25 @@ public final class CustomPttKey {
     private static final Pattern ADD = Pattern.compile("^add device \\d+: (\\S+)");
     private static final Pattern NAME = Pattern.compile("^\\s*name:\\s*\"(.*)\"");
     private static final Pattern KEYNAME = Pattern.compile("\\b((?:KEY|BTN)_[A-Z0-9_]+)\\b");
+    /** A key the kernel has no name for, as getevent prints it ("00f9", the Armor 3WT's side key). */
+    private static final Pattern KEYHEX = Pattern.compile("(?<=\\s)([0-9a-f]{4})(?=\\s|$)");
 
     /** Devices by path from `getevent -pl` (all devices). */
     public static Map<String, Device> parseDevices(String pl) {
         Map<String, Device> out = new HashMap<>();
-        Device cur = null; String path = null;
+        Device cur = null; String path = null; boolean inKey = false;
         for (String line : pl.split("\n")) {
             Matcher m = ADD.matcher(line);
-            if (m.find()) { path = m.group(1); cur = null; continue; }
+            if (m.find()) { path = m.group(1); cur = null; inKey = false; continue; }
             m = NAME.matcher(line);
             if (m.find() && path != null) { cur = new Device(path, m.group(1)); out.put(path, cur); continue; }
             if (cur == null) continue;
             if (line.contains("ABS_MT_POSITION") || line.contains("BTN_TOUCH")) cur.touch = true;
-            if (line.contains("SW  (") || line.contains("ABS (") || line.contains("REL (") || line.contains("LED (") || line.contains("MSC (")) continue;
+            if (line.contains("KEY (")) inKey = true;
+            else if (line.contains("SW  (") || line.contains("ABS (") || line.contains("REL (") || line.contains("LED (") || line.contains("MSC (") || line.contains("input props")) { inKey = false; continue; }
             Matcher k = KEYNAME.matcher(line);
             while (k.find()) cur.keys.add(k.group(1));
+            if (inKey) { Matcher h = KEYHEX.matcher(line.replaceFirst(".*KEY \\([0-9a-fA-F]+\\):", " ")); while (h.find()) cur.keys.add(h.group(1)); }
         }
         return out;
     }
@@ -172,9 +176,15 @@ public final class CustomPttKey {
     private static SharedPreferences prefs(Context c) { return c.getSharedPreferences("radio", Context.MODE_PRIVATE); }
     public static Key saved(Context c) {
         SharedPreferences p = prefs(c); String code = p.getString("pttKeyCode", null);
-        return code == null ? null : new Key(p.getString("pttKeyDevice", ""), code, p.getInt("pttKeyAndroid", 0));
+        if (code == null) { String[] k = profileKey(); return k == null ? null : new Key(k[0], k[1], 0); }   // the phone's own side key (Armor 3WT)
+        return new Key(p.getString("pttKeyDevice", ""), code, p.getInt("pttKeyAndroid", 0));
     }
-    public static boolean enabled(Context c) { return prefs(c).getBoolean("pttKeyOn", false) && saved(c) != null; }
+    /** On by default only where the profile names the phone's side key and the owner has chosen nothing. */
+    public static boolean enabled(Context c) { return prefs(c).getBoolean("pttKeyOn", profileKey() != null) && saved(c) != null; }
+    /** {@link DeviceProfile#pttKey} of the active profile, or null. */
+    static String[] profileKey() {
+        try { String[] k = DeviceProfile.detect().pttKey; return k != null && k.length == 2 ? k : null; } catch (Throwable t) { return null; }
+    }
     public static void save(Context c, Key k) {
         SharedPreferences.Editor e = prefs(c).edit().putString("pttKeyDevice", k.device).putString("pttKeyCode", k.code).putInt("pttKeyAndroid", k.androidKey).putBoolean("pttKeyOn", true);
         if ("KEY_VOLUMEUP".equals(k.code) && !k.device.toUpperCase(Locale.US).contains("ACCDET")) e.putBoolean("volPtt", false);

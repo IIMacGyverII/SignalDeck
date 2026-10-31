@@ -31,4 +31,10 @@ public class PromiscuousStatusTest {
         assertFalse(RadioService.promiscuousEdge(1, false, true));   // flag off: 1 / 2 are calls
         assertFalse(RadioService.promiscuousEdge(1, true, false));   // analog: untouched
     }
+
+    @Test public void appendedColourCodeShownOnlyWhenItIsTheChannels() {
+        assertTrue(RadioService.trustedCc(1, 1));
+        assertFalse(RadioService.trustedCc(14, 1));   // FW62: an out-of-list call read 0E
+        assertFalse(RadioService.trustedCc(-1, 1));   // not appended
+    }
 }

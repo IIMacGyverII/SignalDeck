@@ -3481,9 +3481,17 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (groups != null) for (int g : groups) if (g > 0 && g == target) return true;
         return false;
     }
+    /**
+     * The colour code and slot the promiscuous firmware appends to 0x2B: kept only when the colour code is the channel's own.
+     * FW62 bench (2026-10-31): for a call outside the list the appended bytes read 0E 00 / 0D 00 against a CC 1 sender
+     * (a register the module does not latch for those calls), so a mismatch is not shown as a received colour code.
+     */
+    static boolean trustedCc(int cc, int channelCc) { return cc >= 0 && cc == channelCc; }
+
     @Override public void callerInfo(int type, int caller, int target, int cc, int slot) {
         if (caller <= 0) return;
         ChannelStore.Channel ac = current;
+        if (cc >= 0 && !(ac != null && trustedCc(cc, ac.cc))) { cc = -1; slot = -1; }
         if (ac != null && ac.isDigital()) {
             boolean a = dmrAdmits(type, target, tgOverride.groups(ac), localId(), ac.mode);
             if (profile.dmrAppAdmission && a != dmrAdmitted) log("DMR caller info " + (a ? "admits" : "does not admit") + " type " + type + " target " + target);

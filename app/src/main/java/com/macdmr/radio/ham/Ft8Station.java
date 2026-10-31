@@ -72,16 +72,18 @@ public final class Ft8Station {
     private volatile int step;                                           // 0 idle, 1-6 = the WSJT-X Tx1..Tx6 messages
     private volatile int repeats;
     private volatile long scheduledSlot = -1;
-    private volatile String status = Txt.s(R.string.modes_ft8_status_off);
+    private volatile Msg status = Msg.of(R.string.modes_ft8_status_off);
 
     public Ft8Station(Host host) { this.host = host; }
     public void setListener(Listener l) { listener = l; }
     private void changed() { Listener l = listener; if (l != null) l.changed(); }
 
     public boolean running() { return running; }
-    public void start() { running = true; status = Txt.s(R.string.modes_ft8_status_listening); changed(); }
-    public void stop() { running = false; txEnabled = false; step = 0; partner = null; nextMsg = null; status = Txt.s(R.string.modes_ft8_status_off); changed(); }
-    public String status() { return status; }
+    public void start() { running = true; status = Msg.of(R.string.modes_ft8_status_listening); changed(); }
+    public void stop() { running = false; txEnabled = false; step = 0; partner = null; nextMsg = null; status = Msg.of(R.string.modes_ft8_status_off); changed(); }
+    public String status() { return status.text(); }
+    /** The status as its message: English for DIAG ({@code statusMsg().english()}). */
+    public Msg statusMsg() { return status; }
     public synchronized List<Heard> heard() { return new ArrayList<>(heard); }
     public synchronized List<String> sent() { return new ArrayList<>(sent); }
     public synchronized void clear() { heard.clear(); sent.clear(); changed(); }
@@ -169,7 +171,7 @@ public final class Ft8Station {
             if (from != null && Logbook.looksLikeCall(from)) { String g = w.length >= 3 && isGrid(w[w.length - 1]) ? w[w.length - 1] : null; host.heard(from, g, d.snrDb); }
         }
         synchronized (this) { heard.addAll(fresh); while (heard.size() > 400) heard.remove(0); }
-        status = list.isEmpty() ? Txt.s(R.string.modes_ft8_status_nothing) : Txt.p(R.plurals.modes_ft8_status_decoded, list.size(), list.size());
+        status = list.isEmpty() ? Msg.of(R.string.modes_ft8_status_nothing) : Msg.plural(R.plurals.modes_ft8_status_decoded, list.size(), list.size());
         for (Heard h : fresh) if (h.toMe) answer(h);
         changed();
     }
@@ -282,19 +284,19 @@ public final class Ft8Station {
         if (now < keyAt || now > keyAt + 600 || scheduledSlot == next) return;
         if (!host.canTransmit()) return;
         String m = nextMsg; byte[] p = Ft8Message.pack(m, hashes);
-        if (p == null) { status = Txt.s(R.string.modes_ft8_status_cannot_encode, m); txEnabled = false; changed(); return; }
+        if (p == null) { status = Msg.of(R.string.modes_ft8_status_cannot_encode, m); txEnabled = false; changed(); return; }
         int limit = step == 4 ? 2 : WATCHDOG;                            // RR73 twice at most: the QSO is already logged
-        if (m.equals(lastMsg)) { if (++repeats >= limit) { txEnabled = false; status = Txt.p(R.plurals.modes_ft8_status_no_answer, WATCHDOG, WATCHDOG); host.event(Msg.of(R.string.modes_ft8_event_no_answer, m)); changed(); return; } }
+        if (m.equals(lastMsg)) { if (++repeats >= limit) { txEnabled = false; status = Msg.plural(R.plurals.modes_ft8_status_no_answer, WATCHDOG, WATCHDOG); host.event(Msg.of(R.string.modes_ft8_event_no_answer, m)); changed(); return; } }
         else repeats = 0;
         lastMsg = m; scheduledSlot = next; lastTxSlot = next;
         // the lead-in from the actual moment of keying: a late tick is absorbed, the signal still starts 0.5 s into the slot
         int leadMs = (int) Math.max(0, next * 15000L + 500 - now - txLatencyMs);
         short[] pcm = Ft8.pcm(p, txHz, leadMs, 0.7);
         synchronized (this) { long s = next * 15; sent.add(String.format(Locale.US, "%02d%02d%02d  %4.0f  %s", (s / 3600) % 24, (s / 60) % 60, s % 60, txHz, m)); while (sent.size() > 200) sent.remove(0); }
-        status = Txt.s(R.string.modes_ft8_status_transmitting, m);
+        status = Msg.of(R.string.modes_ft8_status_transmitting, m);
         final int stepAtTx = step;
         Runnable after = () -> {
-            status = Txt.s(R.string.modes_ft8_status_listening);
+            status = Msg.of(R.string.modes_ft8_status_listening);
             if (stepAtTx == 5) { txEnabled = false; step = 0; nextMsg = null; partner = null; host.event(Msg.of(R.string.modes_ft8_event_sent_73)); }
             else if (stepAtTx == 0) { txEnabled = false; nextMsg = null; }   // a typed message goes once
             changed();

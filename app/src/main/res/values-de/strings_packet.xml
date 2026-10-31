@@ -986,8 +986,8 @@
     <!-- Toast after tuning to a station found: %1$s the frequency in MHz. One line. -->
     <string name="packet_pfd_vfo_on">VFO auf %1$s MHz (niedrige Leistung)</string>
     <!-- ==== Packet finder settings dialog. -->
-    <!-- Explanation above the frequency list. Two or three lines. -->
-    <string name="packet_pfd_set_freqs">Frequenzen in MHz, durch Kommas getrennt (leer: die üblichen 2-m-Packet-Frequenzen 144,910–145,090). Ergänze die 70-cm-Packet-Frequenzen deiner Gegend, wenn du sie kennst.</string>
+    <!-- Explanation above the frequency list. Two or three lines. The list also takes ";" and spaces between items, and a comma as the decimal sign ("144,910; 145,010"): in a language that writes a decimal comma, say the items are separated by semicolons and give such an example. -->
+    <string name="packet_pfd_set_freqs">Frequenzen in MHz, durch Semikolon getrennt, Komma oder Punkt als Dezimalzeichen (z. B. 144,910; 145,010; leer: die üblichen 2-m-Packet-Frequenzen 144,910–145,090). Ergänze die 70-cm-Packet-Frequenzen deiner Gegend, wenn du sie kennst.</string>
     <!-- Button that fills in the frequencies of your own analog channels. Short. -->
     <string name="packet_pfd_set_mine">Meine Kanäle verwenden</string>
     <!-- Toast when none of your channels can be used. One line. -->

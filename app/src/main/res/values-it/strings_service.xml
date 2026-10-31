@@ -52,9 +52,9 @@
     <!-- SAFETY: refusal (toast) when a frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
     <string name="service_freq_outside">Questa radio sintonizza %1$s: %2$s MHz è fuori gamma</string>
     <!-- History line when the parrot (simplex repeater) is switched off. %1$d is how many transmissions it repeated. Starts with an emoji; keep it. -->
-    <string name="service_parrot_off_history">🦜 Pappagallo spento (%1$d ripetute)</string>
+    <string name="service_parrot_off_history">🦜 Pappagallo disattivato (%1$d ripetute)</string>
     <!-- Toast when the parrot (simplex repeater) is switched off. Short. -->
-    <string name="service_parrot_off">Pappagallo spento</string>
+    <string name="service_parrot_off">Pappagallo disattivato</string>
     <!-- SAFETY: transmit refusal (toast) when the parrot is switched on on a digital channel. One line. -->
     <string name="service_parrot_needs_fm">Il pappagallo funziona solo su un canale FM analogico</string>
     <!-- Refusal (toast) when the parrot is switched on with the squelch open. Soft SQ is SignalDeck's software squelch. Two lines. -->
@@ -108,7 +108,7 @@
     <!-- The next ISS pass, inside other messages. %1$s is the day and time ("Tue 14:05"), %2$s the highest elevation in degrees. Short. -->
     <string name="service_iss_pass_when">%1$s (massimo %2$s°)</string>
     <!-- Refusal (toast) when the ISS orbit has not been downloaded yet. "Satellite passes" is the name of a screen. One line. -->
-    <string name="service_iss_no_orbit">Orbita della ISS non ancora disponibile: apri una volta Passaggi dei satelliti per scaricarla</string>
+    <string name="service_iss_no_orbit">Orbita della ISS non ancora disponibile: apri una volta Passaggi satellitari per scaricarla</string>
     <!-- Message when no ISS pass high enough comes within a day. One line. -->
     <string name="service_iss_no_pass">Nessun passaggio della ISS sopra 10° nelle prossime 24 ore</string>
     <!-- History line when ISS tracking resumes after the app restarted. %1$s is the mode (SSTV or APRS). Starts with an emoji; keep it. -->
@@ -118,9 +118,9 @@
     <!-- SAFETY: history line when SignalDeck refused to transmit a data or tone transmission on a receive-only channel. Starts with an emoji; keep it. -->
     <string name="service_tx_blocked_receive_only">⛔ TX bloccata su un canale solo in ricezione</string>
     <!-- SAFETY: history line when a transmission was refused because it is longer than the transmit limit. %1$s is what was to be sent (an English label such as "APRS beacon"), %2$d its length in seconds, %3$s the limit ("2 min"). Device → Longest transmission is the setting. Starts with an emoji; keep it. -->
-    <string name="service_tx_too_long_limit">⛔ Troppo lungo da inviare (%1$s, %2$d s; il limite di trasmissione è %3$s, Dispositivo → Trasmissione più lunga)</string>
+    <string name="service_tx_too_long_limit">⛔ Troppo lungo da trasmettere (%1$s, %2$d s; il limite di trasmissione è %3$s, Dispositivo → Trasmissione più lunga)</string>
     <!-- SAFETY: history line when a transmission was refused because it is longer than its sender allows. %1$s is what was to be sent (an English label), %2$d its length in seconds, %3$d the sender's maximum in seconds. Starts with an emoji; keep it. -->
-    <string name="service_tx_too_long_sender">⛔ Troppo lungo da inviare (%1$s, %2$d s; questa funzione consente al massimo %3$d s)</string>
+    <string name="service_tx_too_long_sender">⛔ Troppo lungo da trasmettere (%1$s, %2$d s; questa funzione consente al massimo %3$d s)</string>
     <!-- History line when a data transmission was not sent because the radio never reported that it transmits. %1$s is what was to be sent (an English label). Starts with an emoji; keep it. -->
     <string name="service_tx_not_reported">⚠️ Non inviato (%1$s): la radio non ha segnalato la trasmissione</string>
     <!-- History line after a transmission longer than 30 s. %1$d is its length in seconds, %2$s what was sent (an English label, or "voice"), %3$s the heat guard's state. Starts with an emoji; keep it. -->
@@ -344,7 +344,7 @@
     <!-- Refusal (toast) when tones are sent and the module firmware has no tone generator. FW22 is a firmware version. One or two lines. -->
     <string name="service_tones_need_fw">Il generatore di toni del modulo richiede il firmware di laboratorio (FW22 o successivo)</string>
     <!-- SAFETY: transmit refusal (toast) on a receive-only channel. Short. -->
-    <string name="service_receive_only_channel">Canale solo in ricezione</string>
+    <string name="service_receive_only_channel">Canale solo ricezione</string>
     <!-- Refusal (toast) when something is to be sent while the radio already transmits. Short. -->
     <string name="service_already_tx">Trasmissione già in corso</string>
     <!-- Refusal (toast) when there is nothing to send. Short. -->
@@ -420,7 +420,7 @@
     <!-- Button on the radio notification: previous channel. Very short (media button). -->
     <string name="service_notif_prev">Can −</string>
     <!-- Button on the radio notification while scanning. Very short (media button). -->
-    <string name="service_notif_stop_scan">Ferma scansione</string>
+    <string name="service_notif_stop_scan">Interrompi scansione</string>
     <!-- Button on the radio notification: start scanning. Very short (media button). -->
     <string name="service_notif_scan">Scansione</string>
     <!-- Button on the radio notification: next channel. Very short (media button). -->
@@ -528,7 +528,7 @@
     <!-- Notification title when a message form arrives. %1$s is the form's kind ("ICS-213"), %2$s the sender. One line. -->
     <string name="service_form_notify_title">%1$s da %2$s</string>
     <!-- Notification text when a message form without a subject arrives: where to read it. Short. -->
-    <string name="service_form_open">Apri PKT → Moduli messaggio</string>
+    <string name="service_form_open">Apri PKT → Moduli di messaggio</string>
     <!-- Refusal (toast) when a packet feature is used while the packet engine is not running. Short. -->
     <string name="service_packet_not_running">Il motore packet non è attivo</string>
     <!-- Refusal (toast) when a form is sent by APRS without a callsign. Short. -->

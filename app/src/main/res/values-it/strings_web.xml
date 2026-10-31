@@ -104,7 +104,7 @@
     <!-- Error in the channel editor: the receive frequency is empty. -->
     <string name="web_ch_rx_needed">Inserisci la frequenza di ricezione (MHz)</string>
     <!-- Error in the channel editor. %1$s: this radio's bands, e.g. "136–174 / 400–480 MHz". -->
-    <string name="web_ch_band">Le frequenze devono essere entro %1$s</string>
+    <string name="web_ch_band">Le frequenze devono stare entro %1$s</string>
     <!-- Error in the channel editor: the location is out of range. -->
     <string name="web_ch_latlon">La latitudine deve essere entro ±90 e la longitudine entro ±180</string>
     <!-- Error in the channel editor (DMR). -->
@@ -112,7 +112,7 @@
     <!-- Error in the channel editor (DMR). -->
     <string name="web_ch_groups_max">Al massimo 32 talkgroup nella lista RX (numero di chiamata compreso)</string>
     <!-- Error in the channel editor (DMR encryption). -->
-    <string name="web_ch_key_len">La chiave di cifratura deve essere di 8 caratteri esatti</string>
+    <string name="web_ch_key_len">La chiave di crittografia deve avere esattamente 8 caratteri</string>
     <!-- Error: a new DMR channel on a radio that only does analog (FM). -->
     <string name="web_ch_no_dmr">Questa radio non ha il DMR: aggiungi un canale analogico</string>
     <!-- Error in the VFO editor (DMR). -->
@@ -258,15 +258,15 @@
 
     <!-- ==== forms, Winlink, packet finder ==== -->
     <!-- Reply after putting a message form in the Winlink outbox. -->
-    <string name="web_form_winlink_outbox">Nella posta in uscita Winlink</string>
+    <string name="web_form_winlink_outbox">Nella posta in uscita di Winlink</string>
     <!-- Reply after writing a Winlink e-mail. -->
     <string name="web_wl_outbox">Nella posta in uscita</string>
     <!-- Reply after starting a Winlink connection. -->
     <string name="web_wl_connecting">Connessione in corso</string>
     <!-- Reply after starting a Winlink radio connection. %1$s: the frequency, e.g. "145.0500". -->
-    <string name="web_wl_tuning">Sintonia su %1$s MHz, connessione tra pochi secondi</string>
+    <string name="web_wl_tuning">Sintonizzazione su %1$s MHz, connessione tra pochi secondi</string>
     <!-- Error: a Maidenhead grid square. The examples stay as they are. -->
-    <string name="web_wl_grid">Locatore come JO01 o JO01ab</string>
+    <string name="web_wl_grid">Locatore nel formato JO01 o JO01ab</string>
     <!-- Error: the Winlink attachment is gone. -->
     <string name="web_wl_no_attachment">Allegato inesistente</string>
 
@@ -518,7 +518,7 @@
     <!-- Error: the update file is too big. -->
     <string name="web_update_too_big">L’aggiornamento supera gli 80 MB</string>
     <!-- Reply after a POTA/SOTA contact was logged. %1$s: the callsign. -->
-    <string name="web_pota_logged">%1$s nel log</string>
+    <string name="web_pota_logged">%1$s registrato</string>
     <!-- Reply after a net check-in was changed (traffic, late, out). %1$s: the callsign. -->
     <string name="web_net_checkin_updated">%1$s aggiornato</string>
     <!-- Last-heard list: a channel without a name, by its number. Lower case. %1$d: the channel number. -->

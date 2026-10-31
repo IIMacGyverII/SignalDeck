@@ -20,7 +20,7 @@
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
     <string name="channel_editor_h_pos">Posizione facoltativa della stazione o del ponte che questo canale raggiunge. Con la posizione, la pagina Radio mostra il nome del luogo, la sua distanza e la direzione rispetto a te. La mia posizione inserisce l’ultima posizione nota del telefono.</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
-    <string name="channel_editor_h_rxonly">Solo ricezione: questo canale non trasmette mai. Mentre ci sei sopra vengono rifiutati il tasto di trasmissione, il tasto laterale, la memoria vocale, i beacon, le risposte e ogni altra trasmissione (un posto d’ascolto, un canale per cui non hai la licenza, una frequenza che deve restare silenziosa). I canali meteo NOAA, nautici e ferroviari sono sempre solo ricezione, qualunque cosa indichi questa impostazione.</string>
+    <string name="channel_editor_h_rxonly">Solo ricezione: questo canale non trasmette mai. Mentre ci sei sopra vengono rifiutati il tasto di trasmissione, il tasto laterale, la memoria vocale, i beacon, le risposte e ogni altra trasmissione (un posto d’ascolto, un canale per cui non hai la licenza, una frequenza che deve restare silenziosa). I canali meteo NOAA, nautici e ferroviari sono sempre solo in ricezione, qualunque cosa indichi questa impostazione.</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
     <string name="channel_editor_h_power">Potenza di trasmissione. Alta potenza arriva più lontano e consuma più batteria; Bassa potenza basta per le radio vicine. Alcuni servizi limitano la potenza (per esempio l’FRS).</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
@@ -94,7 +94,7 @@
     <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
     <string name="channel_editor_sec_history">Cronologia</string>
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
-    <string name="channel_editor_l_name">Nome del canale</string>
+    <string name="channel_editor_l_name">Nome canale</string>
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
     <string name="channel_editor_l_type">Tipo di canale</string>
     <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. A DMR channel. -->
@@ -180,7 +180,7 @@
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
     <string name="channel_editor_l_softsq_level">Livello Soft SQ</string>
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The radio's own squelch. -->
-    <string name="channel_editor_l_sq">Livello squelch</string>
+    <string name="channel_editor_l_sq">Livello di squelch</string>
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The kind of tone sent: none, CTCSS or DCS. -->
     <string name="channel_editor_l_tx_tone_type">Tipo tono TX</string>
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Also the title of the tone list. -->

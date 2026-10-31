@@ -18,7 +18,7 @@
     <!-- Button on the link card: give the radio back to the stock app. Short, half-width button. -->
     <string name="device_link_hand_back">Restituisci</string>
     <!-- SAFETY: title of the dialog before taking over a phone whose profile has never run on it. One line. -->
-    <string name="device_link_untested_title">Profilo non provato</string>
+    <string name="device_link_untested_title">Profilo non collaudato</string>
     <!-- SAFETY: take-over warning for an untested profile. %1$s is the phone model, %2$s the stock app's package name. "Hand back", "Device report", "Generate device report" and "Radio probe (root)" are button names on the Device page. -->
     <string name="device_link_untested_msg">SignalDeck ha un profilo per %1$s, scritto a partire dalla sua app originale e dalle segnalazioni dei proprietari, ma non è mai stato eseguito su questo telefono. Prendendo il controllo, %2$s viene messa in pausa e si aprono le porte seriali della radio. Se qualcosa va storto, l’app originale viene riattivata; anche Restituisci o un riavvio le ridanno la radio.\n\nPrima esegui Rapporto dispositivo → Genera rapporto dispositivo e Sonda radio (root) e condividili: è così che questo diventa un profilo provato.</string>
     <!-- Button on the link card and title of the exit sheet: stop SignalDeck properly. Short. -->
@@ -188,7 +188,7 @@
     <!-- Heading of the DMR ID card and title of its dialog. Short. -->
     <string name="device_id_title">Il tuo ID DMR</string>
     <!-- Button on the DMR ID card: edit the ID. Short button. -->
-    <string name="device_id_change">Modifica</string>
+    <string name="device_id_change">Cambia</string>
     <!-- Message of the DMR ID dialog. -->
     <string name="device_id_msg">La radio lo invia come ID del chiamante sui canali digitali.</string>
     <!-- Toast when the DMR ID typed is not valid. -->
@@ -198,7 +198,7 @@
 
     <!-- ==== Device page: Mission Statement ==== -->
     <!-- Button above the tools and title of its sheet. Short. -->
-    <string name="device_mission">Dichiarazione d’intenti</string>
+    <string name="device_mission">La nostra missione</string>
     <!-- The project's mission statement on its sheet, in quotation marks (use your language's quotation marks). Large text, a paragraph. -->
     <string name="device_mission_text">“Questo progetto è una vetrina di ciò che può fare una radio amatoriale Android. È nato per innovare, e poggia sull’innovazione, sulle scoperte e sul duro lavoro di chi è venuto prima di me. Spero che spinga altri a creare e a cercare il passo successivo.”</string>
     <!-- Section heading on the Mission Statement sheet (shown in capitals). Short. -->
@@ -620,9 +620,9 @@
     <!-- Bullet line in the checks dialog on a phone with no profile: the radio probe. Ends with a line break. -->
     <string name="device_checks_probe_no_profile">• con il root Magisk, la sonda radio (chiede al modulo chi è sulle porte seriali usate dall’app walkie-talkie: la richiesta di versione DMR e l’handshake AT SA818; accende il modulo se non risponde, solo sui telefoni con un profilo)\n</string>
     <!-- Bullet line in the checks dialog: the receive-only trial. %1$s is the stock app's package name. Ends with a line break. -->
-    <string name="device_checks_trial">• facoltativa, una prova (30 secondi, circa un minuto e mezzo su un telefono non provato): SignalDeck prende la radio (solo ricezione, non si trasmette niente), registra cosa fanno il modulo e l’audio, poi la restituisce a %1$s\n</string>
+    <string name="device_checks_trial">• facoltativa, una prova (30 secondi, circa un minuto e mezzo su un telefono non collaudato): SignalDeck prende la radio (solo ricezione, non si trasmette niente), registra cosa fanno il modulo e l’audio, poi la restituisce a %1$s\n</string>
     <!-- Bullet line in the checks dialog on an untested phone: the receive-only trial. %1$s is the stock app's package name. Ends with a line break. -->
-    <string name="device_checks_trial_untested">• facoltativa, una prova (30 secondi, circa un minuto e mezzo su un telefono non provato): SignalDeck prende la radio (solo ricezione, non si trasmette niente), registra cosa fanno il modulo e l’audio, come si comportano squelch, livello di ricezione e lettura del segnale e quali frequenze sintonizza ai bordi di banda, poi la restituisce a %1$s\n</string>
+    <string name="device_checks_trial_untested">• facoltativa, una prova (30 secondi, circa un minuto e mezzo su un telefono non collaudato): SignalDeck prende la radio (solo ricezione, non si trasmette niente), registra cosa fanno il modulo e l’audio, come si comportano squelch, livello di ricezione e lettura del segnale e quali frequenze sintonizza ai bordi di banda, poi la restituisce a %1$s\n</string>
     <!-- Line in the checks dialog (starts and ends with a line break). %1$s is the stock app's package name. -->
     <string name="device_checks_stock_closed">\n%1$s viene chiusa per le verifiche; poi riaprila come al solito.\n</string>
     <!-- Last line of the checks dialog (starts with a line break). -->
@@ -802,7 +802,7 @@
     <!-- SAFETY: item in the profile line: an advisory applies. Very short. -->
     <string name="device_status_advisory">⚠ avviso</string>
     <!-- Item in the profile line: the profile has not been tested on this phone. One word. -->
-    <string name="device_status_untested">non provato</string>
+    <string name="device_status_untested">non collaudato</string>
     <!-- The firmware line on the link card before the stock version is known (tap opens the firmware screen). Short. -->
     <string name="device_status_module_fw">Firmware del modulo</string>
     <!-- Notice line on the link card: the firmware is not in the catalogue; tap to submit it. One line, may wrap. -->
@@ -855,7 +855,7 @@
     <!-- Status chip: this radio is no longer supported or sold. One or two words. -->
     <string name="device_notes_status_discontinued">Fuori produzione</string>
     <!-- Status chip: SignalDeck has not been tried on this radio. One or two words. -->
-    <string name="device_notes_status_untested">Non provato</string>
+    <string name="device_notes_status_untested">Non collaudato</string>
 
     <!-- ===== Walkie-talkie app finder (why an app is a candidate) ===== -->
     <!-- Evidence that an installed app is the phone's own walkie-talkie app; shown after the app's name in a picker, several joined by device_radioapp_why_separator. Lower case, short phrase. -->
@@ -1399,7 +1399,7 @@
     <!-- SAFETY: Title of the dialog before the 3-second test tone is transmitted. One line. -->
     <string name="device_diag_tone_q">Trasmettere un tono di prova di 3 s?</string>
     <!-- SAFETY: Message of the test tone dialog: it transmits on the current channel. One or two lines. -->
-    <string name="device_diag_tone_msg">Manda in trasmissione la radio sul canale attuale con un tono a 1 kHz, per un ricevitore da banco o un SDR.</string>
+    <string name="device_diag_tone_msg">Manda in trasmissione la radio sul canale attuale con un tono a 1 kHz, per un ricevitore di laboratorio o un SDR.</string>
     <!-- SAFETY: Confirm button of the test tone dialog: transmits. Dialog button, short. -->
     <string name="device_diag_tone_go">Trasmetti</string>
     <!-- Diagnostics page, full-width pill button: exports a backup and restores it into a scratch database to check it. Short. -->

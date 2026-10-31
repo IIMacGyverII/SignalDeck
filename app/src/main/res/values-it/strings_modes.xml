@@ -226,7 +226,7 @@
     <!-- ICS-213 field AP: who approved the message. Label. -->
     <string name="modes_forms_ics_ap">Approvato da (nome e incarico)</string>
     <!-- Title of the Message forms sheet. One line. -->
-    <string name="modes_forms_title">Moduli messaggio</string>
+    <string name="modes_forms_title">Moduli di messaggio</string>
     <!-- Explanation on the Message forms sheet (radio without DMR). A few lines. -->
     <string name="modes_forms_hint">L’ICS-213 General Message e l’ARRL Radiogram, per le reti di emergenza e di traffico: compilane uno e leggilo in aria, oppure invialo come messaggi APRS a un altro SignalDeck, che ricompone le parti nel modulo.</string>
     <!-- The same on a radio with DMR texts. A few lines. -->
@@ -636,7 +636,7 @@
     <!-- Hint in the text field for what to transmit. Short. -->
     <string name="modes_text_input_hint">Testo da inviare</string>
     <!-- Button: stop the decoder. Short (third of a row). -->
-    <string name="modes_text_stop_listening">Smetti di ascoltare</string>
+    <string name="modes_text_stop_listening">Interrompi ascolto</string>
     <!-- Button: start the decoder. Short (third of a row). -->
     <string name="modes_text_listen">Ascolta</string>
     <!-- Text area before anything was decoded. One line. -->
@@ -652,7 +652,7 @@
     <!-- Parrot explanation. %1$s the longest recording in seconds, %2$s the minutes between Morse IDs. A paragraph. -->
     <string name="modes_parrot_hint">Tutto ciò che la radio riceve su questo canale (fino a %1$s s) viene registrato e ritrasmesso un secondo dopo che l’altra stazione ha smesso, così può sentire come arriva attraverso di te. Con un nominativo impostato, aggiunge il tuo nominativo in CW a una ripetizione al massimo ogni %2$s minuti. Il limite di trasmissione di 30 secondi della radio taglia ogni ripetizione.</string>
     <!-- Button: turn the parrot off and close. Short. -->
-    <string name="modes_parrot_stop">Ferma il pappagallo</string>
+    <string name="modes_parrot_stop">Interrompi il pappagallo</string>
     <!-- Subtitle. %1$s the channel number, %2$s its name. One line. -->
     <string name="modes_parrot_on_channel">Ripete sul can. %1$s · %2$s</string>
     <!-- Subtitle when no channel is known. One line. -->
@@ -810,7 +810,7 @@
     <!-- Line under a recording. %1$s its folder, %2$s date and time, %3$s its length or size. One line. -->
     <string name="modes_recdec_row">%1$s · %2$s · %3$s</string>
     <!-- Title of a satellite pass recording in the list. Short. -->
-    <string name="modes_recdec_pass">Registrazione di un passaggio</string>
+    <string name="modes_recdec_pass">Registrazione del passaggio</string>
     <!-- Toast: the picked file could not be read. One line. -->
     <string name="modes_recdec_unreadable">Impossibile leggere il file</string>
     <!-- Title of the progress sheet, SSTV. One line. -->
@@ -832,7 +832,7 @@
 
     <!-- ===== Morse trainer ===== -->
     <!-- Title of the Morse trainer sheet. One line. -->
-    <string name="modes_morse_title">Allenatore Morse</string>
+    <string name="modes_morse_title">Allenamento Morse</string>
     <!-- Explanation of the Koch method and Farnsworth spacing. A paragraph. -->
     <string name="modes_morse_hint">Il metodo Koch: inizia con due caratteri a piena velocità e aggiungine uno ogni volta che copi una lezione al 90%. La spaziatura Farnsworth lascia pause più lunghe tra i caratteri mentre impari; riducile man mano che migliori. Il suono esce dal telefono, non va in aria.</string>
     <!-- Lesson line. %1$d lesson, %2$d lessons in all, %3$s its characters (spaced), %4$s the new character. One line beside two buttons. -->
@@ -1101,7 +1101,7 @@
     <!-- Toast: Listen here needs a frequency picked on the graph. One line. -->
     <string name="modes_scope_tap_first">Prima tocca il grafico per scegliere una frequenza</string>
     <!-- Toast after Listen here. %1$s the frequency in MHz. One line. -->
-    <string name="modes_scope_listening">Ascolto su %1$s MHz (VFO)</string>
+    <string name="modes_scope_listening">In ascolto su %1$s MHz (VFO)</string>
     <!-- Screen reader description of the graph. One line. -->
     <string name="modes_scope_graph_description">Grafico del band scope e waterfall</string>
 
@@ -1231,7 +1231,7 @@
     <!-- The same before any orbit was downloaded. A paragraph. -->
     <string name="modes_satd_hint_no_orbits">Passaggi sopra di te nelle prossime 24 ore. Segui un passaggio e la radio lo insegue: un minuto prima che sorga il VFO prende le frequenze del satellite, corrette per il Doppler ogni paio di secondi (mai mentre parli), e torna al tuo canale dopo che è tramontato. Un’antenna verticale riceve meglio i passaggi più alti. Orbite non scaricate.</string>
     <!-- Button: stop following a pass. Full width. -->
-    <string name="modes_satd_stop_tracking">Smetti di seguire</string>
+    <string name="modes_satd_stop_tracking">Interrompi inseguimento</string>
     <!-- Toast after Stop tracking. Short. -->
     <string name="modes_satd_tracking_stopped">Inseguimento interrotto</string>
     <!-- Hint: the phone has no location. One line. -->
@@ -1269,7 +1269,7 @@
     <!-- Switch description; keep the path. Two lines. -->
     <string name="modes_satd_record_hint">L’intero passaggio come WAV in Download/DMR/Audio/&lt;satellite&gt; (circa 1 MB al minuto), così un’immagine o un pacchetto perso si può decodificare di nuovo</string>
     <!-- Button: download the orbits and the FM satellite list. Full width. -->
-    <string name="modes_satd_update">Aggiorna orbite</string>
+    <string name="modes_satd_update">Aggiorna dati orbitali</string>
     <!-- Toast after updating the orbits. Short. -->
     <string name="modes_satd_updated">Orbite aggiornate</string>
     <!-- Live line before the pass. %1$s the satellite, %2$s when it rises (HH:mm). One line. -->
@@ -1307,7 +1307,7 @@
         <item quantity="other">%1$d stazioni ascoltate</item>
     </plurals>
     <!-- Logbook explanation. %1$s the contacts ("3 contacts"), %2$s the stations heard ("12 stations heard"). RadioID is a service name; ADIF is the log file format. A paragraph. -->
-    <string name="modes_log_hint">%1$s, %2$s. Le stazioni ascoltate vengono registrate da sole (chiamanti DMR con nominativo RadioID, stazioni APRS, identificativi in CW); toccane una per inserire i rapporti e segnarla come collegamento. Esporta in ADIF per il tuo programma di log o il servizio QSL.</string>
+    <string name="modes_log_hint">%1$s, %2$s. Le stazioni ascoltate vengono registrate da sole (chiamanti DMR con nominativo RadioID, stazioni APRS, identificativi in CW); toccane una per inserire i rapporti e segnarla come collegamento. Esporta ADIF per il tuo programma di log o il servizio QSL.</string>
     <!-- Button: log a contact by hand. Half width. -->
     <string name="modes_log_add">Aggiungi collegamento</string>
     <!-- Button: save and share the log as an ADIF file. Half width. -->

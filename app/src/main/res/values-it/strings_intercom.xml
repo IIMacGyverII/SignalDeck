@@ -9,7 +9,7 @@
     <!-- Classic intercom page, info block: label before the power level. Very short; no space after the colon (the value follows directly). -->
     <string name="intercom_main_classic_power">Potenza:</string>
     <!-- Classic intercom page, info block: label before the squelch level. Short. -->
-    <string name="intercom_main_classic_squelch">Livello squelch:</string>
+    <string name="intercom_main_classic_squelch">Livello di squelch:</string>
     <!-- Classic intercom page, info block: label before the transmit frequency. Very short. -->
     <string name="intercom_main_classic_send">TX:</string>
     <!-- Classic intercom page, info block: label before the receive frequency. Very short. -->
@@ -23,7 +23,7 @@
     <!-- Classic intercom page, info block, DMR channel: %1$s the colour code (a number). Short. -->
     <string name="intercom_main_classic_color_code">Color code:%1$s</string>
     <!-- Classic intercom page, info block, FM channel: %1$s the squelch level (a number). Short. -->
-    <string name="intercom_main_classic_squelch_level">Livello squelch:%1$s</string>
+    <string name="intercom_main_classic_squelch_level">Livello di squelch:%1$s</string>
     <!-- Classic intercom page, info block: %1$s the transmit frequency. Short. -->
     <string name="intercom_main_classic_send_value">TX:%1$s</string>
     <!-- Classic intercom page, info block: %1$s the receive frequency. Short. -->
@@ -198,7 +198,7 @@
 
     <!-- ===== Help page (ui/HelpView.java). The guide text itself is assets/guide/en.json. ===== -->
     <!-- Title of the Help page header. One short line. -->
-    <string name="intercom_help_title">Aiuto e guida</string>
+    <string name="intercom_help_title">Aiuto e istruzioni</string>
     <!-- Subtitle of the Help page header: how many guide topics there are. Shown in caps. Short. English says "topics" for every count, as before (one = other). -->
     <plurals name="intercom_help_topics">
         <item quantity="one">%1$d argomento</item>
@@ -293,7 +293,7 @@
     <!-- Section heading on the Last heard sheet: Android Auto and coverage-logging events. Shown in caps. One line. -->
     <string name="intercom_lastheard_section_events">Auto e copertura</string>
     <!-- Shown on the Last heard sheet when nothing has been heard. One line. -->
-    <string name="intercom_lastheard_empty">Ancora nessun ascolto.</string>
+    <string name="intercom_lastheard_empty">Ancora niente ascoltato.</string>
     <!-- Second line of an alert or event row on Last heard. %1$s is the date and time, %2$s the channel name. One line. -->
     <string name="intercom_lastheard_event_sub">%1$s \u0020· \u0020%2$s \u0020· \u0020tocca per i dettagli</string>
     <!-- The same when the line came several times in a row. %3$d is how many times (shown as "3×"). One line. -->
@@ -359,7 +359,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_rxonly_title">Canale solo ricezione</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_rxonly_text">I canali meteo NOAA (da 162,400 a 162,550 MHz), i canali VHF nautici (da 156,000 a 157,450 MHz) e i canali ferroviari AAR (da 159,810 a 161,565 MHz) sono solo ricezione. Lì la radio non trasmette, qualunque tasto venga premuto.</string>
+    <string name="intercom_lastheard_ex_rxonly_text">I canali meteo NOAA (da 162,400 a 162,550 MHz), i canali VHF nautici (da 156,000 a 157,450 MHz) e i canali ferroviari AAR (da 159,810 a 161,565 MHz) sono solo in ricezione. Lì la radio non trasmette, qualunque tasto venga premuto.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_toolong_title">Troppo lungo da trasmettere</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -379,7 +379,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_keyword_title">Parola chiave ascoltata</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_keyword_text">I sottotitoli in tempo reale hanno riconosciuto una delle tue parole chiave nel parlato ricevuto. Le parole chiave si impostano nella pagina Radio: tieni premuto TXT → Parole chiave.</string>
+    <string name="intercom_lastheard_ex_keyword_text">I sottotitoli in tempo reale hanno riconosciuto una delle tue parole chiave nel parlato ricevuto. Le parole chiave si impostano nella pagina Radio: tieni premuto TXT → Avvisi parole chiave.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_notsent_title">Non inviato</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
@@ -457,7 +457,7 @@
     <!-- Car screen row title when the screen could not be built; the error follows on the next line. One word. -->
     <string name="intercom_car_unavailable">Non disponibile</string>
     <!-- Car screen: shown in the empty Last heard list. Short. -->
-    <string name="intercom_car_nothing_heard">Ancora nessun ascolto</string>
+    <string name="intercom_car_nothing_heard">Ancora niente ascoltato</string>
     <!-- Car screen row title on Last heard for a line with no text of its own. One word. -->
     <string name="intercom_car_received">Ricevuto</string>
     <!-- Car screen row subtitle on Last heard. %1$s is the time, %2$d the channel number, %3$s its name. Car screen row: short. -->
@@ -557,7 +557,7 @@
     <!-- Toast when a widget button is pressed while the radio is not on. -->
     <string name="intercom_widget_not_on">Prima apri l’app radio: la radio è spenta</string>
     <!-- Toast when the widget's Talk is pressed on a receive-only channel. -->
-    <string name="intercom_widget_rx_only">Questo canale è solo ricezione</string>
+    <string name="intercom_widget_rx_only">Questo canale è solo in ricezione</string>
     <!-- Widget status when the radio service is not running. One short line. -->
     <string name="intercom_widget_off">Radio spenta · tocca per aprire</string>
     <!-- Part of the widget and notification status line: the frequency. %1$s is the frequency in MHz. Parts are joined with intercom_widget_sep. -->

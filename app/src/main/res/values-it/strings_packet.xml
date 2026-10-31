@@ -1022,9 +1022,9 @@
     <!-- Button on the PKT sheet while the M17 receiver runs. Short (two buttons share a row). -->
     <string name="packet_pkt_m17_listening">M17 (in ascolto)</string>
     <!-- Button on the PKT sheet that starts the M17 receiver. Short (two buttons share a row). -->
-    <string name="packet_pkt_m17_receive">Ricevi M17</string>
+    <string name="packet_pkt_m17_receive">Ricezione M17</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
-    <string name="packet_pkt_m17_hint">Ricevi M17: ascolta le stazioni in voce digitale M17 su questo canale o sul VFO, con nominativo e messaggio di chi chiama (solo ricezione: questa radio non può trasmettere in M17).</string>
+    <string name="packet_pkt_m17_hint">Ricezione M17: ascolta le stazioni in voce digitale M17 su questo canale o sul VFO, con nominativo e messaggio di chi chiama (solo ricezione: questa radio non può trasmettere in M17).</string>
     <!-- Button on the PKT sheet that stops APRS monitoring. Short (two buttons share a row). -->
     <string name="packet_pkt_stop_monitoring">Interrompi ascolto</string>
     <!-- Button on the PKT sheet that parks the radio on the APRS frequency (%1$s, e.g. 144.390). Short (two buttons share a row). -->
@@ -1276,7 +1276,7 @@
     <!-- Button on the PKT sheet that stops listening for the space station's pictures. Short (two buttons share a row). -->
     <string name="packet_pkt_iss_sstv_stop">Interrompi SSTV ISS</string>
     <!-- Toast after ISS SSTV stops. One line. -->
-    <string name="packet_pkt_iss_sstv_stopped">SSTV ISS interrotto</string>
+    <string name="packet_pkt_iss_sstv_stopped">SSTV ISS interrotta</string>
     <!-- Button on the PKT sheet that tunes the SSTV calling frequency and listens. Short (two buttons share a row). -->
     <string name="packet_pkt_sstv_rx_144500">Ricevi su 144,500</string>
     <!-- Button on the PKT sheet that listens for SSTV on this channel. Short (two buttons share a row). -->
@@ -1317,7 +1317,7 @@
     <!-- Status line: no callsign is set. -->
     <string name="packet_pkt_status_no_call">nessun nominativo impostato</string>
     <!-- Status line: APRS monitoring on %1$s (the frequency, 144.390). -->
-    <string name="packet_pkt_status_monitoring">ascolto su %1$s</string>
+    <string name="packet_pkt_status_monitoring">in ascolto su %1$s</string>
     <!-- Status line: only passive decoding. -->
     <string name="packet_pkt_status_passive">passivo</string>
     <!-- Status line with the KISS TNC on: %1$s monitoring or passive, %2$s the client state, %3$d frames received, %4$d sent. KISS is a protocol name. -->

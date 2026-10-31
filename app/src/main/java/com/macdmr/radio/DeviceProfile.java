@@ -88,6 +88,14 @@ public final class DeviceProfile {
      * other phones, the received level is fixed (a squelch can be calibrated), and the app's gate mutes what you hear.
      */
     public boolean appPlayback;
+    /**
+     * DMR speaker gate (FW57 = the factory image, read 2026-10-31): every digital channel write (0x22) closes the module's
+     * speaker, and only MON off (0x2F 2) with the squelch byte at 0, or MON on, opens it again; once open it passes every
+     * talkgroup, so admission moves into the app: after each digital write SignalDeck sends squelch 0 and the MON state, and
+     * plays a DMR reception only once the module's caller info (0x2B) admits it (a talkgroup in the channel's list, an
+     * All-Call, a private call to this radio) or while MON is on. Only where the app plays the receive audio.
+     */
+    public boolean dmrAppAdmission;
     /** The receive audio carries sub-audible tones, so Soft SQ can detect CTCSS. False on the W6 (cut below ~300 Hz). */
     public boolean subaudible = true;
     /** Soft SQ noise thresholds for levels 1-9 and the close cap on this phone's audio scale; null = the detector's own (the Armor's). */
@@ -292,6 +300,7 @@ public final class DeviceProfile {
         // ptt_control 0 is its transmit state (setPttLaunch). So the PTT line goes to receive first, before the module is
         // powered, or a module left by QuickChat's power-off would come up with its PTT line asserted.
         ARMOR_26_ULTRA.id = "ulefone-armor26ultra"; ARMOR_26_ULTRA.revision = 1;
+        ARMOR_26_ULTRA.dmrAppAdmission = true;   // FW57/factory: a digital write closes the speaker; the app admits DMR (2026-10-31)
         ARMOR_26_ULTRA.moduleLoader = true;     // certified: FW57 loaded from the stock image through the Module firmware page (2026-10-30)
         // Fitted on the 17-bit POCSAG padding run (bits 806–822 of the padded RESTORE B clip): τ ≈ 7.49 ms.
         ARMOR_26_ULTRA.pocsagTauSec = 0.0075;
@@ -628,7 +637,7 @@ public final class DeviceProfile {
         p.id = id; p.revision = revision; p.source = source; p.txBlocked = txBlocked; p.restrictedBy = restrictedBy; p.globalSquelch = globalSquelch; p.lineSetup = lineSetup; p.scanDwellMs = scanDwellMs; p.protocol = protocol; p.bandsHz = bandsHz.clone(); p.rssi = rssi; p.softSqInModule = softSqInModule; p.appPlayback = appPlayback; p.fixedModuleVolume = fixedModuleVolume; p.subaudible = subaudible; p.dataSquelch = dataSquelch; p.moduleLoader = moduleLoader; p.camcorderGain = camcorderGain; p.softSqThresholds = softSqThresholds; p.softSqCloseCap = softSqCloseCap; p.rxDetectNode = rxDetectNode; p.rxLinesOn = rxLinesOn; p.muteLines = muteLines; p.rxLinesOff = rxLinesOff; p.txLinesOn = txLinesOn; p.txLinesOff = txLinesOff; p.gatewayLinesOn = gatewayLinesOn; p.gatewayLinesOff = gatewayLinesOff; p.txAudioScale = txAudioScale; p.toneEnergyMin = toneEnergyMin; p.gatewayVolume = gatewayVolume; p.minWriteGapMs = minWriteGapMs; p.directAudio = directAudio;
         p.bootMicInterrupt = bootMicInterrupt; p.txAudioLeadMs = txAudioLeadMs; p.minKeyGapMs = minKeyGapMs; p.analogVolume = analogVolume; p.stockAreaPrefix = stockAreaPrefix; p.stockDefaultArea = stockDefaultArea; p.stockCommands = stockCommands; p.txTestUnverified = txTestUnverified;
         p.txAudioOnSendStart = txAudioOnSendStart; p.txAudioTailMs = txAudioTailMs; p.politeAfterChannel = politeAfterChannel; p.smsUtf8 = smsUtf8;
-        p.timeSlots = timeSlots; p.pttKey = pttKey; p.txReleaseHoldMs = txReleaseHoldMs;
+        p.timeSlots = timeSlots; p.pttKey = pttKey; p.dmrAppAdmission = dmrAppAdmission; p.txReleaseHoldMs = txReleaseHoldMs;
         return p;
     }
 

@@ -37,7 +37,7 @@ public class LastHeardScreen extends Screen {
                 for (LastHeard.Item it : items) {
                     Row.Builder row = new Row.Builder().setTitle(it.title).addText(it.sub);
                     final int chNum = it.channel;
-                    if (it.known) row.setOnClickListener(() -> { RadioService x = RadioService.running; if (x != null) x.selectChannel(chNum); getScreenManager().popToRoot(); });
+                    if (it.known && com.macdmr.radio.ChannelStore.tunable(s.store().byNumber(chNum))) row.setOnClickListener(() -> { RadioService x = RadioService.running; if (x != null) x.selectChannel(chNum); getScreenManager().popToRoot(); });   // a channel outside this radio's bands is listed, not tuned
                     list.addItem(row.build());
                 }
                 if (items.isEmpty()) list.setNoItemsMessage(Txt.s(R.string.intercom_car_nothing_heard));

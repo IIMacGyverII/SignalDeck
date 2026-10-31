@@ -83,8 +83,8 @@ public class ChannelListScreen extends Screen {
                     .setOnClickListener(() -> getScreenManager().push(new ChannelListScreen(getCarContext(), -1, true, Txt.s(R.string.intercom_car_all_channels)))).build());
         } else {
             List<ChannelStore.Channel> chans = new ArrayList<>();
-            if (all) chans.addAll(s.store().all());
-            else { ChannelStore.Zone z = s.store().zone(zoneId); if (z != null) { Set<Integer> in = new HashSet<>(); for (int x : z.numbers) in.add(x); for (ChannelStore.Channel c : s.store().all()) if (in.contains(c.number)) chans.add(c); } }
+            if (all) chans.addAll(ChannelStore.tunable(s.store().all()));         // only channels this radio can tune
+            else { ChannelStore.Zone z = s.store().zone(zoneId); if (z != null) { Set<Integer> in = new HashSet<>(); for (int x : z.numbers) in.add(x); for (ChannelStore.Channel c : ChannelStore.tunable(s.store().all())) if (in.contains(c.number)) chans.add(c); } }
             ChannelStore.Channel cur = s.current();
             int start = 0;
             if (chans.size() > max && cur != null) for (int i = 0; i < chans.size(); i++) if (chans.get(i).number == cur.number) start = Math.max(0, Math.min(i - max / 2, chans.size() - max));   // long list: centred on the current channel

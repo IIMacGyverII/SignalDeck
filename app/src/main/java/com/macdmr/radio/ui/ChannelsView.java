@@ -293,7 +293,7 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
             btns.addView(b, lp);
             b.setOnClickListener(v -> {
                 dlg.dismiss();
-                if (k == 0 && svc != null) svc.selectChannel(ch.number);
+                if (k == 0 && svc != null) { String e = svc.trySelectChannel(ch.number); if (e != null) android.widget.Toast.makeText(c, e, android.widget.Toast.LENGTH_LONG).show(); }   // not tunable on this radio: say so
                 else if (k == 1 && host != null) host.openEditor(ch, false);
                 else if (k == 2) toggleFavourite(ch, !fav);
                 else if (k == 3) confirmDelete(ch);
@@ -405,6 +405,9 @@ public class ChannelsView extends LinearLayout implements RadioService.Listener 
             LinearLayout badges = row.findViewWithTag("badges"); badges.removeAllViews();
             badges.addView(Neo.chip(c, ch.isM17() ? "M17" : ch.isDigital() ? "DMR" : "FM", ch.isM17() || ch.isDigital() ? Neo.VIOLET : Neo.CYAN));
             if (svc != null && svc.scanPriority() == ch.number) { TextView pc = Neo.chip(c, "PRIORITY", Neo.VIOLET); LayoutParams pl2 = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); pl2.leftMargin = (int) (6 * d); badges.addView(pc, pl2); }
+            boolean canTune = ChannelStore.tunable(ch);                            // outside this radio's bands (a 2 m channel on a UHF-only radio): dimmed, never tuned
+            row.setAlpha(canTune ? 1f : 0.5f);
+            if (!canTune) { TextView nt = Neo.chip(c, "NOT TUNABLE", Neo.MUTED); nt.setLetterSpacing(0.04f); nt.setTextSize(10); nt.setContentDescription("Not tunable on this radio"); /* short and tight: the full chip was cut off on a 480 px screen (W6+) */ LayoutParams nl = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); nl.leftMargin = (int) (6 * d); badges.addView(nt, nl); }
             Object[] lh = heard.get(ch.number);                                   // when the channel was last heard (owner, 2026-10-25: the colour code and tone chip came off the card; the editor has the detail and the history)
             if (lh != null) { TextView ht = Neo.text(c, "heard " + heardWhen((Long) lh[0]), Neo.DIM, 11.5f, Neo.uiMedium(c)); ht.setSingleLine(true); ht.setEllipsize(android.text.TextUtils.TruncateAt.END); LayoutParams hl = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f); hl.leftMargin = (int) (6 * d); badges.addView(ht, hl); }
             ImageView star = row.findViewWithTag("star");

@@ -40,7 +40,7 @@ public final class BandScopeScreen extends ModeScreen {
         info = Neo.text(c, "", Neo.CYAN_LIGHT, 15, Neo.mono(c)); info.setPadding(0, dp(8), 0, dp(2)); col.addView(info);
         peaks = Neo.text(c, "", Neo.MUTED, 13.5f, Neo.uiMedium(c)); peaks.setLineSpacing(0, 1.1f); col.addView(peaks);
         content.addView(col);
-        if (presetIdx < 0 || presetIdx > BandScope.PRESETS.length) presetIdx = 0;
+        if (presetIdx < 0 || presetIdx > BandScope.PRESETS.length || (presetIdx < BandScope.PRESETS.length && !BandScope.fits(BandScope.PRESETS[presetIdx]))) presetIdx = BandScope.firstFitting();   // never start on a band this radio cannot tune (2 m on a UHF-only radio)
         buildButtons();
         setSubtitle("Receive only · nothing is transmitted");
         refresh();
@@ -109,7 +109,9 @@ public final class BandScopeScreen extends ModeScreen {
     /** The region's bands (no NOAA weather band where there is no weather radio), Custom, and Show all when some are left out. */
     private void choosePreset(boolean all) {
         java.util.List<Integer> idx = BandScope.offered(com.macdmr.radio.region.Region.current(c), all);
-        final boolean more = idx.size() < BandScope.PRESETS.length;
+        idx.removeIf(i -> !BandScope.fits(BandScope.PRESETS[i]));        // only bands this radio tunes
+        int inBand = 0; for (BandScope.Preset p : BandScope.PRESETS) if (BandScope.fits(p)) inBand++;
+        final boolean more = idx.size() < inBand;
         int k = idx.size(); String[] n = new String[k + (more ? 2 : 1)];
         for (int j = 0; j < k; j++) { BandScope.Preset p = BandScope.PRESETS[idx.get(j)]; int st = BandScope.steps(p.from, p.to, p.step); n[j] = String.format(Locale.US, "%s  (%.3f–%.3f, %s kHz, %d steps, about %s)", p.name, p.from / 1e6, p.to / 1e6, khz(p.step), st, BandScope.duration((long) st * (BandScope.DEFAULT_SETTLE_MS + 300))); }
         n[k] = "Custom range…"; if (more) n[k + 1] = "Show all bands…";

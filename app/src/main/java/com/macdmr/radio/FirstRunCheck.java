@@ -556,14 +556,15 @@ public final class FirstRunCheck {
         r.append("result: ").append("ready".equals(link) ? "radio came up in " + took / 1000 + " s" : "did not come up (" + link + " after " + took / 1000 + " s)").append('\n');
         if ("ready".equals(link)) {
             if (!svc.profile().verified) {                              // untested phone: give the audio path something to carry
-                p.step("Trial: listening on 446.00625 MHz with the squelch open");
-                svc.listenTest(446_006_250, "Listen test 446.00625");
+                final long lhz = svc.profile().listenTestHz(); final String lmhz = String.format(java.util.Locale.US, "%.5f", lhz / 1e6).replaceAll("0{1,2}$", "");   // 446.00625, or the middle of a band without it
+                p.step("Trial: listening on " + lmhz + " MHz with the squelch open");
+                svc.listenTest((int) lhz, "Listen test " + lmhz);
                 Thread.sleep(3000);                                     // the module settles after a retune
                 // the module only streams audio while its squelch is open, and QuickChat sets a separate global squelch (0x30):
                 // the monitor command (0x2F, as the MON key) forces it open, so noise flows with nobody on the channel
                 svc.setMonitor(true);
                 Thread.sleep(1500);
-                r.append("tuned 446.00625 MHz analog, squelch open and monitor on (receive only)\n");
+                r.append("tuned " + lmhz + " MHz analog, squelch open and monitor on (receive only)\n");
             }
             p.step("Trial: reading signal strength and audio");
             File dir = DeviceReport.newestDir();

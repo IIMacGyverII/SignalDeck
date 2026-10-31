@@ -70,7 +70,7 @@ public final class ActivityDialog {
                     : a.seconds >= 120 ? Txt.p(R.plurals.intercom_activity_row_min, a.receptions, a.receptions, Math.round(a.seconds / 60.0), last)
                     : Txt.p(R.plurals.intercom_activity_row_s, a.receptions, a.receptions, a.seconds, last);
             r.addView(Neo.text(c, line, Neo.MUTED, 12.5f, Neo.uiMedium(c)));
-            if (ch != null) { r.setClickable(true); r.setOnClickListener(v -> { svc.selectChannel(ch.number); if (self[0] != null) self[0].dismiss(); }); }
+            if (ch != null) { r.setClickable(true); r.setOnClickListener(v -> { String e = svc.trySelectChannel(ch.number); if (e != null) { Toast.makeText(c, e, Toast.LENGTH_LONG).show(); return; } if (self[0] != null) self[0].dismiss(); }); }
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT); lp.bottomMargin = (int) (6 * d);
             body.addView(r, lp);
         }

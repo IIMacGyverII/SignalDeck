@@ -36,7 +36,7 @@ public final class ScheduleDialog {
     public static void show(Context c, RadioService svc) {
         float d = Theme.dp(c);
         LinearLayout body = Neo.sheetBody(c, Txt.s(R.string.intercom_schedule_title), "radio");
-        body.addView(Neo.sheetHint(c, Txt.s(R.string.intercom_schedule_hint)));
+        body.addView(Neo.sheetHint(c, Txt.s(com.macdmr.radio.DeviceProfile.inBands(com.macdmr.radio.PacketEngine.APRS_FREQ_HZ) ? R.string.intercom_schedule_hint : R.string.intercom_schedule_hint_no_aprs)));
         final AlertDialog[] self = { null };
         List<Scheduler.Entry> l = Scheduler.list(c);
         SimpleDateFormat f = new SimpleDateFormat("EEE d MMM, HH:mm", Locale.getDefault());
@@ -80,19 +80,23 @@ public final class ScheduleDialog {
         final Neo.NeonSwitch rec = new Neo.NeonSwitch(c); rec.setChecked(e.record);
         final LinearLayout recRow = Neo.switchRow(c, "rec", Neo.RED, Txt.s(R.string.intercom_schedule_record), Txt.s(R.string.intercom_schedule_record_sub), rec);
         body.addView(recRow);
-        final List<ChannelStore.Channel> chans = svc.store().all();
+        final List<ChannelStore.Channel> chans = ChannelStore.tunable(svc.store().all());   // only channels this radio can tune
+        final boolean sstv144 = svc.profile().tunable(com.macdmr.radio.PacketEngine.SSTV_FREQ_HZ);   // the W6 tunes UHF only: SSTV then runs on the channel the radio is on
+        final List<String> acts = new java.util.ArrayList<>(), actNames = new java.util.ArrayList<>();
+        final String[] allNames = Scheduler.Entry.actionNames(svc.aprsHz());     // APRS monitoring names the region's frequency
+        for (int i = 0; i < Scheduler.ACTIONS.length; i++) if (Scheduler.available(svc.profile(), Scheduler.ACTIONS[i], svc.aprsHz()) || Scheduler.ACTIONS[i].equals(e.action)) { acts.add(Scheduler.ACTIONS[i]); actNames.add(allNames[i]); }
         final Runnable showCh = () -> {
             boolean need = Scheduler.usesChannel(e.action);
             chRow.setVisibility(need ? android.view.View.VISIBLE : android.view.View.GONE);
             recRow.setVisibility(Scheduler.LISTEN.equals(e.action) ? android.view.View.VISIBLE : android.view.View.GONE);
             ChannelStore.Channel ch = e.channel >= 0 ? svc.store().byNumber(e.channel) : null;
-            chV.setText(Txt.s(R.string.intercom_schedule_tap_to_change, ch != null ? ch.number + "  " + ch.name : Scheduler.SSTV.equals(e.action) ? Txt.s(R.string.intercom_schedule_sstv_freq, "144.500") : Txt.s(R.string.intercom_schedule_current_channel)));
+            chV.setText(Txt.s(R.string.intercom_schedule_tap_to_change, ch != null ? ch.number + "  " + ch.name : Scheduler.SSTV.equals(e.action) && sstv144 ? Txt.s(R.string.intercom_schedule_sstv_freq, "144.500") : Txt.s(R.string.intercom_schedule_current_channel)));
             act.setText(Txt.s(R.string.intercom_schedule_tap_to_change, e.actionName()));
         };
-        act.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle(Txt.s(R.string.intercom_schedule_what_title)).setItems(Scheduler.Entry.actionNames(svc.aprsHz()), (dd, w) -> { e.action = Scheduler.ACTIONS[w]; showCh.run(); }).show());
+        act.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle(Txt.s(R.string.intercom_schedule_what_title)).setItems(actNames.toArray(new String[0]), (dd, w) -> { e.action = acts.get(w); showCh.run(); }).show());
         chV.setOnClickListener(v -> {
             String[] names = new String[chans.size() + 1];
-            names[0] = Scheduler.SSTV.equals(e.action) ? Txt.s(R.string.intercom_schedule_sstv_freq_item, "144.500") : Txt.s(R.string.intercom_schedule_current_channel);
+            names[0] = Scheduler.SSTV.equals(e.action) && sstv144 ? Txt.s(R.string.intercom_schedule_sstv_freq_item, "144.500") : Txt.s(R.string.intercom_schedule_current_channel);
             for (int i = 0; i < chans.size(); i++) names[i + 1] = chans.get(i).number + "  " + chans.get(i).name;
             new AlertDialog.Builder(c).setTitle(Txt.s(R.string.intercom_schedule_which_channel)).setItems(names, (dd, w) -> { e.channel = w == 0 ? -1 : chans.get(w - 1).number; showCh.run(); }).show();
         });
@@ -138,6 +142,7 @@ public final class ScheduleDialog {
             e.label = label.getText().toString().trim(); e.record = rec.isChecked() && Scheduler.LISTEN.equals(e.action); e.enabled = true;
             if (!Scheduler.usesChannel(e.action)) e.channel = -1;
             if (e.days != 0) e.date = "";
+            { String bp = Scheduler.bandProblem(svc.profile(), e, e.channel >= 0 ? svc.store().byNumber(e.channel) : null, svc.aprsHz()); if (bp != null) { Toast.makeText(c, bp, Toast.LENGTH_LONG).show(); return; } }
             long next = Scheduler.nextStart(e, System.currentTimeMillis(), java.util.TimeZone.getDefault());
             if (next < 0) { Toast.makeText(c, Txt.s(R.string.intercom_schedule_time_past_toast), Toast.LENGTH_LONG).show(); return; }
             Scheduler.put(c, e);

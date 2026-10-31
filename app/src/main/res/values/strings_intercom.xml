@@ -745,8 +745,11 @@
     <string name="intercom_zones_not_legal_hint">Licence-free services %1$s does not list. They stay here because you may need them elsewhere; whether you may transmit on them is your responsibility.</string>
     <!-- Add a zone sheet: status in a list's subtitle, the list is only partly legal in the region. Legal text. Short (followed by more items, separated by "  ·  "). -->
     <string name="intercom_zones_partly_legal">Partly legal here (some channels)</string>
-    <!-- Add a zone sheet: status in a list's subtitle, none of its channels can be tuned on this radio. Short (followed by more items). -->
-    <string name="intercom_zones_outside_bands">Outside this radio\'s bands</string>
+    <!-- Add a zone sheet: hint under the standard lists when some are hidden because this radio can tune none of their channels. %1$d is how many lists; %2$s is the radio's bands as text ("400–480 MHz"). A few lines. -->
+    <plurals name="intercom_zones_out_of_band_hint">
+        <item quantity="one">%1$d standard list is not shown: none of its channels is inside what this radio tunes (%2$s).</item>
+        <item quantity="other">%1$d standard lists are not shown: none of their channels is inside what this radio tunes (%2$s).</item>
+    </plurals>
     <!-- Add a zone sheet: status in a list's subtitle; %1$d of %2$d channels can be tuned on this radio. Short (followed by more items). -->
     <string name="intercom_zones_some_in_bands">%1$d of %2$d in this radio\'s bands</string>
     <!-- Add a zone sheet: a standard list's card title; %1$s is the list name (FRS, GMRS …), %2$d its channel count. English keeps "channels" for 1 too. One line. -->
@@ -775,6 +778,10 @@
         <item quantity="one">%1$d channels</item>
         <item quantity="other">%1$d channels</item>
     </plurals>
+    <!-- Standard list sheet: section title above the channel preview when this radio can tune only some of the list; %1$d of %2$d channels. Short, shown in caps. -->
+    <string name="intercom_zones_preset_tunable">%1$d of %2$d channels tunable here</string>
+    <!-- Standard list sheet: hint under that title; %1$s is the radio's bands as text ("400–480 MHz"). "Add" is the button below. One or two lines. -->
+    <string name="intercom_zones_preset_tunable_hint">This radio tunes %1$s: Add leaves out the channels marked not tunable here.</string>
     <!-- Standard list sheet: button that adds the list; %1$s is the list name (FRS, GMRS …). Short (button). -->
     <string name="intercom_zones_add_preset">Add %1$s</string>
     <!-- Toast when a standard list could not be added; %1$s is the list name, %2$s the error. One or two lines. -->
@@ -869,6 +876,8 @@
     <string name="intercom_schedule_title">Scheduled operations</string>
     <!-- Hint at the top of the Scheduled operations sheet. A few lines. -->
     <string name="intercom_schedule_hint">Start something at a set time, once or every week: listen to a channel (and record it), scan the zone, APRS monitoring, SSTV receive, or send an APRS beacon. When the time is up the radio goes back to what it was doing. It runs with the screen off; a satellite pass being tracked always comes first.</string>
+    <!-- The same hint on a radio that cannot tune the APRS frequency (no "APRS monitoring" in the list). A few lines. -->
+    <string name="intercom_schedule_hint_no_aprs">Start something at a set time, once or every week: listen to a channel (and record it), scan the zone, SSTV receive, or send an APRS beacon. When the time is up the radio goes back to what it was doing. It runs with the screen off; a satellite pass being tracked always comes first.</string>
     <!-- Shown when there are no schedules. One line. -->
     <string name="intercom_schedule_empty">Nothing scheduled yet.</string>
     <!-- Schedule row subtitle while it runs; %1$s is when it repeats (e.g. "Mon Wed 07:00 for 60 min"), %2$s the end time (HH:mm). One line. -->

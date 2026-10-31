@@ -269,8 +269,8 @@ public final class NetsDialog {
         }
     }
     private void tuneChannel(int number) {
-        svc.selectChannel(number);
-        Toast.makeText(c, Txt.s(R.string.intercom_nets_tuned_toast, number), Toast.LENGTH_SHORT).show();
+        String e = svc.trySelectChannel(number);                              // a channel outside this radio's bands is refused, never reported as tuned
+        Toast.makeText(c, e != null ? e : Txt.s(R.string.intercom_nets_tuned_toast, number), e != null ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
     }
 
     private void checkins(final NetFinder.Net n) {

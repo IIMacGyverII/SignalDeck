@@ -88,13 +88,13 @@ public class RadioService extends Service implements RadioEngine.Events {
     private VoskCaptions captions;
     private long zoneId;                       // 0 = all channels
     private final Scanner scanner = new Scanner(new Scanner.Host() {
-        @Override public java.util.List<ChannelStore.Channel> candidates() { return zoneChannels(); }
+        @Override public java.util.List<ChannelStore.Channel> candidates() { return ChannelStore.tunable(zoneChannels()); }   // never a channel this radio cannot tune
         @Override public void tune(ChannelStore.Channel ch) { selectChannel(ch.number); }
         @Override public boolean receiving() { return softSq.isEnabled() ? squelchOpen : receiving; }   // with Soft SQ on the module's squelch is open and it reports a reception all the time: the soft gate is the activity signal
         @Override public boolean softGated() { return softSq.isEnabled(); }
         @Override public long dwellMs() { return profile.scanDwellMs; }
         @Override public long settleMs() { return profile.scanSettleMs; }
-        @Override public ChannelStore.Channel priority() { int n = scanPriority(); return n > 0 ? store.byNumber(n) : null; }
+        @Override public ChannelStore.Channel priority() { int n = scanPriority(); ChannelStore.Channel p = n > 0 ? store.byNumber(n) : null; return ChannelStore.tunable(p) ? p : null; }
         @Override public void status(boolean s, boolean h, ChannelStore.Channel on) {
             if (voiceOn()) {
                 if (s && h && on != null) sayChannel("Holding " + channelWords(on));                       // the scan stopped on activity
@@ -406,6 +406,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (hz == 0) { if (foxHome != null) { foxHome = null; exitVfo(); } return null; }
         ChannelStore.Channel base = foxHome != null ? foxHome : current;
         if (base == null || base.isDigital()) return "Needs an analog channel";
+        if (!profile.tunable((long) base.rxFreq + hz)) return "This radio tunes " + profile.bandsText() + ": " + String.format(Locale.US, "%.3f", (base.rxFreq + hz) / 1e6) + " MHz is outside it";   // the top of a band: the VFO would be refused
         if (foxHome == null) foxHome = base;
         ChannelStore.Channel v = vfoCopy(base); v.rxFreq = base.rxFreq + hz; v.txFreq = base.txFreq; v.name = base.name + " +" + (hz / 1000) + " kHz";
         applyVfo(v, false);
@@ -652,6 +653,8 @@ public class RadioService extends Service implements RadioEngine.Events {
     public String issBeacon() {
         if (packet == null) return "not ready";
         if (!packet.callsignSet()) return "Set your callsign first (PKT \u2192 Settings)";
+        { long f = com.macdmr.radio.ham.Satellites.issHz(this, "issAprs", com.macdmr.radio.ham.Satellites.ISS_APRS_HZ);   // a 2 m ISS APRS on a UHF-only radio: the VFO would be refused and the beacon go out on the channel
+          if (!profile.tunable(f - 10_000) || !profile.tunable(f + 10_000)) return "This radio tunes " + profile.bandsText() + ": the ISS APRS frequency (" + String.format(Locale.US, "%.3f", f / 1e6) + " MHz) is outside it"; }
         final android.location.Location me = lastKnownLocation();
         if (me == null) return "No position fix yet";
         SatState st = satState;
@@ -678,10 +681,12 @@ public class RadioService extends Service implements RadioEngine.Events {
         com.macdmr.radio.ham.SatTrack.Look l5 = com.macdmr.radio.ham.SatTrack.look(el, now + 5000, me.getLatitude(), me.getLongitude(), me.hasAltitude() ? me.getAltitude() : 0);
         a.rxFreq = (int) (Math.round(com.macdmr.radio.ham.SatTrack.downlink(hz, l5.rangeRateKmS) / 500.0) * 500);
         a.txFreq = (int) (Math.round(com.macdmr.radio.ham.SatTrack.uplink(hz, l5.rangeRateKmS) / 500.0) * 500);
+        if (!profile.tunable(a.rxFreq) || !profile.tunable(a.txFreq)) return "This radio tunes " + profile.bandsText() + ": not the ISS APRS downlink or uplink";
         applyVfo(a, false);
         final int rxHz = a.rxFreq;
         new Thread(() -> {
             try { Thread.sleep(RETUNE_SETTLE_MS); } catch (InterruptedException ignored) { }       // the retune settles before keying
+            if (vfo == null || vfo.rxFreq != rxHz) { history("pkt", "⛔ ISS beacon not sent: the radio did not tune the ISS APRS frequency"); return; }   // a refused tune: never key on the channel instead
             String e = packet.sendBeaconVia(new String[] { "ARISS" });
             if (e != null) history("pkt", "\u26D4 ISS beacon not sent: " + e);
             try { Thread.sleep(12000); } catch (InterruptedException ignored) { }
@@ -1016,7 +1021,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     Thread.sleep(300);
                 }
                 moduleHandshake();
-                selectChannel(store.activeNumber());
+                selectChannel(tunableNumber(store.activeNumber()));
                 startRxAudio();
                 setLink("ready");
                 applyModuleTot();                                                     // a module that stayed powered had no boot handshake: give it the limit now
@@ -1485,16 +1490,25 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     public long zoneId() { return zoneId; }
     public String zoneName() { if (zoneId <= 0) return "ALL"; ChannelStore.Zone z = store.zone(zoneId); return z == null ? "ALL" : z.name; }
-    public void setZone(long id) {
+    /** Select a zone; null when done, else why not (a zone holding only channels this radio cannot tune is refused). */
+    public String setZone(long id) {
+        if (id != zoneId && id > 0) {
+            ChannelStore.Zone z = store.zone(id);
+            if (z != null && z.numbers.length > 0 && ChannelStore.tunable(zoneChannelsOf(id)).isEmpty()) {
+                String why = "Zone " + z.name + " has no channel this radio can tune (" + profile.bandsText() + ")";
+                history("warn", "⚠ " + why); return why;
+            }
+        }
         zoneId = id; getSharedPreferences("radio", MODE_PRIVATE).edit().putLong("zone", id).apply(); pushModes();
-        // tune the channel last used in this zone (or stay, when the current channel is in it; else its first channel)
-        if (pttDown || scanner.isScanning() || vfo != null) return;              // not while talking, scanning (it carries on in the new zone) or on the VFO
-        java.util.List<ChannelStore.Channel> in = zoneChannels(); if (in.isEmpty()) return;
+        // tune the channel last used in this zone (or stay, when the current channel is in it; else its first channel this radio tunes)
+        if (pttDown || scanner.isScanning() || vfo != null) return null;         // not while talking, scanning (it carries on in the new zone) or on the VFO
+        java.util.List<ChannelStore.Channel> in = ChannelStore.tunable(zoneChannels()); if (in.isEmpty()) return null;
         int last = getSharedPreferences("radio", MODE_PRIVATE).getInt("zoneLast_" + id, -1);
         ChannelStore.Channel cur = current; int target = -1; boolean curIn = false;
         for (ChannelStore.Channel c : in) { if (c.number == last) target = last; if (cur != null && c.number == cur.number) curIn = true; }
-        if (target < 0) { if (curIn) return; target = in.get(0).number; }
+        if (target < 0) { if (curIn) return null; target = in.get(0).number; }
         if (cur == null || cur.number != target) selectChannel(target);
+        return null;
     }
     /** Remember the channel as the last one used in the current zone (not for channels the scanner steps through). */
     private void rememberZoneChannel(int number) {
@@ -1502,7 +1516,8 @@ public class RadioService extends Service implements RadioEngine.Events {
         for (ChannelStore.Channel c : zoneChannels()) if (c.number == number) { getSharedPreferences("radio", MODE_PRIVATE).edit().putInt("zoneLast_" + zoneId, number).apply(); return; }
     }
     /** Channels in the selected zone, in channel order (all channels when no zone is selected). */
-    public java.util.List<ChannelStore.Channel> zoneChannels() {
+    public java.util.List<ChannelStore.Channel> zoneChannels() { return zoneChannelsOf(zoneId); }
+    private java.util.List<ChannelStore.Channel> zoneChannelsOf(long zoneId) {
         java.util.List<ChannelStore.Channel> all = store.all();
         if (zoneId <= 0) return all;
         ChannelStore.Zone z = store.zone(zoneId); if (z == null) return all;
@@ -1546,10 +1561,22 @@ public class RadioService extends Service implements RadioEngine.Events {
         if (scanner.isScanning()) scanner.stop();
         java.util.List<ChannelStore.Channel> list = zoneChannels(); if (list.isEmpty()) return;
         int pos = -1; for (int i = 0; i < list.size(); i++) if (list.get(i).number == current.number) pos = i;
-        int next = ((pos + delta) % list.size() + list.size()) % list.size();
+        int n = list.size(), dir = delta < 0 ? -1 : 1, next = pos < 0 && dir < 0 ? 0 : pos;
+        for (int k = 0; k < Math.max(1, Math.abs(delta)); k++) {                // a channel this radio cannot tune is stepped over (else the arrows stop behind it)
+            int tries = 0;
+            do { next = ((next + dir) % n + n) % n; } while (!ChannelStore.tunable(list.get(next)) && ++tries < n);
+            if (!ChannelStore.tunable(list.get(next))) { history("warn", "⚠ No channel here this radio can tune (" + profile.bandsText() + ")"); return; }
+        }
         selectChannel(list.get(next).number);
     }
 
+    /** Tune a stored channel the user picked; null when it is being tuned, else why not (no such channel, or one outside this radio's bands). */
+    public String trySelectChannel(int number) {
+        ChannelStore.Channel ch = store.byNumber(number);
+        if (ch == null) return "No channel " + number;
+        if (!ChannelStore.tunable(ch)) return ch.name + " (" + ch.freqText(ch.rxFreq) + " MHz) is outside " + profile.bandsText() + ": this radio cannot tune it";
+        selectChannel(number); return null;
+    }
     private final java.util.concurrent.atomic.AtomicInteger selectSeq = new java.util.concurrent.atomic.AtomicInteger();
     private volatile long lastChannelWrite;
     public void selectChannel(final int number) {
@@ -1602,6 +1629,7 @@ public class RadioService extends Service implements RadioEngine.Events {
      *  until something is really there. */
     /** First-run trial: listen on an analog frequency with the radio's squelch open (noise keeps the audio path busy); receive only. */
     public void listenTest(int hz, String name) {
+        if (!profile.tunable(hz)) { log("listen test: " + hz + " Hz is outside " + profile.bandsText()); return; }
         ChannelStore.Channel a = new ChannelStore.Channel();
         a.type = 1; a.rxFreq = a.txFreq = hz; a.band = 1; a.power = 1; a.name = name;
         a.sq = 0; a.softSq = true; a.softSqLevel = 5;                 // the radio passes everything; Soft SQ keeps the speaker quiet
@@ -1647,7 +1675,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** Program the radio with a channel; {@code fromStore} = a real channel (remembered as active), else the VFO. */
     private synchronized boolean applyChannelNow(ChannelStore.Channel ch, boolean fromStore) {
         { ChannelStore.Channel was = current; if (was == null || was.rxFreq != ch.rxFreq) idleFloor = Double.NaN; }   // another frequency: its own idle floor
-        if (!ChannelStore.inBand(ch.rxFreq) || !ChannelStore.inBand(ch.txFreq)) {         // the module refuses these and stays where it is: never show them as tuned
+        if (!ChannelStore.tunable(ch)) {         // the module refuses these and stays where it is: never show them as tuned
             ChannelStore.Channel on = current;
             history("warn", "⚠ " + ch.name + " (" + ch.freqText(ch.rxFreq) + (ch.txFreq != ch.rxFreq ? " / " + ch.freqText(ch.txFreq) : "") + " MHz) is outside what this radio can tune (" + com.macdmr.radio.DeviceProfile.detect().bandsText() + ")"
                     + (on != null ? "; still on " + on.name + ", " + on.freqText(on.rxFreq) + " MHz" : ""));
@@ -1763,7 +1791,15 @@ public class RadioService extends Service implements RadioEngine.Events {
 
     public void deleteChannel(ChannelStore.Channel ch) {
         store.delete(ch);
-        if (current != null && current.id == ch.id) { current = null; int n = store.count(); if (n > 0) selectChannel(Math.min(ch.number, n)); else noChannel(); }
+        if (current != null && current.id == ch.id) { current = null; int n = store.count(); if (n > 0) selectChannel(tunableNumber(Math.min(ch.number, n))); else noChannel(); }
+    }
+    /** {@code preferred} when this radio can tune it (or there is no such channel), else the next channel it can tune (wrapping round), else {@code preferred} (the tune is then refused with a history line). */
+    private int tunableNumber(int preferred) {
+        java.util.List<ChannelStore.Channel> all = store.all(); ChannelStore.Channel first = null, want = null;
+        for (ChannelStore.Channel c : all) if (c.number == preferred) want = c;
+        if (want == null || ChannelStore.tunable(want)) return preferred;
+        for (ChannelStore.Channel c : all) if (ChannelStore.tunable(c)) { if (c.number > preferred) return c.number; if (first == null) first = c; }
+        return first != null ? first.number : preferred;
     }
 
     // ---- several channels at once (the channel list's selection, on the phone and on the web) ----
@@ -1779,7 +1815,7 @@ public class RadioService extends Service implements RadioEngine.Events {
             if (ch.id == curId) curGone = true;
             store.delete(ch); n++;
         }
-        if (curGone) { current = null; int left = store.count(); if (left > 0) selectChannel(Math.min(curNum, left)); else noChannel(); }
+        if (curGone) { current = null; int left = store.count(); if (left > 0) selectChannel(tunableNumber(Math.min(curNum, left))); else noChannel(); }
         else if (cur != null) for (ChannelStore.Channel c : store.all()) if (c.id == curId) { cur.number = c.number; break; }   // its number may have moved down: same channel, nothing re-tuned
         return n == 0 ? "No channels deleted" : "Deleted " + n + (n == 1 ? " channel" : " channels");
     }
@@ -1899,7 +1935,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         worker.execute(() -> {
             if (vfo == null) return;
             vfo = null;
-            int back = vfoReturn > 0 && store.byNumber(vfoReturn) != null ? vfoReturn : store.activeNumber();
+            int back = tunableNumber(vfoReturn > 0 && store.byNumber(vfoReturn) != null ? vfoReturn : store.activeNumber());
             selectChannelNow(back);
         });
     }
@@ -1958,7 +1994,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         else n = store.importFromStock(this, profile.stockApp, profile.stockAreaPrefix, areaKey == null ? profile.stockDefaultArea : areaKey, err);
         if (n >= 0) {
             getSharedPreferences("radio", MODE_PRIVATE).edit().putBoolean("tgListsImported", true).putBoolean("stockImportDeclined", false).apply();   // imported: an empty list asks again later
-            stockImportPending = false; int keep = store.activeNumber(); selectChannel(keep);
+            stockImportPending = false; int keep = tunableNumber(store.activeNumber()); selectChannel(keep);
         }
         log(n >= 0 ? "imported " + n + " channels from the stock app" + (err.length() > 0 ? " (" + err + ")" : "") : "stock import failed: " + err);
         String tones = n > 0 ? toneNote(store.all()) : null;
@@ -4515,6 +4551,7 @@ public class RadioService extends Service implements RadioEngine.Events {
     // ---- scheduled operations (Scheduler): start, then put the radio back when the time is up ----
     public void runSchedule(int id) { ui.post(() -> runScheduleNow(id, 0)); }
     public void endSchedule(int id) { ui.post(() -> endScheduleNow(id)); }
+    private String outOfBandSkip(int number) { return "skipped: channel " + number + " is outside " + profile.bandsText() + " (this radio cannot tune it)"; }
     private void runScheduleNow(final int id, final int tries) {
         Scheduler.Entry e = Scheduler.byId(this, id); if (e == null) return;
         String what = "\u23F0 Scheduled: " + e.actionName() + (e.label.isEmpty() ? "" : " (" + e.label + ")");
@@ -4530,6 +4567,7 @@ public class RadioService extends Service implements RadioEngine.Events {
         switch (e.action) {
             case Scheduler.LISTEN:
                 if (e.channel >= 0 && store.byNumber(e.channel) == null) { history("pkt", what + " skipped: channel " + e.channel + " no longer exists"); return; }
+                if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { history("pkt", what + " " + outOfBandSkip(e.channel)); return; }
                 if (wasScan) toggleScan();
                 if (e.channel >= 0) selectChannel(e.channel);
                 if (e.record && !wasRec) setRecord(true);
@@ -4539,8 +4577,10 @@ public class RadioService extends Service implements RadioEngine.Events {
             case Scheduler.APRS: r = wasAprs ? "already monitoring" : aprsMonitor(true); break;
             case Scheduler.SSTV:
                 if (wasSstv) { r = "already receiving"; break; }
+                if (e.channel >= 0 && store.byNumber(e.channel) == null) { history("pkt", what + " skipped: channel " + e.channel + " no longer exists"); return; }
+                if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { history("pkt", what + " " + outOfBandSkip(e.channel)); return; }
                 if (e.channel >= 0) { selectChannel(e.channel); ui.postDelayed(() -> sstvMonitor(true, false), RETUNE_SETTLE_MS); r = "on channel " + e.channel; }
-                else r = sstvMonitor(true, true);
+                else r = sstvMonitor(true, profile.tunable(PacketEngine.SSTV_FREQ_HZ));   // 144.500, or the channel the radio is on when it cannot tune 144.500 (the W6)
                 break;
             case Scheduler.BEACON: r = packet == null ? "the packet engine is not running" : packet.sendBeacon(); if (r == null) r = "sent"; break;
             case Scheduler.FINDER: r = finder().start(e.minutes); if (r == null) r = "listening"; break;
@@ -4563,10 +4603,13 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (w.gateway().isEmpty()) { r = "skipped: no gateway yet (connect once with Winlink \u2192 Connect: radio)"; break; }
                 if (w.busy()) { r = "skipped: a Winlink session is already running"; break; }
                 if (e.channel >= 0 && store.byNumber(e.channel) == null) { r = "skipped: channel " + e.channel + " no longer exists"; break; }
+                if (e.channel >= 0 && !ChannelStore.tunable(store.byNumber(e.channel))) { r = outOfBandSkip(e.channel); break; }   // the select would be refused and the call go out on the channel the radio is on
                 final boolean move = e.channel >= 0 && e.channel != prevCh; final int back = prevCh;
                 if (wasScan) toggleScan();
                 if (move) selectChannel(e.channel);
                 ui.postDelayed(() -> {
+                    ChannelStore.Channel on = current;
+                    if (move && (vfo != null || on == null || on.number != e.channel)) { history("pkt", "⏰ Scheduled Winlink check: not sent, the radio did not move to channel " + e.channel); return; }   // never transmit on another channel
                     String err = w.connectRadio(w.gateway(), w.via());
                     if (err != null) { history("pkt", "\u23F0 Scheduled Winlink check: " + err); if (move && back >= 0) selectChannel(back); return; }
                     final long until = System.currentTimeMillis() + 20 * 60_000L;   // never hold the radio longer than 20 minutes

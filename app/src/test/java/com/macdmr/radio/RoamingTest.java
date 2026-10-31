@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 public class RoamingTest {
     private static ChannelStore.Channel dmr(int n, double lat, double lon, int tg, int... rx) {
-        ChannelStore.Channel c = new ChannelStore.Channel(); c.number = n; c.type = 0; c.lat = lat; c.lon = lon; c.txContact = tg; c.contactType = 1; c.groups = rx; c.name = "R" + n; return c;
+        ChannelStore.Channel c = new ChannelStore.Channel(); c.number = n; c.type = 0; c.lat = lat; c.lon = lon; c.txContact = tg; c.contactType = 1; c.groups = rx; c.name = "R" + n; c.rxFreq = 439_000_000 + n * 12_500; c.txFreq = c.rxFreq - 5_000_000; return c;
     }
     @Test public void switchesOnlyWhenClearlyNearer() {
         // three repeaters along a line in England (unrelated test places), 0.1° of latitude ≈ 11 km

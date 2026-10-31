@@ -75,7 +75,7 @@ public final class LastHeardDialog {
             rowv.setClickable(true);
             body.addView(rowv, lp);
             AlertDialog[] holder = new AlertDialog[1];
-            rowv.setOnClickListener(v -> { if (chNum > 0) { svc.selectChannel(chNum); if (holder[0] != null) holder[0].dismiss(); } });
+            rowv.setOnClickListener(v -> { if (chNum > 0) { String e = svc.trySelectChannel(chNum); if (e != null) { android.widget.Toast.makeText(c, e, android.widget.Toast.LENGTH_LONG).show(); return; } if (holder[0] != null) holder[0].dismiss(); } });
             rowv.setTag(holder);
         }
         AlertDialog a = Neo.showSheet(c, body); sheet[0] = a;
@@ -153,7 +153,7 @@ public final class LastHeardDialog {
         }
         if (ch != null && (svc.current() == null || svc.current().number != ch.number)) {
             TextView tune = Neo.button(c, Txt.s(R.string.intercom_lastheard_tune, ch.name), "channels", Neo.CYAN); box.addView(tune, new LinearLayout.LayoutParams(bl));
-            tune.setOnClickListener(x -> { svc.selectChannel(ch.number); if (self[0] != null) self[0].dismiss(); if (sheet[0] != null) sheet[0].dismiss(); });
+            tune.setOnClickListener(x -> { String e = svc.trySelectChannel(ch.number); if (e != null) { android.widget.Toast.makeText(c, e, android.widget.Toast.LENGTH_LONG).show(); return; } if (self[0] != null) self[0].dismiss(); if (sheet[0] != null) sheet[0].dismiss(); });
         }
         self[0] = Neo.showSheet(c, box);
     }

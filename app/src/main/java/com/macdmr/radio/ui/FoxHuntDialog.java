@@ -372,7 +372,7 @@ public final class FoxHuntDialog {
             int k = 0; for (int i = 0; i < steps.length; i++) if (steps[i] == offset[0]) k = i;
             int next = steps[(k + 1) % steps.length];
             String e = svc.foxOffset(next);
-            if (e != null) { Toast.makeText(c, e, Toast.LENGTH_LONG).show(); return; }
+            if (e != null) { Toast.makeText(c, e, Toast.LENGTH_LONG).show(); if (offset[0] != 0) { svc.foxOffset(0); offset[0] = 0; off.setText("Off-frequency"); } return; }   // past the top of the band: the next tap starts again from the channel
             offset[0] = next; peak[0] = -999;
             off.setText(next == 0 ? "Off-frequency" : "+" + (next / 1000) + " kHz");
         });

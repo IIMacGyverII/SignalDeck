@@ -107,15 +107,17 @@ public final class PktDialog {
         body.addView(rSat);
         LinearLayout rIss = row();
         final boolean issMon = svc.satMode() == com.macdmr.radio.ham.Satellites.APRS;
-        final String issAprs = String.format(java.util.Locale.US, "%.3f", com.macdmr.radio.ham.Satellites.issHz(c, "issAprs", com.macdmr.radio.ham.Satellites.ISS_APRS_HZ) / 1e6);
+        final long issAprsHz = com.macdmr.radio.ham.Satellites.issHz(c, "issAprs", com.macdmr.radio.ham.Satellites.ISS_APRS_HZ);
+        final String issAprs = String.format(java.util.Locale.US, "%.3f", issAprsHz / 1e6);
+        final boolean issTunable = com.macdmr.radio.DeviceProfile.inBands(issAprsHz);   // 145.825 on a UHF-only radio (the W6): neither listen nor beacon
         button(rIss, issMon ? "Stop ISS APRS" : "ISS APRS " + issAprs, Theme.PKT, x -> {
             if (issMon) { svc.endSatTracking(); toast("ISS APRS stopped"); dlg.dismiss(); return; }
             String e = svc.startIssMode(com.macdmr.radio.ham.Satellites.APRS);
             if (e != null) { toast(e); return; }
             svc.setIssRepeat(com.macdmr.radio.ham.Satellites.APRS); openScreen();
         });
-        button(rIss, "Beacon via ISS", Theme.VFO, x -> toast(svc.issBeacon()));
-        body.addView(rIss);
+        if (issTunable) button(rIss, "Beacon via ISS", Theme.VFO, x -> toast(svc.issBeacon()));
+        if (issTunable || issMon) body.addView(rIss);
         String[] autoNames = { "off", "every " + pe.beaconMin() + " min", "SmartBeaconing" };
         body.addView(hint("Automatic beacons: " + autoNames[Math.max(0, Math.min(2, pe.autoBeacon()))] + (pe.telemetryOn() ? ", telemetry every 30 min" : "") + (pe.weatherOn() ? ", weather every 30 min" : "") + (aprsHere ? " (only on " + aprsMhz + ", set in Settings)." : " (they go out on " + aprsMhz + ", which this radio does not tune).") + (pe.txIgate() ? " Two-way iGate on: " + pe.gatedToRfCount() + " internet messages sent to the radio." : "") + (pe.groups().isEmpty() ? "" : " Following groups: " + String.join(", ", pe.groups()) + ".")));
         LinearLayout rIs = row();

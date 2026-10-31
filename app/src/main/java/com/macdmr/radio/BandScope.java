@@ -108,6 +108,12 @@ public final class BandScope {
         return false;
     }
 
+    /** Whether the radio of {@code dp} can sweep the preset (its range inside one of the profile's bands): the 2 m presets are not offered on a UHF-only radio. */
+    public static boolean fits(com.macdmr.radio.DeviceProfile dp, Preset p) { return dp.tunable(p.from) && dp.tunable(p.to) && oneBand(dp, p.from, p.to); }
+    public static boolean fits(Preset p) { return fits(com.macdmr.radio.DeviceProfile.detect(), p); }
+    /** The index of the first preset this phone's radio can sweep, or {@code PRESETS.length} (a custom range) when none fits. */
+    public static int firstFitting() { for (int i = 0; i < PRESETS.length; i++) if (fits(PRESETS[i])) return i; return PRESETS.length; }
+
     /** Why a range cannot be swept, or null. Pure. */
     public static String problem(int from, int to, int step) {
         if (from <= 0 || to <= 0 || step <= 0) return "Enter the frequencies in MHz and the step in kHz";

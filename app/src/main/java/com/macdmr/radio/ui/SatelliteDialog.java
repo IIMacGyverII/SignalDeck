@@ -47,7 +47,14 @@ public final class SatelliteDialog {
         final String[][] f = { { "issAprs", "APRS digipeater (MHz)" }, { "issSstv", "SSTV pictures (MHz)" }, { "issRptrDown", "Repeater: listen (MHz)" }, { "issRptrUp", "Repeater: talk (MHz)" }, { "issVoiceDown", "Crew voice: listen (MHz)" }, { "issVoiceUp", "Crew voice: talk (MHz)" } };
         final long[] def = { Satellites.ISS_APRS_HZ, Satellites.ISS_SSTV_HZ, Satellites.ISS_RPTR_DOWN_HZ, Satellites.ISS_RPTR_UP_HZ, Satellites.ISS_VOICE_DOWN_HZ, Satellites.ISS_VOICE_UP_HZ };
         final android.widget.EditText[] e = new android.widget.EditText[f.length];
-        for (int i = 0; i < f.length; i++) e[i] = field(c, body, f[i][1], String.format(Locale.US, "%.3f", Satellites.issHz(c, f[i][0], def[i]) / 1e6));
+        final boolean[] listen = { true, true, true, false, true, false };       // the radio receives on these; the talk ones only matter where it can transmit there
+        final long[] was = new long[f.length];
+        for (int i = 0; i < f.length; i++) {
+            was[i] = Satellites.issHz(c, f[i][0], def[i]);
+            boolean can = com.macdmr.radio.DeviceProfile.inBands(was[i]);
+            e[i] = field(c, body, f[i][1] + (can ? "" : listen[i] ? "  ·  not tunable on this radio" : "  ·  listen only on this radio"), String.format(Locale.US, "%.3f", was[i] / 1e6));
+        }
+        final String bands = com.macdmr.radio.DeviceProfile.detect().bandsText();
         final android.widget.EditText tone = field(c, body, "Repeater tone (Hz)", String.format(Locale.US, "%.1f", Satellites.issRptrTone(c)));
         final AlertDialog[] self = new AlertDialog[1];
         LinearLayout row = new LinearLayout(c);
@@ -59,15 +66,15 @@ public final class SatelliteDialog {
                 long[] hz = new long[f.length];
                 for (int i = 0; i < f.length; i++) {
                     double m = Double.parseDouble(e[i].getText().toString().trim().replace(',', '.'));
-                    if (m < 136 || m > 480) throw new NumberFormatException(f[i][1]);
                     hz[i] = Math.round(m * 1000) * 1000L;
+                    if (listen[i] ? !com.macdmr.radio.DeviceProfile.inBands(hz[i]) && hz[i] != was[i] : m < 136 || m > 480) throw new NumberFormatException(f[i][1]);   // a listen frequency must be one this radio tunes (a stored one it cannot tune is kept as it is)
                 }
                 double t = Double.parseDouble(tone.getText().toString().trim().replace(',', '.'));
                 for (int i = 0; i < f.length; i++) Satellites.setIssHz(c, f[i][0], hz[i]);
                 Satellites.setIssRptrTone(c, t);
                 Toast.makeText(c, "Saved: used from the next pass you track", Toast.LENGTH_LONG).show();
                 if (self[0] != null) self[0].dismiss();
-            } catch (Throwable x) { Toast.makeText(c, "Check the numbers (MHz between 136 and 480)", Toast.LENGTH_LONG).show(); }
+            } catch (Throwable x) { Toast.makeText(c, "Check the numbers: listen frequencies inside " + bands + " (what this radio tunes), talk frequencies between 136 and 480 MHz", Toast.LENGTH_LONG).show(); }
         });
         reset.setOnClickListener(v -> { Satellites.resetIss(c); Toast.makeText(c, "ISS frequencies back to the defaults", Toast.LENGTH_LONG).show(); if (self[0] != null) self[0].dismiss(); });
         status.setOnClickListener(v -> { try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(Satellites.ARISS_STATUS_URL))); } catch (Throwable x) { Toast.makeText(c, "No browser", Toast.LENGTH_LONG).show(); } });

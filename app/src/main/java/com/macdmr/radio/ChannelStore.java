@@ -104,6 +104,11 @@ public final class ChannelStore extends SQLiteOpenHelper {
 
     /** The radio's two bands: 136–174 and 400–480 MHz. */
     public static boolean inBand(int hz) { return com.macdmr.radio.DeviceProfile.inBands(hz); }   // the phone's radio (the W6 tunes 400-470 MHz only)
+    /** Whether this phone's radio can tune the channel: its receive and transmit frequencies both inside the profile's bands (the module refuses the channel otherwise). */
+    public static boolean tunable(Channel c) { return tunable(com.macdmr.radio.DeviceProfile.detect(), c); }
+    public static boolean tunable(com.macdmr.radio.DeviceProfile p, Channel c) { return c != null && p.tunable(c.rxFreq) && p.tunable(c.txFreq); }
+    /** The channels of {@code in} this radio can tune, in order. */
+    public static List<Channel> tunable(List<Channel> in) { List<Channel> out = new ArrayList<>(); if (in != null) for (Channel c : in) if (tunable(c)) out.add(c); return out; }
 
     public ChannelStore(Context c) { super(c, "radio.db", null, 5); }
     /** Run after every change to the channel list or the zones, from any caller (RadioService turns it into one onChannels event). */
@@ -783,7 +788,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 return -1;
             }
             SQLiteDatabase sdb = SQLiteDatabase.openDatabase(dst.getAbsolutePath(), null, SQLiteDatabase.OPEN_READONLY);
-            int n = 0;
+            int n = 0, skipped = 0;
             java.util.Map<Integer, Integer> stockIdToNumber = new java.util.HashMap<>();   // module side-tables key on the stock row _id
             SQLiteDatabase db = getWritableDatabase();
             db.beginTransaction();
@@ -792,9 +797,10 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 while (c.moveToNext()) {
                     Channel ch = new Channel();
                     ch.number = ++n;
-                    stockIdToNumber.put(coli(c, "_id", -1), ch.number);
                     ch.name = col(c, "channel_name", ""); ch.type = coli(c, "channel_type", 1);
                     ch.rxFreq = coli(c, "channel_rxFreq", 0); ch.txFreq = coli(c, "channel_txFreq", 0); ch.power = coli(c, "channel_power", 0);
+                    if (!tunable(ch)) { n--; skipped++; continue; }              // outside what this radio tunes: the module would refuse it
+                    stockIdToNumber.put(coli(c, "_id", -1), ch.number);
                     ch.band = coli(c, "channel_band", 1); ch.sq = coli(c, "channel_sq", 2); ch.rxType = coli(c, "channel_rxType", 0); ch.rxSubCode = coli(c, "channel_rxSubCode", 0);
                     ch.txType = coli(c, "channel_txType", 0); ch.txSubCode = coli(c, "channel_txSubCode", 0); ch.relay = coli(c, "channel_relay", 2); ch.mode = coli(c, "channel_mode", 0);
                     ch.cc = coli(c, "channel_cc", 1); ch.inSlot = coli(c, "channel_inBoundSlot", 0); ch.outSlot = coli(c, "channel_outBoundSlot", 0);
@@ -811,6 +817,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 }
                 db.setTransactionSuccessful();
             } finally { db.endTransaction(); }
+            skippedNote(err, skipped);
             File cdst = new File(ctx.getCacheDir(), "stock_contacts.db");
             SQLiteDatabase cdbTmp = copyStock(ctx, stockPackage, "contact_database.db", "stock_contacts.db");
             SQLiteDatabase cdb = cdbTmp != null ? cdbTmp : sdb;
@@ -907,7 +914,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
     public int importFromFlyscale(Context ctx, String stockPackage, StringBuilder err) {
         SQLiteDatabase sdb = copyRoom(ctx, stockPackage, new String[] { "channel_list_detial.db" }, "fs_channels.db");
         if (sdb == null) { err.append("stock channels not readable: ").append(RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -8")); return -1; }
-        int n = 0;
+        int n = 0, skipped = 0;
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try (Cursor c = sdb.query("CHANNEL_INFO", null, null, null, null, null, "CHANNEL_ID")) {
@@ -915,14 +922,21 @@ public final class ChannelStore extends SQLiteOpenHelper {
             while (c.moveToNext()) {
                 Channel ch = flyscaleChannel(coli(c, "CHANNEL_ID", n), col(c, "GBW", "1"), col(c, "TFV", ""), col(c, "RFV", ""), col(c, "TXCXCSS", "0"), col(c, "RXCXCSS", "0"), col(c, "SQ", "3"), col(c, "POWER", "1"));
                 if (ch == null) continue;
+                if (!tunable(ch)) { skipped++; continue; }
                 ch.number = ++n; ch.active = n == 1;
                 db.insert("channels", null, values(ch));
             }
             db.setTransactionSuccessful();
         } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }
         finally { db.endTransaction(); sdb.close(); }
+        if (n >= 0) skippedNote(err, skipped);
         changed();
         return n;
+    }
+
+    /** "3 skipped: outside what this radio tunes (400–470 MHz)" into an import's notes. */
+    private static void skippedNote(StringBuilder err, int skipped) {
+        if (skipped > 0) err.append(err.length() > 0 ? "; " : "").append(skipped).append(skipped == 1 ? " channel" : " channels").append(" skipped: outside what this radio tunes (").append(com.macdmr.radio.DeviceProfile.detect().bandsText()).append(")");
     }
 
     /** One stock W6 channel row as a SignalDeck analog channel, or null when its frequencies do not parse. */
@@ -1041,7 +1055,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
     public int importFromQuickChat(Context ctx, String stockPackage, StringBuilder err) {
         SQLiteDatabase sdb = copyRoom(ctx, stockPackage, new String[] { "channel_database", "channel.db" }, "qc_channels.db");
         if (sdb == null) { err.append("QuickChat channels not readable: ").append(RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -8")); return -1; }
-        int n = 0;
+        int n = 0, skipped = 0;
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         // the bundled database has channel_table; the phone's own (QuickChat on the Xplore 1, 2026-10-21) has "channels" with
@@ -1060,6 +1074,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 ch.number = ++n;
                 ch.name = col(c, "channelName", "Channel " + n); ch.type = coli(c, "channelType", 1);
                 ch.rxFreq = coli(c, "rx_freq", 0); ch.txFreq = coli(c, "tx_freq", 0); ch.power = coli(c, "power", 1);
+                if (!tunable(ch)) { n--; skipped++; continue; }                  // outside what this radio tunes
                 ch.band = coli(c, "band", 1); ch.sq = coli(c, "sq", 2); ch.rxType = coli(c, "rx_type", 0); ch.rxSubCode = coli(c, "rx_subcode", 0);
                 ch.txType = coli(c, "tx_type", 0); ch.txSubCode = coli(c, "tx_subcode", 0); ch.relay = coli(c, "relay", 2); ch.mode = coli(c, "channelMode", 0);
                 ch.cc = coli(c, "cc", 1); ch.inSlot = coli(c, "inboundSlot", 0); ch.outSlot = coli(c, "outboundSlot", 0);
@@ -1077,6 +1092,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
             db.setTransactionSuccessful();
         } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }
         finally { db.endTransaction(); sdb.close(); }
+        if (n >= 0) skippedNote(err, skipped);
         SQLiteDatabase cdb = copyRoom(ctx, stockPackage, new String[] { "contacts_database", "contact_database", "contacts.db" }, "qc_contacts.db");
         if (cdb != null) {
             try (Cursor c = cdb.query("contacts_table", null, null, null, null, null, "id")) {
@@ -1102,7 +1118,7 @@ public final class ChannelStore extends SQLiteOpenHelper {
         if (sdb == null) { err.append("the stock app's channels are not readable: ").append(RootSetup.run("ls /data/data/" + stockPackage + "/databases/ 2>&1 | head -4")); return -1; }
         String areaName = null;
         try (Cursor a = sdb.rawQuery("SELECT name FROM area WHERE num=?", new String[] { String.valueOf(area) })) { if (a.moveToFirst()) areaName = a.getString(0); } catch (Throwable ignored) { }
-        int n = 0;
+        int n = 0, skipped = 0;
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
         try (Cursor c = sdb.rawQuery("SELECT * FROM channel WHERE area=? ORDER BY num, _id", new String[] { String.valueOf(area) })) {
@@ -1112,13 +1128,15 @@ public final class ChannelStore extends SQLiteOpenHelper {
                 for (int i = 0; i < c.getColumnCount(); i++) row.put(c.getColumnName(i), c.isNull(i) ? null : c.getString(i));
                 Channel ch = agoldChannel(row, ++n, areaName);
                 if (ch == null) { n--; continue; }
+                if (!tunable(ch)) { n--; skipped++; continue; }                  // outside what this radio tunes (the Atom XL: UHF only)
                 ch.active = n == 1;
                 db.insert("channels", null, values(ch));
             }
             db.setTransactionSuccessful();
         } catch (Throwable t) { err.append("channels: ").append(t.getMessage()); n = -1; }
         finally { db.endTransaction(); sdb.close(); }
-        if (n == 0) err.append("area ").append(area).append(" has no channels");
+        if (n >= 0) skippedNote(err, skipped);
+        if (n == 0 && skipped == 0) err.append("area ").append(area).append(" has no channels");
         changed();
         return n;
     }

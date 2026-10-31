@@ -147,7 +147,7 @@ public final class PacketFinder {
 
     public List<Integer> freqs() {
         List<Integer> l = new ArrayList<>();
-        for (String p : prefs.getString("freqs", "").split("[,;\\s]+")) { try { double mhz = Double.parseDouble(p.trim()); int hz = (int) Math.round(mhz * 1e6); if (ok(hz)) l.add(hz); } catch (NumberFormatException ignored) { } }
+        for (String p : listItems(prefs.getString("freqs", ""))) { try { int hz = (int) Math.round(Txt.parseDecimal(p) * 1e6); if (ok(hz)) l.add(hz); } catch (NumberFormatException ignored) { } }
         if (l.isEmpty()) for (int k : DEFAULT_KHZ) if (ok(k * 1000)) l.add(k * 1000);   // the 2 m defaults: none on a UHF-only radio (the W6)
         return l;
     }
@@ -155,20 +155,48 @@ public final class PacketFinder {
     public String myChannelsText() {
         java.util.LinkedHashSet<Integer> hz = new java.util.LinkedHashSet<>();
         try { for (com.macdmr.radio.ChannelStore.Channel ch : svc.store().all()) if (!ch.isDigital() && !ch.isM17() && ok(ch.rxFreq) && hz.size() < 20) hz.add(ch.rxFreq); } catch (Throwable ignored) { }
-        StringBuilder b = new StringBuilder(); for (int f : hz) b.append(b.length() > 0 ? ", " : "").append(new java.math.BigDecimal(f).movePointLeft(6).stripTrailingZeros().toPlainString());
+        boolean comma = decimalComma();   // the phone's field: "144,91; 145,01" in a decimal-comma language, English as before
+        StringBuilder b = new StringBuilder(); for (int f : hz) b.append(b.length() > 0 ? (comma ? "; " : ", ") : "").append(Txt.decimalText(storedMhz(f)));
         return b.toString();
     }
+    /** The list as English text ("144.390, 145.825"): SignalDeck Web's field and the phone's in English. */
     public String freqText() { StringBuilder b = new StringBuilder(); for (int hz : freqs()) b.append(b.length() > 0 ? ", " : "").append(String.format(Locale.US, "%.3f", hz / 1e6)); return b.toString(); }
+    /** {@link #freqText} for the phone's own field, in the app language's style ("144,390; 145,825" in German). */
+    public String freqTextShown() {
+        if (!decimalComma()) return freqText();
+        StringBuilder b = new StringBuilder(); for (int hz : freqs()) b.append(b.length() > 0 ? "; " : "").append(Txt.freqMhz(hz, 3)); return b.toString();
+    }
+    private static boolean decimalComma() { return Txt.decimal(1.5, 1).indexOf(',') >= 0; }
     public int dwellMin() { return prefs.getInt("dwell", 3); }
     public int hours() { return prefs.getInt("hours", 2); }
     static boolean ok(int hz) { return com.macdmr.radio.DeviceProfile.inBands(hz); }
 
-    /** Save the frequency list (MHz, commas), minutes per frequency and hours; returns an error text or null. */
+    /**
+     * The items of a typed frequency list. Items are separated by ";" and white space ("144,910; 145,010"), and by
+     * commas as before ("144.390, 145.825", "144.390,145.825"): within one item a comma is the decimal sign only when
+     * it is the item's one comma and there is no point ("144,910" is 144.910 MHz, as Txt.parseDecimal reads it). Commas
+     * at either end of an item (", " lists) are separators. An item with several commas and no point
+     * ("144,910,145,010") cannot be read either way and stays whole, so the error names it as typed.
+     */
+    static List<String> listItems(String text) {
+        List<String> out = new ArrayList<>();
+        for (String tok : (text == null ? "" : text).split("[;\\s]+")) {
+            String core = tok.replaceAll("^,+|,+$", "");
+            if (core.isEmpty()) continue;
+            int commas = core.length() - core.replace(",", "").length();
+            if (commas == 0 || core.indexOf('.') < 0) out.add(core);                // "144.390", "144,910", or the unreadable "144,910,145,010"
+            else for (String p : core.split(",+")) if (!p.isEmpty()) out.add(p);   // "144.390,145.825": commas separate
+        }
+        return out;
+    }
+    /** MHz as stored: points, no trailing zeros ("144.91"); the list is stored with ";" so every build reads it back. */
+    static String storedMhz(int hz) { return new java.math.BigDecimal(hz).movePointLeft(6).stripTrailingZeros().toPlainString(); }
+
+    /** Save the frequency list (MHz, see {@link #listItems}), minutes per frequency and hours; returns an error text or null. */
     public String setSettings(String freqsMhz, int dwell, int hrs) {
         List<String> bad = new ArrayList<>(); StringBuilder good = new StringBuilder();
-        for (String p : (freqsMhz == null ? "" : freqsMhz).split("[,;\\s]+")) {
-            if (p.trim().isEmpty()) continue;
-            try { int hz = (int) Math.round(Double.parseDouble(p.trim()) * 1e6); if (ok(hz)) good.append(good.length() > 0 ? "," : "").append(p.trim()); else bad.add(p.trim()); } catch (NumberFormatException e) { bad.add(p.trim()); }
+        for (String p : listItems(freqsMhz)) {
+            try { int hz = (int) Math.round(Txt.parseDecimal(p) * 1e6); if (ok(hz)) good.append(good.length() > 0 ? ";" : "").append(storedMhz(hz)); else bad.add(p); } catch (NumberFormatException e) { bad.add(p); }
         }
         if (!bad.isEmpty()) return Txt.s(R.string.packet_finder_err_bad_freq, com.macdmr.radio.DeviceProfile.detect().bandsText(), String.join(", ", bad));
         prefs.edit().putString("freqs", good.toString()).putInt("dwell", Math.max(1, Math.min(30, dwell))).putInt("hours", Math.max(1, Math.min(24, hrs))).apply();

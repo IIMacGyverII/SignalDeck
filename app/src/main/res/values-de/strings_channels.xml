@@ -331,9 +331,9 @@
     <!-- Section heading on the Region sheet (shown in capitals). Short. -->
     <string name="channels_region_section_sets">Was sie festlegt</string>
     <!-- A Region value the user set: %1$s is the value. Keep the two spaces. Short. -->
-    <string name="channels_region_value_yours">%1$s  (dein Wert)</string>
+    <string name="channels_region_value_yours">%1$s\u0020\u0020(dein Wert)</string>
     <!-- A Region value not yet checked against a national source: %1$s is the value. Keep the two spaces. Short. -->
-    <string name="channels_region_value_unconfirmed">%1$s  (noch zu bestätigen)</string>
+    <string name="channels_region_value_unconfirmed">%1$s\u0020\u0020(noch zu bestätigen)</string>
     <!-- Chip on a Region value: back to the region's own value. Very short. -->
     <string name="channels_region_reset">Zurücksetzen</string>
     <!-- Chip on a Region value: set your own. Very short. -->
@@ -459,7 +459,7 @@
     <!-- Kind of a DMR call in the intercom's talkgroup list: an all call, before the number ("All 16777215"). Very short. -->
     <string name="channels_tg_kind_all">Alle</string>
     <!-- The channel's own call in the intercom's talkgroup list: %1$s is "TG 9  Local". Keep the two spaces. One line. -->
-    <string name="channels_tg_programmed">%1$s  (programmiert)</string>
+    <string name="channels_tg_programmed">%1$s\u0020\u0020(programmiert)</string>
 
     <!-- ===== Shared into SignalDeck (import, location) ===== -->
     <!-- Toast when something shared to SignalDeck holds no channels. One line. -->
@@ -707,9 +707,9 @@
     <!-- Detail of an FM repeater: %1$s the tone to send ("100.0"). Short. -->
     <string name="channels_rep_tx_tone">Sendeton %1$s</string>
     <!-- Repeater details: %1$s its town and region, %2$s the distance and direction ("↘SE 12.3mi (19.8km)"). Keep the dots and spaces. One line. -->
-    <string name="channels_rep_where">%1$s  ·  %2$s</string>
+    <string name="channels_rep_where">%1$s\u0020\u0020·\u0020\u0020%2$s</string>
     <!-- The same for a repeater whose position is approximate. One line. -->
-    <string name="channels_rep_where_approx">%1$s  ·  %2$s (Position ungefähr)</string>
+    <string name="channels_rep_where_approx">%1$s\u0020\u0020·\u0020\u0020%2$s (Position ungefähr)</string>
     <!-- Repeater details: %1$s its status from the list ("not operational"). One line. -->
     <string name="channels_rep_status">Status: %1$s</string>
     <!-- Repeater details: %1$s when the network last saw it (as the list gives it). One line. -->
@@ -862,9 +862,9 @@
     <!-- Hint on the sheet of a caller who is not a contact. One line. -->
     <string name="channels_contact_unknown">Noch nicht in deinen Kontakten.</string>
     <!-- The same, with where they were heard: %1$s the grid square and coordinates. Keep the two spaces. One or two lines. -->
-    <string name="channels_contact_unknown_heard">Noch nicht in deinen Kontakten.  Gehört bei %1$s.</string>
+    <string name="channels_contact_unknown_heard">Noch nicht in deinen Kontakten.\u0020\u0020Gehört bei %1$s.</string>
     <!-- The same with when: %1$s the position, %2$s how long ago ("5 min ago"). Keep the two spaces. Two lines. -->
-    <string name="channels_contact_unknown_heard_ago">Noch nicht in deinen Kontakten.  Gehört bei %1$s %2$s.</string>
+    <string name="channels_contact_unknown_heard_ago">Noch nicht in deinen Kontakten.\u0020\u0020Gehört bei %1$s %2$s.</string>
     <!-- Button on a caller's sheet: make a new contact. Short. -->
     <string name="channels_contact_add">Zu Kontakten hinzufügen</string>
     <!-- Button on a caller's sheet: add the callsign or RIC to a contact you have. Short. -->
@@ -924,13 +924,13 @@
     <!-- On the contact's sheet: %1$s how long ago, %2$s how they were heard (APRS, M17…). Short. -->
     <string name="channels_contact_ago_by">%1$s über %2$s</string>
     <!-- A line on the contact's sheet: %1$s its label (Home), %2$s the value. Keep the two spaces. -->
-    <string name="channels_contact_line">%1$s:  %2$s</string>
+    <string name="channels_contact_line">%1$s:\u0020\u0020%2$s</string>
     <!-- Section heading (capitals) on the contact's sheet: %1$d history entries. Short. -->
     <string name="channels_contact_history_n">Verlauf (%1$d)</string>
     <!-- History entry on the contact's sheet: something sent to them; %1$s is how (APRS, DMR SMS…). Keep the arrow and the two spaces. Short. -->
-    <string name="channels_contact_hist_sent">⬆ Gesendet  %1$s</string>
+    <string name="channels_contact_hist_sent">⬆ Gesendet\u0020\u0020%1$s</string>
     <!-- History entry: something heard from them; %1$s is how. Keep the arrow and the two spaces. Short. -->
-    <string name="channels_contact_hist_heard">⬇ Gehört  %1$s</string>
+    <string name="channels_contact_hist_heard">⬇ Gehört\u0020\u0020%1$s</string>
     <!-- Button on the contact's sheet: open the message thread. Very short (three buttons share a row). -->
     <string name="channels_contact_message">Nachricht</string>
     <!-- Dialog title: delete the contact %1$s? One line. -->

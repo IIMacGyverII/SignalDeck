@@ -122,6 +122,9 @@ public class WebI18nTest {
                 Set<String> want = placeholders(src), got = placeholders(tr.getString(k));
                 if (!k.equals(base(k))) { want.remove("n"); got.remove("n"); }    // a plural form may leave the count out ("one channel")
                 assertEquals(where + ": the {placeholders} must be English's", want, got);
+                String text = tr.getString(k);
+                assertFalse(where + ": a written backslash-n (\\\\n in the JSON); English has a line break, write \\n", text.contains("\\n") && !src.contains("\\n"));
+                assertEquals(where + ": line breaks must be English's", src.split("\n", -1).length, text.split("\n", -1).length);
             }
         }
     }

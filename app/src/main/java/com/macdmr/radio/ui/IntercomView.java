@@ -751,7 +751,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
             if (scanState == lastScanState) return;   // pushModes runs on every Soft SQ gate change: rebuild the SCAN key only when it changes
             lastScanState = scanState;
             Context c = getContext(); int col = scanning ? Neo.AMBER : Neo.CYAN;
-            scanBtn.setText(scanning ? (holding ? "HOLD" : "SCANNING") : "SCAN");   // i18n: key legend scanBtn.setTextColor(scanning ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);
+            scanBtn.setText(scanning ? (holding ? "HOLD" : "SCANNING") : "SCAN"); scanBtn.setTextColor(scanning ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);   // i18n: key legend
             Neo.IconDrawable ic = new Neo.IconDrawable(scanning ? "stop" : "scan", scanBtn.getCurrentTextColor()); int sz = Theme.dp(c, 18); ic.setBounds(0, 0, sz, sz); scanBtn.setCompoundDrawables(ic, null, null, null);
             android.graphics.drawable.StateListDrawable st = new android.graphics.drawable.StateListDrawable();
             st.addState(new int[] { android.R.attr.state_pressed }, Neo.outline(c, col, 0x40, 12, 1.5f)); st.addState(new int[] { }, Neo.outline(c, col, scanning ? 0x30 : 0x18, 12, 1.5f));

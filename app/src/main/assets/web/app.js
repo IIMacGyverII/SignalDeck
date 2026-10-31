@@ -75,6 +75,15 @@ function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.rem
 async function act(path, body) { try { const j = await api(path, body); if (j.message) toast(j.message); return j; } catch (e) { toast(e.message); return null; } }
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const mhz = hz => (hz / 1e6).toFixed(4);
+// A number typed in a field, as the phone reads it (Txt.parseDecimal): an optional sign, digits and at most one decimal
+// sign, a point or a comma ("439,9875" is 439.9875). Anything else is NaN ("1.234,5", "1,234.5", "12a", "1,2,3", ""):
+// parseFloat would stop at the comma and send 439.000 MHz. intNum: the same, and it must be whole.
+function num(s) {
+  const v = String(s == null ? '' : s).trim();
+  if (!/^[-+]?(\d+([.,]\d*)?|[.,]\d+)$/.test(v)) return NaN;
+  return Number(v.replace(',', '.'));
+}
+const intNum = s => { const n = num(s); return Number.isInteger(n) ? n : NaN; };
 const hhmm = ts => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 const hhmmss = ts => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 const ago = ts => { const s = Math.max(0, (Date.now() - ts) / 1000); return s < 60 ? t('common_ago_s', { n: Math.round(s) }) : s < 3600 ? t('common_ago_min', { n: Math.round(s / 60) }) : s < 86400 ? t('common_ago_h', { n: Math.round(s / 3600) }) : new Date(ts).toLocaleDateString(); };

@@ -276,9 +276,9 @@ public final class WebHost {
             ch.name = ChannelStore.fitName(b.optString("name", ch.name));
             int asked = b.optInt("type", ch.type);
             ch.type = asked == ChannelStore.Channel.TYPE_M17 ? ChannelStore.Channel.TYPE_M17 : asked == 0 ? 0 : 1;
-            double rxm = b.optDouble("rxMHz", Double.NaN), txm = b.optDouble("txMHz", Double.NaN);   // an empty field arrives as null or NaN
-            if (Double.isNaN(rxm)) return Txt.s(R.string.web_ch_rx_needed);
-            if (Double.isNaN(txm)) txm = rxm;                                                       // empty send frequency: simplex
+            Double rxd = number(b, "rxMHz"), txd = number(b, "txMHz");                              // an empty field arrives as null; "446,00625" is read, "446,0,1" is refused
+            if (rxd == null) return Txt.s(R.string.web_ch_rx_needed);
+            double rxm = rxd, txm = txd == null ? rxm : txd;                                        // empty send frequency: simplex
             ch.rxFreq = (int) Math.round(rxm * 1e6); ch.txFreq = (int) Math.round(txm * 1e6);
             if (!ChannelStore.inBand(ch.rxFreq) || !ChannelStore.inBand(ch.txFreq)) return Txt.s(R.string.web_ch_band, com.macdmr.radio.DeviceProfile.detect().bandsText());
             ch.power = b.optInt("power", ch.power) == 1 ? 1 : 0;
@@ -288,7 +288,7 @@ public final class WebHost {
             String la = b.optString("lat", "").trim(), lo = b.optString("lon", "").trim();
             if (la.isEmpty() && lo.isEmpty()) { ch.lat = 0; ch.lon = 0; }
             else {
-                ch.lat = Double.parseDouble(la); ch.lon = Double.parseDouble(lo);
+                ch.lat = Txt.parseDecimal(la); ch.lon = Txt.parseDecimal(lo);                       // a comma as the decimal sign too ("47,61")
                 if (Math.abs(ch.lat) > 90 || Math.abs(ch.lon) > 180) return Txt.s(R.string.web_ch_latlon);
             }
             if (ch.isDigital()) {
@@ -447,6 +447,29 @@ public final class WebHost {
     }
     private static double parseD(String s, double def) { try { return s == null || s.isEmpty() ? def : Double.parseDouble(s); } catch (Exception e) { return def; } }
     private static int parse(String s, int def) { try { return s == null ? def : Integer.parseInt(s); } catch (Exception e) { return def; } }
+    /**
+     * A number the browser sent: a JSON number, or the text of a field with a point or one comma as the decimal sign
+     * ("439,9875", {@link Txt#parseDecimal}). Null when absent, null or empty. Anything else ("439,98,75", "1.234,5",
+     * "12a", NaN) throws NumberFormatException, so the endpoint answers 400 instead of reading part of it.
+     */
+    public static Double number(JSONObject b, String key) {
+        Object v = b.opt(key);
+        if (v == null || v == JSONObject.NULL) return null;
+        if (v instanceof Number) {
+            double d = ((Number) v).doubleValue();
+            if (Double.isNaN(d) || Double.isInfinite(d)) throw new NumberFormatException(key + ": " + v);
+            return d;
+        }
+        String s = String.valueOf(v).trim();
+        return s.isEmpty() ? null : Txt.parseDecimal(s);
+    }
+    /** {@link #number} that must be whole (a frequency in Hz): "439987500" or 439987500, never 439.9875. */
+    public static Long whole(JSONObject b, String key) {
+        Double d = number(b, key); if (d == null) return null;
+        if (d != Math.rint(d) || Math.abs(d) > 9e15) throw new NumberFormatException(key + ": not a whole number (" + d + ")");
+        return Math.round(d);
+    }
+    private static WebServer.Response badNumber(NumberFormatException e) { return WebServer.Response.error(400, Txt.s(R.string.web_check_numbers_detail, String.valueOf(e.getMessage()))); }
     private static JSONObject checkInJson(com.macdmr.radio.ham.NetStore.CheckIn k) throws Exception {
         return new JSONObject().put("id", k.id).put("ts", k.ts).put("call", k.call).put("name", k.name).put("notes", k.notes).put("traffic", k.traffic).put("late", k.late).put("out", k.out);
     }
@@ -963,9 +986,10 @@ public final class WebHost {
                     if (e == null) { e = new com.macdmr.radio.ham.Logbook.Entry(); e.ts = System.currentTimeMillis(); e.qso = true; e.source = "web"; }
                     String call = b.optString("call", "").trim().toUpperCase(java.util.Locale.US);
                     if (call.isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_log_call_needed));
+                    Double fMhz; try { fMhz = number(b, "freqMHz"); } catch (NumberFormatException bad) { return badNumber(bad); }
                     e.call = call; e.mode = b.optString("mode", e.mode); e.rstSent = b.optString("rstSent", e.rstSent); e.rstRcvd = b.optString("rstRcvd", e.rstRcvd);
                     e.name = b.optString("name", e.name); e.notes = b.optString("notes", e.notes); e.qso = b.optBoolean("qso", e.qso);
-                    if (b.has("freqMHz")) e.freqHz = Math.round(b.getDouble("freqMHz") * 1e6);
+                    if (fMhz != null) e.freqHz = Math.round(fMhz * 1e6);
                     if (b.has("ts")) e.ts = b.getLong("ts");
                     lb.save(e);
                     return ok(Txt.s(R.string.web_log_logged, e.call));
@@ -1375,10 +1399,12 @@ public final class WebHost {
                 if (post) {
                     boolean tx = b.optBoolean("cq", false) || b.has("reply") || b.has("send");
                     if (tx && !allowTx()) return WebServer.Response.error(403, txOff());
+                    final Double txHz; try { txHz = number(b, "txHz"); } catch (NumberFormatException bad) { return badNumber(bad); }
+                    if (b.has("txHz") && txHz == null) return WebServer.Response.error(400, Txt.s(R.string.web_check_numbers));
                     String e = onMain(() -> {
                         if (b.has("on")) svc.setFt8(b.getBoolean("on"));
                         if (b.has("parity")) f8.setTxParity(b.getInt("parity"));
-                        if (b.has("txHz")) f8.setTxHz(b.getDouble("txHz"));
+                        if (txHz != null) f8.setTxHz(txHz);
                         if (b.has("grid")) {
                             String g = b.getString("grid").trim().toUpperCase(java.util.Locale.US);
                             if (!g.isEmpty() && !g.equals("-") && !g.matches("[A-R]{2}[0-9]{2}([A-X]{2})?")) return Txt.s(R.string.web_ft8_grid);
@@ -1801,12 +1827,22 @@ public final class WebHost {
         if (p != null) p.monitor(false);
         return null;
     }
+    /**
+     * The frequency a page goes out on: {@code hz} in Hz, or the current channel's when it is absent or 0 (the Messages
+     * page sends 0 with no channel). A malformed or fractional value throws: never truncated, never swapped for the
+     * channel's frequency.
+     */
+    static int pageHz(JSONObject b, int current) {
+        Long hz = whole(b, "hz");
+        if (hz != null && (hz < 0 || hz > Integer.MAX_VALUE)) throw new NumberFormatException("hz: " + hz);
+        return hz == null || hz == 0 ? current : (int) (long) hz;
+    }
     private WebServer.Response sendWebPage(JSONObject b, String text) throws Exception {
         WebServer.Response denied = gate("/api/pager/send"); if (denied != null) return denied;
         if (!allowTx()) return WebServer.Response.error(403, txOff());
         if (text == null || text.trim().isEmpty()) return WebServer.Response.error(400, Txt.s(R.string.web_pager_write));
-        int hz = b.optInt("hz", 0);
-        if (hz <= 0 && svc.current() != null) hz = svc.current().rxFreq;
+        int hz;
+        try { hz = pageHz(b, svc.current() != null ? svc.current().rxFreq : 0); } catch (NumberFormatException bad) { return badNumber(bad); }
         int[] rics;
         if (b.has("ric") && !b.has("to")) {
             int ric = b.optInt("ric", -1);

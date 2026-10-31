@@ -113,7 +113,7 @@ public final class PacketFinderDialog {
         float d = Theme.dp(c);
         LinearLayout v = new LinearLayout(c); v.setOrientation(LinearLayout.VERTICAL); v.setPadding((int) (20 * d), (int) (8 * d), (int) (20 * d), 0);
         v.addView(Neo.label(c, Txt.s(R.string.packet_pfd_set_freqs), Neo.MUTED, 13, false));
-        final EditText fr = new EditText(c); fr.setText(pf.freqText()); fr.setTextColor(Neo.TEXT); fr.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE); v.addView(fr);
+        final EditText fr = new EditText(c); fr.setText(pf.freqTextShown()); fr.setTextColor(Neo.TEXT); fr.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE); v.addView(fr);
         TextView mine = Neo.button(c, Txt.s(R.string.packet_pfd_set_mine), "list", Neo.CYAN); mine.setTextSize(13);   // a start on a radio the 2 m defaults miss (the W6): your own channels' frequencies
         mine.setOnClickListener(x -> { String m = pf.myChannelsText(); if (m.isEmpty()) Toast.makeText(c, Txt.s(R.string.packet_pfd_set_mine_none), Toast.LENGTH_SHORT).show(); else fr.setText(m); });
         v.addView(mine, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) (40 * d)));

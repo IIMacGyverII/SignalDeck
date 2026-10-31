@@ -15,6 +15,7 @@ import java.util.Locale;
  * powered (the HAL keeps /dev/ttyACM0 open). The stock app's own power-off ({@link #STOP_DEVICE} → HAL stopMcu) switches
  * it off but leaves the controller in mode "none"; toggling the MediaTek controller's cable mode (cmode 0, then 1)
  * puts it back in device mode, and adb over the cable answers about 2 s later.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 final class AgoldUsb {
     private AgoldUsb() { }

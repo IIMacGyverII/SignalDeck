@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,7 +43,7 @@ public final class RootSetup {
             int rc = p.waitFor();
             if (magiskContext && (sb.toString().contains("Unknown option") || sb.toString().contains("Invalid option") || sb.toString().contains("unrecognized"))) return run(cmd, false);
             if (rc != 0) sb.append("(rc=").append(rc).append(")");
-        } catch (Exception e) { sb.append("su failed: ").append(e.getMessage()); }
+        } catch (Exception e) { sb.append("su failed: ").append(e.getMessage()); }   // i18n: command output (diagnostics)
         return sb.toString().trim();
     }
 
@@ -65,12 +66,12 @@ public final class RootSetup {
      * so build a real module zip and hand it to {@code magisk --install-module}.
      */
     public static String installBootModule(DeviceProfile p, File cacheDir) {
-        if (!haveRoot()) return "Root is not granted.";
+        if (!haveRoot()) return Txt.s(R.string.device_root_not_granted);
         try {
             File zip = new File(cacheDir, "dmr-standalone-access.zip");
             try (ZipOutputStream z = new ZipOutputStream(new FileOutputStream(zip))) {
-                String prop = "id=dmr-standalone\n" + "name=SignalDeck access\n" + "version=v1\n" + "versionCode=1\n" + "author=SignalDeck app\n"
-                        + "description=Lets the SignalDeck app open the radio module's serial port and GPIO lines (" + p.name + ").\n";
+                String prop = "id=dmr-standalone\n" + "name=SignalDeck access\n" + "version=v1\n" + "versionCode=1\n" + "author=SignalDeck app\n"   // i18n: module.prop file format
+                        + "description=Lets the SignalDeck app open the radio module's serial port and GPIO lines (" + p.name + ").\n";   // i18n: module.prop file format (Magisk's module list)
                 z.putNextEntry(new ZipEntry("module.prop")); z.write(prop.getBytes("UTF-8")); z.closeEntry();
                 StringBuilder rules = new StringBuilder();
                 for (String l : p.sepolicy) rules.append(l).append('\n');
@@ -79,10 +80,10 @@ public final class RootSetup {
                 z.putNextEntry(new ZipEntry("META-INF/com/google/android/updater-script")); z.write("#MAGISK\n".getBytes("UTF-8")); z.closeEntry();
             }
             run("chmod 644 " + zip.getAbsolutePath());
-            String r = run("magisk --install-module " + zip.getAbsolutePath() + " 2>&1; ls /data/adb/modules_update/dmr-standalone /data/adb/modules/dmr-standalone 2>/dev/null");
+            String r = run("magisk --install-module " + zip.getAbsolutePath() + " 2>&1; ls /data/adb/modules_update/dmr-standalone /data/adb/modules/dmr-standalone 2>/dev/null");   // i18n: shell
             boolean ok = r.contains("sepolicy.rule") || r.toLowerCase(Locale.US).contains("done");
-            return ok ? "Installed. Reboot once; from then on the rules load at every boot (Magisk → Modules shows \"SignalDeck access\")." : "Could not install the module:\n" + r;
-        } catch (Exception e) { return "Could not build the module zip: " + e; }
+            return ok ? Txt.s(R.string.device_root_module_installed) : Txt.s(R.string.device_root_module_failed, r);
+        } catch (Exception e) { return Txt.s(R.string.device_root_module_zip_failed, String.valueOf(e)); }
     }
 
     /**
@@ -92,7 +93,7 @@ public final class RootSetup {
      * 57600 first).
      */
     public static String ensureTty(DeviceProfile p) {
-        String st = "S=stty; [ -x /data/adb/magisk/busybox ] && S='/data/adb/magisk/busybox stty'; ";
+        String st = "S=stty; [ -x /data/adb/magisk/busybox ] && S='/data/adb/magisk/busybox stty'; ";   // i18n: shell
         String s = run("cat /proc/self/attr/current; echo; " + st + "$S -F " + p.controlPort + " " + p.baud + " raw -echo -echoe -echok -echoctl -echoke; echo rc=$?; stty -F " + p.controlPort + " -a | head -1");
         if (p.pcmPort != null) s += " | " + run(st + "$S -F " + p.pcmPort + " " + p.pcmBaud + " raw -echo; stty -F " + p.pcmPort + " -a | head -1");
         return s.replace('\n', ' ');

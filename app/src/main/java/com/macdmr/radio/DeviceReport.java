@@ -39,6 +39,7 @@ import java.util.zip.ZipOutputStream;
  * the SELinux labels, process contexts and the stock app's receivers (which reveal the PTT key broadcasts).
  * Output: {@code Download/DMR/DeviceReport/<model>_<time>/report.txt} plus the copied APKs, and one zip of it
  * all to share straight into a GitHub issue.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class DeviceReport {
     public interface Progress { void step(String s); }

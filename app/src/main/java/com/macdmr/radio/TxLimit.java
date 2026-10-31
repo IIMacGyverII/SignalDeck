@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
 import java.util.Locale;
 
 /**
@@ -34,8 +36,12 @@ public final class TxLimit {
     /** The choices offered, in order; Custom… follows them on the screen. */
     public static final int[] PRESETS_S = { 30, 60, 120, 180, 300, 600, NONE };
 
-    public static final String HEAT_WARNING = "Long transmissions heat the phone. A 2-minute key at high power warmed the radio area about 11 °C on the bench. "
-            + "SignalDeck still stops any transmission if the phone gets too hot (radio area 70 °C, battery 48 °C).";
+    /** English only, for callers not yet moved to {@link #heatWarning()} (DeviceView, WebHost). */
+    public static final String HEAT_WARNING = "Long transmissions heat the phone. A 2-minute key at high power warmed the radio area about 11 °C on the bench. "   // i18n: kept for old callers; screens use heatWarning()
+            + "SignalDeck still stops any transmission if the phone gets too hot (radio area 70 °C, battery 48 °C).";   // i18n: kept for old callers; screens use heatWarning()
+
+    /** The heat warning shown once when a long limit (or none) is picked, in the app's language. */
+    public static String heatWarning() { return Txt.s(R.string.device_txlimit_heat_warning); }
 
     /** A stored value made valid: negative means never set (the default), 1–9 s is raised to the custom minimum. */
     public static int valid(int s) { return s < 0 ? DEFAULT_S : s == NONE ? NONE : Math.max(MIN_CUSTOM_S, s); }
@@ -61,12 +67,14 @@ public final class TxLimit {
     }
 
     /** The value's name: "30 s", "1 min", "2 min", "1 min 30 s", "No limit". */
-    public static String name(int s) {
+    public static String name(int s) { return nameMsg(s).text(); }
+    /** As {@link #name}, as a message (for a stored history line). */
+    public static Msg nameMsg(int s) {
         s = valid(s);
-        if (s == NONE) return "No limit";
-        if (s < 60) return s + " s";
+        if (s == NONE) return Msg.of(R.string.device_txlimit_none);
+        if (s < 60) return Msg.of(R.string.device_txlimit_seconds, s);
         int m = s / 60, r = s % 60;
-        return r == 0 ? m + " min" : String.format(Locale.US, "%d min %d s", m, r);
+        return r == 0 ? Msg.of(R.string.device_txlimit_minutes, m) : Msg.of(R.string.device_txlimit_minutes_seconds, m, r);
     }
 
     /** The preset's index in {@link #PRESETS_S}, or -1 for a custom value. */

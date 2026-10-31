@@ -24,6 +24,7 @@ import android.util.Log;
  * </pre>
  * {@code inject} plays a WAV file (16-bit PCM, any rate, mono or stereo) into the receive path in real time, as if
  * the radio heard it: decoders, the parrot and the DTMF remote see it, nothing is keyed by the injection itself.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class DiagReceiver extends BroadcastReceiver {
     public static final String ACTION = "com.macdmr.radio.DIAG";

@@ -27,6 +27,7 @@ import java.util.Locale;
  *
  * Nothing private goes in: caller IDs keep only their first three digits (the region), the app log drops the frames that
  * carry IDs or texts, and logcat lines are masked like the rest of the device report.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class DmrAudioCheck {
     private DmrAudioCheck() { }

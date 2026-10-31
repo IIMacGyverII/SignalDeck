@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
+
 import android.os.Build;
 
 import java.io.File;
@@ -193,7 +195,7 @@ public final class DeviceProfile {
      */
     public boolean smsUtf8;
     /** The text body this profile sends, for the reports. */
-    public String textBody() { return smsUtf8 ? "type, target, UTF-8 text (QuickChat's)" : "type, target, second ID, UTF-16LE text"; }
+    public String textBody() { return smsUtf8 ? "type, target, UTF-8 text (QuickChat's)" : "type, target, second ID, UTF-16LE text"; }   // i18n: report text (English)
 
     /**
      * The radio's audio as plain ALSA streams on the phone's sound card, for a ROM without the vendor audio service
@@ -238,17 +240,17 @@ public final class DeviceProfile {
 
     /** Ulefone Armor 26 Ultra (walkie-talkie model) — measured 2026-10-17. */
     public static final DeviceProfile ARMOR_26_ULTRA = new DeviceProfile(
-            "Ulefone Armor 26 Ultra", "/dev/ttyS0", 57600, Audio.TINY_SERVICE, null, 0,
-            "/sys/devices/platform/dmr009/pwd", "/sys/devices/platform/dmr009/ptt", "pwd :1",
+            "Ulefone Armor 26 Ultra", "/dev/ttyS0", 57600, Audio.TINY_SERVICE, null, 0,   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+            "/sys/devices/platform/dmr009/pwd", "/sys/devices/platform/dmr009/ptt", "pwd :1",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             // the framework ("smartlinkkey", KEY_SAT keycode 381) sends android.intent.action.PTT.down/up for the side key;
             // com.interphone.ptt.down/up is what the stock app listens for when the key is assigned to it (measured 2026-10-18)
-            new String[] { "android.intent.action.PTT.down", "android.intent.action.PTT.up", "com.interphone.ptt.down", "com.interphone.ptt.up" },
+            new String[] { "android.intent.action.PTT.down", "android.intent.action.PTT.up", "com.interphone.ptt.down", "com.interphone.ptt.up" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             "com.pri.prizeinterphone",
             new String[] {
-                    "allow untrusted_app ttyS_device chr_file { open read write ioctl getattr lock }",
-                    "typeattribute ttyS_device mlstrustedobject",
-                    "allow untrusted_app sysfs_prizefactory file { open read write getattr }",
-                    "typeattribute sysfs_prizefactory mlstrustedobject" },
+                    "allow untrusted_app ttyS_device chr_file { open read write ioctl getattr lock }",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute ttyS_device mlstrustedobject",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "allow untrusted_app sysfs_prizefactory file { open read write getattr }",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute sysfs_prizefactory mlstrustedobject" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             "/system/lib64/libinterphone_serial_port.so", true, true);
 
     /**
@@ -262,16 +264,16 @@ public final class DeviceProfile {
      * with a smaller command set; see the fields set in the static block.
      */
     public static final DeviceProfile ARMOR_20WT = new DeviceProfile(
-            "Ulefone Armor 20WT", "/dev/ttyS1", 57600, Audio.TINY_SERVICE, null, 0,
-            "/sys/devices/platform/dmr009/pwd", "/sys/devices/platform/dmr009/ptt", "pwd :1",
-            new String[] { "com.interphone.ptt.down", "com.interphone.ptt.up", "android.intent.action.PTT.down", "android.intent.action.PTT.up" },
+            "Ulefone Armor 20WT", "/dev/ttyS1", 57600, Audio.TINY_SERVICE, null, 0,   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+            "/sys/devices/platform/dmr009/pwd", "/sys/devices/platform/dmr009/ptt", "pwd :1",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+            new String[] { "com.interphone.ptt.down", "com.interphone.ptt.up", "android.intent.action.PTT.down", "android.intent.action.PTT.up" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             "com.pri.prizeinterphone",
             new String[] {
-                    "allow untrusted_app ttyS_device chr_file { open read write ioctl getattr lock }",
-                    "typeattribute ttyS_device mlstrustedobject",
-                    "allow untrusted_app sysfs_prizefactory file { open read write getattr }",
-                    "typeattribute sysfs_prizefactory mlstrustedobject" },
-            "/system/priv-app/PriInterPhone/lib/arm64/libserial_port_app.so", true, false);
+                    "allow untrusted_app ttyS_device chr_file { open read write ioctl getattr lock }",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute ttyS_device mlstrustedobject",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "allow untrusted_app sysfs_prizefactory file { open read write getattr }",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute sysfs_prizefactory mlstrustedobject" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+            "/system/priv-app/PriInterPhone/lib/arm64/libserial_port_app.so", true, false);   // i18n: phone profile data (names, properties, policy rules, mixer controls)
 
     /**
      * Blackview Xplore 1 — from its QuickChat APK and an owner's dumps (docs/multi-device-xplore1-findings.md): ttyS0/ttyS1
@@ -279,13 +281,13 @@ public final class DeviceProfile {
      * through root rather than opening all of sysfs to apps). Not run on the phone yet: unverified.
      */
     public static final DeviceProfile XPLORE_1 = new DeviceProfile(
-            "Blackview Xplore 1", "/dev/ttyS0", 57600, Audio.UART_PCM, "/dev/ttyS1", 230400,
+            "Blackview Xplore 1", "/dev/ttyS0", 57600, Audio.UART_PCM, "/dev/ttyS1", 230400,   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             "/sys/devices/platform/intercom/intercom_pwd_control", "/sys/devices/platform/intercom/intercom_ptt_control", "1",
             new String[] { "com.android.intent.ptt.down", "com.android.intent.ptt.up" },
             "com.chamsion.quickchat",
             new String[] {
-                    "allow untrusted_app ttyS_device chr_file { open read write ioctl getattr lock }",
-                    "typeattribute ttyS_device mlstrustedobject" },
+                    "allow untrusted_app ttyS_device chr_file { open read write ioctl getattr lock }",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute ttyS_device mlstrustedobject" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             null, true, false);
     static {
         // QuickChat's power-up (j0.a.run): power_control, pwd_control and ptt_control all 1; its power-off writes all 0, and
@@ -300,10 +302,10 @@ public final class DeviceProfile {
         // device 8 with DL8 routed to I2S1, the ES8311's DAC turned up and its ADC muted. Used only when the ROM has no
         // PrizeTinyService (custom ROMs / GSIs).
         ARMOR_26_ULTRA.directAudio = new DirectAudio(0, 11, 8,
-                new String[] { "UL2_CH1 I2S2_CH1=1", "UL2_CH2 I2S2_CH2=1", "ADC SDP MUTE=0", "DAC VOLUME=0", "DAC SDP SRC MUX=SELECT SDP RIGHT DATA" },
+                new String[] { "UL2_CH1 I2S2_CH1=1", "UL2_CH2 I2S2_CH2=1", "ADC SDP MUTE=0", "DAC VOLUME=0", "DAC SDP SRC MUX=SELECT SDP RIGHT DATA" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
                 new String[] { "UL2_CH1 I2S2_CH1=0", "UL2_CH2 I2S2_CH2=0" },
-                new String[] { "I2S1_HD_Mux=Low_Jitter", "I2S1_CH1 DL8_CH1=1", "I2S1_Out_Mux=Output_Widget", "ADC SDP MUTE=1", "DAC VOLUME=163", "DAC SDP SRC MUX=SELECT SDP LEFT DATA" },
-                new String[] { "I2S1_CH1 DL8_CH1=0", "I2S1_Out_Mux=Normal", "I2S1_HD_Mux=Normal", "DAC VOLUME=0", "ADC SDP MUTE=0", "DAC SDP SRC MUX=SELECT SDP RIGHT DATA" });
+                new String[] { "I2S1_HD_Mux=Low_Jitter", "I2S1_CH1 DL8_CH1=1", "I2S1_Out_Mux=Output_Widget", "ADC SDP MUTE=1", "DAC VOLUME=163", "DAC SDP SRC MUX=SELECT SDP LEFT DATA" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                new String[] { "I2S1_CH1 DL8_CH1=0", "I2S1_Out_Mux=Normal", "I2S1_HD_Mux=Normal", "DAC VOLUME=0", "ADC SDP MUTE=0", "DAC SDP SRC MUX=SELECT SDP RIGHT DATA" });   // i18n: phone profile data (names, properties, policy rules, mixer controls)
         ARMOR_20WT.id = "ulefone-armor20wt"; ARMOR_20WT.revision = 2;
         // Its stock app (review 2026-10-30): channel, version, time-out at boot and nothing else; opens the audio path and
         // waits 600 ms before keying; keys no sooner than 2 s after a release; analog volume byte 5; channel files
@@ -313,7 +315,7 @@ public final class DeviceProfile {
         ARMOR_20WT.txAudioLeadMs = 600;
         ARMOR_20WT.minKeyGapMs = 2000;
         ARMOR_20WT.analogVolume = 5;
-        ARMOR_20WT.stockAreaPrefix = "channel_database_"; ARMOR_20WT.stockDefaultArea = "Default";
+        ARMOR_20WT.stockAreaPrefix = "channel_database_"; ARMOR_20WT.stockDefaultArea = "Default";   // i18n: phone profile data (names, properties, policy rules, mixer controls)
         ARMOR_20WT.moduleLoader = false;
         ARMOR_20WT.stockCommands = new int[] { 0x22, 0x23, 0x26, 0x27, 0x2C, 0x2D, 0x34, 0x36, 0x3B };
         ARMOR_20WT.txTestUnverified = true;    // owner, 2026-10-30: the device report's transmit tests may key it
@@ -349,13 +351,13 @@ public final class DeviceProfile {
      * Never read the flyscale_misc attributes on this phone: two of them panic the kernel.
      */
     public static final DeviceProfile ANYSECU_W6 = new DeviceProfile(
-            "ANYSECU W6+", "/dev/ttyS2", 9600, Audio.CAMCORDER, null, 0,
+            "ANYSECU W6+", "/dev/ttyS2", 9600, Audio.CAMCORDER, null, 0,   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             "/sys/class/gpio/gpio322/value", "/sys/class/gpio/gpio188/value", "1",
             new String[] { "fly.privkey.poc.down", "fly.privkey.poc.up" },
             "com.flyscale.analogpoc",
             new String[] {
-                    "allow untrusted_app console_device chr_file { open read write ioctl getattr lock }",
-                    "typeattribute console_device mlstrustedobject" },
+                    "allow untrusted_app console_device chr_file { open read write ioctl getattr lock }",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute console_device mlstrustedobject" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             null, true, true);
     static {
         ANYSECU_W6.id = "anysecu-w6plus"; ANYSECU_W6.revision = 3; ANYSECU_W6.protocol = "sa818";
@@ -401,13 +403,13 @@ public final class DeviceProfile {
      * a HackRF capture, the 28 s watchdog unkeyed), carrier about +1.6 kHz against the HackRF.
      */
     public static final DeviceProfile ANYSECU_W6_DMR = new DeviceProfile(
-            "ANYSECU W6Plus DMR", "/dev/ttyS2", 57600, Audio.CAMCORDER, null, 0,
+            "ANYSECU W6Plus DMR", "/dev/ttyS2", 57600, Audio.CAMCORDER, null, 0,   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             "/sys/class/gpio/gpio322/value", "/sys/class/gpio/gpio188/value", "1",
             new String[] { "fly.privkey.poc.down", "fly.privkey.poc.up" },
             "com.flyscale.dmr",
             new String[] {
-                    "allow untrusted_app console_device chr_file { open read write ioctl getattr lock }",
-                    "typeattribute console_device mlstrustedobject" },
+                    "allow untrusted_app console_device chr_file { open read write ioctl getattr lock }",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute console_device mlstrustedobject" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             null, true, true);
     static {
         ANYSECU_W6_DMR.id = "anysecu-w6plus-dmr"; ANYSECU_W6_DMR.revision = 2;
@@ -461,15 +463,15 @@ public final class DeviceProfile {
      * Atom XL 2026-10-28 (docs/atomxl in phonedmrapp). Revision 2 (owner, 2026-10-28): verified; transmit tested in the cage (FM, DMR voice, DMR text, APRS decoded) on module DMR006.U4A.V067.
      */
     public static final DeviceProfile ATOM_XL = new DeviceProfile(
-            "Unihertz Atom XL", AgoldUsb.BRIDGE_PORT, 115200, Audio.TINY_SERVICE, null, 0,
-            AgoldUsb.MCU_POWER, AgoldUsb.HANDLE_PTT, "power on = 1",
-            new String[] { "android.intent.action.PTT.down", "android.intent.action.PTT.up" },
+            "Unihertz Atom XL", AgoldUsb.BRIDGE_PORT, 115200, Audio.TINY_SERVICE, null, 0,   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+            AgoldUsb.MCU_POWER, AgoldUsb.HANDLE_PTT, "power on = 1",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+            new String[] { "android.intent.action.PTT.down", "android.intent.action.PTT.up" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             "com.agold.intercom",
             new String[] {
-                    "allow untrusted_app ttyACM_device chr_file { open read write ioctl getattr lock }",
-                    "typeattribute ttyACM_device mlstrustedobject",
-                    "allow untrusted_app agui_device chr_file { open read getattr }",       // /dev/stmcu: reception start / end
-                    "typeattribute agui_device mlstrustedobject" },
+                    "allow untrusted_app ttyACM_device chr_file { open read write ioctl getattr lock }",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute ttyACM_device mlstrustedobject",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "allow untrusted_app agui_device chr_file { open read getattr }",       // /dev/stmcu: reception start / end   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+                    "typeattribute agui_device mlstrustedobject" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             null, true, true);
     static {
         ATOM_XL.id = "unihertz-atomxl"; ATOM_XL.revision = 2; ATOM_XL.protocol = "agold";
@@ -494,9 +496,9 @@ public final class DeviceProfile {
      * the module's own range is not measured.
      */
     public static final DeviceProfile ARMOR_3WT = new DeviceProfile(
-            "Ulefone Armor 3WT", ExtModuleLink.CONTROL_PORT, 0, Audio.EXTMODULE, null, 0,
-            AgoldUsb.MCU_POWER, AgoldUsb.HANDLE_PTT, "power on = 1",
-            new String[] { "android.intent.action.PTT.down", "android.intent.action.PTT.up" },
+            "Ulefone Armor 3WT", ExtModuleLink.CONTROL_PORT, 0, Audio.EXTMODULE, null, 0,   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+            AgoldUsb.MCU_POWER, AgoldUsb.HANDLE_PTT, "power on = 1",   // i18n: phone profile data (names, properties, policy rules, mixer controls)
+            new String[] { "android.intent.action.PTT.down", "android.intent.action.PTT.up" },   // i18n: phone profile data (names, properties, policy rules, mixer controls)
             "com.agold.intercom",
             new String[0],                                                       // TCP to 127.0.0.1 only: no device node, no new rule
             null, true, false);
@@ -514,7 +516,7 @@ public final class DeviceProfile {
     }
 
     public static final DeviceProfile UNKNOWN = new DeviceProfile(
-            Build.MANUFACTURER + " " + Build.MODEL + " (not supported yet)", "/dev/ttyS0", 57600, Audio.TINY_SERVICE, null, 0,
+            Build.MANUFACTURER + " " + Build.MODEL + " (not supported yet)", "/dev/ttyS0", 57600, Audio.TINY_SERVICE, null, 0,   // i18n: the unknown phone's profile name, built once at class load (shown as data)
             null, null, "1", null, "", new String[0], null, false, false);
 
     /** The profile in use: a built-in one, or a newer one from the signed profile list, with any advisories applied. */
@@ -615,7 +617,7 @@ public final class DeviceProfile {
     public String bandsText() {
         StringBuilder b = new StringBuilder();
         for (int i = 0; i + 1 < bandsHz.length; i += 2) {
-            if (b.length() > 0) b.append(i + 2 >= bandsHz.length ? " and " : ", ");
+            if (b.length() > 0) b.append(i + 2 >= bandsHz.length ? Txt.s(R.string.device_profile_bands_and) : ", ");
             b.append(mhz(bandsHz[i])).append('–').append(mhz(bandsHz[i + 1]));
         }
         return b.append(" MHz").toString();

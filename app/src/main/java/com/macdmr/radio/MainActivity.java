@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private final View[] tabCell = new View[5];
     private final View[] tabInd = new View[5];
     private final String[] tabIcons = { "intercom", "channels", "contacts", "messages", "device" };
-    private final String[] tabNames = { "Intercom", "Channels", "Contacts", "Messages", "Device" };
+    private final String[] tabNames = { Txt.s(R.string.device_main_tab_intercom), Txt.s(R.string.device_main_tab_channels), Txt.s(R.string.device_main_tab_contacts), Txt.s(R.string.device_main_tab_messages), Txt.s(R.string.device_main_tab_device) };
     private int tab = 0;
     private final Handler ui = new Handler(Looper.getMainLooper());
     private final Runnable rssiTick = new Runnable() { @Override public void run() { if (svc != null && svc.isReady() && tab == 0) svc.pollRssi(); ui.postDelayed(this, 2000); } };
@@ -143,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         takeSharedLocation(getIntent()); takeOpenNets(getIntent()); takeCodeplug(getIntent());
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-            ActivityCompat.requestPermissions(this, android.os.Build.VERSION.SDK_INT >= 33 ? new String[] { Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.ACCESS_FINE_LOCATION, "android.permission.READ_MEDIA_AUDIO" } : new String[] { Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE }, 1);
+            ActivityCompat.requestPermissions(this, android.os.Build.VERSION.SDK_INT >= 33 ? new String[] { Manifest.permission.RECORD_AUDIO, Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.ACCESS_FINE_LOCATION, "android.permission.READ_MEDIA_AUDIO" } : new String[] { Manifest.permission.RECORD_AUDIO, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_EXTERNAL_STORAGE }, 1);   // i18n: permission name
         Intent si = new Intent(this, RadioService.class);
         RadioService.exiting = false;                                // opened again after an exit: the radio comes back
         finishReceiver = new android.content.BroadcastReceiver() { @Override public void onReceive(Context cx, Intent in) { try { unbindService(conn); } catch (Throwable ignored) { } finishAndRemoveTask(); } };
@@ -177,11 +178,11 @@ public class MainActivity extends AppCompatActivity {
         if (svc == null || isFinishing() || p.getBoolean("announced", false) || p.getBoolean("introShown", false)) return;
         p.edit().putBoolean("announced", true).apply();
         android.content.Context c = this; float d = com.macdmr.radio.ui.Theme.dp(c);
-        android.widget.LinearLayout box = com.macdmr.radio.ui.Neo.sheetBody(c, "Coverage maps");
-        box.addView(com.macdmr.radio.ui.Neo.label(c, "NEW FEATURE", com.macdmr.radio.ui.Neo.VIOLET, 12, true));
-        box.addView(com.macdmr.radio.ui.Neo.sheetHint(c, "See where each of your repeaters reaches you, and where you can key it up. Turn on coverage logging and the app measures as you drive or walk, then draws it on the map. Export to Google Earth any time."));
-        android.widget.TextView open = com.macdmr.radio.ui.Neo.button(c, "Open the map", "map", com.macdmr.radio.ui.Neo.VIOLET);
-        android.widget.TextView later = com.macdmr.radio.ui.Neo.button(c, "Later", "close", com.macdmr.radio.ui.Neo.CYAN);
+        android.widget.LinearLayout box = com.macdmr.radio.ui.Neo.sheetBody(c, Txt.s(R.string.device_main_coverage_title), "signal");
+        box.addView(com.macdmr.radio.ui.Neo.label(c, Txt.s(R.string.device_main_coverage_new), com.macdmr.radio.ui.Neo.VIOLET, 12, true));
+        box.addView(com.macdmr.radio.ui.Neo.sheetHint(c, Txt.s(R.string.device_main_coverage_hint)));
+        android.widget.TextView open = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.device_main_coverage_open), "map", com.macdmr.radio.ui.Neo.VIOLET);
+        android.widget.TextView later = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.common_later), "close", com.macdmr.radio.ui.Neo.CYAN);
         android.widget.LinearLayout row = new android.widget.LinearLayout(c); row.setBaselineAligned(false);
         android.widget.LinearLayout.LayoutParams l1 = new android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1.4f); l1.setMargins(0, (int) (14 * d), (int) (4 * d), 0);
         android.widget.LinearLayout.LayoutParams l2 = new android.widget.LinearLayout.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1f); l2.setMargins((int) (4 * d), (int) (14 * d), 0, 0);
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_NETS = "com.macdmr.radio.nets";
     private boolean pendingNets;
     /** Shared channels arrived (ImportCodeplugActivity): show the import preview once the service is there. */
-    public static final String EXTRA_CODEPLUG = "com.macdmr.radio.codeplug", EXTRA_CODEPLUG_NAME = "com.macdmr.radio.codeplugName";
+    public static final String EXTRA_CODEPLUG = "com.macdmr.radio.codeplug", EXTRA_CODEPLUG_NAME = "com.macdmr.radio.codeplugName";   // i18n: intent extra key
     private boolean pendingCodeplug; private String pendingCodeplugName;
     private void takeCodeplug(Intent i) { if (i == null || !i.getBooleanExtra(EXTRA_CODEPLUG, false)) return; pendingCodeplugName = i.getStringExtra(EXTRA_CODEPLUG_NAME); i.removeExtra(EXTRA_CODEPLUG); pendingCodeplug = true; applyCodeplug(); }
     private void applyCodeplug() {
@@ -209,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         String text = null; try { text = new String(java.nio.file.Files.readAllBytes(f.toPath()), java.nio.charset.StandardCharsets.UTF_8); } catch (Throwable ignored) { }
         f.delete();
         Codeplug p = Codeplug.read(text, pendingCodeplugName);
-        if (p == null) { android.widget.Toast.makeText(this, "Nothing to import", android.widget.Toast.LENGTH_SHORT).show(); return; }
+        if (p == null) { android.widget.Toast.makeText(this, Txt.s(R.string.device_main_nothing_to_import), android.widget.Toast.LENGTH_SHORT).show(); return; }
         show(1);
         com.macdmr.radio.ui.CodeplugDialog.preview(this, svc, p, channels::reload);
     }
@@ -232,9 +233,9 @@ public class MainActivity extends AppCompatActivity {
         pendingLocation = null;
         final java.util.List<ChannelStore.Channel> all = svc.store().all();
         String[] names = new String[all.size()]; for (int k = 0; k < names.length; k++) names[k] = all.get(k).number + "  " + all.get(k).name;
-        new android.app.AlertDialog.Builder(this).setTitle(String.format(java.util.Locale.US, "Set %.5f, %.5f as the location of", p[0], p[1]))
-                .setItems(names, (d, w) -> { ChannelStore.Channel ch = all.get(w); ch.lat = p[0]; ch.lon = p[1]; svc.saveChannel(ch, false); android.widget.Toast.makeText(this, ch.name + ": location set", android.widget.Toast.LENGTH_LONG).show(); })
-                .setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(this).setTitle(Txt.s(R.string.device_main_location_title, String.format(java.util.Locale.US, "%.5f", p[0]), String.format(java.util.Locale.US, "%.5f", p[1])))
+                .setItems(names, (d, w) -> { ChannelStore.Channel ch = all.get(w); ch.lat = p[0]; ch.lon = p[1]; svc.saveChannel(ch, false); android.widget.Toast.makeText(this, Txt.s(R.string.device_main_location_set, ch.name), android.widget.Toast.LENGTH_LONG).show(); })
+                .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     /** The DMR text thread of a contact (the Contacts page, a contact sheet opened from any identity). */
@@ -274,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private View placeholder(String name) {
-        TextView t = Theme.label(this, name + "\n\ncoming next", 0xFF8A7FB0, 18, false); t.setGravity(Gravity.CENTER); return t;
+        TextView t = Theme.label(this, Txt.s(R.string.device_main_coming_next, name), 0xFF8A7FB0, 18, false); t.setGravity(Gravity.CENTER); return t;
     }
 
     // ---- modes that take the radio over (APRS monitor, KISS, SSTV, parrot): their own full-screen page ----
@@ -298,15 +299,15 @@ public class MainActivity extends AppCompatActivity {
         java.util.List<String[]> out = new java.util.ArrayList<>();
         RadioService s = svc; if (s == null || s.packet() == null) return out;
         com.macdmr.radio.PacketEngine pe = s.packet();
-        if (s.scope().running()) out.add(new String[] { "scope", "Band scope" });
+        if (s.scope().running()) out.add(new String[] { "scope", Txt.s(R.string.device_main_mode_band_scope) });
         RadioService.SatState ss = s.satState();
-        if (s.satMode() == com.macdmr.radio.ham.Satellites.SSTV) out.add(new String[] { "sstv", "ISS SSTV" + (ss != null && ss.waiting ? " (waiting for the pass)" : "") });
-        else if (pe.sstvRx()) out.add(new String[] { "sstv", "SSTV receive" });
-        if (s.satMode() == com.macdmr.radio.ham.Satellites.APRS) out.add(new String[] { "aprs", "ISS APRS" + (ss != null && ss.waiting ? " (waiting for the pass)" : "") });
-        else if (pe.monitoring() || pe.kiss().isActive()) out.add(new String[] { "aprs", pe.monitoring() ? "APRS monitoring" : "KISS TNC" });
-        if (s.parrot().enabled()) out.add(new String[] { "parrot", "Parrot" });
+        if (s.satMode() == com.macdmr.radio.ham.Satellites.SSTV) out.add(new String[] { "sstv", ss != null && ss.waiting ? Txt.s(R.string.device_main_mode_waiting_pass, "ISS SSTV") : "ISS SSTV" });   // i18n: mode name (ISS SSTV)
+        else if (pe.sstvRx()) out.add(new String[] { "sstv", Txt.s(R.string.device_main_mode_sstv_rx) });
+        if (s.satMode() == com.macdmr.radio.ham.Satellites.APRS) out.add(new String[] { "aprs", ss != null && ss.waiting ? Txt.s(R.string.device_main_mode_waiting_pass, "ISS APRS") : "ISS APRS" });   // i18n: mode name (ISS APRS)
+        else if (pe.monitoring() || pe.kiss().isActive()) out.add(new String[] { "aprs", pe.monitoring() ? Txt.s(R.string.device_main_mode_aprs_monitoring) : "KISS TNC" });   // i18n: mode name (KISS TNC)
+        if (s.parrot().enabled()) out.add(new String[] { "parrot", Txt.s(R.string.device_main_mode_parrot) });
         if (s.ft8Running()) out.add(new String[] { "ft8", "FT8" });
-        if (s.m17Running()) out.add(new String[] { "m17", "M17 receive" });
+        if (s.m17Running()) out.add(new String[] { "m17", Txt.s(R.string.device_main_mode_m17_rx) });
         return out;
     }
     /** Open one running mode's page by its key (see {@link #runningModes}). */
@@ -344,18 +345,18 @@ public class MainActivity extends AppCompatActivity {
     private String modeLabel() {
         RadioService s = svc; if (s == null || s.packet() == null) return null;
         com.macdmr.radio.PacketEngine pe = s.packet();
-        if (s.scope().running()) { int hz = s.scope().currentHz(); return "Band scope sweeping" + (hz > 0 ? String.format(java.util.Locale.US, "  ·  %.4f MHz", hz / 1e6) : ""); }
+        if (s.scope().running()) { int hz = s.scope().currentHz(); return hz > 0 ? Txt.s(R.string.device_main_bar_scope_at, String.format(java.util.Locale.US, "%.4f", hz / 1e6)) : Txt.s(R.string.device_main_bar_scope); }
         RadioService.SatState ss = s.satState();
         if (ss != null && ss.mode != com.macdmr.radio.ham.Satellites.VOICE) {
-            String when = ss.waiting ? "next pass " + new java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(new java.util.Date(ss.aos)) : "pass in progress";
-            return (ss.mode == com.macdmr.radio.ham.Satellites.SSTV ? "\uD83D\uDCFA  ISS SSTV" : "\uD83D\uDCE1  ISS APRS") + "  \u00B7  " + when;
+            String mode = ss.mode == com.macdmr.radio.ham.Satellites.SSTV ? "\uD83D\uDCFA  ISS SSTV" : "\uD83D\uDCE1  ISS APRS";   // i18n: mode name
+            return ss.waiting ? Txt.s(R.string.device_main_bar_sat_next, mode, new java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(new java.util.Date(ss.aos))) : Txt.s(R.string.device_main_bar_sat_now, mode);
         }
-        if (pe.sstvRx()) return "\uD83D\uDCFA  SSTV receive";
-        if (pe.monitoring()) return "\uD83D\uDCE1  APRS monitoring  \u00B7  " + String.format(java.util.Locale.US, "%.3f", s.aprsMonitorHz() / 1e6);
-        if (pe.kiss().isActive()) return "📡  KISS TNC";
-        if (s.parrot().enabled()) return "🦜  Parrot";
-        if (s.m17Running()) { com.macdmr.radio.M17Station.Heard h = s.m17().current(); return "📻  M17" + (h != null ? "  ·  " + (h.src.isEmpty() ? "receiving" : h.src + " → " + h.dst) : "  ·  listening"); }
-        if (s.ft8Running()) return "〰  FT8" + (s.ft8().txEnabled() ? "  ·  transmitting in its period" : "  ·  listening");
+        if (pe.sstvRx()) return Txt.s(R.string.device_main_bar_sstv_rx);
+        if (pe.monitoring()) return Txt.s(R.string.device_main_bar_aprs, String.format(java.util.Locale.US, "%.3f", s.aprsMonitorHz() / 1e6));
+        if (pe.kiss().isActive()) return "📡  KISS TNC";   // i18n: mode name
+        if (s.parrot().enabled()) return Txt.s(R.string.device_main_bar_parrot);
+        if (s.m17Running()) { com.macdmr.radio.M17Station.Heard h = s.m17().current(); return h == null ? Txt.s(R.string.device_main_bar_m17_listening) : h.src.isEmpty() ? Txt.s(R.string.device_main_bar_m17_receiving) : Txt.s(R.string.device_main_bar_m17_heard, h.src, h.dst); }
+        if (s.ft8Running()) return Txt.s(s.ft8().txEnabled() ? R.string.device_main_bar_ft8_tx : R.string.device_main_bar_ft8_listening);
         return null;
     }
     private LinearLayout buildModeBar() {
@@ -364,10 +365,10 @@ public class MainActivity extends AppCompatActivity {
         b.setPadding(Theme.dp(this, 16), Theme.dp(this, 9), Theme.dp(this, 12), Theme.dp(this, 9));
         modeBarText = com.macdmr.radio.ui.Neo.text(this, "", com.macdmr.radio.ui.Neo.GREEN_LIGHT, 15, com.macdmr.radio.ui.Neo.uiSemi(this)); modeBarText.setSingleLine(true);
         b.addView(modeBarText, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        TextView open = com.macdmr.radio.ui.Neo.text(this, "OPEN  ›", com.macdmr.radio.ui.Neo.GREEN, 14, com.macdmr.radio.ui.Neo.ui(this)); open.setLetterSpacing(0.1f);
+        TextView open = com.macdmr.radio.ui.Neo.text(this, Txt.s(R.string.device_main_bar_open), com.macdmr.radio.ui.Neo.GREEN, 14, com.macdmr.radio.ui.Neo.ui(this)); open.setLetterSpacing(0.1f);
         b.addView(open);
         b.setOnClickListener(v -> openModeScreen());
-        b.setContentDescription("Open the running mode's page");
+        b.setContentDescription(Txt.s(R.string.device_main_bar_open_desc));
         return b;
     }
     /** The one-time region card on the intercom: what the phone said (or that it said nothing), Change, and a close button. */
@@ -378,10 +379,10 @@ public class MainActivity extends AppCompatActivity {
         b.setPadding(Theme.dp(this, 16), Theme.dp(this, 8), Theme.dp(this, 6), Theme.dp(this, 8));
         regionBarText = com.macdmr.radio.ui.Neo.text(this, "", com.macdmr.radio.ui.Neo.CYAN_LIGHT, 14.5f, com.macdmr.radio.ui.Neo.uiSemi(this));
         b.addView(regionBarText, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        TextView change = com.macdmr.radio.ui.Neo.text(this, "CHANGE  ›", com.macdmr.radio.ui.Neo.CYAN, 14, com.macdmr.radio.ui.Neo.ui(this)); change.setLetterSpacing(0.1f);
+        TextView change = com.macdmr.radio.ui.Neo.text(this, Txt.s(R.string.device_main_region_change), com.macdmr.radio.ui.Neo.CYAN, 14, com.macdmr.radio.ui.Neo.ui(this)); change.setLetterSpacing(0.1f);
         change.setPadding(Theme.dp(this, 10), Theme.dp(this, 6), Theme.dp(this, 6), Theme.dp(this, 6));
         b.addView(change);
-        android.widget.ImageView x = com.macdmr.radio.ui.Neo.iconButton(this, "close", com.macdmr.radio.ui.Neo.MUTED, "Dismiss");
+        android.widget.ImageView x = com.macdmr.radio.ui.Neo.iconButton(this, "close", com.macdmr.radio.ui.Neo.MUTED, Txt.s(R.string.device_main_region_dismiss));
         b.addView(x, new LinearLayout.LayoutParams(Theme.dp(this, 40), Theme.dp(this, 40)));
         Runnable done = () -> { com.macdmr.radio.region.Region.dismissCard(this); updateRegionBar(); if (device != null) device.updateRegion(); };
         View.OnClickListener open = v -> com.macdmr.radio.ui.RegionSheet.show(this, svc, done);
@@ -395,9 +396,10 @@ public class MainActivity extends AppCompatActivity {
         if (show) {
             com.macdmr.radio.region.Region r = com.macdmr.radio.region.Region.current(this);
             String roam = com.macdmr.radio.region.Region.roamingIn(this);
-            regionBarText.setText(r.chosen ? "Region: " + r.name + " (" + com.macdmr.radio.region.Region.howText(com.macdmr.radio.region.Region.how(this))
-                    + (roam != null ? "; the network is " + com.macdmr.radio.region.RegionTable.countryName(roam) + "'s" : "") + "). APRS " + r.aprsMhz()
-                    : "Choose your region for its APRS frequency and channel lists");
+            String how = com.macdmr.radio.region.Region.howText(com.macdmr.radio.region.Region.how(this));
+            regionBarText.setText(!r.chosen ? Txt.s(R.string.device_main_region_choose)
+                    : roam != null ? Txt.s(R.string.device_main_region_roaming, r.name, how, com.macdmr.radio.region.RegionTable.countryName(roam), r.aprsMhz())
+                    : Txt.s(R.string.device_main_region_set, r.name, how, r.aprsMhz()));
         }
         int vis = show ? View.VISIBLE : View.GONE; if (regionBar.getVisibility() != vis) regionBar.setVisibility(vis);
     }
@@ -420,21 +422,21 @@ public class MainActivity extends AppCompatActivity {
     public void pickImage(java.util.function.Consumer<android.net.Uri> cb) {
         imagePick = cb;
         Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("image/*");
-        try { startActivityForResult(i, 77); } catch (Throwable t) { android.widget.Toast.makeText(this, "No picture app available", android.widget.Toast.LENGTH_LONG).show(); }
+        try { startActivityForResult(i, 77); } catch (Throwable t) { android.widget.Toast.makeText(this, Txt.s(R.string.device_main_no_picture_app), android.widget.Toast.LENGTH_LONG).show(); }
     }
     private java.util.function.Consumer<android.net.Uri> docPick;
     /** Any file (shared channels: a SignalDeck file or a CHIRP CSV; the Winlink gateway CSV). The picker opens on Recent. */
     public void pickDocument(java.util.function.Consumer<android.net.Uri> cb) {
         docPick = cb;
         Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");
-        try { startActivityForResult(i, 79); } catch (Throwable t) { android.widget.Toast.makeText(this, "No file picker available", android.widget.Toast.LENGTH_LONG).show(); }
+        try { startActivityForResult(i, 79); } catch (Throwable t) { android.widget.Toast.makeText(this, Txt.s(R.string.device_main_no_file_picker), android.widget.Toast.LENGTH_LONG).show(); }
     }
     private java.util.function.Consumer<android.net.Uri> folderPick;
     /** Storage Access Framework folder picker (backups made by another app or install are invisible to the File API). */
     public void pickFolder(java.util.function.Consumer<android.net.Uri> cb) {
         folderPick = cb;
         Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-        try { startActivityForResult(i, 78); } catch (Throwable t) { android.widget.Toast.makeText(this, "No file picker available", android.widget.Toast.LENGTH_LONG).show(); }
+        try { startActivityForResult(i, 78); } catch (Throwable t) { android.widget.Toast.makeText(this, Txt.s(R.string.device_main_no_file_picker), android.widget.Toast.LENGTH_LONG).show(); }
     }
     @Override protected void onActivityResult(int req, int res, Intent data) {
         super.onActivityResult(req, res, data);
@@ -466,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Sent by the notification's Exit once the radio is off: close this screen too. */
-    public static final String ACTION_FINISH = "com.macdmr.radio.FINISH";
+    public static final String ACTION_FINISH = "com.macdmr.radio.FINISH";   // i18n: intent action
     private android.content.BroadcastReceiver finishReceiver;
 
     /** Exit SignalDeck (Device page, notification): radio off or handed back, service stopped, app closed. */
@@ -474,7 +476,7 @@ public class MainActivity extends AppCompatActivity {
         RadioService s = svc;
         if (s == null) { finishAndRemoveTask(); return; }
         s.exit(restoreStock, report -> {
-            android.widget.Toast.makeText(this, restoreStock ? "Radio handed back to the stock app" : "Radio switched off. Open SignalDeck to turn it on again", android.widget.Toast.LENGTH_LONG).show();
+            android.widget.Toast.makeText(this, Txt.s(restoreStock ? R.string.device_main_exit_handed_back : R.string.device_main_exit_switched_off), android.widget.Toast.LENGTH_LONG).show();
             try { unbindService(conn); } catch (Throwable ignored) { }
             finishAndRemoveTask();
         });

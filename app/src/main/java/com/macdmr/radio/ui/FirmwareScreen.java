@@ -4,6 +4,9 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -29,7 +32,8 @@ import java.util.Locale;
 /** The module firmware page: what is loaded, the pre-flight, the transfer, and recovery on the same screen. */
 public final class FirmwareScreen extends LinearLayout {
     private static final String[] PHASES = { "preparing", "update", "handshake", "erasing", "transfer", "finish", "restart", "verify" };
-    private static final String[] PHASE_LABELS = { "Prepare", "Update", "Hello", "Erasing", "Transfer", "Finish", "Restart", "Verify" };
+    private static final int[] PHASE_LABELS = { R.string.device_fw_phase_prepare, R.string.device_fw_phase_update, R.string.device_fw_phase_hello, R.string.device_fw_phase_erasing,
+            R.string.device_fw_phase_transfer, R.string.device_fw_phase_finish, R.string.device_fw_phase_restart, R.string.device_fw_phase_verify };
 
     private final RadioService svc;
     private final Handler ui = new Handler(Looper.getMainLooper());
@@ -48,7 +52,7 @@ public final class FirmwareScreen extends LinearLayout {
         bar.setFill(Math.min(1f, (System.currentTimeMillis() - eraseAt) / 12000f));
         long leftErase = Math.max(0, 12000 - (System.currentTimeMillis() - eraseAt));
         long left = leftErase + 370L * lastAck;
-        figures.setText(String.format(Locale.US, "Erasing\n%d s left in this phase", (leftErase + 999) / 1000));
+        figures.setText(Txt.s(R.string.device_fw_erasing_left, (leftErase + 999) / 1000));
         ui.postDelayed(this, 200);
     } };
 
@@ -61,8 +65,8 @@ public final class FirmwareScreen extends LinearLayout {
         setClickable(true);
         setKeepScreenOn(true);
 
-        LinearLayout header = Neo.header(c, "Module firmware", svc.profile().name);
-        android.widget.ImageView back = Neo.iconButton(c, "left", Neo.CYAN, "Back");
+        LinearLayout header = Neo.header(c, Txt.s(R.string.device_fw_title), svc.profile().name);
+        android.widget.ImageView back = Neo.iconButton(c, "left", Neo.CYAN, Txt.s(R.string.common_back));
         back.setOnClickListener(v -> { if (!running) onClose.run(); });
         LayoutParams bl = new LayoutParams(dp(44), dp(44)); bl.rightMargin = dp(12);
         header.addView(back, 0, bl);
@@ -73,29 +77,29 @@ public final class FirmwareScreen extends LinearLayout {
         sv.addView(body);
         addView(sv, new LayoutParams(LayoutParams.MATCH_PARENT, 0, 1f));
 
-        section(body, "At your own risk").setText(DISCLAIMER);
-        installed = section(body, "Installed");
-        chosen = section(body, "Chosen image");
-        backupLine = section(body, "Factory backup");
-        body.addView(Neo.caps(c, "Images"));
+        section(body, Txt.s(R.string.device_fw_risk_heading)).setText(Txt.s(R.string.device_fw_disclaimer));
+        installed = section(body, Txt.s(R.string.device_fw_installed));
+        chosen = section(body, Txt.s(R.string.device_fw_chosen));
+        backupLine = section(body, Txt.s(R.string.device_fw_factory_backup));
+        body.addView(Neo.caps(c, Txt.s(R.string.device_fw_images)));
         images = new LinearLayout(c); images.setOrientation(VERTICAL); body.addView(images);
         body.addView(gap());
-        body.addView(Neo.caps(c, "Pre-flight"));
+        body.addView(Neo.caps(c, Txt.s(R.string.device_fw_preflight)));
         checks = new LinearLayout(c); checks.setOrientation(VERTICAL); body.addView(checks);
         body.addView(gap());
         bar = new PhaseBar(c); body.addView(bar, new LayoutParams(LayoutParams.MATCH_PARENT, dp(64)));
-        figures = Neo.text(c, "Waiting", Neo.MUTED, 13, Neo.mono(c)); figures.setPadding(0, dp(8), 0, 0); body.addView(figures);
+        figures = Neo.text(c, Txt.s(R.string.device_fw_waiting), Neo.MUTED, 13, Neo.mono(c)); figures.setPadding(0, dp(8), 0, 0); body.addView(figures);
         result = Neo.text(c, "", Neo.TEXT, 16, Neo.ui(c)); result.setPadding(0, dp(8), 0, 0); body.addView(result);
 
-        logToggle = Neo.button(c, "Handshake log", "diag", Neo.CYAN);
+        logToggle = Neo.button(c, Txt.s(R.string.device_fw_handshake_log), "diag", Neo.CYAN);
         body.addView(logToggle, buttonPad());
         log = Neo.text(c, "", Neo.TEXT_SOFT, 12, Neo.mono(c)); log.setVisibility(GONE); body.addView(log);
         logToggle.setOnClickListener(v -> { logOpen = !logOpen; log.setVisibility(logOpen ? VISIBLE : GONE); });
 
         LinearLayout row = new LinearLayout(c);
-        load = Neo.button(c, "Load", "update", Neo.GREEN);
-        restore = Neo.button(c, "Restore factory", "restore", Neo.AMBER);
-        stop = Neo.button(c, "Stop", "stop", Neo.RED);
+        load = Neo.button(c, Txt.s(R.string.device_fw_load), "update", Neo.GREEN);
+        restore = Neo.button(c, Txt.s(R.string.device_fw_restore_factory), "restore", Neo.AMBER);
+        stop = Neo.button(c, Txt.s(R.string.common_stop), "stop", Neo.RED);
         stop.setEnabled(false);
         row.addView(load, weight()); row.addView(restore, weight()); row.addView(stop, weight());
         body.addView(row);
@@ -103,17 +107,17 @@ public final class FirmwareScreen extends LinearLayout {
         confirm.setPadding(dp(12), dp(12), dp(12), dp(12)); confirm.setBackground(Neo.card(c, Neo.AMBER, 14));
         body.addView(confirm, buttonPad());
 
-        download = Neo.button(c, "Download factory image", "update", Neo.AMBER);
+        download = Neo.button(c, Txt.s(R.string.device_fw_download_factory), "update", Neo.AMBER);
         download.setVisibility(GONE);
         download.setOnClickListener(v -> { if (factoryMissing) downloadFactory(); else if (fetchChosen) downloadChosen(); else checkCatalogue(); });
         body.addView(download, buttonPad());
 
-        body.addView(Neo.caps(c, "Advanced"));
-        allowUnlisted = Neo.button(c, "Allow unlisted images · off", "lock", Neo.AMBER);
+        body.addView(Neo.caps(c, Txt.s(R.string.device_fw_advanced)));
+        allowUnlisted = Neo.button(c, Txt.s(R.string.device_fw_unlisted_off), "lock", Neo.AMBER);
         allowUnlisted.setOnClickListener(v -> toggleUnlisted());
         body.addView(allowUnlisted, buttonPad());
         hashEntry = new EditText(c);
-        hashEntry.setHint("First 8 characters of the hash");
+        hashEntry.setHint(Txt.s(R.string.device_fw_hash_hint));
         hashEntry.setSingleLine(true);
         hashEntry.setTextColor(Neo.TEXT);
         hashEntry.setHintTextColor(Neo.MUTED);
@@ -132,7 +136,7 @@ public final class FirmwareScreen extends LinearLayout {
     /** Fetch the signed catalogue again (new released images show up in the list). */
     private void checkCatalogue() {
         if (running) return;
-        result.setText("Checking the firmware catalogue");
+        result.setText(Txt.s(R.string.device_fw_checking_catalogue));
         result.setTextColor(Neo.TEXT);
         new Thread(() -> { String msg = FirmwareCatalog.fetch(getContext()); onUi(() -> { result.setText(msg); refreshFacts(); }); }, "fw-catalog").start();
     }
@@ -141,23 +145,23 @@ public final class FirmwareScreen extends LinearLayout {
     private void downloadChosen() {
         if (running || selected.factory || selected.unlisted) return;
         final ImageTable.Row want = selected;
-        result.setText("Downloading " + want.tag);
+        result.setText(Txt.s(R.string.device_fw_downloading, want.tag));
         result.setTextColor(Neo.TEXT);
         new Thread(() -> {
             String msg = FirmwareCatalog.fetch(getContext());
             byte[] got = FirmwareCatalog.download(getContext(), want.tag);
-            String line = got != null ? want.tag + " downloaded and checked" : msg.startsWith("Firmware catalogue") ? "Download failed: the file did not arrive or does not match its catalogue entry" : msg;
+            String line = got != null ? Txt.s(R.string.device_fw_downloaded_checked, want.tag) : FirmwareCatalog.isFetchLine(msg) ? Txt.s(R.string.device_fw_download_failed) : msg;
             onUi(() -> { result.setText(line); result.setTextColor(got != null ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT); refreshFacts(); });
         }, "fw-download").start();
     }
 
     private void downloadFactory() {
         if (running) return;
-        result.setText("Checking the firmware catalogue");
+        result.setText(Txt.s(R.string.device_fw_checking_catalogue));
         new Thread(() -> {
             String msg = FirmwareCatalog.fetch(getContext());
-            byte[] got = msg.startsWith("Firmware catalogue") ? FirmwareCatalog.download(getContext(), ImageTable.FACTORY.tag) : null;
-            String line = got != null ? "Factory image downloaded" : msg;
+            byte[] got = FirmwareCatalog.isFetchLine(msg) ? FirmwareCatalog.download(getContext(), ImageTable.FACTORY.tag) : null;
+            String line = got != null ? Txt.s(R.string.device_fw_factory_downloaded) : msg;
             onUi(() -> { result.setText(line); refreshFacts(); });
         }, "fw-catalog").start();
     }
@@ -165,13 +169,13 @@ public final class FirmwareScreen extends LinearLayout {
     private void toggleUnlisted() {
         if (running) return;
         if (Unlisted.allowed(getContext())) { Unlisted.allow(getContext(), false); refreshFacts(); return; }
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Allow unlisted images? (1 of 2)")
-                .setMessage("An unlisted file is not from the catalogue. It cannot be verified after loading beyond its version string. This project does not cover it, and you are responsible for what the radio transmits.")
-                .setPositiveButton("Continue", (d, w) -> new android.app.AlertDialog.Builder(getContext()).setTitle("Your decision (2 of 2)")
-                        .setMessage("It is your radio and your decision. The switch turns itself off after a load. You can turn it on again later.")
-                        .setPositiveButton("I understand, allow it", (d2, w2) -> { Unlisted.allow(getContext(), true); refreshFacts(); })
-                        .setNegativeButton("Cancel", null).show())
-                .setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.device_fw_unlisted_q1_title))
+                .setMessage(Txt.s(R.string.device_fw_unlisted_q1))
+                .setPositiveButton(Txt.s(R.string.common_continue), (d, w) -> new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.device_fw_unlisted_q2_title))
+                        .setMessage(Txt.s(R.string.device_fw_unlisted_q2))
+                        .setPositiveButton(Txt.s(R.string.device_fw_unlisted_allow), (d2, w2) -> { Unlisted.allow(getContext(), true); refreshFacts(); })
+                        .setNegativeButton(Txt.s(R.string.common_cancel), null).show())
+                .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void ask(boolean wrongTag) {
@@ -179,18 +183,18 @@ public final class FirmwareScreen extends LinearLayout {
         if (selected.unlisted && Unlisted.allowed(getContext())) {
             String typed = hashEntry.getText() == null ? "" : hashEntry.getText().toString().trim().toLowerCase(java.util.Locale.US);
             if (typed.length() < 8 || !selected.sha256.startsWith(typed.substring(0, 8))) {
-                result.setText("Type the first 8 characters of the hash");
+                result.setText(Txt.s(R.string.device_fw_type_hash));
                 result.setTextColor(Neo.AMBER_LIGHT);
                 return;
             }
         }
         confirm.removeAllViews();
-        TextView q = Neo.text(getContext(), "Load " + selected.tag + "? The module keeps that image until you load another one, including after a reboot. While it loads, the radio shows busy and Talk does nothing. At your own risk: no warranty.",
+        TextView q = Neo.text(getContext(), Txt.s(R.string.device_fw_confirm, selected.tag),
                 Neo.TEXT, 15, Neo.uiMedium(getContext()));
         confirm.addView(q);
         LinearLayout r = new LinearLayout(getContext());
-        TextView go = Neo.button(getContext(), "Load", "update", Neo.GREEN);
-        TextView no = Neo.button(getContext(), "Cancel", "close", Neo.CYAN);
+        TextView go = Neo.button(getContext(), Txt.s(R.string.device_fw_load), "update", Neo.GREEN);
+        TextView no = Neo.button(getContext(), Txt.s(R.string.common_cancel), "close", Neo.CYAN);
         r.addView(go, weight()); r.addView(no, weight());
         confirm.addView(r);
         confirm.setVisibility(VISIBLE);
@@ -206,13 +210,13 @@ public final class FirmwareScreen extends LinearLayout {
             byte[] image = FirmwareVault.bytesFor(getContext(), selected);
             if (image == null && !selected.factory && !selected.unlisted) {        // a catalogue image not on the phone yet: fetch it first
                 final String tag = selected.tag;
-                onUi(() -> { bar.setPhase("downloading"); log.append("Downloading " + tag + " from the firmware catalogue\n"); });
+                onUi(() -> { bar.setPhase("downloading"); log.append(Txt.s(R.string.device_fw_log_downloading, tag) + "\n"); });
                 FirmwareCatalog.fetch(getContext());
                 image = FirmwareCatalog.download(getContext(), tag);
-                if (image != null) onUi(() -> log.append(tag + " downloaded; size, hash and version match\n"));
+                if (image != null) onUi(() -> log.append(Txt.s(R.string.device_fw_log_downloaded, tag) + "\n"));
             }
-            if (image == null) { onUi(() -> finishUi(selected.factory ? "The factory copy is not on this phone"
-                    : selected.unlisted ? "That image is not in Download/DMR/Firmware" : "Download failed: the file did not arrive or does not match its catalogue entry")); return; }
+            if (image == null) { onUi(() -> finishUi(selected.factory ? Txt.s(R.string.device_fw_no_factory_copy)
+                    : selected.unlisted ? Txt.s(R.string.device_fw_not_in_folder) : Txt.s(R.string.device_fw_download_failed))); return; }
             final byte[] chosenImage = image;
             svc.loadFirmware(selected, chosenImage, new FirmwareSession.Ui() {
                 public void phase(String name) { onUi(() -> {
@@ -229,8 +233,8 @@ public final class FirmwareScreen extends LinearLayout {
                         long bytes = Math.min(selected.size, (long) done * 1024);
                         long left = (long) (total - done) * lastAck;
                         double rate = elapsed > 0 ? bytes / (elapsed / 1000.0) : 0;
-                        figures.setText(String.format(Locale.US, "%d / %d blocks\n%,d bytes  ·  %.0f B/s\n%d:%02d elapsed  ·  %d:%02d left  ·  %d retries",
-                                done, total, bytes, rate, elapsed / 60000, (elapsed / 1000) % 60, left / 60000, (left / 1000) % 60, retries));
+                        figures.setText(Txt.s(R.string.device_fw_progress, done, total, String.format(Locale.US, "%,d", bytes), String.format(Locale.US, "%.0f", rate),
+                                elapsed / 60000, (elapsed / 1000) % 60, left / 60000, (left / 1000) % 60, retries));
                     });
                 }
                 public void checks(List<FirmwareSession.Check> list) { onUi(() -> showChecks(list)); }
@@ -242,7 +246,7 @@ public final class FirmwareScreen extends LinearLayout {
     private void finishUi(String line) {
         running = false; stop.setEnabled(false);
         result.setText(line == null ? "" : line);
-        result.setTextColor(line != null && (line.startsWith("DMR") || line.startsWith("Restored")) ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT);
+        result.setTextColor(line != null && (line.startsWith("DMR") || FirmwareSession.isRestoredLine(line)) ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT);   // a module tag, or the factory restore after a wrong tag
         refreshFacts();
     }
 
@@ -263,15 +267,15 @@ public final class FirmwareScreen extends LinearLayout {
                 onPhone.clear(); onPhone.addAll(present);
                 if (!running) showChecks(preview);
                 ImageTable.Row runningRow = ImageTable.byTag(now, FirmwareCatalog.rows(getContext()));
-                installed.setText(now.isEmpty() ? "The module has not answered yet. Recovery can load the factory image."
-                        : now + (runningRow == null ? "\nThis version is not in the known list." : "\n" + runningRow.summary));
+                installed.setText(now.isEmpty() ? Txt.s(R.string.device_fw_not_answered)
+                        : runningRow == null ? Txt.s(R.string.device_fw_unknown_version, now) : now + "\n" + ImageTable.summary(runningRow));
                 recovery = now.isEmpty();
                 if (recovery) selected = ImageTable.FACTORY;
-                backupLine.setText(copy.verified ? "Verified · " + copy.source + "\nDownload/DMR/Firmware/factory-" + ImageTable.FACTORY.tag + "-" + ImageTable.FACTORY.sha256.substring(0, 8) + ".bin"
-                        : "Not verified yet. " + (copy.sha256.isEmpty() ? "The stock app's copy could not be read." : "The stock copy does not match the known factory image."));
+                backupLine.setText(copy.verified ? Txt.s(R.string.device_fw_backup_verified, copy.source, ImageTable.FACTORY.tag, ImageTable.FACTORY.sha256.substring(0, 8))
+                        : copy.sha256.isEmpty() ? Txt.s(R.string.device_fw_backup_unread) : Txt.s(R.string.device_fw_backup_mismatch));
                 factoryMissing = !copy.verified;
                 fetchChosen = copy.verified && !selected.factory && !selected.unlisted && !present.contains(selected.tag);
-                download.setText(factoryMissing ? "Download factory image" : fetchChosen ? "Download " + selected.tag : "Check for new firmware");
+                download.setText(factoryMissing ? Txt.s(R.string.device_fw_download_factory) : fetchChosen ? Txt.s(R.string.device_fw_download_tag, selected.tag) : Txt.s(R.string.device_fw_check_new));
                 download.setVisibility(running ? GONE : VISIBLE);
                 images.removeAllViews();
                 for (ImageTable.Row row : FirmwareCatalog.rows(getContext())) {
@@ -284,7 +288,7 @@ public final class FirmwareScreen extends LinearLayout {
                     });
                     images.addView(t, buttonPad());
                 }
-                allowUnlisted.setText(Unlisted.allowed(getContext()) ? "Allow unlisted images · on" : "Allow unlisted images · off");
+                allowUnlisted.setText(Unlisted.allowed(getContext()) ? Txt.s(R.string.device_fw_unlisted_on) : Txt.s(R.string.device_fw_unlisted_off));
                 if (!recovery) for (ImageTable.Row row : unlistedRows) {
                     TextView t = Neo.button(getContext(), row.tag, "update", row.tag.equals(selected.tag) && selected.unlisted ? Neo.GREEN : Neo.AMBER);
                     t.setOnClickListener(v -> { if (!running) { selected = row; showChosen(); refreshFacts(); } });
@@ -297,8 +301,8 @@ public final class FirmwareScreen extends LinearLayout {
 
     private void showChosen() {
         boolean here = onPhone.contains(selected.tag) || selected.unlisted;
-        chosen.setText(selected.tag + "\n" + selected.summary + "\n" + String.format(Locale.US, "%,d bytes · hash %s · %s",
-                selected.size, selected.sha256, here ? "file on this phone" : "file not on this phone"));
+        chosen.setText(selected.tag + "\n" + ImageTable.summary(selected) + "\n" + Txt.s(here ? R.string.device_fw_chosen_here : R.string.device_fw_chosen_missing,
+                String.format(Locale.US, "%,d", selected.size), selected.sha256));
         hashEntry.setVisibility(selected.unlisted && Unlisted.allowed(getContext()) ? VISIBLE : GONE);
     }
 
@@ -311,10 +315,7 @@ public final class FirmwareScreen extends LinearLayout {
         }
     }
 
-    /** The owner's disclaimer for loading module firmware (2026-10-30), shown on the page and in every Load confirmation. */
-    static final String DISCLAIMER = "Loading module firmware is at your own risk. The released images are tested on the bench, the page checks the "
-            + "phone, the module and the file before anything is written, and you can always load the factory image again. Still, SignalDeck and its "
-            + "contributors give no warranty, and are not responsible for a radio module that stops working or for what it transmits.";
+    // The owner's disclaimer for loading module firmware (2026-10-30), shown on the page: R.string.device_fw_disclaimer.
 
     private TextView section(LinearLayout body, String title) {
         body.addView(Neo.caps(getContext(), title));
@@ -366,7 +367,7 @@ public final class FirmwareScreen extends LinearLayout {
                 float lit = i < phase ? 1f : i == phase ? part : 0f;
                 if (lit > 0f) canvas.drawRoundRect(x, y, x + w * lit, y + h, h, h, fill);
                 label.setColor(i == phase ? Neo.CYAN_LIGHT : Neo.MUTED);
-                canvas.drawText(PHASE_LABELS[i], x + w / 2f, y + h + d * 12, label);
+                canvas.drawText(Txt.s(PHASE_LABELS[i]), x + w / 2f, y + h + d * 12, label);
             }
         }
     }

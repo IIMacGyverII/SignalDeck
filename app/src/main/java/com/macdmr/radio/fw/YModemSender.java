@@ -100,7 +100,7 @@ public final class YModemSender {
         long t0 = System.currentTimeMillis();
         try {
             if (watch != null) watch.phase("update");
-            if (!prompt(pwd, ptt, wire, pins)) return fail("no-prompt", "no bootloader prompt", t0);
+            if (!prompt(pwd, ptt, wire, pins)) return fail("no-prompt", "no bootloader prompt", t0);   // i18n: bootloader protocol log/result code (developer)
             if (watch != null) watch.phase("handshake");
             byte[] header = nameBlock(name, image.length);
             if (!ack(wire, header, true)) return lastFail(t0);
@@ -110,9 +110,9 @@ public final class YModemSender {
             int seq = 1;
             for (int i = 0; i < blocks; i++) {
                 if (halt != null && halt.halt()) {
-                    log.line("stopped after block " + i + " of " + blocks);
-                    try { wire.close(); } catch (IOException e) { log.line("close: " + e.getMessage()); }
-                    return new Result("aborted", "stopped after block " + i);
+                    log.line("stopped after block " + i + " of " + blocks);   // i18n: bootloader protocol log/result code (developer)
+                    try { wire.close(); } catch (IOException e) { log.line("close: " + e.getMessage()); }   // i18n: bootloader protocol log/result code (developer)
+                    return new Result("aborted", "stopped after block " + i);   // i18n: bootloader protocol log/result code (developer)
                 }
                 pause.ms(blockPauseMs);
                 drain(wire);
@@ -122,13 +122,13 @@ public final class YModemSender {
                 long sent = System.currentTimeMillis();
                 if (!ack(wire, block(STX, seq & 0xFF, data), false)) return lastFail(t0);
                 long ackMs = System.currentTimeMillis() - sent;
-                log.line("block " + (i + 1) + "/" + blocks + " ack " + ackMs + " ms");
+                log.line("block " + (i + 1) + "/" + blocks + " ack " + ackMs + " ms");   // i18n: bootloader protocol log/result code (developer)
                 if (watch != null) watch.block(i + 1, blocks, ackMs);
                 seq++;
                 if (i + 1 == stopAt) {
-                    log.line("abort50 after block " + stopAt + " of " + blocks);
-                    try { wire.close(); } catch (IOException e) { log.line("close: " + e.getMessage()); }
-                    return new Result("aborted", "closed after block " + stopAt);
+                    log.line("abort50 after block " + stopAt + " of " + blocks);   // i18n: bootloader protocol log/result code (developer)
+                    try { wire.close(); } catch (IOException e) { log.line("close: " + e.getMessage()); }   // i18n: bootloader protocol log/result code (developer)
+                    return new Result("aborted", "closed after block " + stopAt);   // i18n: bootloader protocol log/result code (developer)
                 }
             }
             if (watch != null) watch.phase("finish");
@@ -139,29 +139,29 @@ public final class YModemSender {
             pins.set(pwd, false);
             pause.ms(500);
             pins.set(pwd, true);
-            log.line("power raised");
+            log.line("power raised");   // i18n: bootloader protocol log/result code (developer)
             if (tag == null) return new Result("ok", "");
             String got = tag.read();
-            log.line("total " + (System.currentTimeMillis() - t0) + " ms tag " + got);
+            log.line("total " + (System.currentTimeMillis() - t0) + " ms tag " + got);   // i18n: bootloader protocol log/result code (developer)
             return new Result("ok", got == null ? "" : got.trim());
         } catch (IOException e) {
-            log.line("io-error " + e.getMessage());
+            log.line("io-error " + e.getMessage());   // i18n: bootloader protocol log/result code (developer)
             return new Result("io-error", e.getMessage() == null ? "" : e.getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return new Result("io-error", "interrupted");
+            return new Result("io-error", "interrupted");   // i18n: bootloader protocol log/result code (developer)
         }
     }
 
     private String failCode = "timeout";
 
     private Result lastFail(long t0) {
-        log.line(failCode + " at " + (System.currentTimeMillis() - t0) + " ms");
+        log.line(failCode + " at " + (System.currentTimeMillis() - t0) + " ms");   // i18n: bootloader protocol log/result code (developer)
         return new Result(failCode, "");
     }
 
     private Result fail(String code, String why, long t0) {
-        log.line(why + " at " + (System.currentTimeMillis() - t0) + " ms");
+        log.line(why + " at " + (System.currentTimeMillis() - t0) + " ms");   // i18n: bootloader protocol log/result code (developer)
         return new Result(code, why);
     }
 
@@ -173,11 +173,11 @@ public final class YModemSender {
             if (sb.length() > 0) sb.append(' ');
             sb.append(String.format("%02X", b));
             if (sb.length() > 180) {
-                log.line("drain " + sb);
+                log.line("drain " + sb);   // i18n: bootloader protocol log/result code (developer)
                 sb.setLength(0);
             }
         }
-        if (sb.length() > 0) log.line("drain " + sb);
+        if (sb.length() > 0) log.line("drain " + sb);   // i18n: bootloader protocol log/result code (developer)
     }
 
     private boolean prompt(String pwd, String ptt, Wire wire, Pins pins) throws IOException, InterruptedException {
@@ -185,18 +185,18 @@ public final class YModemSender {
             knock(pwd, ptt, pins);
             long t0 = System.currentTimeMillis();
             wire.write(new byte[] { 0x31 });
-            log.line("knock " + t + " wrote 0x31");
+            log.line("knock " + t + " wrote 0x31");   // i18n: bootloader protocol log/result code (developer)
             long end = t0 + PROMPT_MS;
             while (System.currentTimeMillis() < end) {
                 int b = wire.read((int) Math.max(1, end - System.currentTimeMillis()));
                 if (b < 0) break;
-                log.line(String.format("rx %02X", b));
+                log.line(String.format("rx %02X", b));   // i18n: bootloader protocol log/result code (developer)
                 if (b == CRC_REQ) {
-                    log.line("prompt C in " + (System.currentTimeMillis() - t0) + " ms");
+                    log.line("prompt C in " + (System.currentTimeMillis() - t0) + " ms");   // i18n: bootloader protocol log/result code (developer)
                     return true;
                 }
             }
-            log.line("knock " + t + " silent");
+            log.line("knock " + t + " silent");   // i18n: bootloader protocol log/result code (developer)
         }
         return false;
     }
@@ -206,13 +206,13 @@ public final class YModemSender {
         pins.set(ptt, false); pause.ms(50);
         pins.set(pwd, true); pause.ms(1000);
         pins.set(ptt, true);
-        log.line("knock done");
+        log.line("knock done");   // i18n: bootloader protocol log/result code (developer)
     }
 
     /** @param thenC block 0 is accepted only after ACK and then C */
     private boolean ack(Wire wire, byte[] packet, boolean thenC) throws IOException, InterruptedException {
         for (int attempt = 0; attempt <= RETRIES; attempt++) {
-            log.line(String.format("tx %02X seq %d len %d", packet[0] & 0xFF, packet[1] & 0xFF, packet.length));
+            log.line(String.format("tx %02X seq %d len %d", packet[0] & 0xFF, packet[1] & 0xFF, packet.length));   // i18n: bootloader protocol log/result code (developer)
             wire.write(packet);
             if (thenC && watch != null) watch.phase("erasing");
             long end = System.currentTimeMillis() + (thenC ? HEADER_MS : BLOCK_MS);
@@ -220,7 +220,7 @@ public final class YModemSender {
             while (System.currentTimeMillis() < end) {
                 int b = wire.read((int) Math.max(1, end - System.currentTimeMillis()));
                 if (b < 0) { failCode = "timeout"; break; }
-                log.line(String.format("rx %02X", b));
+                log.line(String.format("rx %02X", b));   // i18n: bootloader protocol log/result code (developer)
                 if (b == CAN) { failCode = "cancelled"; return false; }
                 if (b == NAK) { failCode = "nak-limit"; break; }
                 if (b == ACK) {
@@ -231,7 +231,7 @@ public final class YModemSender {
                 if (b == CRC_REQ && sawAck) return true;
             }
             if (attempt == RETRIES) return false;
-            log.line("retry " + (attempt + 1));
+            log.line("retry " + (attempt + 1));   // i18n: bootloader protocol log/result code (developer)
             if (watch != null) watch.retry();
         }
         return false;
@@ -244,13 +244,13 @@ public final class YModemSender {
             while (System.currentTimeMillis() < end) {
                 int b = wire.read((int) Math.max(1, end - System.currentTimeMillis()));
                 if (b < 0) { failCode = "timeout"; break; }
-                log.line(String.format("rx %02X", b));
+                log.line(String.format("rx %02X", b));   // i18n: bootloader protocol log/result code (developer)
                 if (b == CAN) { failCode = "cancelled"; return false; }
                 if (b == NAK) { failCode = "nak-limit"; break; }
                 if (b == ACK) return true;
             }
             if (attempt == RETRIES) return false;
-            log.line("eot retry " + (attempt + 1));
+            log.line("eot retry " + (attempt + 1));   // i18n: bootloader protocol log/result code (developer)
         }
         return false;
     }

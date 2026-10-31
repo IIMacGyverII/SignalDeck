@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -34,14 +35,25 @@ import java.util.zip.ZipFile;
  */
 public final class RadioAppFinder {
     public static final class App {
-        public String pkg, label; public int score; public boolean launcher; public final List<String> why = new ArrayList<>();
+        public String pkg, label; public int score; public boolean launcher;
+        /** The evidence in English, for the Device report (which stays English). */
+        public final List<String> why = new ArrayList<>();
+        /** The same evidence as string ids, for screens ({@link #whyText}). */
+        public final List<Integer> whyIds = new ArrayList<>();
+        void because(int id) { why.add(Txt.en(id)); whyIds.add(id); }
+        /** The evidence in the app's language, joined for a screen. */
+        public String whyText() {
+            StringBuilder b = new StringBuilder();
+            for (int id : whyIds) { if (b.length() > 0) b.append(Txt.s(R.string.device_radioapp_why_separator)); b.append(Txt.s(id)); }
+            return b.toString();
+        }
         @Override public String toString() { return label + " (" + pkg + ")"; }
     }
     private RadioAppFinder() { }
 
     private static final Pattern NAME = Pattern.compile("(?i)intercom|interphone|walkie|talkie|dmr|ptt|poc|quickchat|radio|talkback");
     private static final Pattern NOT_IT = Pattern.compile("(?i).*(updat|\\.ota|provider|overlay|theme|wallpaper|launcher|inputmethod|keyboard|printspooler|\\.cts|test|backup|"
-            + "telephony|\\.phone$|\\.stk|ims|\\.radio\\.service|fmradio|wifi|bluetooth|\\.nfc|camera|gallery|music|\\.sms|mms|contacts|dialer|settings|systemui|setupwizard).*");
+            + "telephony|\\.phone$|\\.stk|ims|\\.radio\\.service|fmradio|wifi|bluetooth|\\.nfc|camera|gallery|music|\\.sms|mms|contacts|dialer|settings|systemui|setupwizard).*");   // i18n: regex
     private static final Pattern FRAMEWORK = Pattern.compile("^(android|com\\.google\\..*|com\\.android\\..*|com\\.qualcomm\\..*|vendor\\.qti\\..*|com\\.mediatek\\..*)$");
     private static final byte[][] DEX_MARKERS = { "/dev/ttyS".getBytes(), "/dev/ttyMT".getBytes(), "/dev/ttyHS".getBytes(), "/sys/devices/platform/".getBytes() };
 
@@ -69,10 +81,10 @@ public final class RadioAppFinder {
             if (FRAMEWORK.matcher(pkg).matches() && !named) continue;
             App a = new App(); a.pkg = pkg;
             try { a.label = String.valueOf(pm.getApplicationLabel(ai)); } catch (Throwable t) { a.label = pkg; }
-            if (holders.contains(pkg)) { a.score += 6; a.why.add("has a serial port open now"); }
-            if (pttListeners.contains(pkg)) { a.score += 3; a.why.add("listens for the PTT key"); }
-            if (named) { a.score += 3; a.why.add("its name sounds like a radio app"); }
-            if (launchable.contains(pkg)) { a.launcher = true; a.score += 1; a.why.add("has a launcher icon"); }
+            if (holders.contains(pkg)) { a.score += 6; a.because(R.string.device_radioapp_why_serial_open); }
+            if (pttListeners.contains(pkg)) { a.score += 3; a.because(R.string.device_radioapp_why_ptt); }
+            if (named) { a.score += 3; a.because(R.string.device_radioapp_why_name); }
+            if (launchable.contains(pkg)) { a.launcher = true; a.score += 1; a.because(R.string.device_radioapp_why_launcher); }
             scanApk(ai.sourceDir, a);
             if (a.score >= 4) out.add(a);
         }
@@ -95,9 +107,9 @@ public final class RadioAppFinder {
                     for (int k = 0; k < DEX_MARKERS.length; k++) if (indexOf(b, DEX_MARKERS[k]) >= 0) { if (k < 3) tty = true; else sys = true; }
                 }
             }
-            if (lib) { a.score += 4; a.why.add("ships a serial-port library"); }
-            if (tty) { a.score += 4; a.why.add("its code opens /dev/tty… ports"); }
-            if (sys) { a.score += 1; a.why.add("its code uses /sys/devices/platform lines"); }
+            if (lib) { a.score += 4; a.because(R.string.device_radioapp_why_serial_lib); }
+            if (tty) { a.score += 4; a.because(R.string.device_radioapp_why_tty); }
+            if (sys) { a.score += 1; a.because(R.string.device_radioapp_why_sys); }
         } catch (Throwable ignored) { }
     }
 
@@ -112,7 +124,7 @@ public final class RadioAppFinder {
     }
 
     public static String describe(List<App> apps) {
-        if (apps.isEmpty()) return "  (no app scored high enough: no system app holds a serial port, ships a serial library, opens /dev/tty… or listens for the PTT key)\n";
+        if (apps.isEmpty()) return "  (no app scored high enough: no system app holds a serial port, ships a serial library, opens /dev/tty… or listens for the PTT key)\n";   // i18n: device report text
         StringBuilder s = new StringBuilder();
         for (App a : apps) s.append(String.format(Locale.US, "  %2d  %s (%s): %s\n", a.score, a.label, a.pkg, String.join(", ", a.why)));
         return s.toString();

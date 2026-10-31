@@ -1149,7 +1149,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                         : profile.audio == DeviceProfile.Audio.UART_PCM ? new UartPcmAudio(profile.pcmPort, profile.pcmBaud)
                         : profile.audio == DeviceProfile.Audio.CAMCORDER ? new CamcorderAudio(profile.appPlayback, profile.camcorderGain, profile.gatewayLinesOn, profile.gatewayLinesOff, profile.txAudioScale, (android.media.AudioManager) getSystemService(AUDIO_SERVICE), profile.gatewayVolume) : vendorOrDirectAudio();
                 audio.setSink((b, len) -> { if (!injecting) onRxPcm(b, len); });   // a bench injection replaces the live audio while it plays
-                audio.setGate(() -> squelchOpen && !muted && !rawHeld() && !(profile.appPlayback && pttDown) && !dataQuiet());   // M17 in play, a data mode without MON, or app playback while keyed: the raw FM stays off the speaker; decoded M17 voice has its own track
+                audio.setGate(() -> squelchOpen && !muted && !rawHeld() && !(profile.appPlayback && pttDown) && !dataQuiet() && dmrAudioAllowed());   // M17 in play, a data mode without MON, or app playback while keyed: the raw FM stays off the speaker; decoded M17 voice has its own track
             }
             if (agoldBridge() && audio instanceof AlsaDirectAudio)        // the bridge's stream stops after 20-70 s of capture: open it per reception, as the stock app does
                 ((AlsaDirectAudio) audio).setOnCaptureEnded(this::captureEnded);
@@ -1400,7 +1400,9 @@ public class RadioService extends Service implements RadioEngine.Events {
     public long monAckAt() { return monAckAt; }
     /** Send MON and check that the radio answers within 1.5 s; no answer: send again (3 times), then warn. A refusal is retried in ack(). */
     private void sendMonitor(final boolean want) {
-        worker.execute(() -> { try { monSentAt = System.currentTimeMillis(); engine.setMonitor(want); } catch (IOException e) { log("monitor: " + e); } });
+        final ChannelStore.Channel onCh = current;
+        final boolean dmrGate = !want && profile.dmrAppAdmission && onCh != null && onCh.isDigital();   // MON off reopens the DMR speaker only with squelch 0
+        worker.execute(() -> { try { monSentAt = System.currentTimeMillis(); if (dmrGate) engine.setSquelch(0); engine.setMonitor(want); } catch (IOException e) { log("monitor: " + e); } });
         final long asked = System.currentTimeMillis();
         ui.postDelayed(() -> {
             if (monitorOn != want || monAckAt >= asked) return;            // answered (or MON changed meanwhile)
@@ -1703,6 +1705,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                 tunedAt = System.currentTimeMillis(); engine.setDigital(ch.rxFreq, ch.txFreq, id, tgOverride.groups(ch), call[0], call[1], ch.power, ch.cc, ch.inSlot, ch.outSlot, 8, 4);
                 engine.setInterrupt(ch.interrupt == 1);
                 if (profile.politeAfterChannel >= 0) engine.setPolite(profile.politeAfterChannel);   // QuickChat follows every channel with 0x37 (0 = off)
+                if (profile.dmrAppAdmission) reopenDmrSpeaker(monitorOn && !moved(ch));
             } else if (ch.isM17()) {
                 tunedAt = System.currentTimeMillis(); engine.setAnalog(ch.rxFreq, ch.txFreq, 1, ch.power, hardwareSq(ch), 0, 0, 0, 0, profile.analogVolume, 2);   // wide FM; M17 is layered on top
                 lastChannelWrite = System.currentTimeMillis();
@@ -3020,15 +3023,17 @@ public class RadioService extends Service implements RadioEngine.Events {
                 if (agoldBridge() && !synthRx) lineReported();           // an edge from the line itself
                 receiving = true; rxBeganAt = System.currentTimeMillis(); dmrEvent("start", 0, 0, 0);
                 if (current != null && current.isDigital()) {           // a DMR call: forget the last talker, ask who this is now and again a second later
-                    lastCaller = 0; lastCallerCc = -1; callLogged = false;
-                    if (!agoldBridge()) for (long ms : new long[] { 300, 1200 }) ui.postDelayed(() -> { if (receiving) worker.execute(() -> { try { engine.queryCallerInfo(); } catch (IOException ignored) { } }); }, ms);
+                    lastCaller = 0; lastCallerCc = -1; callLogged = false; dmrAdmitted = false;
+                    if (profile.dmrAppAdmission) dmrRequery(rxBeganAt);
+                    if (!agoldBridge()) for (long ms : profile.dmrAppAdmission ? new long[] { 80, 300, 1200 } : new long[] { 300, 1200 }) ui.postDelayed(() -> { if (receiving) worker.execute(() -> { try { engine.queryCallerInfo(); } catch (IOException ignored) { } }); }, ms);
                 }
                 bridgeReception(true);
                 refreshControls(); rxStart = System.currentTimeMillis(); rxCounts = rxReportsReception(); softSq.rxStarted(); ui.post(() -> { for (Listener l : listeners) l.onRx(true); }); pollRssi(); break;
             case 2: {
                 synthRx = false; monRx = false;
                 dmrEvent("stop", 0, 0, 0);
-                receiving = false; bridgeReception(false); refreshControls(); long len = rxStart > 0 ? System.currentTimeMillis() - rxStart : 0; rxStart = 0;
+                // a call outside the list starts no reception of its own: it must never inherit the last one's admission
+                receiving = false; dmrAdmitted = false; bridgeReception(false); refreshControls(); long len = rxStart > 0 ? System.currentTimeMillis() - rxStart : 0; rxStart = 0;
                 if (softSq.isEnabled() && squelchOpen) { softSq.closeNow(); softGateHistory(false); squelchOpen = false; log("soft squelch closed (carrier gone)"); }
                 softSq.awaitRxStart();                                   // with the module squelch held open a RECEIVE_STOP only happens while the receiver re-settles
                 if (current != null && current.isDigital() && !agoldBridge()) { try { engine.queryCallerInfo(); } catch (IOException ignored) { } }   // who was that (0x2B); the Atom XL asks after its capture closes
@@ -3437,8 +3442,54 @@ public class RadioService extends Service implements RadioEngine.Events {
     public ModuleEngine engine() { return engine; }
     /** One history line, voice announcement and caller report per call (the caller is asked at the start, a second in, and at the end). */
     private volatile boolean callLogged; private volatile int loggedCaller, loggedTarget;
+    // ---- DMR admission in the app (DeviceProfile#dmrAppAdmission) ----
+    /** Set by the caller info of the current DMR reception when it admits the call; cleared at every reception start. */
+    private volatile boolean dmrAdmitted;
+    /** Reopen the module's speaker after a digital channel write: squelch 0, then MON in its current state (FW57 / factory). */
+    private void reopenDmrSpeaker(boolean mon) {
+        try { engine.setSquelch(0); engine.setMonitor(mon); log("DMR speaker reopened (squelch 0, MON " + (mon ? "on" : "off") + ")"); } catch (IOException e) { log("DMR speaker: " + e); }
+    }
+    /** While a DMR reception lasts, ask who is talking once a second: a second call inside the same reception (no new start) is admitted or muted on its own. */
+    private void dmrRequery(final long began) {
+        ui.postDelayed(() -> {
+            if (!receiving || rxBeganAt != began) return;
+            ChannelStore.Channel c = current; if (c == null || !c.isDigital()) return;
+            worker.execute(() -> { try { engine.queryCallerInfo(); } catch (IOException ignored) { } });
+            dmrRequery(began);
+        }, 1000);
+    }
+    /** The receive audio may play: always off a DMR channel or without app admission; on one, with MON on or once the call is admitted. */
+    private boolean dmrAudioAllowed() {
+        if (!profile.dmrAppAdmission || monitorOn) return true;
+        ChannelStore.Channel c = current;
+        if (c == null || !c.isDigital()) return true;
+        // The module starts a reception only for a call it admits (bench 2026-10-31: an out-of-list talkgroup starts none and
+        // is never reported), and its caller info can be stale at a call's start; so a DMR channel plays only during a reception.
+        // Between receptions the open speaker carries the discriminator: hiss when idle, 4FSK buzz from any DMR carrier.
+        boolean allow = receiving;
+        if (allow != dmrGateLogged) { dmrGateLogged = allow; log(allow ? "DMR audio on: a reception the module admitted" : "DMR audio muted: no admitted reception"); }
+        return allow;
+    }
+    private volatile boolean dmrGateLogged;
+    /**
+     * Whether a reported call is one this radio should play: a group call to a talkgroup in the channel's list, an All-Call
+     * (type 2, or the group 16777215), or a private call to this radio's ID (the channel's own ID on the VFO). Calls outside the
+     * list are never reported by the module, and they stay muted.
+     */
+    static boolean dmrAdmits(int type, int target, int[] groups, int ownId, int channelId) {
+        if (type == 2 || target == 16777215) return true;
+        if (type == 0) return target == ownId || (channelId > 0 && target == channelId);
+        if (groups != null) for (int g : groups) if (g > 0 && g == target) return true;
+        return false;
+    }
     @Override public void callerInfo(int type, int caller, int target, int cc, int slot) {
         if (caller <= 0) return;
+        ChannelStore.Channel ac = current;
+        if (ac != null && ac.isDigital()) {
+            boolean a = dmrAdmits(type, target, tgOverride.groups(ac), localId(), ac.mode);
+            if (profile.dmrAppAdmission && a != dmrAdmitted) log("DMR caller info " + (a ? "admits" : "does not admit") + " type " + type + " target " + target);
+            dmrAdmitted = a;                                         // logged for the bench; the gate itself follows the module's reception
+        }
         dmrEvent("caller", type, caller, target, cc, slot);
         final String ccts = cc >= 0 ? "  CC " + cc + " TS " + (slot + 1) : "";   // appended by the promiscuous firmware while MON is on   // i18n: DMR colour code and timeslot (protocol words)
         lastCaller = caller; lastCallType = type; lastTarget = target; if (cc >= 0) lastCallerCc = cc;

@@ -512,11 +512,11 @@
     <!-- Notification title when a page to one of your RICs arrives. Short. -->
     <string name="service_page_for_you">Message pager pour vous</string>
     <!-- Caller line on an M17 channel while a station is heard. %1$s is its callsign, %2$s the destination, %3$s how many frames were received. One line. -->
-    <string name="service_m17_heard_line">%1$s → %2$s  %3$s trames</string>
+    <string name="service_m17_heard_line">%1$s → %2$s\u0020\u0020%3$s trames</string>
     <!-- Caller line on an M17 channel while nothing is heard. %1$s is the destination, %2$s the channel access number (CAN). One line. -->
-    <string name="service_m17_idle_line">M17 %1$s  CAN %2$s</string>
+    <string name="service_m17_idle_line">M17 %1$s\u0020\u0020CAN %2$s</string>
     <!-- Caller line on an M17 channel while nothing is heard and the firmware can only receive M17. %1$s is the destination, %2$s the channel access number (CAN). One line. -->
-    <string name="service_m17_idle_line_rx">M17 réception seule %1$s  CAN %2$s</string>
+    <string name="service_m17_idle_line_rx">M17 réception seule %1$s\u0020\u0020CAN %2$s</string>
     <!-- Refusal (toast) when M17 receive is switched on on a DMR channel. One line. -->
     <string name="service_m17_needs_fm">Le M17 exige un canal analogique (FM) ou le VFO</string>
     <!-- The subject of a received message form that has only a number (radiogram). %1$s is the number. Short. -->

@@ -178,9 +178,9 @@
     <!-- History line: the Morse ID went out. %1$s your callsign. -->
     <string name="packet_morse_sent">🔤 Indicatif en Morse %1$s envoyé</string>
     <!-- History line: the repeater's own callsign was heard in Morse. %1$s the callsign, %2$s the decoded text, %3$s the tone in Hz, %4$d the speed in words per minute. Note the two spaces before "(". -->
-    <string name="packet_morse_heard_repeater">🔤 Identification du relais %1$s en Morse (correspond à ce canal) : %2$s  (%3$s Hz, %4$d mots/min)</string>
+    <string name="packet_morse_heard_repeater">🔤 Identification du relais %1$s en Morse (correspond à ce canal) : %2$s\u0020\u0020(%3$s Hz, %4$d mots/min)</string>
     <!-- History line: Morse was decoded. %1$s the text, %2$s the tone in Hz, %3$d words per minute. Note the two spaces before "(". -->
-    <string name="packet_morse_heard">🔤 Morse : %1$s  (%2$s Hz, %3$d mots/min)</string>
+    <string name="packet_morse_heard">🔤 Morse : %1$s\u0020\u0020(%2$s Hz, %3$d mots/min)</string>
     <!-- ==== APRS on the radio: notifications and history lines. -->
     <!-- Notification title: a message to one of your APRS groups. %1$s the group, %2$s the sender. -->
     <string name="packet_aprs_notify_group">Groupe APRS %1$s : %2$s</string>
@@ -479,7 +479,7 @@
     <!-- Chip: the APRS-IS link and its status (%1$s, e.g. "connected · 3 gated"). -->
     <string name="packet_aprs_chip_is">APRS-IS : %1$s</string>
     <!-- Divider in the live list before packets from before monitoring started, when none came since. Shown in capitals. Note the two spaces around ·. -->
-    <string name="packet_aprs_earlier_nothing">AVANT  ·  rien depuis le début de l’écoute</string>
+    <string name="packet_aprs_earlier_nothing">AVANT\u0020\u0020·\u0020\u0020rien depuis le début de l’écoute</string>
     <!-- Divider in the live list before packets from before monitoring started. Shown in capitals. -->
     <string name="packet_aprs_earlier">AVANT</string>
     <!-- The live list of the APRS screen is empty. -->
@@ -489,7 +489,7 @@
     <!-- The stations tab of the APRS screen is empty. -->
     <string name="packet_aprs_stations_empty">Pas encore de positions. Les stations s’affichent avec leur distance et leur direction par rapport à vous, les plus récentes en premier. Appuyez sur l’indicatif pour le contact, ou sur le reste de la carte pour ouvrir la position dans votre application de cartographie.</string>
     <!-- Messages tab card heading for a message to you: %1$s the sender and addressee. Note the three spaces. -->
-    <string name="packet_aprs_for_you">%1$s   (pour vous)</string>
+    <string name="packet_aprs_for_you">%1$s\u0020\u0020\u0020(pour vous)</string>
     <!-- Last line of a message card that can be answered. Short. -->
     <string name="packet_aprs_tap_reply">Appuyez pour répondre</string>
     <!-- The messages tab of the APRS screen is empty. -->
@@ -665,7 +665,7 @@
     <!-- Predicted square card subtitle: %1$s the repeater, %2$s the distance and direction. -->
     <string name="packet_map_cell_predicted">Prévision · %1$s · %2$s</string>
     <!-- Predicted square card (Heard layer), no prediction details: %1$d the assumed antenna height in m. Note the two spaces before "Trees". -->
-    <string name="packet_map_cell_pred_rx_none">Non mesuré ici : calculé d’après le relief entre ce carré et le relais (antenne à %1$d m du sol).  Les arbres et les bâtiments ne figurent pas dans les données de relief : attendez-vous à moins en forêt et en ville.</string>
+    <string name="packet_map_cell_pred_rx_none">Non mesuré ici : calculé d’après le relief entre ce carré et le relais (antenne à %1$d m du sol).\u0020\u0020Les arbres et les bâtiments ne figurent pas dans les données de relief : attendez-vous à moins en forêt et en ville.</string>
     <!-- Predicted square card (Heard layer): %1$d the antenna height in m, %2$s the calibration note. -->
     <string name="packet_map_cell_pred_rx">Non mesuré ici : calculé d’après le relief entre ce carré et le relais (antenne à %1$d m du sol). %2$s. Les arbres et les bâtiments ne figurent pas dans les données de relief : attendez-vous à moins en forêt et en ville.</string>
     <!-- Predicted square card (Heard layer) when the antenna height was fitted to the readings: %1$d the height in m, %2$s the calibration note. -->
@@ -673,7 +673,7 @@
     <!-- Predicted square card title (Key-ups layer): %1$d dB of margin. -->
     <string name="packet_map_cell_should_key">Devrait déclencher (%1$d dB de marge)</string>
     <!-- Predicted square card (Key-ups layer), no prediction details. Note the two spaces before "The". -->
-    <string name="packet_map_cell_pred_tx_none">Calculé d’après le relief et un portatif typique en puissance haute.  Plus vous enregistrez de déclenchements, plus l’estimation s’améliore.</string>
+    <string name="packet_map_cell_pred_tx_none">Calculé d’après le relief et un portatif typique en puissance haute.\u0020\u0020Plus vous enregistrez de déclenchements, plus l’estimation s’améliore.</string>
     <!-- Predicted square card (Key-ups layer): %1$s the calibration note. -->
     <string name="packet_map_cell_pred_tx">Calculé d’après le relief et un portatif typique en puissance haute. %1$s. Plus vous enregistrez de déclenchements, plus l’estimation s’améliore.</string>
     <!-- Measured square card title: %1$d dBm, %2$s in S units. -->
@@ -887,7 +887,7 @@
     <!-- Delivery mark while the text goes out. Lower case, short. -->
     <string name="packet_msg_st_sending">envoi…</string>
     <!-- Conversation card name for a page thread: PAGE and the sender. Note the two spaces. Capitals. -->
-    <string name="packet_msg_chip_page">PAGER  %1$s</string>
+    <string name="packet_msg_chip_page">PAGER\u0020\u0020%1$s</string>
     <!-- Conversation card: the last text was yours. %1$s the text. -->
     <string name="packet_msg_you">Vous : %1$s</string>
     <!-- Last item in the quick replies list: edit the list. One line. -->
@@ -1436,7 +1436,7 @@
     <!-- The list of bulletins heard is empty (NWS: the US weather service's announcements). -->
     <string name="packet_pkt_blnheard_empty">Aucun bulletin ni annonce NWS entendu pour l’instant.</string>
     <!-- Row heading in the bulletins heard list: %1$s the bulletin (BLN1), %2$s the sender. Note the two spaces. -->
-    <string name="packet_pkt_blnheard_row">%1$s  de %2$s</string>
+    <string name="packet_pkt_blnheard_row">%1$s\u0020\u0020de %2$s</string>
     <!-- ==== Send DTMF sheet. -->
     <!-- Title of the send-DTMF sheet. One line. -->
     <string name="packet_pkt_dtmf_title">Envoyer du DTMF</string>
@@ -1469,7 +1469,7 @@
     <!-- Toast when Send picture is opened from somewhere that cannot pick a picture. One line. -->
     <string name="packet_pkt_sstv_err_main">Ouvrez depuis l’écran principal</string>
     <!-- SSTV mode list: a mode longer than 30 s (the cool-down guard applies). %1$s the mode and its length ("Martin M1 (≈115 s)"). Note the two spaces. -->
-    <string name="packet_pkt_sstv_mode_long">%1$s  · long</string>
+    <string name="packet_pkt_sstv_mode_long">%1$s\u0020\u0020· long</string>
     <!-- Title of the SSTV mode list. One line. -->
     <string name="packet_pkt_sstv_mode_title">Mode SSTV</string>
     <!-- Toast when an SSTV picture starts going out; %1$s the mode. One line. -->
@@ -1482,7 +1482,7 @@
     <!-- The stations heard list is empty. Mic-E and NMEA are APRS format names. -->
     <string name="packet_pkt_stations_empty">Rien de décodé pour l’instant. Les positions, Mic-E, objets et trames NMEA s’affichent ici avec leur distance et leur relèvement depuis votre position.</string>
     <!-- Row heading in the stations list: %1$s the callsign, %2$s the distance in miles, %3$s the compass direction (N, NE …). Note the two spaces. -->
-    <string name="packet_pkt_station_dist">%1$s  %2$s mi %3$s</string>
+    <string name="packet_pkt_station_dist">%1$s\u0020\u0020%2$s mi %3$s</string>
     <!-- Stations list, details line: speed. %1$s miles per hour. Very short. -->
     <string name="packet_pkt_station_mph">%1$s mph</string>
     <!-- Stations list, details line: altitude. %1$d feet. Very short. -->
@@ -1507,14 +1507,14 @@
     <!-- The APRS log is empty. -->
     <string name="packet_pkt_log_empty">Les messages, acquittements, balises, digipeats et statuts s’affichent ici, les plus récents en premier.</string>
     <!-- APRS log row for a message to you: %1$s the sender and addressee ("💬 N0ABC → N0XYZ-7"). Note the two spaces. -->
-    <string name="packet_pkt_log_for_you">%1$s  (pour vous)</string>
+    <string name="packet_pkt_log_for_you">%1$s\u0020\u0020(pour vous)</string>
     <!-- ==== DTMF heard list. -->
     <!-- Title of the DTMF heard list. One line. -->
     <string name="packet_pkt_dtmflog_title">DTMF entendus</string>
     <!-- The DTMF heard list is empty. -->
     <string name="packet_pkt_dtmflog_empty">Aucune séquence DTMF décodée pour l’instant.</string>
     <!-- DTMF heard row: %1$s the time, %2$d the channel number, %3$s its name. "ch" is short for channel. Note the two spaces. -->
-    <string name="packet_pkt_dtmflog_row">%1$s  can. %2$d %3$s</string>
+    <string name="packet_pkt_dtmflog_row">%1$s\u0020\u0020can. %2$d %3$s</string>
     <!-- ==== Weather alerts heard list. -->
     <!-- Title of the weather alerts heard list. One line. -->
     <string name="packet_pkt_wxlog_title">Alertes météo entendues</string>

@@ -174,7 +174,7 @@
     <!-- Separator between two web addresses in device_web_open, with two spaces on each side. Keep the spaces. -->
     <string name="device_web_url_or">\u0020\u0020ou\u0020\u0020</string>
     <!-- Web card subtitle, second line: the PIN to log in. Starts with a line break; two spaces after PIN. %1$s is the PIN. -->
-    <string name="device_web_pin">\nPIN  %1$s</string>
+    <string name="device_web_pin">\nPIN\u0020\u0020%1$s</string>
     <!-- Web card subtitle, third line: the secure address for the microphone. Starts with a line break. %1$s is the https URL, %2$s the start of the certificate fingerprint. -->
     <string name="device_web_tls">\nPour parler avec le micro d’un ordinateur : %1$s (acceptez une fois l’avertissement de certificat ; empreinte %2$s…)</string>
     <!-- Web card subtitle, last line: how many browsers are connected (%1$d). Starts with a line break. -->
@@ -300,19 +300,19 @@
     <!-- First paragraph of the Contribute sheet. -->
     <string name="device_contrib_intro">SignalDeck est un projet libre et open source (GPL-3.0) : libre d’utilisation, libre d’étude et libre d’amélioration, et il le restera. Si vous l’appréciez, il y a trois façons de l’aider à grandir.</string>
     <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. Short. -->
-    <string name="device_contrib_donate">1  Faire un don</string>
+    <string name="device_contrib_donate">1\u0020\u0020Faire un don</string>
     <!-- Paragraph under "1 Donate". -->
     <string name="device_contrib_donate_text">Si SignalDeck vous est utile, pensez à faire un don. Le développer et le maintenir coûte cher : les dons permettent d’acheter d’autres téléphones pour le développement et la compatibilité, et d’ajouter de nouvelles fonctions. Tout montant aide, et merci.</string>
     <!-- Button: open the Ko-fi donation page. Ko-fi is a site name. One line. -->
     <string name="device_contrib_kofi">Faire un don sur Ko-fi</string>
     <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. One line. -->
-    <string name="device_contrib_develop">2  Participer au développement</string>
+    <string name="device_contrib_develop">2\u0020\u0020Participer au développement</string>
     <!-- Paragraph under "2 Take part in the development". -->
     <string name="device_contrib_develop_text">Cherchez les bugs, proposez des idées de fonctions et échangez avec d’autres utilisateurs de SignalDeck. Signalez un bug ou proposez une fonction sur GitHub, ou rejoignez la communauté sur le site web.</string>
     <!-- Button: open the GitHub issues page. One line. -->
     <string name="device_contrib_issue">Signaler un bug ou une idée</string>
     <!-- Section heading on the Contribute sheet (capitals), numbered; two spaces after the number. One line. -->
-    <string name="device_contrib_phone">3  Rendre votre téléphone compatible</string>
+    <string name="device_contrib_phone">3\u0020\u0020Rendre votre téléphone compatible</string>
     <!-- Paragraph under "3 Make your own phone compatible". "Help support this phone" and "Device report" are button names. -->
     <string name="device_contrib_phone_text">Forkez le projet et faites fonctionner votre téléphone avec. Quand vous estimez que votre téléphone est entièrement compatible, dites-le-nous : le travail est relu et intégré, et tous ceux qui ont ce téléphone en profitent. Aidez à prendre en charge ce téléphone (sous Rapport d’appareil) rassemble les informations dont un nouveau téléphone a besoin.</string>
     <!-- Button: open the SignalDeck repository on GitHub. One line. -->
@@ -402,13 +402,13 @@
     <!-- Message explaining what the device report gathers. A paragraph. -->
     <string name="device_report_what_msg">Pour un téléphone qui n’a pas encore de profil, ou pour aider à en déboguer un : rassemble les informations dont un profil a besoin (ports série, nœuds du module radio, l’application talkie-walkie d’origine et son APK, bibliothèques du fabricant, jars du framework, services ; avec le root, aussi les labels SELinux et les broadcasts de la touche PTT), les enregistre dans Download/DMR/DeviceReport et propose de partager le zip dans un ticket GitHub. Rien n’est modifié sur le téléphone.</string>
     <!-- Row 1 of the Help support this phone list: title line, then a line break and the details. Two spaces after the number. May be prefixed with a tick. -->
-    <string name="device_support_step1">1  Lancer tous les tests\nEnviron deux minutes, écoute seulement ; nécessite le root Magisk</string>
+    <string name="device_support_step1">1\u0020\u0020Lancer tous les tests\nEnviron deux minutes, écoute seulement ; nécessite le root Magisk</string>
     <!-- Row 2 of the Help support this phone list: title line, line break, details. Two spaces after the number. May be prefixed with a tick or a lock. -->
-    <string name="device_support_step2">2  Test avec une seconde radio (le mieux)\nN’importe quelle autre radio FM : émettez quand on vous le demande ; SignalDeck mesure lui-même la réception, le squelch, MON et le squelch sur tonalité</string>
+    <string name="device_support_step2">2\u0020\u0020Test avec une seconde radio (le mieux)\nN’importe quelle autre radio FM : émettez quand on vous le demande ; SignalDeck mesure lui-même la réception, le squelch, MON et le squelch sur tonalité</string>
     <!-- Row 2b of the Help support this phone list: title line, line break, details. May be prefixed with a tick or a lock. -->
     <string name="device_support_step2b">2b Test d’écoute (sans autre radio)\nPrenez la main sur la radio, choisissez un canal où l’on entend des stations, puis le souffle (10 s) et la station (50 s)</string>
     <!-- Row 3 of the Help support this phone list: title line, line break, details. Two spaces after the number. May be prefixed with a lock. -->
-    <string name="device_support_step3">3  Envoyer les résultats\nPartagez le zip du rapport (il commence par un résumé) ou ouvrez un ticket GitHub</string>
+    <string name="device_support_step3">3\u0020\u0020Envoyer les résultats\nPartagez le zip du rapport (il commence par un résumé) ou ouvrez un ticket GitHub</string>
     <!-- Last row of the Help support this phone list: explains it. Short. -->
     <string name="device_support_what">De quoi s’agit-il ?</string>
     <!-- Title of the Help support this phone list. %1$s is the phone model. One line. -->
@@ -1214,7 +1214,7 @@
     <!-- Module firmware page, Chosen image section, the line after the image's name and description: %1$s is its size in bytes (already formatted), %2$s its hash; the file is not on the phone yet. One line (it wraps). -->
     <string name="device_fw_chosen_missing">%1$s octets · hash %2$s · fichier absent de ce téléphone</string>
     <!-- Module firmware page, progress figures during the transfer, monospace, three lines: blocks sent of total (%1$d, %2$d); bytes sent (%3$s, formatted) and speed (%4$s bytes per second); time elapsed (%5$d:%6$02d) and left (%7$d:%8$02d) in minutes:seconds, and retries (%9$d). Keep each line short. -->
-    <string name="device_fw_progress">%1$d / %2$d blocs\n%3$s octets  ·  %4$s o/s\n%5$d:%6$02d écoulé  ·  %7$d:%8$02d restant  ·  %9$d reprises</string>
+    <string name="device_fw_progress">%1$d / %2$d blocs\n%3$s octets\u0020\u0020·\u0020\u0020%4$s o/s\n%5$d:%6$02d écoulé\u0020\u0020·\u0020\u0020%7$d:%8$02d restant\u0020\u0020·\u0020\u0020%9$d reprises</string>
 
     <!-- ==== Module firmware: the signed catalogue (fw/FirmwareCatalog) ==== -->
     <!-- SAFETY: Module firmware pre-flight, the "This phone" check fails: the catalogue knows this phone, and no variant of it is a supported base. One line. -->

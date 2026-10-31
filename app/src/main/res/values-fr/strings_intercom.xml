@@ -19,7 +19,7 @@
     <!-- Classic intercom page, info block: the channel transmits on low power. Short line. -->
     <string name="intercom_main_classic_power_low">Puissance : basse</string>
     <!-- Classic intercom page, info block, M17 channel: %1$s the channel access number (CAN), %2$s the destination. Keep the two spaces. Short. -->
-    <string name="intercom_main_classic_can">CAN :%1$s  %2$s</string>
+    <string name="intercom_main_classic_can">CAN :%1$s\u0020\u0020%2$s</string>
     <!-- Classic intercom page, info block, DMR channel: %1$s the colour code (a number). Short. -->
     <string name="intercom_main_classic_color_code">Code couleur :%1$s</string>
     <!-- Classic intercom page, info block, FM channel: %1$s the squelch level (a number). Short. -->
@@ -68,7 +68,7 @@
     <!-- New-look intercom headline, all caps: the radio is up and idle. One line. -->
     <string name="intercom_main_neo_ready">PRÊTE</string>
     <!-- New-look intercom headline: a dot, two spaces, then %1$s the state or the caller. Keep the dot and the two spaces. -->
-    <string name="intercom_main_neo_headline">●  %1$s</string>
+    <string name="intercom_main_neo_headline">●\u0020\u0020%1$s</string>
     <!-- New-look intercom, activity box header for a DMR channel (hidden on the new look, kept in caps). Short. -->
     <string name="intercom_main_neo_history_dmr">ACTIVITÉ DMR</string>
     <!-- New-look intercom, activity box header for an FM channel (hidden on the new look, kept in caps). Short. -->
@@ -183,13 +183,13 @@
     <!-- S-meter text: nothing received. All caps, short. -->
     <string name="intercom_main_meter_none">AUCUN SIGNAL</string>
     <!-- S-meter text, nothing received, with the noise floor: %1$d the floor in dBm. Keep the spacing around the dot. One line. -->
-    <string name="intercom_main_meter_floor">AUCUN SIGNAL  ·  bruit %1$d dBm</string>
+    <string name="intercom_main_meter_floor">AUCUN SIGNAL\u0020\u0020·\u0020\u0020bruit %1$d dBm</string>
     <!-- S-meter text on phones without signal strength: something is received. All caps, short. -->
     <string name="intercom_main_meter_receiving">RÉCEPTION</string>
     <!-- S-meter text on phones without signal strength: nothing received. All caps, short. -->
     <string name="intercom_main_meter_quiet">CALME</string>
     <!-- S-meter reading: %1$s the S-units ("S7", "S9+10"), %2$d the level in dBm. Keep the two spaces. Short. -->
-    <string name="intercom_main_meter_dbm">%1$s  %2$d dBm</string>
+    <string name="intercom_main_meter_dbm">%1$s\u0020\u0020%2$d dBm</string>
 
     <!-- Title of the talkgroup picker (long-press on CALL): %1$s the channel name. One line. -->
     <string name="intercom_main_tg_title">Talkgroup sur %1$s</string>
@@ -218,7 +218,7 @@
     <!-- Shown when a Help search finds nothing. %1$s is what the user typed. -->
     <string name="intercom_help_no_match">Rien dans le guide ne correspond à « %1$s ».</string>
     <!-- Subtitle of a Help topic page, shown in caps: %1$s the topic's group, %2$d its number, %3$d how many topics. Keep the spaced dot. Short. -->
-    <string name="intercom_help_topic_position">%1$s  ·  %2$d sur %3$d</string>
+    <string name="intercom_help_topic_position">%1$s\u0020\u0020·\u0020\u0020%2$d sur %3$d</string>
     <!-- Back button (screen-reader label) and the button at the end of a Help topic that go back to the topic list. Short. -->
     <string name="intercom_help_all_topics">Tous les sujets</string>
     <!-- Caps label on the card at the end of a Help topic that opens the previous topic. Keep the arrow. Very short. -->
@@ -252,7 +252,7 @@
     <!-- Signal text on a mode page for radios without signal strength: a signal is being received. Lower case, very short. -->
     <string name="intercom_mode_signal_receiving">réception</string>
     <!-- Signal text on a mode page: %1$s the S-meter reading ("S7", "S9+10"), %2$d the level in dBm. Keep the two spaces. Short. -->
-    <string name="intercom_mode_signal_dbm">%1$s  %2$d dBm</string>
+    <string name="intercom_mode_signal_dbm">%1$s\u0020\u0020%2$d dBm</string>
     <!-- Signal text on a mode page while waiting for a satellite pass: %1$s the time (HH:mm) the radio tunes to it. Lower case, short. -->
     <string name="intercom_mode_tunes_at">réglage à %1$s</string>
     <!-- How long ago something happened, under a minute: %1$d seconds. Short. -->
@@ -295,15 +295,15 @@
     <!-- Shown on the Last heard sheet when nothing has been heard. One line. -->
     <string name="intercom_lastheard_empty">Rien d’entendu pour l’instant.</string>
     <!-- Second line of an alert or event row on Last heard. %1$s is the date and time, %2$s the channel name. One line. -->
-    <string name="intercom_lastheard_event_sub">%1$s  ·  %2$s  ·  appuyez pour les détails</string>
+    <string name="intercom_lastheard_event_sub">%1$s\u0020\u0020·\u0020\u0020%2$s\u0020\u0020·\u0020\u0020appuyez pour les détails</string>
     <!-- The same when the line came several times in a row. %3$d is how many times (shown as "3×"). One line. -->
-    <string name="intercom_lastheard_event_sub_n">%1$s  ·  %2$s  ·  %3$d×  ·  appuyez pour les détails</string>
+    <string name="intercom_lastheard_event_sub_n">%1$s\u0020\u0020·\u0020\u0020%2$s\u0020\u0020·\u0020\u0020%3$d×\u0020\u0020·\u0020\u0020appuyez pour les détails</string>
     <!-- When an alert happened, on its details sheet, when it came several times in a row. %1$s is the date and time, %2$d the count. One line. -->
     <string name="intercom_lastheard_when_n">%1$s (la dernière de %2$d d’affilée)</string>
     <!-- Where an alert happened, on its details sheet. %1$s channel name, %2$s transmit and %3$s receive frequency (MHz), %4$s the mode (DMR or FM). One or two lines. -->
-    <string name="intercom_lastheard_where_high">%1$s  ·  TX %2$s / RX %3$s MHz  ·  %4$s, puissance haute</string>
+    <string name="intercom_lastheard_where_high">%1$s\u0020\u0020·\u0020\u0020TX %2$s / RX %3$s MHz\u0020\u0020·\u0020\u0020%4$s, puissance haute</string>
     <!-- The same for a channel set to low power. -->
-    <string name="intercom_lastheard_where_low">%1$s  ·  TX %2$s / RX %3$s MHz  ·  %4$s, puissance basse</string>
+    <string name="intercom_lastheard_where_low">%1$s\u0020\u0020·\u0020\u0020TX %2$s / RX %3$s MHz\u0020\u0020·\u0020\u0020%4$s, puissance basse</string>
     <!-- Section heading on an alert's details sheet: the history lines within 20 seconds of it. Shown in caps. One line. -->
     <string name="intercom_lastheard_around">Au même moment (±20 s)</string>
     <!-- Button on the details sheet of the Android Auto is hiding the radio alert: opens Android Auto's settings. Full-width button, one line. -->
@@ -391,7 +391,7 @@
     <!-- Summary on a channel's history when nothing was heard on it. One line. -->
     <string name="intercom_chhistory_none">Rien d’entendu sur ce canal pour l’instant.</string>
     <!-- The summary with the counts. %1$s is the sentence above, %2$s the number of entries (intercom_chhistory_entries), then the counts of each kind. Two lines. -->
-    <string name="intercom_chhistory_summary">%1$s  %2$s : %3$d voix, %4$d textes, %5$d tonalités, %6$d identifications de relais, %7$d packet, %8$d de vous.</string>
+    <string name="intercom_chhistory_summary">%1$s\u0020\u0020%2$s : %3$d voix, %4$d textes, %5$d tonalités, %6$d identifications de relais, %7$d packet, %8$d de vous.</string>
     <!-- Number of history entries in a channel's summary. -->
     <plurals name="intercom_chhistory_entries">
         <item quantity="one">%1$d entrée</item>
@@ -405,7 +405,7 @@
         <item quantity="other">%1$d entrées, les %2$d plus récentes affichées</item>
     </plurals>
     <!-- Second line of a DMR caller's row in a channel's history. %1$s is time, kind and level, %2$s the caller (name and ID). Tapping opens the contact. One or two lines. -->
-    <string name="intercom_chhistory_row_caller">%1$s  ·  %2$s  ·  appuyez pour le contact</string>
+    <string name="intercom_chhistory_row_caller">%1$s\u0020\u0020·\u0020\u0020%2$s\u0020\u0020·\u0020\u0020appuyez pour le contact</string>
     <!-- Shown in a channel's history when it is empty: what will be listed. Two lines. -->
     <string name="intercom_chhistory_empty">La voix, les appelants, les textes, les tonalités, les identifications de relais, le trafic packet et vos propres émissions sur ce canal s’afficheront ici.</string>
     <!-- Button under a channel's history that removes it. Full-width button, one line. -->
@@ -734,9 +734,9 @@
     </plurals>
     <!-- Zones sheet row: how many channels the zone holds, for the zone in use. One line. -->
     <plurals name="intercom_zones_row_count_in_use">
-        <item quantity="one">%1$d canal  ·  en cours</item>
-        <item quantity="many">%1$d de canaux  ·  en cours</item>
-        <item quantity="other">%1$d canaux  ·  en cours</item>
+        <item quantity="one">%1$d canal\u0020\u0020·\u0020\u0020en cours</item>
+        <item quantity="many">%1$d de canaux\u0020\u0020·\u0020\u0020en cours</item>
+        <item quantity="other">%1$d canaux\u0020\u0020·\u0020\u0020en cours</item>
     </plurals>
     <!-- Content description (screen reader) of a zone row's ⋮ button; %1$s is the zone name. -->
     <string name="intercom_zones_options_cd">Options de la zone %1$s</string>
@@ -772,9 +772,9 @@
     <string name="intercom_zones_some_in_bands">%1$d sur %2$d dans les bandes de cette radio</string>
     <!-- Add a zone sheet: a standard list's card title; %1$s is the list name (FRS, GMRS …), %2$d its channel count. English keeps "channels" for 1 too. One line. -->
     <plurals name="intercom_zones_preset_title">
-        <item quantity="one">%1$s  ·  %2$d canal</item>
-        <item quantity="many">%1$s  ·  %2$d de canaux</item>
-        <item quantity="other">%1$s  ·  %2$d canaux</item>
+        <item quantity="one">%1$s\u0020\u0020·\u0020\u0020%2$d canal</item>
+        <item quantity="many">%1$s\u0020\u0020·\u0020\u0020%2$d de canaux</item>
+        <item quantity="other">%1$s\u0020\u0020·\u0020\u0020%2$d canaux</item>
     </plurals>
     <!-- Add a zone sheet: a standard list's subtitle when you already have a zone of that name; %1$s is the status line (region · licence), %2$s the zone name. Two lines. -->
     <string name="intercom_zones_preset_sub_have">%1$s\nVous avez une zone nommée %2$s : les canaux manquants y sont ajoutés</string>
@@ -935,7 +935,7 @@
     <!-- Schedule editor: switch row subtitle; the path is where recordings are saved. One line. -->
     <string name="intercom_schedule_record_sub">REC pendant toute la durée (Download/DMR/Audio/&lt;canal&gt;)</string>
     <!-- Schedule editor: tappable value line; %1$s is the value (a channel, an action, a time, a date). One line. -->
-    <string name="intercom_schedule_tap_to_change">%1$s  ·  appuyez pour modifier</string>
+    <string name="intercom_schedule_tap_to_change">%1$s\u0020\u0020·\u0020\u0020appuyez pour modifier</string>
     <!-- Schedule editor: channel value for the SSTV action (a fixed frequency); %1$s is the frequency (144.500). One line. -->
     <string name="intercom_schedule_sstv_freq">%1$s MHz (la fréquence d’appel SSTV)</string>
     <!-- Schedule editor: channel list item for the SSTV action; %1$s is the frequency (144.500). One line. -->
@@ -949,7 +949,7 @@
     <!-- Schedule editor: section title above the day pills. Short, shown in caps. -->
     <string name="intercom_schedule_days">Jours (aucun coché : une fois, à la date)</string>
     <!-- Schedule editor: date value for a one-off schedule; %1$s is the date (yyyy-MM-dd). One line. -->
-    <string name="intercom_schedule_once_on">Une fois, le %1$s  ·  appuyez pour modifier</string>
+    <string name="intercom_schedule_once_on">Une fois, le %1$s\u0020\u0020·\u0020\u0020appuyez pour modifier</string>
     <!-- Schedule editor: section title above the start time. Short, shown in caps. -->
     <string name="intercom_schedule_starts">Début</string>
     <!-- Schedule editor: section title above the length field. One line, shown in caps. -->
@@ -985,7 +985,7 @@
     <!-- Toast when no contact exists to send the DMR emergency text to. "Contacts page" names the page. One line. -->
     <string name="intercom_emergency_no_contacts_toast">Ajoutez d’abord un contact ou un talkgroup (page Contacts)</string>
     <!-- Recipient list item / recipient line for a talkgroup; %1$s is its name, %2$d its number. "TG" = talkgroup. One line. -->
-    <string name="intercom_emergency_tg_item">TG %1$s  ·  %2$d</string>
+    <string name="intercom_emergency_tg_item">TG %1$s\u0020\u0020·\u0020\u0020%2$d</string>
     <!-- Title of the recipient list. One line. -->
     <string name="intercom_emergency_to_title">Texte d’urgence à</string>
     <!-- Emergency sheet: the big send button; it must be held. Short, caps. -->
@@ -993,15 +993,15 @@
     <!-- Emergency sheet: the send button after a send, to send again. Short, caps. -->
     <string name="intercom_emergency_send_again">RENVOYER (MAINTENIR)</string>
     <!-- Emergency sheet: the send button while held; %1$d is the seconds left (2, 1). Short, caps. -->
-    <string name="intercom_emergency_keep_holding">MAINTENEZ  %1$d</string>
+    <string name="intercom_emergency_keep_holding">MAINTENEZ\u0020\u0020%1$d</string>
     <!-- Emergency sheet: line under the send button. One line. -->
     <string name="intercom_emergency_hold_hint">Maintenez la touche deux secondes.</string>
     <!-- Emergency sheet: line under the send button when it was let go too early. One line. -->
     <string name="intercom_emergency_not_sent">Non envoyé : maintenez la touche deux secondes.</string>
     <!-- Emergency sheet: recipient line when none is chosen; › shows it opens a list. One line. -->
-    <string name="intercom_emergency_choose">Choisir un contact ou un talkgroup  ›</string>
+    <string name="intercom_emergency_choose">Choisir un contact ou un talkgroup\u0020\u0020›</string>
     <!-- Emergency sheet: recipient line for a talkgroup; %1$s is its name, %2$d its number; › shows it opens a list. One line. -->
-    <string name="intercom_emergency_recipient_tg">TG %1$s  ·  %2$d  ›</string>
+    <string name="intercom_emergency_recipient_tg">TG %1$s\u0020\u0020·\u0020\u0020%2$d\u0020\u0020›</string>
 
     <!-- ==== Activity sheet ==== -->
     <!-- Title of the Activity sheet (busiest channels and hours). One line. -->
@@ -1024,21 +1024,21 @@
     <string name="intercom_activity_channel_n">canal %1$d</string>
     <!-- Activity sheet channel row: receptions and when last heard; %1$d receptions, %2$s the date (MM-dd HH:mm). One line. -->
     <plurals name="intercom_activity_row">
-        <item quantity="one">%1$d réception  ·  dernière %2$s</item>
-        <item quantity="many">%1$d de réceptions  ·  dernière %2$s</item>
-        <item quantity="other">%1$d réceptions  ·  dernière %2$s</item>
+        <item quantity="one">%1$d réception\u0020\u0020·\u0020\u0020dernière %2$s</item>
+        <item quantity="many">%1$d de réceptions\u0020\u0020·\u0020\u0020dernière %2$s</item>
+        <item quantity="other">%1$d réceptions\u0020\u0020·\u0020\u0020dernière %2$s</item>
     </plurals>
     <!-- Activity sheet channel row with audio time in minutes; %1$d receptions, %2$d minutes, %3$s the date. One line. -->
     <plurals name="intercom_activity_row_min">
-        <item quantity="one">%1$d réception, %2$d min  ·  dernière %3$s</item>
-        <item quantity="many">%1$d de réceptions, %2$d min  ·  dernière %3$s</item>
-        <item quantity="other">%1$d réceptions, %2$d min  ·  dernière %3$s</item>
+        <item quantity="one">%1$d réception, %2$d min\u0020\u0020·\u0020\u0020dernière %3$s</item>
+        <item quantity="many">%1$d de réceptions, %2$d min\u0020\u0020·\u0020\u0020dernière %3$s</item>
+        <item quantity="other">%1$d réceptions, %2$d min\u0020\u0020·\u0020\u0020dernière %3$s</item>
     </plurals>
     <!-- Activity sheet channel row with audio time in seconds; %1$d receptions, %2$d seconds, %3$s the date. One line. -->
     <plurals name="intercom_activity_row_s">
-        <item quantity="one">%1$d réception, %2$d s  ·  dernière %3$s</item>
-        <item quantity="many">%1$d de réceptions, %2$d s  ·  dernière %3$s</item>
-        <item quantity="other">%1$d réceptions, %2$d s  ·  dernière %3$s</item>
+        <item quantity="one">%1$d réception, %2$d s\u0020\u0020·\u0020\u0020dernière %3$s</item>
+        <item quantity="many">%1$d de réceptions, %2$d s\u0020\u0020·\u0020\u0020dernière %3$s</item>
+        <item quantity="other">%1$d réceptions, %2$d s\u0020\u0020·\u0020\u0020dernière %3$s</item>
     </plurals>
     <!-- Activity sheet: button that makes a scan zone of the busiest channels. One line (button). -->
     <string name="intercom_activity_make_zone">Créer une zone de balayage des plus actifs</string>
@@ -1074,12 +1074,12 @@
     <string name="intercom_net_past">Réseaux passés</string>
     <!-- Title of a past-net card. %1$s net name, %2$d number of check-ins. One line. The English uses "check-ins" for every count. -->
     <plurals name="intercom_net_past_title">
-        <item quantity="one">%1$s  ·  %2$d pointage</item>
-        <item quantity="many">%1$s  ·  %2$d de pointages</item>
-        <item quantity="other">%1$s  ·  %2$d pointages</item>
+        <item quantity="one">%1$s\u0020\u0020·\u0020\u0020%2$d pointage</item>
+        <item quantity="many">%1$s\u0020\u0020·\u0020\u0020%2$d de pointages</item>
+        <item quantity="other">%1$s\u0020\u0020·\u0020\u0020%2$d pointages</item>
     </plurals>
     <!-- Second line of a past-net card. %1$s start date and time, %2$d length in minutes, %3$s channel name. One line. -->
-    <string name="intercom_net_past_sub">%1$s  ·  %2$d min  ·  %3$s  ·  appuyez pour le compte rendu</string>
+    <string name="intercom_net_past_sub">%1$s\u0020\u0020·\u0020\u0020%2$d min\u0020\u0020·\u0020\u0020%3$s\u0020\u0020·\u0020\u0020appuyez pour le compte rendu</string>
     <!-- Title of the confirmation dialog that deletes a past net. %1$s net name. One line. -->
     <string name="intercom_net_delete_confirm">Supprimer %1$s ?</string>
     <!-- Title of the running-net sheet. %1$s net name. One line. -->
@@ -1087,7 +1087,7 @@
     <!-- Hint on the running-net sheet. -->
     <string name="intercom_net_running_hint">Les pointages après 15 minutes sont marqués en retard. Appuyez sur un indicateur pour le changer ; appui long sur une station pour la retirer.</string>
     <!-- The same hint with the net's channel in front. %1$s channel name. -->
-    <string name="intercom_net_running_hint_channel">%1$s  ·  Les pointages après 15 minutes sont marqués en retard. Appuyez sur un indicateur pour le changer ; appui long sur une station pour la retirer.</string>
+    <string name="intercom_net_running_hint_channel">%1$s\u0020\u0020·\u0020\u0020Les pointages après 15 minutes sont marqués en retard. Appuyez sur un indicateur pour le changer ; appui long sur une station pour la retirer.</string>
     <!-- Hint in the callsign field on the running-net sheet. One word. -->
     <string name="intercom_net_callsign_hint">Indicatif</string>
     <!-- Button next to the callsign field that checks the station in. Short (140 dp button). -->
@@ -1301,11 +1301,11 @@
     <!-- Net editor: the chosen channel (fixed). %1$d channel number. One line. -->
     <string name="intercom_netedit_channel_plain">Canal %1$d</string>
     <!-- Net editor: the chosen channel (fixed). %1$d number, %2$s name, %3$s frequency ("146.9400"). One line. -->
-    <string name="intercom_netedit_channel_named">Canal %1$d  %2$s  %3$s MHz</string>
+    <string name="intercom_netedit_channel_named">Canal %1$d\u0020\u0020%2$s\u0020\u0020%3$s MHz</string>
     <!-- Net editor: the chosen channel, tap to change it. %1$d channel number. One line. -->
-    <string name="intercom_netedit_channel_plain_tap">Canal %1$d  ·  appuyez pour modifier</string>
+    <string name="intercom_netedit_channel_plain_tap">Canal %1$d\u0020\u0020·\u0020\u0020appuyez pour modifier</string>
     <!-- Net editor: the chosen channel, tap to change it. %1$d number, %2$s name, %3$s frequency ("146.9400"). One line. -->
-    <string name="intercom_netedit_channel_named_tap">Canal %1$d  %2$s  %3$s MHz  ·  appuyez pour modifier</string>
+    <string name="intercom_netedit_channel_named_tap">Canal %1$d\u0020\u0020%2$s\u0020\u0020%3$s MHz\u0020\u0020·\u0020\u0020appuyez pour modifier</string>
     <!-- Title of the channel list dialog in the net editor. One line. -->
     <string name="intercom_netedit_which_channel">Quel canal ?</string>
     <!-- Section title of the weekday buttons in the net editor. One word, shown in caps. -->
@@ -1313,7 +1313,7 @@
     <!-- Section title of the start time in the net editor. One word, shown in caps. -->
     <string name="intercom_netedit_starts">Début</string>
     <!-- Net editor start time, 12-hour. %1$d hour, %2$02d minutes, %3$s AM or PM. One line, large. -->
-    <string name="intercom_netedit_time">%1$d:%2$02d %3$s  ·  appuyez pour modifier</string>
+    <string name="intercom_netedit_time">%1$d:%2$02d %3$s\u0020\u0020·\u0020\u0020appuyez pour modifier</string>
     <!-- Morning marker after a 12-hour time. Very short. -->
     <string name="intercom_netedit_am">AM</string>
     <!-- Afternoon marker after a 12-hour time. Very short. -->

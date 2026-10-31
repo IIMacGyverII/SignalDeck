@@ -627,7 +627,7 @@ public final class PktDialog {
                         .putInt("isBeaconMin", Integer.parseInt(isMin.getText().toString().trim())).putString("isComment", isComment.getText().toString().trim())
                         .putInt("txLeadMs", PacketEngine.LEAD_CHOICES[lead[0]]).putInt("txLeadKind", kind[0]).putInt("txPower", power[0] == 1 ? 0 : 1).putInt("autoBeacon", auto[0]).putInt("beaconMin", Math.max(1, Integer.parseInt(bMin.getText().toString().trim())))
                         .putBoolean("telemetry", extra[0]).putBoolean("weather", extra[1]).putBoolean("txIgate", extra[2]).putString("groups", groups.getText().toString().trim().toUpperCase(Locale.US))
-                        .putBoolean("autoAck", pe.autoAckAllowed() ? flags[0] : pe.prefs().getBoolean("autoAck", true)).putBoolean("digipeat", flags[1]).putBoolean("dtmf", flags[2]).putBoolean("wx", flags[3]).putBoolean("cw", flags[4]).putBoolean("cwId", flags[5]).apply();
+                        .putBoolean("autoAck", pe.autoAckAllowed() ? flags[0] : pe.prefs().getBoolean("autoAck", false)).putBoolean("digipeat", flags[1]).putBoolean("dtmf", flags[2]).putBoolean("wx", flags[3]).putBoolean("cw", flags[4]).putBoolean("cwId", flags[5]).apply();
                 com.macdmr.radio.Station.setRics(c, myRics.getText().toString());
                 pe.applySettings();
                 toast("Saved"); sub.dismiss();

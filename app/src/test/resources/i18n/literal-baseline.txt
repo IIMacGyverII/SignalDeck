@@ -195,12 +195,8 @@
 45 com/macdmr/radio/ui/VfoDialog.java
 100 com/macdmr/radio/ui/WinlinkDialog.java
 70 com/macdmr/radio/ui/ZonesDialog.java
-3 com/macdmr/radio/web/PhoneStats.java
-307 com/macdmr/radio/web/WebHost.java
-32 com/macdmr/radio/web/WebServer.java
-3 com/macdmr/radio/web/WebTls.java
 8 com/macdmr/radio/winlink/B2Message.java
 14 com/macdmr/radio/winlink/B2fClient.java
 6 com/macdmr/radio/winlink/RmsList.java
 48 com/macdmr/radio/winlink/Winlink.java
-# total 6919
+# total 6574

@@ -21,17 +21,17 @@ async function listenStart() {
   const ctl = new AbortController(); AU.abort = ctl;
   try {
     const r = await fetch('/api/audio', { signal: ctl.signal, cache: 'no-store' });
-    if (r.status === 401) { showLogin(); throw new Error('login required'); }
-    if (!r.ok || !r.body) throw new Error('HTTP ' + r.status);
+    if (r.status === 401) { showLogin(); throw new Error(t('common_login_required')); }
+    if (!r.ok || !r.body) throw new Error('HTTP ' + r.status);   // i18n: protocol
     const rd = r.body.getReader();
     for (;;) {
       const { value, done } = await rd.read();
       if (done) break;
       if (value && value.length) play(value);
     }
-    if (AU.on) { toast('Audio stream ended: reconnecting'); AU.on = false; setTimeout(listenStart, 1500); }
+    if (AU.on) { toast(t('intercom_audio_ended')); AU.on = false; setTimeout(listenStart, 1500); }
   } catch (e) {
-    if (AU.on && e.name !== 'AbortError') { toast('Audio: ' + e.message + ' (retrying)'); AU.on = false; setTimeout(() => { if (!AU.stopped) listenStart(); }, 3000); }
+    if (AU.on && e.name !== 'AbortError') { toast(t('intercom_audio_error', { error: e.message })); AU.on = false; setTimeout(() => { if (!AU.stopped) listenStart(); }, 3000); }
   }
   renderListen();
 }
@@ -53,8 +53,8 @@ function play(u8) {
 }
 
 function renderListen() {
-  const b = $('listenBtn'); b.classList.toggle('on', AU.on); b.textContent = AU.on ? '🔊 LISTENING' : '🔈 LISTEN';
-  $('listenState').textContent = AU.on ? (Date.now() - AU.lastData < 1500 ? 'audio' : 'quiet') : '';
+  const b = $('listenBtn'); b.classList.toggle('on', AU.on); b.textContent = AU.on ? t('intercom_listening') : t('intercom_listen');
+  $('listenState').textContent = AU.on ? (Date.now() - AU.lastData < 1500 ? t('intercom_listen_audio') : t('intercom_listen_quiet')) : '';
 }
 $('listenBtn').onclick = () => { if (AU.on) listenStop(); else listenStart().catch(e => toast(e.message)); };
 $('vol').oninput = () => { if (AU.gain) AU.gain.gain.value = +$('vol').value / 100; };

@@ -12,6 +12,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,18 +81,18 @@ public final class NetStore extends SQLiteOpenHelper {
         long end = n.end == 0 ? System.currentTimeMillis() : n.end;
         StringBuilder sb = new StringBuilder();
         sb.append(n.name).append(" — ").append(d.format(new Date(n.start))).append('\n');
-        sb.append(n.channel).append(n.freqHz > 0 ? String.format(Locale.US, " (%.4f MHz)", n.freqHz / 1e6) : "").append('\n');
-        sb.append("Opened ").append(t.format(new Date(n.start))).append(", closed ").append(n.end == 0 ? "(running)" : t.format(new Date(end))).append(", ").append((end - n.start) / 60000).append(" min\n");
-        if (netControl != null && !netControl.isEmpty()) sb.append("Net control: ").append(netControl).append('\n');
+        sb.append(n.freqHz > 0 ? Txt.s(R.string.intercom_netstore_report_channel, n.channel, String.format(Locale.US, "%.4f", n.freqHz / 1e6)) : n.channel).append('\n');
+        sb.append(Txt.s(R.string.intercom_netstore_report_times, t.format(new Date(n.start)), n.end == 0 ? Txt.s(R.string.intercom_netstore_report_running) : t.format(new Date(end)), (end - n.start) / 60000)).append('\n');
+        if (netControl != null && !netControl.isEmpty()) sb.append(Txt.s(R.string.intercom_netstore_report_control, netControl)).append('\n');
         int traffic = 0; for (CheckIn k : ins) if (k.traffic) traffic++;
-        sb.append("Check-ins: ").append(ins.size()).append(traffic > 0 ? ", " + traffic + " with traffic" : "").append("\n\n");
+        sb.append(traffic > 0 ? Txt.s(R.string.intercom_netstore_report_checkins_traffic, ins.size(), traffic) : Txt.s(R.string.intercom_netstore_report_checkins, ins.size())).append("\n\n");
         int i = 1;
         for (CheckIn k : ins) {
             String line = String.format(Locale.US, "%2d. %-8s %s  %s", i++, k.call, t.format(new Date(k.ts)), k.name == null ? "" : k.name);
             while (line.endsWith(" ")) line = line.substring(0, line.length() - 1);   // keep the numbers aligned, drop only trailing space
             sb.append(line);
-            List<String> f = new ArrayList<>(); if (k.traffic) f.add("traffic"); if (k.late) f.add("late"); if (k.out) f.add("checked out");
-            if (!f.isEmpty()) sb.append("  [").append(String.join(", ", f)).append(']');
+            List<String> f = new ArrayList<>(); if (k.traffic) f.add(Txt.s(R.string.intercom_netstore_report_flag_traffic)); if (k.late) f.add(Txt.s(R.string.intercom_netstore_report_flag_late)); if (k.out) f.add(Txt.s(R.string.intercom_netstore_report_flag_out));
+            if (!f.isEmpty()) sb.append("  [").append(String.join(Txt.s(R.string.intercom_netstore_report_flag_sep), f)).append(']');
             if (k.notes != null && !k.notes.isEmpty()) sb.append("  ").append(k.notes);
             sb.append('\n');
         }

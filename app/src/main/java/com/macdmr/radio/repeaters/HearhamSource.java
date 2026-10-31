@@ -84,7 +84,7 @@ public final class HearhamSource {
                     r.toneUp = encode;
                     r.toneDown = decode;
                 }
-                if (o.optInt("operational", 1) == 0) r.status = "not operational";
+                if (o.optInt("operational", 1) == 0) r.status = com.macdmr.radio.i18n.Txt.s(com.macdmr.radio.R.string.channels_rep_not_operational);
 
                 r.key = RepeaterModels.makeKey(r.callsign, r.rxHz);
                 out.add(r);

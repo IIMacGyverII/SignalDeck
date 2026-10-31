@@ -17,6 +17,8 @@ import android.os.Build;
 import android.util.Log;
 
 import com.macdmr.radio.ham.NetFinder;
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.repeaters.GeoUtil;
 import com.macdmr.radio.repeaters.RepeaterModels.Repeater;
 import com.macdmr.radio.repeaters.RepeaterService;
@@ -46,7 +48,7 @@ import java.util.TimeZone;
  * nets for 12 hours. Check-ins (which carry home addresses) are never stored: only callsign, name and state are read.
  */
 public final class NetWatch {
-    private static final String TAG = "NetWatch", API = "https://www.netlogger.org/api/";
+    private static final String TAG = "NetWatch", API = "https://www.netlogger.org/api/";   // i18n: log tag and URL
     private final Context ctx; private final RadioService svc; private final SharedPreferences prefs;
 
     public NetWatch(RadioService svc) { this.svc = svc; ctx = svc.getApplicationContext(); prefs = ctx.getSharedPreferences("nets", Context.MODE_PRIVATE); }
@@ -62,7 +64,7 @@ public final class NetWatch {
     public synchronized List<NetFinder.Net> active() {
         long now = System.currentTimeMillis();
         if (activeXml == null || now - activeAt >= 60_000) {
-            try { activeXml = get(API + "GetActiveNets.php"); activeError = null; }
+            try { activeXml = get(API + "GetActiveNets.php"); activeError = null; }   // i18n: URL
             catch (Exception e) { activeError = e.getMessage(); if (activeXml == null) return new ArrayList<>(); }
             activeAt = now;
         }
@@ -75,7 +77,7 @@ public final class NetWatch {
         String xml = null;
         try {
             if (f.exists() && System.currentTimeMillis() - f.lastModified() < 12 * 3_600_000L) xml = new String(Files.readAllBytes(f.toPath()), StandardCharsets.ISO_8859_1);
-            else { xml = get(API + "GetPastNets.php?Interval=7"); try (FileOutputStream o = new FileOutputStream(f)) { o.write(xml.replaceAll("<srcIP>[^<]*</srcIP>", "").getBytes(StandardCharsets.ISO_8859_1)); } }   // never keep the loggers' IP addresses
+            else { xml = get(API + "GetPastNets.php?Interval=7"); try (FileOutputStream o = new FileOutputStream(f)) { o.write(xml.replaceAll("<srcIP>[^<]*</srcIP>", "").getBytes(StandardCharsets.ISO_8859_1)); } }   // never keep the loggers' IP addresses   // i18n: URL
         } catch (Exception e) {
             Log.w(TAG, "past nets: " + e.getMessage());
             try { if (xml == null && f.exists()) xml = new String(Files.readAllBytes(f.toPath()), StandardCharsets.ISO_8859_1); } catch (Exception ignored) { }
@@ -89,7 +91,7 @@ public final class NetWatch {
         String k = n.server + "|" + n.apiName; long now = System.currentTimeMillis();
         Long at = checkinAt.get(k);
         if (at == null || now - at >= 20_000) {
-            checkinXml.put(k, get(API + "GetCheckins.php?ServerName=" + URLEncoder.encode(n.server, "UTF-8") + "&NetName=" + URLEncoder.encode(n.apiName, "UTF-8")));
+            checkinXml.put(k, get(API + "GetCheckins.php?ServerName=" + URLEncoder.encode(n.server, "UTF-8") + "&NetName=" + URLEncoder.encode(n.apiName, "UTF-8")));   // i18n: URL
             checkinAt.put(k, now);
         }
         String x = checkinXml.get(k);
@@ -117,7 +119,7 @@ public final class NetWatch {
         List<NetFinder.Place> out = new ArrayList<>();
         for (ChannelStore.Channel ch : svc.store().all()) {
             NetFinder.Place p = new NetFinder.Place();
-            p.label = "ch " + ch.number + " " + ch.name; p.rxHz = ch.rxFreq; p.txHz = ch.txFreq; p.channel = ch.number; p.data = ch;
+            p.label = Txt.s(R.string.service_net_channel, ch.number, ch.name); p.rxHz = ch.rxFreq; p.txHz = ch.txFreq; p.channel = ch.number; p.data = ch;
             if (ch.isDigital()) { if (ch.txContact > 0) p.talkgroups.add(ch.txContact); for (int g : ch.groups) if (g > 0) p.talkgroups.add(g); }
             out.add(p);
         }
@@ -127,7 +129,7 @@ public final class NetWatch {
                 double mi = ctx.getSharedPreferences("repeaters", Context.MODE_PRIVATE).getInt("radiusMi", 30);
                 for (Repeater r : new RepeaterService(ctx, svc.store()).nearby(me.getLatitude(), me.getLongitude(), mi * 1.609344, false, new StringBuilder())) {
                     NetFinder.Place p = new NetFinder.Place();
-                    p.label = (r.callsign == null ? "Repeater" : r.callsign) + " repeater"; p.rxHz = r.rxHz; p.txHz = r.txHz; p.data = r;
+                    p.label = r.callsign == null ? Txt.s(R.string.service_net_repeater_unnamed) : Txt.s(R.string.service_net_repeater, r.callsign); p.rxHz = r.rxHz; p.txHz = r.txHz; p.data = r;
                     if (r.hasCoords) p.km = GeoUtil.haversineMeters(me.getLatitude(), me.getLongitude(), r.lat, r.lon) / 1000.0;
                     out.add(p);
                 }
@@ -226,7 +228,7 @@ public final class NetWatch {
             else if (n.freqHz > 0 || n.talkgroup > 0) s.elsewhere.add(n);
         }
         s.heard = NetFinder.live(rows(System.currentTimeMillis() - 3 * 3_600_000L), System.currentTimeMillis());
-        if (s.heard != null) { ChannelStore.Channel ch = svc.store().byNumber(s.heard.channel); s.heardLabel = "ch " + s.heard.channel + (ch == null ? "" : " " + ch.name); }
+        if (s.heard != null) { ChannelStore.Channel ch = svc.store().byNumber(s.heard.channel); s.heardLabel = ch == null ? Txt.s(R.string.service_net_channel_number, s.heard.channel) : Txt.s(R.string.service_net_channel, s.heard.channel, ch.name); }
         s.yours.sort((x, y) -> y.near - x.near);           // confirmed near you first
         for (NetFinder.Slot sl : schedule()) (shown(sl.near, sl.channel) ? s.schedule : s.unsure).add(sl);
         return s;
@@ -255,18 +257,18 @@ public final class NetWatch {
             NetFinder.Place p = NetFinder.match(probe, ps);
             if (p == null) continue;
             sl.near = locality(probe, p); if (sl.near < 0) continue;
-            boolean dup = false; for (NetFinder.Slot m : mine) if (NetFinder.sameNet(m, sl)) { m.source = "added by you · on NetLogger"; dup = true; }
+            boolean dup = false; for (NetFinder.Slot m : mine) if (NetFinder.sameNet(m, sl)) { m.source = Txt.s(R.string.service_net_source_added_netlogger); dup = true; }
             if (dup) continue;
             sl.place = p; sl.channel = p.channel; out.add(sl);
         }
         for (NetFinder.Slot sl : NetFinder.learned(NetFinder.sessions(rows(now - 8 * 7 * 86_400_000L)), tz)) {
             NetFinder.Slot same = null;
             for (NetFinder.Slot o : out) if (NetFinder.sameNet(o, sl)) same = o;
-            if (same != null) { same.source = same.source + " · heard " + sl.seen + "×"; same.stations = sl.stations; same.near = 1; continue; }
+            if (same != null) { same.source = Txt.s(R.string.service_net_source_and_heard, same.source, sl.seen); same.stations = sl.stations; same.near = 1; continue; }
             ChannelStore.Channel ch = svc.store().byNumber(sl.channel);
             for (NetFinder.Place p : ps) if (p.channel == sl.channel) sl.place = p;
-            if (sl.name.isEmpty()) sl.name = (sl.dow == 0 ? "Daily activity" : "Weekly net") + " on " + (ch == null ? "ch " + sl.channel : ch.name);
-            sl.source = "heard " + sl.seen + "×"; sl.near = 1;
+            if (sl.name.isEmpty()) { String where = ch == null ? Txt.s(R.string.service_net_channel_number, sl.channel) : ch.name; sl.name = Txt.s(sl.dow == 0 ? R.string.service_net_daily_on : R.string.service_net_weekly_on, where); }
+            sl.source = Txt.s(R.string.service_net_source_heard, sl.seen); sl.near = 1;
             out.add(sl);
         }
         schedule = out; scheduleAt = now;
@@ -307,7 +309,7 @@ public final class NetWatch {
             if (at <= now || at - now > 10 * 60_000L || !shown(sl.near, sl.channel)) continue;
             String k = sl.key() + "@" + at;
             if (!done.add(k)) continue; changed = true;
-            notify("Net in " + Math.max(1, (at - now + 30_000) / 60_000) + " min: " + sl.name, NetFinder.when(sl) + " · " + (sl.place != null ? sl.place.label : "") + " · tap for the Nets page", k.hashCode());
+            notify(Msg.of(R.string.service_net_reminder_title, Math.max(1, (at - now + 30_000) / 60_000), sl.name), Txt.s(R.string.service_net_reminder_text, NetFinder.when(sl), sl.place != null ? sl.place.label : ""), k.hashCode());
         }
         if (changed) { if (done.size() > 200) done.clear(); prefs.edit().putStringSet("reminded", done).apply(); }
     }
@@ -320,31 +322,32 @@ public final class NetWatch {
             if (p == null || !shown(locality(n, p), p.channel)) continue;
             String k = n.server + "|" + n.apiName + "|" + n.opened;
             if (!done.add(k)) continue; changed = true;
-            notify("Net on the air: " + n.name, NetFinder.where(n) + " · " + p.label + (n.netControl.isEmpty() ? "" : " · net control " + n.netControl), k.hashCode());
+            notify(Msg.of(R.string.service_net_live_title, n.name), n.netControl.isEmpty() ? Txt.s(R.string.service_net_live_text, NetFinder.where(n), p.label) : Txt.s(R.string.service_net_live_text_ncs, NetFinder.where(n), p.label, n.netControl), k.hashCode());
         }
         if (changed) { if (done.size() > 200) done.clear(); prefs.edit().putStringSet("alerted", done).apply(); }
     }
 
-    private void notify(String title, String text, int id) {
+    private void notify(Msg titleMsg, String text, int id) {
+        String title = titleMsg.text();
         try {
             NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE); if (nm == null) return;
-            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(new NotificationChannel("nets", "Nets", NotificationManager.IMPORTANCE_DEFAULT));
+            if (Build.VERSION.SDK_INT >= 26) nm.createNotificationChannel(new NotificationChannel("nets", Txt.s(R.string.service_channel_nets), NotificationManager.IMPORTANCE_DEFAULT));
             Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(ctx, "nets") : new Notification.Builder(ctx);
             Intent open = new Intent(ctx, MainActivity.class).putExtra(MainActivity.EXTRA_NETS, true).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             b.setSmallIcon(android.R.drawable.ic_popup_reminder).setContentTitle(title).setContentText(text).setStyle(new Notification.BigTextStyle().bigText(text)).setAutoCancel(true)
                     .setContentIntent(PendingIntent.getActivity(ctx, 7, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT));
             nm.notify(5000 + (id & 0xFFF), b.build());
-            svc.history("pkt", "📋 " + title);
+            svc.history("pkt", Msg.of(R.string.service_net_history, titleMsg));
         } catch (Throwable t) { Log.w(TAG, "notify: " + t); }
     }
 
     /** "in 12 min", "now", "Tue 7:30 PM". */
     public static String relative(NetFinder.Slot s, long now) {
         long at = NetFinder.next(s, now, TimeZone.getDefault());
-        if (at <= now) return "on now";
+        if (at <= now) return Txt.s(R.string.service_net_on_now);
         long m = (at - now) / 60_000;
-        if (m < 60) return "in " + Math.max(1, m) + " min";
-        if (m < 24 * 60) return "in " + (m / 60) + " h " + (m % 60) + " min";
-        long days = Math.round(m / 1440.0); return days <= 1 ? "tomorrow" : "in " + days + " days";
+        if (m < 60) return Txt.s(R.string.service_net_in_min, Math.max(1, m));
+        if (m < 24 * 60) return Txt.s(R.string.service_net_in_h_min, m / 60, m % 60);
+        long days = Math.round(m / 1440.0); return days <= 1 ? Txt.s(R.string.service_net_tomorrow) : Txt.p(R.plurals.service_net_in_days, (int) days, days);
     }
 }

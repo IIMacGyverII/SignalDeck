@@ -16,6 +16,8 @@ import android.os.Looper;
 import android.os.SystemClock;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Msg;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,6 +47,8 @@ public final class CoverageLogger {
         boolean toneMatches(ChannelStore.Channel ch);
         void pollRssi();
         void event(String line);
+        /** The same as a message, so it can be shown in the app's language; by default its English text. */
+        default void event(Msg m) { event(m.english()); }
     }
 
     private final Context ctx; private final Host host; private final CoverageStore store; private final SharedPreferences prefs;
@@ -96,7 +100,7 @@ public final class CoverageLogger {
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, listener, Looper.getMainLooper());
             try { lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0, listener, Looper.getMainLooper()); } catch (Throwable ignored) { }
             Location last = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER); if (last != null) fix = last;
-        } catch (SecurityException se) { host.event("📶 Coverage logging needs location permission"); }
+        } catch (SecurityException se) { host.event(Msg.of(R.string.packet_cov_event_no_permission)); }
         catch (Throwable ignored) { }
         ui.removeCallbacks(poll); ui.post(poll);
     }
@@ -174,8 +178,8 @@ public final class CoverageLogger {
             store.addTx(k, f.getLatitude(), f.getLongitude(), f.getAccuracy(), ch.power, len, res, best, floor, System.currentTimeMillis());
             sessionTx++;
             dataChanged();
-            if (res == CoverageMath.KEYED) host.event("📶 Keyed " + ch.name + " from here (tail " + best + " dBm, " + CoverageMath.sUnits(best) + ")");
-            else if (res == CoverageMath.NO_REPLY) host.event("📶 No reply from " + ch.name + " after your transmission");
+            if (res == CoverageMath.KEYED) host.event(Msg.of(R.string.packet_cov_event_keyed, ch.name, best, CoverageMath.sUnits(best)));
+            else if (res == CoverageMath.NO_REPLY) host.event(Msg.of(R.string.packet_cov_event_no_reply, ch.name));
         }, CoverageMath.PROBE_MS[CoverageMath.PROBE_MS.length - 1] + 300);
     }
 }

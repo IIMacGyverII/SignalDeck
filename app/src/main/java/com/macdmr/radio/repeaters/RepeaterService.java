@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.repeaters;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Address;
@@ -38,7 +40,7 @@ import java.util.Set;
  * repeater as channels + contacts + a zone through the planner and remembers each install so it can be undone.
  */
 public final class RepeaterService {
-    private static final String TAG = "Repeaters";
+    private static final String TAG = "Repeaters";   // i18n: log tag
     private static final long DAY = 24L * 3600 * 1000;
     private final Context ctx; private final ChannelStore store;
     private final SharedPreferences prefs;
@@ -64,12 +66,12 @@ public final class RepeaterService {
     public List<Repeater> nearby(double lat, double lon, double radiusKm, boolean force, StringBuilder status) {
         long now = System.currentTimeMillis();
         List<Repeater> bm = new ArrayList<>(), hh = new ArrayList<>(), rid = new ArrayList<>();
-        String j = cached("repeaters_bm.json", "https://api.brandmeister.network/v2/device?repeater=true", 7 * DAY, force, "application/json");
-        if (j != null) bm = BrandMeisterSource.parseDeviceList(j, now).repeaters; else status.append("BrandMeister unavailable. ");
+        String j = cached("repeaters_bm.json", "https://api.brandmeister.network/v2/device?repeater=true", 7 * DAY, force, "application/json");   // i18n: cache file and URL
+        if (j != null) bm = BrandMeisterSource.parseDeviceList(j, now).repeaters; else status.append(Txt.s(R.string.channels_rep_unavailable_bm));
         j = cached("repeaters_hearham.json", HearhamSource.URL, 30 * DAY, force, "application/json");
-        if (j != null) hh = HearhamSource.parse(j, now); else status.append("hearham unavailable. ");
+        if (j != null) hh = HearhamSource.parse(j, now); else status.append(Txt.s(R.string.channels_rep_unavailable_hh));
         j = cached("repeaters_radioid.json", RadioIdRepeaterSource.URL, 7 * DAY, force, "application/json");
-        if (j != null) rid = RadioIdRepeaterSource.parse(j, now); else status.append("RadioID list unavailable. ");
+        if (j != null) rid = RadioIdRepeaterSource.parse(j, now); else status.append(Txt.s(R.string.channels_rep_unavailable_rid));
         geocodeMissing(rid, lat, lon, radiusKm);
         List<Repeater> all = RepeaterCatalog.merge(bm, hh, rid);
         List<Repeater> out = new ArrayList<>();
@@ -81,7 +83,7 @@ public final class RepeaterService {
             if (r.distanceMeters <= radiusKm * 1000) out.add(r);
         }
         out.sort((a, b) -> Double.compare(a.distanceMeters, b.distanceMeters));
-        status.append(String.format(Locale.US, "%d BrandMeister, %d hearham, %d RadioID known; %d within %s", bm.size(), hh.size(), rid.size(), out.size(), com.macdmr.radio.region.Region.km() ? String.format(Locale.US, "%.0f km", radiusKm) : String.format(Locale.US, "%.0f miles", radiusKm / 1.609344)));
+        status.append(Txt.s(R.string.channels_rep_known, bm.size(), hh.size(), rid.size(), out.size(), com.macdmr.radio.region.Region.km() ? String.format(Locale.US, "%.0f km", radiusKm) : Txt.s(R.string.channels_rep_miles, String.format(Locale.US, "%.0f", radiusKm / 1.609344))));
         return out;
     }
 
@@ -130,9 +132,9 @@ public final class RepeaterService {
 
     public static String preview(Plan p) {
         StringBuilder sb = new StringBuilder();
-        for (ChannelSpec c : p.channels) sb.append(c.isFm() ? "📻 " : "talk".equals(c.role) ? "🗣 " : "👂 ").append(c.name).append(c.isFm() ? "" : "  TS" + (c.slotIndex + 1) + " TG " + c.txContact).append('\n');
-        if (!p.contactsNeeded.isEmpty()) sb.append(p.contactsNeeded.size()).append(" talkgroup contacts\n");
-        sb.append("Zone \"").append(p.zoneName).append("\"");
+        for (ChannelSpec c : p.channels) sb.append(c.isFm() ? "📻 " : "talk".equals(c.role) ? "🗣 " : "👂 ").append(c.name).append(c.isFm() ? "" : "  TS" + (c.slotIndex + 1) + " TG " + c.txContact).append('\n');   // i18n: protocol words (TS, TG)
+        if (!p.contactsNeeded.isEmpty()) sb.append(Txt.p(R.plurals.channels_rep_preview_contacts, p.contactsNeeded.size(), p.contactsNeeded.size())).append('\n');
+        sb.append(Txt.s(R.string.channels_rep_preview_zone, p.zoneName));
         for (String w : p.warnings) sb.append("\n⚠ ").append(w);
         return sb.toString();
     }
@@ -171,8 +173,9 @@ public final class RepeaterService {
             run.put("channels", new JSONArray(chIds)); run.put("contacts", new JSONArray(contactsMade)); run.put("name", plan.zoneName);
             JSONArray runs = new JSONArray(prefs.getString("runs", "[]")); runs.put(run); while (runs.length() > 25) runs.remove(0);
             prefs.edit().putString("runs", runs.toString()).apply();
-            return plan.channels.size() + " channel" + (plan.channels.size() == 1 ? "" : "s") + (contactsMade.isEmpty() ? "" : ", " + contactsMade.size() + " contacts") + " added in zone \"" + plan.zoneName + "\"";
-        } catch (Throwable t) { Log.w(TAG, "program: " + t); return "Failed: " + t.getMessage(); }
+            return contactsMade.isEmpty() ? Txt.p(R.plurals.channels_rep_programmed, plan.channels.size(), plan.channels.size(), plan.zoneName)
+                    : Txt.p(R.plurals.channels_rep_programmed_contacts, plan.channels.size(), plan.channels.size(), plan.zoneName, contactsMade.size());
+        } catch (Throwable t) { Log.w(TAG, "program: " + t); return Txt.s(R.string.channels_rep_failed, String.valueOf(t.getMessage())); }
     }
 
     public static final class Run { public long id; public String name, callsign; }
@@ -187,7 +190,7 @@ public final class RepeaterService {
         try {
             JSONArray a = new JSONArray(prefs.getString("runs", "[]")); JSONArray keep = new JSONArray(); JSONObject run = null;
             for (int i = 0; i < a.length(); i++) { JSONObject o = a.getJSONObject(i); if (o.getLong("runId") == runId) run = o; else keep.put(o); }
-            if (run == null) return "Not found";
+            if (run == null) return Txt.s(R.string.channels_rep_undo_not_found);
             int removed = 0;
             JSONArray ch = run.getJSONArray("channels");
             for (int i = 0; i < ch.length(); i++) { long id = ch.getLong(i); for (ChannelStore.Channel c : store.all()) if (c.id == id) { store.delete(c); removed++; break; } }
@@ -202,7 +205,7 @@ public final class RepeaterService {
                 }
             }
             prefs.edit().putString("runs", keep.toString()).apply();
-            return removed + " channels removed (" + run.optString("callsign") + ")";
-        } catch (Throwable t) { return "Failed: " + t.getMessage(); }
+            return Txt.s(R.string.channels_rep_undo_removed, removed, run.optString("callsign"));
+        } catch (Throwable t) { return Txt.s(R.string.channels_rep_failed, String.valueOf(t.getMessage())); }
     }
 }

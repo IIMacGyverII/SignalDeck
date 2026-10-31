@@ -37,14 +37,14 @@ public final class WebTls {
     static final String ALIAS = "signaldeck-web";
 
     private static KeyStore keyStore() throws Exception {
-        KeyStore ks = KeyStore.getInstance("AndroidKeyStore"); ks.load(null);
+        KeyStore ks = KeyStore.getInstance("AndroidKeyStore"); ks.load(null);   // i18n: key store name and certificate subject
         if (!ks.containsAlias(ALIAS)) {
-            KeyPairGenerator g = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");
+            KeyPairGenerator g = KeyPairGenerator.getInstance(KeyProperties.KEY_ALGORITHM_EC, "AndroidKeyStore");   // i18n: key store name and certificate subject
             long now = System.currentTimeMillis();
             g.initialize(new KeyGenParameterSpec.Builder(ALIAS, KeyProperties.PURPOSE_SIGN)
                     .setAlgorithmParameterSpec(new ECGenParameterSpec("secp256r1"))
                     .setDigests(KeyProperties.DIGEST_NONE, KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA384, KeyProperties.DIGEST_SHA512)
-                    .setCertificateSubject(new X500Principal("CN=SignalDeck Web, O=SignalDeck"))
+                    .setCertificateSubject(new X500Principal("CN=SignalDeck Web, O=SignalDeck"))   // i18n: key store name and certificate subject
                     .setCertificateSerialNumber(BigInteger.valueOf(now))
                     .setCertificateNotBefore(new Date(now - 86_400_000L))
                     .setCertificateNotAfter(new Date(now + 10L * 365 * 86_400_000L))

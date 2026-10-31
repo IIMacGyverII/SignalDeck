@@ -20,6 +20,7 @@ import com.macdmr.radio.ChannelStore;
 import com.macdmr.radio.CircuitBoardView;
 import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
+import com.macdmr.radio.i18n.Txt;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -112,7 +113,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         android.text.TextPaint p = new android.text.TextPaint(scanBtn.getPaint());
         p.setTextSize(k.scanSp * getResources().getDisplayMetrics().scaledDensity);
         float d = Theme.dp(getContext()), extra = (18 + 8 + 24 + 6) * d;   // icon, icon gap, side padding, slack
-        float scanNeed = Math.max(p.measureText("SCANNING"), Math.max(p.measureText("SCAN"), p.measureText("HOLD"))) + extra;
+        float scanNeed = Math.max(p.measureText("SCANNING"), Math.max(p.measureText("SCAN"), p.measureText("HOLD"))) + extra;   // i18n: key legend
         float zoneNeed = p.measureText(zoneBtn.getText().toString()) + extra;
         ((LayoutParams) scanBtn.getLayoutParams()).weight = scanNeed;
         ((LayoutParams) zoneBtn.getLayoutParams()).weight = zoneNeed;
@@ -182,7 +183,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         digitOne = new ImageView(c); digitTwo = new ImageView(c);
         LayoutParams dl = new LayoutParams((int) (34 * d), (int) (58 * d)); dl.rightMargin = (int) (6 * d);
         digits.addView(digitOne, dl); digits.addView(digitTwo, new LayoutParams((int) (34 * d), (int) (58 * d)));
-        vfoLabel = Theme.label(c, "VFO", Theme.VFO[3], 30, true); vfoLabel.setVisibility(GONE); vfoLabel.setShadowLayer(14 * d, 0, 0, Theme.VFO[2]);
+        vfoLabel = Theme.label(c, "VFO", Theme.VFO[3], 30, true); vfoLabel.setVisibility(GONE); vfoLabel.setShadowLayer(14 * d, 0, 0, Theme.VFO[2]);   // i18n: key legend
         digits.addView(vfoLabel);
         chRow.addView(digits, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         addView(chRow, chLp);
@@ -193,8 +194,8 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         LinearLayout info = new LinearLayout(c); info.setPadding(0, (int) (6 * d), 0, (int) (4 * d));
         LinearLayout leftCol = new LinearLayout(c); leftCol.setOrientation(VERTICAL);
         // module: OEM's 15 dp labels are restyled to 11 sp with no padding (MainHook 1762-1774)
-        power = Theme.label(c, "Power:", Theme.CYAN, 11, false); squelch = Theme.label(c, "Squelch Level:", Theme.CYAN, 11, false);
-        send = Theme.label(c, "Send:", Theme.CYAN, 11, false); receive = Theme.label(c, "Receive:", Theme.CYAN, 11, false);
+        power = Theme.label(c, Txt.s(R.string.intercom_main_classic_power), Theme.CYAN, 11, false); squelch = Theme.label(c, Txt.s(R.string.intercom_main_classic_squelch), Theme.CYAN, 11, false);
+        send = Theme.label(c, Txt.s(R.string.intercom_main_classic_send), Theme.CYAN, 11, false); receive = Theme.label(c, Txt.s(R.string.intercom_main_classic_receive), Theme.CYAN, 11, false);
         for (TextView t : new TextView[] { power, squelch, send, receive }) { t.setPadding(dp10, (int) (1 * d), 0, (int) (1 * d)); leftCol.addView(t); }   // the page's 10 dp margin
         info.addView(leftCol, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         location = Theme.label(c, "", Theme.WHITE, 12, false); location.setGravity(Gravity.END);
@@ -205,13 +206,13 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         // ---- Signal (0.4) · SCAN (0.3) · ZONE (0.3) ----
         LinearLayout sr = new LinearLayout(c); sr.setGravity(Gravity.CENTER_VERTICAL);
         LayoutParams srLp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); srLp.leftMargin = srLp.rightMargin = dp10; srLp.topMargin = dp4;
-        signal = Theme.label(c, "Signal: --", Theme.YELLOW, 16, true); signal.setGravity(Gravity.CENTER);
+        signal = Theme.label(c, Txt.s(R.string.intercom_main_classic_signal_none_yet), Theme.YELLOW, 16, true); signal.setGravity(Gravity.CENTER);
         signal.setSingleLine(true); signal.setMaxLines(1);   // "Signal: -104 dBm" must never wrap and push the page down
         androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(signal, 10, 16, 1, android.util.TypedValue.COMPLEX_UNIT_SP);
         signal.setBackground(Theme.rounded(c, 0x15FFFF00, 0xAAFFFF00, 2, 8)); signal.setPadding(dp4, (int) (12 * d), dp4, (int) (12 * d));
         LayoutParams sl = new LayoutParams(0, LayoutParams.WRAP_CONTENT, 0.4f); sl.rightMargin = dp4;
         sr.addView(signal, sl);
-        TextView scan = pill(c, "🔍 SCAN"), zone = pill(c, "ZONE: ALL"); scanBtn = scan; zoneBtn = zone;
+        TextView scan = pill(c, "🔍 SCAN"), zone = pill(c, "ZONE: ALL"); scanBtn = scan; zoneBtn = zone;   // i18n: key legend
         LayoutParams bl = new LayoutParams(0, LayoutParams.MATCH_PARENT, 0.3f); bl.leftMargin = dp4;
         sr.addView(scan, bl); sr.addView(zone, new LayoutParams(bl));
         addView(sr, srLp);
@@ -222,7 +223,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         // ---- SQ slider row (module: SQ: 14 sp grey bold, value 18 sp cyan, cyan seek bar) ----
         LinearLayout sq = new LinearLayout(c); sq.setGravity(Gravity.CENTER_VERTICAL);
         LayoutParams sqLp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); sqLp.leftMargin = (int) (16 * d); sqLp.topMargin = dp4; sqLp.bottomMargin = (int) (-6 * d);
-        TextView sqLabel = Theme.label(c, "SQ:", Theme.GREY, 14, true); LayoutParams ll = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); ll.rightMargin = (int) (2 * d);
+        TextView sqLabel = Theme.label(c, "SQ:", Theme.GREY, 14, true); LayoutParams ll = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); ll.rightMargin = (int) (2 * d);   // i18n: key legend
         sq.addView(sqLabel, ll);
         sqValue = Theme.label(c, "3", Theme.CYAN, 18, true); sq.addView(sqValue);
         SeekBar seek = new SeekBar(c); seek.setMax(9); seek.setProgress(5); sqSeek = seek;
@@ -247,17 +248,17 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         final LinearLayout infoPanel = new LinearLayout(c); infoPanel.setOrientation(VERTICAL); this.infoPanel = infoPanel;
         infoPanel.setBackground(Theme.rounded(c, 0x18000000, 0x5500BFFF, 1, 8));
         int ip = (int) (5 * d); infoPanel.setPadding(ip, ip, ip, ip);
-        headline = Theme.label(c, "📻 Ready", Theme.GREEN, 16, true); headline.setMaxLines(1);
+        headline = Theme.label(c, Txt.s(R.string.intercom_main_classic_ready), Theme.GREEN, 16, true); headline.setMaxLines(1);
         LayoutParams hl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); hl.bottomMargin = (int) (2 * d);
         // headline row with a clear-and-close button: hides the box (and empties its list) until the next reception or transmission
         LinearLayout headRow = new LinearLayout(c); headRow.setGravity(Gravity.CENTER_VERTICAL);
         headRow.addView(headline, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         ImageView closeBox = new ImageView(c); closeBox.setImageDrawable(new Neo.IconDrawable("close", Neo.MUTED)); closeBox.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        int cp = (int) (8 * d); closeBox.setPadding(cp, cp, cp, cp); closeBox.setContentDescription("Clear and hide until the next reception"); closeBox.setClickable(true);
+        int cp = (int) (8 * d); closeBox.setPadding(cp, cp, cp, cp); closeBox.setContentDescription(Txt.s(R.string.intercom_main_panel_close)); closeBox.setClickable(true);
         closeBox.setOnClickListener(v -> closePanel());
         headRow.addView(closeBox, new LayoutParams((int) (34 * d), (int) (34 * d)));
         infoPanel.addView(headRow, hl);
-        historyHeader = Theme.label(c, "Analog History", Theme.CYAN2, 13, true);
+        historyHeader = Theme.label(c, Txt.s(R.string.intercom_main_classic_history_analog), Theme.CYAN2, 13, true);
         LayoutParams hh = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); hh.bottomMargin = dp4;
         infoPanel.addView(historyHeader, hh);
         historyText = Theme.label(c, "", Theme.CYAN2, 11, false); infoPanel.addView(historyText);
@@ -271,24 +272,24 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
             if (svc == null) return;
             final String tone = svc.pendingToneLabel();
             if (tone != null && svc.current() != null) {
-                new android.app.AlertDialog.Builder(c).setTitle("CTCSS " + tone + " Hz heard")
-                        .setMessage("Use it as the receive and transmit tone on " + svc.current().name + "? With the tone set, Soft SQ opens only for this tone and other stations will hear you if they need it.")
-                        .setPositiveButton("Use it", (d2, w) -> android.widget.Toast.makeText(c, svc.applyPendingTone(), android.widget.Toast.LENGTH_LONG).show())
-                        .setNeutralButton("Last heard", (d2, w) -> LastHeardDialog.show(c, svc))
-                        .setNegativeButton("Not now", (d2, w) -> svc.dismissPendingTone()).show();
+                new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.intercom_main_tone_heard_title, tone))
+                        .setMessage(Txt.s(R.string.intercom_main_tone_heard_message, svc.current().name))
+                        .setPositiveButton(Txt.s(R.string.intercom_main_tone_heard_use), (d2, w) -> android.widget.Toast.makeText(c, svc.applyPendingTone(), android.widget.Toast.LENGTH_LONG).show())
+                        .setNeutralButton(Txt.s(R.string.intercom_main_last_heard), (d2, w) -> LastHeardDialog.show(c, svc))
+                        .setNegativeButton(Txt.s(R.string.common_not_now), (d2, w) -> svc.dismissPendingTone()).show();
             } else LastHeardDialog.show(c, svc);
         });
         FrameLayout.LayoutParams ipl = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.START);
         ipl.topMargin = ipl.leftMargin = ipl.rightMargin = dp8;
         panel.addView(infoPanel, ipl);
         infoPanel.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> board.barCeilingPx = v.getVisibility() == VISIBLE ? b : 0);   // the spectrum bars stay below the activity box
-        restoreBox = Neo.iconButton(c, "txt", Neo.CYAN, "Show the activity box"); int rp = (int) (9 * d); restoreBox.setPadding(rp, rp, rp, rp);
+        restoreBox = Neo.iconButton(c, "txt", Neo.CYAN, Txt.s(R.string.intercom_main_panel_restore)); int rp = (int) (9 * d); restoreBox.setPadding(rp, rp, rp, rp);
         restoreBox.setOnClickListener(v -> restorePanel()); restoreBox.setVisibility(GONE);
         FrameLayout.LayoutParams rbl = new FrameLayout.LayoutParams((int) (38 * d), (int) (38 * d), Gravity.TOP | Gravity.END); rbl.topMargin = rbl.rightMargin = dp8;
         panel.addView(restoreBox, rbl);
         transcriptionBox = new LinearLayout(c); transcriptionBox.setOrientation(VERTICAL);
         transcriptionBox.setBackground(Theme.rounded(c, 0xF0071626, 0xAA00BFFF, 2, 8)); transcriptionBox.setPadding(dp8, dp8, dp8, dp8);
-        TextView th = Theme.label(c, "📝 Transcription", Theme.CYAN2, 10, true);
+        TextView th = Theme.label(c, Txt.s(R.string.intercom_main_transcription), Theme.CYAN2, 10, true);
         LayoutParams thl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); thl.bottomMargin = dp4;
         transcriptionBox.addView(th, thl);
         // capped like the module (inner scroll, newest at the bottom) so the box never grows over the history
@@ -314,14 +315,14 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         int pttPx = neo && k.ptt > 0 ? (int) (k.ptt * d) : FrameLayout.LayoutParams.WRAP_CONTENT;
         bottom.addView(ptt, new FrameLayout.LayoutParams(pttPx, pttPx, Gravity.CENTER));
         if (neo) {
-            softSq = new NeoToggle(c, "softsq", "SOFT SQ", Neo.CYAN); txt = new NeoToggle(c, "txt", "TXT", Neo.VIOLET); vfo = new NeoToggle(c, "vfo", "VFO", Neo.AMBER);
-            rec = new NeoToggle(c, "rec", "REC", Neo.RED); mon = new NeoToggle(c, "mon", "MON", Neo.AMBER); pkt = new NeoToggle(c, "pkt", "PKT", Neo.GREEN);
+            softSq = new NeoToggle(c, "softsq", "SOFT SQ", Neo.CYAN); txt = new NeoToggle(c, "txt", "TXT", Neo.VIOLET); vfo = new NeoToggle(c, "vfo", "VFO", Neo.AMBER);   // i18n: key legend
+            rec = new NeoToggle(c, "rec", "REC", Neo.RED); mon = new NeoToggle(c, "mon", "MON", Neo.AMBER); pkt = new NeoToggle(c, "pkt", "PKT", Neo.GREEN);   // i18n: key legend
             NeonToggle[] l = { softSq, txt, vfo }, r = { rec, mon, pkt };
             if (k.compact) for (NeonToggle t : new NeonToggle[] { softSq, txt, vfo, rec, mon, pkt }) ((NeoToggle) t).compact();
             for (int i = 0; i < 3; i++) { bottom.addView(l[i], neoSat(d, k, Gravity.START, k.satTop0 + i * k.satStep)); bottom.addView(r[i], neoSat(d, k, Gravity.END, k.satTop0 + i * k.satStep)); }
         } else {
-        softSq = new NeonToggle(c, "🎚️", "SOFT SQ", Theme.SOFTSQ); txt = new NeonToggle(c, "✍️", "TXT", Theme.TXT); vfo = new NeonToggle(c, "🎛️", "VFO", Theme.VFO);
-        rec = new NeonToggle(c, "🔴", "REC", Theme.REC); mon = new NeonToggle(c, "👁️", "MON", Theme.MON); pkt = new NeonToggle(c, "📡", "PKT", Theme.PKT);
+        softSq = new NeonToggle(c, "🎚️", "SOFT SQ", Theme.SOFTSQ); txt = new NeonToggle(c, "✍️", "TXT", Theme.TXT); vfo = new NeonToggle(c, "🎛️", "VFO", Theme.VFO);   // i18n: key legend
+        rec = new NeonToggle(c, "🔴", "REC", Theme.REC); mon = new NeonToggle(c, "👁️", "MON", Theme.MON); pkt = new NeonToggle(c, "📡", "PKT", Theme.PKT);   // i18n: key legend
         bottom.addView(softSq, sat(d, 80, Gravity.START, 8, 4));
         bottom.addView(txt, sat(d, 70, Gravity.START, 8, 58));
         bottom.addView(vfo, sat(d, 70, Gravity.START, 8, 112));
@@ -352,13 +353,13 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         mon.setOnClickListener(v -> { if (svc != null) svc.setMonitor(!mon.isOn()); });
         txt.setOnClickListener(v -> {
             if (svc == null) return;
-            if (!svc.captionsAvailable()) { android.widget.Toast.makeText(c, "google".equals(svc.captionEngine()) ? "Long-press TXT and enter a Google Cloud API key, or switch to the on-device engine" : "Captions are not available right now", android.widget.Toast.LENGTH_LONG).show(); return; }
+            if (!svc.captionsAvailable()) { android.widget.Toast.makeText(c, "google".equals(svc.captionEngine()) ? Txt.s(R.string.intercom_main_captions_need_key) : Txt.s(R.string.intercom_main_captions_unavailable), android.widget.Toast.LENGTH_LONG).show(); return; }
             svc.setCaptions(!txt.isOn());
         });
         txt.setOnLongClickListener(v -> {
             final boolean google = "google".equals(svc.captionEngine());
-            new android.app.AlertDialog.Builder(c).setTitle("Live captions").setItems(new String[] { "Engine: " + (google ? "Google Cloud (switch to on-device Vosk)" : "on-device Vosk (switch to Google Cloud)"), "Recognition model (Vosk)\u2026", "Google Cloud API key\u2026", "Keyword alerts\u2026" }, (d2, w) -> {
-                if (w == 0) { svc.setCaptionEngine(google ? "vosk" : "google"); android.widget.Toast.makeText(c, "Captions now use " + (google ? "the on-device Vosk recognizer" : "Google Cloud Speech"), android.widget.Toast.LENGTH_SHORT).show(); }
+            new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.intercom_main_captions_menu_title)).setItems(new String[] { google ? Txt.s(R.string.intercom_main_captions_engine_google) : Txt.s(R.string.intercom_main_captions_engine_vosk), Txt.s(R.string.intercom_main_captions_menu_model), Txt.s(R.string.intercom_main_captions_menu_key), Txt.s(R.string.intercom_main_captions_menu_keywords) }, (d2, w) -> {
+                if (w == 0) { svc.setCaptionEngine(google ? "vosk" : "google"); android.widget.Toast.makeText(c, google ? Txt.s(R.string.intercom_main_captions_now_vosk) : Txt.s(R.string.intercom_main_captions_now_google), android.widget.Toast.LENGTH_SHORT).show(); }
                 else if (w == 1) pickCaptionModel();
                 else if (w == 2) editGoogleKey();
                 else editKeywords();
@@ -366,7 +367,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
             return true;
         });
         vfo.setOnClickListener(v -> { if (svc != null) VfoDialog.show(c, svc); });
-        vfo.setOnLongClickListener(v -> { if (svc != null && svc.vfoActive()) { svc.exitVfo(); android.widget.Toast.makeText(c, "VFO off", android.widget.Toast.LENGTH_SHORT).show(); } return true; });
+        vfo.setOnLongClickListener(v -> { if (svc != null && svc.vfoActive()) { svc.exitVfo(); android.widget.Toast.makeText(c, Txt.s(R.string.intercom_main_vfo_off_toast), android.widget.Toast.LENGTH_SHORT).show(); } return true; });
         pkt.setOnClickListener(v -> { if (svc != null) PktDialog.show(c, svc); });   // the packet tools; running modes are one tap away at the top
         ptt.setListener(down -> { if (svc != null) svc.ptt(down); });
     }
@@ -381,10 +382,10 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
     /** Offer to switch looks (long-press the classic title, or the new look's menu). */
     private void offerLook(boolean toNew) {
         final Context c = getContext();
-        new android.app.AlertDialog.Builder(c).setTitle(toNew ? "Try the new intercom look?" : "Back to the classic intercom?")
-                .setMessage("Device → Radio settings → New intercom look switches it too.")
-                .setPositiveButton(toNew ? "New look" : "Classic", (dd, w) -> { setNewLook(c, toNew); if (c instanceof com.macdmr.radio.MainActivity) ((com.macdmr.radio.MainActivity) c).rebuildIntercom(); })
-                .setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(c).setTitle(toNew ? Txt.s(R.string.intercom_main_look_try_new) : Txt.s(R.string.intercom_main_look_back_classic))
+                .setMessage(Txt.s(R.string.intercom_main_look_message))
+                .setPositiveButton(toNew ? Txt.s(R.string.intercom_main_look_new) : Txt.s(R.string.intercom_main_look_classic), (dd, w) -> { setNewLook(c, toNew); if (c instanceof com.macdmr.radio.MainActivity) ((com.macdmr.radio.MainActivity) c).rebuildIntercom(); })
+                .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     /** Soft halo behind the channel number: a radial gradient drawn once (a text shadow is re-blurred on every change and cost up to 38 ms of GPU per channel step). */
@@ -409,14 +410,14 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
      */
     private void buildNeoTop(final Context c, final float d) {
         final int m = (int) (k.side * d);
-        neoHeader = Neo.header(c, "", "Zone · ALL");
+        neoHeader = Neo.header(c, "", Txt.s(R.string.intercom_main_zone_subtitle, "ALL").toUpperCase(java.util.Locale.US));
         neoHeader.setMinimumHeight((int) (k.headerMin * d));
         title = Neo.headerTitle(neoHeader); title.setTextSize(k.titleSp); Neo.headerSubtitle(neoHeader).setTextSize(k.subSp);
         ImageView logo = new ImageView(c); logo.setImageDrawable(new Neo.IconDrawable("radio", Neo.CYAN));
         LayoutParams lg = new LayoutParams((int) (k.logo * d), (int) (k.logo * d)); lg.rightMargin = (int) (k.logoGap * d);
         neoHeader.addView(logo, 0, lg);
-        ImageView menu = Neo.iconButton(c, "menu", Neo.CYAN, "Menu");
-        menu.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setItems(new String[] { "Choose zone", "Last heard", "Nets near you", "Map & coverage", "Fox hunt", "Emergency", "Classic intercom look" }, (dd, w) -> {
+        ImageView menu = Neo.iconButton(c, "menu", Neo.CYAN, Txt.s(R.string.intercom_main_menu));
+        menu.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setItems(new String[] { Txt.s(R.string.intercom_main_menu_zone), Txt.s(R.string.intercom_main_last_heard), Txt.s(R.string.intercom_main_menu_nets), Txt.s(R.string.intercom_main_menu_map), Txt.s(R.string.intercom_main_menu_fox), Txt.s(R.string.intercom_main_menu_emergency), Txt.s(R.string.intercom_main_menu_classic) }, (dd, w) -> {
             if (w == 0) pickZone(); else if (w == 1) { if (svc != null) LastHeardDialog.show(c, svc); } else if (w == 2) NetsDialog.show(c, svc); else if (w == 3) MapDialog.show(c, svc); else if (w == 4) FoxHuntDialog.show(c, svc); else if (w == 5) EmergencyDialog.show(c, svc); else offerLook(false);
         }).show());
         Neo.addAction(neoHeader, menu);
@@ -425,7 +426,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
 
         // channel strip: arrows, big number, mode chips
         FrameLayout strip = new FrameLayout(c);
-        ImageView prev = roundArrow(c, "left", "Previous channel"), next = roundArrow(c, "right", "Next channel");
+        ImageView prev = roundArrow(c, "left", Txt.s(R.string.intercom_main_prev_channel)), next = roundArrow(c, "right", Txt.s(R.string.intercom_main_next_channel));
         FrameLayout.LayoutParams pl = new FrameLayout.LayoutParams((int) (k.arrow * d), (int) (k.arrow * d), Gravity.START | Gravity.CENTER_VERTICAL); pl.leftMargin = (int) (k.arrowSide * d);
         FrameLayout.LayoutParams nl = new FrameLayout.LayoutParams((int) (k.arrow * d), (int) (k.arrow * d), Gravity.END | Gravity.CENTER_VERTICAL); nl.rightMargin = (int) (k.arrowSide * d);
         strip.addView(prev, pl); strip.addView(next, nl);
@@ -467,9 +468,9 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         // S-meter
         LinearLayout sm = rcard;
         LinearLayout smTop = new LinearLayout(c); smTop.setGravity(Gravity.CENTER_VERTICAL);
-        TextView sigLabel = Neo.caps(c, "Signal"); sigLabel.setTextSize(k.labelSp);
+        TextView sigLabel = Neo.caps(c, Txt.s(R.string.intercom_main_meter_label)); sigLabel.setTextSize(k.labelSp);
         smTop.addView(sigLabel, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        smeterText = Neo.text(c, "NO SIGNAL", Neo.DIM, k.meterSp, Neo.mono(c)); smTop.addView(smeterText);
+        smeterText = Neo.text(c, Txt.s(R.string.intercom_main_meter_none), Neo.DIM, k.meterSp, Neo.mono(c)); smTop.addView(smeterText);
         sm.addView(smTop);
         smeter = new SMeterView(c); smeter.setCompact(k.compact); LayoutParams mlp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); mlp.topMargin = (int) (k.meterTop * d);
         sm.addView(smeter, mlp);
@@ -480,7 +481,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
 
         // SCAN / ZONE
         LinearLayout br = new LinearLayout(c); br.setBaselineAligned(false);
-        scanBtn = Neo.button(c, "SCAN", "scan", Neo.CYAN); zoneBtn = Neo.button(c, "ZONE: ALL", "zone", Neo.CYAN);
+        scanBtn = Neo.button(c, "SCAN", "scan", Neo.CYAN); zoneBtn = Neo.button(c, "ZONE: ALL", "zone", Neo.CYAN);   // i18n: key legend
         for (TextView t : new TextView[] { scanBtn, zoneBtn }) {
             t.setLetterSpacing(0.12f); t.setTextSize(k.scanSp); t.setMinHeight((int) (k.scanMinH * d)); t.setSingleLine(true); t.setMaxLines(1);
             if (k.compact) t.setPadding((int) (10 * d), (int) (3 * d), (int) (10 * d), (int) (3 * d));
@@ -498,7 +499,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
 
         // Soft SQ slider
         LinearLayout sq = new LinearLayout(c); sq.setGravity(Gravity.CENTER_VERTICAL);
-        TextView sqLabel = Neo.caps(c, "Soft SQ"); sqLabel.setTextSize(k.sqLabelSp);
+        TextView sqLabel = Neo.caps(c, "Soft SQ"); sqLabel.setTextSize(k.sqLabelSp);   // i18n: key legend
         sq.addView(sqLabel, new LayoutParams((int) (k.sqLabelW * d), LayoutParams.WRAP_CONTENT));
         SeekBar seek = new SeekBar(c); seek.setMax(9); seek.setProgress(5); sqSeek = seek;
         seek.setProgressTintList(android.content.res.ColorStateList.valueOf(Neo.CYAN)); seek.setProgressBackgroundTintList(android.content.res.ColorStateList.valueOf(Neo.TRACK)); seek.setThumbTintList(android.content.res.ColorStateList.valueOf(Neo.CYAN));
@@ -532,29 +533,29 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
 
     private void editGoogleKey() {
         if (svc == null) return;
-        final android.widget.EditText et = new android.widget.EditText(getContext()); et.setHint("Google Cloud Speech-to-Text API key"); et.setText(svc.googleKey());
+        final android.widget.EditText et = new android.widget.EditText(getContext()); et.setHint(Txt.s(R.string.intercom_main_key_hint)); et.setText(svc.googleKey());
         et.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Google Cloud API key").setMessage("Used only when the engine is Google Cloud. The key stays in this app's private settings and is never written to logs or backups.").setView(et)
-                .setPositiveButton("Save", (d2, w) -> svc.setGoogleKey(et.getText().toString())).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.intercom_main_key_title)).setMessage(Txt.s(R.string.intercom_main_key_message)).setView(et)
+                .setPositiveButton(Txt.s(R.string.common_save), (d2, w) -> svc.setGoogleKey(et.getText().toString())).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void editKeywords() {
         if (svc == null) return;
         final android.widget.EditText et = new android.widget.EditText(getContext());
-        et.setHint("e.g. emergency, mayday, your name, your town"); et.setText(svc.keywords()); et.setMinLines(3);
+        et.setHint(Txt.s(R.string.intercom_main_keywords_hint)); et.setText(svc.keywords()); et.setMinLines(3);
         et.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Keyword alerts").setMessage("Words or phrases, one per line or comma-separated. When live captions hear one, the phone vibrates, posts a notification and (with voice announcements on) says it.").setView(et)
-                .setPositiveButton("Save", (d2, w) -> svc.setKeywords(et.getText().toString())).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.intercom_main_keywords_title)).setMessage(Txt.s(R.string.intercom_main_keywords_message)).setView(et)
+                .setPositiveButton(Txt.s(R.string.common_save), (d2, w) -> svc.setKeywords(et.getText().toString())).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void pickCaptionModel() {
         if (svc == null) return;
         int cur = 1; for (int i = 0; i < com.macdmr.radio.VoskCaptions.MODELS.length; i++) if (com.macdmr.radio.VoskCaptions.MODELS[i].equals(svc.captionModel())) cur = i;
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Live-caption model").setSingleChoiceItems(com.macdmr.radio.VoskCaptions.MODEL_LABELS, cur, null)
-                .setPositiveButton("Use", (d, w) -> {
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.intercom_main_model_title)).setSingleChoiceItems(com.macdmr.radio.VoskCaptions.modelLabels(), cur, null)
+                .setPositiveButton(Txt.s(R.string.intercom_main_model_use), (d, w) -> {
                     int i = ((android.app.AlertDialog) d).getListView().getCheckedItemPosition();
-                    if (i >= 0) { svc.setCaptionModel(com.macdmr.radio.VoskCaptions.MODELS[i]); android.widget.Toast.makeText(getContext(), "Switching model; it downloads once and is kept across app updates", android.widget.Toast.LENGTH_LONG).show(); }
-                }).setNegativeButton("Cancel", null).show();
+                    if (i >= 0) { svc.setCaptionModel(com.macdmr.radio.VoskCaptions.MODELS[i]); android.widget.Toast.makeText(getContext(), Txt.s(R.string.intercom_main_model_switching), android.widget.Toast.LENGTH_LONG).show(); }
+                }).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void pickZone() { if (svc != null) ZonesDialog.show(getContext(), svc, null); }
@@ -562,26 +563,26 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
 
     private void refreshHeadline() {
         if (neo) { refreshNeoHeadline(); return; }
-        if (svc != null && svc.firmwareLoading()) { headline.setText("Radio busy, loading firmware"); headline.setTextColor(Theme.AMBER); }
-        else if (tx) { headline.setText("🔴 Transmitting"); headline.setTextColor(Theme.RED); }
-        else if (receivingNow()) { headline.setText("📻 Receiving..."); headline.setTextColor(Theme.GREEN); }
-        else if (svc != null && "no root".equals(svc.link())) { headline.setText("🔒 Root needed — allow in Magisk, then Device → Bring radio up"); headline.setTextColor(Theme.AMBER); }
-        else if (svc != null && "unsupported".equals(svc.link())) { headline.setText("📱 This phone is not supported yet — Device → Device report"); headline.setTextColor(Theme.AMBER); }
-        else { headline.setText(svc != null && svc.isReady() ? "📻 Ready" : "⏳ " + (svc != null ? svc.link() : "")); headline.setTextColor(Theme.GREEN); }
+        if (svc != null && svc.firmwareLoading()) { headline.setText(Txt.s(R.string.intercom_main_classic_loading)); headline.setTextColor(Theme.AMBER); }
+        else if (tx) { headline.setText(Txt.s(R.string.intercom_main_classic_transmitting)); headline.setTextColor(Theme.RED); }
+        else if (receivingNow()) { headline.setText(Txt.s(R.string.intercom_main_classic_receiving)); headline.setTextColor(Theme.GREEN); }
+        else if (svc != null && "no root".equals(svc.link())) { headline.setText(Txt.s(R.string.intercom_main_classic_root_needed)); headline.setTextColor(Theme.AMBER); }   // i18n: svc.link() state key
+        else if (svc != null && "unsupported".equals(svc.link())) { headline.setText(Txt.s(R.string.intercom_main_classic_unsupported)); headline.setTextColor(Theme.AMBER); }
+        else { headline.setText(svc != null && svc.isReady() ? Txt.s(R.string.intercom_main_classic_ready) : "⏳ " + (svc != null ? svc.link() : "")); headline.setTextColor(Theme.GREEN); }
         ptt.setState(tx ? PttButton.State.TX : receivingNow() ? PttButton.State.RX : (svc != null && svc.isReady() && svc.txInhibited() ? PttButton.State.BUSY : PttButton.State.IDLE));
         board.isReceiving = rx;
     }
 
     private void refreshNeoHeadline() {
         String t; int col;
-        if (svc != null && svc.firmwareLoading()) { t = "RADIO BUSY, LOADING FIRMWARE"; col = Neo.AMBER; }
-        else if (tx) { t = "TRANSMITTING"; col = Neo.RED; }
-        else if (receivingNow()) { t = "RECEIVING"; col = Neo.GREEN; }
-        else if (svc != null && "no root".equals(svc.link())) { t = "ROOT NEEDED · allow in Magisk, then Device → Take over"; col = Neo.AMBER; }
-        else if (svc != null && "unsupported".equals(svc.link())) { t = "PHONE NOT SUPPORTED YET · Device → Device report"; col = Neo.AMBER; }
-        else if (svc != null && svc.isReady()) { t = "READY"; col = Neo.GREEN; }
+        if (svc != null && svc.firmwareLoading()) { t = Txt.s(R.string.intercom_main_neo_loading); col = Neo.AMBER; }
+        else if (tx) { t = Txt.s(R.string.intercom_main_neo_transmitting); col = Neo.RED; }
+        else if (receivingNow()) { t = Txt.s(R.string.intercom_main_neo_receiving); col = Neo.GREEN; }
+        else if (svc != null && "no root".equals(svc.link())) { t = Txt.s(R.string.intercom_main_neo_root_needed); col = Neo.AMBER; }   // i18n: svc.link() state key
+        else if (svc != null && "unsupported".equals(svc.link())) { t = Txt.s(R.string.intercom_main_neo_unsupported); col = Neo.AMBER; }
+        else if (svc != null && svc.isReady()) { t = Txt.s(R.string.intercom_main_neo_ready); col = Neo.GREEN; }
         else { t = svc != null ? svc.link().toUpperCase(java.util.Locale.US) : ""; col = Neo.AMBER; }
-        headline.setText("●  " + t); headline.setTextColor(col);
+        headline.setText(Txt.s(R.string.intercom_main_neo_headline, t)); headline.setTextColor(col);
         ptt.setState(tx ? PttButton.State.TX : receivingNow() ? PttButton.State.RX : (svc != null && svc.isReady() && svc.txInhibited() ? PttButton.State.BUSY : PttButton.State.IDLE));
         board.isReceiving = rx;
     }
@@ -589,33 +590,33 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
     /** New look: number, chips and the four readout cells for the channel. */
     private void neoChannel(ChannelStore.Channel ch, boolean isVfo) {
         Context c = getContext(); float d = Theme.dp(c);
-        title.setText((isVfo ? "VFO" : ch.name).toUpperCase(java.util.Locale.US));
-        bigNum.setText(isVfo ? "VFO" : String.format(java.util.Locale.US, "%02d", ch.number % 100));
+        title.setText((isVfo ? "VFO" : ch.name).toUpperCase(java.util.Locale.US));   // i18n: key legend
+        bigNum.setText(isVfo ? "VFO" : String.format(java.util.Locale.US, "%02d", ch.number % 100));   // i18n: key legend (readout abbreviation)
         int numCol = isVfo ? Neo.AMBER : Neo.CYAN; bigNum.setTextColor(numCol); bigNum.setBackground(glow(numCol));
         chipRow.removeAllViews();
-        TextView[] chips = { Neo.chip(c, ch.isM17() ? "M17" : ch.isDigital() ? "DMR" : "FM", ch.isM17() || ch.isDigital() ? Neo.VIOLET : Neo.CYAN), Neo.chip(c, ch.rxFreq < 300_000_000 ? "VHF" : "UHF", Neo.CYAN), Neo.chip(c, ch.power == 1 ? "HIGH PWR" : "LOW PWR", Neo.AMBER) };
+        TextView[] chips = { Neo.chip(c, ch.isM17() ? "M17" : ch.isDigital() ? "DMR" : "FM", ch.isM17() || ch.isDigital() ? Neo.VIOLET : Neo.CYAN), Neo.chip(c, ch.rxFreq < 300_000_000 ? "VHF" : "UHF", Neo.CYAN), Neo.chip(c, ch.power == 1 ? Txt.s(R.string.intercom_main_chip_high_power) : Txt.s(R.string.intercom_main_chip_low_power), Neo.AMBER) };
         for (int i = 0; i < chips.length; i++) {
             chips[i].setTextSize(k.chipSp); chips[i].setPadding((int) (k.chipPadH * d), (int) (k.chipPadV * d), (int) (k.chipPadH * d), (int) (k.chipPadV * d));
             LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             if (i > 0) { if (k.chipsBeside) lp.topMargin = (int) (k.chipGap * d); else lp.leftMargin = (int) (k.chipGap * d); }
             chipRow.addView(chips[i], lp);
         }
-        readLabel[0].setText("TX"); readLabel[1].setText("RX");
+        readLabel[0].setText("TX"); readLabel[1].setText("RX");   // i18n: key legend (readout abbreviation)
         send.setText(ChannelsView.mhz(ch.txFreq)); receive.setText(ChannelsView.mhz(ch.rxFreq));
         if (ch.isM17()) {
-            readLabel[2].setText("CAN"); squelch.setText(String.valueOf(ch.can())); power.setTextColor(Neo.TEXT);
-            readLabel[3].setText("DEST"); power.setText(ch.m17Dest());
+            readLabel[2].setText("CAN"); squelch.setText(String.valueOf(ch.can())); power.setTextColor(Neo.TEXT);   // i18n: key legend (readout abbreviation)
+            readLabel[3].setText(Txt.s(R.string.intercom_main_read_dest)); power.setText(ch.m17Dest());
         } else if (ch.isDigital()) {
-            if (com.macdmr.radio.DeviceProfile.detect().timeSlots) { readLabel[2].setText("CC · TS"); squelch.setText(ch.cc + " · " + (ch.inSlot + 1)); }
-            else { readLabel[2].setText("CC"); squelch.setText(String.valueOf(ch.cc)); }      // the Armor 3WT: no slot setting
+            if (com.macdmr.radio.DeviceProfile.detect().timeSlots) { readLabel[2].setText("CC · TS"); squelch.setText(ch.cc + " · " + (ch.inSlot + 1)); }   // i18n: key legend (readout abbreviation)
+            else { readLabel[2].setText("CC"); squelch.setText(String.valueOf(ch.cc)); }   // i18n: key legend (readout abbreviation); the Armor 3WT: no slot setting
             int picked = svc != null && !isVfo ? svc.talkgroupOverride() : 0;          // a talkgroup picked here (long-press) shows in amber
-            readLabel[3].setText(picked > 0 ? "CALL · PICKED" : "CALL");
-            power.setText(picked > 0 ? "TG " + picked : (ch.contactType == 1 ? "TG " : ch.contactType == 2 ? "ALL " : "ID ") + ch.txContact);
+            readLabel[3].setText(picked > 0 ? Txt.s(R.string.intercom_main_read_call_picked) : Txt.s(R.string.intercom_main_read_call));
+            power.setText(picked > 0 ? "TG " + picked : (ch.contactType == 1 ? "TG " : ch.contactType == 2 ? "ALL " : "ID ") + ch.txContact);   // i18n: DMR call-type abbreviation
             power.setTextColor(picked > 0 ? Neo.AMBER : Neo.TEXT);
         } else {
-            readLabel[2].setText("SQ"); squelch.setText(String.valueOf(ch.sq)); power.setTextColor(Neo.TEXT);
-            readLabel[3].setText("TONE");
-            String tone = ch.rxType == 1 && com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode) > 0 ? String.format(java.util.Locale.US, "%.1f", com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode)) : ch.rxType == 2 || ch.rxType == 3 ? com.macdmr.radio.dsp.ToneTable.toneLabel(ch.rxType, ch.rxSubCode) : "NONE";
+            readLabel[2].setText("SQ"); squelch.setText(String.valueOf(ch.sq)); power.setTextColor(Neo.TEXT);   // i18n: key legend (readout abbreviation)
+            readLabel[3].setText(Txt.s(R.string.intercom_main_read_tone));
+            String tone = ch.rxType == 1 && com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode) > 0 ? Txt.decimal(com.macdmr.radio.dsp.ToneTable.ctcssHz(ch.rxSubCode), 1) : ch.rxType == 2 || ch.rxType == 3 ? com.macdmr.radio.dsp.ToneTable.toneLabel(ch.rxType, ch.rxSubCode) : Txt.s(R.string.intercom_main_read_tone_none);
             power.setText(tone);
         }
     }
@@ -632,16 +633,16 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
             boolean on = picked > 0 ? !o.programmed && o.number == picked : o.programmed;
             items[i] = (on ? "✓  " : "     ") + o.label;
         }
-        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(getContext()).setTitle("Talkgroup on " + ch.name)
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.intercom_main_tg_title, ch.name))
                 .setItems(items, (d, w) -> {
                     com.macdmr.radio.TalkgroupOverride.Option o = opts.get(w);
                     String err = svc.pickTalkgroup(o.programmed ? 0 : o.number);
                     if (err != null) android.widget.Toast.makeText(getContext(), err, android.widget.Toast.LENGTH_SHORT).show();
                 });
         if (opts.size() == 1) {                                                 // a message would hide the list: say what to do instead
-            new android.app.AlertDialog.Builder(getContext()).setTitle("Talkgroup on " + ch.name)
-                    .setMessage("No group contacts yet. Add talkgroups on the Contacts page (type Group) to pick them here.")
-                    .setPositiveButton("OK", null).show();
+            new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.intercom_main_tg_title, ch.name))
+                    .setMessage(Txt.s(R.string.intercom_main_tg_none))
+                    .setPositiveButton(Txt.s(R.string.common_ok), null).show();
             return;
         }
         b.show();
@@ -654,7 +655,7 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
         boolean isVfo = ch.id < 0;
         if (neo) {
             neoChannel(ch, isVfo); vfo.setOn(isVfo);
-            historyHeader.setText(ch.isM17() ? "M17" : ch.isDigital() ? "DMR ACTIVITY" : "ANALOG HISTORY");
+            historyHeader.setText(ch.isM17() ? "M17" : ch.isDigital() ? Txt.s(R.string.intercom_main_neo_history_dmr) : Txt.s(R.string.intercom_main_neo_history_analog));
             softSq.setVisibility(ch.isDigital() || ch.isM17() ? INVISIBLE : VISIBLE);
             chanFm = !ch.isDigital() && !ch.isM17(); showSqRow(softSq.isOn());
             history.clear();
@@ -662,15 +663,15 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
             renderHistory(); refreshHeadline();
             return;
         }
-        title.setText(ch.name + (ch.rxFreq < 300_000_000 ? "(VHF)" : "(UHF)"));
+        title.setText(ch.name + (ch.rxFreq < 300_000_000 ? "(VHF)" : "(UHF)"));   // i18n: band name
         int shown = ch.number % 100;
         digitOne.setImageResource(DIGITS[shown / 10]); digitTwo.setImageResource(DIGITS[shown % 10]);
         digitOne.setVisibility(isVfo ? GONE : VISIBLE); digitTwo.setVisibility(isVfo ? GONE : VISIBLE); vfoLabel.setVisibility(isVfo ? VISIBLE : GONE);
         vfo.setOn(isVfo);
-        power.setText("Power:" + (ch.power == 1 ? "High power" : "Low power"));
-        squelch.setText(ch.isM17() ? "CAN:" + ch.can() + "  " + ch.m17Dest() : ch.isDigital() ? "Color Code:" + ch.cc : "Squelch Level:" + ch.sq);
-        send.setText("Send:" + ch.freqText(ch.txFreq)); receive.setText("Receive:" + ch.freqText(ch.rxFreq));
-        historyHeader.setText(ch.isM17() ? "M17" : ch.isDigital() ? "DMR Activity" : "Analog History");
+        power.setText(ch.power == 1 ? Txt.s(R.string.intercom_main_classic_power_high) : Txt.s(R.string.intercom_main_classic_power_low));
+        squelch.setText(ch.isM17() ? Txt.s(R.string.intercom_main_classic_can, String.valueOf(ch.can()), ch.m17Dest()) : ch.isDigital() ? Txt.s(R.string.intercom_main_classic_color_code, String.valueOf(ch.cc)) : Txt.s(R.string.intercom_main_classic_squelch_level, String.valueOf(ch.sq)));
+        send.setText(Txt.s(R.string.intercom_main_classic_send_value, ch.freqText(ch.txFreq))); receive.setText(Txt.s(R.string.intercom_main_classic_receive_value, ch.freqText(ch.rxFreq)));
+        historyHeader.setText(ch.isM17() ? "M17" : ch.isDigital() ? Txt.s(R.string.intercom_main_classic_history_dmr) : Txt.s(R.string.intercom_main_classic_history_analog));
         softSq.setVisibility(ch.isDigital() || ch.isM17() ? INVISIBLE : VISIBLE);
         history.clear();
         if (svc != null && !panelClosed) for (String l : svc.store().recentHistory(ch.number, 3)) history.addLast(l);
@@ -690,16 +691,16 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
     private void updateMeter() {
         if (svc != null && !svc.profile().rssi) {                            // no signal readings (the W6): say whether something is received, no bars
             boolean r = receivingNow();
-            if (!neo) { signal.setText(r ? "Receiving" : "No signal"); return; }
+            if (!neo) { signal.setText(r ? Txt.s(R.string.intercom_main_classic_signal_receiving) : Txt.s(R.string.intercom_main_classic_signal_none)); return; }
             smeter.setVisibility(GONE);
-            smeterText.setText(r ? "RECEIVING" : "QUIET"); smeterText.setTextColor(r ? Neo.GREEN_LIGHT : Neo.DIM); smeterText.setTextSize(r ? 17 : 12.5f);
+            smeterText.setText(r ? Txt.s(R.string.intercom_main_meter_receiving) : Txt.s(R.string.intercom_main_meter_quiet)); smeterText.setTextColor(r ? Neo.GREEN_LIGHT : Neo.DIM); smeterText.setTextSize(r ? 17 : 12.5f);
             return;
         }
-        if (!neo) { boolean on2 = receivingNow() && lastDbm != -999; signal.setText(on2 ? "Signal: " + lastDbm + " dBm" : "No signal"); return; }   // classic: the yellow box reads only while something is heard
+        if (!neo) { boolean on2 = receivingNow() && lastDbm != -999; signal.setText(on2 ? Txt.s(R.string.intercom_main_classic_signal_dbm, lastDbm) : Txt.s(R.string.intercom_main_classic_signal_none)); return; }   // classic: the yellow box reads only while something is heard
         boolean on = receivingNow() && lastDbm != -999;
         smeter.setDbm(on ? lastDbm : -999);
-        if (on) { smeterText.setText(SMeterView.sUnits(lastDbm) + "  " + lastDbm + " dBm"); smeterText.setTextColor(lastDbm > -93 ? Neo.AMBER_LIGHT : Neo.TEXT); smeterText.setTextSize(k.meterSp); }
-        else { smeterText.setText(lastDbm == -999 ? "NO SIGNAL" : "NO SIGNAL  \u00B7  floor " + lastDbm + " dBm"); smeterText.setTextColor(Neo.DIM); smeterText.setTextSize(k.meterQuietSp); }
+        if (on) { smeterText.setText(Txt.s(R.string.intercom_main_meter_dbm, SMeterView.sUnits(lastDbm), lastDbm)); smeterText.setTextColor(lastDbm > -93 ? Neo.AMBER_LIGHT : Neo.TEXT); smeterText.setTextSize(k.meterSp); }
+        else { smeterText.setText(lastDbm == -999 ? Txt.s(R.string.intercom_main_meter_none) : Txt.s(R.string.intercom_main_meter_floor, lastDbm)); smeterText.setTextColor(Neo.DIM); smeterText.setTextSize(k.meterQuietSp); }
     }
     @Override public void onRssi(int dbm) {
         lastDbm = dbm; updateMeter();
@@ -707,8 +708,8 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
     }
     @Override public void onAudioLevel(int amplitude) { board.audioAmplitude = amplitude; }
     @Override public void onSpectrum(float[] bands) { board.spectrum = bands; }
-    @Override public void onHistory(String line) { reopenPanel("history: " + line); if (!history.isEmpty() && history.peekLast().equals(line)) return; history.addLast(line); while (history.size() > 3) history.removeFirst(); renderHistory(); }
-    @Override public void onCaller(String text) { reopenPanel("caller: " + text); headline.setText(neo ? "●  " + text : "📻 " + text); }
+    @Override public void onHistory(String line) { reopenPanel("history: " + line); if (!history.isEmpty() && history.peekLast().equals(line)) return; history.addLast(line); while (history.size() > 3) history.removeFirst(); renderHistory(); }   // i18n: log reason (reopenPanel logs it)
+    @Override public void onCaller(String text) { reopenPanel("caller: " + text); headline.setText(neo ? Txt.s(R.string.intercom_main_neo_headline, text) : Txt.s(R.string.intercom_main_classic_caller, text)); }   // i18n: log reason (reopenPanel logs it)
     @Override public void onLog(String s) { }
     @Override public void onLink(String state) { refreshHeadline(); }
     @Override public void onSms(int from, int type, String text) { }
@@ -734,30 +735,30 @@ public class IntercomView extends LinearLayout implements RadioService.Listener 
     private boolean gateWasOpen;
     private int lastScanState = -1;
     @Override public void onModes(boolean sq, int level, boolean open, boolean monitor, boolean recording, boolean scanning, boolean holding, String zoneName) {
-        if (sq && open && !gateWasOpen) reopenPanel("soft squelch opened");
+        if (sq && open && !gateWasOpen) reopenPanel("soft squelch opened");   // i18n: log reason (reopenPanel logs it)
         boolean was = gateWasOpen; gateWasOpen = sq && open;   // Soft SQ channels: the gate opening is the reception
         if (was != gateWasOpen) { updateMeter(); refreshHeadline(); }   // headline and talk key follow what is actually heard
         softSq.setOn(sq); mon.setOn(monitor); rec.setOn(recording); pkt.setOn(svc != null && svc.packetActive());
         showSqRow(sq);
         if (!sqFromUser) { sqSeek.setProgress(level); sqValue.setText(String.valueOf(level)); }
         sqValue.setTextColor(sq ? (open ? Theme.GREEN : Theme.AMBER) : Theme.CYAN);
-        zoneBtn.setText("ZONE: " + zoneName.toUpperCase(java.util.Locale.US));
+        zoneBtn.setText("ZONE: " + zoneName.toUpperCase(java.util.Locale.US));   // i18n: key legend
         if (neo) {
             if (!zoneBtn.getText().toString().equals(lastZoneText)) { lastZoneText = zoneBtn.getText().toString(); rebalanceScanZone(); }
-            this.zoneName = zoneName; Neo.headerSubtitle(neoHeader).setText(("Zone · " + zoneName).toUpperCase(java.util.Locale.US));
+            this.zoneName = zoneName; Neo.headerSubtitle(neoHeader).setText(Txt.s(R.string.intercom_main_zone_subtitle, zoneName).toUpperCase(java.util.Locale.US));
             sqValue.setTextColor(sq ? (open ? Neo.GREEN : Neo.AMBER) : Neo.CYAN);
             int scanState = scanning ? (holding ? 2 : 1) : 0;
             if (scanState == lastScanState) return;   // pushModes runs on every Soft SQ gate change: rebuild the SCAN key only when it changes
             lastScanState = scanState;
             Context c = getContext(); int col = scanning ? Neo.AMBER : Neo.CYAN;
-            scanBtn.setText(scanning ? (holding ? "HOLD" : "SCANNING") : "SCAN"); scanBtn.setTextColor(scanning ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);
+            scanBtn.setText(scanning ? (holding ? "HOLD" : "SCANNING") : "SCAN"); scanBtn.setTextColor(scanning ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);   // i18n: key legend
             Neo.IconDrawable ic = new Neo.IconDrawable(scanning ? "stop" : "scan", scanBtn.getCurrentTextColor()); int sz = Theme.dp(c, 18); ic.setBounds(0, 0, sz, sz); scanBtn.setCompoundDrawables(ic, null, null, null);
             android.graphics.drawable.StateListDrawable st = new android.graphics.drawable.StateListDrawable();
             st.addState(new int[] { android.R.attr.state_pressed }, Neo.outline(c, col, 0x40, 12, 1.5f)); st.addState(new int[] { }, Neo.outline(c, col, scanning ? 0x30 : 0x18, 12, 1.5f));
             scanBtn.setBackground(st);
             return;
         }
-        scanBtn.setText(scanning ? (holding ? "\u23F9 HOLD" : "\u23F9 SCANNING") : "\uD83D\uDD0D SCAN");
+        scanBtn.setText(scanning ? (holding ? "\u23F9 HOLD" : "\u23F9 SCANNING") : "\uD83D\uDD0D SCAN");   // i18n: key legend
         scanBtn.setTextColor(scanning ? Theme.AMBER : Theme.CYAN);
         scanBtn.setBackground(scanning ? Theme.gradient(getContext(), 0xFF4A3A0D, 0xFF80651A, Theme.AMBER, 2, 8) : Theme.pill(getContext()));
     }

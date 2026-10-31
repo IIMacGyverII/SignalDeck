@@ -33,7 +33,7 @@ public final class RmsList {
     public static Result parse(String text) {
         List<List<String>> rows = csv(text);
         if (rows.isEmpty()) throw new IllegalArgumentException("The file is empty");
-        List<String> head = rows.get(0); int cCall = idx(head, "Callsign"), cGrid = idx(head, "GridSquare"), cFreq = idx(head, "Frequency"), cMode = idx(head, "Mode"), cHours = idx(head, "Hours"), cQth = idx(head, "QTH");
+        List<String> head = rows.get(0); int cCall = idx(head, "Callsign"), cGrid = idx(head, "GridSquare"), cFreq = idx(head, "Frequency"), cMode = idx(head, "Mode"), cHours = idx(head, "Hours"), cQth = idx(head, "QTH");   // i18n: CSV header names
         if (cCall < 0 || cFreq < 0 || cMode < 0) throw new IllegalArgumentException("Not a Winlink gateway list (expected the CSV from winlink.org, RMS Channels)");
         Result r = new Result();
         for (int i = 1; i < rows.size(); i++) {
@@ -79,7 +79,7 @@ public final class RmsList {
         List<List<String>> out = new ArrayList<>(); List<String> row = new ArrayList<>(); StringBuilder f = new StringBuilder(); boolean q = false;
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            if (q) { if (ch == '"') { if (i + 1 < text.length() && text.charAt(i + 1) == '"') { f.append('"'); i++; } else q = false; } else f.append(ch); }
+            if (q) { if (ch == '"') { if (i + 1 < text.length() && text.charAt(i + 1) == '"') { f.append('"'); i++; } else q = false; } else f.append(ch); }   // i18n: CSV parsing
             else if (ch == '"') q = true;
             else if (ch == ',') { row.add(f.toString()); f.setLength(0); }
             else if (ch == '\n' || ch == '\r') { if (ch == '\r' && i + 1 < text.length() && text.charAt(i + 1) == '\n') i++; row.add(f.toString()); f.setLength(0); if (!(row.size() == 1 && row.get(0).isEmpty())) out.add(row); row = new ArrayList<>(); }

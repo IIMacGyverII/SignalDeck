@@ -9,6 +9,8 @@ package com.macdmr.radio;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.macdmr.radio.i18n.Txt;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,10 +61,10 @@ public final class Scanner {
     public boolean isHolding() { return holding; }
 
     public synchronized String start() {
-        if (scanning) return "Already scanning";
+        if (scanning) return Txt.s(R.string.service_scan_already);
         list = new ArrayList<>();
         for (ChannelStore.Channel ch : host.candidates()) if (!skipped.contains(ch.number) && !(ch.isDigital() && ch.txContact <= 0)) list.add(ch);
-        if (list.size() < 2) return "Nothing to scan: need at least two channels in the zone";   // (counted before the priority channel is taken out)
+        if (list.size() < 2) return Txt.s(R.string.service_scan_too_few);   // (counted before the priority channel is taken out)
         scanning = true; holding = false; idx = -1; landedAt = 0; lastActivityAt = 0;
         prio = host.priority(); onPriority = false; sincePriority = 0; peeking = false; lastPeek = 0;
         if (prio != null) for (int i = 0; i < list.size(); i++) if (list.get(i).number == prio.number) { list.remove(i); break; }   // visited by look-back, not twice
@@ -79,15 +81,15 @@ public final class Scanner {
 
     /** Long-press while stopped on a channel: drop it from this scan session. */
     public synchronized String skipCurrent() {
-        if (!scanning) return "Not scanning";
-        if (!holding || idx < 0) return "Long-press while the scanner is stopped on a channel to skip it";
-        if (onPriority) return "That is the priority channel: clear it in Channels to stop checking it";
+        if (!scanning) return Txt.s(R.string.service_scan_not_scanning);
+        if (!holding || idx < 0) return Txt.s(R.string.service_scan_skip_how);
+        if (onPriority) return Txt.s(R.string.service_scan_skip_priority);
         ChannelStore.Channel ch = list.get(idx);
         skipped.add(ch.number); holding = false; lastActivityAt = 0;
         list.remove(idx); idx = Math.max(-1, idx - 1);
-        if (list.size() < 2) { stop(); return "Skipped - nothing left to scan"; }
+        if (list.size() < 2) { stop(); return Txt.s(R.string.service_scan_skip_last); }
         handler.removeCallbacks(tick); handler.post(tick);
-        return "Skipping Ch " + ch.number + " for this scan";
+        return Txt.s(R.string.service_scan_skipping, ch.number);
     }
 
     public void clearSkips() { skipped.clear(); }

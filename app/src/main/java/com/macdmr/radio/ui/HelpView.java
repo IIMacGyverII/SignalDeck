@@ -18,7 +18,9 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.macdmr.radio.R;
 import com.macdmr.radio.i18n.Guide;
+import com.macdmr.radio.i18n.Txt;
 
 import java.util.Locale;
 
@@ -72,8 +74,8 @@ public class HelpView extends LinearLayout {
         current = -1;
         stage.removeAllViews();
         LinearLayout page = new LinearLayout(c); page.setOrientation(VERTICAL);
-        LinearLayout header = Neo.header(c, "Help & how-to", TOPICS.length + " topics");
-        ImageView close = Neo.iconButton(c, "close", Neo.CYAN, "Close help"); close.setOnClickListener(v -> onClose.run());
+        LinearLayout header = Neo.header(c, Txt.s(R.string.intercom_help_title), Txt.p(R.plurals.intercom_help_topics, TOPICS.length, TOPICS.length));
+        ImageView close = Neo.iconButton(c, "close", Neo.CYAN, Txt.s(R.string.intercom_help_close)); close.setOnClickListener(v -> onClose.run());
         Neo.addAction(header, close);
         page.addView(header);
 
@@ -87,7 +89,7 @@ public class HelpView extends LinearLayout {
         sf.setBackground(Neo.card(c, Neo.alpha(Neo.CYAN, 0x33), 12)); sf.setPadding((int) (14 * d), 0, (int) (10 * d), 0);
         ImageView si = new ImageView(c); si.setImageDrawable(new Neo.IconDrawable("search", Neo.MUTED));
         sf.addView(si, new LayoutParams((int) (18 * d), (int) (18 * d)));
-        search = new EditText(c); search.setHint("Search the guide"); search.setSingleLine(true); search.setTextSize(16); search.setTypeface(Neo.uiSemi(c));
+        search = new EditText(c); search.setHint(Txt.s(R.string.intercom_help_search_hint)); search.setSingleLine(true); search.setTextSize(16); search.setTypeface(Neo.uiSemi(c));
         search.setTextColor(Neo.TEXT); search.setHintTextColor(Neo.DIM); search.setBackground(null); search.setPadding((int) (10 * d), 0, 0, 0);
         search.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         sf.addView(search, new LayoutParams(0, (int) (44 * d), 1f));
@@ -111,7 +113,7 @@ public class HelpView extends LinearLayout {
         LinearLayout ht = new LinearLayout(c); ht.setGravity(Gravity.CENTER_VERTICAL);
         ht.addView(Neo.iconTile(c, start.icon, Neo.CYAN, 52), new LayoutParams((int) (52 * d), (int) (52 * d)));
         LinearLayout hc = new LinearLayout(c); hc.setOrientation(VERTICAL); hc.setPadding((int) (14 * d), 0, 0, 0);
-        TextView kicker = Neo.caps(c, "Start here"); kicker.setTextColor(Neo.CYAN_LIGHT); hc.addView(kicker);
+        TextView kicker = Neo.caps(c, Txt.s(R.string.intercom_help_start_here)); kicker.setTextColor(Neo.CYAN_LIGHT); hc.addView(kicker);
         TextView htitle = Neo.text(c, start.title, Neo.TEXT, 21, Neo.ui(c)); htitle.setPadding(0, (int) (3 * d), 0, 0); hc.addView(htitle);
         ht.addView(hc, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         ImageView arrow = new ImageView(c); arrow.setImageDrawable(new Neo.IconDrawable("right", Neo.CYAN)); ht.addView(arrow, new LayoutParams((int) (22 * d), (int) (22 * d)));
@@ -140,12 +142,12 @@ public class HelpView extends LinearLayout {
             LinearLayout fr = new LinearLayout(c); fr.setGravity(Gravity.CENTER_VERTICAL);
             fr.addView(Neo.iconTile(c, ft.icon, Neo.VIOLET, 46), new LayoutParams((int) (46 * d), (int) (46 * d)));
             LinearLayout fc = new LinearLayout(c); fc.setOrientation(VERTICAL); fc.setPadding((int) (14 * d), 0, 0, 0);
-            TextView fk = Neo.caps(c, "New \u00b7 featured"); fk.setTextColor(Neo.VIOLET_LIGHT); fc.addView(fk);
+            TextView fk = Neo.caps(c, Txt.s(R.string.intercom_help_featured_kicker)); fk.setTextColor(Neo.VIOLET_LIGHT); fc.addView(fk);
             TextView ftt = Neo.text(c, ft.title, Neo.TEXT, 20, Neo.ui(c)); ftt.setPadding(0, (int) (3 * d), 0, 0); fc.addView(ftt);
             fr.addView(fc, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             ImageView fa = new ImageView(c); fa.setImageDrawable(new Neo.IconDrawable("right", Neo.VIOLET)); fr.addView(fa, new LayoutParams((int) (22 * d), (int) (22 * d)));
             feat.addView(fr);
-            TextView fsum = Neo.text(c, "See where each repeater reaches you and where you can key it up, measured automatically as you drive or walk. Two map layers, export to Google Earth.", Neo.TEXT_SOFT, 14.5f, Neo.uiMedium(c));
+            TextView fsum = Neo.text(c, Txt.s(R.string.intercom_help_featured_text), Neo.TEXT_SOFT, 14.5f, Neo.uiMedium(c));
             fsum.setPadding(0, (int) (10 * d), 0, 0); fsum.setLineSpacing(0, 1.1f); feat.addView(fsum);
             feat.setOnClickListener(v -> showTopic(fIdx, -1));
             LayoutParams fl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); fl.topMargin = (int) (12 * d);
@@ -212,7 +214,7 @@ public class HelpView extends LinearLayout {
             }
         }
         if (n == 0) {
-            TextView none = Neo.text(c, "Nothing in the guide matches “" + q + "”.", Neo.MUTED, 15, Neo.uiMedium(c)); none.setPadding((int) (4 * d), (int) (20 * d), 0, 0);
+            TextView none = Neo.text(c, Txt.s(R.string.intercom_help_no_match, q), Neo.MUTED, 15, Neo.uiMedium(c)); none.setPadding((int) (4 * d), (int) (20 * d), 0, 0);
             results.addView(none);
         }
     }
@@ -224,11 +226,11 @@ public class HelpView extends LinearLayout {
         final Guide.Topic t = TOPICS[idx];
         stage.removeAllViews();
         LinearLayout page = new LinearLayout(c); page.setOrientation(VERTICAL);
-        LinearLayout header = Neo.header(c, t.title, t.group + "  ·  " + (idx + 1) + " of " + TOPICS.length);
-        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, "All topics"); back.setOnClickListener(v -> showHome());
+        LinearLayout header = Neo.header(c, t.title, Txt.s(R.string.intercom_help_topic_position, t.group, idx + 1, TOPICS.length));
+        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, Txt.s(R.string.intercom_help_all_topics)); back.setOnClickListener(v -> showHome());
         LayoutParams bl = new LayoutParams((int) (44 * d), (int) (44 * d)); bl.rightMargin = (int) (12 * d);
         header.addView(back, 0, bl);
-        ImageView close = Neo.iconButton(c, "close", Neo.CYAN, "Close help"); close.setOnClickListener(v -> onClose.run());
+        ImageView close = Neo.iconButton(c, "close", Neo.CYAN, Txt.s(R.string.intercom_help_close)); close.setOnClickListener(v -> onClose.run());
         Neo.addAction(header, close);
         page.addView(header);
 
@@ -265,15 +267,15 @@ public class HelpView extends LinearLayout {
         LinearLayout nav = new LinearLayout(c); nav.setBaselineAligned(false);
         LayoutParams nl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); nl.topMargin = (int) (20 * d);
         if (idx > 0) {
-            View prev = navCard(c, "Previous", TOPICS[idx - 1], false); prev.setOnClickListener(v -> showTopic(idx - 1, -1));
+            View prev = navCard(c, Txt.s(R.string.intercom_help_previous), TOPICS[idx - 1], false); prev.setOnClickListener(v -> showTopic(idx - 1, -1));
             LayoutParams p = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); p.rightMargin = (int) (4 * d); nav.addView(prev, p);
         }
         if (idx < TOPICS.length - 1) {
-            View next = navCard(c, "Next", TOPICS[idx + 1], true); next.setOnClickListener(v -> showTopic(idx + 1, -1));
+            View next = navCard(c, Txt.s(R.string.intercom_help_next), TOPICS[idx + 1], true); next.setOnClickListener(v -> showTopic(idx + 1, -1));
             LayoutParams p = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); p.leftMargin = idx > 0 ? (int) (4 * d) : 0; nav.addView(next, p);
         }
         body.addView(nav, nl);
-        TextView all = Neo.button(c, "All topics", "menu", Neo.CYAN); all.setOnClickListener(v -> showHome());
+        TextView all = Neo.button(c, Txt.s(R.string.intercom_help_all_topics), "menu", Neo.CYAN); all.setOnClickListener(v -> showHome());
         LayoutParams al = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); al.topMargin = (int) (10 * d);
         body.addView(all, al);
 
@@ -288,7 +290,7 @@ public class HelpView extends LinearLayout {
         android.graphics.drawable.StateListDrawable s = new android.graphics.drawable.StateListDrawable();
         s.addState(new int[] { android.R.attr.state_pressed }, Neo.tint(c, accent(t), 14, 1.5f)); s.addState(new int[] { }, Neo.card(c, Neo.alpha(accent(t), 0x66), 14));
         card.setBackground(s); card.setClickable(true); card.setFocusable(true);
-        TextView l = Neo.caps(c, (next ? "" : "← ") + label + (next ? " →" : "")); card.addView(l);
+        TextView l = Neo.caps(c, label); card.addView(l);
         TextView tt = Neo.text(c, t.title, Neo.TEXT, 16, Neo.ui(c)); tt.setPadding(0, (int) (4 * d), 0, 0); tt.setGravity(next ? Gravity.END : Gravity.START); card.addView(tt);
         return card;
     }

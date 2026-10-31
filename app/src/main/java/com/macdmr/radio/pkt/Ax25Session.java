@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.pkt;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Msg;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -27,8 +30,11 @@ public final class Ax25Session {
         void received(String text);
         /** The same data unchanged (binary protocols such as Winlink B2F). */
         default void receivedBytes(byte[] info) { }
-        /** "connecting", "connected", "disconnected: why". */
+        /** "connecting", "connected", "disconnected: why" (English). */
         void state(String state);
+        /** The same as a message, so it can be shown in the app's language; by default the English text. The keys of the
+         *  disconnected states all start with {@code packet_ax25_disconnected}. */
+        default void state(Msg state) { state(state.english()); }
     }
 
     public enum State { DISCONNECTED, CONNECTING, CONNECTED, DISCONNECTING }
@@ -63,15 +69,15 @@ public final class Ax25Session {
         via = path == null ? new String[0] : path;
         reset(); state = State.CONNECTING; tries = 1;
         send(u(SABM | PF, true)); t1At = now + T1_MS;
-        link.state("connecting to " + peer());
+        link.state(Msg.of(R.string.packet_ax25_connecting, peer()));
     }
 
     public synchronized void disconnect(long now) {
         if (state == State.DISCONNECTED) return;
-        if (state == State.CONNECTING) { state = State.DISCONNECTED; reset(); link.state("disconnected: cancelled"); return; }   // reset stops the retry timer
+        if (state == State.CONNECTING) { state = State.DISCONNECTED; reset(); link.state(Msg.of(R.string.packet_ax25_disconnected_cancelled)); return; }   // reset stops the retry timer
         state = State.DISCONNECTING; tries = 1; queue.clear();
         send(u(DISC | PF, true)); t1At = now + T1_MS;
-        link.state("disconnecting");
+        link.state(Msg.of(R.string.packet_ax25_disconnecting));
     }
 
     /** Queue text (a line ending in CR, as BBSs expect); it is sent in PACLEN pieces. */
@@ -97,7 +103,7 @@ public final class Ax25Session {
         if (t1At == 0 || now < t1At) return;
         if (++tries > N2) {
             State was = state; state = State.DISCONNECTED; reset();
-            link.state("disconnected: " + (was == State.CONNECTING ? "no answer from " + peer() : "link lost (no acknowledgement after " + N2 + " tries)"));
+            link.state(was == State.CONNECTING ? Msg.of(R.string.packet_ax25_disconnected_no_answer, peer()) : Msg.of(R.string.packet_ax25_disconnected_link_lost, N2));
             return;
         }
         switch (state) {
@@ -139,18 +145,18 @@ public final class Ax25Session {
                 peer = src; peerSsid = sSsid; via = reverse(digis);
                 boolean fresh = state != State.CONNECTED; reset(); state = State.CONNECTED;
                 send(u(UA | (pf ? PF : 0), false));
-                link.state("connected to " + peer() + (fresh ? " (they called)" : ""));
+                link.state(Msg.of(fresh ? R.string.packet_ax25_connected_they_called : R.string.packet_ax25_connected, peer()));
                 return true;
             }
             if (!fromPeer) return true;
             if (type == UA) {
-                if (state == State.CONNECTING) { state = State.CONNECTED; t1At = 0; tries = 0; link.state("connected to " + peer()); pump(now); }
-                else if (state == State.DISCONNECTING) { state = State.DISCONNECTED; reset(); link.state("disconnected"); }
+                if (state == State.CONNECTING) { state = State.CONNECTED; t1At = 0; tries = 0; link.state(Msg.of(R.string.packet_ax25_connected, peer())); pump(now); }
+                else if (state == State.DISCONNECTING) { state = State.DISCONNECTED; reset(); link.state(Msg.of(R.string.packet_ax25_disconnected)); }
                 return true;
             }
-            if (type == DM) { if (state != State.DISCONNECTED) { State was = state; state = State.DISCONNECTED; reset(); link.state(was == State.CONNECTING ? "disconnected: " + peer() + " is busy or refused" : "disconnected"); } return true; }
-            if (type == DISC) { send(u(UA | (pf ? PF : 0), false)); if (state != State.DISCONNECTED) { state = State.DISCONNECTED; reset(); link.state("disconnected by " + peer()); } return true; }
-            if (type == FRMR) { state = State.DISCONNECTED; reset(); link.state("disconnected: frame rejected (FRMR)"); return true; }
+            if (type == DM) { if (state != State.DISCONNECTED) { State was = state; state = State.DISCONNECTED; reset(); link.state(was == State.CONNECTING ? Msg.of(R.string.packet_ax25_disconnected_busy, peer()) : Msg.of(R.string.packet_ax25_disconnected)); } return true; }
+            if (type == DISC) { send(u(UA | (pf ? PF : 0), false)); if (state != State.DISCONNECTED) { state = State.DISCONNECTED; reset(); link.state(Msg.of(R.string.packet_ax25_disconnected_by, peer())); } return true; }
+            if (type == FRMR) { state = State.DISCONNECTED; reset(); link.state(Msg.of(R.string.packet_ax25_disconnected_frmr)); return true; }
             return true;
         }
         if (!fromPeer || state != State.CONNECTED) {
@@ -255,11 +261,11 @@ public final class Ax25Session {
 
     /** One line for a diagnostic log: "N0ABC-7>N0RMS-10 I ns=2 nr=1 P 128 B" (no FCS). */
     public static String describe(byte[] f) {
-        if (f == null || f.length < 15) return "short frame (" + (f == null ? 0 : f.length) + " B)";
+        if (f == null || f.length < 15) return "short frame (" + (f == null ? 0 : f.length) + " B)";   // i18n: diagnostic log
         String dst = addr(f, 0) + ssid(f[6]), src = addr(f, 7) + ssid(f[13]);
         int off = 14; boolean last = (f[13] & 1) != 0; StringBuilder via = new StringBuilder();
         while (!last && off + 7 <= f.length) { via.append(',').append(addr(f, off)).append(ssid(f[off + 6])); if ((f[off + 6] & 0x80) != 0) via.append('*'); last = (f[off + 6] & 1) != 0; off += 7; }
-        if (off >= f.length) return src + ">" + dst + via + " (no control byte)";
+        if (off >= f.length) return src + ">" + dst + via + " (no control byte)";   // i18n: diagnostic log
         int ctl = f[off] & 0xFF; boolean pf = (ctl & PF) != 0; boolean cmd = (f[6] & 0x80) != 0 && (f[13] & 0x80) == 0;
         String what;
         if ((ctl & 1) == 0) what = "I ns=" + ((ctl >> 1) & 7) + " nr=" + ((ctl >> 5) & 7) + (pf ? " P" : "") + " " + Math.max(0, f.length - off - 2) + " B";

@@ -54,7 +54,7 @@ public class I18nResourcesTest {
             assertNotNull(e.name + ": every string needs a context note (an XML comment above it) for translators", e.comment);
             String text = e.plural != null ? e.plural.get("other") : e.text;
             assertNotNull(e.name + ": a plural needs an 'other' form", text);
-            if (placeholders(text).size() > 1) {
+            if (e.formatted && placeholders(text).size() > 1) {
                 Matcher m = PH.matcher(text);
                 while (m.find()) if (!m.group().equals("%%") && !m.group().equals("%n"))
                     assertNotNull(e.name + ": with more than one value, number them (%1$s, %2$d) so a translation can reorder them", m.group(1));
@@ -77,6 +77,8 @@ public class I18nResourcesTest {
                         assertEquals(where + " [" + q.getKey() + "]: placeholders", want, withoutCount(placeholders(q.getValue()), want));
                 } else {
                     assertNotNull(where + ": English has it as a plain string", e.text);
+                    assertEquals(where + ": formatted=\"false\" must match English", src.formatted, e.formatted);
+                    if (!src.formatted) continue;   // "50 %, faint" is text, not a placeholder
                     assertEquals(where + ": placeholders must be the same as English", placeholders(src.text), placeholders(e.text));
                 }
             }
@@ -109,6 +111,18 @@ public class I18nResourcesTest {
             }
             Guide.parse(en, tr);   // and it lays over English without error
         }
+    }
+
+    /** formatted="false" is read without arguments, and a string with arguments cannot be unformatted. */
+    @Test public void unformattedStringsHaveNoArguments() {
+        int n = 0;
+        for (StringsXml.Entry e : StringsXml.read(StringsXml.valuesDir())) {
+            if (e.formatted) continue; n++;
+            assertNotNull(e.name + ": formatted=\"false\" on a plural", e.text);
+            assertFalse(e.name + ": formatted=\"false\" but it has numbered placeholders", e.text.matches("(?s).*%\\d+\\$.*"));
+        }
+        assertTrue("modes_fox_shaded and modes_morse_hint are formatted=\"false\"", n >= 2);
+        assertEquals("Shaded: where the fox probably is; bright outline 50 %, faint 90 %.", Txt.s(R.string.modes_fox_shaded));
     }
 
     @Test public void shippedLanguagesHaveFolders() {

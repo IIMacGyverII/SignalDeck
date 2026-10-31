@@ -160,7 +160,7 @@ public final class Ft8Message {
         if (t.isEmpty()) return null;
         String[] w = t.split(" ");
         String to, de, extra; int next;
-        if (w[0].equals("CQ") && w.length >= 3 && parseCqModifier(w[0] + " " + w[1]) >= 0) { to = "CQ " + w[1]; next = 2; }
+        if (w[0].equals("CQ") && w.length >= 3 && parseCqModifier(w[0] + " " + w[1]) >= 0) { to = "CQ " + w[1]; next = 2; }   // i18n: FT8 message text, sent on air
         else { to = w[0]; next = 1; }
         de = next < w.length ? w[next++] : null;
         extra = next < w.length ? w[next++] : "";
@@ -247,11 +247,11 @@ public final class Ft8Message {
             if (n28 == 0) return "DE";
             if (n28 == 1) return "QRZ";
             if (n28 == 2) return "CQ";
-            if (n28 <= 1002) return String.format(Locale.US, "CQ %03d", n28 - 3);
+            if (n28 <= 1002) return String.format(Locale.US, "CQ %03d", n28 - 3);   // i18n: FT8 message text, sent on air
             if (n28 <= 532443) {
                 long n = n28 - 1003; char[] a = new char[4];
                 for (int i = 3; i >= 0; i--) { a[i] = charn((int) (n % 27), LETTERS_SPACE); n /= 27; }
-                return "CQ " + new String(a).trim();
+                return "CQ " + new String(a).trim();   // i18n: FT8 message text, sent on air
             }
             return null;
         }
@@ -317,7 +317,7 @@ public final class Ft8Message {
             if (h != null && plain.length() >= 3) h.save(plain);
             String hc = h != null ? h.lookup(12, n12) : null; String hashed = hc != null ? "<" + hc + ">" : "<...>";
             String c1 = iflip != 0 ? plain : hashed, c2 = iflip != 0 ? hashed : plain;
-            if (icq != 0) return "CQ " + c2;
+            if (icq != 0) return "CQ " + c2;   // i18n: FT8 message text, sent on air
             String x = nrpt == 1 ? " RRR" : nrpt == 2 ? " RR73" : nrpt == 3 ? " 73" : "";
             return c1 + " " + c2 + x;
         }

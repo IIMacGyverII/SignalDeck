@@ -49,15 +49,15 @@ public final class SSTVEncoder {
 
     public static String name(int mode) {
         switch (mode) {
-            case ROBOT_24_COLOR: return "Robot 24 Color";
-            case ROBOT_12_BW: return "Robot 12 BW";
-            case ROBOT_8_BW: return "Robot 8 BW";
-            case ROBOT_36: return "Robot 36";
-            case MARTIN_M1: return "Martin M1";
-            case MARTIN_M2: return "Martin M2";
-            case SCOTTIE_S1: return "Scottie S1";
-            case SCOTTIE_S2: return "Scottie S2";
-            case PD_90: return "PD 90";
+            case ROBOT_24_COLOR: return "Robot 24 Color";   // i18n: mode name
+            case ROBOT_12_BW: return "Robot 12 BW";   // i18n: mode name
+            case ROBOT_8_BW: return "Robot 8 BW";   // i18n: mode name
+            case ROBOT_36: return "Robot 36";   // i18n: mode name
+            case MARTIN_M1: return "Martin M1";   // i18n: mode name
+            case MARTIN_M2: return "Martin M2";   // i18n: mode name
+            case SCOTTIE_S1: return "Scottie S1";   // i18n: mode name
+            case SCOTTIE_S2: return "Scottie S2";   // i18n: mode name
+            case PD_90: return "PD 90";   // i18n: mode name
             default: return "?";
         }
     }

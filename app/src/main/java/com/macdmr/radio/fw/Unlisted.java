@@ -4,6 +4,9 @@
  */
 package com.macdmr.radio.fw;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -33,7 +36,7 @@ public final class Unlisted {
         for (String name : listed.split("\\s+")) {
             if (!name.endsWith(".bin")) continue;
             String r = RootSetup.run("cp '/sdcard/Download/DMR/Firmware/" + name + "' '" + dst.getAbsolutePath()
-                    + "' && chown " + uid + ":" + uid + " '" + dst.getAbsolutePath() + "' && echo ok");
+                    + "' && chown " + uid + ":" + uid + " '" + dst.getAbsolutePath() + "' && echo ok");   // i18n: shell command
             if (r == null || !r.endsWith("ok")) continue;
             try {
                 byte[] b = java.nio.file.Files.readAllBytes(dst.toPath());
@@ -43,7 +46,7 @@ public final class Unlisted {
                 String sha = FirmwareVault.sha256(b);
                 if (ImageTable.bySha(sha) != null) continue;
                 out.add(new ImageTable.Row(tag, sha, b.length,
-                        "Not in the catalogue. This project does not cover what it loads. The version string in the file is " + tag + ".",
+                        Txt.s(R.string.device_fw_unlisted_summary, tag),
                         ImageTable.FACTORY.tag, ImageTable.FACTORY.model, ImageTable.FACTORY.stockPackage, ImageTable.FACTORY.stockVersion,
                         false, false, true));
             } catch (Exception ignored) { }

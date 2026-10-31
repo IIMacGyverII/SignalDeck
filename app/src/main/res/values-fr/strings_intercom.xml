@@ -363,7 +363,7 @@
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_toolong_title">Trop long pour être émis</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->
-    <string name="intercom_lastheard_ex_toolong_text">Le firmware de cette radio coupe chaque émission au bout de 30 secondes : l’application refuse donc tout audio de plus d’environ 28,5 secondes (par exemple un long enregistrement ou un mode SSTV qui demande plus de temps).</string>
+    <string name="intercom_lastheard_ex_toolong_text">Ce qu’il fallait envoyer dépassait la limite d’émission de la radio (Appareil → Durée d’émission maximale) : SignalDeck l’a donc refusé au lieu de le couper en cours de route (par exemple un long enregistrement ou un mode SSTV qui demande plus de temps). Certains émetteurs ont leur propre maximum, plus court ; la ligne indique quelle limite a été atteinte.</string>
     <!-- Title of the Last heard details sheet for this kind of alert or event. One line. -->
     <string name="intercom_lastheard_ex_busy_title">Canal occupé</string>
     <!-- Explanation on the Last heard details sheet: what it means and what to do. Safety text in places: keep every fact, number and menu name. -->

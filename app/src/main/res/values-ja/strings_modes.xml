@@ -1,0 +1,1942 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Radio modes and ham tools: Fox hunt, Winlink, forms, SSTV, FT8, M17, band scope, satellites, POTA, logbook, conditions,
+     exam practice, recordings, Morse trainer, voice keyer, pager, terminal, text modes, parrot. See strings_common.xml for
+     the conventions. Text sent on the air or over Winlink (FT8, RTTY, CW, M17 data, B2F, form messages) stays in code. -->
+<resources>
+
+    <!-- ===== VHF/UHF conditions (PKT → Conditions; also SignalDeck Web) ===== -->
+    <!-- Tropo class 0: ordinary propagation. Shown in the tropo strip's tooltip on the web page. A few words. -->
+    <string name="modes_cond_class_normal">通常</string>
+    <!-- Tropo class 1: propagation slightly better than usual. A few words. -->
+    <string name="modes_cond_class_enhanced">やや良好</string>
+    <!-- Tropo class 2: signals bend back to the ground and go further. Shown as the best window's headline. One line. -->
+    <string name="modes_cond_class_super">超屈折：通常より遠くまで</string>
+    <!-- Tropo class 3: a duct is likely, contacts of hundreds of km. Shown as the best window's headline. One line. -->
+    <string name="modes_cond_class_duct">ダクト発生の可能性：遠距離</string>
+    <!-- NOAA geomagnetic activity in words, Kp 7 and more. Lower case, shown after "Kp 7.3 · ". One or two words. -->
+    <string name="modes_cond_kp_severe">非常に激しい磁気嵐</string>
+    <!-- NOAA geomagnetic activity in words, Kp 6. Lower case. One or two words. -->
+    <string name="modes_cond_kp_strong">強い磁気嵐</string>
+    <!-- NOAA geomagnetic activity in words, Kp 5. Lower case. One word. -->
+    <string name="modes_cond_kp_storm">磁気嵐</string>
+    <!-- NOAA geomagnetic activity in words, Kp 4. Lower case. One word. -->
+    <string name="modes_cond_kp_active">活発</string>
+    <!-- NOAA geomagnetic activity in words, Kp 3. Lower case. One word. -->
+    <string name="modes_cond_kp_unsettled">やや不安定</string>
+    <!-- NOAA geomagnetic activity in words, below Kp 3. Lower case. One word. -->
+    <string name="modes_cond_kp_quiet">静穏</string>
+    <!-- Note on the Quadrantids meteor shower, after "Up to 110 meteors an hour, ". Lower case, a few words. -->
+    <string name="modes_cond_shower_quadrantids">ピークが短く鋭い</string>
+    <!-- Note on the Eta Aquariids meteor shower. Lower case, a few words. -->
+    <string name="modes_cond_shower_eta_aquariids">夜明け前が最適</string>
+    <!-- Note on the Arietids meteor shower: it peaks in daylight, so only radio notices it. Lower case, a few words. -->
+    <string name="modes_cond_shower_arietids">昼間の流星群：電波でのみ観測</string>
+    <!-- Note on the Perseids meteor shower. Lower case, a few words. -->
+    <string name="modes_cond_shower_perseids">夏の定番</string>
+    <!-- Note on the Geminids meteor shower. Lower case, a few words. -->
+    <string name="modes_cond_shower_geminids">年間で最大</string>
+    <!-- Problem line under the conditions cards: the Kp feed did not answer. Joined with " · ". One line. -->
+    <string name="modes_cond_problem_kp">Kp（NOAA SWPC）に接続できません</string>
+    <!-- Problem line: the aurora map did not download. One line. -->
+    <string name="modes_cond_problem_aurora">オーロラマップ（NOAA SWPC）に接続できません</string>
+    <!-- Problem line: the weather forecast used for tropo did not download. One line. -->
+    <string name="modes_cond_problem_tropo">対流圏予報（Open-Meteo）に接続できません</string>
+    <!-- Problem line: the phone has no location, so tropo and aurora cannot be worked out. One line. -->
+    <string name="modes_cond_problem_nofix">位置未取得：対流圏とオーロラには位置が必要です</string>
+    <!-- Title of the VHF/UHF conditions sheet. One line. -->
+    <string name="modes_cond_title">VHF/UHF のコンディション</string>
+    <!-- Explanation under the conditions sheet's title. A few lines. -->
+    <string name="modes_cond_hint">いつもより遠くまで電波を出す価値はあるでしょうか。VHF/UHF の遠距離交信の主な要因は対流圏ダクトです。オーロラと流星群は短時間のパスを開きます（主に SSB とデジタルモード、ときには FM）。</string>
+    <!-- Shown while the forecasts download. One line. -->
+    <string name="modes_cond_loading">予報を確認しています…</string>
+    <!-- Card title (shown in capitals): the tropospheric forecast. Short. -->
+    <string name="modes_cond_tropo_title">対流圏（今後 48 時間）</string>
+    <!-- Card text when the phone has no location (tropo and satellite cards). One line. -->
+    <string name="modes_cond_needs_fix">位置の取得が必要です。</string>
+    <!-- Tropo card text when the forecast download failed. One line. -->
+    <string name="modes_cond_tropo_failed">予報を読み込めませんでした。</string>
+    <!-- Tropo card headline when nothing beats normal. One line, large text. -->
+    <string name="modes_cond_tropo_normal">通常：伝搬の向上は見込めません</string>
+    <!-- Tropo card headline: the best window. %1$s the class ("Ducting likely: long range"), %2$s its start (weekday and time), %3$s its end (time). Large text, may wrap. -->
+    <string name="modes_cond_tropo_window">%1$s、%2$s〜%3$s</string>
+    <!-- Legend and caveats under the tropo colour strip. A paragraph. -->
+    <string name="modes_cond_tropo_legend">グレー：通常 · シアン：やや良好 · 緑：超屈折（通常より遠くまで） · オレンジ：ダクト発生の可能性（数百 km）。地表付近の気温と湿度の予報層から算出しています（Open-Meteo、位置は約 50 km 単位に丸めます）。地表付近の薄いダクトは過小評価されるため、暖かい日の後の風のない晴れた夜は、表示より良いことがあります。</string>
+    <!-- Card title (shown in capitals): aurora. Short. -->
+    <string name="modes_cond_aurora_title">オーロラ</string>
+    <!-- Aurora card headline when the Kp index could not be read. Short, large text. -->
+    <string name="modes_cond_kp_unavailable">Kp 取得不可</string>
+    <!-- Aurora card headline. %1$s the Kp index ("4.3"), %2$s its words ("active"). Short, large text. -->
+    <string name="modes_cond_kp_now">Kp %1$s · %2$s</string>
+    <!-- Aurora card line: the highest Kp forecast. %1$s the Kp index, %2$s its words, %3$s when (weekday and time). One line. -->
+    <string name="modes_cond_kp_forecast">予報は最大 Kp %1$s（%2$s、%3$s）</string>
+    <!-- Aurora card line: the chance of aurora above the user. %1$s a whole number of percent. One line. -->
+    <string name="modes_cond_aurora_chance">現在の上空のオーロラ確率：%1$s %%（NOAA OVATION）</string>
+    <!-- Aurora card advice. A short paragraph. -->
+    <string name="modes_cond_aurora_advice">VHF のオーロラ反射では、北側のオーロラ帯で電波が反射します。アンテナを北に向けてください。ザラザラしたうなるような音になります（FM より CW や SSB 向きです）。中緯度では Kp 5 以上が必要です。</string>
+    <!-- Card title (shown in capitals): meteor showers. Short. -->
+    <string name="modes_cond_meteor_title">流星群</string>
+    <!-- Meteor card text when no shower peaks in the next 45 days. One line. -->
+    <string name="modes_cond_meteor_none">今後 6 週間に主な流星群はありません。</string>
+    <!-- Meteor card headline: a shower happening now. %1$s the shower's name ("Perseids"). Large text, one line. -->
+    <string name="modes_cond_shower_active">%1$s · 現在活動中</string>
+    <!-- Meteor card headline: a coming shower. %1$s its name, %2$s the peak date ("Sat 12 Aug"), %3$s the number of days until it. Large text. -->
+    <plurals name="modes_cond_shower_peak">
+        <item quantity="other">%1$s · 極大 %2$s（あと %3$s 日）</item>
+    </plurals>
+    <!-- Meteor card line under a shower. %1$s the zenithal hourly rate (a whole number). One line. -->
+    <string name="modes_cond_shower_rate">1 時間に最大 %1$s 個の流星。</string>
+    <!-- The same with the shower's note. %1$s the hourly rate, %2$s the note ("best before dawn"). One line. -->
+    <string name="modes_cond_shower_rate_note">1 時間に最大 %1$s 個の流星、%2$s。</string>
+    <!-- Meteor card advice. A short paragraph. -->
+    <string name="modes_cond_meteor_advice">流星の飛跡は、2 m の電波を一瞬から数秒間反射します（「ピング」）。距離は約 800〜2000 km で、夜明け前が最適です。</string>
+    <!-- Card title (shown in capitals): the next satellite passes. Short. -->
+    <string name="modes_cond_sat_title">次の衛星パス</string>
+    <!-- Satellite card text when no pass is coming. One line. -->
+    <string name="modes_cond_sat_none">今後 12 時間に仰角 20° を超えるパスはありません。</string>
+    <!-- Satellite card line: a satellite in view now. %1$s its name, %2$s its highest elevation in whole degrees. One line. -->
+    <string name="modes_cond_sat_up_now">%1$s · 現在可視 · %2$s°</string>
+    <!-- Satellite card line: a coming pass. %1$s the satellite, %2$s when (weekday and time), %3$s its highest elevation in whole degrees. One line. -->
+    <string name="modes_cond_sat_pass">%1$s · %2$s · %3$s°</string>
+    <!-- Satellite card footnote. One or two lines. -->
+    <string name="modes_cond_sat_footer">今後 12 時間の仰角 20° を超えるパス。PKT → 衛星パス でドップラー補正しながら追跡できます。</string>
+    <!-- Footnote of the conditions sheet. %1$s the time the data was fetched (HH:mm). Two lines. -->
+    <string name="modes_cond_sources">出典：NOAA SWPC（Kp、OVATION オーロラ）、Open-Meteo（対流圏）、AMSAT/SatNOGS の軌道データ。%1$s 更新、20 分後に再取得します。</string>
+
+    <!-- ===== DTMF remote control (PKT → DTMF remote, history lines) ===== -->
+    <!-- DTMF remote command 1: the phone speaks its position on the channel. Short, in a list "1   Position by voice". -->
+    <string name="modes_dtmf_cmd_position">音声で位置</string>
+    <!-- DTMF remote command 2: the phone speaks battery, channel and signal. Short. -->
+    <string name="modes_dtmf_cmd_status">音声でステータス</string>
+    <!-- DTMF remote command 3: send an APRS position beacon. Short. -->
+    <string name="modes_dtmf_cmd_beacon">APRS 位置ビーコン</string>
+    <!-- DTMF remote command 4: turn the parrot (repeat what it hears) on. Short. -->
+    <string name="modes_dtmf_cmd_parrot_on">パロット オン</string>
+    <!-- DTMF remote command 5: turn the parrot off. Short. -->
+    <string name="modes_dtmf_cmd_parrot_off">パロット オフ</string>
+    <!-- DTMF remote command 6: send the Morse ID. Short. -->
+    <string name="modes_dtmf_cmd_morse_id">CW ID</string>
+    <!-- History line: three wrong PINs, the remote is locked. One line. -->
+    <string name="modes_dtmf_event_locked">🔒 PIN を 3 回間違えたため、DTMF リモートを 10 分間ロックしました</string>
+    <!-- History line: a DTMF sequence had the wrong PIN. One line. -->
+    <string name="modes_dtmf_event_wrong_pin">🔒 DTMF リモート：PIN が違います</string>
+    <!-- History line: the PIN was right but the command digit is not one of 1–6. %1$s the digit received. One line. -->
+    <string name="modes_dtmf_event_unknown">📟 DTMF リモート：不明なコマンド %1$s</string>
+    <!-- History line: a remote command was run. %1$s the command's name ("Status by voice"). One line. -->
+    <string name="modes_dtmf_event_command">📟 DTMF リモート：%1$s</string>
+
+    <!-- ===== FM satellites and their AMSAT status (Satellite passes sheet, SignalDeck Web) ===== -->
+    <!-- Separator between the items of a short list ("heard 3×, not heard 1×"). Comma and a space. -->
+    <string name="modes_list_separator">、</string>
+    <!-- Error after updating the satellites: SatNOGS did not answer. One line. -->
+    <string name="modes_fmsat_unreachable">FM 衛星の情報を取得するため SatNOGS に接続できませんでした</string>
+    <!-- Error after updating the satellites. %1$s the technical reason (English, from the system). One line. -->
+    <string name="modes_fmsat_failed">FM 衛星：%1$s</string>
+    <!-- Satellite list line: AMSAT's status page could not be read. One line. -->
+    <string name="modes_fmsat_status_offline">AMSAT ステータス：オフライン</string>
+    <!-- Satellite list line: nobody reported on this satellite to AMSAT recently. One line. -->
+    <string name="modes_fmsat_status_none">AMSAT：過去 4 日間の報告なし</string>
+    <!-- Part of the AMSAT status line: how many people heard the satellite. %1$d a count. "×" means times. Very short. -->
+    <string name="modes_fmsat_status_heard">受信 %1$d 件</string>
+    <!-- Part of the AMSAT status line: reports of telemetry only (no voice). %1$d a count. Very short. -->
+    <string name="modes_fmsat_status_telemetry">テレメトリーのみ %1$d 件</string>
+    <!-- Part of the AMSAT status line: reports that it was not heard. %1$d a count. Very short. -->
+    <string name="modes_fmsat_status_not_heard">受信できず %1$d 件</string>
+    <!-- Satellite list line: AMSAT's reports of the last 4 days. %1$s the parts ("heard 3×, not heard 1×"). One line. -->
+    <string name="modes_fmsat_status">AMSAT、4 日間：%1$s</string>
+    <!-- The same with when it was last heard. %1$s the parts, %2$s when ("3 h ago"). One line. -->
+    <string name="modes_fmsat_status_last">AMSAT、4 日間：%1$s · 最終受信 %2$s</string>
+    <!-- When the satellite was last heard: less than an hour ago. Very short. -->
+    <string name="modes_fmsat_last_hour">1 時間以内</string>
+    <!-- When the satellite was last heard. %1$d hours (1 to 47); "h" is the hour abbreviation. Very short. -->
+    <string name="modes_fmsat_last_hours">%1$d 時間前</string>
+    <!-- When the satellite was last heard. %1$d days (2 or more). Very short. -->
+    <plurals name="modes_fmsat_last_days">
+        <item quantity="other">%1$d 日前</item>
+    </plurals>
+
+    <!-- ===== M17 packet protocols, POTA/SOTA spots, voice keyer, parrot ===== -->
+    <!-- Name of an M17 packet with no protocol (raw data), as in "raw, 12 bytes". Very short, lower case. -->
+    <string name="modes_m17_proto_raw">生データ</string>
+    <!-- Name of an M17 packet protocol SignalDeck does not know. %1$d its number. Very short, lower case. -->
+    <string name="modes_m17_proto_other">プロトコル %1$d</string>
+    <!-- Problem line on the POTA sheet: the POTA spot list did not download. Joined with " · ". One line. -->
+    <string name="modes_pota_unreachable">POTA スポットに接続できません</string>
+    <!-- Problem line on the POTA sheet: the SOTA spot list did not download. One line. -->
+    <string name="modes_sota_unreachable">SOTA スポットに接続できません</string>
+    <!-- Voice keyer error: a recording is already running. One line (toast). -->
+    <string name="modes_keyer_err_recording">すでに録音中です</string>
+    <!-- Voice keyer error: SignalDeck may not use the microphone. One line (toast). -->
+    <string name="modes_keyer_err_permission">マイクの権限が必要です</string>
+    <!-- Voice keyer error: another app holds the microphone. One line (toast). -->
+    <string name="modes_keyer_err_busy">マイクは使用中です</string>
+    <!-- History line: the parrot recorded a call but could not transmit it. %1$d the recording's length in seconds. One line. -->
+    <string name="modes_parrot_event_failed">🦜 パロット：%1$d 秒の録音を送信できませんでした</string>
+    <!-- History line: the parrot played a call back. %1$d its length in seconds. One line. -->
+    <string name="modes_parrot_event_repeated">🦜 パロット：%1$d 秒を中継</string>
+    <!-- History line: the parrot played a call back, shortened to the radio's 26 s limit. %1$d its length in seconds. One line. -->
+    <string name="modes_parrot_event_repeated_cut">🦜 パロット：%1$d 秒を中継（無線機の上限の 26 秒で打ち切り）</string>
+    <!-- History line: the parrot played a call back followed by the Morse ID ("ID"). %1$d its length in seconds. One line. -->
+    <string name="modes_parrot_event_repeated_id">🦜 パロット：%1$d 秒を中継 + ID</string>
+    <!-- History line: the parrot played a shortened call back followed by the Morse ID. %1$d its length in seconds. One line. -->
+    <string name="modes_parrot_event_repeated_cut_id">🦜 パロット：%1$d 秒を中継（無線機の上限の 26 秒で打ち切り）+ ID</string>
+
+    <!-- ===== Message forms (PKT → Message forms): ICS-213 and ARRL Radiogram =====
+         Field labels are shown in the form editor; in the read-only view the part in brackets is dropped, so keep
+         explanations in " (…)". The form text that is sent or read on the air keeps the English labels. -->
+    <!-- Radiogram field NR: the message number. Label above a text field. Short. -->
+    <string name="modes_forms_rg_nr">番号</string>
+    <!-- Radiogram field PR: precedence, with its codes (R, P, O and the word EMERGENCY are typed as is). Label, may wrap. -->
+    <string name="modes_forms_rg_pr">優先度（R 通常、P 優先、O 至急、EMERGENCY）</string>
+    <!-- Radiogram field HX: handling instructions (codes HXA…HXG). Label. -->
+    <string name="modes_forms_rg_hx">取扱指示（HX…、任意）</string>
+    <!-- Radiogram field SO: the station that first sent the message. Label. -->
+    <string name="modes_forms_rg_so">発信局</string>
+    <!-- Radiogram field CK: the check, the number of words in the text. Label. -->
+    <string name="modes_forms_rg_ck">チェック（本文の語数）</string>
+    <!-- Radiogram field PL: where the message was written. Label. -->
+    <string name="modes_forms_rg_pl">発信地</string>
+    <!-- Radiogram field TF: the time it was handed in. Label. -->
+    <string name="modes_forms_rg_tf">受付時刻</string>
+    <!-- Radiogram field DT: the date. Label. -->
+    <string name="modes_forms_rg_dt">日付</string>
+    <!-- Radiogram field TO: the addressee. Label. -->
+    <string name="modes_forms_rg_to">宛先：氏名と住所</string>
+    <!-- Radiogram field PH: the addressee's phone number. Label. -->
+    <string name="modes_forms_rg_ph">電話</string>
+    <!-- Radiogram field MS: the message text. Label. -->
+    <string name="modes_forms_rg_ms">本文</string>
+    <!-- Radiogram field SG: the signature. Label. -->
+    <string name="modes_forms_rg_sg">署名</string>
+    <!-- ICS-213 field TO: the addressee. Label. -->
+    <string name="modes_forms_ics_to">宛先（氏名と役職）</string>
+    <!-- ICS-213 field FR: the sender. Label. -->
+    <string name="modes_forms_ics_fr">差出人（氏名と役職）</string>
+    <!-- ICS-213 field SU: the subject. Label. -->
+    <string name="modes_forms_ics_su">件名</string>
+    <!-- ICS-213 field DT: the date. Label. -->
+    <string name="modes_forms_ics_dt">日付</string>
+    <!-- ICS-213 field TM: the time. Label. -->
+    <string name="modes_forms_ics_tm">時刻</string>
+    <!-- ICS-213 field MS: the message. Label. -->
+    <string name="modes_forms_ics_ms">メッセージ</string>
+    <!-- ICS-213 field AP: who approved the message. Label. -->
+    <string name="modes_forms_ics_ap">承認者（氏名と役職）</string>
+    <!-- Title of the Message forms sheet. One line. -->
+    <string name="modes_forms_title">メッセージフォーム</string>
+    <!-- Explanation on the Message forms sheet (radio without DMR). A few lines. -->
+    <string name="modes_forms_hint">ICS-213 General Message と ARRL Radiogram は、非常通信や通信訓練のロールコール用のフォームです。記入して無線で読み上げるか、APRS メッセージとして別の SignalDeck に送ると、受信側で元のフォームに組み立てられます。</string>
+    <!-- The same on a radio with DMR texts. A few lines. -->
+    <string name="modes_forms_hint_dmr">ICS-213 General Message と ARRL Radiogram は、非常通信や通信訓練のロールコール用のフォームです。記入して無線で読み上げるか、APRS メッセージや DMR テキストとして別の SignalDeck に送ると、受信側で元のフォームに組み立てられます。</string>
+    <!-- Button: start a new ICS-213 form. Short (half-width button). -->
+    <string name="modes_forms_new_ics">新規 ICS-213</string>
+    <!-- Button: start a new radiogram. Short (half-width button). -->
+    <string name="modes_forms_new_radiogram">新規ラジオグラム</string>
+    <!-- Section heading (capitals) when there are no forms. Short. -->
+    <string name="modes_forms_none">フォームはまだありません</string>
+    <!-- Section heading (capitals) above the list of forms. Short. -->
+    <string name="modes_forms_list">送信済みと受信済み</string>
+    <!-- Form list: a radiogram without subject, named by its number. %1$s the number. Short. -->
+    <string name="modes_forms_number">番号 %1$s</string>
+    <!-- Form list line under a sent form. %1$s the callsign it went to, %2$s how (APRS, DMR, Winlink), %3$s date and time. One line. -->
+    <string name="modes_forms_row_to">宛先 %1$s · %2$s · %3$s</string>
+    <!-- Form list line under a received form. %1$s the sender, %2$s how, %3$s date and time. One line. -->
+    <string name="modes_forms_row_from">差出人 %1$s · %2$s · %3$s</string>
+    <!-- The same as modes_forms_row_to with its status. %4$s the status ("sending 2/3"). One line. -->
+    <string name="modes_forms_row_to_status">宛先 %1$s · %2$s · %3$s · %4$s</string>
+    <!-- The same as modes_forms_row_from with its status. %4$s the status. One line. -->
+    <string name="modes_forms_row_from_status">差出人 %1$s · %2$s · %3$s · %4$s</string>
+    <!-- Form list title of a radiogram. %1$s its subject or number. One line. -->
+    <string name="modes_forms_row_radiogram">ラジオグラム：%1$s</string>
+    <!-- Form list title of an ICS-213. %1$s its subject. One line. -->
+    <string name="modes_forms_row_ics">ICS-213：%1$s</string>
+    <!-- Hint on a sent form. %1$s the callsign, %2$s how (APRS, DMR, Winlink), %3$s date and time. One line. -->
+    <string name="modes_forms_view_sent">%2$s で %1$s へ送信 · %3$s</string>
+    <!-- Hint on a received form. %1$s the sender, %2$s how, %3$s date and time. One line. -->
+    <string name="modes_forms_view_received">%2$s で %1$s から受信 · %3$s</string>
+    <!-- Button and sheet title: show the form in large text to read it over the air. Short. -->
+    <string name="modes_forms_read_on_air">無線で読み上げ</string>
+    <!-- Title of Android's share chooser for a form. One line. -->
+    <string name="modes_forms_share_title">フォームを共有</string>
+    <!-- Button: answer the form with a new one. Short. -->
+    <string name="modes_forms_reply">返信</string>
+    <!-- Confirmation dialog title before deleting a form. One line. -->
+    <string name="modes_forms_delete_confirm">このフォームを削除しますか？</string>
+    <!-- Hint under the large form text. Two lines. -->
+    <string name="modes_forms_read_hint">項目ごとにゆっくり読み上げてください。珍しい語はフォネティックでスペルを伝え、数字は 1 桁ずつ読みます。</string>
+    <!-- Hint in the radiogram editor: the check field is computed. One line. -->
+    <string name="modes_forms_check_hint">チェックは送信時に本文の語数から自動で入力されます。</string>
+    <!-- Button and dialog title: send the form as APRS messages. Half-width button. -->
+    <string name="modes_forms_send_aprs">APRS で送信</string>
+    <!-- Button: send the form as DMR texts. Half-width button. -->
+    <string name="modes_forms_send_dmr">DMR テキストで送信</string>
+    <!-- Button and dialog title: put the form in the Winlink outbox. Full-width button. -->
+    <string name="modes_forms_send_winlink">Winlink で送信</string>
+    <!-- Toast after saving a form. Very short. -->
+    <string name="modes_forms_saved">保存しました</string>
+    <!-- Hint in the Winlink address field. One line. -->
+    <string name="modes_forms_winlink_to_hint">コールサインまたはメールアドレス（複数はカンマ区切り）</string>
+    <!-- Message of the Send by Winlink dialog. A few lines. -->
+    <string name="modes_forms_winlink_message">フォームは、誰でも読めるメールとして Winlink の送信トレイに入ります（SignalDeck はこれをフォームに組み立て直します）。次回の Winlink 接続時に送信されます。</string>
+    <!-- Dialog button: queue the form in the Winlink outbox. Short. -->
+    <string name="modes_forms_winlink_put">送信トレイへ</string>
+    <!-- Toast after queuing the form for Winlink. One line. -->
+    <string name="modes_forms_winlink_done">Winlink の送信トレイに入れました</string>
+    <!-- Hint in the APRS callsign field. N0CALL-7 is an example callsign. One line. -->
+    <string name="modes_forms_aprs_to_hint">コールサイン（例：N0CALL-7）</string>
+    <!-- Message of the Send by APRS dialog. %1$d the number of APRS messages the form needs. Two lines. -->
+    <plurals name="modes_forms_aprs_message">
+        <item quantity="other">APRS チャンネルで 12 秒ごとに 1 件ずつ、%1$d 件のメッセージを送信します（無線機はアナログチャンネルにしておく必要があります）。</item>
+    </plurals>
+    <!-- Toast while the form goes out by APRS. %1$d the number of messages. One line. -->
+    <plurals name="modes_forms_aprs_sending">
+        <item quantity="other">APRS メッセージ %1$d 件を送信中</item>
+    </plurals>
+    <!-- Toast: DMR needs a contact to send to, and there are none. One line. -->
+    <string name="modes_forms_no_contacts">連絡先がまだありません（連絡先タブ）</string>
+    <!-- Contact list item: a talkgroup. %1$s its name, %2$s its number. Two spaces before the bracket. One line. -->
+    <string name="modes_forms_contact_tg">%1$s\u0020（トークグループ %2$s）</string>
+    <!-- Contact list item: a private DMR ID. %1$s its name, %2$s the ID. Two spaces before the bracket. One line. -->
+    <string name="modes_forms_contact_id">%1$s\u0020（ID %2$s）</string>
+    <!-- Title of the DMR contact picker. %1$d the number of texts the form needs. One line. -->
+    <plurals name="modes_forms_dmr_title">
+        <item quantity="other">DMR テキストで送信（%1$d 件）</item>
+    </plurals>
+    <!-- Toast while the form goes out. Very short. -->
+    <string name="modes_forms_sending">送信中</string>
+
+    <!-- ===== Fox hunt engine: prediction, fox identity, spin bearing ===== -->
+    <!-- How sure the fox estimate is: its 50 % area is small. Lower case, after "Fox estimate (bearings, ". One word. -->
+    <string name="modes_fox_conf_good">良</string>
+    <!-- How sure the fox estimate is: medium. Lower case. One word. -->
+    <string name="modes_fox_conf_fair">中</string>
+    <!-- How sure the fox estimate is: its area is large. Lower case. One word. -->
+    <string name="modes_fox_conf_rough">粗い</string>
+    <!-- Name of a fox-estimate layer: the compass bearings of the marks. Lower case, in "bearings + heat map". Short. -->
+    <string name="modes_fox_layer_bearings">方位</string>
+    <!-- Name of a fox-estimate layer: the heat map from signal strength. Lower case. Short. -->
+    <string name="modes_fox_layer_heat">ヒートマップ</string>
+    <!-- Name of a fox-estimate layer: the terrain shadowing. Lower case. Short. -->
+    <string name="modes_fox_layer_terrain">地形</string>
+    <!-- What the estimate is when no layer runs: the strongest mark alone. Lower case. Short. -->
+    <string name="modes_fox_layer_strongest">最も強いマーク</string>
+    <!-- Joins the layer names ("bearings + heat map"). A plus with spaces. -->
+    <string name="modes_fox_layer_separator">\u0020+\u0020</string>
+    <!-- Why the heat map is not used yet: fewer than 3 marks. Lower case, after "Not used yet: ". Short. -->
+    <string name="modes_fox_block_marks">ヒートマップにはマークが 3 つ必要です</string>
+    <!-- Why the heat map is not used yet: the marks are too weak. Lower case. Short. -->
+    <string name="modes_fox_block_floor">ヒートマップにはノイズフロアを超えるマークが 2 つ必要です</string>
+    <!-- Why the heat map is not used yet: the marks are too close together. Lower case. Short. -->
+    <string name="modes_fox_block_spread">ヒートマップには 100 m 以上離れたマークが必要です</string>
+    <!-- Why bearings are not used: no compass in this phone. Lower case, after "Not used yet: ". One line. -->
+    <string name="modes_fox_note_no_compass">この端末にはコンパスがないため、マークに方位が付きません。ヒートマップは信号の強さから推定します</string>
+    <!-- Why bearings are not used yet: no mark has a bearing. Lower case. Short. -->
+    <string name="modes_fox_note_no_bearing">方位付きのマークがまだありません</string>
+    <!-- Why terrain is not used: it needs the heat map, which is switched off. Lower case. Short. -->
+    <string name="modes_fox_note_terrain_off">地形はヒートマップを補正しますが、ヒートマップがオフです</string>
+    <!-- Why terrain is not used yet: the elevation data for this area has not downloaded. Lower case. Short. -->
+    <string name="modes_fox_note_no_terrain">この地域の地形データがまだありません</string>
+    <!-- Which signals count as the fox: every reception. After "Fox: ". Short. -->
+    <string name="modes_fox_any_signal">すべての信号</string>
+    <!-- The fox is one DMR ID. %1$s the ID. After "Fox: ". Short. -->
+    <string name="modes_fox_dmr_id">DMR ID %1$s</string>
+    <!-- The fox is one DMR ID with a colour code. %1$s the ID, %2$s the colour code. Short. -->
+    <string name="modes_fox_dmr_id_cc">DMR ID %1$s、CC %2$s</string>
+    <!-- The fox is any DMR caller. Lower case. Short. -->
+    <string name="modes_fox_dmr_any">すべての DMR 送信局</string>
+    <!-- The fox is any DMR caller on one colour code. %1$s the colour code. Short. -->
+    <string name="modes_fox_dmr_any_cc">すべての DMR 送信局、CC %1$s</string>
+    <!-- The fox is picked by the channel's DCS code. Lower case. Short. -->
+    <string name="modes_fox_dcs">チャンネルの DCS</string>
+    <!-- The fox is picked by a CTCSS tone. %1$s the tone in Hz ("88.5"). Short. -->
+    <string name="modes_fox_ctcss">CTCSS %1$s Hz</string>
+    <!-- No tone is set, so every reception counts. Lower case. Short. -->
+    <string name="modes_fox_no_tone">トーン未設定（すべての受信）</string>
+    <!-- Spin bearing result from the signal peak. %1$s bearing (3 digits), %2$s ± degrees, %3$s depth in dB. One line. -->
+    <string name="modes_spin_result_peak">%1$s° ±%2$s°（ピークから、深さ %3$s dB）</string>
+    <!-- Spin bearing result from the null (the body blocks the signal from behind). %1$s bearing, %2$s ± degrees, %3$s depth in dB. One line. -->
+    <string name="modes_spin_result_null">%1$s° ±%2$s°（背後のヌルから、深さ %3$s dB）</string>
+    <!-- Guidance while turning on the spot: the circle is complete. Large text, short. -->
+    <string name="modes_spin_done">一周しました：完了</string>
+    <!-- Guidance while turning: turning too fast. Large text, one word. -->
+    <string name="modes_spin_slower">ゆっくり</string>
+    <!-- Guidance while turning: stopped or too slow. Large text, short. -->
+    <string name="modes_spin_keep_turning">回り続けて</string>
+    <!-- Guidance while turning: going well. Large text, short. -->
+    <string name="modes_spin_keep_going">その調子</string>
+    <!-- Spin failed: too few signal readings. One line. -->
+    <string name="modes_spin_few">測定値が少なすぎます。もっとゆっくり、一周回ってください</string>
+    <!-- Spin failed: part of the circle has no readings. %1$s the gap in degrees. One line. -->
+    <string name="modes_spin_gap">一周していません（%1$s° の欠け）。最後まで回ってください</string>
+    <!-- Spin failed: the signal hardly changed while turning. %1$s the difference in dB. Two lines. -->
+    <string name="modes_spin_flat">差が小さすぎます（%1$s dB）。スマートフォンを胸に平らに当て、開けた場所に出てもう一度回ってください</string>
+
+    <!-- ===== Satellites ===== -->
+    <!-- About the ISS APRS digipeater, on the satellite list. One or two lines. -->
+    <string name="modes_sat_about_iss_aprs">パケットデジピーター：パスは APRS 画面でワッチします。PKT → ISS 経由でビーコン で位置を送信します</string>
+    <!-- About the ISS SSTV events. Robot 36 is an SSTV mode. One or two lines. -->
+    <string name="modes_sat_about_iss_sstv">画像イベント（Robot 36）：画像は SSTV 画面でデコードします。告知されたイベント中のみ</string>
+    <!-- About the ISS cross-band repeater. One or two lines. -->
+    <string name="modes_sat_about_iss_rptr">クロスバンド FM レピーター（ときどき稼働）：70 cm で受信、2 m でトーン付きで送信</string>
+    <!-- About the ISS crew voice channel. One line. -->
+    <string name="modes_sat_about_iss_voice">クルーとの交信や学校との交信。主に受信のみ</string>
+    <!-- About the SO-50 satellite. One or two lines. -->
+    <string name="modes_sat_about_so50">FM レピーター。74.4 Hz のトーンを 2 秒送ると 10 分タイマーが作動します</string>
+    <!-- About the PO-101 satellite (Diwata-2 is its other name). One or two lines. -->
+    <string name="modes_sat_about_po101">スケジュール運用の FM レピーター（Diwata-2）。70 cm で 141.3 Hz を付けて送信</string>
+    <!-- Error: the orbit download failed from both sources. One line. -->
+    <string name="modes_sat_download_failed">衛星の軌道データをダウンロードできませんでした（AMSAT と CelesTrak に接続できません）</string>
+    <!-- Error: the orbits could not be written. %1$s the technical reason. One line. -->
+    <string name="modes_sat_save_failed">保存できませんでした：%1$s</string>
+
+    <!-- ===== FT8 station (FT8 page status line, errors, history lines). The FT8 messages themselves stay as sent. ===== -->
+    <!-- FT8 status: the decoder is off. Status line, short. -->
+    <string name="modes_ft8_status_off">受信していません</string>
+    <!-- FT8 status: decoding. Status line, short. -->
+    <string name="modes_ft8_status_listening">受信中</string>
+    <!-- FT8 status after a 15 s slot with no decode. Status line, one line. -->
+    <string name="modes_ft8_status_nothing">受信中、前のスロットではデコードなし</string>
+    <!-- FT8 status after a slot. %1$d the number of messages decoded (1 or more). Status line, one line. -->
+    <plurals name="modes_ft8_status_decoded">
+        <item quantity="other">受信中、前のスロットで %1$d 件デコード</item>
+    </plurals>
+    <!-- FT8 status: the next message cannot be encoded. %1$s the message. Status line. -->
+    <string name="modes_ft8_status_cannot_encode">エンコードできません：%1$s</string>
+    <!-- FT8 status: the sequence gave up. %1$d the number of tries. Status line. -->
+    <plurals name="modes_ft8_status_no_answer">
+        <item quantity="other">停止：%1$d 回試行しても応答なし</item>
+    </plurals>
+    <!-- FT8 status while sending. %1$s the FT8 message ("CQ K1ABC FN42"). Status line. -->
+    <string name="modes_ft8_status_transmitting">送信中：%1$s</string>
+    <!-- FT8 error: the clicked decode has no callsign to answer. Toast. -->
+    <string name="modes_ft8_err_no_call">そのメッセージにはコールサインがありません</string>
+    <!-- FT8 error: a typed message is too long or has characters FT8 cannot carry. Toast, two lines. -->
+    <string name="modes_ft8_err_no_fit">そのメッセージは FT8 で送れません（フリーテキストは A-Z 0-9 + - . / ? の 13 文字まで）</string>
+    <!-- FT8 error: no callsign is set (it is set in the APRS settings). Toast. -->
+    <string name="modes_ft8_err_callsign">先にコールサインを設定してください（APRS 設定）</string>
+    <!-- FT8 error: the callsign cannot be encoded in FT8. Toast. -->
+    <string name="modes_ft8_err_call_unsendable">このコールサインは FT8 で送信できません</string>
+    <!-- History line: the callsign is non-standard, so CQ goes out without the grid. WSJT-X is a program's name. Two lines. -->
+    <string name="modes_ft8_event_nonstandard">⚠️ このコールサインは FT8 の標準形式ではありません（サフィックスが 4 文字以上、または特殊なプリフィックス）。そのため WSJT-X と同じく、CQ はグリッドロケーターなしで送信します</string>
+    <!-- History line: an FT8 contact finished. %1$s the other station's callsign. One line. -->
+    <string name="modes_ft8_event_complete">📡 %1$s との FT8 QSO が完了</string>
+    <!-- History line: an FT8 contact was logged. %1$s callsign (and grid), %2$s the report sent, %3$s the report received ("-" if none). One line. -->
+    <string name="modes_ft8_event_logged">📒 FT8 QSO を記録：%1$s、送信レポート %2$s、受信レポート %3$s</string>
+    <!-- History line: the sequence stopped. %1$s the FT8 message that got no answer. One line. -->
+    <string name="modes_ft8_event_no_answer">⏹ FT8：「%1$s」に応答がないため停止</string>
+    <!-- History line: the closing 73 went out. One line. -->
+    <string name="modes_ft8_event_sent_73">📡 FT8：73 を送信</string>
+
+    <!-- ===== Winlink (PKT → Winlink e-mail): states, errors, import summary. The messages and the B2F protocol stay English. ===== -->
+    <!-- Joins clauses of one sentence ("12 packet gateways …; 3 HF; 2 on other bands"). A semicolon and a space. -->
+    <string name="modes_clause_separator">、</string>
+    <!-- Winlink state when no session runs. Status line, short. -->
+    <string name="modes_winlink_state_idle">未接続</string>
+    <!-- Winlink state: opening the internet connection to the Winlink server (CMS). Status line. -->
+    <string name="modes_winlink_state_connecting_cms">Winlink CMS に接続中…</string>
+    <!-- Winlink state: logged in to the server, mail is going both ways. Status line. -->
+    <string name="modes_winlink_state_cms">CMS に接続：メールを送受信中</string>
+    <!-- Winlink state: calling a packet gateway on the radio. %1$s its callsign. Status line. -->
+    <string name="modes_winlink_state_calling">%1$s を呼出中…</string>
+    <!-- Winlink state: connected to a gateway. %1$s its callsign. Status line. -->
+    <string name="modes_winlink_state_gateway">%1$s に接続：メールを送受信中</string>
+    <!-- Winlink session result: the user stopped it. Status line, also in the history. Short. -->
+    <string name="modes_winlink_stopped">停止しました</string>
+    <!-- Winlink session result: it failed. %1$s the reason (English technical text, or modes_winlink_timeout). Status line. -->
+    <string name="modes_winlink_failed">失敗：%1$s</string>
+    <!-- Reason after "Failed: ": the other side did not answer in time. Lower case, short. -->
+    <string name="modes_winlink_timeout">時間内に応答なし</string>
+    <!-- Winlink session result. %1$d messages sent, %2$d received. Status line, also in the history. -->
+    <string name="modes_winlink_done">完了：送信 %1$d 件、受信 %2$d 件</string>
+    <!-- Notification text after a session that brought mail. %1$d the number of new messages. One line. -->
+    <plurals name="modes_winlink_new_mail">
+        <item quantity="other">新着メッセージ %1$d 件</item>
+    </plurals>
+    <!-- Transfer progress line. %1$s what (modes_winlink_sending / receiving), %2$d bytes done, %3$d bytes in all. One line. -->
+    <string name="modes_winlink_progress">%1$s · %2$d / %3$d バイト</string>
+    <!-- What is moving: a message going out. %1$s its message ID. Lower case, short. -->
+    <string name="modes_winlink_sending">%1$s を送信中</string>
+    <!-- What is moving: a message coming in. %1$s its message ID. Lower case, short. -->
+    <string name="modes_winlink_receiving">%1$s を受信中</string>
+    <!-- Gateway list import: how many gateways this radio can use. %1$d usable, %2$d rows in the file. One or two lines. -->
+    <plurals name="modes_winlink_import_usable">
+        <item quantity="other">ファイル内 %2$d 件のうち、この無線機で使えるパケットゲートウェイは %1$d 件（1200 baud、136〜174 または 400〜480 MHz）</item>
+    </plurals>
+    <!-- Gateway list import, added clause: gateways on HF. %1$d a count. Very short. -->
+    <string name="modes_winlink_import_hf">HF %1$d 件</string>
+    <!-- Gateway list import, added clause: gateways at other speeds or modes. %1$d a count. Short. -->
+    <plurals name="modes_winlink_import_other_baud">
+        <item quantity="other">ほかの速度やモード %1$d 件</item>
+    </plurals>
+    <!-- Gateway list import, added clause: gateways outside this radio's bands. %1$d a count. Short. -->
+    <plurals name="modes_winlink_import_other_bands">
+        <item quantity="other">ほかのバンド %1$d 件</item>
+    </plurals>
+    <!-- Winlink error: no callsign set (it is set in PKT → Settings). Toast. -->
+    <string name="modes_winlink_err_callsign">先にコールサインを設定してください（PKT → 設定）</string>
+    <!-- Winlink error: the new message has no recipient. Toast. -->
+    <string name="modes_winlink_err_no_to">宛先を 1 つ以上追加してください（コールサインまたはメールアドレス）</string>
+    <!-- Winlink error: the subject is longer than Winlink allows. Toast. -->
+    <string name="modes_winlink_err_subject">件名が長すぎます（128 文字まで）</string>
+    <!-- Winlink error: the message is empty. Toast. -->
+    <string name="modes_winlink_err_empty">先に本文を入力してください</string>
+    <!-- Winlink error: a session is already running. Toast. -->
+    <string name="modes_winlink_err_busy">Winlink セッションはすでに動作中です</string>
+    <!-- Winlink error: the gateway callsign is not valid; N0ABC-10 is an example. Toast. -->
+    <string name="modes_winlink_err_gateway">N0ABC-10 のようなゲートウェイのコールサインを入力してください</string>
+
+    <!-- ===== M17 station (M17 page, history lines) ===== -->
+    <!-- M17 error: the receiver's calibration file is missing from the app. Toast. -->
+    <string name="modes_m17_err_calibration">M17 の校正データがありません</string>
+    <!-- M17 error: the Codec 2 voice codec did not load. %1$s the technical reason. Toast. -->
+    <string name="modes_m17_err_codec">Codec 2 を使用できません：%1$s</string>
+    <!-- M17 calibration line: the receiver learnt its table from this phone's receptions. Lower case, one line. -->
+    <string name="modes_m17_cal_fitted">この端末での受信から校正済み</string>
+    <!-- M17 calibration line: the fixed-tap receiver is in use. Lower case, one line. -->
+    <string name="modes_m17_cal_held">この端末用の固定タップ。モジュールの音声フィルターは開いたままです</string>
+    <!-- M17 calibration line: no table for this phone, the one from the Ulefone Armor 26 Ultra is used. Lower case, one line. -->
+    <string name="modes_m17_cal_armor">Ulefone Armor 26 Ultra で校正（この端末ではないため、デコードできない場合があります）</string>
+    <!-- M17 calibration line: the table was made on this phone model. Lower case, one line. -->
+    <string name="modes_m17_cal_model">この端末の機種で校正済み</string>
+    <!-- M17 calibration line: the table was made for this phone. Lower case, one line. -->
+    <string name="modes_m17_cal_phone">この端末用に校正済み</string>
+    <!-- History line: an M17 call. %1$s the caller, %2$s the destination. One line. -->
+    <string name="modes_m17_event_call">📻 M17：%1$s → %2$s</string>
+    <!-- History line: an M17 call with its text. %1$s caller, %2$s destination, %3$s the text the caller sends with the call. Two spaces before the quote. One line. -->
+    <string name="modes_m17_event_call_meta">📻 M17：%1$s → %2$s\u0020「%3$s」</string>
+    <!-- History line: an encrypted M17 call (SignalDeck does not play it). %1$s caller, %2$s destination. One line. -->
+    <string name="modes_m17_event_call_enc">📻 M17：%1$s → %2$s\u0020（暗号化：再生しません）</string>
+    <!-- History line: an encrypted M17 call with its text. %1$s caller, %2$s destination, %3$s the caller's text. One line. -->
+    <string name="modes_m17_event_call_meta_enc">📻 M17：%1$s → %2$s\u0020「%3$s」\u0020（暗号化：再生しません）</string>
+    <!-- History line: an M17 call whose header could not be read. One line. -->
+    <string name="modes_m17_event_damaged">📻 M17：送信あり（ヘッダーが破損。送信者はフレームから判別します）</string>
+    <!-- History line: an M17 call ended, caller unknown. %1$s seconds ("4.2"), %2$d frames. One line. -->
+    <string name="modes_m17_event_ended">📻 M17 の送信終了：%1$s 秒、%2$d フレーム</string>
+    <!-- The same with some frames lost. %3$d the percentage received cleanly. One line. -->
+    <string name="modes_m17_event_ended_lossy">📻 M17 の送信終了：%1$s 秒、%2$d フレーム（正常 %3$d %%）</string>
+    <!-- History line: an M17 call ended. %1$s the caller, %2$s seconds, %3$d frames. One line. -->
+    <string name="modes_m17_event_ended_from">📻 %1$s からの M17 終了：%2$s 秒、%3$d フレーム</string>
+    <!-- The same with some frames lost. %4$d the percentage received cleanly. One line. -->
+    <string name="modes_m17_event_ended_from_lossy">📻 %1$s からの M17 終了：%2$s 秒、%3$d フレーム（正常 %4$d %%）</string>
+    <!-- An M17 data packet that is not a text. %1$s its protocol ("APRS", "raw"), %2$d its size in bytes. One line. -->
+    <plurals name="modes_m17_packet">
+        <item quantity="other">%1$s、%2$d バイト</item>
+    </plurals>
+    <!-- M17 texts line: part of a packet was lost. One line. -->
+    <string name="modes_m17_frames_lost">✉ M17：フレームが欠落しました</string>
+    <!-- History line: an M17 data packet. %1$s the sender, %2$s the destination, %3$s what it carried ("APRS, 12 bytes"). One line. -->
+    <string name="modes_m17_event_packet">%1$s → %2$s：%3$s</string>
+    <!-- History line: an M17 text message. %1$s the sender, %2$s the destination, %3$s the message as sent. One line. -->
+    <string name="modes_m17_event_sms">✉ %1$s → %2$s：%3$s</string>
+
+    <!-- ===== SSTV picture combining ===== -->
+    <!-- Combine error: fewer than two pictures picked. Toast. -->
+    <string name="modes_sstv_combine_two">同じ画像の受信を 2 つ以上選んでください</string>
+    <!-- Combine error: a picture file could not be read. %1$s the file name. Toast. -->
+    <string name="modes_sstv_combine_unreadable">%1$s を読み込めませんでした</string>
+    <!-- Combine error: the pictures have different sizes. Toast, two lines. -->
+    <string name="modes_sstv_combine_sizes">画像のサイズが異なるため（SSTV モードが異なります）、合成できません</string>
+    <!-- Combine error: only one picture is still selected. Toast. -->
+    <string name="modes_sstv_combine_one">使用中の画像が 1 枚だけです。合成するものがありません</string>
+    <!-- After combining. %1$d pictures combined (2 or more), %2$s the new file's name. Toast. -->
+    <plurals name="modes_sstv_combine_done">
+        <item quantity="other">%1$d 枚の画像を合成 → %2$s</item>
+    </plurals>
+
+    <!-- ===== Band scope engine ===== -->
+    <!-- Band scope preset: the FM simplex part of the 2 m band. Short (list item). -->
+    <string name="modes_scope_preset_2m_simplex">2 m FM シンプレックス</string>
+    <!-- Band scope preset: the marine VHF band. Short. -->
+    <string name="modes_scope_preset_marine">国際 VHF</string>
+    <!-- Band scope preset: the NOAA weather radio channels. Short. -->
+    <string name="modes_scope_preset_noaa">NOAA 気象放送</string>
+    <!-- Band scope error: a field is empty. Toast. -->
+    <string name="modes_scope_err_enter">周波数を MHz、ステップを kHz で入力してください</string>
+    <!-- Band scope error: the step is too small. Toast. -->
+    <string name="modes_scope_err_step">ステップは 2.5 kHz 以上にしてください</string>
+    <!-- Band scope error: the end frequency is below the start. Toast. -->
+    <string name="modes_scope_err_order">終了周波数は開始周波数より上にしてください</string>
+    <!-- Band scope error: the range leaves the radio's bands. %1$s the bands ("136–174 and 400–480 MHz"). Toast. -->
+    <string name="modes_scope_err_band">この無線機が合わせられるのは %1$s です。範囲はそのどれか 1 つに収めてください</string>
+    <!-- Band scope error: the range has fewer than two steps. Toast. -->
+    <string name="modes_scope_err_few">2 ステップ以上の範囲を選んでください</string>
+    <!-- Band scope error: too many steps. %1$d the steps asked for, %2$d the most allowed. Toast. -->
+    <string name="modes_scope_err_many">%1$d ステップは多すぎます（%2$d まで）。ステップを大きくしてください</string>
+    <!-- Band scope state: the sweep stopped on an error. %1$s the technical reason. Lower case, status line. -->
+    <string name="modes_scope_state_failed">停止：%1$s</string>
+
+    <!-- ===== Decoding a recording (SSTV / APRS from a recording) ===== -->
+    <!-- Error: another recording is being decoded. %1$s its file name. Toast. -->
+    <string name="modes_rec_err_busy">すでに録音をデコード中です（%1$s）</string>
+    <!-- Error: the recording file is gone. Toast. -->
+    <string name="modes_rec_err_missing">録音が見つかりません</string>
+    <!-- Error: the decode mode asked for is neither SSTV nor APRS. Toast. -->
+    <string name="modes_rec_err_mode">不明なモード</string>
+    <!-- Decode stage: loading the audio. Lower case, status line. -->
+    <string name="modes_rec_stage_reading">録音を読み込み中</string>
+    <!-- Decode stage: searching for APRS packets. Lower case, status line. -->
+    <string name="modes_rec_stage_aprs">APRS パケットを検索中</string>
+    <!-- Decode stage: searching for SSTV headers of any mode. Lower case, status line. -->
+    <string name="modes_rec_stage_sstv">SSTV ヘッダーを検索中（全モード）</string>
+    <!-- Decode stage: searching for Robot 36 pictures whose header was not heard. Lower case, status line. -->
+    <string name="modes_rec_stage_robot">ヘッダーのない Robot 36 画像を検索中</string>
+    <!-- Decode result: the user stopped it. Short. -->
+    <string name="modes_rec_stopped">停止しました</string>
+    <!-- Decode result: no APRS packet. %1$s the recording's length ("12:30"). One line. -->
+    <string name="modes_rec_aprs_none">%1$s の音声にパケットはありません</string>
+    <!-- Decode result: APRS packets found. %1$d packets, %2$s the recording's length. One line. -->
+    <plurals name="modes_rec_aprs_found">
+        <item quantity="other">%2$s の音声にパケット %1$d 件</item>
+    </plurals>
+    <!-- Decode result: no SSTV picture. %1$s the recording's length. One line. -->
+    <string name="modes_rec_sstv_none">%1$s の音声に SSTV 画像はありません</string>
+    <!-- Decode result: SSTV pictures found. %1$d pictures, %2$d of them complete, %3$s the recording's length. Two lines. -->
+    <plurals name="modes_rec_sstv_found">
+        <item quantity="other">%3$s の音声に画像 %1$d 枚（完全 %2$d 枚）、Download/DMR/SSTV に保存しました</item>
+    </plurals>
+    <!-- History line after decoding a recording. %1$s the file name, %2$s the result (one of the lines above). One line. -->
+    <string name="modes_rec_event_decoded">📼 %1$s をデコード：%2$s</string>
+
+    <!-- ===== Pager station ===== -->
+    <!-- Pager error: scanning needs two frequencies or more. Toast. -->
+    <string name="modes_pager_err_two">ページャーの周波数を 2 つ以上追加してください</string>
+    <!-- Name of the message thread for pages whose address (RIC) could not be read. Short (list title). -->
+    <string name="modes_pager_ric_unreadable">RIC 判読不能</string>
+
+    <!-- ===== RTTY and PSK31 keyboard chat ===== -->
+    <!-- Title of the RTTY/PSK31 sheet (mode names stay as they are). One line. -->
+    <string name="modes_text_title">RTTY と PSK31</string>
+    <!-- Explanation on the RTTY/PSK31 sheet. A paragraph. -->
+    <string name="modes_text_hint">モードを選んで「受信」をタップします。デコーダーは音声帯域のどこにあっても自動で信号を見つけます（RTTY はマーク 600〜2700 Hz、PSK31 は 300〜2700 Hz）。応答は受信中の周波数で、何も受信していなければ 2125 Hz（RTTY）と 1000 Hz（PSK31）で送信します。この無線機は 1 回の送信を 30 秒で打ち切るため、長い文は複数回に分けて送信します。</string>
+    <!-- Hint in the text field for what to transmit. Short. -->
+    <string name="modes_text_input_hint">送信する文を入力</string>
+    <!-- Button: stop the decoder. Short (third of a row). -->
+    <string name="modes_text_stop_listening">受信停止</string>
+    <!-- Button: start the decoder. Short (third of a row). -->
+    <string name="modes_text_listen">受信</string>
+    <!-- Text area before anything was decoded. One line. -->
+    <string name="modes_text_nothing">まだ何も受信していません。</string>
+
+    <!-- ===== Parrot (simplex repeater) screen ===== -->
+    <!-- Title of the parrot screen: it repeats what it hears. One or two words. -->
+    <string name="modes_parrot_title">パロット</string>
+    <!-- Label under the count of replays (capitals, small, half-width tile). One or two words. -->
+    <string name="modes_parrot_stat_repeated">中継回数</string>
+    <!-- Label under the time since the last reception (capitals, small, half-width tile). One or two words. -->
+    <string name="modes_parrot_stat_last">最終受信</string>
+    <!-- Parrot explanation. %1$s the longest recording in seconds, %2$s the minutes between Morse IDs. A paragraph. -->
+    <string name="modes_parrot_hint">このチャンネルで受信したものはすべて（最大 %1$s 秒）録音され、相手局の送信が終わった 1 秒後に送り返されます。相手局はこの局を通して自分の音を確認できます。コールサインを設定していれば、最大 %2$s 分に 1 回、再生の後にコールサインをモールスで付けます。各再生は、無線機の 30 秒の送信時間制限で打ち切られます。</string>
+    <!-- Button: turn the parrot off and close. Short. -->
+    <string name="modes_parrot_stop">パロット停止</string>
+    <!-- Subtitle. %1$s the channel number, %2$s its name. One line. -->
+    <string name="modes_parrot_on_channel">Ch %1$s · %2$s で中継中</string>
+    <!-- Subtitle when no channel is known. One line. -->
+    <string name="modes_parrot_on_this">このチャンネルで中継中</string>
+    <!-- Big state word (capitals): playing a recording back. One word, large text. -->
+    <string name="modes_parrot_replaying">再生中</string>
+    <!-- Big state word (capitals): recording a reception. One word, large text. -->
+    <string name="modes_parrot_recording">録音中</string>
+    <!-- Big state word (capitals): waiting for a reception. One word, large text. -->
+    <string name="modes_parrot_waiting">待機中</string>
+
+    <!-- ===== Recordings and captions lists ===== -->
+    <!-- Title of the recordings sheet. One line. -->
+    <string name="modes_media_recordings_title">録音</string>
+    <!-- Recordings sheet with none. REC is the name of the record button; keep the path. Two lines. -->
+    <string name="modes_media_recordings_none">録音はまだありません。REC をオンにすると、チャンネルでの受信がすべて Download/DMR/Audio/&lt;チャンネル&gt;/ に保存されます。</string>
+    <!-- Recordings sheet hint. Keep the path. Two lines. -->
+    <string name="modes_media_recordings_hint">タップで再生・停止、長押しで削除。ファイルは Download/DMR/Audio/&lt;チャンネル&gt;/ にあります。</string>
+    <!-- Confirmation dialog title before deleting a recording. One line. -->
+    <string name="modes_media_delete_confirm">録音を削除しますか？</string>
+    <!-- Toast after deleting a recording. One word. -->
+    <string name="modes_media_deleted">削除しました</string>
+    <!-- Toast: the recording would not play. %1$s the technical reason. One line. -->
+    <string name="modes_media_cannot_play">再生できません：%1$s</string>
+    <!-- Title of the captions sheet: the speech-to-text sentences heard. One line. -->
+    <string name="modes_media_captions_title">受信した字幕</string>
+    <!-- Captions sheet with none. TXT is the name of the captions button. Two lines. -->
+    <string name="modes_media_captions_none">字幕はまだありません。TXT をオンにすると、完成した文がチャンネルと時刻付きでここに保存されます。</string>
+    <!-- Captions sheet hint. One line. -->
+    <string name="modes_media_captions_hint">完成した字幕の文、新しい順。</string>
+    <!-- A caption's channel when the channel no longer exists. %1$s its number. Lower case, short. -->
+    <string name="modes_media_channel">チャンネル %1$s</string>
+
+    <!-- ===== ISS pass card (APRS and SSTV pages) ===== -->
+    <!-- The pass tracking repeats for every pass. A sentence. -->
+    <string name="modes_pass_follow_all">停止するまで、すべてのパスを追跡します。</string>
+    <!-- The pass tracking is for this pass only. A sentence. -->
+    <string name="modes_pass_follow_one">このパスのみ。</string>
+    <!-- Time until the pass, an hour or more. %1$d hours, %2$d minutes. Very short. -->
+    <string name="modes_pass_in_hours">%1$d 時間 %2$d 分</string>
+    <!-- Time until the pass, under an hour. %1$d minutes, %2$d seconds. Very short. -->
+    <string name="modes_pass_in_minutes">%1$d 分 %2$d 秒</string>
+    <!-- Card title: the next ISS pass. %1$s weekday and time, %2$s the countdown ("1 h 12 min"). One line. -->
+    <string name="modes_pass_next">🛰\u0020 次の ISS パス %1$s\u0020 ·\u0020 あと %2$s</string>
+    <!-- Card text before the pass. %1$s highest elevation in degrees, %2$s its length in minutes, %3$s one of the follow sentences. Two lines. -->
+    <string name="modes_pass_next_detail">最大仰角 %1$s°、約 %2$s 分。無線機は上昇の 1 分前に周波数を合わせ、ドップラーシフトに追従します。%3$s</string>
+    <!-- Card title during the pass. %1$s elevation in degrees, %2$s compass direction ("NE"). One line. -->
+    <string name="modes_pass_up">🛰\u0020 ISS 可視中\u0020 ·\u0020 仰角 %1$s°、%2$s</string>
+    <!-- Card title just before the ISS rises. One line. -->
+    <string name="modes_pass_rising">🛰\u0020 ISS がまもなく上昇</string>
+    <!-- Card text while the ISS is up. %1$s receive frequency (MHz), %2$s Doppler shift (kHz, signed), %3$s time until it sets (m:ss), %4$s distance in km. Two lines. -->
+    <string name="modes_pass_listening_sets">%1$s MHz で受信中（ドップラー %2$s kHz）\u0020 ·\u0020 沈むまで %3$s\u0020 ·\u0020 距離 %4$s km</string>
+    <!-- The same before it rises: the time until the pass window ends. Two lines. -->
+    <string name="modes_pass_listening_ends">%1$s MHz で受信中（ドップラー %2$s kHz）\u0020 ·\u0020 パス終了まで %3$s\u0020 ·\u0020 距離 %4$s km</string>
+    <!-- Card line: the transmit frequency for the ISS digipeater. %1$s MHz. One line. -->
+    <string name="modes_pass_talk">送信 %1$s MHz</string>
+
+    <!-- ===== Packet terminal ===== -->
+    <!-- Title of the packet terminal sheet. One line. -->
+    <string name="modes_term_title">パケット端末</string>
+    <!-- Explanation on the terminal sheet. BBS = bulletin board; B and BYE are commands typed as is. A paragraph. -->
+    <string name="modes_term_hint">BBS またはノードのチャンネルに合わせてから接続します。1 回のやりとりには数秒かかります。送信のたびに 1.6 秒のトーンで始まり、失われたフレームは再送されます。1 行入力して「送信」をタップします。ほとんどの BBS はプロンプトで応答し、B か BYE でセッションを終了します。</string>
+    <!-- Label above the callsign field. One line. -->
+    <string name="modes_term_call">接続先（コールサイン-SSID）</string>
+    <!-- Label above the digipeater field; RELAY is an example alias. One line. -->
+    <string name="modes_term_via">経由するデジピーター（任意、例：RELAY）</string>
+    <!-- Button: connect. Half-width. -->
+    <string name="modes_term_connect">接続</string>
+    <!-- Button: disconnect. Half-width. -->
+    <string name="modes_term_disconnect">切断</string>
+    <!-- Toggle button: incoming connections are accepted. Half-width. -->
+    <string name="modes_term_accept">着信：受け入れ</string>
+    <!-- Toggle button: incoming connections are refused. Half-width. -->
+    <string name="modes_term_refuse">着信：拒否</string>
+    <!-- Hint in the line to send. Short. -->
+    <string name="modes_term_input_hint">1 行入力</string>
+    <!-- Terminal state with frames not acknowledged yet. %1$s the link state, %2$d the frames waiting. One line. -->
+    <plurals name="modes_term_state_pending">
+        <item quantity="other">%1$s\u0020 ·\u0020 確認応答待ち %2$d 件</item>
+    </plurals>
+    <!-- Terminal screen before anything came in. Short. -->
+    <string name="modes_term_nothing">まだ何もありません。</string>
+
+    <!-- ===== Pager (POCSAG) compose screen ===== -->
+    <!-- Title of the pager screen. One word. -->
+    <string name="modes_pager_title">ページャー</string>
+    <!-- Section heading above the frequency field. Short. -->
+    <string name="modes_pager_freq">周波数（MHz）</string>
+    <!-- Hint under the frequency. Two lines. -->
+    <string name="modes_pager_freq_hint">ページャーメッセージはこの周波数でローパワーで送信します。現在のチャンネルと違う場合は、先にその周波数に合わせ、安定するのを待ちます。</string>
+    <!-- Hint when no own pager address (RIC) is set. Two lines. -->
+    <string name="modes_pager_rics_none">自局のページャー RIC は PKT → APRS 設定 で設定します。その RIC 宛のメッセージが自局宛になります。</string>
+    <!-- Hint listing the user's own pager addresses. %1$s the RICs. One line. -->
+    <string name="modes_pager_rics">自局の RIC：%1$s</string>
+    <!-- Section heading above the recipients field. Short. -->
+    <string name="modes_pager_to">宛先（RIC または連絡先の名前）</string>
+    <!-- Section heading above the message text. One word. -->
+    <string name="modes_pager_message">メッセージ</string>
+    <!-- Character count under the message. %1$d characters. Short. -->
+    <plurals name="modes_pager_chars">
+        <item quantity="other">%1$d 文字</item>
+    </plurals>
+    <!-- Explanation of signing and the pager types. A paragraph. -->
+    <string name="modes_pager_sign_hint">英数字ページャー、ファンクション 3。数字専用ページャーへの送信にはまだ対応していません。署名を付けると、本文の先頭にコールサインとコロンが入り、返信はこれを頼りに届きます。SignalDeck 以外のページャーでは、これもメッセージの一部として表示されます。スマートフォン出荷時のファームウェアでは、「送信」を押すと、ページャーにはシンボルエンジンが必要だと説明が出ます。</string>
+    <!-- The chosen speed. %1$d baud rate, %2$d the POCSAG function number. One line. -->
+    <string name="modes_pager_speed">%1$d baud\u0020 ·\u0020 ファンクション %2$d（英数字）</string>
+    <!-- Toggle line: signing is on. One line. -->
+    <string name="modes_pager_sign_on">コールサインで署名：オン</string>
+    <!-- Toggle line: signing is off. One line. -->
+    <string name="modes_pager_sign_off">コールサインで署名：オフ</string>
+    <!-- Status: the frequency is not a number. One line. -->
+    <string name="modes_pager_err_freq">周波数を MHz で入力してください</string>
+    <!-- Status after Send. %1$d the number of pager addresses. One line. -->
+    <plurals name="modes_pager_sending">
+        <item quantity="other">%1$d 個の RIC に送信中</item>
+    </plurals>
+    <!-- Status: no recipient was entered. One line. -->
+    <string name="modes_pager_err_empty">RIC か連絡先を追加してください</string>
+    <!-- Status: a number is out of the RIC range. %1$s what was typed. One line. -->
+    <string name="modes_pager_err_ric">%1$s は RIC ではありません（0〜2097151）</string>
+    <!-- Status: no contact has that name. %1$s what was typed. One line. -->
+    <string name="modes_pager_err_contact">%1$s という名前の連絡先はありません</string>
+    <!-- Status: the contact has no pager address. %1$s the contact's name. One line. -->
+    <string name="modes_pager_err_no_ric">%1$s にはページャー RIC がありません</string>
+
+    <!-- ===== Decode a recording ===== -->
+    <!-- Title of the recording picker, decoding SSTV. One line. -->
+    <string name="modes_recdec_title_sstv">録音をデコード：SSTV</string>
+    <!-- Title of the recording picker, decoding APRS. One line. -->
+    <string name="modes_recdec_title_aprs">録音をデコード：APRS</string>
+    <!-- Explanation for SSTV decoding; Robot, Martin, Scottie and PD are SSTV mode names. A paragraph. -->
+    <string name="modes_recdec_hint_sstv">録音の中から SSTV 画像を探します。SignalDeck が受信できるすべてのモード（各画像の先頭のヘッダーから Robot、Martin、Scottie、PD…、さらにフェージングでヘッダーが失われた Robot 36 画像）が対象で、完全なものも一部だけのものも、受信した画像と一緒に保存します。バックグラウンドで録音の再生より速く処理し、無線機は使いません。</string>
+    <!-- Explanation for APRS decoding. A paragraph. -->
+    <string name="modes_recdec_hint_aprs">録音の中から APRS パケットを探し、電波に乗った時刻付きで一覧にします（録音の隣に .aprs.txt ファイルとしても保存します）。送信、デジピート、中継は一切しません。バックグラウンドで処理し、無線機は使いません。</string>
+    <!-- Section heading (capitals) when there are no recordings. Short. -->
+    <string name="modes_recdec_none">録音はまだありません</string>
+    <!-- Section heading (capitals) above the recordings. Short. -->
+    <string name="modes_recdec_list">録音（新しい順）</string>
+    <!-- Hint when there are no recordings: where they come from. Two lines. -->
+    <string name="modes_recdec_none_hint">衛星パス → パスごとに録音 ですべてのパスを保存し、REC で無線機の受信を保存し、「録音をアップロード」で任意の場所から追加できます。</string>
+    <!-- Button: pick an audio file from the phone. Full width. -->
+    <string name="modes_recdec_upload">録音をアップロード…</string>
+    <!-- A recording's length, a minute or more. %1$d minutes, %2$d seconds. Very short. -->
+    <string name="modes_recdec_minutes">%1$d 分 %2$d 秒</string>
+    <!-- A recording's length under a minute. %1$d seconds. Very short. -->
+    <string name="modes_recdec_seconds">%1$d 秒</string>
+    <!-- A compressed recording's size. %1$s kilobytes. Very short. -->
+    <string name="modes_recdec_kb">%1$s kB</string>
+    <!-- Line under a recording. %1$s its folder, %2$s date and time, %3$s its length or size. One line. -->
+    <string name="modes_recdec_row">%1$s · %2$s · %3$s</string>
+    <!-- Title of a satellite pass recording in the list. Short. -->
+    <string name="modes_recdec_pass">パスの録音</string>
+    <!-- Toast: the picked file could not be read. One line. -->
+    <string name="modes_recdec_unreadable">ファイルを読み込めませんでした</string>
+    <!-- Title of the progress sheet, SSTV. One line. -->
+    <string name="modes_recdec_decoding_sstv">SSTV をデコード中</string>
+    <!-- Title of the progress sheet, APRS. One line. -->
+    <string name="modes_recdec_decoding_aprs">APRS をデコード中</string>
+    <!-- Progress state: decoding failed. %1$s the technical reason. One line, large text. -->
+    <string name="modes_recdec_failed">デコードできませんでした：%1$s</string>
+    <!-- Progress state. %1$d the percentage done. Short, large text. -->
+    <string name="modes_recdec_percent">%1$d %%</string>
+    <!-- Progress state with the stage. %1$d percentage, %2$s the stage ("looking for APRS packets"). One line, large text. -->
+    <string name="modes_recdec_percent_stage">%1$d %% · %2$s</string>
+    <!-- Above a long packet list: only the newest 60 are shown. %1$d how many there are. One line. -->
+    <string name="modes_recdec_last_60">（%1$d 件中、最新 60 件）</string>
+    <!-- Placeholder while decoding SSTV. One line. -->
+    <string name="modes_recdec_pictures_here">画像は見つかるとここに表示されます。</string>
+    <!-- Placeholder while decoding APRS. One line. -->
+    <string name="modes_recdec_packets_here">パケットは見つかるとここに表示されます。</string>
+
+    <!-- ===== Morse trainer ===== -->
+    <!-- Title of the Morse trainer sheet. One line. -->
+    <string name="modes_morse_title">モールス練習</string>
+    <!-- Explanation of the Koch method and Farnsworth spacing. A paragraph. -->
+    <string name="modes_morse_hint" formatted="false">コッホ法：最初は 2 文字を本来の速度で練習し、レッスンを 90 % で受信できるたびに 1 文字ずつ増やします。ファーンズワース法では、覚える間は文字と文字の間隔を長くとり、上達したら詰めていきます。音はスマートフォンで鳴るだけで、電波は出ません。</string>
+    <!-- Lesson line. %1$d lesson, %2$d lessons in all, %3$s its characters (spaced), %4$s the new character. One line beside two buttons. -->
+    <string name="modes_morse_lesson">レッスン %1$d / %2$d：\u0020%3$s\u0020\u0020（新：%4$s）</string>
+    <!-- Speed line. %1$d character speed, %2$d the spacing (Farnsworth) speed, both in words per minute. One line beside two buttons. -->
+    <string name="modes_morse_speed">文字 %1$d WPM\u0020 ·\u0020 間隔 %2$d WPM</string>
+    <!-- Label of the spacing stepper. One word. -->
+    <string name="modes_morse_spacing">間隔</string>
+    <!-- Section heading (capitals): listening practice. Short. -->
+    <string name="modes_morse_copy">受信練習</string>
+    <!-- Button: play five random groups. Half width. -->
+    <string name="modes_morse_play">5 グループ再生</string>
+    <!-- Button: play the same groups again. Half width. -->
+    <string name="modes_morse_again">もう一度</string>
+    <!-- Hint in the field where the user types what was heard. Short. -->
+    <string name="modes_morse_copy_hint">聞こえた文字を入力</string>
+    <!-- Button: score what was typed. Full width. -->
+    <string name="modes_morse_check">採点</string>
+    <!-- Copy result, monospaced: "sent:" and "you:" are padded so the two lines line up; keep them the same width. %1$s the score in percent, %2$s the verdict, %3$s what was sent, %4$s what was typed. Three lines. -->
+    <string name="modes_morse_result">%1$s %%\u0020 %2$s\n送信：\u0020 %3$s\n入力：\u0020 %4$s</string>
+    <!-- Verdict: 90 % or more, the next lesson opens. Short. -->
+    <string name="modes_morse_next_lesson">✔ 次のレッスンが解放されました</string>
+    <!-- Verdict: 90 % or more on the last lesson. Short. -->
+    <string name="modes_morse_all_done">✔ すべての文字を修了</string>
+    <!-- Verdict: under 90 %. Short. -->
+    <string name="modes_morse_keep_going">このレッスンを続けましょう</string>
+    <!-- Section heading (capitals): keying practice. Short. -->
+    <string name="modes_morse_sending">送信練習</string>
+    <!-- Hint for the key. Two lines. -->
+    <string name="modes_morse_sending_hint">長点はキーを押し続け、短点は軽くタップします。1.5 秒止まると、送った内容と速度がデコーダーに表示されます。</string>
+    <!-- The big Morse key button (capitals). One short word. -->
+    <string name="modes_morse_key">電鍵</string>
+    <!-- Decoder output when nothing could be read. One line. -->
+    <string name="modes_morse_unreadable">（まだ読み取れません。短点は短く、長点はその 3 倍の長さにしてください）</string>
+    <!-- Decoder output. %1$s the decoded text, %2$d the speed in words per minute. One line. -->
+    <string name="modes_morse_decoded">%1$s\u0020\u0020 ≈ %2$d WPM</string>
+
+    <!-- ===== Voice keyer ===== -->
+    <!-- Default name of keyer message 1: a CQ call. Short. -->
+    <string name="modes_keyer_slot_cq">CQ</string>
+    <!-- Default name of keyer message 2: the opening of a net. Short. -->
+    <string name="modes_keyer_slot_net">ロールコール開始</string>
+    <!-- Default name of keyer message 3: the user's identification. Short. -->
+    <string name="modes_keyer_slot_id">自局 ID</string>
+    <!-- Title of the voice keyer sheet. One line. -->
+    <string name="modes_keyer_title">ボイスメモリー</string>
+    <!-- Explanation on the voice keyer sheet; Record, Stop, Listen and Send are the button names. A paragraph. -->
+    <string name="modes_keyer_hint">スマートフォンのマイクで録音します（「録音」、話す、「停止」。最大 25 秒、前後の無音はカット）。「再生」でスマートフォンから再生し、「送信」で現在のチャンネルに送信します。CW ID がオンなら、アマチュアのチャンネルでは後にコールサインをモールスで送信します。</string>
+    <!-- Dialog title for renaming a keyer message. One line. -->
+    <string name="modes_keyer_name_title">メッセージ名</string>
+    <!-- Button: record a message. Quarter-width button, very short. -->
+    <string name="modes_keyer_record">録音</string>
+    <!-- Button: play the message on the phone. Quarter-width button, very short. -->
+    <string name="modes_keyer_listen">再生</string>
+    <!-- Toast: the slot is empty. One line. -->
+    <string name="modes_keyer_nothing">まだ録音されていません</string>
+    <!-- Toast after Send. %1$s the message's name. One line. -->
+    <string name="modes_keyer_sending">%1$s を送信中</string>
+    <!-- Section heading (capitals): the identification timer. Short. -->
+    <string name="modes_keyer_id_section">ID 送出</string>
+    <!-- Explanation of the ten-minute ID timer; "I just identified" is the button below. A paragraph. -->
+    <string name="modes_keyer_id_hint">アマチュア無線の規則では、送信中は 10 分ごとと終わりにコールサインを送出する必要があります。タイマーは、前回の ID 送出後、アマチュアのチャンネルで最初に送信したときに始まります。時間切れになると、送信時にスマートフォンが振動して知らせます。CW ID（PKT、ボイスメモリー、または送信後）でリセットされます。コールサインを声で言った後は「ID を送出した」をタップしてください。</string>
+    <!-- Button: reset the ID timer after saying the callsign. Full width. -->
+    <string name="modes_keyer_identified">ID を送出した</string>
+    <!-- Slot state while recording. Lower case, very short. -->
+    <string name="modes_keyer_recording">録音中…</string>
+    <!-- Slot state: its length. %1$s seconds ("4.2"). Very short. -->
+    <string name="modes_keyer_length">%1$s s</string>
+    <!-- Slot state: nothing recorded. Lower case, one word. -->
+    <string name="modes_keyer_empty">空</string>
+    <!-- Toggle button: Morse ID after this message is on. Quarter-width, very short. -->
+    <string name="modes_keyer_id_on">ID：オン</string>
+    <!-- Toggle button: Morse ID after this message is off. Quarter-width, very short. -->
+    <string name="modes_keyer_id_off">ID：オフ</string>
+    <!-- ID clock when not counting. Large text, short. -->
+    <string name="modes_keyer_timer_idle">ID タイマー停止中</string>
+    <!-- ID clock counting down. %1$s minutes and seconds (m:ss). Large text, short. -->
+    <string name="modes_keyer_timer_due">ID 送出まで %1$s</string>
+    <!-- ID clock at zero: say the callsign now. Large text, short. -->
+    <string name="modes_keyer_timer_now">今すぐ ID 送出</string>
+
+    <!-- Joins whole sentences into one paragraph. A space (empty in languages written without spaces). -->
+    <string name="modes_sentence_separator"></string>
+    <!-- Joins facts on one line ("35 questions, pass at 26  ·  best 30/35"). A middle dot with two spaces each side. -->
+    <string name="modes_dot_separator">\u0020 ·\u0020\u0020</string>
+
+    <!-- ===== M17 screen ===== -->
+    <!-- Section heading (capitals) above the M17 text field. One word. -->
+    <string name="modes_m17_text">テキスト</string>
+    <!-- Hint in the M17 text field. One word. -->
+    <string name="modes_m17_message_hint">メッセージ</string>
+    <!-- Section heading (capitals) above the M17 texts sent and received. One word. -->
+    <string name="modes_m17_texts">テキスト</string>
+    <!-- Section heading (capitals) above the M17 transmissions heard. One word. -->
+    <string name="modes_m17_heard">受信</string>
+    <!-- Button held down to transmit M17 voice. Short (half of the button row). -->
+    <string name="modes_m17_hold_to_talk">押して送信</string>
+    <!-- Button: stop M17 and close the screen. Short. -->
+    <string name="modes_m17_stop">M17 停止</string>
+    <!-- Subtitle. %1$s the channel number, %2$s its name. One line. -->
+    <string name="modes_m17_on_channel">Ch %1$s · %2$s で M17 受信中</string>
+    <!-- Subtitle when no channel is known. One line. -->
+    <string name="modes_m17_on_this">このチャンネルで M17 受信中</string>
+    <!-- Big state (capitals): a transmission is coming in. Large text, one line. -->
+    <string name="modes_m17_receiving">受信中</string>
+    <!-- Big state (capitals): waiting for a transmission. Large text, one line. -->
+    <string name="modes_m17_listening">M17 を待機中</string>
+    <!-- Under the caller: an encrypted transmission is not played. One line. -->
+    <string name="modes_m17_encrypted">暗号化：再生しません</string>
+    <!-- Under the caller: a data transmission. One line. -->
+    <string name="modes_m17_data">音声ではなくデータ</string>
+    <!-- Statistics line (monospaced). %1$s seconds ("4.2"), %2$d frames, %3$d signal quality in percent. One line. -->
+    <string name="modes_m17_stats">%1$s s\u0020 ·\u0020 %2$d フレーム\u0020 ·\u0020 信号 %3$d %%</string>
+    <!-- An M17 text this phone sent. %1$s time, %2$s from, %3$s to, %4$s the text. One line. -->
+    <string name="modes_m17_text_sent">%1$s\u0020 送信\u0020 %2$s → %3$s\u0020 %4$s</string>
+    <!-- An M17 text received. %1$s time, %2$s from, %3$s to, %4$s the text. One line. -->
+    <string name="modes_m17_text_received">%1$s\u0020 %2$s → %3$s\u0020 %4$s</string>
+    <!-- Empty heard list. VFO is the free-tuning mode. Two lines. -->
+    <string name="modes_m17_nothing">まだありません。M17 の周波数に合わせてください（チャンネルまたは VFO）。送信は同期信号から検出し、スマートフォンのスピーカーで再生します。</string>
+    <!-- Notes paragraph, first sentence when this radio can send M17. @ALL is the M17 broadcast address. -->
+    <string name="modes_m17_note_send">「押して送信」で、音声を M17 で全員（@ALL）に送信します。送信時間制限まで送れます（デバイス → 最長送信時間）。最後の言葉が切れないよう、短いテールを付けます。コールサインは APRS 設定のものを使います。</string>
+    <!-- Notes paragraph, first sentence on a firmware without the symbol engine. -->
+    <string name="modes_m17_note_firmware">このファームウェアでは受信専用です。M17 を送信するには、シンボルエンジン付きのモジュールのファームウェアが必要です。</string>
+    <!-- Notes paragraph, first sentence on a radio that cannot send M17. -->
+    <string name="modes_m17_note_rx_only">受信専用：この無線機のモジュールは M17 を送信できません。</string>
+    <!-- Notes paragraph: the receiver rebuilds the low tones. %1$s the calibration line ("calibrated for this phone"). -->
+    <string name="modes_m17_note_rebuild">無線機の音声経路は M17 に必要な低い音を取り除いてしまうため、SignalDeck が受信時にそれを復元します（%1$s）。</string>
+    <!-- Notes paragraph, on phones where the radio's own sound cannot be muted. -->
+    <string name="modes_m17_note_buzz">この端末では、無線機自身の音がスピーカーから出るため、送信を再生している間、デコードした音声の下にブーンという音が聞こえます。</string>
+    <!-- Notes paragraph, last sentence with the fixed-tap receiver. -->
+    <string name="modes_m17_note_held">モジュールの音声フィルターを開いたままにしているため、途中から始まった送信にも同期できます。</string>
+    <!-- Notes paragraph, last sentence otherwise. -->
+    <string name="modes_m17_note_strong">ある程度強い信号と、各送信の始まり（プリアンブル）が必要です。</string>
+
+    <!-- ===== Exam practice (the questions themselves stay English: they are the US pools) ===== -->
+    <!-- Toast: the question pool file could not be read. %1$s the technical reason. -->
+    <string name="modes_exam_err_pool">問題集を読み込めませんでした：%1$s</string>
+    <!-- Title of the exam practice sheet. One line. -->
+    <string name="modes_exam_title">試験対策（米国）</string>
+    <!-- Explanation on the exam home page; NCVEC and Russ Olsen are names. A paragraph. -->
+    <string name="modes_exam_hint">米国のアマチュア無線免許試験を、公式の問題集（英語）で練習します。模擬試験は本番と同じく各グループから 1 問ずつ出題します。合格には 35 問中 26 問の正解が必要です（Extra は 50 問中 37 問）。問題集はパブリックドメイン（NCVEC）で、機械可読版は Russ Olsen によるものです。</string>
+    <!-- Exam card: the exam's size and pass mark. %1$d questions, %2$d right answers needed. Short. -->
+    <plurals name="modes_exam_questions_pass">
+        <item quantity="other">%1$d 問、%2$d 問で合格</item>
+    </plurals>
+    <!-- Exam card: the best practice score. %1$d right, %2$d questions. Very short. -->
+    <string name="modes_exam_best">最高 %1$d/%2$d</string>
+    <!-- Exam card: questions answered wrong, to go over again. %1$d a count. Short. -->
+    <plurals name="modes_exam_missed_review">
+        <item quantity="other">復習する間違い %1$d 問</item>
+    </plurals>
+    <!-- Element page: the pool's size. %1$d questions. One line. -->
+    <plurals name="modes_exam_pool_size">
+        <item quantity="other">問題集は %1$d 問です。</item>
+    </plurals>
+    <!-- Button: start a practice exam. %1$d its questions. Full width. -->
+    <plurals name="modes_exam_practice">
+        <item quantity="other">模擬試験（%1$d 問）</item>
+    </plurals>
+    <!-- Button: go over the missed questions. %1$d how many. Full width. -->
+    <string name="modes_exam_missed_button">間違えた問題（%1$d）</string>
+    <!-- Toast: no question was missed yet. One line. -->
+    <string name="modes_exam_nothing_missed">間違えた問題はまだありません</string>
+    <!-- Section heading (capitals) above the subelements (chapters of the pool). Short. -->
+    <string name="modes_exam_study_section">分野を学習</string>
+    <!-- Subelement card. %1$d its questions. One line. -->
+    <plurals name="modes_exam_study_card">
+        <item quantity="other">%1$d 問、1 問ごとに答えを表示</item>
+    </plurals>
+    <!-- Sheet title during a practice exam. %1$d this question, %2$d all of them. One line. -->
+    <string name="modes_exam_question_exam">試験 %1$d / %2$d</string>
+    <!-- Sheet title while studying. %1$d this question, %2$d all of them. One line. -->
+    <string name="modes_exam_question_study">学習 %1$d / %2$d</string>
+    <!-- Button after a right answer while studying. Full width. -->
+    <string name="modes_exam_right_next">正解 — 次へ</string>
+    <!-- Button after a wrong answer while studying. %1$s the right answer's letter (A–D). Full width. -->
+    <string name="modes_exam_answer_next">正解は %1$s — 次へ</string>
+    <!-- Sheet title at the end of a practice exam. One line. -->
+    <string name="modes_exam_result_exam">試験結果</string>
+    <!-- Sheet title at the end of a study run. One line. -->
+    <string name="modes_exam_result_study">学習結果</string>
+    <!-- Result: passed. %1$d the right answers that were needed. One line. -->
+    <plurals name="modes_exam_passed">
+        <item quantity="other">合格：必要な正解数は %1$d 問でした。</item>
+    </plurals>
+    <!-- Result: not passed. %1$d the right answers needed. Two lines. -->
+    <plurals name="modes_exam_not_yet">
+        <item quantity="other">不合格：%1$d 問の正解が必要です。下の間違いを復習してから、もう一度挑戦してください。</item>
+    </plurals>
+    <!-- Result of a study run or a stopped exam. %1$s percent right; "Missed questions" is the button name. Two lines. -->
+    <string name="modes_exam_percent">正解率 %1$s %%。間違えた問題は、正解するまで「間違えた問題」に残ります。</string>
+    <!-- Section heading (capitals) above the missed questions. One word. -->
+    <string name="modes_exam_missed_section">間違い</string>
+    <!-- Under a missed question: the right answer. %1$s its letter, %2$s its text (English). One line or more. -->
+    <string name="modes_exam_answer">正解 %1$s：%2$s</string>
+    <!-- Under a missed question: what was chosen. %1$s its letter, %2$s its text (English). One line or more. -->
+    <string name="modes_exam_you_chose">選んだ答え %1$s：%2$s</string>
+    <!-- Button back to the exam element. %1$s its name ("Technician"). Full width. -->
+    <string name="modes_exam_back_to">%1$s に戻る</string>
+
+    <!-- ===== Band scope screen ===== -->
+    <!-- Title of the band scope screen. One or two words. -->
+    <string name="modes_scope_title">バンドスコープ</string>
+    <!-- Subtitle while the scope is stopped. One line. -->
+    <string name="modes_scope_subtitle">受信専用 · 送信は一切しません</string>
+    <!-- Subtitle while sweeping. %1$s start MHz, %2$s end MHz, %3$d steps, %4$s step in kHz, %5$s "≈" when the time is an estimate (else empty), %6$s the sweep time ("40 s"). One line. -->
+    <string name="modes_scope_running">%1$s〜%2$s · %3$d × %4$s kHz · 掃引 %5$s%6$s</string>
+    <!-- The same during a sweep, with the step in progress. %7$d the step number. One line. -->
+    <string name="modes_scope_running_step">%1$s〜%2$s · %3$d × %4$s kHz · 掃引 %5$s%6$s · ステップ %7$d</string>
+    <!-- Under the graph: no peak stands out. One line. -->
+    <string name="modes_scope_no_peaks">ノイズ（8 dB）を超える信号はありません。</string>
+    <!-- Under the graph: the strongest signals. %1$s the list, one frequency and level per line. -->
+    <string name="modes_scope_peaks">ノイズを超える強い信号：\n%1$s</string>
+    <!-- Under the graph while the first sweep runs. Short. -->
+    <string name="modes_scope_first_sweep">最初の掃引中…</string>
+    <!-- Under the graph before starting; Start is the button name. Two or three lines. -->
+    <string name="modes_scope_intro">バンドかカスタム範囲を選んで「開始」をタップします。無線機がステップごとに掃引します（受信専用。停止すると元のチャンネルに戻ります）。グラフをタップすると周波数を読み取れます。</string>
+    <!-- Button: tune the radio (VFO) to the frequency picked on the graph. Half width. -->
+    <string name="modes_scope_listen_here">ここで受信</string>
+    <!-- Button: reset the peak-hold line. Half width. -->
+    <string name="modes_scope_clear_peaks">ピークをクリア</string>
+    <!-- Band list item. %1$s band name, %2$s start MHz, %3$s end MHz, %4$s step kHz, %5$d steps, %6$s the sweep time. One or two lines. -->
+    <plurals name="modes_scope_preset_item">
+        <item quantity="other">%1$s\u0020（%2$s〜%3$s、%4$s kHz、%5$d ステップ、約 %6$s）</item>
+    </plurals>
+    <!-- Band list item: enter a range by hand. Short. -->
+    <string name="modes_scope_custom_item">カスタム範囲…</string>
+    <!-- Band list item: show the bands the region leaves out. Short. -->
+    <string name="modes_scope_show_all">すべてのバンドを表示…</string>
+    <!-- Title of the band list dialog. Short. -->
+    <string name="modes_scope_which_band">どのバンドにしますか？</string>
+    <!-- Title of the custom range sheet. Short. -->
+    <string name="modes_scope_custom_title">カスタム範囲</string>
+    <!-- Custom range hint. %1$s the radio's bands, %2$d the most steps. Three lines. -->
+    <string name="modes_scope_custom_hint">%1$s の中の任意の範囲（無線機はこれ以外に合わせられません）、最大 %2$d ステップ。1 ステップに約 1 秒かかるので、狭い範囲を細かいステップで掃引するとすぐ一巡しますが、広い範囲では数分かかります。</string>
+    <!-- Section heading above the start frequency. Short. -->
+    <string name="modes_scope_from">開始（MHz）</string>
+    <!-- Section heading above the end frequency. Short. -->
+    <string name="modes_scope_to">終了（MHz）</string>
+    <!-- Section heading above the step. Short. -->
+    <string name="modes_scope_step">ステップ（kHz）</string>
+    <!-- Button: use the custom range. Full width. -->
+    <string name="modes_scope_use">この範囲を使用</string>
+    <!-- Custom range estimate. %1$d steps, %2$s the sweep time ("2 min"). One line. -->
+    <plurals name="modes_scope_estimate">
+        <item quantity="other">%1$d ステップ、1 回の掃引に約 %2$s</item>
+    </plurals>
+    <!-- Toast: Listen here needs a frequency picked on the graph. One line. -->
+    <string name="modes_scope_tap_first">先にグラフをタップして周波数を選んでください</string>
+    <!-- Toast after Listen here. %1$s the frequency in MHz. One line. -->
+    <string name="modes_scope_listening">%1$s MHz で受信中（VFO）</string>
+    <!-- Screen reader description of the graph. One line. -->
+    <string name="modes_scope_graph_description">バンドスコープのグラフとウォーターフォール</string>
+
+    <!-- ===== FT8 screen ===== -->
+    <!-- Button: start calling CQ. Third of a row, short. -->
+    <string name="modes_ft8_call_cq">CQ を出す</string>
+    <!-- Button: stop transmitting. Third of a row, short. -->
+    <string name="modes_ft8_halt">送信停止</string>
+    <!-- Button: type a message to send. Third of a row, short. -->
+    <string name="modes_ft8_send_text">テキスト送信</string>
+    <!-- Button: open the FT8 settings. Third of a row, short. -->
+    <string name="modes_ft8_settings">設定</string>
+    <!-- Button: stop FT8 and close. Third of a row, short. -->
+    <string name="modes_ft8_stop">FT8 停止</string>
+    <!-- Subtitle. %1$s channel number, %2$s its name. One line. -->
+    <string name="modes_ft8_on_channel">Ch %1$s · %2$s で FM の FT8</string>
+    <!-- Subtitle when no channel is known. One line. -->
+    <string name="modes_ft8_on_this">このチャンネルで FM の FT8</string>
+    <!-- QSO line while transmitting in the first period (:00 :30). %1$s the FT8 message. Monospaced, one line. -->
+    <string name="modes_ft8_tx_first">TX 前半 ▸ %1$s</string>
+    <!-- QSO line while transmitting in the second period (:15 :45). %1$s the FT8 message. Monospaced, one line. -->
+    <string name="modes_ft8_tx_second">TX 後半 ▸ %1$s</string>
+    <!-- QSO line: in a contact. %1$s the other callsign. One line. -->
+    <string name="modes_ft8_qso_with">%1$s と QSO 中</string>
+    <!-- QSO line: idle. One line. -->
+    <string name="modes_ft8_not_tx">送信していません</string>
+    <!-- Status line. %1$s the station status ("Listening"), %2$s the audio transmit frequency in Hz. One line. -->
+    <string name="modes_ft8_status_line">%1$s\u0020 ·\u0020 送信 %2$s Hz</string>
+    <!-- The same with the grid sent. %3$s the grid ("FN42"). One line. -->
+    <string name="modes_ft8_status_line_grid">%1$s\u0020 ·\u0020 送信 %2$s Hz\u0020 ·\u0020 グリッド %3$s</string>
+    <!-- Period button: transmit in the first period (seconds :00 and :30). Third of a row. -->
+    <string name="modes_ft8_period_first">TX 前半（:00 :30）</string>
+    <!-- Period button: transmit in the second period (seconds :15 and :45). Third of a row. -->
+    <string name="modes_ft8_period_second">TX 後半（:15 :45）</string>
+    <!-- Empty decode list. RR73 and 73 are FT8 messages; WSJT-X is a program. Two paragraphs. -->
+    <string name="modes_ft8_empty_hint">受信中です。15 秒ごとに直前のスロットをデコードし、新しいものを上にしてここに表示します。CQ をタップすると応答し、その後のやりとり（グリッド、レポート、R レポート、RR73、73）をアプリが自動で行い、交信を記録します。\n\nFM の FT8 は、この FM チャンネルで FT8 の音声を送信している局と交信します：別の SignalDeck や、FM 機を使った WSJT-X など。SSB の FT8（144.174 / 432.174 MHz）は受信できません。また FM では、各スロットで最も強い 1 局しか受信できません。</string>
+    <!-- Toast after tapping a decode, first period. %1$s the callsign. One line. -->
+    <string name="modes_ft8_calling_first">前半で %1$s を呼出中</string>
+    <!-- Toast after tapping a decode, second period. %1$s the callsign. One line. -->
+    <string name="modes_ft8_calling_second">後半で %1$s を呼出中</string>
+    <!-- Section heading (capitals) above our own transmissions. One word. -->
+    <string name="modes_ft8_sent">送信済み</string>
+    <!-- Title of the send-a-message sheet. One line. -->
+    <string name="modes_ft8_send_title">FT8 メッセージを送信</string>
+    <!-- Hint on the send sheet. %1$s the user's callsign (or YOURCALL). The message itself is sent in English as typed. Two lines. -->
+    <string name="modes_ft8_send_hint">任意の標準メッセージ（例：「CQ %1$s」）、または 13 文字までのフリーテキスト（A-Z、0-9、スペース、+ - . / ?）。自局の周期で 1 回だけ送信します。</string>
+    <!-- Toast after queuing a typed message. One line. -->
+    <string name="modes_ft8_queued">次の自局の周期で送信します</string>
+    <!-- Title of the FT8 settings sheet. One line. -->
+    <string name="modes_ft8_settings_title">FT8 の設定</string>
+    <!-- Section heading (capitals): the grid locator sent. One line. -->
+    <string name="modes_ft8_grid_section">CQ と応答で送るグリッド</string>
+    <!-- Grid hint. %1$s the grid in use ("FN42", or modes_ft8_grid_none). Three lines. -->
+    <string name="modes_ft8_grid_hint">FT8 は 4 文字のメイデンヘッドグリッド（約 100 x 200 km）を送ります。空欄ならスマートフォンの位置情報を使い、入力すれば固定し、- を入力するとグリッドを送りません。現在：%1$s。</string>
+    <!-- No grid is sent. Lower case, one word. -->
+    <string name="modes_ft8_grid_none">なし</string>
+    <!-- Hint in the grid field when empty: the phone's location is used. Short. -->
+    <string name="modes_ft8_grid_input_hint">位置情報から</string>
+    <!-- Section heading (capitals): the audio transmit frequency. Short. -->
+    <string name="modes_ft8_txfreq_section">送信周波数</string>
+    <!-- Transmit frequency hint. %1$s the frequency in Hz. Two lines. -->
+    <string name="modes_ft8_txfreq_hint">自局の信号の音声周波数（%1$s Hz）。ウォーターフォールをタップすると移動します。FM ではあまり関係ありません。受信機は一度に 1 局しか受信しないためです。</string>
+    <!-- Section heading (capitals): clock accuracy. One word. -->
+    <string name="modes_ft8_clock_section">時計</string>
+    <!-- Button: empty the decode list. Half width. -->
+    <string name="modes_ft8_clear_list">リストをクリア</string>
+    <!-- Toast: the grid typed is not valid. FN42 is an example. One line. -->
+    <string name="modes_ft8_grid_invalid">グリッドは A-R の英字 2 文字と数字 2 桁です（例：FN42）</string>
+    <!-- Clock hint before any decode. DT is the time-offset column. Two lines. -->
+    <string name="modes_ft8_clock_hint">FT8 では、時計が相手局と約 1 秒以内で合っている必要があります。スマートフォンはネットワークから時刻を合わせます。最初のデコード後、DT 列にずれが表示されます。</string>
+    <!-- Clock hint: the time offset is small. %1$s the average offset in seconds ("+0.3"). One line. -->
+    <string name="modes_ft8_clock_fine">最近のデコードの DT 平均は %1$s 秒です。問題ありません。</string>
+    <!-- Clock hint: the time offset is large. %1$s the average offset in seconds. Two lines. -->
+    <string name="modes_ft8_clock_off">最近のデコードの DT 平均は %1$s 秒です。ずれが大きいため、スマートフォンの時刻の自動設定（または相手局の時計）を確認してください。</string>
+    <!-- Slot clock bar (monospaced, drawn on a thin bar): the first period. %1$s seconds into the slot (" 7.3"). Short. -->
+    <string name="modes_ft8_clock_first">前半\u0020 %1$s s</string>
+    <!-- The same while we transmit in it. Short. -->
+    <string name="modes_ft8_clock_first_tx">前半\u0020 %1$s s\u0020 · TX</string>
+    <!-- Slot clock bar: the second period. %1$s seconds into the slot. Short. -->
+    <string name="modes_ft8_clock_second">後半\u0020 %1$s s</string>
+    <!-- The same while we transmit in it. Short. -->
+    <string name="modes_ft8_clock_second_tx">後半\u0020 %1$s s\u0020 · TX</string>
+    <!-- Screen reader description of the waterfall. One line. -->
+    <string name="modes_ft8_waterfall_description">ウォーターフォール。タップして送信周波数を選択</string>
+
+    <!-- ===== Satellite passes sheet (PKT → Satellite passes) ===== -->
+    <!-- Toast while the orbits download. One line. -->
+    <string name="modes_satd_downloading">衛星の軌道データをダウンロード中…</string>
+    <!-- Title of the ISS frequencies sheet, and the button that opens it. Short. -->
+    <string name="modes_satd_iss_title">ISS の周波数</string>
+    <!-- ISS frequencies explanation; ARISS is the ISS amateur radio programme. Three lines. -->
+    <string name="modes_satd_iss_hint">ARISS は国際宇宙ステーションの無線機の運用内容を変更します：APRS は 145.825 と 437.825 の間で切り替わり、レピーターは稼働したりしなかったりし、SSTV は告知されたイベント中だけです。ARISS のステータスページの現在の内容を設定してください。初期値は 2026年10月7日時点のステータスです。</string>
+    <!-- Field label: the ISS APRS digipeater frequency. One line. -->
+    <string name="modes_satd_iss_aprs">APRS デジピーター（MHz）</string>
+    <!-- Field label: the ISS SSTV frequency. One line. -->
+    <string name="modes_satd_iss_sstv">SSTV 画像（MHz）</string>
+    <!-- Field label: the ISS repeater's downlink. One line. -->
+    <string name="modes_satd_iss_rptr_down">レピーター：受信（MHz）</string>
+    <!-- Field label: the ISS repeater's uplink. One line. -->
+    <string name="modes_satd_iss_rptr_up">レピーター：送信（MHz）</string>
+    <!-- Field label: the ISS crew voice downlink. One line. -->
+    <string name="modes_satd_iss_voice_down">クルー音声：受信（MHz）</string>
+    <!-- Field label: the ISS crew voice uplink. One line. -->
+    <string name="modes_satd_iss_voice_up">クルー音声：送信（MHz）</string>
+    <!-- Field label with a warning: this radio cannot tune the frequency. %1$s the label above. One line. -->
+    <string name="modes_satd_not_tunable">%1$s\u0020 ·\u0020 この無線機では範囲外</string>
+    <!-- Field label with a warning: this radio can only receive there. %1$s the label above. One line. -->
+    <string name="modes_satd_listen_only">%1$s\u0020 ·\u0020 この無線機では受信のみ</string>
+    <!-- Field label: the ISS repeater's CTCSS tone. One line. -->
+    <string name="modes_satd_iss_tone">レピーターのトーン（Hz）</string>
+    <!-- Button: put the ISS frequencies back to the defaults. Third of a row. -->
+    <string name="modes_satd_defaults">初期値</string>
+    <!-- Button: open the ARISS status web page. Third of a row. -->
+    <string name="modes_satd_ariss_status">ARISS ステータス</string>
+    <!-- Toast after saving the ISS frequencies. One line. -->
+    <string name="modes_satd_iss_saved">保存しました：次に追跡するパスから使用します</string>
+    <!-- Toast: a frequency is out of range. %1$s the bands this radio tunes. Two lines. -->
+    <string name="modes_satd_iss_invalid">数値を確認してください：受信周波数は %1$s（この無線機が合わせられる範囲）内、送信周波数は 136〜480 MHz の間です</string>
+    <!-- Toast after resetting the ISS frequencies. One line. -->
+    <string name="modes_satd_iss_reset">ISS の周波数を初期値に戻しました</string>
+    <!-- Toast: no app can open the web page. Short. -->
+    <string name="modes_satd_no_browser">ブラウザがありません</string>
+    <!-- Title of the satellite passes sheet. One line. -->
+    <string name="modes_satd_title">衛星パス</string>
+    <!-- Explanation on the passes sheet. %1$s the age of the orbits in hours. A paragraph. -->
+    <string name="modes_satd_hint">今後 24 時間に上空を通過するパス。パスを追跡すると、無線機がそれに追従します。上昇の 1 分前に VFO を衛星の周波数に合わせ、数秒ごとにドップラー補正し（送信中は補正しません）、沈んだ後は元のチャンネルに戻ります。高いパスほど垂直アンテナでよく聞こえます。軌道データは %1$s 時間前のものです。</string>
+    <!-- The same before any orbit was downloaded. A paragraph. -->
+    <string name="modes_satd_hint_no_orbits">今後 24 時間に上空を通過するパス。パスを追跡すると、無線機がそれに追従します。上昇の 1 分前に VFO を衛星の周波数に合わせ、数秒ごとにドップラー補正し（送信中は補正しません）、沈んだ後は元のチャンネルに戻ります。高いパスほど垂直アンテナでよく聞こえます。軌道データは未ダウンロードです。</string>
+    <!-- Button: stop following a pass. Full width. -->
+    <string name="modes_satd_stop_tracking">追跡を停止</string>
+    <!-- Toast after Stop tracking. Short. -->
+    <string name="modes_satd_tracking_stopped">追跡を停止しました</string>
+    <!-- Hint: the phone has no location. One line. -->
+    <string name="modes_satd_no_fix">位置を取得していません。位置情報をオンにしてから、もう一度開いてください。</string>
+    <!-- Hint: satellites left out because this radio cannot tune them. %1$d how many, %2$s the radio's bands. Two lines. -->
+    <plurals name="modes_satd_outside">
+        <item quantity="other">%1$d 機の衛星は、この無線機が合わせられる範囲（%2$s）の外で送信しているため、一覧にありません。</item>
+    </plurals>
+    <!-- Placeholder while AMSAT's reports load. Short. -->
+    <string name="modes_satd_amsat_loading">AMSAT ステータス…</string>
+    <!-- Satellite frequencies, receive only. %1$s downlink MHz, %2$s the satellite's description. Two lines. -->
+    <string name="modes_satd_listen">受信 %1$s MHz（受信のみ）。%2$s</string>
+    <!-- Satellite frequencies. %1$s downlink MHz, %2$s uplink MHz, %3$s the description. Two lines. -->
+    <string name="modes_satd_listen_talk">受信 %1$s、送信 %2$s MHz。%3$s</string>
+    <!-- Satellite frequencies with a tone. %1$s downlink, %2$s uplink MHz, %3$s the CTCSS tone in Hz, %4$s the description. Two lines. -->
+    <string name="modes_satd_listen_talk_tone">受信 %1$s、送信 %2$s MHz（%3$s Hz）。%4$s</string>
+    <!-- Hint: no orbit for this satellite. One line. -->
+    <string name="modes_satd_no_orbit">ダウンロードしたデータにこの衛星の軌道はありません。</string>
+    <!-- Pass row, the satellite is up now. %1$s highest elevation in degrees, %2$d the pass length in minutes. One line. -->
+    <string name="modes_satd_pass_up">現在可視\u0020 ·\u0020 最大仰角 %1$s°\u0020 ·\u0020 %2$d 分</string>
+    <!-- Pass row. %1$s weekday and time it rises, %2$s highest elevation in degrees, %3$d minutes. One line. -->
+    <string name="modes_satd_pass_at">%1$s\u0020 ·\u0020 最大仰角 %2$s°\u0020 ·\u0020 %3$d 分</string>
+    <!-- Pass row, second line. %1$s compass direction it rises, %2$s where it sets ("NE"). One line. -->
+    <string name="modes_satd_pass_rises">%1$s から上昇、%2$s に沈む\u0020 ·\u0020 タップで追跡</string>
+    <!-- Toast after tapping a pass that comes later. %1$s the satellite, %2$s when tracking starts (HH:mm). One line. -->
+    <string name="modes_satd_tracking_from">%2$s から %1$s を追跡します</string>
+    <!-- Toast after tapping a pass under way. %1$s the satellite. One line. -->
+    <string name="modes_satd_tracking_now">%1$s を追跡中</string>
+    <!-- Hint: no pass coming. One line. -->
+    <string name="modes_satd_no_pass">今後 24 時間に仰角 10° を超えるパスはありません。</string>
+    <!-- Switch: record every tracked pass. Short. -->
+    <string name="modes_satd_record">パスごとに録音</string>
+    <!-- Switch description; keep the path. Two lines. -->
+    <string name="modes_satd_record_hint">パス全体を WAV で Download/DMR/Audio/&lt;衛星&gt; に保存します（1 分あたり約 1 MB）。受信し損ねた画像やパケットを後からデコードし直せます</string>
+    <!-- Button: download the orbits and the FM satellite list. Full width. -->
+    <string name="modes_satd_update">軌道データを更新</string>
+    <!-- Toast after updating the orbits. Short. -->
+    <string name="modes_satd_updated">軌道データを更新しました</string>
+    <!-- Live line before the pass. %1$s the satellite, %2$s when it rises (HH:mm). One line. -->
+    <string name="modes_satd_live_waiting">%1$s を追跡中：%2$s のパスを待機中</string>
+    <!-- Live line during a pass, satellite coming closer. %1$s satellite, %2$s azimuth degrees, %3$s compass, %4$s elevation degrees, %5$s listen MHz, %6$s talk MHz. Two lines. -->
+    <string name="modes_satd_live_approaching">%1$s\u0020 ·\u0020 方位 %2$s° %3$s、仰角 %4$s°\n受信 %5$s\u0020 ·\u0020 送信 %6$s MHz\u0020 ·\u0020 接近中</string>
+    <!-- The same, satellite moving away. Two lines. -->
+    <string name="modes_satd_live_receding">%1$s\u0020 ·\u0020 方位 %2$s° %3$s、仰角 %4$s°\n受信 %5$s\u0020 ·\u0020 送信 %6$s MHz\u0020 ·\u0020 遠ざかり中</string>
+
+    <!-- ===== Logbook ===== -->
+    <!-- Title of the logbook sheet. One word. -->
+    <string name="modes_log_title">ログ</string>
+    <!-- Top line with the user's grid. %1$s the grid ("FN42ab"), %2$d grid squares worked. One line. -->
+    <plurals name="modes_log_grids_here">
+        <item quantity="other">現在地 %1$s\u0020 ·\u0020 交信したグリッド %2$d</item>
+    </plurals>
+    <!-- Top line without a position. %1$d grid squares worked. One line. -->
+    <plurals name="modes_log_grids">
+        <item quantity="other">交信したグリッド %1$d</item>
+    </plurals>
+    <!-- Part of modes_log_hint: the contacts logged. %1$d a count. -->
+    <plurals name="modes_log_contacts">
+        <item quantity="other">%1$d 交信</item>
+    </plurals>
+    <!-- Part of modes_log_hint: stations heard but not worked. %1$d a count. -->
+    <plurals name="modes_log_heard">
+        <item quantity="other">受信局 %1$d</item>
+    </plurals>
+    <!-- Logbook explanation. %1$s the contacts ("3 contacts"), %2$s the stations heard ("12 stations heard"). RadioID is a service name; ADIF is the log file format. A paragraph. -->
+    <string name="modes_log_hint">%1$s、%2$s。受信局は自動で記録されます（RadioID にコールサインのある DMR 送信局、APRS 局、CW ID）。タップしてレポートを入力すると、交信として記録できます。ログソフトや QSL サービス用に ADIF でエクスポートできます。</string>
+    <!-- Button: log a contact by hand. Half width. -->
+    <string name="modes_log_add">交信を追加</string>
+    <!-- Button: save and share the log as an ADIF file. Half width. -->
+    <string name="modes_log_export">ADIF をエクスポート</string>
+    <!-- Filter button: only contacts are listed. Third of a row. -->
+    <string name="modes_log_showing_contacts">表示：交信</string>
+    <!-- Filter button: everything is listed. Third of a row. -->
+    <string name="modes_log_showing_all">表示：すべて</string>
+    <!-- Toggle button: stations heard are logged automatically. Third of a row. -->
+    <string name="modes_log_heard_on">受信局を記録：オン</string>
+    <!-- Toggle button: stations heard are not logged. Third of a row. -->
+    <string name="modes_log_heard_off">受信局を記録：オフ</string>
+    <!-- Toggle button: callsigns are looked up online. Third of a row. -->
+    <string name="modes_log_lookup_on">検索：オン</string>
+    <!-- Toggle button: no online lookup. Third of a row. -->
+    <string name="modes_log_lookup_off">検索：オフ</string>
+    <!-- Empty list, contacts only. One line. -->
+    <string name="modes_log_no_contacts">記録された交信はまだありません。</string>
+    <!-- Empty list. One line. -->
+    <string name="modes_log_nothing">まだ何も記録されていません。</string>
+    <!-- Chip on an entry that was heard, not worked. Lower case, one short word. -->
+    <string name="modes_log_chip_heard">受信</string>
+    <!-- Entry line part: the signal report sent. %1$s the report ("59"). Very short. -->
+    <string name="modes_log_rst_sent">送信 %1$s</string>
+    <!-- Entry line part: the signal report received. %1$s the report. Very short. -->
+    <string name="modes_log_rst_rcvd">受信 %1$s</string>
+    <!-- Title of the entry editor for an existing entry. One line. -->
+    <string name="modes_log_entry_title">ログの項目</string>
+    <!-- Title of the entry editor for a new contact. One line. -->
+    <string name="modes_log_new_title">新しい交信</string>
+    <!-- Field label: callsign. Short. -->
+    <string name="modes_log_f_call">コールサイン</string>
+    <!-- Field label: frequency. Short. -->
+    <string name="modes_log_f_freq">周波数（MHz）</string>
+    <!-- Button that cycles the mode. %1$s the mode (FM, DMR, PKT, CW). Full width. -->
+    <string name="modes_log_mode">モード：%1$s</string>
+    <!-- Field label: report sent; 59 is a typical report. Short. -->
+    <string name="modes_log_f_sent">送信レポート（例：59）</string>
+    <!-- Field label: report received. Short. -->
+    <string name="modes_log_f_rcvd">受信レポート</string>
+    <!-- Field label: the other operator's name. Short. -->
+    <string name="modes_log_f_name">名前</string>
+    <!-- Field label: where the other station is (QTH). Short. -->
+    <string name="modes_log_f_qth">QTH</string>
+    <!-- Field label: Maidenhead grid square. Short. -->
+    <string name="modes_log_f_grid">グリッドロケーター</string>
+    <!-- Button: look the callsign up online (HamDB). Full width. -->
+    <string name="modes_log_lookup">コールサインを検索</string>
+    <!-- Toast: Look up needs a callsign. One line. -->
+    <string name="modes_log_enter_call_first">先にコールサインを入力してください</string>
+    <!-- Button text while looking up. Short. -->
+    <string name="modes_log_looking_up">検索中…</string>
+    <!-- Toast: the lookup found nothing; HamDB is a service name. One line. -->
+    <string name="modes_log_not_found">見つかりません（HamDB に載っているのは米国、カナダと一部の国の免許です）</string>
+    <!-- Toast after a lookup. %1$s the name found, %2$s the licence class ("Extra"). One line. -->
+    <string name="modes_log_found_class">%1$s、クラス %2$s</string>
+    <!-- Field label: notes. Short. -->
+    <string name="modes_log_f_notes">メモ</string>
+    <!-- Toggle button: the entry is a contact (QSO). Full width. -->
+    <string name="modes_log_was_qso">交信した（QSO）</string>
+    <!-- Toggle button: the station was only heard. Full width. -->
+    <string name="modes_log_only_heard">受信のみ（交信ではない）</string>
+    <!-- Toast: Save needs a callsign. One line. -->
+    <string name="modes_log_enter_call">コールサインを入力してください</string>
+    <!-- Toast: the frequency is not a number. One line. -->
+    <string name="modes_log_freq_invalid">周波数を MHz で入力してください（例：146.520）</string>
+    <!-- Toast after export. %1$s the file name; keep the path. One line. -->
+    <string name="modes_log_exported">Download/DMR/Logbook/%1$s に保存しました</string>
+    <!-- Title of Android's share chooser for the log. One line. -->
+    <string name="modes_log_share">ログを共有</string>
+    <!-- Toast: the export failed. %1$s the technical reason. One line. -->
+    <string name="modes_log_export_failed">エクスポートに失敗しました：%1$s</string>
+
+    <!-- ===== SSTV screen ===== -->
+    <!-- Explanation of the two decoders; "Any mode" and "Robot 36 continuous" are the decoder button's names; Robot, Martin, Scottie, PD are SSTV modes. A paragraph. -->
+    <string name="modes_sstv_hint">デコーダーは 2 つあります（下のボタンで切り替え）。「すべてのモード」は、先頭の VIS ヘッダーから Robot、Martin、Scottie、PD の画像を認識します。「Robot 36 連続」（ISS では常にこちら）はヘッダー不要で、ライン同期に同期します。途中から受信した画像も描画して下部に配置し、フェージングの間も描画を続け、画像が来るまで画面にはノイズが表示されます。すべての画像と、16 ライン以上の部分的な画像は Download/DMR/SSTV に保存されます。</string>
+    <!-- Gallery heading (capitals) before it loads. One word. -->
+    <string name="modes_sstv_received">受信済み</string>
+    <!-- Gallery heading (capitals) with no pictures. Short. -->
+    <string name="modes_sstv_received_none">受信済み\u0020 ·\u0020 まだありません</string>
+    <!-- Gallery heading (capitals). %1$d the number of pictures. Short. -->
+    <string name="modes_sstv_received_count">受信済み\u0020 ·\u0020 %1$d</string>
+    <!-- Button: combine the selected pictures into one. Quarter of a row, very short. -->
+    <string name="modes_sstv_combine">合成</string>
+    <!-- Toast: Share or Delete with nothing selected. One line. -->
+    <string name="modes_sstv_tap_to_select">画像をタップして選択してください</string>
+    <!-- Button: open the SSTV send sheet. Half width. -->
+    <string name="modes_sstv_send">画像を送信</string>
+    <!-- Toast: the decoder cannot be switched during an ISS pass. One line. -->
+    <string name="modes_sstv_iss_robot">ISS のイベントは Robot 36 のため、常に連続デコーダーを使います</string>
+    <!-- Toast after switching to the continuous decoder. One line. -->
+    <string name="modes_sstv_mode_continuous_toast">Robot 36 連続：ヘッダー不要、部分的な画像も保存</string>
+    <!-- Toast after switching to the any-mode decoder. One line. -->
+    <string name="modes_sstv_mode_any_toast">すべてのモード：VIS ヘッダーで開始</string>
+    <!-- Button: stop SSTV and close. Half width. -->
+    <string name="modes_sstv_stop">受信停止</string>
+    <!-- Toast after stopping an ISS SSTV session. Short. -->
+    <string name="modes_sstv_iss_stopped">ISS SSTV を停止しました</string>
+    <!-- Button: decode SSTV from a recording. Full width. -->
+    <string name="modes_sstv_decode_recording">録音をデコード</string>
+    <!-- Progress under the picture. %1$d lines received, %2$d lines in the picture. Monospaced, short. -->
+    <string name="modes_sstv_lines">%1$d / %2$d ライン</string>
+    <!-- Status when the decoder is idle. One word. -->
+    <string name="modes_sstv_waiting">待機中</string>
+    <!-- Decoder button: the Robot 36 continuous decoder. Half width. -->
+    <string name="modes_sstv_dec_continuous">Robot 36 連続</string>
+    <!-- Decoder button: any mode, started by the header. Half width. -->
+    <string name="modes_sstv_dec_any">すべてのモード（ヘッダー）</string>
+    <!-- Status while waiting for an ISS pass. One line. -->
+    <string name="modes_sstv_starts_with_pass">デコーダーはパスの開始とともに起動します</string>
+    <!-- Subtitle during an ISS pass. %1$s the nominal frequency in MHz. One line. -->
+    <string name="modes_sstv_iss_subtitle">ISS SSTV %1$s · ドップラー補正</string>
+    <!-- Subtitle: listening on the SSTV calling frequency. One line. -->
+    <string name="modes_sstv_on_144">144.500 MHz で受信中</string>
+    <!-- Subtitle: listening on the current channel. One line. -->
+    <string name="modes_sstv_on_channel">このチャンネルで受信中</string>
+    <!-- Button: go back to the channel. Half width. -->
+    <string name="modes_sstv_use_channel">このチャンネルを使用</string>
+    <!-- Button: tune the SSTV frequency 144.500 MHz. Half width. -->
+    <string name="modes_sstv_go_144">144.500 へ</string>
+    <!-- Picture viewer hint. %1$s date and time received. One line. -->
+    <string name="modes_sstv_received_at">%1$s に受信 · Download/DMR/SSTV</string>
+    <!-- Title of Android's share chooser for one picture. One line. -->
+    <string name="modes_sstv_share_picture">画像を共有</string>
+    <!-- Toast: sharing failed. %1$s the technical reason. One line. -->
+    <string name="modes_sstv_share_failed">共有できませんでした：%1$s</string>
+    <!-- Selection count above the selection buttons. %1$d pictures selected. Short. -->
+    <plurals name="modes_sstv_selected">
+        <item quantity="other">%1$d 枚選択</item>
+    </plurals>
+    <!-- Toast: Combine needs two pictures or more. One line. -->
+    <string name="modes_sstv_select_two">同じ画像の受信を 2 つ以上選んでください</string>
+    <!-- Toast while the pictures are lined up. %1$d pictures (2 or more). One line. -->
+    <plurals name="modes_sstv_lining_up">
+        <item quantity="other">%1$d 枚の画像を位置合わせ中…</item>
+    </plurals>
+    <!-- Title of the combine sheet. %1$d pictures (2 or more). One line. -->
+    <plurals name="modes_sstv_combine_title">
+        <item quantity="other">%1$d 枚の画像を合成</item>
+    </plurals>
+    <!-- Button: undo manual moves, back to the automatic line-up. Half width. -->
+    <string name="modes_sstv_automatic">自動</string>
+    <!-- Where this picture is: it is the reference the others line up on. Lower case, short. -->
+    <string name="modes_sstv_where_ref">基準</string>
+    <!-- Where this picture is: not used in the combination. Lower case, short. -->
+    <string name="modes_sstv_where_out">除外</string>
+    <!-- Offset of the picture. %1$d lines up, %2$d pixels left. Lower case, short. -->
+    <string name="modes_sstv_where_up_left">上へ %1$d ライン、左へ %2$d px</string>
+    <!-- Offset of the picture. %1$d lines up, %2$d pixels right. Lower case, short. -->
+    <string name="modes_sstv_where_up_right">上へ %1$d ライン、右へ %2$d px</string>
+    <!-- Offset of the picture. %1$d lines down, %2$d pixels left. Lower case, short. -->
+    <string name="modes_sstv_where_down_left">下へ %1$d ライン、左へ %2$d px</string>
+    <!-- Offset of the picture. %1$d lines down, %2$d pixels right. Lower case, short. -->
+    <string name="modes_sstv_where_down_right">下へ %1$d ライン、右へ %2$d px</string>
+    <!-- Picture picker button (tap for the next). %1$d this picture, %2$d all, %3$s its name, %4$s where it is. Two lines. -->
+    <string name="modes_sstv_pick">画像 %1$d / %2$d ▸\n%3$s · %4$s</string>
+    <!-- Toggle button: this is the reference picture. Short (104 dp). -->
+    <string name="modes_sstv_use_ref">基準</string>
+    <!-- Toggle button: the picture is used. Short (104 dp). -->
+    <string name="modes_sstv_use_in">使用</string>
+    <!-- Toggle button: the picture is left out. Short (104 dp). -->
+    <string name="modes_sstv_use_out">除外</string>
+    <!-- Combine note: only one picture is still used. A sentence. -->
+    <string name="modes_sstv_note_one">使用中の画像は 1 枚だけです。</string>
+    <!-- Combine note: the user moved pictures. A sentence. -->
+    <string name="modes_sstv_note_manual">手動で配置しました。</string>
+    <!-- Combine note: the line-up was found automatically. A sentence. -->
+    <string name="modes_sstv_note_auto">自動で位置合わせしました。</string>
+    <!-- Combine note: some line-ups are guesses. %1$s the picture numbers ("2, 4"). A sentence. -->
+    <string name="modes_sstv_note_unsure">画像 %1$s の位置合わせは不確かです。確認して、矢印で動かしてください。</string>
+    <!-- Combine note, always shown. Two sentences. -->
+    <string name="modes_sstv_note_partial">部分的な画像は下部に描かれるため、一部は本来もっと上かもしれません。画像名をタップすると、矢印で動かす画像を選べます。矢印を長押しすると 8 ステップ動きます。</string>
+    <!-- Text shared with one picture. One line. -->
+    <string name="modes_sstv_share_text_one">SignalDeck で受信した SSTV 画像</string>
+    <!-- Text shared with several pictures. %1$d how many (2 or more). One line. -->
+    <plurals name="modes_sstv_share_text">
+        <item quantity="other">SignalDeck で受信した SSTV 画像 %1$d 枚</item>
+    </plurals>
+    <!-- Share chooser title for one picture. One line. -->
+    <string name="modes_sstv_share_title_one">画像を共有</string>
+    <!-- Share chooser title for several pictures. %1$d how many (2 or more). One line. -->
+    <plurals name="modes_sstv_share_title">
+        <item quantity="other">%1$d 枚の画像を共有</item>
+    </plurals>
+    <!-- Delete confirmation title for one picture. One line. -->
+    <string name="modes_sstv_delete_one">この画像を削除しますか？</string>
+    <!-- Delete confirmation title for several pictures. %1$d how many (2 or more). One line. -->
+    <plurals name="modes_sstv_delete_many">
+        <item quantity="other">この %1$d 枚の画像を削除しますか？</item>
+    </plurals>
+    <!-- Delete confirmation message. Two lines. -->
+    <string name="modes_sstv_delete_message">この端末の Download/DMR/SSTV から削除されます。元に戻すことはできません。</string>
+    <!-- Toast after deleting. %1$d pictures deleted. One line. -->
+    <plurals name="modes_sstv_deleted">
+        <item quantity="other">%1$d 枚の画像を削除しました</item>
+    </plurals>
+
+    <!-- Joins facts on one line ("146.5200 MHz FM · under your activation US-1234"). A middle dot with a space each side. -->
+    <string name="modes_middot_separator">\u0020·\u0020</string>
+
+    <!-- ===== POTA / SOTA (program names and references stay as they are) ===== -->
+    <!-- Explanation on the POTA/SOTA sheet. Two lines. -->
+    <string name="modes_pota_hint">Parks on the Air と Summits on the Air：アマチュア無線家が公園や山頂から運用し、ほかの局がそれと交信します。公園や山頂からアクティベーションしてここで交信を記録するか、運用中のアクティベーターを探して交信しましょう。</string>
+    <!-- Section heading (capitals): the user's own activation. Short. -->
+    <string name="modes_pota_your_activation">自分のアクティベーション</string>
+    <!-- Activation card. %1$s start time, %2$d contacts today (UTC), %3$d needed for the activation to count. One line. -->
+    <string name="modes_pota_since">%1$s から · 本日（UTC）%2$d / %3$d 交信</string>
+    <!-- The same once enough contacts are logged. One line. -->
+    <string name="modes_pota_since_counts">%1$s から · 本日（UTC）%2$d / %3$d 交信：成立</string>
+    <!-- Button and sheet title: log a contact. Half width. -->
+    <string name="modes_pota_log_contact">交信を記録</string>
+    <!-- Button: end the activation. Full width. -->
+    <string name="modes_pota_end_activation">アクティベーションを終了</string>
+    <!-- Confirmation title. %1$s the reference ("US-1234"). One line. -->
+    <string name="modes_pota_end_confirm">%1$s を終了しますか？</string>
+    <!-- Confirmation message. One line. -->
+    <string name="modes_pota_end_message">交信はログに残ります（エクスポートもできます）。</string>
+    <!-- Dialog button: end the activation. One word. -->
+    <string name="modes_pota_end">終了</string>
+    <!-- Hint when no activation runs. Two lines. -->
+    <string name="modes_pota_start_hint">公園や山頂で準備ができたら開始してください。交信はそのリファレンスで記録され、カウントされます（POTA：UTC の 1 日に 10 交信、SOTA：4 交信）。</string>
+    <!-- Button: start a park activation. Half width. -->
+    <string name="modes_pota_activate_park_button">公園をアクティベート…</string>
+    <!-- Button: start a summit activation. Half width. -->
+    <string name="modes_pota_activate_summit_button">山頂をアクティベート…</string>
+    <!-- Section heading (capitals): activators spotted now. Short. -->
+    <string name="modes_pota_on_air">運用中</string>
+    <!-- Shown while the spots download. One line. -->
+    <string name="modes_pota_loading">POTA と SOTA のスポットを読み込み中…</string>
+    <!-- Spots: nobody on FM, and no spot at all. One line. -->
+    <string name="modes_pota_nobody">現在、2 m や 70 cm の FM で運用している局はいません。</string>
+    <!-- Spots: nobody on FM, others on HF. %1$d activators listed. Two lines. -->
+    <plurals name="modes_pota_nobody_others">
+        <item quantity="other">現在、2 m や 70 cm の FM で運用している局はいません（HF やほかのモードのアクティベーター %1$d 局を下に表示）。</item>
+    </plurals>
+    <!-- Spots: some can be worked. %1$d how many. One line. -->
+    <string name="modes_pota_workable">2 m / 70 cm の FM で %1$d 局：タップして周波数を合わせるか記録します。</string>
+    <!-- Spot action: tune the VFO there. %1$s MHz. One line. -->
+    <string name="modes_pota_tune_to">%1$s MHz に合わせる（VFO）</string>
+    <!-- Spot action: log the activator. %1$s callsign, %2$s their reference. One line. -->
+    <string name="modes_pota_log_hunting">%1$s を記録（%2$s をハンティング）</string>
+    <!-- Toast after tuning. %1$s the callsign. One line. -->
+    <string name="modes_pota_tuned">%1$s に合わせました</string>
+    <!-- Sheet title: start a park activation. One line. -->
+    <string name="modes_pota_activate_park">公園をアクティベート</string>
+    <!-- Sheet title: start a summit activation. One line. -->
+    <string name="modes_pota_activate_summit">山頂をアクティベート</string>
+    <!-- Section heading above the park reference field; the examples stay as they are. One line. -->
+    <string name="modes_pota_park_ref">公園のリファレンス（US-1234、GB-0001…）</string>
+    <!-- Section heading above the summit reference field; the examples stay as they are. One line. -->
+    <string name="modes_pota_summit_ref">山頂のリファレンス（W0C/FR-001、G/SE-001…）</string>
+    <!-- Button: start the activation. Full width. -->
+    <string name="modes_pota_start">アクティベーションを開始</string>
+    <!-- Toast: the reference has the wrong shape. %1$s POTA or SOTA. One line. -->
+    <string name="modes_pota_bad_ref">%1$s のリファレンスではないようです</string>
+    <!-- Dialog title: the reference is unknown. %1$s the reference. One line. -->
+    <string name="modes_pota_not_found">%1$s が見つかりませんでした</string>
+    <!-- Dialog message. %1$s POTA or SOTA. Two lines. -->
+    <string name="modes_pota_not_found_message">%1$s に登録されていません（または接続できませんでした）。このまま開始しますか？</string>
+    <!-- Toast after starting. %1$s reference, %2$s park or summit name. One line. -->
+    <string name="modes_pota_activating">%1$s をアクティベーション中：%2$s</string>
+    <!-- Section heading (capitals): parks near the phone. Short. -->
+    <string name="modes_pota_parks_near">近くの公園</string>
+    <!-- Shown while nearby parks load. Short. -->
+    <string name="modes_pota_looking">検索中…</string>
+    <!-- Nearby parks need a location. One line. -->
+    <string name="modes_pota_needs_fix">位置の取得が必要です。</string>
+    <!-- Nearby parks failed to load. One line. -->
+    <string name="modes_pota_unreachable_parks">POTA に接続できませんでした。</string>
+    <!-- No park nearby. One line. -->
+    <string name="modes_pota_no_park">60 km 以内に公園はありません。</string>
+    <!-- Above the nearby parks. One line. -->
+    <string name="modes_pota_tap_park">タップするとリファレンスを入力します：</string>
+    <!-- Log sheet title for a hunted activator. %1$s the callsign. One line. -->
+    <string name="modes_pota_log_call">%1$s を記録</string>
+    <!-- Log sheet fact: logged under your activation. %1$s the reference. Short. -->
+    <string name="modes_pota_under_activation">自分のアクティベーション %1$s</string>
+    <!-- Log sheet fact: the activator's reference. %1$s POTA or SOTA, %2$s the reference. Short. -->
+    <string name="modes_pota_their_ref">相手の %1$s %2$s</string>
+    <!-- Section heading above the report sent. Short. -->
+    <string name="modes_pota_f_sent">送信レポート</string>
+    <!-- Section heading above the other station's reference. One line. -->
+    <string name="modes_pota_f_their_ref">相手の公園または山頂（P2P、任意）</string>
+    <!-- Section heading above the notes. Short. -->
+    <string name="modes_pota_f_notes">メモ（任意）</string>
+    <!-- Toast: no valid callsign. One line. -->
+    <string name="modes_pota_enter_call">コールサインを入力してください</string>
+    <!-- Toast after logging. %1$s the callsign. One line. -->
+    <string name="modes_pota_logged">%1$s を記録しました</string>
+    <!-- Toast after logging during an activation. %1$s callsign, %2$d contacts today, %3$d needed. One line. -->
+    <string name="modes_pota_logged_count">%1$s を記録しました（本日 %2$d / %3$d）</string>
+    <!-- Duplicate warning title. %1$s the callsign. One line. -->
+    <string name="modes_pota_dupe">%1$s はすでにログにあります</string>
+    <!-- Duplicate warning message. %1$s the activation reference. Two lines. -->
+    <string name="modes_pota_dupe_message">本日このバンドで %1$s として交信済みです。それでも記録しますか？</string>
+    <!-- Dialog button: log the duplicate anyway. Short. -->
+    <string name="modes_pota_log_again">再度記録</string>
+    <!-- Toast: nothing to export. %1$s the reference. One line. -->
+    <string name="modes_pota_no_contacts">%1$s の交信はまだありません</string>
+    <!-- Toast after export without a callsign set. %1$s the file name; keep the path. Two lines. -->
+    <string name="modes_pota_exported_no_call">Download/DMR/Logbook/%1$s に保存しました（局名の欄のため、APRS 設定でコールサインを設定してください）</string>
+    <!-- Title of Android's share chooser for the activation log. One line. -->
+    <string name="modes_pota_send_log">ログを送信</string>
+
+    <!-- ===== Winlink sheet (PKT → Winlink e-mail). Messages themselves (subjects, Re:/Fw:, quoted text) stay as sent. ===== -->
+    <!-- Title of the Winlink sheet. One line. -->
+    <string name="modes_wl_title">Winlink メール</string>
+    <!-- Explanation on the Winlink sheet; RMS is a Winlink gateway type. Three lines. -->
+    <string name="modes_wl_hint">無線でメール：コールサインやインターネットのアドレス宛にメッセージを書き、接続すると送信トレイの中身を送り、届いているものを受け取ります。2 m や 70 cm の Winlink パケットゲートウェイ（RMS）経由で無線を使うか、インターネットが使えるときはインターネットで送受信します。</string>
+    <!-- Notice tile title: the feature is untested. One line. -->
+    <string name="modes_wl_beta_title">新機能：実際の Winlink システムでは未テストです</string>
+    <!-- Notice tile text. One or two lines. -->
+    <string name="modes_wl_beta_text">動作したかどうか教えてください。ここをタップすると GitHub で報告できます。</string>
+    <!-- Button: connect to the Winlink server over the internet. Half width. -->
+    <string name="modes_wl_connect_internet">接続：インターネット</string>
+    <!-- Button: connect to a gateway over the radio. Half width. -->
+    <string name="modes_wl_connect_radio">接続：無線</string>
+    <!-- Button: write a new message. Third of a row. -->
+    <string name="modes_wl_new_message">新規メッセージ</string>
+    <!-- Button: the gateway list. Third of a row. -->
+    <string name="modes_wl_gateways">ゲートウェイ</string>
+    <!-- Button: show the session log. Full width. -->
+    <string name="modes_wl_session_log">セッションログ</string>
+    <!-- Line after a session with the detailed log on; "Session log" and "Share log" are button names. Two lines. -->
+    <string name="modes_wl_log_recorded">詳細ログを記録しました。うまくいってもいかなくても、セッションログ → ログを共有 で送ってください。ありがとうございます。</string>
+    <!-- Line when no password is set. Two lines. -->
+    <string name="modes_wl_no_password">Winlink のパスワードが未設定です（設定）。コールサインを登録すると、メールボックスに必要になります。</string>
+    <!-- Folder name: received mail. One word. -->
+    <string name="modes_wl_inbox">受信トレイ</string>
+    <!-- Folder name: mail waiting to be sent. Short. -->
+    <string name="modes_wl_outbox">送信トレイ（次回の接続で送信）</string>
+    <!-- Folder name: mail sent. One word. -->
+    <string name="modes_wl_sent">送信済み</string>
+    <!-- Section heading (capitals) of an empty folder. %1$s the folder name. Short. -->
+    <string name="modes_wl_folder_empty">%1$s：空</string>
+    <!-- Section heading (capitals) of a folder. %1$s the folder name, %2$d messages. Short. -->
+    <string name="modes_wl_folder_count">%1$s（%2$d）</string>
+    <!-- Below a long folder. %1$d messages not listed. One line. -->
+    <plurals name="modes_wl_older">
+        <item quantity="other">古いもの %1$d 件は表示していません。</item>
+    </plurals>
+    <!-- Message line: the sender. %1$s callsign or address. Short. -->
+    <string name="modes_wl_from">差出人 %1$s</string>
+    <!-- Message line: the recipients. %1$s callsigns or addresses. Short. -->
+    <string name="modes_wl_to">宛先 %1$s</string>
+    <!-- Message header: copies. %1$s callsigns or addresses. Short. -->
+    <string name="modes_wl_cc">Cc %1$s</string>
+    <!-- Message header: its Winlink message ID. %1$s the ID. Short. -->
+    <string name="modes_wl_mid">メッセージ ID %1$s</string>
+    <!-- Title of the gateway sheet and of its import result dialog. One line. -->
+    <string name="modes_wl_gw_title">Winlink ゲートウェイ</string>
+    <!-- How to get the gateway list. RMS List, Packet, CSV File, Desktop site, Recent and Downloads are names on winlink.org, in the browser and in the file picker; "Open winlink.org" and "Import the CSV" are the buttons below. A paragraph. -->
+    <string name="modes_wl_gw_hint">1.「winlink.org を開く」で、Winlink のゲートウェイ一覧をブラウザで開きます。RMS List をタップし、Packet を選んでから CSV File をタップしてダウンロードします（ボタンが切れている場合は、ブラウザの「PC 版サイト」をオンにしてください）。2. アプリに戻って「CSV をインポート」をタップします。ダウンロードしたファイルは「最近」の一番上か、「ダウンロード」にあります。SignalDeck は、この無線機で合わせられる 1200 baud のパケットゲートウェイだけを残し、スマートフォンの最後の位置からの距離順に並べます（計算はスマートフォン内で行い、どこにも送信しません）。タップすると周波数を合わせて接続します。</string>
+    <!-- Button: open the gateway list on winlink.org. Half width. -->
+    <string name="modes_wl_gw_open">winlink.org を開く</string>
+    <!-- Button: import the downloaded CSV file. Half width. -->
+    <string name="modes_wl_gw_import">CSV をインポート</string>
+    <!-- Toast: the file picker needs the app's main screen. One line. -->
+    <string name="modes_wl_gw_from_app">アプリから開いてください</string>
+    <!-- Import error: the file is over 8 MB. One line. -->
+    <string name="modes_wl_gw_too_large">ファイルが大きすぎます</string>
+    <!-- Import result: it failed. %1$s the reason. One line. -->
+    <string name="modes_wl_gw_import_failed">インポートできませんでした：%1$s</string>
+    <!-- Section heading (capitals) with no list. Short. -->
+    <string name="modes_wl_gw_none">一覧はまだインポートされていません</string>
+    <!-- Section heading (capitals). %1$d gateways, %2$s the import date. Short. -->
+    <plurals name="modes_wl_gw_count">
+        <item quantity="other">ゲートウェイ %1$d 件 · %2$s にインポート</item>
+    </plurals>
+    <!-- Button: set the packet finder to the ten nearest gateways. Full width. -->
+    <string name="modes_wl_gw_finder">パケット検索：近くの 10 局を受信</string>
+    <!-- Toast. %1$d the gateway frequencies set. One line. -->
+    <plurals name="modes_wl_gw_finder_set">
+        <item quantity="other">パケット検索をゲートウェイの %1$d 周波数に設定しました（各 5 分）</item>
+    </plurals>
+    <!-- Below a long list. %1$d gateways not listed. One line. -->
+    <plurals name="modes_wl_gw_farther">
+        <item quantity="other">遠いもの %1$d 件は表示していません。</item>
+    </plurals>
+    <!-- Gateway line with its opening hours. %1$s distance and frequency, %2$s the hours ("06-22"). One line. -->
+    <string name="modes_wl_gw_hours">%1$s · 運用時間 %2$s</string>
+    <!-- Gateway action. %1$s the frequency in MHz. One line. -->
+    <string name="modes_wl_gw_tune_connect">%1$s に合わせて接続</string>
+    <!-- Gateway action. One line. -->
+    <string name="modes_wl_gw_tune_listen">合わせて先に受信</string>
+    <!-- Gateway action: remember it as the gateway to call. One line. -->
+    <string name="modes_wl_gw_use">自分のゲートウェイにする</string>
+    <!-- Toast. %1$s the frequency in MHz. One line. -->
+    <string name="modes_wl_gw_tuning">%1$s MHz に合わせています。数秒後に接続します</string>
+    <!-- Button: forget the imported list. Full width. -->
+    <string name="modes_wl_gw_remove">一覧を削除</string>
+    <!-- Radio connect dialog hint. A paragraph. -->
+    <string name="modes_wl_radio_hint">先にゲートウェイのチャンネルに合わせてください（アナログチャンネル。ほとんどのパケットゲートウェイは 2 m か 70 cm の 1200 baud で、winlink.org の RMS channels に載っています）。セッションには数分かかります。送信のたびに 1.6 秒の前置きが入り、電波上で失われたフレームは再送されます。</string>
+    <!-- Hint in the gateway field; N0ABC-10 is an example. Short. -->
+    <string name="modes_wl_radio_gateway_hint">ゲートウェイ（例：N0ABC-10）</string>
+    <!-- Hint in the digipeater field. Short. -->
+    <string name="modes_wl_radio_via_hint">経由するデジピーター（任意）</string>
+    <!-- Title of the radio connect dialog. One line. -->
+    <string name="modes_wl_radio_title">無線ゲートウェイに接続</string>
+    <!-- Winlink settings explanation. A paragraph. -->
+    <string name="modes_wl_set_hint">コールサインは PKT → 設定 のものを使います。新しいコールサインで初めて接続すると、Winlink アカウントが作成されます。winlink.org でパスワードを設定し、ここに入力してください。パスワードは SignalDeck の非公開設定にだけ保存され、表示、記録、デバイスレポートやバックアップへの記載は一切ありません。</string>
+    <!-- Password field hint when one is stored. One line. -->
+    <string name="modes_wl_set_password_set">パスワード（設定済み。空欄で維持、- で消去）</string>
+    <!-- Password field hint. Short. -->
+    <string name="modes_wl_set_password">Winlink パスワード</string>
+    <!-- Grid field hint; JO01 is an example. Short. -->
+    <string name="modes_wl_set_grid">グリッドロケーター（任意、例：JO01）</string>
+    <!-- Under the grid field. One line. -->
+    <string name="modes_wl_set_grid_hint">グリッドロケーターはログイン時にゲートウェイに送信されます（任意）。</string>
+    <!-- Check box: the detailed diagnostic log. Two lines. -->
+    <string name="modes_wl_set_diag">詳細診断ログ（タイミング、プロトコルの生バイト、すべての無線フレーム）</string>
+    <!-- Check box: include message data in the log. One line. -->
+    <string name="modes_wl_set_diag_data">メッセージのデータもログに含める</string>
+    <!-- Under the check boxes. Two lines. -->
+    <string name="modes_wl_set_diag_hint">問題の報告用です。パスワードは一切記録されません。2 つ目のボックスにチェックを入れない限り、メッセージのデータは含まれません。</string>
+    <!-- Title of the Winlink settings dialog. One line. -->
+    <string name="modes_wl_set_title">Winlink の設定</string>
+    <!-- Toast: the grid is not valid. One line. -->
+    <string name="modes_wl_set_grid_invalid">JO01 や JO01ab のようなグリッドロケーターを入力してください</string>
+    <!-- Title of the session log sheet. One line. -->
+    <string name="modes_wl_log_title">Winlink セッションログ</string>
+    <!-- Session log before any session. Short. -->
+    <string name="modes_wl_log_none">セッションはまだありません。</string>
+    <!-- Button: share the session log. Full width. -->
+    <string name="modes_wl_log_share">ログを共有</string>
+    <!-- Title of Android's share chooser for the log. One line. -->
+    <string name="modes_wl_log_share_title">Winlink のログを共有</string>
+    <!-- Under the log. %1$s the GitHub issues address. Two lines. -->
+    <string name="modes_wl_log_hint">メールで送るか、SignalDeck の GitHub ページの Issue に添付してください（%1$s）。ログには自局とゲートウェイのコールサインが含まれますが、パスワードは一切含まれません。</string>
+    <!-- Title of the first-connection dialog. Short. -->
+    <string name="modes_wl_ask_title">Winlink のテストに協力する</string>
+    <!-- First-connection dialog message; "Session log", "Share log" and "Settings" are names in the app. Three paragraphs. -->
+    <string name="modes_wl_ask_message">SignalDeck の Winlink は新しい機能で、実際の Winlink システムではまだテストされていません。\n\n接続時の詳細診断ログをオンにしますか？タイミング、プロトコル、すべての無線フレームを記録します（パスワードは一切記録しません。メッセージのデータは設定で選んだ場合のみ）。\n\nうまくいってもいかなくても、後でログを送ってください（セッションログ → ログを共有）。それが修正の手がかりになります。オフにするには Winlink → 設定 を開きます。</string>
+    <!-- Dialog button: turn the detailed log on. Short. -->
+    <string name="modes_wl_ask_on">ログをオンにする</string>
+    <!-- Title of the compose sheet. One line. -->
+    <string name="modes_wl_compose_title">新しい Winlink メッセージ</string>
+    <!-- Compose hint. Two or three lines. -->
+    <string name="modes_wl_compose_hint">宛先：コールサイン（相手は Winlink のメールボックスで読みます）またはメールアドレスをカンマ区切りで入力します。プレーンテキストのみ。無線では短くしてください。送信トレイに保存され、次回の接続で送信されます。</string>
+    <!-- Field label: recipients. One word. -->
+    <string name="modes_wl_f_to">宛先</string>
+    <!-- Field label: copies. Short. -->
+    <string name="modes_wl_f_cc">Cc（任意）</string>
+    <!-- Field label: subject. One word. -->
+    <string name="modes_wl_f_subject">件名</string>
+    <!-- Field label: the text. One word. -->
+    <string name="modes_wl_f_message">メッセージ</string>
+    <!-- Toast after queuing a message. Short. -->
+    <string name="modes_wl_in_outbox">送信トレイに入れました</string>
+    <!-- Attachment tile line. %1$d its size in bytes (under 1024). One line. -->
+    <plurals name="modes_wl_attach_bytes">
+        <item quantity="other">%1$d バイト · タップで開く・共有</item>
+    </plurals>
+    <!-- Attachment tile line. %1$d its size in kilobytes. One line. -->
+    <string name="modes_wl_attach_kb">%1$d KB · タップで開く・共有</string>
+    <!-- Button: forward the message. Third of a row. -->
+    <string name="modes_wl_forward">転送</string>
+    <!-- Delete confirmation for a message in the outbox. One line. -->
+    <string name="modes_wl_delete_outbox">このメッセージを削除しますか？送信されなくなります。</string>
+    <!-- Delete confirmation. One line. -->
+    <string name="modes_wl_delete">このメッセージを削除しますか？</string>
+    <!-- Toast: the attachment could not be opened. %1$s the reason. One line. -->
+    <string name="modes_wl_open_failed">開けませんでした：%1$s</string>
+
+    <!-- ===== Fox hunt sheet ===== -->
+    <!-- Title of the fox hunt sheet (finding a hidden transmitter). One line. -->
+    <string name="modes_fox_title">フォックスハンティング</string>
+    <!-- Fox hunt hint. %1$s the channel name, %2$s its frequency in MHz; "Mark" is the button name. Three lines. -->
+    <string name="modes_fox_hint">%1$s（%2$s MHz）で受信中。歩くか車で移動し、信号が最も強い方向にスマートフォンを向けて「マーク」をタップします。方位線が交わる所にフォックスがいます。</string>
+    <!-- The same with no channel. Three lines. -->
+    <string name="modes_fox_hint_no_channel">チャンネルなしで受信中。歩くか車で移動し、信号が最も強い方向にスマートフォンを向けて「マーク」をタップします。方位線が交わる所にフォックスがいます。</string>
+    <!-- Layer pill: compass bearings. Third of a row, one word. -->
+    <string name="modes_fox_pill_bearings">方位</string>
+    <!-- Layer pill: the signal-strength heat map. Third of a row, short. -->
+    <string name="modes_fox_pill_heat">ヒートマップ</string>
+    <!-- Layer pill: terrain shadowing. Third of a row, one word. -->
+    <string name="modes_fox_pill_terrain">地形</string>
+    <!-- Section heading (capitals): the prediction layers. One word. -->
+    <string name="modes_fox_prediction">予測</string>
+    <!-- Button cycling the fox's antenna height: on the ground. Half width. -->
+    <string name="modes_fox_agl_ground">フォックスは地上</string>
+    <!-- The same: on a roof. Half width. -->
+    <string name="modes_fox_agl_roof">フォックスは屋上（10 m）</string>
+    <!-- The same: on a tower. Half width. -->
+    <string name="modes_fox_agl_tower">フォックスは鉄塔（30 m）</string>
+    <!-- Button and dialog title: download the ground heights. Half width. -->
+    <string name="modes_fox_download_terrain">地形データをダウンロード</string>
+    <!-- The same button with the size. %1$s megabytes ("2.4"). Half width. -->
+    <string name="modes_fox_download_terrain_size">地形データをダウンロード（約 %1$s MB）</string>
+    <!-- Download dialog message. %1$s megabytes. "Terrain" is the layer pill. Three lines. -->
+    <string name="modes_fox_download_message">この地域の地面の高さ（約 %1$s MB）を一度だけダウンロードし、スマートフォン内に保存して、次回以降のハンティングとエリアマップに使います。以後「地形」レイヤーはオフラインで動作します。</string>
+    <!-- Dialog button: download. One word. -->
+    <string name="modes_fox_download">ダウンロード</string>
+    <!-- Chip on the map that switches to the plot. One word. -->
+    <string name="modes_fox_chip_plot">プロット</string>
+    <!-- The same chip on the plot, back to the map (capitals). One word. -->
+    <string name="modes_fox_chip_map_caps">マップ</string>
+    <!-- The same chip on the map (capitals). One word. -->
+    <string name="modes_fox_chip_plot_caps">プロット</string>
+    <!-- Caveat under the map. Two lines. -->
+    <string name="modes_fox_rough_hint">信号強度による推定はおおまかです。壁、車、自分の体で測定値が 10 dB 以上変わります。マークは開けた場所で、間隔をあけて、毎回同じ持ち方で取ってください。</string>
+    <!-- Button: save a reading here. Third of a row, one word. -->
+    <string name="modes_fox_mark">マーク</string>
+    <!-- The Mark button while waiting for the fox to transmit. Third of a row. -->
+    <string name="modes_fox_mark_waiting">待機中…</string>
+    <!-- Toggle button: the rising beep is off. Third of a row. -->
+    <string name="modes_fox_beeper_off">ビープ オフ</string>
+    <!-- Toggle button: the rising beep is on. Third of a row. -->
+    <string name="modes_fox_beeper_on">ビープ オン</string>
+    <!-- Button: tune off the channel when the signal is too strong. Third of a row. -->
+    <string name="modes_fox_off_freq">周波数をずらす</string>
+    <!-- The same button once tuned off. %1$d kHz. Third of a row. -->
+    <string name="modes_fox_offset">+%1$d kHz</string>
+    <!-- Button: take a bearing by turning on the spot. Third of a row, one word. -->
+    <string name="modes_fox_spin">回転</string>
+    <!-- Button: show the estimate in a maps app. Third of a row. -->
+    <string name="modes_fox_open_maps">マップで開く</string>
+    <!-- Button: remove all marks. Third of a row. -->
+    <string name="modes_fox_clear_marks">マークを消去</string>
+    <!-- Section heading (capitals): which receptions count. Short. -->
+    <string name="modes_fox_signal_section">フォックスの信号</string>
+    <!-- Pill: only the fox's own transmissions count. Half width. -->
+    <string name="modes_fox_only_fox">フォックスのみ</string>
+    <!-- Button: say how the fox is told apart (tone or DMR ID). Half width. -->
+    <string name="modes_fox_set_fox">フォックスを設定</string>
+    <!-- The same button with the setting. %1$s what identifies the fox ("CTCSS 88.5 Hz"). Half width. -->
+    <string name="modes_fox_fox_is">フォックス：%1$s</string>
+    <!-- Button: automatic marks are off. Half width. -->
+    <string name="modes_fox_auto_off">自動マーク オフ</string>
+    <!-- Button: automatic marks every N metres. %1$d metres. Half width. -->
+    <string name="modes_fox_auto_every">%1$d m ごとに自動マーク</string>
+    <!-- Field hint: the fox's DMR ID. One line. -->
+    <string name="modes_fox_dmr_id_hint">フォックスの DMR ID（空欄 = すべての送信局）</string>
+    <!-- Field hint: the fox's colour code. One line. -->
+    <string name="modes_fox_dmr_cc_hint">カラーコード 0-15（空欄 = すべて）</string>
+    <!-- Dialog title: the fox on a DMR channel. One line. -->
+    <string name="modes_fox_dmr_title">DMR のフォックス</string>
+    <!-- Dialog button: use the last DMR caller. %1$s the ID. Short. -->
+    <string name="modes_fox_last_caller">最後の送信局 %1$s</string>
+    <!-- Tone choice: the channel's own tone, none set. One line. -->
+    <string name="modes_fox_tone_channel_none">チャンネルのトーンスケルチ（未設定：すべての受信）</string>
+    <!-- Tone choice: the channel's own tone. %1$s the tone ("88.5 Hz", "D023N"). One line. -->
+    <string name="modes_fox_tone_channel">チャンネルのトーンスケルチ（%1$s）</string>
+    <!-- Tone choice: the tone heard now. %1$s Hz. One line. -->
+    <string name="modes_fox_tone_heard">今受信しているトーン（%1$s Hz）</string>
+    <!-- Tone choice: pick from the list. One line. -->
+    <string name="modes_fox_tone_pick">CTCSS トーンを選ぶ…</string>
+    <!-- Dialog title: the fox's tone. One line. -->
+    <string name="modes_fox_tone_title">フォックスのトーン</string>
+    <!-- Dialog title: the CTCSS tone list. One line. -->
+    <string name="modes_fox_ctcss_title">CTCSS トーン</string>
+    <!-- On a radio without signal readings. Two lines. -->
+    <string name="modes_fox_no_rssi">この無線機は信号強度を出力しないため、フォックスを探すことはできません。フォックスになることはできます。下のビーコンがハンターの探す目標です。</string>
+    <!-- Section heading (capitals): be the hidden transmitter. Short. -->
+    <string name="modes_fox_be_fox">フォックスになる</string>
+    <!-- Button: stop the fox beacon. Full width. -->
+    <string name="modes_fox_beacon_stop">フォックス送信機を停止</string>
+    <!-- Button: start the fox beacon. Full width. -->
+    <string name="modes_fox_beacon_start">フォックス送信機を開始</string>
+    <!-- Beacon hint. Three lines. -->
+    <string name="modes_fox_beacon_hint">停止するかチャンネルを変えるまで、このチャンネルで 1 分ごとに 5 秒間ビープ音を送信し（アマチュアのチャンネルでは後にコールサインをモールスで送信）、ほかの局が探せるようにします。電池を満充電にしたスマートフォンを隠してください。</string>
+    <!-- Prediction note: both layers are off. One line. -->
+    <string name="modes_fox_pred_off">予測オフ：レイヤーがない場合と同じく、方位線の交点を推定位置とします。</string>
+    <!-- Prediction note while terrain is computed. One line. -->
+    <string name="modes_fox_working_terrain">地形を計算中…</string>
+    <!-- Prediction note with no marks. One line. -->
+    <string name="modes_fox_mark_to_start">測定値をマークして開始してください。</string>
+    <!-- Prediction note: the map legend. One line. -->
+    <string name="modes_fox_shaded" formatted="false">網掛け：フォックスがいる可能性の高い範囲。明るい輪郭が 50 %、薄い輪郭が 90 %。</string>
+    <!-- Prediction note: why a layer is not used. %1$s the reasons (lower case, joined with "; "). Ends with a space. Two lines. -->
+    <string name="modes_fox_not_used">まだ使用していません：%1$s。</string>
+    <!-- The same followed by the map legend. %1$s the reasons. Two lines. -->
+    <string name="modes_fox_not_used_shaded">まだ使用していません：%1$s。網掛け：フォックスがいる可能性の高い範囲。明るい輪郭が 50 %%、薄い輪郭が 90 %%。</string>
+    <!-- Prediction note while the terrain downloads. One line. -->
+    <string name="modes_fox_downloading">地形データをダウンロード中…</string>
+    <!-- The same with progress. %1$d tiles done, %2$d in all. One line. -->
+    <string name="modes_fox_downloading_n">地形データをダウンロード中 %1$d / %2$d…</string>
+    <!-- Under the big number: no signal reading. Lower case, short. -->
+    <string name="modes_fox_no_reading">測定値なし</string>
+    <!-- Under the big number: the strongest reading. %1$d dBm. Short. -->
+    <string name="modes_fox_peak">ピーク %1$d</string>
+    <!-- Under the big number: tuned off the channel. %1$d kHz. Short. -->
+    <string name="modes_fox_tuned_off">%1$d kHz ずらし中</string>
+    <!-- Toast label for a mark from the fox's transmission, before "-85 dBm". Short. -->
+    <string name="modes_fox_how_fox">フォックスをマーク</string>
+    <!-- Toast label for an automatic mark. Short. -->
+    <string name="modes_fox_how_auto">自動マーク</string>
+    <!-- Toast label for a mark. Short. -->
+    <string name="modes_fox_how_marked">マーク</string>
+    <!-- Toast label for a mark from a spin. Short. -->
+    <string name="modes_fox_how_spin">回転マーク</string>
+    <!-- Mark toast. %1$s one of the labels above, %2$d dBm. One line. -->
+    <string name="modes_fox_marked">%1$s %2$d dBm</string>
+    <!-- Mark toast with a bearing. %1$s label, %2$d dBm, %3$s bearing (3 digits). One line. -->
+    <string name="modes_fox_marked_toward">%1$s %2$d dBm、方位 %3$s°</string>
+    <!-- Mark toast with a bearing and its spread. %4$s ± degrees. One line. -->
+    <string name="modes_fox_marked_toward_sigma">%1$s %2$d dBm、方位 %3$s°（±%4$s°）</string>
+    <!-- Fox state: any signal, with auto-marks. %1$d metres. Two lines. -->
+    <string name="modes_fox_state_auto">自動マーク：前回のマークから %1$d m 移動すると、受信ごとに 1 つマークします。</string>
+    <!-- Fox state: any signal. One line. -->
+    <string name="modes_fox_state_any">送信者に関係なく、すべての測定値が有効です。</string>
+    <!-- Fox state: Soft SQ defeats the DCS check. "Soft SQ" is a setting's name. Two lines. -->
+    <string name="modes_fox_state_softsq">Soft SQ が無線機のスケルチを開いたままにするため、DCS でフォックスを区別できません。Soft SQ をオフにしてください。</string>
+    <!-- Fox state: a mark waits for the fox. One line. -->
+    <string name="modes_fox_state_waiting">フォックスを待機中…次の送信でマークします。</string>
+    <!-- Fox state: the fox transmits now. One line. -->
+    <string name="modes_fox_state_on">フォックスが送信中：測定値は有効です。</string>
+    <!-- Fox state: the fox is quiet. One line. -->
+    <string name="modes_fox_state_off">フォックスは送信していません：測定値は送信を待ちます。</string>
+    <!-- Fox state: auto-marks are on. %1$d metres. Short. -->
+    <string name="modes_fox_state_auto_every">%1$d m ごとに自動マーク。</string>
+    <!-- Info line: no compass. Short. -->
+    <string name="modes_fox_no_compass">コンパスなし</string>
+    <!-- Info line: where the phone points. %1$s degrees (3 digits), %2$s compass point ("NE"). Short. -->
+    <string name="modes_fox_pointing">向き %1$s° %2$s</string>
+    <!-- What the distance is to: the strongest mark. Short. -->
+    <string name="modes_fox_what_strongest">最も強いマーク</string>
+    <!-- What the distance is to: the estimate. %1$s the layers ("bearings + heat map"). Short. -->
+    <string name="modes_fox_what_estimate">フォックスの推定位置（%1$s）</string>
+    <!-- The same with its confidence. %2$s good, fair or rough. Short. -->
+    <string name="modes_fox_what_estimate_conf">フォックスの推定位置（%1$s、%2$s）</string>
+    <!-- What the distance is to: the bearing crossing. %1$d bearings. Short. -->
+    <plurals name="modes_fox_what_bearings">
+        <item quantity="other">%1$d 本の方位線によるフォックスの推定位置</item>
+    </plurals>
+    <!-- Info line: the estimate is where you are. %1$s what (one of the above). One line. -->
+    <string name="modes_fox_here">%1$s：ここ（10 m 以内）</string>
+    <!-- Info line: no marks. Short. -->
+    <string name="modes_fox_no_marks">マークはまだありません</string>
+    <!-- Toast: Mark and Spin are refused while transmitting. One line. -->
+    <string name="modes_fox_not_while_tx">送信中はできません。自局の信号を測定してしまいます</string>
+    <!-- Toast: no location yet. One line. -->
+    <string name="modes_fox_no_position">位置を取得していません。位置情報をオンにしてください</string>
+    <!-- Toast: the waiting mark was cancelled. Short. -->
+    <string name="modes_fox_mark_cancelled">マークを取り消しました</string>
+    <!-- Toast: the mark waits for the fox. Two lines. -->
+    <string name="modes_fox_mark_wait_toast">フォックスを待機中：次の送信でマークします（取り消すにはもう一度「マーク」をタップ）</string>
+    <!-- Toast: no signal reading yet. Short. -->
+    <string name="modes_fox_no_signal">まだ測定値がありません</string>
+    <!-- Toast: the spin needs a compass. One line. -->
+    <string name="modes_fox_spin_compass">回転にはスマートフォンのコンパスが必要です</string>
+    <!-- Toast: Open in maps needs a mark. Short. -->
+    <string name="modes_fox_mark_first">先に測定値をマークしてください</string>
+    <!-- Toast: no maps app. Short. -->
+    <string name="modes_fox_no_map_app">地図アプリがありません</string>
+    <!-- Confirmation title. One line. -->
+    <string name="modes_fox_clear_confirm">すべてのマークを消去しますか？</string>
+    <!-- Confirmation message. One line. -->
+    <string name="modes_fox_clear_message">このハンティングのマーク、方位、推定位置が削除されます。</string>
+    <!-- Title of the spin sheet. One line. -->
+    <string name="modes_fox_spin_title">回して方位測定</string>
+    <!-- How to spin. Three lines. -->
+    <string name="modes_fox_spin_hint">スマートフォンを胸に平らに当て、上端を前に向けて、その場でゆっくり一周回ります（20〜40 秒）。体が背後からの信号を遮るため、最も強い方向がフォックスの方向、最も弱い方向がその反対です。</string>
+    <!-- Large guidance before turning. Short. -->
+    <string name="modes_fox_spin_start">回り始めて</string>
+    <!-- Button: fit the bearing now. Half width. -->
+    <string name="modes_fox_spin_fit">今すぐ算出</string>
+    <!-- Button: save the bearing as a mark. Half width. -->
+    <string name="modes_fox_spin_save">マークを保存</string>
+    <!-- Button: start the spin over. Half width. -->
+    <string name="modes_fox_spin_again">もう一度回る</string>
+    <!-- Large result. %1$s bearing (3 digits), %2$s compass point. Short. -->
+    <string name="modes_fox_spin_toward">フォックスは %1$s° %2$s</string>
+    <!-- Large result when the fit failed. Short. -->
+    <string name="modes_fox_spin_retry">再試行</string>
+    <!-- Large guidance while waiting for the fox to transmit. Short. -->
+    <string name="modes_fox_spin_waiting">フォックスを待機中</string>
+    <!-- Result detail from the strongest direction. %1$s ± degrees, %2$s dB, %3$d readings. Two lines. -->
+    <plurals name="modes_fox_spin_within_peak">
+        <item quantity="other">誤差は約 ±%1$s°（最も強い方向から算出、最強と最弱の差 %2$s dB、測定値 %3$d 件）</item>
+    </plurals>
+    <!-- Result detail from the weakest direction (behind the user). Two lines. -->
+    <plurals name="modes_fox_spin_within_null">
+        <item quantity="other">誤差は約 ±%1$s°（背後の最も弱い方向から算出、最強と最弱の差 %2$s dB、測定値 %3$d 件）</item>
+    </plurals>
+    <!-- Spin progress. %1$s percent of the circle, %2$d readings, %3$s degrees turned. One line. -->
+    <plurals name="modes_fox_spin_progress">
+        <item quantity="other">一周の %1$s %%\u0020 ·\u0020 測定値 %2$d 件\u0020 ·\u0020 回転 %3$s°</item>
+    </plurals>
+    <!-- The same while only the fox's transmissions count. Two or three lines. -->
+    <plurals name="modes_fox_spin_progress_wait">
+        <item quantity="other">一周の %1$s %%\u0020 ·\u0020 測定値 %2$d 件\u0020 ·\u0020 回転 %3$s°\nフォックスの送信だけが有効です。送信している間、ゆっくり回り続けてください。</item>
+    </plurals>
+    <!-- Plot placeholder (drawn in the middle of the plot). Short. -->
+    <string name="modes_fox_plot_empty">ここにマークが表示されます</string>
+    <!-- Plot scale. %1$s kilometres. Small text, short. -->
+    <string name="modes_fox_rings_km">円の間隔 %1$s km</string>
+    <!-- Plot scale. %1$s metres. Small text, short. -->
+    <string name="modes_fox_rings_m">円の間隔 %1$s m</string>
+    <!-- Plot scale. %1$s miles. Small text, short. -->
+    <string name="modes_fox_rings_mi">円の間隔 %1$s mi</string>
+</resources>

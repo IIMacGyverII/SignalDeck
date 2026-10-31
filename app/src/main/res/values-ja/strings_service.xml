@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The radio service: history lines, toasts, notifications, refusals and status text from the service and its helpers. See strings_common.xml for the conventions. -->
+<resources>
+    <!-- History line (Last heard) when SignalDeck ends a voice transmission at the transmit limit. %1$s is the limit ("2 min"). Starts with an emoji; keep it. -->
+    <string name="service_tx_limit_ended">⏱ 送信時間制限 %1$s で送信を終了しました</string>
+    <!-- Toast when a voice keyer slot is sent but holds no recording. %1$s is the slot's name. One line. -->
+    <string name="service_keyer_nothing_recorded">%1$s には何も録音されていません</string>
+    <!-- SAFETY: transmit refusal (toast) when the voice keyer is used on a digital channel. One line. -->
+    <string name="service_keyer_needs_fm">ボイスメモリーにはアナログ FM チャンネルが必要です</string>
+    <!-- SAFETY: transmit refusal (toast) on a receive-only channel (voice keyer, fox beacon, parrot, key-up test). One line. -->
+    <string name="service_tx_receive_only">このチャンネルは受信専用です</string>
+    <!-- History line after a recorded voice keyer message was transmitted. %1$s is the message's name. Starts with an emoji; keep it. -->
+    <string name="service_keyer_sent">🎙 ボイスメモリーを送信：%1$s</string>
+    <!-- History line after a recorded voice keyer message was transmitted with the Morse callsign ID after it. %1$s is the message's name. Starts with an emoji; keep it. -->
+    <string name="service_keyer_sent_id">🎙 ボイスメモリーを送信：%1$s + CW ID</string>
+    <!-- Long toast: the station identification is due. %1$d is the interval in minutes (10). One or two lines. -->
+    <string name="service_id_due_toast">コールサインを送出してください：前回の ID 送出から %1$d 分経ちました</string>
+    <!-- History line: the station identification is due. %1$d is the interval in minutes. Starts with an emoji; keep it. -->
+    <string name="service_id_due_history">⏰ ID 送出の時間です：前回の ID から %1$d 分</string>
+    <!-- SAFETY: refusal (toast) when the transmit limit is changed in Restricted mode. One line. -->
+    <string name="service_txlimit_locked">制限モードでは送信時間制限を変更できません</string>
+    <!-- SAFETY: refusal (toast) when a custom transmit limit is too short. %1$d is the minimum in seconds (10). One line. -->
+    <string name="service_txlimit_minimum">制限は %1$d 秒以上です</string>
+    <!-- History line when a satellite pass recording is finished. %1$s is the file name. Starts with an emoji; keep it. -->
+    <string name="service_sat_pass_recorded">🎧 パスを録音しました：%1$s</string>
+    <!-- Refusal (toast) when a satellite or ISS feature needs the phone's position and there is none. One line. -->
+    <string name="service_no_fix_location">位置を取得できません：位置情報をオンにしてください</string>
+    <!-- SAFETY: refusal (toast) when a satellite sends outside the radio's bands. %1$s is the radio's bands ("UHF 400–480 MHz"), %2$s the satellite's name, %3$s its frequency in MHz. -->
+    <string name="service_sat_out_of_band">この無線機の範囲は %1$s です：%2$s は %3$s MHz で送信しています</string>
+    <!-- History line: the band scope was stopped because a satellite pass is being tracked. Starts with an emoji; keep it. -->
+    <string name="service_scope_stopped_pass">✂ 衛星パスのためバンドスコープを停止しました</string>
+    <!-- History line when a satellite pass starts being tracked. %1$s is the satellite's name. Starts with an emoji; keep it. -->
+    <string name="service_sat_tracking">🛰 %1$s を追尾中：パスに合わせて同調しています</string>
+    <!-- History line when the recording of a satellite pass starts. %1$s is the file name. Starts with an emoji; keep it. -->
+    <string name="service_sat_recording">🛰 パスを録音中（%1$s）</string>
+    <!-- History line at the end of a satellite pass. %1$s is the satellite's name. Starts with an emoji; keep it. -->
+    <string name="service_sat_pass_over">🛰 %1$s のパスが終了しました</string>
+    <!-- History line when the fox-hunt beacon is switched off. Starts with an emoji; keep it. -->
+    <string name="service_fox_off_history">🦊 フォックス送信機オフ</string>
+    <!-- Toast when the fox-hunt beacon is switched off. Short. -->
+    <string name="service_fox_off">フォックス送信機オフ</string>
+    <!-- SAFETY: transmit refusal (toast) when the fox beacon is started on a digital channel. One line. -->
+    <string name="service_fox_needs_fm">フォックス送信機にはアナログ FM チャンネルが必要です</string>
+    <!-- History line: the fox beacon stopped because the user changed channel. Starts with an emoji; keep it. -->
+    <string name="service_fox_stopped_channel">🦊 フォックス送信機を停止しました：チャンネルが変わりました</string>
+    <!-- History line when the fox-hunt beacon starts. %1$s is the channel name. Starts with an emoji; keep it. -->
+    <string name="service_fox_on_history">🦊 %1$s でフォックス送信機オン（毎分）</string>
+    <!-- Toast when the fox-hunt beacon starts. %1$s is the channel name. One line. -->
+    <string name="service_fox_on">%1$s でフォックス送信機オン：毎分 5 秒間ビープ音を送信します</string>
+    <!-- Refusal (toast) when a feature that tunes an offset from the channel is used on a digital channel. Short. -->
+    <string name="service_needs_analog">アナログチャンネルが必要です</string>
+    <!-- SAFETY: refusal (toast) when a frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
+    <string name="service_freq_outside">この無線機の範囲は %1$s です：%2$s MHz は範囲外です</string>
+    <!-- History line when the parrot (simplex repeater) is switched off. %1$d is how many transmissions it repeated. Starts with an emoji; keep it. -->
+    <string name="service_parrot_off_history">🦜 パロットオフ（%1$d 回中継）</string>
+    <!-- Toast when the parrot (simplex repeater) is switched off. Short. -->
+    <string name="service_parrot_off">パロットオフ</string>
+    <!-- SAFETY: transmit refusal (toast) when the parrot is switched on on a digital channel. One line. -->
+    <string name="service_parrot_needs_fm">パロットにはアナログ FM チャンネルが必要です</string>
+    <!-- Refusal (toast) when the parrot is switched on with the squelch open. Soft SQ is SignalDeck's software squelch. Two lines. -->
+    <string name="service_parrot_needs_squelch">先にチャンネルのスケルチを上げてください（または Soft SQ をオン）：スケルチ 0 では、パロットがノイズを中継してしまいます</string>
+    <!-- History line when the parrot (simplex repeater) is switched on. %1$s is the channel name. Starts with an emoji; keep it. -->
+    <string name="service_parrot_on_history">🦜 パロットオン：%1$s で受信した内容を中継します</string>
+    <!-- Toast when the parrot (simplex repeater) is switched on. %1$s is the channel name. One or two lines. -->
+    <string name="service_parrot_on">%1$s でパロットオン：受信が終わってから 1 秒後に送信し直します</string>
+    <!-- A DMR talkgroup without a name, as a number (history, Last heard, notifications). %1$d is the talkgroup number. TG is the usual abbreviation for talkgroup. -->
+    <string name="service_tg_number">TG %1$d</string>
+    <!-- History line when a caption keyword alert fires. %1$s is the keyword. Starts with an emoji; keep it. -->
+    <string name="service_keyword_heard">🔔 キーワード「%1$s」を受信</string>
+    <!-- Notification title when a caption keyword alert fires. %1$s is the keyword, %2$s the channel name. One line. -->
+    <string name="service_keyword_notify_title">%2$s でキーワード「%1$s」を受信</string>
+    <!-- Notification title when a caption keyword alert fires and no channel is known. %1$s is the keyword. One line. -->
+    <string name="service_keyword_notify_title_radio">無線でキーワード「%1$s」を受信</string>
+    <!-- Refusal (toast) when SSTV receive on 144.500 MHz is asked on a radio that cannot tune it. %1$s is the radio's bands. "Receive here" is the name of the other button. -->
+    <string name="service_sstv_out_of_band">この無線機の範囲は %1$s で、144.500 MHz には合わせられません：「ここで受信」を使ってください</string>
+    <!-- Toast when SSTV picture receive starts on the 144.500 MHz calling frequency. One line. -->
+    <string name="service_sstv_on_park">144.500 MHz で SSTV 受信</string>
+    <!-- Toast when SSTV picture receive starts on the current channel. One line. -->
+    <string name="service_sstv_on_channel">このチャンネルで SSTV 受信</string>
+    <!-- Toast when SSTV picture receive is switched off. Short. -->
+    <string name="service_sstv_off">SSTV 受信オフ</string>
+    <!-- History line when a beacon asked by DTMF remote control could not be sent. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_remote_beacon_failed">⛔ リモートのビーコンを送信できませんでした：%1$s</string>
+    <!-- History line after a spoken reply to a DTMF remote-control request was transmitted. %1$s is what was said (English speech). Starts with an emoji; keep it. -->
+    <string name="service_remote_reply_sent">🗣 リモートの応答を送信しました：%1$s</string>
+    <!-- Refusal (toast) when an ISS beacon is asked before the callsign is set. PKT → Settings is where it is set. One line. -->
+    <string name="service_iss_need_callsign">先にコールサインを設定してください（PKT → 設定）</string>
+    <!-- SAFETY: refusal (toast) when the ISS APRS frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
+    <string name="service_iss_out_of_band">この無線機の範囲は %1$s です：ISS の APRS 周波数（%2$s MHz）は範囲外です</string>
+    <!-- Refusal (toast) when the ISS beacon needs the phone's position and there is none yet. Short. -->
+    <string name="service_no_fix_yet">位置を取得していません</string>
+    <!-- Refusal (toast) when an ISS beacon is asked while the ISS is not in view. Short. -->
+    <string name="service_iss_below_horizon">ISS は地平線の下です</string>
+    <!-- History line when an APRS beacon through the ISS could not be sent. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_iss_beacon_failed">⛔ ISS ビーコンを送信できませんでした：%1$s</string>
+    <!-- Toast when an APRS beacon through the ISS digipeater is being sent. ARISS is the programme's name. One line. -->
+    <string name="service_iss_beaconing">ISS 経由でビーコン送信中（ARISS）</string>
+    <!-- Refusal (toast) when the ISS is not in view now. Short. -->
+    <string name="service_iss_not_in_view">ISS は見えていません</string>
+    <!-- Refusal (toast) when the ISS is not in view now. %1$s is the next pass ("Tue 14:05 (highest 42°)"). One line. -->
+    <string name="service_iss_not_in_view_next">ISS は見えていません：次のパス %1$s</string>
+    <!-- SAFETY: refusal (toast) when the ISS APRS downlink or uplink (Doppler-corrected) is outside the radio's bands. %1$s is the radio's bands. -->
+    <string name="service_iss_link_out_of_band">この無線機の範囲は %1$s です：ISS の APRS ダウンリンク・アップリンクは範囲外です</string>
+    <!-- SAFETY: history line when the ISS beacon was not sent because the radio refused the frequency. Starts with an emoji; keep it. -->
+    <string name="service_iss_beacon_not_tuned">⛔ ISS ビーコンを送信しませんでした：無線機が ISS の APRS 周波数に合わせられませんでした</string>
+    <!-- Toast when an APRS beacon is sent through the ISS. %1$s is the ISS's elevation in degrees, %2$s the uplink frequency in MHz. ARISS is the programme's name. -->
+    <string name="service_iss_beaconing_at">ISS 仰角 %1$s°：ARISS 経由で %2$s MHz（ドップラー補正済み）でビーコン送信中</string>
+    <!-- The next ISS pass, inside other messages. %1$s is the day and time ("Tue 14:05"), %2$s the highest elevation in degrees. Short. -->
+    <string name="service_iss_pass_when">%1$s（最大仰角 %2$s°）</string>
+    <!-- Refusal (toast) when the ISS orbit has not been downloaded yet. "Satellite passes" is the name of a screen. One line. -->
+    <string name="service_iss_no_orbit">ISS の軌道データがありません：「衛星パス」を一度開いてダウンロードしてください</string>
+    <!-- Message when no ISS pass high enough comes within a day. One line. -->
+    <string name="service_iss_no_pass">今後 24 時間に仰角 10° を超える ISS のパスはありません</string>
+    <!-- History line when ISS tracking resumes after the app restarted. %1$s is the mode (SSTV or APRS). Starts with an emoji; keep it. -->
+    <string name="service_iss_resumed">🛰 再起動後、ISS の追尾を再開しました（%1$s）</string>
+    <!-- History line when ISS tracking could not resume after the app restarted. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_iss_resume_failed">🛰 ISS の追尾を再開できませんでした：%1$s</string>
+    <!-- SAFETY: history line when SignalDeck refused to transmit a data or tone transmission on a receive-only channel. Starts with an emoji; keep it. -->
+    <string name="service_tx_blocked_receive_only">⛔ 受信専用チャンネルのため送信を阻止しました</string>
+    <!-- SAFETY: history line when a transmission was refused because it is longer than the transmit limit. %1$s is what was to be sent (an English label such as "APRS beacon"), %2$d its length in seconds, %3$s the limit ("2 min"). Device → Longest transmission is the setting. Starts with an emoji; keep it. -->
+    <string name="service_tx_too_long_limit">⛔ 長すぎるため送信できません（%1$s、%2$d 秒。送信時間制限は %3$s、デバイス → 最長送信時間）</string>
+    <!-- SAFETY: history line when a transmission was refused because it is longer than its sender allows. %1$s is what was to be sent (an English label), %2$d its length in seconds, %3$d the sender's maximum in seconds. Starts with an emoji; keep it. -->
+    <string name="service_tx_too_long_sender">⛔ 長すぎるため送信できません（%1$s、%2$d 秒。この送信元の上限は %3$d 秒）</string>
+    <!-- History line when a data transmission was not sent because the radio never reported that it transmits. %1$s is what was to be sent (an English label). Starts with an emoji; keep it. -->
+    <string name="service_tx_not_reported">⚠️ %1$s を送信できませんでした：無線機が送信を報告しませんでした</string>
+    <!-- History line after a transmission longer than 30 s. %1$d is its length in seconds, %2$s what was sent (an English label, or "voice"), %3$s the heat guard's state. Starts with an emoji; keep it. -->
+    <string name="service_tx_long">📻 長時間の送信 %1$d 秒（%2$s）。%3$s</string>
+    <!-- Name of the notification channel for weather and keyword alerts (Android's notification settings). Short. -->
+    <string name="service_channel_alerts">気象警報</string>
+    <!-- Name of the notification channel for APRS messages and other packet notifications (Android's notification settings). Short. -->
+    <string name="service_channel_packet">APRS メッセージ</string>
+    <!-- SAFETY: refusal (toast) when the APRS frequency is outside the radio's bands. %1$s is the radio's bands, %2$s the frequency in MHz. -->
+    <string name="service_aprs_out_of_band">この無線機の範囲は %1$s で、%2$s MHz は範囲外です</string>
+    <!-- Toast when APRS monitoring starts. %1$s is the frequency in MHz. One line. -->
+    <string name="service_aprs_monitor_on">%1$s MHz で APRS ワッチ</string>
+    <!-- Toast when APRS monitoring stops. Short. -->
+    <string name="service_aprs_monitor_off">APRS ワッチオフ</string>
+    <!-- History warning on Agold phones whose App block setting would stop SignalDeck with the screen off. %1$s lists the blocking switches that are on. Settings → App block → SignalDeck is the path in the phone's own settings. Starts with an emoji; keep it. -->
+    <string name="service_agold_app_block">⚠ Agold の App block により、画面オフで SignalDeck が停止します（%1$s がオン）：設定 → App block → SignalDeck でオフにしてください</string>
+    <!-- History warning after Hand back when the radio's USB bridge did not answer. Starts with an emoji; keep it. -->
+    <string name="service_bridge_no_answer_handback">⚠ 無線機の USB ブリッジが応答しませんでした：純正無線アプリを開く前に端末を再起動してください</string>
+    <!-- History warning after Hand back when the phone holds radio firmware files the stock app would load. %1$s is the folder. Starts with an emoji; keep it. -->
+    <string name="service_stock_firmware_files">⚠ %1$s に無線ファームウェアのファイルがあります：純正アプリは起動時にこれをモジュールに書き込みます。意図していない場合は削除してください。</string>
+    <!-- History line: the parrot stopped because the user changed channel. Starts with an emoji; keep it. -->
+    <string name="service_parrot_stopped_channel">🦜 パロットを停止しました：チャンネルが変わりました</string>
+    <!-- History line (Last heard box) when a CTCSS tone is detected on a channel without one. %1$s is the tone in Hz ("100.0"). Tapping the box applies it. Starts with an emoji; keep it. -->
+    <string name="service_tone_heard">🎵 CTCSS %1$s Hz を検出 — この枠をタップすると設定します</string>
+    <!-- Toast when the heard tone is to be applied but none is pending. Short. -->
+    <string name="service_tone_nothing">設定するものがありません</string>
+    <!-- Toast after the heard CTCSS tone was set on the channel. %1$s is the tone in Hz, %2$s the channel name. One line. -->
+    <string name="service_tone_applied">%2$s に CTCSS %1$s Hz を設定しました</string>
+    <!-- History line when a recording of the received audio is finished. %1$s is the file name. Starts with an emoji; keep it. -->
+    <string name="service_recorded">🎧 %1$s を録音しました</string>
+    <!-- Toast when a packet mode (APRS, SSTV, ISS beacon) is asked before the packet engine has started. Very short. -->
+    <string name="service_packet_not_ready">準備中</string>
+    <!-- History warning when the radio module did not take the "promiscuous" flag (hear every DMR call). MON is the monitor button. Starts with an emoji; keep it. -->
+    <string name="service_mon_flag_refused">⚠ モジュールが全受信フラグを受け付けませんでした（MON は無線機本来のモニターのみ）</string>
+    <!-- History warning when the radio did not answer the MON (monitor) switch. Starts with an emoji; keep it. -->
+    <string name="service_mon_no_answer">⚠ 無線機が MON に応答しませんでした：数秒後にもう一度切り替えてください</string>
+    <!-- Live caption line while Google Cloud transcribes what was heard. Starts with an emoji; keep it. Short. -->
+    <string name="service_caption_transcribing">☁ 文字起こし中…</string>
+    <!-- Live caption line when the Google Cloud transcription failed. Starts with an emoji; keep it. Short. -->
+    <string name="service_caption_cloud_failed">⚠ クラウドの文字起こしに失敗</string>
+    <!-- Prefix of a caption line on DMR: who spoke. %1$s is the caller's name or "ID 1234567". Keep the colon and the space. -->
+    <string name="service_caption_speaker">%1$s：</string>
+    <!-- A DMR caller without a name, shown by their DMR ID (captions, notification, Android Auto). %1$d is the DMR ID number. Short. -->
+    <string name="service_caller_id">ID %1$d</string>
+    <!-- Toast when the scan is stopped. Short. -->
+    <string name="service_scan_stopped">スキャン停止</string>
+    <!-- Toast when a scan is asked while the VFO (free frequency entry) is on. One line. -->
+    <string name="service_scan_vfo_on">チャンネルをスキャンするには VFO をオフにしてください</string>
+    <!-- Toast when the scan starts. %1$s is the zone's name ("All channels" or a zone). One line. -->
+    <string name="service_scanning_zone">%1$s をスキャン中</string>
+    <!-- SAFETY: refusal (toast) when a zone holds only channels outside this radio's bands. %1$s is the zone's name, %2$s the radio's bands. -->
+    <string name="service_zone_untunable">ゾーン %1$s に、この無線機で合わせられるチャンネルがありません（%2$s）</string>
+    <!-- SAFETY: history warning when a zone holds only channels outside this radio's bands. %1$s is the zone's name, %2$s the radio's bands. Starts with an emoji; keep it. -->
+    <string name="service_zone_untunable_history">⚠ ゾーン %1$s に、この無線機で合わせられるチャンネルがありません（%2$s）</string>
+    <!-- Refusal (toast) when a talkgroup is picked while not on a saved DMR channel. One line. -->
+    <string name="service_tg_needs_dmr">保存済みの DMR チャンネルでトークグループを選んでください</string>
+    <!-- Refusal (toast) for an action that cannot run while transmitting. Short. -->
+    <string name="service_not_while_tx">送信中はできません</string>
+    <!-- History line when a talkgroup is picked for the current DMR channel for now. %1$d is the talkgroup, %2$s the channel name, %3$d the channel's own talkgroup. -->
+    <string name="service_tg_override">チャンネルを変えるまで %2$s でトークグループ %1$d を使用（チャンネルの設定は %3$d のまま）</string>
+    <!-- History line when the DMR channel goes back to its own talkgroup. %1$s is the channel name, %2$d its talkgroup. -->
+    <string name="service_tg_back">%1$s 本来の呼出先 %2$d に戻りました</string>
+    <!-- SAFETY: history warning when the channel arrows find no channel this radio can tune. %1$s is the radio's bands. Starts with an emoji; keep it. -->
+    <string name="service_no_tunable_channel">⚠ この無線機で合わせられるチャンネルがありません（%1$s）</string>
+    <!-- Refusal (toast) when a channel number that does not exist is picked. %1$d is the number. Short. -->
+    <string name="service_no_channel_number">チャンネル %1$d はありません</string>
+    <!-- SAFETY: refusal (toast) when a channel outside this radio's bands is picked. %1$s is the channel name, %2$s its frequency in MHz, %3$s the radio's bands. -->
+    <string name="service_channel_untunable">%1$s（%2$s MHz）は %3$s の範囲外です：この無線機では合わせられません</string>
+    <!-- SAFETY: history warning when a channel outside this radio's bands was refused. %1$s is the channel name, %2$s its frequency (or "RX / TX") in MHz, %3$s the radio's bands. Starts with an emoji; keep it. -->
+    <string name="service_channel_outside">⚠ %1$s（%2$s MHz）は、この無線機で合わせられる範囲（%3$s）の外です</string>
+    <!-- SAFETY: history warning when a channel outside this radio's bands was refused and the radio stays on another. %1$s is the channel name, %2$s its frequency in MHz, %3$s the radio's bands, %4$s the channel still in use, %5$s its frequency in MHz. Starts with an emoji; keep it. -->
+    <string name="service_channel_outside_still">⚠ %1$s（%2$s MHz）は、この無線機で合わせられる範囲（%3$s）の外です。%4$s（%5$s MHz）のままです</string>
+    <!-- Refusal (toast or history line) while the radio module's firmware is being loaded. Short. -->
+    <string name="service_fw_busy">無線機は使用中です（ファームウェア書き込み中）</string>
+    <!-- Toast after deleting channels when none was deleted. Short. -->
+    <string name="service_channels_none_deleted">削除したチャンネルはありません</string>
+    <!-- Toast after deleting several channels. %1$d is how many. Short. -->
+    <plurals name="service_channels_deleted">
+        <item quantity="other">%1$d チャンネルを削除しました</item>
+    </plurals>
+    <!-- Refusal (toast) when the zone picked no longer exists. Short. -->
+    <string name="service_zone_missing">そのゾーンはありません</string>
+    <!-- Refusal (toast) when a new zone is made without a name. Short. -->
+    <string name="service_zone_needs_name">新しいゾーンには名前が必要です</string>
+    <!-- Refusal (toast) when no channel is selected for a zone. Short. -->
+    <string name="service_channels_none_selected">チャンネルが選択されていません</string>
+    <!-- Toast after adding channels to a zone. %1$d is how many, %2$s the zone's name. One line. -->
+    <plurals name="service_zone_added">
+        <item quantity="other">ゾーン %2$s に %1$d チャンネルを追加しました</item>
+    </plurals>
+    <!-- Toast after making a new zone from selected channels. %1$s is the zone's name, %2$d how many channels it holds. One line. -->
+    <plurals name="service_zone_new">
+        <item quantity="other">新しいゾーン %1$s（%2$d チャンネル）</item>
+    </plurals>
+    <!-- Refusal (toast) when taking channels out would leave a zone empty. %1$s is the zone's name. "Zones" is the name of the zone list. One line. -->
+    <string name="service_zone_would_empty">ゾーン %1$s が空になります：代わりにゾーンを削除してください（ゾーン）</string>
+    <!-- Toast after taking channels out of a zone. %1$d is how many, %2$s the zone's name. One line. -->
+    <plurals name="service_zone_removed">
+        <item quantity="other">ゾーン %2$s から %1$d チャンネルを除外しました</item>
+    </plurals>
+    <!-- Toast after adding channels to the Favourites (starred) zone. %1$d is how many. Short. -->
+    <plurals name="service_channels_starred">
+        <item quantity="other">%1$d チャンネルをお気に入りに追加しました</item>
+    </plurals>
+    <!-- Toast after taking channels out of the Favourites (starred) zone. %1$d is how many. Short. -->
+    <plurals name="service_channels_unstarred">
+        <item quantity="other">%1$d チャンネルをお気に入りから外しました</item>
+    </plurals>
+    <!-- History warning after an import, holding the note on receive tones. %1$s is that note (service_tone_note_*). Starts with an emoji; keep it. -->
+    <string name="service_tone_note_history">🎵 %1$s</string>
+    <!-- History line: following the ISS pass after pass could not go on. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_sat_repeat_failed_history">🛰 %1$s</string>
+    <!-- History line: the parrot was started or stopped by a DTMF remote command. %1$s is what happened (the parrot's own status text). Starts with an emoji; keep it. -->
+    <string name="service_remote_parrot_history">📟 %1$s</string>
+    <!-- History line: a DTMF remote command could not send the Morse ID. %1$s is the reason. Starts with an emoji; keep it. -->
+    <string name="service_remote_morse_failed_history">⛔ %1$s</string>
+    <!-- Toast when importing the stock app's channels failed. %1$s is the reason. -->
+    <string name="service_import_failed">インポートに失敗しました：%1$s</string>
+    <!-- Toast after importing the stock app's channels. %1$d is how many. English uses "channels" for one too. -->
+    <plurals name="service_imported">
+        <item quantity="other">%1$d チャンネルをインポートしました</item>
+    </plurals>
+    <!-- Toast after importing the stock app's channels with a problem. %1$d is how many, %2$s the problem. -->
+    <plurals name="service_imported_err">
+        <item quantity="other">%1$d チャンネルをインポートしました（%2$s）</item>
+    </plurals>
+    <!-- Toast after importing the stock app's channels. %1$d is how many, %2$s the note on receive tones (service_tone_note_*). -->
+    <plurals name="service_imported_tones">
+        <item quantity="other">%1$d チャンネルをインポートしました。%2$s</item>
+    </plurals>
+    <!-- Toast after importing the stock app's channels with a problem. %1$d is how many, %2$s the problem, %3$s the note on receive tones. -->
+    <plurals name="service_imported_err_tones">
+        <item quantity="other">%1$d チャンネルをインポートしました（%2$s）。%3$s</item>
+    </plurals>
+    <!-- Note after importing the stock app's channels when every analog channel opens only for a receive tone. %1$d is how many. "RX tone type" and "None" are the names of a field and its choice in the channel editor. -->
+    <string name="service_tone_note_all">インポートしたアナログチャンネル %1$d 件はすべて、純正アプリの設定どおり受信トーンがあるときだけ開きます：トーンを出さない無線機の信号は聞こえません。必要ならチャンネル編集で「受信トーン種別」を「なし」にしてください</string>
+    <!-- As service_tone_note_all, when all use the same tone. %1$d is how many, %2$s the tone ("CTCSS 62.5"). -->
+    <string name="service_tone_note_all_kind">インポートしたアナログチャンネル %1$d 件はすべて、純正アプリの設定どおり受信トーン（%2$s）があるときだけ開きます：トーンを出さない無線機の信号は聞こえません。必要ならチャンネル編集で「受信トーン種別」を「なし」にしてください</string>
+    <!-- Note after importing the stock app's channels when some analog channels open only for a receive tone. %1$d is how many do, %2$d how many analog channels there are. -->
+    <string name="service_tone_note_some">インポートしたアナログチャンネル %2$d 件のうち %1$d 件は、純正アプリの設定どおり受信トーンがあるときだけ開きます：トーンを出さない無線機の信号は聞こえません。必要ならチャンネル編集で「受信トーン種別」を「なし」にしてください</string>
+    <!-- As service_tone_note_some, when they all use the same tone. %1$d is how many do, %2$d how many analog channels there are, %3$s the tone ("CTCSS 62.5"). -->
+    <string name="service_tone_note_some_kind">インポートしたアナログチャンネル %2$d 件のうち %1$d 件は、純正アプリの設定どおり受信トーン（%3$s）があるときだけ開きます：トーンを出さない無線機の信号は聞こえません。必要ならチャンネル編集で「受信トーン種別」を「なし」にしてください</string>
+    <!-- Toast after the user chose not to import the stock app's channels. Short. -->
+    <string name="service_import_declined">チャンネルなしで開始します</string>
+    <!-- SAFETY: history warning when PTT is pressed on an M17 channel and the module firmware cannot send M17. "Symbol engine" is the firmware feature. Starts with an emoji; keep it. -->
+    <string name="service_m17_receive_only">⚠️ モジュールのファームウェアにシンボルエンジンが入るまで、M17 は受信専用です</string>
+    <!-- SAFETY: history line when PTT is pressed on a phone whose device profile has not been transmit-tested. Starts with an emoji; keep it. -->
+    <string name="service_tx_untested_profile">⛔ この端末では、プロファイルがテストされるまで送信はオフです</string>
+    <!-- History warning when the radio never reported that it transmits after the key, so no audio was sent. Starts with an emoji; keep it. -->
+    <string name="service_tx_no_send_start">⚠️ 無線機が送信を報告しませんでした。音声は送信されていません</string>
+    <!-- History line after the Morse callsign ID was sent at the end of a transmission. %1$s is the callsign. Starts with an emoji; keep it. -->
+    <string name="service_morse_id">🔤 CW ID %1$s</string>
+    <!-- History line after a voice transmission longer than 30 s. %1$d is its length in seconds, %2$s the heat guard's state. Starts with an emoji; keep it. -->
+    <string name="service_tx_long_voice">📻 長時間の送信 %1$d 秒（音声）。%2$s</string>
+    <!-- Refusal (toast) when a pager message has no recipient. RIC is the pager's address number. Short. -->
+    <string name="service_page_need_ric">RIC を 1 つ以上追加してください</string>
+    <!-- Refusal (toast) when a message to send is empty. Short. -->
+    <string name="service_write_message">メッセージを入力してください</string>
+    <!-- SAFETY: refusal (toast) when the pager frequency is outside the radio's bands. %1$s is the radio's bands. -->
+    <string name="service_page_out_of_band">周波数は %1$s の範囲内にしてください</string>
+    <!-- Refusal (toast) when the radio is not up yet. Short. -->
+    <string name="service_radio_not_ready">無線機の準備ができていません</string>
+    <!-- SAFETY: transmit refusal (toast) on a receive-only channel. Short. -->
+    <string name="service_tx_off_channel">このチャンネルでは送信はオフです</string>
+    <!-- Refusal (toast) when pages are sent on a module firmware without the symbol engine. FW21 is a firmware version. One or two lines. -->
+    <string name="service_page_needs_fw">ページャーメッセージは、モジュールのファームウェアにシンボルエンジンがある場合（FW21 以降）のみ送信できます</string>
+    <!-- Refusal (toast) when the module's symbol engine is already sending. Short. -->
+    <string name="service_symbol_engine_busy">シンボルエンジンは使用中です</string>
+    <!-- SAFETY: refusal (toast) when a pager message would take longer than 25 s to send. One line. -->
+    <string name="service_page_too_long">そのページャーメッセージは 25 秒を超えます</string>
+    <!-- SAFETY: refusal (toast) when a pager message is longer than the transmit limit. %1$s is the limit ("2 min"); Device → Longest transmission is the setting. -->
+    <string name="service_page_over_limit">そのページャーメッセージは送信時間制限（%1$s、デバイス → 最長送信時間）を超えます</string>
+    <!-- Name of the temporary frequency (VFO) used to send or receive pages, shown as the channel name. One word. -->
+    <string name="service_vfo_pager">ページャー</string>
+    <!-- History warning when the module firmware refused the pager waveform. Starts with an emoji; keep it. -->
+    <string name="service_page_waveform_refused">⚠️ このファームウェアはページャーの波形を受け付けませんでした</string>
+    <!-- History line after a pager message was sent. %1$d is how many RICs (pager addresses), %2$d the speed in baud. Starts with an emoji; keep it. -->
+    <plurals name="service_page_sent">
+        <item quantity="other">📟 %1$d 件の RIC に %2$d baud でページャーメッセージを送信しました</item>
+    </plurals>
+    <!-- History warning when sending a pager message failed. %1$s is the error. Starts with an emoji; keep it. -->
+    <string name="service_page_failed">⚠️ ページャーメッセージの送信に失敗しました：%1$s</string>
+    <!-- Message on the firmware page when a load is asked while one is running. Short. -->
+    <string name="service_fw_load_running">既に書き込み中です</string>
+    <!-- Message on the firmware page on a phone whose radio module SignalDeck cannot load firmware into. One line. -->
+    <string name="service_fw_no_loader">この端末の無線モジュールには、SignalDeck からファームウェアを書き込めません</string>
+    <!-- SAFETY: history warning when M17 transmit is asked and the module firmware cannot send it. "Symbol engine" is the firmware feature. Starts with an emoji; keep it. -->
+    <string name="service_m17_needs_fw_history">⚠️ M17 の送信には、シンボルエンジン入りのモジュールファームウェアが必要です</string>
+    <!-- SAFETY: history warning when M17 transmit is asked on a digital (DMR) channel. Starts with an emoji; keep it. -->
+    <string name="service_m17_needs_analog_history">⚠️ M17 の送信にはアナログチャンネルが必要です</string>
+    <!-- SAFETY: refusal (toast) when an M17 text is sent and the module firmware cannot send M17. One line. -->
+    <string name="service_m17_needs_fw">M17 の送信には、シンボルエンジン入りのモジュールファームウェアが必要です</string>
+    <!-- SAFETY: refusal (toast) when an M17 text is sent on a digital (DMR) channel. One line. -->
+    <string name="service_m17_needs_analog">M17 の送信にはアナログチャンネルが必要です</string>
+    <!-- Refusal (toast) when an M17 text is sent while M17 is already sending. Short. -->
+    <string name="service_m17_busy">M17 は既に送信中です</string>
+    <!-- History line after an M17 text was sent. %1$s is the sender's callsign, %2$s the destination, %3$s the text. Starts with an emoji; keep it. -->
+    <string name="service_m17_text_sent">✉ %1$s → %2$s：%3$s</string>
+    <!-- Refusal (toast) when an M17 text could not be prepared. Short. -->
+    <string name="service_m17_text_failed">テキストを送信できませんでした</string>
+    <!-- History warning when the module firmware refused to start M17 sending. Starts with an emoji; keep it. -->
+    <string name="service_m17_reset_refused">⚠️ このファームウェアは M17 のシンボルリセットを受け付けませんでした</string>
+    <!-- History line after an M17 transmission longer than 30 s. %1$d is its length in seconds, %2$s the heat guard's state. Starts with an emoji; keep it. -->
+    <string name="service_tx_long_m17">📻 長時間の送信 %1$d 秒（M17）。%2$s</string>
+    <!-- Refusal (toast) when tones are sent and the module firmware has no tone generator. FW22 is a firmware version. One or two lines. -->
+    <string name="service_tones_need_fw">モジュールのトーン発生器には試験用ファームウェア（FW22 以降）が必要です</string>
+    <!-- SAFETY: transmit refusal (toast) on a receive-only channel. Short. -->
+    <string name="service_receive_only_channel">受信専用チャンネル</string>
+    <!-- Refusal (toast) when something is to be sent while the radio already transmits. Short. -->
+    <string name="service_already_tx">既に送信中です</string>
+    <!-- Refusal (toast) when there is nothing to send. Short. -->
+    <string name="service_nothing_to_send">送信するものがありません</string>
+    <!-- SAFETY: refusal (toast) when tones would last longer than the transmit limit. %1$d is their length in seconds, %2$s the limit ("2 min"). Device → Longest transmission is the setting. -->
+    <string name="service_tones_over_limit">送信時間制限を超えます（%1$d 秒。デバイス → 最長送信時間は %2$s）</string>
+    <!-- History warning when the module firmware refused to start the tone queue. Starts with an emoji; keep it. -->
+    <string name="service_tones_reset_refused">⚠️ このファームウェアはトーンキューのリセットを受け付けませんでした</string>
+    <!-- History warning when the module refused the tones. %1$s is what was to be sent (an English label). Starts with an emoji; keep it. -->
+    <string name="service_tones_refused">⚠️ モジュールがトーンキューを拒否しました（%1$s）</string>
+    <!-- History line after tones were sent through the module's tone generator. %1$s is what was sent (an English label), %2$d its length in seconds. Starts with an emoji; keep it. -->
+    <string name="service_tones_sent">🔉 モジュールのトーン発生器で %1$s（%2$d 秒）</string>
+    <!-- SAFETY: history line when the heat guard ended a long transmission. %1$s is what was sent (an English label), %2$s the reason (temperatures). Starts with an emoji; keep it. -->
+    <string name="service_heat_stop">⛔ %1$s を早めに終了しました：%2$s。次の長い送信の前に端末を冷ましてください。</string>
+    <!-- SAFETY: history line when the heat guard ended a transmission at 30 s. %1$s is what was sent (an English label), %2$s the reason. Starts with an emoji; keep it. -->
+    <string name="service_heat_cap">⛔ %1$s を 30 秒で終了しました：%2$s</string>
+    <!-- History line after an FM reception. %1$d is its length in seconds. Starts with an emoji; keep it. -->
+    <string name="service_rx_received">📻 受信 %1$d 秒</string>
+    <!-- History line after an M17 transmission ended. Starts with an emoji; keep it. Short. -->
+    <string name="service_tx_m17_done">📻 M17 送信</string>
+    <!-- History line after a transmission SignalDeck played itself (APRS, FT8, SSTV…). %1$s is what was sent (an English label). Starts with an emoji; keep it. Short. -->
+    <string name="service_tx_label_done">📻 送信：%1$s</string>
+    <!-- History line after a voice transmission ended. Starts with an emoji; keep it. Short. -->
+    <string name="service_tx_voice_done">📻 音声送信</string>
+    <!-- SAFETY: history warning when the radio module ended a transmission at its own time-out. %1$d is the time-out in seconds. Starts with an emoji; keep it. -->
+    <string name="service_tx_module_timeout">⏱ 無線機が自ら送信を終了しました：無線機のタイムアウト %1$d 秒</string>
+    <!-- SAFETY: history line when the radio refused to transmit because the channel is busy. Starts with an emoji; keep it. Short. -->
+    <string name="service_channel_busy">⚠ チャンネル使用中</string>
+    <!-- History warning when the radio's reception line does not work, so receptions are found from the signal strength. Starts with an emoji; keep it. -->
+    <string name="service_rx_line_dead">⚠ 無線機の受信信号線が機能していません：SignalDeck は信号強度から受信を検出します（少し遅れます）。音声が途切れることがあります。端末を再起動すると直ります</string>
+    <!-- History warning when the radio's reception line is stuck, so receptions are found from the signal strength. Starts with an emoji; keep it. -->
+    <string name="service_rx_line_stuck">⚠ 無線機の受信信号線が固まっています：SignalDeck は信号強度から受信を検出します（少し遅れます）。端末を再起動すると直ります</string>
+    <!-- History warning when the radio's USB bridge did not come back after a restart. Take over is the button that starts SignalDeck's control of the radio. Starts with an emoji; keep it. -->
+    <string name="service_bridge_lost">⚠ 再起動後、無線機の USB ブリッジが戻りませんでした：無線機はオフになり、純正アプリに戻っています。もう一度「引き継ぐ」をタップするか、繰り返し起きる場合は端末を再起動してください</string>
+    <!-- History warning when the radio module did not answer at start-up and was restarted successfully. Starts with an emoji; keep it. -->
+    <string name="service_module_restarted_startup">⚠ 無線モジュールが起動時に応答しなかったため再起動しました：現在は動作しています</string>
+    <!-- History warning when the radio module does not answer commands. MON is the monitor button. Starts with an emoji; keep it. -->
+    <string name="service_module_no_commands">⚠ 無線モジュールがコマンド（チャンネル、MON、スケルチ）に応答しません。通常は端末の再起動で直ります。デバイスレポートを送ってください</string>
+    <!-- History warning when SignalDeck restarts a radio module that stopped answering. Starts with an emoji; keep it. -->
+    <string name="service_module_restarting">⚠ 無線モジュールがコマンドに応答しなくなりました：再起動しています（数秒間受信できません）</string>
+    <!-- History line when the restarted radio module answers again. Starts with an emoji; keep it. -->
+    <string name="service_module_restart_ok">✔ 無線モジュールを再起動し、再び応答しています</string>
+    <!-- History warning when the radio module still does not answer after a restart. Starts with an emoji; keep it. -->
+    <string name="service_module_restart_failed">⚠ 再起動後も無線モジュールが応答しません。通常は端末の再起動で直ります。デバイスレポートを送ってください</string>
+    <!-- What a DMR call went to: an all call (everyone). Short. -->
+    <string name="service_dmr_all_call">一斉呼出</string>
+    <!-- What a DMR call went to: a private call to this radio. Short. -->
+    <string name="service_dmr_private">個別呼出</string>
+    <!-- History line when a DMR voice call is heard. %1$s is what it went to ("TG 91", "All call", "Private"), %2$s who called (name and ID, or the ID), %3$s the colour code and timeslot ("  CC 1 TS 2") or nothing. Starts with an emoji; keep it. -->
+    <string name="service_dmr_voice_rx">📻 音声受信 %1$s、%2$s から%3$s</string>
+    <!-- A DMR caller with a name, inside other lines. %1$s is the name, %2$d the DMR ID. -->
+    <string name="service_dmr_who">%1$s（%2$d）</string>
+    <!-- History warning when the radio refused the MON (monitor) switch. Starts with an emoji; keep it. -->
+    <string name="service_mon_refused">⚠ 無線機が MON を拒否しました（チャンネル変更直後で使用中？）：数秒待ってからもう一度切り替えてください</string>
+    <!-- History warning when the radio refused a channel. %1$s is the channel name, %2$s its frequency in MHz. Starts with an emoji; keep it. -->
+    <string name="service_channel_refused">⚠ 無線機が %1$s（%2$s MHz）を拒否しました</string>
+    <!-- History warning when the radio refused a DMR channel that has no call number. %1$s is the channel name, %2$s its frequency in MHz. Starts with an emoji; keep it. -->
+    <string name="service_channel_refused_call">⚠ 無線機が %1$s（%2$s MHz）を拒否しました（DMR チャンネルには呼出番号が必要です）</string>
+    <!-- History warning when the radio refused a channel and stays on the previous one. %1$s is the channel name, %2$s its frequency in MHz, %3$s the channel still in use, %4$s its frequency. Starts with an emoji; keep it. -->
+    <string name="service_channel_refused_still">⚠ 無線機が %1$s（%2$s MHz）を拒否しました。%3$s（%4$s MHz）のままです</string>
+    <!-- History warning when the radio refused a DMR channel without a call number and stays on the previous one. %1$s is the channel name, %2$s its frequency in MHz, %3$s the channel still in use, %4$s its frequency. Starts with an emoji; keep it. -->
+    <string name="service_channel_refused_call_still">⚠ 無線機が %1$s（%2$s MHz）を拒否しました（DMR チャンネルには呼出番号が必要です）。%3$s（%4$s MHz）のままです</string>
+    <!-- History line when a DMR text arrives. %1$s is the sender, %2$s the start of the text. Starts with an emoji; keep it. -->
+    <string name="service_sms_from">✉ %1$s からのテキスト：%2$s</string>
+    <!-- History line when a DMR group text arrives. %1$s is the sender, %2$s the talkgroup, %3$s the start of the text. Starts with an emoji; keep it. -->
+    <string name="service_sms_from_on">✉ %2$s で %1$s からのテキスト：%3$s</string>
+    <!-- SAFETY: history line when a DMR text was not sent because transmitting is off on this phone or channel. Starts with an emoji; keep it. -->
+    <string name="service_sms_tx_off">⛔ テキストを送信しませんでした：この端末またはチャンネルでは送信がオフです</string>
+    <!-- Name of the notification channel for the ongoing radio notification (Android's notification settings). One word. -->
+    <string name="service_channel_radio">無線</string>
+    <!-- Title of the ongoing radio notification. %1$d is the channel number, %2$s its name. One line. Ch is short for channel. -->
+    <string name="service_notif_title">Ch %1$d · %2$s</string>
+    <!-- Button on the radio notification: previous channel. Very short (media button). -->
+    <string name="service_notif_prev">Ch −</string>
+    <!-- Button on the radio notification while scanning. Very short (media button). -->
+    <string name="service_notif_stop_scan">スキャン停止</string>
+    <!-- Button on the radio notification: start scanning. Very short (media button). -->
+    <string name="service_notif_scan">スキャン</string>
+    <!-- Button on the radio notification: next channel. Very short (media button). -->
+    <string name="service_notif_next">Ch +</string>
+    <!-- Button on the radio notification (expanded): radio off and leave SignalDeck. Very short. -->
+    <string name="service_notif_exit">終了</string>
+    <!-- Notification text and Android Auto status while the radio is not up. %1$s is the radio's state, an English code ("booting", "no root", "error: …"). -->
+    <string name="service_radio_link">無線機 %1$s</string>
+    <!-- History line when coverage logging starts by itself for a drive. Starts with an emoji; keep it. -->
+    <string name="service_cov_car_on">📶 Android Auto 接続中はエリア記録オン</string>
+    <!-- Choice of the steering-wheel Next talk setting: hold Next to talk. One word (chip). -->
+    <string name="service_next_talk_hold">長押し</string>
+    <!-- Choice of the steering-wheel Next talk setting: press Next twice to talk. One or two words (chip). -->
+    <string name="service_next_talk_double">ダブル押し</string>
+    <!-- Choice of the steering-wheel microphone setting: the phone's own microphone. One word (chip). -->
+    <string name="service_wheel_mic_phone">端末</string>
+    <!-- Choice of the steering-wheel microphone setting: the car's microphone through a phone call. Short (chip). -->
+    <string name="service_wheel_mic_car">車（通話として）</string>
+    <!-- Choice of "Stop when I stop talking": the quiet gap before the transmission stops. %1$s is the number of seconds ("1.5"). Very short (chip). -->
+    <string name="service_vox_seconds">%1$s s</string>
+    <!-- History warning when the car did not open its microphone for a talk call, so the phone's microphone is used. Starts with an emoji; keep it. -->
+    <string name="service_car_no_mic">⚠️ 送信用の通話で車がマイクを開きませんでした：この送信は端末のマイクを使います</string>
+    <!-- History line when the talk call was hung up in the car, which stops the transmission. Starts with an emoji; keep it. -->
+    <string name="service_car_hung_up">📞 車で終話しました：送信を停止しました</string>
+    <!-- History line (first wheel presses of a drive): a steering-wheel button was pressed. %1$s is the key's Android name ("MEDIA_NEXT"). Starts with an emoji; keep it. -->
+    <string name="service_wheel_pressed">🎛 ハンドル：%1$s を押下</string>
+    <!-- History line: a steering-wheel button is held and repeats. %1$s is the key's Android name, %2$d the repeat count. Starts with an emoji; keep it. -->
+    <string name="service_wheel_repeat">🎛 ハンドル：%1$s を押下（リピート %2$d）</string>
+    <!-- History line: a steering-wheel button was released. %1$s is the key's Android name. Starts with an emoji; keep it. -->
+    <string name="service_wheel_released">🎛 ハンドル：%1$s を解放</string>
+    <!-- History warning: this car sends the wheel's Next as a command, so holding Next to talk cannot work. Starts with an emoji; keep it. -->
+    <string name="service_car_next_command">⚠️ Android Auto はハンドルの「次へ」をボタン操作ではなくコマンドとして送ります：この車では「次へ」の長押しで送信できません</string>
+    <!-- History warning: Android Auto disconnected while transmitting. %1$s is the channel name, %2$s its frequency ("446.000 MHz"). Starts with an emoji; keep it. -->
+    <string name="service_car_dropped_tx">⚠️ %1$s（%2$s）で送信中に Android Auto が切断されました：送信電波が USB ケーブルに干渉しています</string>
+    <!-- History warning: the USB cable stopped charging while transmitting. %1$s is the channel name, %2$s its frequency ("446.000 MHz"). Starts with an emoji; keep it. -->
+    <string name="service_usb_dropped_tx">⚠️ %1$s（%2$s）で送信中に USB ケーブルが切断されました（充電停止）：送信電波が USB ケーブルに干渉しています</string>
+    <!-- History warning: Android Auto did not load SignalDeck on this connection. Starts with an emoji; keep it. -->
+    <string name="service_car_not_loaded">⚠️ この接続では Android Auto が SignalDeck を読み込みませんでした：ケーブルを抜いて挿し直してください</string>
+    <!-- History line: Android Auto connected and shows SignalDeck's Radio controls screen. Starts with an emoji; keep it. -->
+    <string name="service_car_connected_controls">🚗 Android Auto 接続（無線操作画面）</string>
+    <!-- History line: Android Auto connected and shows SignalDeck as a media app. Starts with an emoji; keep it. -->
+    <string name="service_car_connected_media">🚗 Android Auto 接続（メディアアプリ）</string>
+    <!-- History line: Android Auto disconnected. Starts with an emoji; keep it. -->
+    <string name="service_car_disconnected">🚗 Android Auto 切断</string>
+    <!-- History warning: Android Auto hides SignalDeck because its Unknown sources setting is off. Starts with an emoji; keep it. -->
+    <string name="service_car_unknown_sources">⚠️ Android Auto が SignalDeck を非表示にしています：「提供元不明のアプリ」がオフです（対処法はデバイス画面にあります）</string>
+    <!-- History line when the radio sound is paused from the media controls. Starts with an emoji; keep it. -->
+    <string name="service_media_paused">🔇 無線の音声を一時停止（メディア操作）。受信は継続中</string>
+    <!-- History line when the radio sound plays again from the media controls. Starts with an emoji; keep it. -->
+    <string name="service_media_playing">🔊 無線の音声を再生中</string>
+    <!-- History line: Android Auto gave the sound to another source. Starts with an emoji; keep it. -->
+    <string name="service_car_sound_taken">🚗 Android Auto が音声をほかのソースに切り替えました（別のソースが再生されました）</string>
+    <!-- A DMR talkgroup with its name (car screen, notification). %1$d is the number, %2$s the name. -->
+    <string name="service_tg_named">TG %1$d %2$s</string>
+    <!-- What a DMR call goes to: a private call (car screen). Short. -->
+    <string name="service_dmr_private_call">個別呼出</string>
+    <!-- Refusal (toast) when the radio is off. Short. -->
+    <string name="service_radio_not_on">無線機がオンになっていません</string>
+    <!-- Refusal (toast) of the repeater key-up test while coverage logging is off. One or two lines. -->
+    <string name="service_keyup_needs_coverage">先にエリア記録をオンにしてください：結果は位置とともに保存されます</string>
+    <!-- Refusal (toast) of the repeater key-up test on DMR. 9990 is BrandMeister's echo (parrot) number. Two lines. -->
+    <string name="service_keyup_dmr">DMR では代わりにパロットを使ってください：BrandMeister で 9990 に個別呼出すると、自分の送信が再生されます</string>
+    <!-- Refusal (toast) of the repeater key-up test on a simplex channel or one without a location. One line. -->
+    <string name="service_keyup_needs_repeater">位置が登録された FM レピーターのチャンネルを選んでください</string>
+    <!-- Refusal (toast) of the repeater key-up test before the callsign is set. PKT → APRS settings is where it is set. Two lines. -->
+    <string name="service_keyup_needs_callsign">先にコールサインを設定してください（PKT → APRS 設定）：テストではそれを ID として送信します</string>
+    <!-- Text of the ongoing radio notification before the radio is up. Short. -->
+    <string name="service_notif_idle">無線機待機中</string>
+    <!-- Choice of the roger beep setting: a short beep at the end of each transmission. One word (chip). -->
+    <string name="service_roger_beep">ビープ</string>
+    <!-- Choice of the roger beep setting: two tones. One word (chip). -->
+    <string name="service_roger_two_tone">2 トーン</string>
+    <!-- Choice of the roger beep setting: the letter K in Morse. Short (chip). -->
+    <string name="service_roger_morse_k">モールス K</string>
+    <!-- History line after an emergency DMR text was sent. %1$s is the recipient, %2$s the text sent (English, as sent on air). Starts with an emoji; keep it. -->
+    <string name="service_sos_history">🆘 %1$s へ緊急テキスト：%2$s</string>
+    <!-- Refusal (toast) when pager receive is switched on on a digital channel. Short. -->
+    <string name="service_pages_need_analog">ページャーにはアナログチャンネルが必要です</string>
+    <!-- Refusal (toast) when pager receive is switched on with a module firmware that cannot decode pages. One line. -->
+    <string name="service_pages_need_fw">ページャー受信には試験用ファームウェアが必要です</string>
+    <!-- Who a page came from when its pager address (RIC) could not be read. Short. -->
+    <string name="service_ric_unreadable">RIC 読み取り不可</string>
+    <!-- Who a page came from: its pager address (RIC). %1$d is the RIC. Short. -->
+    <string name="service_ric_number">RIC %1$d</string>
+    <!-- A received page (history line and message list). %1$s is the sender (or "RIC 1234"), %2$s the text. Starts with an emoji; keep it. -->
+    <string name="service_page_line">📟 %1$s：%2$s</string>
+    <!-- A received M17 text in the pager list. %1$s is the sender, %2$s the text. Starts with an emoji; keep it. -->
+    <string name="service_page_line_m17">✉ %1$s：%2$s</string>
+    <!-- Notification title when a page to one of your RICs arrives. Short. -->
+    <string name="service_page_for_you">自分宛てのページャーメッセージ</string>
+    <!-- Caller line on an M17 channel while a station is heard. %1$s is its callsign, %2$s the destination, %3$s how many frames were received. One line. -->
+    <string name="service_m17_heard_line">%1$s → %2$s\u0020\u0020%3$s フレーム</string>
+    <!-- Caller line on an M17 channel while nothing is heard. %1$s is the destination, %2$s the channel access number (CAN). One line. -->
+    <string name="service_m17_idle_line">M17 %1$s\u0020\u0020CAN %2$s</string>
+    <!-- Caller line on an M17 channel while nothing is heard and the firmware can only receive M17. %1$s is the destination, %2$s the channel access number (CAN). One line. -->
+    <string name="service_m17_idle_line_rx">M17 受信のみ %1$s\u0020\u0020CAN %2$s</string>
+    <!-- Refusal (toast) when M17 receive is switched on on a DMR channel. One line. -->
+    <string name="service_m17_needs_fm">M17 にはアナログ（FM）チャンネルか VFO が必要です</string>
+    <!-- The subject of a received message form that has only a number (radiogram). %1$s is the number. Short. -->
+    <string name="service_form_number">番号 %1$s</string>
+    <!-- History line when a message form (ICS-213, radiogram) arrives. %1$s is the form's kind, %2$s the sender. Starts with an emoji; keep it. -->
+    <string name="service_form_from">📋 %2$s からの %1$s</string>
+    <!-- History line when a message form arrives. %1$s is the form's kind, %2$s the sender, %3$s its subject. Starts with an emoji; keep it. -->
+    <string name="service_form_from_subject">📋 %2$s からの %1$s：%3$s</string>
+    <!-- Notification title when a message form arrives. %1$s is the form's kind ("ICS-213"), %2$s the sender. One line. -->
+    <string name="service_form_notify_title">%2$s からの %1$s</string>
+    <!-- Notification text when a message form without a subject arrives: where to read it. Short. -->
+    <string name="service_form_open">PKT → メッセージフォームを開く</string>
+    <!-- Refusal (toast) when a packet feature is used while the packet engine is not running. Short. -->
+    <string name="service_packet_not_running">パケットエンジンが動作していません</string>
+    <!-- Refusal (toast) when a form is sent by APRS without a callsign. Short. -->
+    <string name="service_form_need_callsign">送信先のコールサインを入力してください</string>
+    <!-- Refusal (toast) when a form is sent by DMR without a recipient. Short. -->
+    <string name="service_form_need_contact">連絡先またはトークグループを選んでください</string>
+    <!-- Refusal (toast) when a form is sent by DMR while not on a DMR channel. Short. -->
+    <string name="service_form_needs_dmr">DMR テキストには DMR チャンネルが必要です</string>
+    <!-- Refusal (toast) when a form is sent by Winlink without an address. One line. -->
+    <string name="service_form_need_address">送信先のコールサインまたはメールアドレスを入力してください</string>
+    <!-- DMR roaming status (Device page): waiting because the radio is not on a DMR repeater channel. One line. -->
+    <string name="service_roam_not_dmr">待機中：無線機が DMR レピーターのチャンネルにありません</string>
+    <!-- DMR roaming status: waiting because the channel has no location. %1$s is the channel name. "Nearby Repeaters" is a screen. One line. -->
+    <string name="service_roam_no_location">待機中：%1$s に位置がありません（「近くのレピーター」で追加できます）</string>
+    <!-- DMR roaming status: waiting for the phone's position. Short. -->
+    <string name="service_roam_no_fix">GPS の測位待ち</string>
+    <!-- DMR roaming status: already on the nearest repeater. %1$s is the channel name, %2$s its distance in km. One line. -->
+    <string name="service_roam_nearest">このトークグループで最寄りのレピーターを使用中（%1$s、%2$s km）</string>
+    <!-- DMR roaming status after switching repeater. %1$s is the new channel, %2$s its distance in km, %3$s the old channel, %4$s its distance in km. One line. -->
+    <string name="service_roam_switched">%1$s に切り替えました（%2$s km。%3$s は %4$s km）</string>
+    <!-- History line after DMR roaming switched repeater. %1$s is service_roam_switched. Starts with an emoji; keep it. -->
+    <string name="service_roam_history">🚗 ローミング：%1$s</string>
+    <!-- Refusal (toast) when the radio is not up yet. Short. -->
+    <string name="service_radio_not_ready_long">無線機の準備ができていません</string>
+    <!-- Refusal (toast) of a band scope sweep around a tracked satellite pass. Two lines. -->
+    <string name="service_scope_sat_busy">衛星パスを追尾中です（または 15 分以内に始まります）：バンドスコープを使うと無線機の周波数がパスから外れてしまいます</string>
+    <!-- SAFETY: result of a scheduled operation skipped because its channel is outside the radio's bands. %1$d is the channel number, %2$s the radio's bands. -->
+    <string name="service_sched_skip_band">スキップ：チャンネル %1$d は %2$s の範囲外です（この無線機では合わせられません）</string>
+    <!-- Start of the history lines of a scheduled operation. %1$s is the operation ("Scan the zone"). Starts with an emoji; keep it. -->
+    <string name="service_sched_what">⏰ 予約：%1$s</string>
+    <!-- Start of the history lines of a scheduled operation with a label. %1$s is the operation, %2$s the user's label. Starts with an emoji; keep it. -->
+    <string name="service_sched_what_label">⏰ 予約：%1$s（%2$s）</string>
+    <!-- History line: a scheduled operation was skipped for a satellite pass. %1$s is service_sched_what. -->
+    <string name="service_sched_skipped_sat">%1$s をスキップ：追尾中の衛星パスと重なります</string>
+    <!-- History line: a scheduled operation was skipped because the radio was transmitting. %1$s is service_sched_what. -->
+    <string name="service_sched_skipped_tx">%1$s をスキップ：無線機が送信中でした</string>
+    <!-- History line: the band scope was stopped for a scheduled operation. Starts with an emoji; keep it. -->
+    <string name="service_scope_stopped_sched">✂ 予約操作のためバンドスコープを停止しました</string>
+    <!-- History line: a scheduled operation was skipped because its channel was deleted. %1$s is service_sched_what, %2$d the channel number. -->
+    <string name="service_sched_skipped_missing">%1$s をスキップ：チャンネル %2$d はもうありません</string>
+    <!-- SAFETY: history line: a scheduled operation was skipped because its channel is outside the radio's bands. %1$s is service_sched_what, %2$d the channel number, %3$s the radio's bands. -->
+    <string name="service_sched_skipped_band">%1$s をスキップ：チャンネル %2$d は %3$s の範囲外です（この無線機では合わせられません）</string>
+    <!-- Result of a scheduled Listen: the channel it listens to. %1$d is the channel number. Short. -->
+    <string name="service_sched_r_channel">チャンネル %1$d</string>
+    <!-- Result of a scheduled Listen that records. %1$d is the channel number. Short. -->
+    <string name="service_sched_r_channel_rec">チャンネル %1$d、録音中</string>
+    <!-- Result of a scheduled Listen on the current channel. Short. -->
+    <string name="service_sched_r_this">このチャンネル</string>
+    <!-- Result of a scheduled Listen on the current channel that records. Short. -->
+    <string name="service_sched_r_this_rec">このチャンネル、録音中</string>
+    <!-- Result of a scheduled scan when a scan was already running. Short. -->
+    <string name="service_sched_r_scanning">既にスキャン中</string>
+    <!-- Result of scheduled APRS monitoring when it was already on. Short. -->
+    <string name="service_sched_r_monitoring">既にワッチ中</string>
+    <!-- Result of a scheduled SSTV receive when it was already on. Short. -->
+    <string name="service_sched_r_receiving">既に受信中</string>
+    <!-- Result of a scheduled SSTV receive on a channel. %1$d is the channel number. Short. -->
+    <string name="service_sched_r_on_channel">チャンネル %1$d で</string>
+    <!-- Result of a scheduled beacon when the packet engine is not running. Short. -->
+    <string name="service_sched_r_no_packet">パケットエンジンが動作していません</string>
+    <!-- Result of a scheduled beacon that was sent. One word. -->
+    <string name="service_sched_r_sent">送信済み</string>
+    <!-- Result of a scheduled packet finder that started. One word. -->
+    <string name="service_sched_r_listening">受信中</string>
+    <!-- Result of a scheduled Winlink check over the internet: connecting to the Winlink server (CMS). Short. -->
+    <string name="service_sched_r_cms">CMS に接続中</string>
+    <!-- History line with the result of a scheduled Winlink check. %1$s is the result. Starts with an emoji; keep it. -->
+    <string name="service_sched_winlink">⏰ 予約した Winlink 確認：%1$s</string>
+    <!-- Result of a scheduled Winlink check by radio before a gateway was ever used. "Winlink → Connect: radio" is the button path. One line. -->
+    <string name="service_sched_r_no_gateway">スキップ：ゲートウェイ未使用（一度 Winlink → 接続：無線 で接続してください）</string>
+    <!-- Result of a scheduled Winlink check while a session runs. Short. -->
+    <string name="service_sched_r_winlink_busy">スキップ：Winlink セッションが既に動作中</string>
+    <!-- Result of a scheduled Winlink check whose channel was deleted. %1$d is the channel number. Short. -->
+    <string name="service_sched_r_missing">スキップ：チャンネル %1$d はもうありません</string>
+    <!-- SAFETY: history line: a scheduled Winlink check was not sent because the radio did not move to its channel. %1$d is the channel number. Starts with an emoji; keep it. -->
+    <string name="service_sched_winlink_not_moved">⏰ 予約した Winlink 確認：未送信。無線機がチャンネル %1$d に移りませんでした</string>
+    <!-- History line with the result of a scheduled Winlink check, after which the radio went back to its channel. %1$s is the result, %2$d the channel number. Starts with an emoji; keep it. -->
+    <string name="service_sched_winlink_back">⏰ 予約した Winlink 確認：%1$s。チャンネル %2$d に戻りました</string>
+    <!-- Result of a scheduled Winlink check by radio: calling the gateway. %1$s is its callsign. Short. -->
+    <string name="service_sched_r_calling">%1$s を呼出中</string>
+    <!-- Result of a scheduled Winlink check by radio: calling the gateway on another channel. %1$s is its callsign, %2$d the channel number. Short. -->
+    <string name="service_sched_r_calling_on">チャンネル %2$d で %1$s を呼出中</string>
+    <!-- History line when a scheduled operation with a duration started. %1$s is service_sched_what, %2$d the minutes. -->
+    <string name="service_sched_started_for">%1$s（%2$d 分間）</string>
+    <!-- History line when a scheduled operation started. %1$s is service_sched_what, %2$s its result. -->
+    <string name="service_sched_result">%1$s：%2$s</string>
+    <!-- History line when a scheduled operation with a duration started. %1$s is service_sched_what, %2$s its result, %3$d the minutes. -->
+    <string name="service_sched_result_for">%1$s：%2$s（%3$d 分間）</string>
+    <!-- The name of a scheduled operation that no longer exists, in service_sched_ended. One word. -->
+    <string name="service_sched_operation">操作</string>
+    <!-- History line when a scheduled operation ended. %1$s is the operation ("Scan the zone"). Starts with an emoji; keep it. -->
+    <string name="service_sched_ended">⏰ 予約：%1$s が終了しました</string>
+    <!-- History line when a scheduled operation ended and the radio went back to its channel. %1$s is the operation, %2$d the channel number. Starts with an emoji; keep it. -->
+    <string name="service_sched_ended_back">⏰ 予約：%1$s が終了しました：チャンネル %2$d に戻りました</string>
+    <!-- Scheduled operation (Schedules list and history): listen to a channel. One line. -->
+    <string name="service_sched_listen">チャンネルを受信</string>
+    <!-- Scheduled operation: scan the zone. One line. -->
+    <string name="service_sched_scan">ゾーンをスキャン</string>
+    <!-- Scheduled operation: APRS monitoring. One line. -->
+    <string name="service_sched_aprs">APRS ワッチ</string>
+    <!-- Scheduled operation in the choice list: APRS monitoring on the region's frequency. %1$s is the frequency in MHz ("144.800"). One line. -->
+    <string name="service_sched_aprs_freq">APRS ワッチ（%1$s）</string>
+    <!-- Scheduled operation: SSTV picture receive. One line. -->
+    <string name="service_sched_sstv">SSTV 受信</string>
+    <!-- Scheduled operation: send an APRS position beacon. One line. -->
+    <string name="service_sched_beacon">APRS ビーコンを送信</string>
+    <!-- Scheduled operation: check Winlink e-mail through a radio gateway. One line. -->
+    <string name="service_sched_winlink_radio">Winlink メールを確認（無線ゲートウェイ）</string>
+    <!-- Scheduled operation: check Winlink e-mail over the internet. One line. -->
+    <string name="service_sched_winlink_net">Winlink メールを確認（インターネット）</string>
+    <!-- Scheduled operation: the packet finder (listen for packet stations). BBSs, nodes and gateways are kinds of packet station. One line. -->
+    <string name="service_sched_finder">パケット検索（BBS、ノード、ゲートウェイを受信）</string>
+    <!-- SAFETY: refusal (toast) when APRS monitoring is scheduled on a radio that cannot tune the APRS frequency. %1$s is the radio's bands, %2$s the APRS frequency in MHz. -->
+    <string name="service_sched_no_aprs">この無線機の範囲は %1$s で、%2$s MHz には合わせられません：APRS ワッチはできません</string>
+    <!-- SAFETY: refusal (toast) when a schedule's channel is outside the radio's bands. %1$s is the channel name, %2$s the radio's bands. -->
+    <string name="service_sched_channel_outside">%1$s は %2$s の範囲外です：この無線機では合わせられません</string>
+    <!-- When a schedule runs: once (no date set). One word. -->
+    <string name="service_sched_once">1 回のみ</string>
+    <!-- When a schedule runs: every day. Short. -->
+    <string name="service_sched_every_day">毎日</string>
+    <!-- When a schedule runs: Monday to Friday. One word. -->
+    <string name="service_sched_weekdays">平日</string>
+    <!-- When a schedule runs: Saturday and Sunday. One word. -->
+    <string name="service_sched_weekends">週末</string>
+    <!-- Monday, abbreviated, in a schedule's days ("Tue, Thu 19:00"). Three letters or so. -->
+    <string name="service_sched_mon">月</string>
+    <!-- Tuesday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_tue">火</string>
+    <!-- Wednesday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_wed">水</string>
+    <!-- Thursday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_thu">木</string>
+    <!-- Friday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_fri">金</string>
+    <!-- Saturday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_sat">土</string>
+    <!-- Sunday, abbreviated, in a schedule's days. Three letters or so. -->
+    <string name="service_sched_sun">日</string>
+    <!-- Separator between the abbreviated days of a schedule ("Tue, Thu"). Keep the space. -->
+    <string name="service_sched_day_sep">、</string>
+    <!-- When a schedule runs. %1$s is the days ("Weekdays", "Tue, Thu") or the date, %2$s the time ("19:00"). One line. -->
+    <string name="service_sched_when">%1$s %2$s</string>
+    <!-- When a schedule runs and for how long. %1$s is the days or the date, %2$s the time ("19:00"), %3$d the minutes. One line. -->
+    <string name="service_sched_when_for">%1$s %2$s から %3$d 分間</string>
+    <!-- Where a net is (Nets page, reminders): one of your channels. %1$d is the channel number, %2$s its name. "ch" is short for channel. -->
+    <string name="service_net_channel">ch %1$d %2$s</string>
+    <!-- Where a net is: a nearby repeater. %1$s is its callsign. Short. -->
+    <string name="service_net_repeater">%1$s レピーター</string>
+    <!-- Where a net is: a nearby repeater without a callsign. Short. -->
+    <string name="service_net_repeater_unnamed">レピーター</string>
+    <!-- Where a net is heard: a channel number without a name. %1$d is the number. "ch" is short for channel. -->
+    <string name="service_net_channel_number">ch %1$d</string>
+    <!-- Nets page: where a net in the schedule comes from: you added it, and NetLogger lists it too. Short. -->
+    <string name="service_net_source_added_netlogger">自分で追加 · NetLogger にもあり</string>
+    <!-- Nets page: where a net comes from, and how often the radio heard it. %1$s is the first source, %2$d the times heard. -->
+    <string name="service_net_source_and_heard">%1$s · 受信 %2$d 回</string>
+    <!-- Nets page: the name of activity the radio heard every day at the same time. %1$s is the channel. -->
+    <string name="service_net_daily_on">%1$s で毎日のアクティビティ</string>
+    <!-- Nets page: the name of a net the radio heard each week at the same time. %1$s is the channel. -->
+    <string name="service_net_weekly_on">%1$s で毎週のロールコール</string>
+    <!-- Nets page: where a net comes from: the radio heard it. %1$d is how many times. Short. -->
+    <string name="service_net_source_heard">受信 %1$d 回</string>
+    <!-- Notification title: a net starts soon. %1$d is the minutes, %2$s the net's name. One line. -->
+    <string name="service_net_reminder_title">%1$d 分後にロールコール：%2$s</string>
+    <!-- Notification text of a net reminder. %1$s is when ("Tue 19:30"), %2$s where (channel or repeater). Tapping opens the Nets page. -->
+    <string name="service_net_reminder_text">%1$s · %2$s · タップでロールコール画面へ</string>
+    <!-- Notification title: a net near you is on the air now (NetLogger). %1$s is its name. One line. -->
+    <string name="service_net_live_title">ロールコールがオンエア中：%1$s</string>
+    <!-- Notification text of a live net. %1$s is the frequency or talkgroup, %2$s where (channel or repeater). -->
+    <string name="service_net_live_text">%1$s · %2$s</string>
+    <!-- Notification text of a live net. %1$s is the frequency or talkgroup, %2$s where, %3$s the net control station's callsign. -->
+    <string name="service_net_live_text_ncs">%1$s · %2$s · キー局 %3$s</string>
+    <!-- Name of the notification channel for net reminders (Android's notification settings). One word. -->
+    <string name="service_channel_nets">ロールコール</string>
+    <!-- History line of a net reminder or live-net alert. %1$s is the notification title. Starts with an emoji; keep it. -->
+    <string name="service_net_history">📋 %1$s</string>
+    <!-- Nets page: when a net is: on the air now. Short. -->
+    <string name="service_net_on_now">オンエア中</string>
+    <!-- Nets page: when a net starts. %1$d is the minutes. Short. -->
+    <string name="service_net_in_min">%1$d 分後</string>
+    <!-- Nets page: when a net starts. %1$d is the hours, %2$d the minutes. Short. -->
+    <string name="service_net_in_h_min">%1$d 時間 %2$d 分後</string>
+    <!-- Nets page: when a net starts: tomorrow. One word. -->
+    <string name="service_net_tomorrow">明日</string>
+    <!-- Nets page: when a net starts, in days (2 or more). %1$d is the days. Short. -->
+    <plurals name="service_net_in_days">
+        <item quantity="other">%1$d 日後</item>
+    </plurals>
+    <!-- Toast when a scan is started while one runs. Short. -->
+    <string name="service_scan_already">既にスキャン中です</string>
+    <!-- Toast when the zone has fewer than two channels to scan. One line. -->
+    <string name="service_scan_too_few">スキャンするものがありません：ゾーンにチャンネルが 2 つ以上必要です</string>
+    <!-- Toast when "skip this channel" is asked while not scanning. Short. -->
+    <string name="service_scan_not_scanning">スキャン中ではありません</string>
+    <!-- Toast explaining how to skip a channel during a scan. One or two lines. -->
+    <string name="service_scan_skip_how">スキャナーがチャンネルで止まっている間に長押しすると、そのチャンネルをスキップします</string>
+    <!-- Toast when the priority channel is to be skipped. "Channels" is the channel list. One or two lines. -->
+    <string name="service_scan_skip_priority">それは優先チャンネルです：確認をやめるには「チャンネル」で解除してください</string>
+    <!-- Toast after skipping a channel left nothing to scan. Short. -->
+    <string name="service_scan_skip_last">スキップしました - スキャンするものが残っていません</string>
+    <!-- Toast after a channel was skipped for this scan. %1$d is the channel number. Short. -->
+    <string name="service_scan_skipping">このスキャンでは Ch %1$d をスキップします</string>
+    <!-- M17 screen, in brackets after "rebuilds them on receive": the receive equaliser in use is the one shipped for this phone. Short. -->
+    <string name="service_m17cal_shipped">この端末用の出荷時タップ</string>
+    <!-- M17 screen: still the shipped equaliser; the last call had too few frames to fit one. %1$d is the usable frames. Short. -->
+    <string name="service_m17cal_shipped_frames">出荷時タップ、使用可能フレーム %1$d</string>
+    <!-- M17 screen: an equaliser was fitted from a call and waits for a second call to check it. %1$d is the frames, %2$d the signal level in dBm. -->
+    <string name="service_m17cal_fit_waiting">2 回目の受信で確認待ちの適合値（%1$d フレーム、%2$d dBm）</string>
+    <!-- M17 screen: the equaliser was fitted on this phone and checked. %1$d is the frames, %2$d the level of the fitting call in dBm, %3$d the level of the checking call. -->
+    <string name="service_m17cal_fitted">この端末で適合・確認済み、%1$d フレーム、%2$d dBm、確認時 %3$d dBm</string>
+    <!-- M17 screen: a fitted equaliser was not kept; it decoded no better. %1$d and %2$d are the clean frames with the new and the old one. "locked" means the link setup was decoded. -->
+    <string name="service_m17cal_not_kept_locked">適合値は不採用（クリーン %1$d 対 %2$d、ロックあり）</string>
+    <!-- M17 screen: a fitted equaliser was not kept and decoded no link setup. %1$d and %2$d are the clean frames with the new and the old one. -->
+    <string name="service_m17cal_not_kept_nolock">適合値は不採用（クリーン %1$d 対 %2$d、ロックなし）</string>
+    <!-- M17 screen: the receive equaliser did not change; the call had too few confirmed frames. %1$d is the frames, %2$d how many a fit needs. -->
+    <string name="service_m17eq_unchanged">テーブル変更なし、確認済みフレーム %1$d（適合には %2$d 必要）</string>
+    <!-- M17 screen: an equaliser was fitted and waits for a second call to check it. %1$d is the frames. -->
+    <string name="service_m17eq_waiting">%1$d フレームからの適合値、2 回目の受信で確認待ち</string>
+    <!-- M17 screen: the equaliser was fitted on this phone and checked. %1$d is the frames it was fitted from, %2$d and %3$d the confirmed frames with the new and the old one. -->
+    <string name="service_m17eq_fitted">この端末で %1$d フレームから適合。別の受信で確認：確認済みフレーム %2$d 対 %3$d</string>
+    <!-- M17 screen: a fitted equaliser was not kept: no link setup was decoded. %1$d and %2$d are the confirmed frames with the new and the old one. -->
+    <string name="service_m17eq_not_kept_nolink">適合値は不採用（確認済みフレーム %1$d 対 %2$d、リンク設定なし）</string>
+    <!-- M17 screen: a fitted equaliser was not kept: fewer confirmed frames. %1$d and %2$d are the confirmed frames with the new and the old one. -->
+    <string name="service_m17eq_not_kept_fewer">適合値は不採用（確認済みフレーム %1$d 対 %2$d、減少）</string>
+    <!-- M17 screen: a fitted equaliser was not kept: the checking call was the same station and not 6 dB weaker. %1$d and %2$d are the confirmed frames with the new and the old one. -->
+    <string name="service_m17eq_not_kept_same">適合値は不採用（確認済みフレーム %1$d 対 %2$d、同じ局で 6 dB 以上弱くない）</string>
+    <!-- A channel's tone setting: no CTCSS or DCS tone. One word. -->
+    <string name="service_tone_none">なし</string>
+    <!-- A channel's tone setting: a CTCSS tone. %1$s is the tone in Hz ("67.0"). Short. -->
+    <string name="service_tone_ctcss">CTCSS %1$s Hz</string>
+    <!-- A channel's tone setting: a CTCSS tone that is not in the table. Short. -->
+    <string name="service_tone_ctcss_invalid">CTCSS（無効）</string>
+    <!-- A channel's tone setting: a DCS code. %1$s is the code ("023N"). Short. -->
+    <string name="service_tone_dcs">DCS %1$s</string>
+    <!-- A channel's tone setting: a DCS code that is not in the table. Short. -->
+    <string name="service_tone_dcs_invalid">DCS（無効）</string>
+    <!-- A channel's tone setting of an unknown kind. One word. -->
+    <string name="service_tone_unknown">不明</string>
+    <!-- Choice in the live-caption model list: the small speech model. One line. -->
+    <string name="service_vosk_small">小 — 40 MB、最速</string>
+    <!-- Choice in the live-caption model list: the medium speech model. One line. -->
+    <string name="service_vosk_better">中 — 125 MB、バランス型</string>
+    <!-- Choice in the live-caption model list: the large speech model. One line. -->
+    <string name="service_vosk_best">大 — 1.8 GB、フルサイズの英語</string>
+    <!-- Choice in the live-caption model list: the largest speech model. GigaSpeech is the model's name. One line. -->
+    <string name="service_vosk_max">最大 — 2.3 GB、GigaSpeech、最も高精度</string>
+    <!-- Live-caption status while the speech model loads. Short. -->
+    <string name="service_vosk_loading">モデル読み込み中</string>
+    <!-- Live-caption status when the speech model is ready. One word. -->
+    <string name="service_vosk_ready">準備完了</string>
+    <!-- Live-caption status when the speech model could not be loaded or downloaded. %1$s is the error. -->
+    <string name="service_vosk_error">モデルエラー：%1$s</string>
+    <!-- Live-caption status while the speech model downloads. %1$s is the model's name, %2$d its size in MB, %3$d the percentage done. -->
+    <string name="service_vosk_downloading">%1$s をダウンロード中（%2$d MB）%3$d%%</string>
+    <!-- Live-caption status while the downloaded speech model is unpacked. Short. -->
+    <string name="service_vosk_unpacking">モデル展開中</string>
+    <!-- Live-caption status when a reception starts before the speech model is ready. Short. -->
+    <string name="service_vosk_preparing">音声モデルを準備中…</string>
+    <!-- Caption line when Google Cloud transcription has no API key. TXT is the captions button. In square brackets. -->
+    <string name="service_stt_no_key">［API キーが未設定です - TXT を押して設定してください］</string>
+    <!-- Caption line when the Google Cloud transcription had a network error. %1$s is the error. In square brackets. -->
+    <string name="service_stt_network">［ネットワークエラー：%1$s］</string>
+    <!-- Caption line when the Google Cloud transcription failed. %1$s is the error. In square brackets. -->
+    <string name="service_stt_error">［エラー：%1$s］</string>
+    <!-- Caption line when Google Cloud refuses the transcription because billing is off. In square brackets. -->
+    <string name="service_stt_billing">［文字起こし：Google Cloud プロジェクトで課金を有効にしてください］</string>
+    <!-- Caption line when the Cloud Speech-to-Text API is not enabled. In square brackets. -->
+    <string name="service_stt_api_off">［文字起こし：Google Cloud で Cloud Speech-to-Text API を有効にしてください］</string>
+    <!-- Caption line when the Google Cloud API key is refused. In square brackets. -->
+    <string name="service_stt_bad_key">［文字起こし：API キーが無効か、Speech-to-Text での使用が許可されていません］</string>
+    <!-- Caption line when the Google Cloud quota is used up. In square brackets. -->
+    <string name="service_stt_quota">［文字起こし：Google の割り当て上限を超えました - 後で再試行してください］</string>
+    <!-- Caption line when Google Cloud calls the transcription request bad. %1$s is Google's message. In square brackets. -->
+    <string name="service_stt_bad_request">［文字起こし：不正なリクエスト（%1$s）］</string>
+    <!-- Caption line for another Google Cloud transcription error. %1$d is the HTTP code. In square brackets. -->
+    <string name="service_stt_api_error">［文字起こし API エラー %1$d］</string>
+    <!-- Caption line for another Google Cloud transcription error. %1$d is the HTTP code, %2$s Google's status word. In square brackets. -->
+    <string name="service_stt_api_error_status">［文字起こし API エラー %1$d %2$s］</string>
+    <!-- Error inside "model error: …" when the speech model download failed. %1$d is the HTTP status code. -->
+    <string name="service_vosk_http">モデルのダウンロード中に HTTP %1$d</string>
+    <!-- SAFETY: History line (Last heard → Alerts): a long transmission was held back by the heat guard. %1$s the reason (heat guard text: too hot, cooling down…). Keep the ⏳ first. -->
+    <string name="service_tx_held">⏳ %1$s</string>
+    <!-- SAFETY: Emergency sheet result: nothing was sent because the radio is not running. -->
+    <string name="service_sos_radio_off">未送信：無線機がオンになっていません</string>
+    <!-- SAFETY: Emergency sheet result: nothing was sent because this channel is receive-only (weather, marine, railroad). -->
+    <string name="service_sos_receive_only">未送信：このチャンネルは受信専用です</string>
+    <!-- SAFETY: Emergency sheet result on a DMR channel: pick the contact or talkgroup that gets the emergency text first. -->
+    <string name="service_sos_choose_recipient">未送信：緊急テキストの送信先を選んでください</string>
+    <!-- SAFETY: Emergency sheet result: the DMR emergency text went out. %1$s who it went to (name or number). -->
+    <string name="service_sos_text_sent">%1$s に緊急テキストを送信しました</string>
+    <!-- SAFETY: As service_sos_text_sent, when the phone had no GPS position to include. -->
+    <string name="service_sos_text_sent_no_fix">%1$s に緊急テキストを送信しました（位置未取得）</string>
+    <!-- SAFETY: Emergency sheet result on an FM channel: APRS (packet radio) is not running, so nothing was sent. -->
+    <string name="service_sos_no_packet">未送信：パケット通信を使用できません</string>
+    <!-- SAFETY: Emergency sheet result: not sent; %1$s the reason the packet engine gave. -->
+    <string name="service_sos_not_sent">未送信：%1$s</string>
+    <!-- SAFETY: Emergency sheet result: an APRS emergency position report went out on channel %1$s (its name). -->
+    <string name="service_sos_aprs_position_sent">%1$s で APRS の緊急位置情報を送信しました</string>
+    <!-- SAFETY: As service_sos_aprs_position_sent, but only a status (the phone had no GPS position). -->
+    <string name="service_sos_aprs_status_sent">%1$s で APRS の緊急ステータス（位置未取得）を送信しました</string>
+</resources>

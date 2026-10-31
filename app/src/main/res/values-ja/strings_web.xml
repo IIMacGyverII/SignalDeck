@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SignalDeck Web: the phone's replies to the browser pages (WebHost, WebServer). They show in the page as a toast (a
+  short message at the bottom), an error line or a status line, unless a comment says otherwise. Toasts have room for
+  one or two lines. The pages never compare these texts, so every one can be translated. The pages' own text is in
+  assets/web/i18n/en.json.
+-->
+<resources>
+    <!-- ==== general replies ==== -->
+    <!-- Error when the browser tries to transmit but the owner has not allowed it on the phone. "Device → SignalDeck Web" names the phone's page. -->
+    <string name="web_tx_off">Web からの送信はオフです（端末：デバイス → SignalDeck Web）</string>
+    <!-- Error: the action is locked because the phone is in Restricted mode (a mode the owner sets on the phone). -->
+    <string name="web_restricted">制限モードではオフになっています</string>
+    <!-- Error: the radio module is busy while its firmware is being loaded. -->
+    <string name="web_firmware_busy">無線機は使用中です（ファームウェア書き込み中）</string>
+    <!-- Error: the action cannot run while the radio transmits. -->
+    <string name="web_not_while_tx">送信中はできません</string>
+    <!-- Error: the radio module is not connected or not ready yet. -->
+    <string name="web_radio_not_ready">無線機の準備ができていません</string>
+    <!-- Error: transmitting is blocked while a satellite pass is tracked in listen-only mode. -->
+    <string name="web_sat_receive_only">この衛星パスの間は受信のみです</string>
+    <!-- Error: the current channel is set to receive only. -->
+    <string name="web_channel_receive_only">このチャンネルは受信専用です</string>
+    <!-- Reply after something was saved. Very short. -->
+    <string name="web_saved">保存しました</string>
+    <!-- Reply after something was deleted. Very short. -->
+    <string name="web_deleted">削除しました</string>
+    <!-- Reply after something was removed from a list. Very short. -->
+    <string name="web_removed">除外しました</string>
+    <!-- Reply after a list was emptied. Very short. -->
+    <string name="web_cleared">クリアしました</string>
+    <!-- Reply while a running job (a scan, a decode, a connection) stops. Very short. -->
+    <string name="web_stopping">停止中</string>
+    <!-- Reply while a message goes out. Very short. -->
+    <string name="web_sending">送信中</string>
+    <!-- Reply after a listening job started (the packet finder). Very short. -->
+    <string name="web_listening">受信中</string>
+    <!-- Reply after an item was saved. %1$s: its name (a contact, a channel, a recording). -->
+    <string name="web_saved_item">%1$s を保存しました</string>
+    <!-- Reply after an item was deleted. %1$s: its name (a contact, a channel, a recording). -->
+    <string name="web_deleted_item">%1$s を削除しました</string>
+    <!-- Reply after an item was removed from a list. %1$s: its name (a callsign). -->
+    <string name="web_removed_item">%1$s を除外しました</string>
+    <!-- Error: a file could not be deleted. %1$s: the file name. -->
+    <string name="web_delete_failed_item">%1$s を削除できませんでした</string>
+    <!-- Error: the request asked for an action the phone does not know. -->
+    <string name="web_unknown_action">不明な操作です</string>
+    <!-- Error: the request asked for an action the phone does not know. %1$s: the action's code word. -->
+    <string name="web_unknown_action_named">不明な操作です：%1$s</string>
+    <!-- Error: a file name in the request is not allowed (it has a folder in it). -->
+    <string name="web_bad_name">使用できない名前です</string>
+    <!-- Error: the file asked for is not on the phone. -->
+    <string name="web_not_found">見つかりません</string>
+    <!-- Error: a number in the form could not be read. -->
+    <string name="web_check_numbers">数値を確認してください</string>
+    <!-- Error: a number in the form could not be read. %1$s: the technical reason. -->
+    <string name="web_check_numbers_detail">数値を確認してください：%1$s</string>
+    <!-- Error: the phone has no GPS position yet. -->
+    <string name="web_no_fix">端末で位置を取得できていません</string>
+    <!-- Error: the phone has no GPS position yet (it may get one soon). -->
+    <string name="web_no_fix_yet">端末でまだ位置を取得していません</string>
+    <!-- Error: a callsign field is empty. -->
+    <string name="web_enter_callsign">コールサインを入力してください</string>
+    <!-- Error: a frequency is outside what this radio tunes. -->
+    <string name="web_bad_frequency">無効な周波数です</string>
+    <!-- Error: a dangerous action (restart, install) needs the confirmation dialog in the page. -->
+    <string name="web_confirm_first">先にページで確認してください</string>
+    <!-- Error from the phone's web server: the browser is not logged in (the PIN page appears). -->
+    <string name="web_login_required">ログインが必要です</string>
+    <!-- Error on the PIN page: the PIN typed is wrong. One line. -->
+    <string name="web_login_wrong_pin">PIN が違います</string>
+    <!-- Error on the PIN page after many wrong PINs. One line. -->
+    <string name="web_login_too_many">試行回数が多すぎます：1 分待ってください</string>
+    <!-- Error: the browser asked for an API path the phone does not have. %1$s: the path. -->
+    <string name="web_no_such_api">その API はありません：%1$s</string>
+    <!-- Error: the address asked for is not allowed (it tries to leave the web folder). -->
+    <string name="web_bad_path">無効なパスです</string>
+    <!-- Error: the page or file asked for does not exist. -->
+    <string name="web_file_not_found">見つかりません</string>
+    <!-- Error: a request from another web site was refused (a security check). -->
+    <string name="web_cross_site">クロスサイトリクエストを拒否しました</string>
+    <!-- Shown on the phone (Device → SignalDeck Web) when the web server could not start. %1$d: the port number; %2$s: the system's reason. -->
+    <string name="web_server_port_error">ポート %1$d：%2$s</string>
+
+    <!-- ==== talking with the browser microphone ==== -->
+    <!-- Error: another browser or the phone is already transmitting. -->
+    <string name="web_talk_busy">既にほかの誰かが送信中です</string>
+    <!-- History line on the phone and in the page when a browser starts talking with its microphone. %1$s: the browser's network address. -->
+    <string name="web_history_talk_mic">🌐 Web からブラウザのマイクで送信中（%1$s）</string>
+    <!-- Error: transmitting stopped. %1$s: why (web_talk_no_audio or web_talk_closed). -->
+    <string name="web_talk_stopped">停止しました：%1$s</string>
+    <!-- Why transmitting stopped: the browser sent no audio for a while. Fills %1$s of web_talk_stopped; lower case. -->
+    <string name="web_talk_no_audio">ブラウザから音声が届きません</string>
+    <!-- Why transmitting stopped: the browser's connection closed. Fills %1$s of web_talk_stopped; lower case. -->
+    <string name="web_talk_closed">接続が切れました</string>
+    <!-- History line when the web page keys the radio (PTT). %1$s: the browser's network address. -->
+    <string name="web_history_web_tx">🌐 Web から送信中（%1$s）</string>
+    <!-- Reply when the web PTT button is pressed. Very short. -->
+    <string name="web_ptt_down">PTT オン</string>
+    <!-- Reply when the web PTT button is released. Very short. -->
+    <string name="web_ptt_up">PTT オフ</string>
+
+    <!-- ==== channel editor checks ==== -->
+    <!-- Error in the channel editor: the receive frequency is empty. -->
+    <string name="web_ch_rx_needed">受信周波数（MHz）を入力してください</string>
+    <!-- Error in the channel editor. %1$s: this radio's bands, e.g. "136–174 / 400–480 MHz". -->
+    <string name="web_ch_band">周波数は %1$s の範囲内にしてください</string>
+    <!-- Error in the channel editor: the location is out of range. -->
+    <string name="web_ch_latlon">緯度は ±90、経度は ±180 の範囲内にしてください</string>
+    <!-- Error in the channel editor (DMR). -->
+    <string name="web_ch_call_number">呼出番号は DMR ID またはトークグループ（1〜16777215）にしてください</string>
+    <!-- Error in the channel editor (DMR). -->
+    <string name="web_ch_groups_max">受信リストのトークグループは最大 32 個です（呼出番号を含む）</string>
+    <!-- Error in the channel editor (DMR encryption). -->
+    <string name="web_ch_key_len">暗号キーはちょうど 8 文字にしてください</string>
+    <!-- Error: a new DMR channel on a radio that only does analog (FM). -->
+    <string name="web_ch_no_dmr">この無線機は DMR 非対応です：アナログチャンネルを追加してください</string>
+    <!-- Error in the VFO editor (DMR). -->
+    <string name="web_vfo_call_needed">個別呼出・グループ呼出には呼出番号が必要です</string>
+    <!-- Reply after tuning the VFO. %1$s: the frequency, e.g. "145.5000". -->
+    <string name="web_vfo_tuned">VFO %1$s MHz</string>
+    <!-- Reply after leaving the VFO. -->
+    <string name="web_vfo_back">チャンネルに戻りました</string>
+    <!-- Error: no channel with this number. %1$d: the number. -->
+    <string name="web_no_channel">チャンネル %1$d はありません</string>
+    <!-- Error: the channel to delete is gone. -->
+    <string name="web_no_such_channel">そのチャンネルはありません</string>
+    <!-- Reply after starring a channel. %1$d: its number. -->
+    <string name="web_star_on">チャンネル %1$d をお気に入りに追加しました</string>
+    <!-- Reply after unstarring a channel. %1$d: its number. -->
+    <string name="web_star_off">チャンネル %1$d をお気に入りから外しました</string>
+    <!-- Reply after selecting a channel. %1$d: its number. Short. -->
+    <string name="web_channel_selected">チャンネル %1$d</string>
+    <!-- Error: the channel's frequency is outside this radio's bands. %1$s: the channel's name; %2$s: the bands, e.g. "400–480 MHz". -->
+    <string name="web_channel_untunable">%1$s は %2$s の範囲外です：この無線機では合わせられません</string>
+    <!-- Reply after the channel arrows. Very short, lower case. -->
+    <string name="web_channel_stepped">切り替えました</string>
+    <!-- Reply after saving a channel that has no name. %1$d: its number. -->
+    <string name="web_ch_saved_number">チャンネル %1$d を保存しました</string>
+    <!-- Reply after deleting a channel that has no name. %1$d: its number. -->
+    <string name="web_ch_deleted_number">チャンネル %1$d を削除しました</string>
+    <!-- Name for a channel that has none, in the caption list. %1$d: its number. Lower case. -->
+    <string name="web_captions_channel">チャンネル %1$d</string>
+    <!-- Error: the stock-app import question was already answered (on the phone or in another browser). -->
+    <string name="web_stock_answered">既に回答済みです</string>
+    <!-- Error: the channel selection is empty. -->
+    <string name="web_bulk_none">チャンネルを 1 つ以上選んでください</string>
+
+    <!-- ==== captions ==== -->
+    <!-- Error when turning captions on with the Google engine but no key. "long-press TXT" refers to the phone's TXT key. -->
+    <string name="web_captions_need_key">Google エンジンで字幕を使うには Google Cloud のキーが必要です：端末でキーを設定するか、端末内エンジンに切り替えてください（TXT を長押し）</string>
+    <!-- Reply after turning live captions on. -->
+    <string name="web_captions_on">字幕オン</string>
+    <!-- Reply after turning live captions on with the on-device engine. -->
+    <string name="web_captions_on_vosk">字幕オン（端末内モデルは初回使用時にダウンロードされます）</string>
+    <!-- Reply after turning live captions off. -->
+    <string name="web_captions_off">字幕オフ</string>
+    <!-- Error: the speech model asked for does not exist. -->
+    <string name="web_model_unknown">不明なモデルです</string>
+    <!-- Error: not enough space for a speech model. %1$s: the size, e.g. "5.2 GB" or "90 MB". -->
+    <string name="web_model_no_space">このモデルを入れる空き容量が端末にありません（ダウンロード中に約 %1$s 必要です）</string>
+    <!-- Reply: the speech model is on the phone and is being loaded. -->
+    <string name="web_model_loading">モデルを読み込み中</string>
+    <!-- Reply: the speech model is being downloaded to the phone. -->
+    <string name="web_model_downloading">端末にモデルをダウンロード中</string>
+    <!-- Error: the speech model to delete is in use. -->
+    <string name="web_model_in_use">そのモデルは使用中です：先に別のモデルを選んでください</string>
+    <!-- Error: a speech model is busy. -->
+    <string name="web_model_busy">モデルをダウンロード中または読み込み中です：完了してから再試行してください</string>
+    <!-- Error: the speech model could not be deleted. -->
+    <string name="web_model_delete_failed">削除できませんでした</string>
+    <!-- Error: the caption engine asked for does not exist. -->
+    <string name="web_engine_unknown">不明なエンジンです</string>
+    <!-- Error: the Google engine needs an API key. Google Cloud Speech is a product name. -->
+    <string name="web_engine_need_key">先に Google Cloud Speech の API キーを設定してください</string>
+    <!-- Reply after choosing the Google caption engine. Google Cloud Speech is a product name. -->
+    <string name="web_engine_google">字幕に Google Cloud Speech を使用します</string>
+    <!-- Reply after choosing the on-device caption engine. -->
+    <string name="web_engine_phone">字幕は端末内で作成します</string>
+
+    <!-- ==== APRS, SSTV, decoding, satellites, scope ==== -->
+    <!-- Error: an APRS message needs a recipient and a text. -->
+    <string name="web_aprs_to_text_needed">宛先と本文が必要です</string>
+    <!-- Reply after queueing an APRS message. %1$s: the callsign. -->
+    <string name="web_aprs_message_queued">%1$s 宛てのメッセージを送信待ちにしました</string>
+    <!-- Reply after sending an APRS position beacon. -->
+    <string name="web_aprs_beacon_sent">ビーコンを送信しました</string>
+    <!-- Error: no SSTV picture has been received yet. -->
+    <string name="web_sstv_no_picture">まだ画像がありません</string>
+    <!-- Error: the recording to decode is gone. -->
+    <string name="web_decode_not_found">録音が見つかりません</string>
+    <!-- Reply after starting to decode a recording. %1$s: the file name. -->
+    <string name="web_decode_started">%1$s をデコード中</string>
+    <!-- Error: the uploaded file is empty. -->
+    <string name="web_decode_empty">空のファイルです</string>
+    <!-- Reply after uploading a recording. %1$s: the file name. -->
+    <string name="web_decode_uploaded">%1$s をアップロードしました。デコード中</string>
+    <!-- Error: the upload worked but the decode could not start. %1$s: the file name; %2$s: the reason. -->
+    <string name="web_decode_uploaded_failed">%1$s をアップロードしましたが、問題があります：%2$s</string>
+    <!-- Error: combining SSTV pictures needs at least two. -->
+    <string name="web_sstv_select_two">画像を 2 枚以上選んでください</string>
+    <!-- Error: an SSTV picture is gone. %1$s: its file name. -->
+    <string name="web_sstv_not_found_name">見つかりません：%1$s</string>
+    <!-- Error: no pictures were given to delete. -->
+    <string name="web_sstv_none_given">画像が指定されていません</string>
+    <!-- Error: the file to send as SSTV is not a picture. -->
+    <string name="web_sstv_bad_picture">この端末で読み込める画像ではありません（PNG か JPEG を使ってください）</string>
+    <!-- Reply after starting to send an SSTV picture. %1$s: the SSTV mode name (e.g. "Robot 36"), not translated. -->
+    <string name="web_sstv_sending">%1$s で画像を送信中</string>
+    <!-- Reply after stopping ISS tracking. -->
+    <string name="web_iss_stopped">追尾を停止しました</string>
+    <!-- Reply after starting ISS tracking. %1$s: "aprs" or "sstv". -->
+    <string name="web_iss_tracking">ISS を追尾中（%1$s）</string>
+    <!-- Reply after the orbit download. -->
+    <string name="web_sat_updated">軌道データと FM 衛星リストを更新しました</string>
+    <!-- Shown on a satellite's card: the orbit download has no orbit for it. -->
+    <string name="web_sat_no_orbit_it">ダウンロードしたデータにこの衛星の軌道はありません</string>
+    <!-- Error: no orbit for a satellite. %1$s: the satellite's name. -->
+    <string name="web_sat_no_orbit">%1$s の軌道データがありません</string>
+    <!-- Reply after starting to track a satellite pass. %1$s: the satellite's name. -->
+    <string name="web_sat_tracking">%1$s を追尾中</string>
+    <!-- Error: the pass to track is already over. -->
+    <string name="web_sat_pass_gone">そのパスは既に終わっています</string>
+    <!-- Error: the satellite asked for is not in the list. -->
+    <string name="web_sat_none">その衛星はありません</string>
+    <!-- Reply after starting the band scope. Very short. -->
+    <string name="web_scope_sweeping">掃引中</string>
+    <!-- Error: the frequency picked on the band scope is outside this radio's bands. -->
+    <string name="web_scope_untunable">この無線機で合わせられる周波数ではありません</string>
+    <!-- Reply after choosing a frequency on the band scope. %1$s: the frequency, e.g. "145.5000". -->
+    <string name="web_scope_listening">%1$s MHz を受信中（VFO）</string>
+    <!-- Status of the terrain prediction on the coverage map before it has a status of its own. Lower case, short. -->
+    <string name="web_coverage_predict_starting">開始中…</string>
+
+    <!-- ==== schedules, recordings, logbook, POTA ==== -->
+    <!-- Error in the scheduled operation form. -->
+    <string name="web_sched_days">曜日か日付を選んでください</string>
+    <!-- Error in the scheduled operation form: a one-off time in the past. -->
+    <string name="web_sched_past">その時刻は既に過ぎています</string>
+    <!-- Error: the recording is gone. -->
+    <string name="web_rec_none">その録音はありません</string>
+    <!-- Error: a logbook entry needs a callsign. -->
+    <string name="web_log_call_needed">コールサインが必要です</string>
+    <!-- Reply after logging a contact. %1$s: the callsign. -->
+    <string name="web_log_logged">%1$s を記録しました</string>
+    <!-- Error: not a park or summit reference. The examples stay as they are. -->
+    <string name="web_pota_bad_ref">POTA（US-1234）または SOTA（W0C/FR-001）のリファレンスではありません</string>
+    <!-- Reply after starting a POTA/SOTA activation whose reference is not in the list. %1$s: the reference. -->
+    <string name="web_pota_activating_unknown">%1$s をアクティベーション中（プログラムのリストにありません）</string>
+    <!-- Reply after starting a POTA/SOTA activation. %1$s: the reference; %2$s: the park or summit name. -->
+    <string name="web_pota_activating">%1$s をアクティベーション中：%2$s</string>
+    <!-- Reply after ending a POTA/SOTA activation. -->
+    <string name="web_pota_ended">アクティベーションを終了しました</string>
+    <!-- Error: this contact is a duplicate. DUPE is the usual ham word. %1$s: the callsign; %2$s: the park or summit reference. -->
+    <string name="web_pota_dupe">DUPE：%1$s は本日このバンドで %2$s として記録済みです</string>
+    <!-- Error: no POTA/SOTA activation is running. -->
+    <string name="web_pota_none">アクティベーションはありません</string>
+
+    <!-- ==== forms, Winlink, packet finder ==== -->
+    <!-- Reply after putting a message form in the Winlink outbox. -->
+    <string name="web_form_winlink_outbox">Winlink の送信トレイに入れました</string>
+    <!-- Reply after writing a Winlink e-mail. -->
+    <string name="web_wl_outbox">送信トレイに入れました</string>
+    <!-- Reply after starting a Winlink connection. -->
+    <string name="web_wl_connecting">接続中</string>
+    <!-- Reply after starting a Winlink radio connection. %1$s: the frequency, e.g. "145.0500". -->
+    <string name="web_wl_tuning">%1$s MHz に合わせています。数秒後に接続します</string>
+    <!-- Error: a Maidenhead grid square. The examples stay as they are. -->
+    <string name="web_wl_grid">グリッドロケーターは JO01 や JO01ab の形式です</string>
+    <!-- Error: the Winlink attachment is gone. -->
+    <string name="web_wl_no_attachment">その添付ファイルはありません</string>
+
+    <!-- ==== settings, radio, packet tools ==== -->
+    <!-- Reply after changing a setting. %1$s: the setting's name. -->
+    <string name="web_set_saved">%1$s を保存しました</string>
+    <!-- Error: the setting asked for does not exist. -->
+    <string name="web_set_none">その設定はありません</string>
+    <!-- Error: a DMR ID out of range. -->
+    <string name="web_set_dmrid_range">DMR ID は 1〜16776415 です</string>
+    <!-- A choice of the Longest transmission setting, the default one. %1$s: the time, e.g. "30 s". -->
+    <string name="web_set_txlimit_default">%1$s（初期値）</string>
+    <!-- A choice of the Longest transmission setting: a value set on the phone. %1$s: the time, e.g. "45 s". -->
+    <string name="web_set_txlimit_custom">カスタム：%1$s</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_radio">無線</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_identity">ID</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_logbook">ログ</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_coverage">エリア</string>
+    <!-- Group heading on the web Settings page (shown in capitals). Short. -->
+    <string name="web_set_group_car">車</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_txlimit_label">最長送信時間</string>
+    <!-- Setting description under its name. Two lines. -->
+    <string name="web_set_txlimit_sub">この時間を過ぎると、SignalDeck はどの送信も終了します。端末が高温になれば、時間内でも過熱保護が長い送信を止めます</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_dmrid_label">自局の DMR ID</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_dmrid_sub">DMR チャンネルで送信したときにほかの無線機に表示される ID</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_hwptt_label">側面の PTT キー</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_hwptt_sub">端末本体の PTT ボタンで送信します</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_volptt_label">音量アップで送信</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_volptt_sub">端末で無線画面を開いている間</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_customptt_label">カスタム PTT キー</string>
+    <!-- Setting description under its name. "Device → Custom PTT key" names the phone's setting. -->
+    <string name="web_set_customptt_sub">端末で登録したボタン（デバイス → カスタム PTT キー）で送信します。登録は端末を手に持って行います</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_scansoftsq_label">スキャン中の Soft SQ</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_scansoftsq_sub">すべてのアナログチャンネルで、それぞれのレベルを使用（未設定なら 5）</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_roger_label">ロジャービープ</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_roger_sub">各送信の終わりに短い音を鳴らします</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_voice_label">音声アナウンス</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_voice_sub">チャンネル変更、相手の名前、キーワード通知</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_keywords_label">キーワード通知</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_keywords_sub">ライブ字幕で通知する単語（カンマ区切り）</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_logheard_label">受信局をログに記録</string>
+    <!-- Setting description under its name. "Heard" is how the logbook marks these entries. -->
+    <string name="web_set_logheard_sub">DMR の発信者と APRS 局を「受信」としてログに記録します</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_lookup_label">名前をオンラインで検索</string>
+    <!-- Setting description under its name. RadioID is a service name. -->
+    <string name="web_set_lookup_sub">発信者と局を RadioID / コールサインで検索</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_roaming_label">DMR ローミング</string>
+    <!-- Setting description under its name. Two lines. -->
+    <string name="web_set_roaming_sub">移動中、このゾーンで同じトークグループの最寄りのレピーターに切り替えます（位置が登録されたレピーターのチャンネルが必要）</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_coverage_label">エリア記録</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_coverage_sub">信号とアクセスを GPS 付きで記録し、エリアマップに表示します</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_covincar_label">車でエリアを記録</string>
+    <!-- Setting description under its name. Android Auto is a product name. -->
+    <string name="web_set_covincar_sub">Android Auto 接続中にエリアを記録します</string>
+    <!-- Setting name on the web Settings page. One line. Android Auto is a product name. -->
+    <string name="web_set_carmic_label">Android Auto で車のマイクを使用</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_carmic_sub">送信時、ハンズフリー接続で車のマイクを使います</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_wheeltalk_label">ハンドルの再生/一時停止で送信</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_wheeltalk_sub">Android Auto で、再生/一時停止で送信を開始・停止します</string>
+    <!-- Setting name on the web Settings page. One line. "Next" is the media key. -->
+    <string name="web_set_nexttalk_label">ハンドルの「次へ」で送信</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_nexttalk_sub">「次へ」の長押し、または 2 回押しで送信</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_wheelmic_label">ハンドル送信のマイク</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_wheelmic_sub">車（通話として）または端末のマイク</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_voxstop_label">話し終えたら停止</string>
+    <!-- Setting description under its name. -->
+    <string name="web_set_voxstop_sub">ハンドルから始めた送信が対象</string>
+    <!-- Setting name on the web Settings page. One line. -->
+    <string name="web_set_carscreen_label">車で全画面の無線操作</string>
+    <!-- Setting description under its name. "Talk" is the name of the car screen's button. -->
+    <string name="web_set_carscreen_sub">オフ：メディアアプリ。オン：大きな送信画面（変更後は車に再接続してください）</string>
+    <!-- Reply after Take over on the web Settings page. -->
+    <string name="web_radio_takeover">無線モジュールを引き継いでいます</string>
+    <!-- Reply after Hand back on the web Settings page. -->
+    <string name="web_radio_handback">無線モジュールを純正アプリに戻しています</string>
+    <!-- Error: the packet engine has not started yet. -->
+    <string name="web_pkt_not_ready">パケットエンジンの準備ができていません</string>
+    <!-- Error in the APRS settings: the callsign's format. -->
+    <string name="web_aprs_call_format">コールサイン：英数字 1〜6 文字。SSID は専用の欄に入力します</string>
+    <!-- Error in the APRS settings. SSID is the usual ham word. -->
+    <string name="web_aprs_ssid">SSID は 0〜15 です</string>
+    <!-- Error in the APRS settings. -->
+    <string name="web_aprs_lead">前置きの長さは一覧の選択肢から選んでください</string>
+    <!-- Error in the APRS settings. KISS is a protocol name. -->
+    <string name="web_aprs_kiss_port">KISS ポートは 1024〜65535 です</string>
+    <!-- Reply after saving the APRS settings. -->
+    <string name="web_aprs_saved">APRS 設定を保存しました</string>
+    <!-- Reply after turning the APRS-IS internet link on. APRS-IS is a service name. -->
+    <string name="web_tool_is_start">APRS-IS を開始中</string>
+    <!-- Reply after turning the APRS-IS internet link off. -->
+    <string name="web_tool_is_off">APRS-IS オフ</string>
+    <!-- Reply after turning the KISS TNC on. KISS TNC is a protocol name. -->
+    <string name="web_tool_kiss_on">KISS TNC オン</string>
+    <!-- Reply after turning the KISS TNC off. -->
+    <string name="web_tool_kiss_off">KISS TNC オフ</string>
+    <!-- Error: the DTMF digits typed are not valid. -->
+    <string name="web_dtmf_format">DTMF：0-9、A-D、*、# を 1〜32 文字</string>
+    <!-- Reply after sending DTMF digits. %1$s: the digits. -->
+    <string name="web_dtmf_sending">DTMF %1$s を送信中</string>
+    <!-- Reply after sending the Morse identification. -->
+    <string name="web_cwid_sending">CW ID を送信中</string>
+
+    <!-- ==== nets, voice keyer, FT8, repeaters, zones, backups ==== -->
+    <!-- Error: a net is already running. -->
+    <string name="web_net_running">既にロールコールを実施中です</string>
+    <!-- Name given to a net when none is typed. Short. -->
+    <string name="web_net_default_name">ロールコール</string>
+    <!-- History line when a net starts. %1$s: the net's name. -->
+    <string name="web_history_net_started">📋 ロールコール開始：%1$s</string>
+    <!-- Reply when a net starts. %1$s: the net's name. -->
+    <string name="web_net_started">ロールコール開始：%1$s</string>
+    <!-- History line when a net ends. %1$s: the net's name; %2$d: the number of check-ins. The English uses "check-ins" for one too. -->
+    <plurals name="web_history_net_ended">
+        <item quantity="other">📋 ロールコール終了：%1$s（チェックイン %2$d 局）</item>
+    </plurals>
+    <!-- Reply when a net ends. %1$d: the number of check-ins. The English uses "check-ins" for one too. -->
+    <plurals name="web_net_ended">
+        <item quantity="other">ロールコール終了：チェックイン %1$d 局</item>
+    </plurals>
+    <!-- Error: no net is running. -->
+    <string name="web_net_none">実施中のロールコールはありません</string>
+    <!-- Error: the check-in is not a callsign. -->
+    <string name="web_net_bad_call">コールサインではないようです</string>
+    <!-- Reply after a check-in. %1$s: the callsign. -->
+    <string name="web_net_checked_in">%1$s がチェックインしました</string>
+    <!-- Error: the check-in is gone. -->
+    <string name="web_net_no_checkin">そのチェックインはありません</string>
+    <!-- Error: the net is gone. -->
+    <string name="web_net_no_net">そのロールコールはありません</string>
+    <!-- Error: a running net cannot be deleted. -->
+    <string name="web_net_end_first">先にロールコールを終了してください</string>
+    <!-- Reply after deleting a net. -->
+    <string name="web_net_deleted">ロールコールを削除しました</string>
+    <!-- Error: the voice keyer recording is too short. -->
+    <string name="web_keyer_short">録音が短すぎます</string>
+    <!-- Reply after saving a voice keyer message. %1$s: the slot's name; %2$s: its length in seconds, e.g. "4.2". -->
+    <string name="web_keyer_saved">%1$s を保存しました（%2$s 秒）</string>
+    <!-- Error: the voice keyer slot is empty. -->
+    <string name="web_keyer_empty">何も録音されていません</string>
+    <!-- Error: an FT8 grid locator. The example stays as it is. -->
+    <string name="web_ft8_grid">グリッドは A〜R の英字 2 文字と数字 2 桁です（例：FN42）</string>
+    <!-- Error: the FT8 decode clicked is gone. -->
+    <string name="web_ft8_gone">そのデコードはもう一覧にありません</string>
+    <!-- Error: the repeater list is out of date. -->
+    <string name="web_rpt_search_again">もう一度検索してください：そのレピーターは前回のリストにありません</string>
+    <!-- Error: adding a repeater produced no channels. -->
+    <string name="web_rpt_nothing">書き込むものがありません</string>
+    <!-- Error in the zone editor. -->
+    <string name="web_zone_name_needed">ゾーンには名前が必要です</string>
+    <!-- Error in the zone editor. -->
+    <string name="web_zone_pick">ゾーンのチャンネルを 1 つ以上選んでください</string>
+    <!-- Reply after saving a zone. %1$s: its name. -->
+    <string name="web_zone_saved">ゾーン %1$s を保存しました</string>
+    <!-- Error: the zone is gone. -->
+    <string name="web_zone_none">そのゾーンはありません</string>
+    <!-- Reply after deleting a zone. %1$s: its name. -->
+    <string name="web_zone_deleted">ゾーン %1$s を削除しました</string>
+    <!-- Reply after a backup. %1$s: the backup folder's name. The path stays as it is. -->
+    <string name="web_backup_done">Download/DMR/DMR_Backups/%1$s にバックアップしました</string>
+    <!-- Error: the backup is gone. -->
+    <string name="web_backup_none">そのバックアップはありません</string>
+    <!-- Error when restoring from files. The file names stay as they are. -->
+    <string name="web_restore_need_channels">Channels.csv が必要です（同じバックアップの Contacts.csv、TG_Lists.csv、Zones.csv と一緒に）</string>
+    <!-- Error: the restore failed. %1$s: the reason. -->
+    <string name="web_restore_failed">復元に失敗しました：%1$s</string>
+
+    <!-- ==== contacts, messages, pager, device ==== -->
+    <!-- Error: the contact is gone. -->
+    <string name="web_contact_none">その連絡先はありません</string>
+    <!-- Error in the contact form. SSID is the usual ham word. -->
+    <string name="web_contact_call_format">コールサイン：英数字。-SSID は任意</string>
+    <!-- Error in the contact form: the home location. -->
+    <string name="web_contact_home">自宅：グリッドロケーター、または緯度, 経度</string>
+    <!-- Error in the contact form. -->
+    <string name="web_contact_id_range">DMR ID は 1〜16777215 にしてください</string>
+    <!-- Error in the contact form. RIC is a pager address. -->
+    <string name="web_contact_needs_id">連絡先には DMR ID、コールサイン、ページャーの RIC のいずれかが必要です</string>
+    <!-- Error: a text needs a recipient and a text. -->
+    <string name="web_msg_need">宛先と本文が必要です</string>
+    <!-- Error: the text is too long. -->
+    <string name="web_msg_too_long">テキストは最大 140 文字です</string>
+    <!-- Reply after sending a text. %1$s: the contact's name or number. -->
+    <string name="web_sending_to">%1$s に送信中</string>
+    <!-- Reply after turning the pager monitor on. -->
+    <string name="web_pager_monitor_on">ページャーワッチオン</string>
+    <!-- Reply after turning the pager monitor off. -->
+    <string name="web_pager_monitor_off">ページャーワッチオフ</string>
+    <!-- Error: a page needs a message. -->
+    <string name="web_pager_write">メッセージを入力してください</string>
+    <!-- Error: a page needs a pager address (RIC). -->
+    <string name="web_pager_add_ric">RIC を追加してください</string>
+    <!-- Reply after sending a page. %1$d: the number of pager addresses (RICs). -->
+    <plurals name="web_pager_sending">
+        <item quantity="other">%1$d 件の RIC に送信中</item>
+    </plurals>
+    <!-- Reply after Restart the module on the web Settings page. -->
+    <string name="web_device_restarting">無線モジュールを再起動中</string>
+    <!-- Reply to Check for updates: nothing is published. -->
+    <string name="web_update_none">SignalDeck のリリースはまだ公開されていません</string>
+    <!-- Reply to Check for updates. %1$s: the new version, e.g. "1.0.0-beta.14". -->
+    <string name="web_update_available">アップデート %1$s を利用できます</string>
+    <!-- Reply to Check for updates. %1$s: the installed version. -->
+    <string name="web_update_latest">最新バージョンです（%1$s）</string>
+    <!-- Reply while an update installs. %1$s: the version. -->
+    <string name="web_update_installing">%1$s をインストール中</string>
+    <!-- Error: the update check failed. -->
+    <string name="web_update_failed">アップデートの確認に失敗しました</string>
+    <!-- Error: the published update has no download link. -->
+    <string name="web_update_no_url">このアップデートにはダウンロード先がありません</string>
+    <!-- Error: the update file is too big. -->
+    <string name="web_update_too_big">アップデートが 80 MB を超えています</string>
+    <!-- Reply after a POTA/SOTA contact was logged. %1$s: the callsign. -->
+    <string name="web_pota_logged">%1$s を記録しました</string>
+    <!-- Reply after a net check-in was changed (traffic, late, out). %1$s: the callsign. -->
+    <string name="web_net_checkin_updated">%1$s を更新しました</string>
+    <!-- Last-heard list: a channel without a name, by its number. Lower case. %1$d: the channel number. -->
+    <string name="web_heard_channel">チャンネル %1$d</string>
+</resources>

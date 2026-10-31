@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The channel editor: its fields, their help texts (the i icons) and its messages. See strings_common.xml for the conventions. -->
+<resources>
+
+    <!-- ===== Field help: the text of each field's i button in the channel editor (also shown by SignalDeck Web) ===== -->
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_notes">このチャンネルについて覚えておきたいことを書きます。利用者、レピーターの管理者やクラブ、リンク、運用時間、チェックインの方法など。チャンネルを共有するときに一緒に渡すこともできます（チャンネルを共有 → チャンネルメモ）。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$d is the longest name the radio takes (characters). -->
+    <string name="channel_editor_h_name">無線画面とチャンネル一覧に表示され、音声アナウンスでも読み上げられます。最大 %1$d 文字で、欄の下のカウンターに残りの文字数が表示されます。無線機本体には名前は送られません。OpenGD77 CPS などのコードプラグツールは短い名前（16 文字）しか保持しないため、そこで開いたバックアップでは長い名前が途中で切れることがあります。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_type">デジタル（DMR）チャンネルは音声とテキストをデータとして送り、カラーコード、タイムスロット、呼出先が必要です。アナログチャンネルは従来の FM です。M17 チャンネルはワイド FM の上に M17 を載せたもので、宛先コールサイン（または全員）とチャンネルアクセス番号を使います。種別を切り替えると、その種別で使う設定が表示されます。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_m17">このチャンネルの呼出先です。@ALL は全員を呼び出し、コールサインはその局を呼び出します。「連絡先から選択」では、コールサインのある連絡先を選べます。自局のコールサイン（送信に使うもの）は、APRS 設定の局コールサインです。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_can">チャンネルアクセス番号で、0〜15 です。この番号が一致する無線機同士でしか受信できません。通常は 0 を使います。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$s is the longest name the radio takes (characters). -->
+    <string name="channel_editor_h_tx">送信に使う周波数（MHz）です。シンプレックスチャンネルでは受信周波数と同じで、レピーターチャンネルではレピーターの入力周波数です（例：UHF の GMRS では +5 MHz、2 m では ±0.6 MHz）。空欄のときは受信周波数になります（シンプレックス）。この無線機で使える周波数は %1$s です。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$s is the longest name the radio takes (characters). -->
+    <string name="channel_editor_h_rx">受信に使う周波数（MHz）です。レピーターチャンネルではレピーターの出力周波数です。この無線機で使える周波数は %1$s で、それ以外の周波数（たとえば 220 MHz）は保存できません。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_pos">このチャンネルで届く局やレピーターの位置です（任意）。入力すると、無線画面に地名と、現在地からの距離と方位が表示されます。「現在地」を押すと、スマートフォンが最後に取得した位置が入力されます。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_rxonly">受信専用：このチャンネルでは一切送信しません。このチャンネルにいる間は、送信キー、側面キー、ボイスメモリー、ビーコン、返信など、すべての送信が拒否されます（聞くだけのワッチ、免許のないチャンネル、送信を控えるべき周波数など）。NOAA 気象放送、船舶、鉄道のチャンネルは、この設定にかかわらず常に受信専用です。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_power">送信出力です。ハイは遠くまで届きますが、バッテリーを多く使います。近くの無線機ならローで十分です。サービスによっては出力が制限されています（例：FRS）。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_band">チャンネル幅で、ワイド（25 kHz）かナロー（12.5 kHz）です。相手の無線機やレピーターに合わせてください。VHF（300 MHz 未満）では、この無線機は常にワイドに設定されます。ナローにすると、そこでは受信できなくなるためです。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_relay">無線機の中継切断の設定です。標準（推奨）：無線機はレピーターに接続したまま、通常どおり送信します。切断：無線機はレピーターの確認を待つため、まったく送信できないことがあります。ネットワークから指示された場合にだけ使ってください。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_cc">スケルチトーンに相当する DMR の設定で、0〜15 です。自局の無線機とレピーター（シンプレックスチャンネルではほかの無線機）が同じカラーコードを使っていないと、お互いの声は聞こえません。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_mode">直接：無線機同士で交信します（シンプレックス）。ダブルスロット：2 つのタイムスロットを同時に運ぶ DMR レピーターを経由します。レピーターチャンネルにはダブルスロットを使ってください。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_noslot">タイムスロット：この端末の無線モジュールが決めます。モジュールのチャンネル設定にはスロットがないため、SignalDeck ではここで TS1 と TS2 を選べず、レピーター（ダブルスロット）チャンネルは動作しないことがあります。確実に使えるのは、ほかの無線機とのシンプレックス DMR です。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_slot">DMR レピーターは、タイムスロット 1 と 2 で 2 つの別々の交信を同時に運びます。トークグループがあるスロットを選んでください（レピーターの一覧に記載されています）。シンプレックスチャンネルでは、すべての無線機が同じスロット（通常は TS1）を使う必要があります。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_ctype">呼び出す相手です。個別（1 つの DMR ID）、グループ（トークグループ）、すべて（全無線機）から選びます。この無線機では、「すべて」に設定したチャンネルは発信者を ID 16777215 と表示し、受信した音声も流さないため、通常のトークグループ交信には「グループ」を使ってください。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_callfrom">呼出番号は自分で入力するか、連絡先から選びます。グループ呼出ではグループ連絡先（トークグループ）、個別呼出では個別連絡先（DMR ID）から選びます。どちらの場合も、チャンネルには番号が保存されます。トークグループは「連絡先」ページで種別「グループ」として追加してください。無線画面で CALL を長押しすると、チャンネルを編集せずに、しばらくの間別のトークグループを選べます。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_callpick">このチャンネルが呼び出す連絡先です。タップすると別の連絡先を選べます。一覧は上の連絡先種別に合わせて表示されます。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_call">送信先の DMR ID（個別呼出）またはトークグループ番号（グループ呼出）です。グループ呼出の場合は、保存時に受信グループに追加されます。無線機は、このリストにあるトークグループのグループ呼出しか通さないためです。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_groups">このチャンネルで聞きたいトークグループを、カンマで区切って最大 32 件入力します。無線機は、このリストにあるトークグループのグループ呼出だけを通します。自局の DMR ID 宛ての個別呼出は常に通り、無線画面の MON では無線機がデコードできるすべての呼出が通ります。下の「トークグループリスト」では、保存したリストを挿入する（モジュールのリストは純正アプリから引き継がれます）か、このリストに名前を付けて保存できます。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_enc">無線機独自の DMR 秘話スクランブルで、8 文字のキーを使います。同じ方式と同じキーを使う無線機にしか聞こえず、ほとんどの DMR 無線機では聞くことができません。アマチュア無線の周波数では、暗号化は禁止されています。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_key">ちょうど 8 文字で、グループ内のすべての無線機で同じキーにします。「暗号化」が「有効」のときだけ使われます。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_int">DMR の送信割り込みです。ON にすると、対応する無線機では進行中の通話に割り込めます（たとえば呼び出した相手の無線機から）。割り込みが拒否されると、無線機は相手の機器が割り込みを許可していないことを通知します。純正の設定は OFF です。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_sq">無線機自身のスケルチで、このチャンネルの Soft SQ がオフのときに使われます。0 は完全に開いた状態で、ノイズが聞こえ、無線機は常に受信中と報告します。1〜9 で閉じますが、この無線機ではどの値も同じしきい値（約 −90 dBm）として動作します。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_softsq">Soft SQ は無線機のスケルチを開いたままにし、何を聞かせるかをアプリが判断します。チャンネルに CTCSS トーンがあればそのトーンで、なければ音声とノイズを聞き分けるノイズスケルチで判断します。無線機自身のスケルチより弱い局も拾えます。無線画面の SOFT SQ キーでも切り替えられます。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_softsq_lvl">Soft SQ の厳しさで、1（緩い：弱くノイズの多い信号でも開く）から 9（厳しい：きれいな信号だけ）まであります。無線画面のスライダーと同じです。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_maps">「マップで開く」は、この位置（または現在地）を地図アプリで表示します。そこで場所を探して「共有 → SignalDeck」を選ぶか、座標やリンクをコピーして戻り、「貼り付け」をタップします。「貼り付け」はクリップボードの座標、geo: リンク、Google、Apple、OpenStreetMap のリンクを読み取り、短縮された共有リンクもたどります。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_txt">送信と一緒に送る可聴域以下のトーンです。CTCSS（低いトーン、62.5〜254.1 Hz）か DCS（デジタルコード）を使います。トーンスケルチを使うレピーターや無線機は、正しいトーンのときだけ開きます。レピーターのアクセストーンは一覧に記載されています。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_txc">送信する CTCSS 周波数または DCS コードです。タップして一覧から選びます。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_rxt">このトーンを含む信号だけがスケルチを開くため、同じ周波数のほかの利用者の音は聞こえません。Soft SQ がオンのときは CTCSS トーンをアプリ自身が確認し、DCS は無線機が確認します。</string>
+    <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
+    <string name="channel_editor_h_rxc">受信時に待ち受ける CTCSS 周波数または DCS コードです。タップして一覧から選びます。</string>
+
+    <!-- ===== Channel editor: header, sections, labels and choices ===== -->
+    <!-- Title of the channel editor for a new channel. Short. -->
+    <string name="channel_editor_title_new">新規チャンネル</string>
+    <!-- Title of the channel editor. Short. -->
+    <string name="channel_editor_title_edit">チャンネル編集</string>
+    <!-- Subtitle of the channel editor for a new channel (shown in capitals). Short. -->
+    <string name="channel_editor_subtitle_new">入力して保存</string>
+    <!-- Subtitle of the channel editor (capitals): %1$d is the channel number. Short. -->
+    <string name="channel_editor_subtitle_number">チャンネル %1$d</string>
+    <!-- Content description of the back arrow of the channel editor. Short. -->
+    <string name="channel_editor_cd_back">保存せずに戻る</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_channel">チャンネル</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_radio">無線</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. FM channels. -->
+    <string name="channel_editor_sec_analog">アナログ</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_location">位置</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_notes">メモ</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_nets">ロールコール</string>
+    <!-- Section heading in the channel editor (shown in capitals). One or two words. -->
+    <string name="channel_editor_sec_history">履歴</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_name">チャンネル名</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_type">チャンネル種別</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. A DMR channel. -->
+    <string name="channel_editor_o_digital">デジタル</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. An FM channel. -->
+    <string name="channel_editor_o_analog">アナログ</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_rx">受信周波数（MHz）</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_tx">送信周波数（MHz）</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Transmit power. -->
+    <string name="channel_editor_l_power">送信出力</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_low_power">ロー</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_high_power">ハイ</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Whether the channel may transmit. -->
+    <string name="channel_editor_l_transmit">送信</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. The channel may transmit. -->
+    <string name="channel_editor_o_allowed">許可</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. The channel never transmits. -->
+    <string name="channel_editor_o_rx_only">受信専用</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The radio module's relay setting. -->
+    <string name="channel_editor_l_relay">中継（レピーター）</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Relay setting. -->
+    <string name="channel_editor_o_disconnect">切断</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Relay setting (recommended). -->
+    <string name="channel_editor_o_normal">標準</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The DMR colour code. -->
+    <string name="channel_editor_l_cc">カラーコード</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. DMR direct or through a repeater. -->
+    <string name="channel_editor_l_mode">モード</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Radio to radio. -->
+    <string name="channel_editor_o_direct">直接</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Through a DMR repeater (two time slots). -->
+    <string name="channel_editor_o_double_slot">ダブルスロット</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_slot">タイムスロット</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Who a DMR call goes to. -->
+    <string name="channel_editor_l_ctype">連絡先種別</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. A private call (one DMR ID). -->
+    <string name="channel_editor_o_private">個別</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. A group call (a talkgroup). -->
+    <string name="channel_editor_o_group">グループ</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. An all call. -->
+    <string name="channel_editor_o_all">すべて</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Where the call number comes from. -->
+    <string name="channel_editor_l_callfrom">呼出番号の取得元</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_typed">直接入力</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Pick it from the contacts. -->
+    <string name="channel_editor_o_contacts">連絡先</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_call">呼出番号（DMR ID / トークグループ）</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The contact the channel calls. -->
+    <string name="channel_editor_l_callpick">連絡先</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_groups">受信グループ（トークグループ、カンマ区切り、最大 32）</string>
+    <!-- Button under the RX group list: named talkgroup lists. Short. -->
+    <string name="channel_editor_tg_lists_button">トークグループリスト…</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. DMR privacy scrambling. -->
+    <string name="channel_editor_l_enc">暗号化</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_disabled">無効</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. -->
+    <string name="channel_editor_o_enabled">有効</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_key">暗号化キー（8 文字）</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. DMR transmit interrupt. -->
+    <string name="channel_editor_l_int">送信割り込み</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Capitals. -->
+    <string name="channel_editor_o_int_off">OFF</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Capitals. -->
+    <string name="channel_editor_o_int_on">ON</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Channel width. -->
+    <string name="channel_editor_l_band">帯域幅</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. 12.5 kHz. -->
+    <string name="channel_editor_o_narrow">ナロー</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. 25 kHz. -->
+    <string name="channel_editor_o_wide">ワイド</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Soft SQ is the app's own squelch (a feature name). -->
+    <string name="channel_editor_l_softsq">Soft SQ</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_softsq_level">Soft SQ レベル</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The radio's own squelch. -->
+    <string name="channel_editor_l_sq">スケルチレベル</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The kind of tone sent: none, CTCSS or DCS. -->
+    <string name="channel_editor_l_tx_tone_type">送信トーン種別</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Also the title of the tone list. -->
+    <string name="channel_editor_l_tx_tone">送信トーン</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The kind of tone that opens the squelch. -->
+    <string name="channel_editor_l_rx_tone_type">受信トーン種別</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Also the title of the tone list. -->
+    <string name="channel_editor_l_rx_tone">受信トーン</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. No tone. -->
+    <string name="channel_editor_tone_none">なし</string>
+    <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. DCS with inverted polarity; DCS stays. -->
+    <string name="channel_editor_tone_dcs_inverted">DCS 反転</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. @ALL is an M17 word: keep it. -->
+    <string name="channel_editor_l_m17dest">宛先（@ALL またはコールサイン）</string>
+    <!-- Button under the M17 destination. Short. -->
+    <string name="channel_editor_pick_contacts">連絡先から選択…</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The M17 channel access number. -->
+    <string name="channel_editor_l_can">チャンネルアクセス番号</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_lat">緯度（任意）</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_lon">経度（任意）</string>
+    <!-- Button under the location fields (three share a row). Very short. -->
+    <string name="channel_editor_my_position">現在地</string>
+    <!-- Button under the location fields (three share a row). Very short. -->
+    <string name="channel_editor_open_maps">マップで開く</string>
+    <!-- Button under the location fields (three share a row). Very short. -->
+    <string name="channel_editor_paste">貼り付け</string>
+    <!-- Toast when My position has no position yet. Short. -->
+    <string name="channel_editor_no_fix">位置を取得していません</string>
+    <!-- Hint under the location buttons; Open Maps, Share → SignalDeck and Paste name buttons. Two lines. -->
+    <string name="channel_editor_location_how">地図アプリで場所を選べます。「マップで開く」で場所を探し、「共有 → SignalDeck」を選びます。または座標かリンクをコピーして「貼り付け」をタップします。</string>
+    <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. -->
+    <string name="channel_editor_l_notes">メモ（任意）</string>
+
+    <!-- ===== Channel editor: history, nets, location and talkgroup lists ===== -->
+    <!-- History section of a channel not yet saved. One or two lines. -->
+    <string name="channel_editor_history_new">チャンネルを保存すると、このチャンネルで受信・送信したものがすべてここに表示されます。</string>
+    <!-- History section when SignalDeck does not drive the radio yet. One line. -->
+    <string name="channel_editor_history_no_service">履歴を見るには、無線モジュールを引き継いでください。</string>
+    <!-- History section when it cannot be read; %1$s is the error. One line. -->
+    <string name="channel_editor_history_failed">履歴を表示できません：%1$s</string>
+    <!-- Nets section of a channel not yet saved. One line. -->
+    <string name="channel_editor_nets_new">先にチャンネルを保存してから、このチャンネルのロールコールを追加してください。</string>
+    <!-- A net on this channel: %1$s its schedule ("Tue 7:30 PM"), %2$d its length in minutes. One line. -->
+    <string name="channel_editor_net_line">%1$s · %2$d 分 · タップして編集</string>
+    <!-- The same with the net's notes (%3$s). One line. -->
+    <string name="channel_editor_net_line_notes">%1$s · %2$d 分 · %3$s · タップして編集</string>
+    <!-- Button in the Nets section. Short. -->
+    <string name="channel_editor_add_net">ロールコールを追加</string>
+    <!-- Hint in the Nets section; Nets near you and Intercom name a sheet and a page. Two lines. -->
+    <string name="channel_editor_nets_how">このチャンネルで行われるロールコールや集まりです。「近くのロールコール」（無線画面のメニュー）に表示され、10 分前に通知することもできます。</string>
+    <!-- Toast after a place was shared or pasted into the editor. One line. -->
+    <string name="channel_editor_location_filled">位置を入力しました：「保存」をタップすると保持されます</string>
+    <!-- Label of the pin in the maps app for a channel with no name. One word. -->
+    <string name="channel_editor_maps_label">チャンネル</string>
+    <!-- Toast when the maps app opens. One line. -->
+    <string name="channel_editor_maps_how">場所を探して「共有 → SignalDeck」を選んでください（またはコピーして「貼り付け」をタップ）</string>
+    <!-- Toast when no maps app is installed. Short. -->
+    <string name="channel_editor_no_maps">地図アプリがインストールされていません</string>
+    <!-- Toast when Paste finds nothing. One or two lines. -->
+    <string name="channel_editor_clipboard_empty">クリップボードが空です：先に地図アプリで場所の座標かリンクをコピーしてください</string>
+    <!-- Toast when the pasted text holds no coordinates. One line. -->
+    <string name="channel_editor_clipboard_no_coords">コピーしたテキストに座標が見つかりません</string>
+    <!-- Last item of the Talkgroup lists menu. One line. -->
+    <string name="channel_editor_tg_save_item">この受信グループを新しいリストとして保存…</string>
+    <!-- Title of the Talkgroup lists menu. Short. -->
+    <string name="channel_editor_tg_lists_title">トークグループリスト</string>
+    <!-- Toast after adding a talkgroup list to the RX list: %1$d talkgroups added. One line. -->
+    <plurals name="channel_editor_tg_added">
+        <item quantity="other">%1$d 件のトークグループを追加しました：「保存」をタップすると保持されます</item>
+    </plurals>
+    <!-- The same when the RX list is now full (32). One line. -->
+    <plurals name="channel_editor_tg_added_full">
+        <item quantity="other">%1$d 件のトークグループを追加しました（無線機の上限は 32 件）：「保存」をタップすると保持されます</item>
+    </plurals>
+    <!-- Hint of the name field for a new talkgroup list. Short. -->
+    <string name="channel_editor_tg_list_name">リスト名</string>
+    <!-- Dialog title: save the RX list under a name. Short. -->
+    <string name="channel_editor_tg_save_title">トークグループリストを保存</string>
+    <!-- Toast after saving a talkgroup list; %1$s is its name. Short. -->
+    <string name="channel_editor_tg_saved">「%1$s」を保存しました</string>
+    <!-- Contact row when the typed number is not a contact; %1$d is the number. Short. -->
+    <string name="channel_editor_call_not_contact">%1$d（連絡先にありません）</string>
+    <!-- Contact row before a contact is chosen. Very short. -->
+    <string name="channel_editor_choose">選択…</string>
+    <!-- Dialog title when there are no private contacts to pick. Short. -->
+    <string name="channel_editor_no_private">個別連絡先がありません</string>
+    <!-- Dialog title when there are no group contacts to pick. Short. -->
+    <string name="channel_editor_no_group">グループ連絡先がありません</string>
+    <!-- Dialog message; Private, Call number from and Typed number name a contact type, a field and a choice. Two lines. -->
+    <string name="channel_editor_no_private_msg">「連絡先」ページで追加する（種別「個別」）か、「呼出番号の取得元」を「直接入力」に戻してください。</string>
+    <!-- Dialog message; Group, Call number from and Typed number name a contact type, a field and a choice. Two lines. -->
+    <string name="channel_editor_no_group_msg">「連絡先」ページで追加する（種別「グループ」）か、「呼出番号の取得元」を「直接入力」に戻してください。</string>
+    <!-- Title of the list of private contacts to call. Short. -->
+    <string name="channel_editor_private_contacts">個別連絡先</string>
+    <!-- Title of the list of group contacts to call. Short. -->
+    <string name="channel_editor_group_contacts">グループ連絡先（トークグループ）</string>
+    <!-- Title of the list of M17 destinations. Short. -->
+    <string name="channel_editor_m17_dest_title">M17 の宛先</string>
+    <!-- Toast when a tone is picked before its type. One line. -->
+    <string name="channel_editor_tone_type_first">先に上のトーン種別で CTCSS か DCS を選んでください</string>
+    <!-- Content description of a field's i button; %1$s is the field's label. Short. -->
+    <string name="channel_editor_cd_about">%1$sについて</string>
+    <!-- Button that closes a field's help card. Short. -->
+    <string name="channel_editor_got_it">了解</string>
+
+    <!-- ===== Channel editor: checks on Save ===== -->
+    <!-- Save check: a field is empty; %1$s names it ("the receive frequency (MHz)"). One line. -->
+    <string name="channel_editor_err_enter">%1$sを入力してください</string>
+    <!-- Save check: %1$s is what was typed, %2$s names the field. One line. -->
+    <string name="channel_editor_err_not_number">「%1$s」は数値ではありません：%2$sを確認してください</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_rx">受信周波数（MHz）</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_tx">送信周波数（MHz）</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_lat">緯度</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_lon">経度</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_call">呼出番号</string>
+    <!-- Names the field in "Enter %1$s" and "\"x\" is not a number: check %2$s" (channel_editor_err_enter / _not_number). A noun phrase. -->
+    <string name="channel_editor_what_group">受信グループの各項目</string>
+    <!-- Save check: %1$s is the bands this radio tunes ("400-480 MHz"). One line. -->
+    <string name="channel_editor_err_band">周波数は %1$s の範囲内にしてください</string>
+    <!-- Save check on the location fields. One line. -->
+    <string name="channel_editor_err_both">緯度と経度を両方入力するか、両方とも空欄にしてください</string>
+    <!-- Save check on the location fields. One line. -->
+    <string name="channel_editor_err_latlon">緯度は ±90、経度は ±180 の範囲内にしてください</string>
+    <!-- Save check on the RX group list. One line. -->
+    <string name="channel_editor_err_groups">受信グループのトークグループは最大 32 件です（呼出番号を含む）</string>
+    <!-- Save check on the encrypt key. One line. -->
+    <string name="channel_editor_err_key">暗号化キーはちょうど 8 文字にしてください</string>
+    <!-- Title of the dialog that shows a Save check. Short. -->
+    <string name="channel_editor_check_title">チャンネルを確認</string>
+</resources>

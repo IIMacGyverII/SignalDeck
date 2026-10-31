@@ -98,7 +98,7 @@
     <!-- Satellite card line: a coming pass. %1$s the satellite, %2$s when (weekday and time), %3$s its highest elevation in whole degrees. One line. -->
     <string name="modes_cond_sat_pass">%1$s · %2$s · %3$s°</string>
     <!-- Satellite card footnote. One or two lines. -->
-    <string name="modes_cond_sat_footer">今後 12 時間の仰角 20° を超えるパス。PKT → 衛星パス でドップラー補正しながら追跡できます。</string>
+    <string name="modes_cond_sat_footer">今後 12 時間の仰角 20° を超えるパス。PKT → 衛星パス でドップラー補正しながら追尾できます。</string>
     <!-- Footnote of the conditions sheet. %1$s the time the data was fetched (HH:mm). Two lines. -->
     <string name="modes_cond_sources">出典：NOAA SWPC（Kp、OVATION オーロラ）、Open-Meteo（対流圏）、AMSAT/SatNOGS の軌道データ。%1$s 更新、20 分後に再取得します。</string>
 
@@ -412,7 +412,7 @@
     <!-- FT8 error: a typed message is too long or has characters FT8 cannot carry. Toast, two lines. -->
     <string name="modes_ft8_err_no_fit">そのメッセージは FT8 で送れません（フリーテキストは A-Z 0-9 + - . / ? の 13 文字まで）</string>
     <!-- FT8 error: no callsign is set (it is set in the APRS settings). Toast. -->
-    <string name="modes_ft8_err_callsign">先にコールサインを設定してください（APRS 設定）</string>
+    <string name="modes_ft8_err_callsign">先にコールサインを設定してください（APRS とパケットの設定）</string>
     <!-- FT8 error: the callsign cannot be encoded in FT8. Toast. -->
     <string name="modes_ft8_err_call_unsendable">このコールサインは FT8 で送信できません</string>
     <!-- History line: the callsign is non-standard, so CQ goes out without the grid. WSJT-X is a program's name. Two lines. -->
@@ -600,7 +600,7 @@
     <!-- Pager error: scanning needs two frequencies or more. Toast. -->
     <string name="modes_pager_err_two">ページャーの周波数を 2 つ以上追加してください</string>
     <!-- Name of the message thread for pages whose address (RIC) could not be read. Short (list title). -->
-    <string name="modes_pager_ric_unreadable">RIC 判読不能</string>
+    <string name="modes_pager_ric_unreadable">RIC 読み取り不可</string>
 
     <!-- ===== RTTY and PSK31 keyboard chat ===== -->
     <!-- Title of the RTTY/PSK31 sheet (mode names stay as they are). One line. -->
@@ -662,7 +662,7 @@
 
     <!-- ===== ISS pass card (APRS and SSTV pages) ===== -->
     <!-- The pass tracking repeats for every pass. A sentence. -->
-    <string name="modes_pass_follow_all">停止するまで、すべてのパスを追跡します。</string>
+    <string name="modes_pass_follow_all">停止するまで、すべてのパスを追尾します。</string>
     <!-- The pass tracking is for this pass only. A sentence. -->
     <string name="modes_pass_follow_one">このパスのみ。</string>
     <!-- Time until the pass, an hour or more. %1$d hours, %2$d minutes. Very short. -->
@@ -718,7 +718,7 @@
     <!-- Hint under the frequency. Two lines. -->
     <string name="modes_pager_freq_hint">ページャーメッセージはこの周波数でローパワーで送信します。現在のチャンネルと違う場合は、先にその周波数に合わせ、安定するのを待ちます。</string>
     <!-- Hint when no own pager address (RIC) is set. Two lines. -->
-    <string name="modes_pager_rics_none">自局のページャー RIC は PKT → APRS 設定 で設定します。その RIC 宛のメッセージが自局宛になります。</string>
+    <string name="modes_pager_rics_none">自局のページャー RIC は PKT → 設定 で設定します。その RIC 宛のメッセージが自局宛になります。</string>
     <!-- Hint listing the user's own pager addresses. %1$s the RICs. One line. -->
     <string name="modes_pager_rics">自局の RIC：%1$s</string>
     <!-- Section heading above the recipients field. Short. -->
@@ -921,7 +921,7 @@
     <!-- Empty heard list. VFO is the free-tuning mode. Two lines. -->
     <string name="modes_m17_nothing">まだありません。M17 の周波数に合わせてください（チャンネルまたは VFO）。送信は同期信号から検出し、スマートフォンのスピーカーで再生します。</string>
     <!-- Notes paragraph, first sentence when this radio can send M17. @ALL is the M17 broadcast address. -->
-    <string name="modes_m17_note_send">「押して送信」で、音声を M17 で全員（@ALL）に送信します。送信時間制限まで送れます（デバイス → 最長送信時間）。最後の言葉が切れないよう、短いテールを付けます。コールサインは APRS 設定のものを使います。</string>
+    <string name="modes_m17_note_send">「押して送信」で、音声を M17 で全員（@ALL）に送信します。送信時間制限まで送れます（デバイス → 最長送信時間）。最後の言葉が切れないよう、短いテールを付けます。コールサインは「APRS とパケットの設定」のものを使います。</string>
     <!-- Notes paragraph, first sentence on a firmware without the symbol engine. -->
     <string name="modes_m17_note_firmware">このファームウェアでは受信専用です。M17 を送信するには、シンボルエンジン付きのモジュールのファームウェアが必要です。</string>
     <!-- Notes paragraph, first sentence on a radio that cannot send M17. -->
@@ -993,7 +993,7 @@
     <!-- Result of a study run or a stopped exam. %1$s percent right; "Missed questions" is the button name. Two lines. -->
     <string name="modes_exam_percent">正解率 %1$s %%。間違えた問題は、正解するまで「間違えた問題」に残ります。</string>
     <!-- Section heading (capitals) above the missed questions. One word. -->
-    <string name="modes_exam_missed_section">間違い</string>
+    <string name="modes_exam_missed_section">間違えた問題</string>
     <!-- Under a missed question: the right answer. %1$s its letter, %2$s its text (English). One line or more. -->
     <string name="modes_exam_answer">正解 %1$s：%2$s</string>
     <!-- Under a missed question: what was chosen. %1$s its letter, %2$s its text (English). One line or more. -->
@@ -1167,7 +1167,7 @@
     <!-- Button: open the ARISS status web page. Third of a row. -->
     <string name="modes_satd_ariss_status">ARISS ステータス</string>
     <!-- Toast after saving the ISS frequencies. One line. -->
-    <string name="modes_satd_iss_saved">保存しました：次に追跡するパスから使用します</string>
+    <string name="modes_satd_iss_saved">保存しました：次に追尾するパスから使用します</string>
     <!-- Toast: a frequency is out of range. %1$s the bands this radio tunes. Two lines. -->
     <string name="modes_satd_iss_invalid">数値を確認してください：受信周波数は %1$s（この無線機が合わせられる範囲）内、送信周波数は 136〜480 MHz の間です</string>
     <!-- Toast after resetting the ISS frequencies. One line. -->
@@ -1177,13 +1177,13 @@
     <!-- Title of the satellite passes sheet. One line. -->
     <string name="modes_satd_title">衛星パス</string>
     <!-- Explanation on the passes sheet. %1$s the age of the orbits in hours. A paragraph. -->
-    <string name="modes_satd_hint">今後 24 時間に上空を通過するパス。パスを追跡すると、無線機がそれに追従します。上昇の 1 分前に VFO を衛星の周波数に合わせ、数秒ごとにドップラー補正し（送信中は補正しません）、沈んだ後は元のチャンネルに戻ります。高いパスほど垂直アンテナでよく聞こえます。軌道データは %1$s 時間前のものです。</string>
+    <string name="modes_satd_hint">今後 24 時間に上空を通過するパス。パスを追尾すると、無線機がそれに追従します。上昇の 1 分前に VFO を衛星の周波数に合わせ、数秒ごとにドップラー補正し（送信中は補正しません）、沈んだ後は元のチャンネルに戻ります。高いパスほど垂直アンテナでよく聞こえます。軌道データは %1$s 時間前のものです。</string>
     <!-- The same before any orbit was downloaded. A paragraph. -->
-    <string name="modes_satd_hint_no_orbits">今後 24 時間に上空を通過するパス。パスを追跡すると、無線機がそれに追従します。上昇の 1 分前に VFO を衛星の周波数に合わせ、数秒ごとにドップラー補正し（送信中は補正しません）、沈んだ後は元のチャンネルに戻ります。高いパスほど垂直アンテナでよく聞こえます。軌道データは未ダウンロードです。</string>
+    <string name="modes_satd_hint_no_orbits">今後 24 時間に上空を通過するパス。パスを追尾すると、無線機がそれに追従します。上昇の 1 分前に VFO を衛星の周波数に合わせ、数秒ごとにドップラー補正し（送信中は補正しません）、沈んだ後は元のチャンネルに戻ります。高いパスほど垂直アンテナでよく聞こえます。軌道データは未ダウンロードです。</string>
     <!-- Button: stop following a pass. Full width. -->
-    <string name="modes_satd_stop_tracking">追跡を停止</string>
+    <string name="modes_satd_stop_tracking">追尾を停止</string>
     <!-- Toast after Stop tracking. Short. -->
-    <string name="modes_satd_tracking_stopped">追跡を停止しました</string>
+    <string name="modes_satd_tracking_stopped">追尾を停止しました</string>
     <!-- Hint: the phone has no location. One line. -->
     <string name="modes_satd_no_fix">位置を取得していません。位置情報をオンにしてから、もう一度開いてください。</string>
     <!-- Hint: satellites left out because this radio cannot tune them. %1$d how many, %2$s the radio's bands. Two lines. -->
@@ -1205,11 +1205,11 @@
     <!-- Pass row. %1$s weekday and time it rises, %2$s highest elevation in degrees, %3$d minutes. One line. -->
     <string name="modes_satd_pass_at">%1$s\u0020 ·\u0020 最大仰角 %2$s°\u0020 ·\u0020 %3$d 分</string>
     <!-- Pass row, second line. %1$s compass direction it rises, %2$s where it sets ("NE"). One line. -->
-    <string name="modes_satd_pass_rises">%1$s から上昇、%2$s に沈む\u0020 ·\u0020 タップで追跡</string>
+    <string name="modes_satd_pass_rises">%1$s から上昇、%2$s に沈む\u0020 ·\u0020 タップで追尾</string>
     <!-- Toast after tapping a pass that comes later. %1$s the satellite, %2$s when tracking starts (HH:mm). One line. -->
-    <string name="modes_satd_tracking_from">%2$s から %1$s を追跡します</string>
+    <string name="modes_satd_tracking_from">%2$s から %1$s を追尾します</string>
     <!-- Toast after tapping a pass under way. %1$s the satellite. One line. -->
-    <string name="modes_satd_tracking_now">%1$s を追跡中</string>
+    <string name="modes_satd_tracking_now">%1$s を追尾中</string>
     <!-- Hint: no pass coming. One line. -->
     <string name="modes_satd_no_pass">今後 24 時間に仰角 10° を超えるパスはありません。</string>
     <!-- Switch: record every tracked pass. Short. -->
@@ -1221,7 +1221,7 @@
     <!-- Toast after updating the orbits. Short. -->
     <string name="modes_satd_updated">軌道データを更新しました</string>
     <!-- Live line before the pass. %1$s the satellite, %2$s when it rises (HH:mm). One line. -->
-    <string name="modes_satd_live_waiting">%1$s を追跡中：%2$s のパスを待機中</string>
+    <string name="modes_satd_live_waiting">%1$s を追尾中：%2$s のパスを待機中</string>
     <!-- Live line during a pass, satellite coming closer. %1$s satellite, %2$s azimuth degrees, %3$s compass, %4$s elevation degrees, %5$s listen MHz, %6$s talk MHz. Two lines. -->
     <string name="modes_satd_live_approaching">%1$s\u0020 ·\u0020 方位 %2$s° %3$s、仰角 %4$s°\n受信 %5$s\u0020 ·\u0020 送信 %6$s MHz\u0020 ·\u0020 接近中</string>
     <!-- The same, satellite moving away. Two lines. -->
@@ -1548,7 +1548,7 @@
     <!-- Toast: nothing to export. %1$s the reference. One line. -->
     <string name="modes_pota_no_contacts">%1$s の交信はまだありません</string>
     <!-- Toast after export without a callsign set. %1$s the file name; keep the path. Two lines. -->
-    <string name="modes_pota_exported_no_call">Download/DMR/Logbook/%1$s に保存しました（局名の欄のため、APRS 設定でコールサインを設定してください）</string>
+    <string name="modes_pota_exported_no_call">Download/DMR/Logbook/%1$s に保存しました（局名の欄のため、「APRS とパケットの設定」でコールサインを設定してください）</string>
     <!-- Title of Android's share chooser for the activation log. One line. -->
     <string name="modes_pota_send_log">ログを送信</string>
 

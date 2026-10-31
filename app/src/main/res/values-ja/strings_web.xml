@@ -112,7 +112,7 @@
     <!-- Error in the channel editor (DMR). -->
     <string name="web_ch_groups_max">受信リストのトークグループは最大 32 個です（呼出番号を含む）</string>
     <!-- Error in the channel editor (DMR encryption). -->
-    <string name="web_ch_key_len">暗号キーはちょうど 8 文字にしてください</string>
+    <string name="web_ch_key_len">暗号化キーはちょうど 8 文字にしてください</string>
     <!-- Error: a new DMR channel on a radio that only does analog (FM). -->
     <string name="web_ch_no_dmr">この無線機は DMR 非対応です：アナログチャンネルを追加してください</string>
     <!-- Error in the VFO editor (DMR). -->
@@ -228,7 +228,7 @@
     <!-- Error: the frequency picked on the band scope is outside this radio's bands. -->
     <string name="web_scope_untunable">この無線機で合わせられる周波数ではありません</string>
     <!-- Reply after choosing a frequency on the band scope. %1$s: the frequency, e.g. "145.5000". -->
-    <string name="web_scope_listening">%1$s MHz を受信中（VFO）</string>
+    <string name="web_scope_listening">%1$s MHz で受信中（VFO）</string>
     <!-- Status of the terrain prediction on the coverage map before it has a status of its own. Lower case, short. -->
     <string name="web_coverage_predict_starting">開始中…</string>
 
@@ -302,7 +302,7 @@
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_hwptt_label">側面の PTT キー</string>
     <!-- Setting description under its name. -->
-    <string name="web_set_hwptt_sub">端末本体の PTT ボタンで送信します</string>
+    <string name="web_set_hwptt_sub">端末本体の PTT キーで送信します</string>
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_volptt_label">音量アップで送信</string>
     <!-- Setting description under its name. -->
@@ -446,7 +446,7 @@
     <!-- Error: the repeater list is out of date. -->
     <string name="web_rpt_search_again">もう一度検索してください：そのレピーターは前回のリストにありません</string>
     <!-- Error: adding a repeater produced no channels. -->
-    <string name="web_rpt_nothing">書き込むものがありません</string>
+    <string name="web_rpt_nothing">追加するものがありません</string>
     <!-- Error in the zone editor. -->
     <string name="web_zone_name_needed">ゾーンには名前が必要です</string>
     <!-- Error in the zone editor. -->
@@ -486,14 +486,14 @@
     <!-- Reply after turning the pager monitor on. -->
     <string name="web_pager_monitor_on">ページャーワッチオン</string>
     <!-- Reply after turning the pager monitor off. -->
-    <string name="web_pager_monitor_off">ページャーワッチオフ</string>
+    <string name="web_pager_monitor_off">ページャーワッチを停止しました</string>
     <!-- Error: a page needs a message. -->
     <string name="web_pager_write">メッセージを入力してください</string>
     <!-- Error: a page needs a pager address (RIC). -->
     <string name="web_pager_add_ric">RIC を追加してください</string>
     <!-- Reply after sending a page. %1$d: the number of pager addresses (RICs). -->
     <plurals name="web_pager_sending">
-        <item quantity="other">%1$d 件の RIC に送信中</item>
+        <item quantity="other">%1$d 個の RIC に送信中</item>
     </plurals>
     <!-- Reply after Restart the module on the web Settings page. -->
     <string name="web_device_restarting">無線モジュールを再起動中</string>

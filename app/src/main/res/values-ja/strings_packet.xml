@@ -66,7 +66,7 @@
     <!-- Toast: no callsign is set. PKT → Settings is where to set it. -->
     <string name="packet_err_callsign_settings">先にコールサインを設定してください（PKT → 設定）</string>
     <!-- Toast: no callsign is set. PKT → APRS settings is where to set it. -->
-    <string name="packet_err_callsign_aprs">先にコールサインを設定してください（PKT → APRS 設定）</string>
+    <string name="packet_err_callsign_aprs">先にコールサインを設定してください（PKT → 設定）</string>
     <!-- Toast: no callsign is set (APRS-IS). -->
     <string name="packet_err_callsign">先にコールサインを設定してください</string>
     <!-- Toast: packet cannot be sent on a DMR channel. -->
@@ -909,7 +909,7 @@
     <!-- Toast when the packet finder cannot start. One or two lines. -->
     <string name="packet_finder_err_tx">送信中は開始できません</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
-    <string name="packet_finder_err_sat">衛星パスを追跡中です</string>
+    <string name="packet_finder_err_sat">衛星パスを追尾中です</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
     <string name="packet_finder_err_winlink">Winlink セッションが動作中です</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
@@ -1042,7 +1042,7 @@
     <!-- Toast after a weather report is queued. One line. -->
     <string name="packet_pkt_weather_queued">気象情報を送信待ちにしました</string>
     <!-- Button on the PKT sheet while a satellite is tracked (%1$s its name, e.g. ISS). Short (two buttons share a row). -->
-    <string name="packet_pkt_sat_tracking">衛星：%1$s を追跡中</string>
+    <string name="packet_pkt_sat_tracking">衛星：%1$s を追尾中</string>
     <!-- Button on the PKT sheet that opens the satellite sheet. Short (two buttons share a row). -->
     <string name="packet_pkt_sat_passes">衛星パス</string>
     <!-- Button on the PKT sheet that opens the band scope. Short (two buttons share a row). -->
@@ -1250,7 +1250,7 @@
     <!-- Toast after the pager receiver stops. One line. -->
     <string name="packet_pkt_pager_off">ページャー受信オフ</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
-    <string name="packet_pkt_pager_hint">英数字のページャーメッセージを、1 回の送信で 1 つまたは複数の RIC に送ります。自局のページャー RIC は APRS 設定にあります。スマートフォン出荷時のファームウェアでは、シンボルエンジンが必要だとページャー画面に表示されます。</string>
+    <string name="packet_pkt_pager_hint">英数字のページャーメッセージを、1 回の送信で 1 つまたは複数の RIC に送ります。自局のページャー RIC は「APRS とパケットの設定」にあります。スマートフォン出荷時のファームウェアでは、シンボルエンジンが必要だとページャー画面に表示されます。</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
     <string name="packet_pkt_sstv_section">SSTV 画像</string>
     <!-- Button on the PKT sheet that stops the SSTV receiver. Short (two buttons share a row). -->

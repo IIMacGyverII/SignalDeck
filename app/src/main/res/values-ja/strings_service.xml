@@ -54,7 +54,7 @@
     <!-- History line when the parrot (simplex repeater) is switched off. %1$d is how many transmissions it repeated. Starts with an emoji; keep it. -->
     <string name="service_parrot_off_history">🦜 パロットオフ（%1$d 回中継）</string>
     <!-- Toast when the parrot (simplex repeater) is switched off. Short. -->
-    <string name="service_parrot_off">パロットオフ</string>
+    <string name="service_parrot_off">パロット オフ</string>
     <!-- SAFETY: transmit refusal (toast) when the parrot is switched on on a digital channel. One line. -->
     <string name="service_parrot_needs_fm">パロットにはアナログ FM チャンネルが必要です</string>
     <!-- Refusal (toast) when the parrot is switched on with the squelch open. Soft SQ is SignalDeck's software squelch. Two lines. -->
@@ -62,7 +62,7 @@
     <!-- History line when the parrot (simplex repeater) is switched on. %1$s is the channel name. Starts with an emoji; keep it. -->
     <string name="service_parrot_on_history">🦜 パロットオン：%1$s で受信した内容を中継します</string>
     <!-- Toast when the parrot (simplex repeater) is switched on. %1$s is the channel name. One or two lines. -->
-    <string name="service_parrot_on">%1$s でパロットオン：受信が終わってから 1 秒後に送信し直します</string>
+    <string name="service_parrot_on">%1$s でパロット オン：受信が終わってから 1 秒後に送信し直します</string>
     <!-- A DMR talkgroup without a name, as a number (history, Last heard, notifications). %1$d is the talkgroup number. TG is the usual abbreviation for talkgroup. -->
     <string name="service_tg_number">TG %1$d</string>
     <!-- History line when a caption keyword alert fires. %1$s is the keyword. Starts with an emoji; keep it. -->
@@ -470,7 +470,7 @@
     <!-- Refusal (toast) of the repeater key-up test on a simplex channel or one without a location. One line. -->
     <string name="service_keyup_needs_repeater">位置が登録された FM レピーターのチャンネルを選んでください</string>
     <!-- Refusal (toast) of the repeater key-up test before the callsign is set. PKT → APRS settings is where it is set. Two lines. -->
-    <string name="service_keyup_needs_callsign">先にコールサインを設定してください（PKT → APRS 設定）：テストではそれを ID として送信します</string>
+    <string name="service_keyup_needs_callsign">先にコールサインを設定してください（PKT → 設定）：テストではそれを ID として送信します</string>
     <!-- Text of the ongoing radio notification before the radio is up. Short. -->
     <string name="service_notif_idle">無線機待機中</string>
     <!-- Choice of the roger beep setting: a short beep at the end of each transmission. One word (chip). -->

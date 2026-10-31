@@ -10,7 +10,7 @@
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
     <string name="channel_editor_h_type">デジタル（DMR）チャンネルは音声とテキストをデータとして送り、カラーコード、タイムスロット、呼出先が必要です。アナログチャンネルは従来の FM です。M17 チャンネルはワイド FM の上に M17 を載せたもので、宛先コールサイン（または全員）とチャンネルアクセス番号を使います。種別を切り替えると、その種別で使う設定が表示されます。</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
-    <string name="channel_editor_h_m17">このチャンネルの呼出先です。@ALL は全員を呼び出し、コールサインはその局を呼び出します。「連絡先から選択」では、コールサインのある連絡先を選べます。自局のコールサイン（送信に使うもの）は、APRS 設定の局コールサインです。</string>
+    <string name="channel_editor_h_m17">このチャンネルの呼出先です。@ALL は全員を呼び出し、コールサインはその局を呼び出します。「連絡先から選択」では、コールサインのある連絡先を選べます。自局のコールサイン（送信に使うもの）は、「APRS とパケットの設定」の局コールサインです。</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
     <string name="channel_editor_h_can">チャンネルアクセス番号で、0〜15 です。この番号が一致する無線機同士でしか受信できません。通常は 0 を使います。</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. %1$s is the longest name the radio takes (characters). -->
@@ -166,9 +166,9 @@
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. DMR transmit interrupt. -->
     <string name="channel_editor_l_int">送信割り込み</string>
     <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Capitals. -->
-    <string name="channel_editor_o_int_off">OFF</string>
+    <string name="channel_editor_o_int_off">オフ</string>
     <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Capitals. -->
-    <string name="channel_editor_o_int_on">ON</string>
+    <string name="channel_editor_o_int_on">オン</string>
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. Channel width. -->
     <string name="channel_editor_l_band">帯域幅</string>
     <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. 12.5 kHz. -->

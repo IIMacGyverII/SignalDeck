@@ -46,7 +46,7 @@
     <!-- Settings switch title: the phone's side push-to-talk key transmits. One line. -->
     <string name="device_set_side_ptt">側面の PTT キー</string>
     <!-- Subtitle of "Side PTT key". May wrap. -->
-    <string name="device_set_side_ptt_sub">端末本体の PTT ボタンで送信します</string>
+    <string name="device_set_side_ptt_sub">端末本体の PTT キーで送信します</string>
     <!-- Settings switch title: the volume-up key transmits. One line. -->
     <string name="device_set_vol_ptt">音量アップで送信</string>
     <!-- Subtitle of "Volume-up transmits". One line. -->
@@ -682,7 +682,7 @@
     <!-- Title while the PTT key is captured. One line. -->
     <string name="device_capture_title">今すぐ PTT キーを押してください</string>
     <!-- Message while the PTT key is captured. -->
-    <string name="device_capture_msg">これから 10 秒の間に、端末側面の PTT ボタンを数回押して離してください。端末がこのボタンについて報告する内容をすべて記録します。</string>
+    <string name="device_capture_msg">これから 10 秒の間に、端末側面の PTT キーを数回押して離してください。端末がこのキーについて報告する内容をすべて記録します。</string>
     <!-- Toast after the PTT capture when there is no report to save it in. -->
     <string name="device_capture_no_report">記録しましたが、保存するには先にレポートを作成してください</string>
     <!-- Toast after the PTT capture was saved. -->
@@ -1371,7 +1371,7 @@
 
     <!-- ==== Settings → Diagnostics page (ui/DiagnosticsView). The engine log itself stays English. ==== -->
     <!-- SAFETY: Diagnostics page, pill button that takes over the radio (powers the module up for SignalDeck). One of four buttons in a row: very short. -->
-    <string name="device_diag_bring_up">無線を起動</string>
+    <string name="device_diag_bring_up">無線起動</string>
     <!-- SAFETY: Diagnostics page, pill button that hands the radio back to the phone's own radio app. One of four buttons in a row: short. -->
     <string name="device_diag_release">解放（純正アプリ有効）</string>
     <!-- Diagnostics page, pill button that asks the radio module for its firmware version (into the log). One of three in a row: short. -->

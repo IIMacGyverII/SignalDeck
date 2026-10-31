@@ -49,7 +49,7 @@
     <!-- Classic intercom page, headline: receiving. Keep the emoji. One line. -->
     <string name="intercom_main_classic_receiving">📻 受信中…</string>
     <!-- Classic intercom page, headline: no root access yet. "Device → Bring radio up" names the Device page and its button. One line (ellipsised). -->
-    <string name="intercom_main_classic_root_needed">🔒 root 権限が必要です — Magisk で許可してから、デバイス → 無線を起動</string>
+    <string name="intercom_main_classic_root_needed">🔒 root 権限が必要です — Magisk で許可してから、デバイス → 無線起動</string>
     <!-- Classic intercom page, headline: this phone model is not supported. "Device → Device report" names the Device page and its row. One line (ellipsised). -->
     <string name="intercom_main_classic_unsupported">📱 この端末はまだ対応していません — デバイス → デバイスレポート</string>
     <!-- Classic intercom page, headline: who is calling. %1$s the caller (name, callsign or DMR ID). Keep the emoji. One line. -->
@@ -735,7 +735,7 @@
     <!-- Add a zone sheet: card subtitle for the own-channels zone. One line. -->
     <string name="intercom_zones_own_sub">名前を付けてから、含めるチャンネルにチェックを入れます</string>
     <!-- Title of the name dialog for a new zone. Short. -->
-    <string name="intercom_zones_new_zone">新しいゾーン</string>
+    <string name="intercom_zones_new_zone">新規ゾーン</string>
     <!-- Toast when the new zone's name is already taken; %1$s is the existing zone's name. One line. -->
     <string name="intercom_zones_exists_toast">%1$s という名前のゾーンはすでにあります</string>
     <!-- Add a zone sheet: section title above the standard channel lists, when a region is chosen; %1$s is the region (e.g. "United States"). Short, shown in caps. -->
@@ -869,9 +869,9 @@
     <!-- Title of the Scheduled operations sheet. One line. -->
     <string name="intercom_schedule_title">予約操作</string>
     <!-- Hint at the top of the Scheduled operations sheet. A few lines. -->
-    <string name="intercom_schedule_hint">決まった時刻に、1 回だけ、または毎週、操作を開始します：チャンネルの受信（録音も可）、ゾーンのスキャン、APRS ワッチ、SSTV 受信、APRS ビーコンの送信。終了時刻になると、無線機は元の動作に戻ります。画面がオフでも動作し、追跡中の衛星パスが常に優先されます。</string>
+    <string name="intercom_schedule_hint">決まった時刻に、1 回だけ、または毎週、操作を開始します：チャンネルの受信（録音も可）、ゾーンのスキャン、APRS ワッチ、SSTV 受信、APRS ビーコンの送信。終了時刻になると、無線機は元の動作に戻ります。画面がオフでも動作し、追尾中の衛星パスが常に優先されます。</string>
     <!-- The same hint on a radio that cannot tune the APRS frequency (no "APRS monitoring" in the list). A few lines. -->
-    <string name="intercom_schedule_hint_no_aprs">決まった時刻に、1 回だけ、または毎週、操作を開始します：チャンネルの受信（録音も可）、ゾーンのスキャン、SSTV 受信、APRS ビーコンの送信。終了時刻になると、無線機は元の動作に戻ります。画面がオフでも動作し、追跡中の衛星パスが常に優先されます。</string>
+    <string name="intercom_schedule_hint_no_aprs">決まった時刻に、1 回だけ、または毎週、操作を開始します：チャンネルの受信（録音も可）、ゾーンのスキャン、SSTV 受信、APRS ビーコンの送信。終了時刻になると、無線機は元の動作に戻ります。画面がオフでも動作し、追尾中の衛星パスが常に優先されます。</string>
     <!-- Shown when there are no schedules. One line. -->
     <string name="intercom_schedule_empty">予約はまだありません。</string>
     <!-- Schedule row subtitle while it runs; %1$s is when it repeats (e.g. "Mon Wed 07:00 for 60 min"), %2$s the end time (HH:mm). One line. -->
@@ -943,7 +943,7 @@
     <!-- Emergency sheet: how it goes out on an analog channel; %1$s is the channel name. One or two lines. -->
     <string name="intercom_emergency_how_analog">%1$s（アナログ）：緊急シンボル付きの APRS 位置を送ります。</string>
     <!-- Emergency sheet: the same, when no callsign is set yet; "PKT → APRS settings" is the menu path. Two lines. -->
-    <string name="intercom_emergency_how_analog_no_call">%1$s（アナログ）：緊急シンボル付きの APRS 位置を送ります。先に PKT → APRS 設定 でコールサインを設定してください。</string>
+    <string name="intercom_emergency_how_analog_no_call">%1$s（アナログ）：緊急シンボル付きの APRS 位置を送ります。先に PKT → 設定 でコールサインを設定してください。</string>
     <!-- Emergency sheet: section title above the message field. Short, shown in caps. -->
     <string name="intercom_emergency_message">メッセージ</string>
     <!-- Emergency sheet: hint of the message field. Short. -->
@@ -1011,7 +1011,7 @@
     <!-- Title of the Net control sheet (start a net, past nets). One line. -->
     <string name="intercom_net_title">キー局</string>
     <!-- Hint at the top of the Net control sheet. -->
-    <string name="intercom_net_start_hint">ロールコールを運用します。開始したら、呼んできた局から順にチェックイン（無線機が受信したばかりの局をタップしても可）、連絡あり・遅れ・退出の局に印を付け、最後にレポートを作って終了します。レポートは共有やログへの追加ができます。</string>
+    <string name="intercom_net_start_hint">ロールコールを運営します。開始したら、呼んできた局から順にチェックイン（無線機が受信したばかりの局をタップしても可）、連絡あり・遅れ・退出の局に印を付け、最後にレポートを作って終了します。レポートは共有やログへの追加ができます。</string>
     <!-- Label of the net name field on the Net control sheet. Short. -->
     <string name="intercom_net_name_label">ロールコール名</string>
     <!-- Default net name in the Net control sheet's name field, before the user has run a net. It becomes the net's stored name. -->
@@ -1125,7 +1125,7 @@
     <!-- Button on the Nets sheet that reloads the lists. Short (half-width button). -->
     <string name="intercom_nets_refresh">更新</string>
     <!-- Button on the Nets sheet that opens Net control. Short (half-width button). -->
-    <string name="intercom_nets_run">ロールコールを運用</string>
+    <string name="intercom_nets_run">ロールコール運営</string>
     <!-- Button on the Nets sheet that adds a net schedule to a channel. Short (full-width button). -->
     <string name="intercom_nets_add">チャンネルにロールコールを追加</string>
     <!-- Status line when NetLogger could not be read. %1$s the error. One or two lines. -->

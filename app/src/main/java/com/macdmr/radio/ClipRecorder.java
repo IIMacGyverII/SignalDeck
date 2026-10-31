@@ -63,7 +63,7 @@ public final class ClipRecorder {
     public synchronized double rms() { return samples == 0 ? -1 : Math.sqrt((double) sumSq / samples); }
     public synchronized String stats() {
         double rms = samples == 0 ? 0 : Math.sqrt((double) sumSq / samples);
-        return String.format(Locale.US, "%s: %.1f s, level RMS %d (%.0f dBFS), peak %d, clipped %.2f %%, dropouts (≥10 ms of digital silence) %d, longest %d ms",
+        return String.format(Locale.US, "%s: %.1f s, level RMS %d (%.0f dBFS), peak %d, clipped %.2f %%, dropouts (≥10 ms of digital silence) %d, longest %d ms",   // i18n: first-run check (bench text)
                 file.getName(), samples / 8000.0, Math.round(rms), rms > 0 ? 20 * Math.log10(rms / 32768.0) : -99, peak,
                 samples == 0 ? 0 : 100.0 * clipped / samples, dropouts, longestZero / 8);
     }

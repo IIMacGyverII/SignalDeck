@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.content.Context;
 import android.util.Log;
 
@@ -55,12 +57,12 @@ public final class Satellites {
     }
     private static Sat[] builtIn(Context c) {
         return new Sat[] {
-            new Sat("iss-aprs", "ISS APRS", "ISS", ISS_CATALOG, issHz(c, "issAprs", ISS_APRS_HZ), issHz(c, "issAprs", ISS_APRS_HZ), 0, "Packet digipeater: the pass is monitored on the APRS page; PKT \u2192 Beacon via ISS sends your position through it", APRS),
-            new Sat("iss-sstv", "ISS SSTV", "ISS", ISS_CATALOG, issHz(c, "issSstv", ISS_SSTV_HZ), 0, 0, "Picture events (Robot 36): pictures are decoded on the SSTV page. Only during announced events", SSTV),
-            new Sat("iss-rptr", "ISS repeater", "ISS", ISS_CATALOG, issHz(c, "issRptrDown", ISS_RPTR_DOWN_HZ), issHz(c, "issRptrUp", ISS_RPTR_UP_HZ), issRptrTone(c), "Cross-band FM repeater, on at times: listen on 70 cm, talk on 2 m with the tone"),
-            new Sat("iss-voice", "ISS voice", "ISS", ISS_CATALOG, issHz(c, "issVoiceDown", ISS_VOICE_DOWN_HZ), issHz(c, "issVoiceUp", ISS_VOICE_UP_HZ), 0, "Crew contacts and school contacts; mostly listen"),
-            new Sat("so50", "SO-50", "SO-50", 27607, 436_795_000, 145_850_000, 67.0, "FM repeater; a 74.4 Hz tone for 2 s arms its 10-minute timer"),
-            new Sat("po101", "PO-101", "PO-101", 43678, 145_900_000, 437_500_000, 141.3, "FM repeater on a schedule (Diwata-2); talk on 70 cm with 141.3 Hz"),
+            new Sat("iss-aprs", "ISS APRS", "ISS", ISS_CATALOG, issHz(c, "issAprs", ISS_APRS_HZ), issHz(c, "issAprs", ISS_APRS_HZ), 0, Txt.s(R.string.modes_sat_about_iss_aprs), APRS),   // i18n: satellite name
+            new Sat("iss-sstv", "ISS SSTV", "ISS", ISS_CATALOG, issHz(c, "issSstv", ISS_SSTV_HZ), 0, 0, Txt.s(R.string.modes_sat_about_iss_sstv), SSTV),   // i18n: satellite name
+            new Sat("iss-rptr", "ISS repeater", "ISS", ISS_CATALOG, issHz(c, "issRptrDown", ISS_RPTR_DOWN_HZ), issHz(c, "issRptrUp", ISS_RPTR_UP_HZ), issRptrTone(c), Txt.s(R.string.modes_sat_about_iss_rptr)),   // i18n: satellite name
+            new Sat("iss-voice", "ISS voice", "ISS", ISS_CATALOG, issHz(c, "issVoiceDown", ISS_VOICE_DOWN_HZ), issHz(c, "issVoiceUp", ISS_VOICE_UP_HZ), 0, Txt.s(R.string.modes_sat_about_iss_voice)),   // i18n: satellite name
+            new Sat("so50", "SO-50", "SO-50", 27607, 436_795_000, 145_850_000, 67.0, Txt.s(R.string.modes_sat_about_so50)),   // i18n: satellite name
+            new Sat("po101", "PO-101", "PO-101", 43678, 145_900_000, 437_500_000, 141.3, Txt.s(R.string.modes_sat_about_po101)),   // i18n: satellite name
         };
     }
 
@@ -75,11 +77,11 @@ public final class Satellites {
         String body = get("https://www.amsat.org/tle/current/nasabare.txt");
         if (body == null || !body.contains("25544")) {
             StringBuilder sb = new StringBuilder();
-            for (int cat : new int[] { 25544, 27607, 43678 }) { String b = get("https://celestrak.org/NORAD/elements/gp.php?CATNR=" + cat + "&FORMAT=TLE"); if (b != null) sb.append(b.trim()).append('\n'); }
+            for (int cat : new int[] { 25544, 27607, 43678 }) { String b = get("https://celestrak.org/NORAD/elements/gp.php?CATNR=" + cat + "&FORMAT=TLE"); if (b != null) sb.append(b.trim()).append('\n'); }   // i18n: URL
             body = sb.length() > 0 ? sb.toString() : null;
         }
-        if (body == null) return "Could not download satellite orbits (AMSAT and CelesTrak unreachable)";
-        try { Files.write(file().toPath(), body.getBytes(StandardCharsets.US_ASCII)); } catch (Throwable t) { return "Could not save: " + t.getMessage(); }
+        if (body == null) return Txt.s(R.string.modes_sat_download_failed);
+        try { Files.write(file().toPath(), body.getBytes(StandardCharsets.US_ASCII)); } catch (Throwable t) { return Txt.s(R.string.modes_sat_save_failed, String.valueOf(t.getMessage())); }
         FmSats.updateIfOld(ctx, 3 * 86_400_000L);                               // the FM satellite list: every few days is plenty
         return null;
     }

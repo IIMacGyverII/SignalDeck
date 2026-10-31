@@ -6,6 +6,10 @@
  */
 package com.macdmr.radio.pkt;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,14 +49,18 @@ public class SAMEDecoder {
         public final long receivedMs = System.currentTimeMillis();
         Message(String raw, boolean eom) { this.raw = raw; this.eom = eom; }
 
-        public String summary() {
-            if (eom) return "End of message";
-            StringBuilder sb = new StringBuilder();
-            sb.append(eventName.isEmpty() ? event : eventName);
-            if (durationMin > 0) sb.append(" — ").append(durationMin / 60).append("h").append(String.format(Locale.US, "%02d", durationMin % 60));
-            sb.append(" — ").append(areas.size()).append(areas.size() == 1 ? " area" : " areas");
-            if (!sender.isEmpty()) sb.append(" — ").append(sender.trim());
-            return sb.toString();
+        /** One line for the alert list and the history, in English (stored with the alert). */
+        public String summary() { return summaryMsg().english(); }
+
+        /** The same line as a message: "Tornado Warning — 1h00 — 3 areas — KXYZ/NWS". */
+        public Msg summaryMsg() {
+            if (eom) return Msg.of(R.string.packet_same_end_of_message);
+            Object name = eventName.isEmpty() ? event : eventArg(event);
+            Msg areasN = Msg.plural(R.plurals.packet_same_areas, areas.size(), areas.size());
+            Msg dur = Msg.of(R.string.packet_same_duration, durationMin / 60, String.format(Locale.US, "%02d", durationMin % 60));
+            String snd = sender.trim();
+            if (durationMin > 0) return sender.isEmpty() ? Msg.of(R.string.packet_same_summary_dur, name, dur, areasN) : Msg.of(R.string.packet_same_summary_dur_sender, name, dur, areasN, snd);
+            return sender.isEmpty() ? Msg.of(R.string.packet_same_summary, name, areasN) : Msg.of(R.string.packet_same_summary_sender, name, areasN, snd);
         }
     }
 
@@ -231,28 +239,45 @@ public class SAMEDecoder {
         int r = 0; for (int i = 0; i < 8; i++) { r = (r << 1) | (b & 1); b >>= 1; } return r;
     }
 
-    private static final Map<String, String> EVENTS = new HashMap<String, String>();
+    /** SAME event codes and their display names (the codes stay as sent; the names are translated). */
+    private static final Map<String, Integer> EVENTS = new HashMap<String, Integer>();
     static {
-        String[][] e = {
-            {"TOR","Tornado Warning"},{"TOA","Tornado Watch"},{"SVR","Severe Thunderstorm Warning"},{"SVA","Severe Thunderstorm Watch"},
-            {"SVS","Severe Weather Statement"},{"FFW","Flash Flood Warning"},{"FFA","Flash Flood Watch"},{"FFS","Flash Flood Statement"},
-            {"FLW","Flood Warning"},{"FLA","Flood Watch"},{"FLS","Flood Statement"},{"WSW","Winter Storm Warning"},{"WSA","Winter Storm Watch"},
-            {"BZW","Blizzard Warning"},{"HWW","High Wind Warning"},{"HWA","High Wind Watch"},{"SMW","Special Marine Warning"},{"SPS","Special Weather Statement"},
-            {"HUW","Hurricane Warning"},{"HUA","Hurricane Watch"},{"HLS","Hurricane Statement"},{"TRW","Tropical Storm Warning"},{"TRA","Tropical Storm Watch"},
-            {"TSW","Tsunami Warning"},{"TSA","Tsunami Watch"},{"SSW","Storm Surge Warning"},{"SSA","Storm Surge Watch"},{"EWW","Extreme Wind Warning"},
-            {"DSW","Dust Storm Warning"},{"FRW","Fire Warning"},{"FZW","Freeze Warning"},{"HMW","Hazardous Materials Warning"},{"LEW","Law Enforcement Warning"},
-            {"LAE","Local Area Emergency"},{"NUW","Nuclear Power Plant Warning"},{"RHW","Radiological Hazard Warning"},{"SPW","Shelter In Place Warning"},
-            {"VOW","Volcano Warning"},{"CAE","Child Abduction Emergency"},{"CDW","Civil Danger Warning"},{"CEM","Civil Emergency Message"},
-            {"EVI","Evacuation Immediate"},{"EQW","Earthquake Warning"},{"AVW","Avalanche Warning"},{"AVA","Avalanche Watch"},{"CFW","Coastal Flood Warning"},
-            {"CFA","Coastal Flood Watch"},{"EAN","Emergency Action Notification"},{"EAT","Emergency Action Termination"},{"NIC","National Information Center"},
-            {"NPT","National Periodic Test"},{"RMT","Required Monthly Test"},{"RWT","Required Weekly Test"},{"ADR","Administrative Message"},{"DMO","Practice/Demo Warning"},
-            {"BHW","Biological Hazard Warning"},{"BWW","Boil Water Warning"},{"CHW","Chemical Hazard Warning"},{"TOE","911 Telephone Outage"},{"WFW","Wildfire Warning"},{"WFA","Wildfire Watch"},
+        Object[][] e = {
+            {"TOR", R.string.packet_same_tor},{"TOA", R.string.packet_same_toa},{"SVR", R.string.packet_same_svr},{"SVA", R.string.packet_same_sva},
+            {"SVS", R.string.packet_same_svs},{"FFW", R.string.packet_same_ffw},{"FFA", R.string.packet_same_ffa},{"FFS", R.string.packet_same_ffs},
+            {"FLW", R.string.packet_same_flw},{"FLA", R.string.packet_same_fla},{"FLS", R.string.packet_same_fls},{"WSW", R.string.packet_same_wsw},
+            {"WSA", R.string.packet_same_wsa},{"BZW", R.string.packet_same_bzw},{"HWW", R.string.packet_same_hww},{"HWA", R.string.packet_same_hwa},
+            {"SMW", R.string.packet_same_smw},{"SPS", R.string.packet_same_sps},{"HUW", R.string.packet_same_huw},{"HUA", R.string.packet_same_hua},
+            {"HLS", R.string.packet_same_hls},{"TRW", R.string.packet_same_trw},{"TRA", R.string.packet_same_tra},{"TSW", R.string.packet_same_tsw},
+            {"TSA", R.string.packet_same_tsa},{"SSW", R.string.packet_same_ssw},{"SSA", R.string.packet_same_ssa},{"EWW", R.string.packet_same_eww},
+            {"DSW", R.string.packet_same_dsw},{"FRW", R.string.packet_same_frw},{"FZW", R.string.packet_same_fzw},{"HMW", R.string.packet_same_hmw},
+            {"LEW", R.string.packet_same_lew},{"LAE", R.string.packet_same_lae},{"NUW", R.string.packet_same_nuw},{"RHW", R.string.packet_same_rhw},
+            {"SPW", R.string.packet_same_spw},{"VOW", R.string.packet_same_vow},{"CAE", R.string.packet_same_cae},{"CDW", R.string.packet_same_cdw},
+            {"CEM", R.string.packet_same_cem},{"EVI", R.string.packet_same_evi},{"EQW", R.string.packet_same_eqw},{"AVW", R.string.packet_same_avw},
+            {"AVA", R.string.packet_same_ava},{"CFW", R.string.packet_same_cfw},{"CFA", R.string.packet_same_cfa},{"EAN", R.string.packet_same_ean},
+            {"EAT", R.string.packet_same_eat},{"NIC", R.string.packet_same_nic},{"NPT", R.string.packet_same_npt},{"RMT", R.string.packet_same_rmt},
+            {"RWT", R.string.packet_same_rwt},{"ADR", R.string.packet_same_adr},{"DMO", R.string.packet_same_dmo},{"BHW", R.string.packet_same_bhw},
+            {"BWW", R.string.packet_same_bww},{"CHW", R.string.packet_same_chw},{"TOE", R.string.packet_same_toe},{"WFW", R.string.packet_same_wfw},
+            {"WFA", R.string.packet_same_wfa},
         };
-        for (String[] p : e) EVENTS.put(p[0], p[1]);
+        for (Object[] p : e) EVENTS.put((String) p[0], (Integer) p[1]);
     }
 
+    /** The event's name in English (stored with the alert), or the code when it is not a known one. */
     public static String eventName(String code) {
-        String n = EVENTS.get(code);
-        return n != null ? n : (code == null ? "" : code);
+        Integer n = EVENTS.get(code);
+        return n != null ? Txt.en(n) : (code == null ? "" : code);
+    }
+
+    /** The event's name in the app's language, or the code when it is not a known one. */
+    public static String eventTitle(String code) {
+        Integer n = EVENTS.get(code);
+        return n != null ? Txt.s(n) : (code == null ? "" : code);
+    }
+
+    /** The event's name as a message argument (the code itself when it is not a known one). */
+    static Object eventArg(String code) {
+        Integer n = EVENTS.get(code);
+        return n != null ? Msg.of(n) : (code == null ? "" : code);
     }
 }

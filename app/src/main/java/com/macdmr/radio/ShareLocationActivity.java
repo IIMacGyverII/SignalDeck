@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,7 +25,8 @@ public class ShareLocationActivity extends Activity {
         new Thread(() -> {
             final double[] p = GeoLink.resolve(text);
             runOnUiThread(() -> {
-                if (p == null) Toast.makeText(this, "No coordinates found in what was shared", Toast.LENGTH_LONG).show();
+                if (p == null) Toast.makeText(this, Txt.s(R.string.channels_share_no_coords), Toast.LENGTH_LONG).show();
+
                 else startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP)
                         .putExtra(MainActivity.EXTRA_LAT, p[0]).putExtra(MainActivity.EXTRA_LON, p[1]));
                 finish();

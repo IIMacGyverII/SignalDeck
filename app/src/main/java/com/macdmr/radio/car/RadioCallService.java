@@ -21,6 +21,8 @@ import android.telecom.TelecomManager;
 import android.util.Log;
 
 import com.macdmr.radio.RadioService;
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 
 /**
  * A steering-wheel transmission as a self-managed call, so it can use the car's microphone and still be stopped from
@@ -29,7 +31,7 @@ import com.macdmr.radio.RadioService;
  * its own; it only makes Android open the hands-free link (car microphone) and route the car's End and hang-up to us.
  */
 public final class RadioCallService extends ConnectionService {
-    private static final String TAG = "RadioCall";
+    private static final String TAG = "RadioCall";   // i18n: log tag
     public static final String ACCOUNT = "dmr-radio-talk";
     private static volatile Talk current;
 
@@ -39,7 +41,7 @@ public final class RadioCallService extends ConnectionService {
     public static boolean register(Context c) {
         try {
             TelecomManager tm = (TelecomManager) c.getSystemService(Context.TELECOM_SERVICE);
-            PhoneAccount pa = PhoneAccount.builder(handle(c), "SignalDeck Talk").setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED).addSupportedUriScheme("radio").build();
+            PhoneAccount pa = PhoneAccount.builder(handle(c), Txt.s(R.string.intercom_car_call_account)).setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED).addSupportedUriScheme("radio").build();
             tm.registerPhoneAccount(pa);
             return true;
         } catch (Throwable t) { Log.w(TAG, "register: " + t); return false; }
@@ -48,10 +50,10 @@ public final class RadioCallService extends ConnectionService {
     /** Start a talk "call"; the radio keys when the car's audio route is up. Error text or null. */
     public static String start(Context c) {
         try {
-            if (current != null) return "already in a talk call";
+            if (current != null) return "already in a talk call";   // i18n: logged only
             TelecomManager tm = (TelecomManager) c.getSystemService(Context.TELECOM_SERVICE);
             Bundle extras = new Bundle(); extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle(c));
-            if (!tm.isOutgoingCallPermitted(handle(c))) return "Android does not permit a call now";
+            if (!tm.isOutgoingCallPermitted(handle(c))) return "Android does not permit a call now";   // i18n: logged only
             tm.placeCall(Uri.fromParts("radio", "talk", null), extras);
             return null;
         } catch (Throwable t) { Log.w(TAG, "start: " + t); return String.valueOf(t.getMessage()); }
@@ -66,7 +68,7 @@ public final class RadioCallService extends ConnectionService {
         t.setConnectionProperties(Connection.PROPERTY_SELF_MANAGED);
         t.setAudioModeIsVoip(true);
         t.setAddress(Uri.fromParts("radio", "talk", null), TelecomManager.PRESENTATION_ALLOWED);
-        t.setCallerDisplayName("SignalDeck: talking", TelecomManager.PRESENTATION_ALLOWED);
+        t.setCallerDisplayName(Txt.s(R.string.intercom_car_call_name), TelecomManager.PRESENTATION_ALLOWED);
         t.setInitializing();
         t.setActive();
         current = t;

@@ -9,6 +9,9 @@ package com.macdmr.radio.region;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,8 +72,10 @@ public final class Region {
     public boolean amateur(long hz) { for (long[] b : amateurBands) if (hz >= b[0] && hz <= b[1]) return true; return false; }
     /** The station-ID interval in milliseconds (the region's, else 10 minutes). */
     public long idEveryMs() { return (stationIdMinutes > 0 ? stationIdMinutes : 10) * 60_000L; }
-    public String aprsMhz() { return mhz(aprsHz); }
+    public String aprsMhz() { return mhzShown(aprsHz); }
     public static String mhz(int hz) { return hz <= 0 ? "none" : String.format(Locale.US, "%.3f", hz / 1e6); }
+    /** {@link #mhz} for the screen: the app language's decimal sign ("144,390" in German). Names and stored text keep {@link #mhz}. */
+    public static String mhzShown(int hz) { return hz <= 0 ? "none" : Txt.freqMhz(hz, 3); }
 
     /** The same region with the user's own values on top ({@link #VALUES} keys; a frequency of 0 = none). Bad values are skipped. */
     public Region withOverrides(Map<String, ?> ov) {
@@ -98,20 +103,20 @@ public final class Region {
     /** One value as shown on the Region sheet. */
     public String show(String key) {
         switch (key) {
-            case APRS: return mhz(aprsHz) + " MHz";
-            case CALL2: return call2mHz > 0 ? mhz(call2mHz) + " MHz" : "none listed";
-            case CALL70: return call70Hz > 0 ? mhz(call70Hz) + " MHz" : "none listed";
-            case SSTV: return sstvHz > 0 ? mhz(sstvHz) + " MHz" : "none listed";
-            case WEATHER: return weatherRadio ? "Yes" : "No";
-            case UNITS: return km ? "Kilometres" : "Miles";
-            case STATION_ID: return stationIdMinutes > 0 ? "Every " + stationIdMinutes + " min" : "Every 10 min (app default)";
+            case APRS: return mhzShown(aprsHz) + " MHz";
+            case CALL2: return call2mHz > 0 ? mhzShown(call2mHz) + " MHz" : Txt.s(R.string.channels_region_none_listed);
+            case CALL70: return call70Hz > 0 ? mhzShown(call70Hz) + " MHz" : Txt.s(R.string.channels_region_none_listed);
+            case SSTV: return sstvHz > 0 ? mhzShown(sstvHz) + " MHz" : Txt.s(R.string.channels_region_none_listed);
+            case WEATHER: return Txt.s(weatherRadio ? R.string.channels_region_yes : R.string.channels_region_no);
+            case UNITS: return Txt.s(km ? R.string.channels_region_km : R.string.channels_region_miles);
+            case STATION_ID: return stationIdMinutes > 0 ? Txt.s(R.string.channels_region_id_every, stationIdMinutes) : Txt.s(R.string.channels_region_id_default);
             default: return "";
         }
     }
     public static String label(String key) {
         switch (key) {
-            case APRS: return "APRS frequency"; case CALL2: return "2 m FM calling"; case CALL70: return "70 cm FM calling"; case SSTV: return "FM SSTV";
-            case WEATHER: return "Weather radio (NOAA-style, SAME)"; case UNITS: return "Distances"; case STATION_ID: return "Station-ID reminder";
+            case APRS: return Txt.s(R.string.channels_region_label_aprs); case CALL2: return Txt.s(R.string.channels_region_label_call2); case CALL70: return Txt.s(R.string.channels_region_label_call70); case SSTV: return Txt.s(R.string.channels_region_label_sstv);
+            case WEATHER: return Txt.s(R.string.channels_region_label_weather); case UNITS: return Txt.s(R.string.channels_region_label_units); case STATION_ID: return Txt.s(R.string.channels_region_label_station_id);
             default: return key;
         }
     }
@@ -131,7 +136,8 @@ public final class Region {
         c = c.trim().toUpperCase(Locale.US);
         return c.matches("[A-Z]{2}") && known.contains(c) && !c.equals("ZZ") ? c : null;
     }
-    public static String howText(String how) { return "sim".equals(how) ? "from your SIM" : "network".equals(how) ? "from the mobile network" : "locale".equals(how) ? "from the phone's language setting" : "chosen by you"; }
+    public static String howText(String how) { return Txt.s("sim".equals(how) ? R.string.channels_region_how_sim : "network".equals(how) ? R.string.channels_region_how_network : "locale".equals(how) ? R.string.channels_region_how_locale : R.string.channels_region_how_user); }
+
 
     // ---- stored choice (prefs "region") ----
     private static final String PREFS = "region";

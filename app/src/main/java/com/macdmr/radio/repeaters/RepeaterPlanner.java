@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.repeaters;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
 import com.macdmr.radio.repeaters.RepeaterModels.Repeater;
 import com.macdmr.radio.repeaters.RepeaterModels.Talkgroup;
 
@@ -62,7 +64,7 @@ public final class RepeaterPlanner {
         public boolean isFm() { return type == 1; }
 
         @Override public String toString() {
-            if (type == 1) return "fm " + name + " rx=" + rxHz + " tx=" + txHz
+            if (type == 1) return "fm " + name + " rx=" + rxHz + " tx=" + txHz   // i18n: debug toString
                  + " txTone=" + toneUp + " rxTone=" + toneDown + " bw=" + bandwidth;
             return role + " " + name + " txTG=" + txContact + " slot" + (slotIndex + 1)
                  + " rxGroups=" + java.util.Arrays.toString(groups);
@@ -86,7 +88,7 @@ public final class RepeaterPlanner {
     /** {@code dmrRadio} false (the W6): a DMR + FM repeater becomes its FM channel only, a DMR-only one nothing. */
     public static Plan plan(Repeater rep, Set<Integer> talkTgIds, Map<Integer, String> names, boolean dmrRadio) {
         Plan plan = new Plan();
-        if (rep == null) { plan.warnings.add("no repeater"); return plan; }
+        if (rep == null) { plan.warnings.add(Txt.s(R.string.channels_rep_warn_none)); return plan; }
         plan.zoneName = trim("»" + nz(rep.callsign) + " " + nz(rep.city), com.macdmr.radio.ChannelStore.NAME_MAX);
 
         // FM: exactly one analog channel.
@@ -107,15 +109,15 @@ public final class RepeaterPlanner {
         }
 
         if (!dmrRadio) {
-            plan.warnings.add("a DMR repeater: this radio has no DMR");
+            plan.warnings.add(Txt.s(R.string.channels_rep_warn_no_dmr));
             return plan;
         }
         if (!rep.dmr) {
-            plan.warnings.add("not a DMR or FM repeater");
+            plan.warnings.add(Txt.s(R.string.channels_rep_warn_not_dmr_fm));
             return plan;
         }
         if (rep.talkgroups.isEmpty()) {
-            plan.warnings.add("no talkgroups known for this repeater");
+            plan.warnings.add(Txt.s(R.string.channels_rep_warn_no_tgs));
             return plan;
         }
         Set<Integer> talk = talkTgIds != null ? talkTgIds : new LinkedHashSet<Integer>();
@@ -140,8 +142,7 @@ public final class RepeaterPlanner {
             int[] groups = toGroups(tgs);
             boolean truncated = tgs.size() > MAX_GROUPS;
             if (truncated) {
-                plan.warnings.add("slot " + slot + " has " + tgs.size()
-                    + " talkgroups; only the first " + MAX_GROUPS + " are programmed");
+                plan.warnings.add(Txt.s(R.string.channels_rep_warn_truncated, slot, tgs.size(), MAX_GROUPS));
             }
             int primary = tgs.get(0);
 
@@ -188,7 +189,7 @@ public final class RepeaterPlanner {
     private static String tgName(int id, String onTg, Map<Integer, String> nm) {
         if (onTg != null && !onTg.isEmpty()) return onTg;
         String n = nm.get(id);
-        return n != null ? n : ("TG " + id);
+        return n != null ? n : ("TG " + id);   // i18n: contact name (stored)
     }
 
     static String trim(String s, int max) {

@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.util.Log;
 
 import com.macdmr.radio.ham.MessageThreads;
@@ -67,7 +68,7 @@ public final class PagerStation {
     }
 
     public synchronized String monitor(boolean on) {
-        if (on && (scanHz == null || scanHz.length < 2)) return "Add at least two pager frequencies";
+        if (on && (scanHz == null || scanHz.length < 2)) return Txt.s(R.string.modes_pager_err_two);
         monitor = on;
         if (scan != null) scan.interrupt();
         if (!on) return null;
@@ -147,7 +148,7 @@ public final class PagerStation {
                 if (seen.contains(mark)) continue;
                 seen.add(mark); while (seen.size() > 40) seen.remove(0);
             }
-            MessageThreads.Key key = p.ricUnreadable ? new MessageThreads.Key(MessageThreads.Kind.RIC, 0, "RIC unreadable", "unreadable")
+            MessageThreads.Key key = p.ricUnreadable ? new MessageThreads.Key(MessageThreads.Kind.RIC, 0, Txt.s(R.string.modes_pager_ric_unreadable), "unreadable")
                     : MessageThreads.page(p.ric, p.text, host.contacts());
             ChannelStore.PageRow row = new ChannelStore.PageRow();
             row.ts = System.currentTimeMillis(); row.hz = host.currentHz(); row.ric = p.ricUnreadable ? -1 : p.ric; row.func = p.func; row.baud = hit.baud;

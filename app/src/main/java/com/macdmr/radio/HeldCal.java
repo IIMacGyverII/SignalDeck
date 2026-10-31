@@ -10,6 +10,8 @@ import com.macdmr.radio.ham.HeldFit;
 import com.macdmr.radio.ham.HeldPath;
 import com.macdmr.radio.ham.M17;
 
+import com.macdmr.radio.i18n.Txt;
+
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
@@ -43,7 +45,7 @@ public final class HeldCal {
         acceptedFile().delete();
         new File(dir, "held_" + profile + ".note").delete();
         pending = null;
-        line = "shipped taps for this phone";
+        line = Txt.s(R.string.service_m17cal_shipped);
     }
 
     /** A call just ended. {@code frames} were already guarded. {@code audio} is the last few seconds. */
@@ -51,9 +53,9 @@ public final class HeldCal {
         if (src == null) src = "";
         if (pending == null) {
             double[] w = HeldFit.fit(frames);
-            if (w == null) { line = "shipped taps, " + frames.size() + " usable frames"; return false; }
+            if (w == null) { line = Txt.s(R.string.service_m17cal_shipped_frames, frames.size()); return false; }
             pending = w; fitSrc = src; fitDbm = dbm; fitFrames = frames.size();
-            line = String.format(Locale.US, "fit waiting for a second call (%d frames at %d dBm)", fitFrames, fitDbm);
+            line = Txt.s(R.string.service_m17cal_fit_waiting, fitFrames, fitDbm);
             return false;
         }
         int liveN = clean(audio, liveTaps);
@@ -62,11 +64,11 @@ public final class HeldCal {
         if (HeldFit.keep(pendN, liveN, locked, fitDbm, dbm, fitSrc, src)) {
             write(acceptedFile(), pending);
             writeNote(fitFrames, fitDbm, dbm);
-            line = String.format(Locale.US, "fitted on this phone, %d frames at %d dBm, checked at %d dBm", fitFrames, fitDbm, dbm);
+            line = Txt.s(R.string.service_m17cal_fitted, fitFrames, fitDbm, dbm);
             pending = null;
             return true;
         }
-        line = String.format(Locale.US, "fit not kept (%d clean vs %d, %s)", pendN, liveN, locked ? "locked" : "no lock");
+        line = Txt.s(locked ? R.string.service_m17cal_not_kept_locked : R.string.service_m17cal_not_kept_nolock, pendN, liveN);
         pending = null;
         return false;
     }
@@ -88,7 +90,7 @@ public final class HeldCal {
 
     private void writeNote(int frames, int a, int b) {
         try {
-            String text = String.format(Locale.US, "frames %d\nfitDbm %d\ncheckDbm %d\ndate %s\n", frames, a, b,
+            String text = String.format(Locale.US, "frames %d\nfitDbm %d\ncheckDbm %d\ndate %s\n", frames, a, b,   // i18n: file format
                     new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new java.util.Date()));
             java.nio.file.Files.write(new File(dir, "held_" + profile + ".note").toPath(), text.getBytes("UTF-8"));
         } catch (Exception ignored) { }

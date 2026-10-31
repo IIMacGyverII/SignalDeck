@@ -31,12 +31,13 @@ import java.util.Map;
  *       that calls Txt runs (and says the same English) under JUnit.</li>
  * </ul>
  * Logs, diagnostics, report.json, file formats and anything sent on the air never go through {@link #s}.
+ * <p>i18n: stays English (exception messages and preference keys only; the user-facing text is in the resources).
  */
 public final class Txt {
     private Txt() { }
 
     /** Shipped languages besides English (the Device → Language list), as BCP 47 tags; add one when it ships. */
-    public static final String[] LANGUAGES = { "en" };
+    public static final String[] LANGUAGES = { "en", "de", "pt-BR" };
     /** Pseudo-locales for the layout and extraction checks; offered in debug builds only (pseudoLocalesEnabled). */
     public static final String[] PSEUDO = { "en-XA", "ar-XB" };
 
@@ -134,6 +135,62 @@ public final class Txt {
         Context c = app;
         if (c == null) { Integer i = hostIds(plural).get(name); return i == null ? 0 : i; }
         return c.getResources().getIdentifier(name, plural ? "plurals" : "string", c.getPackageName());
+    }
+
+    // ---- numbers and dates on screen -----------------------------------------------------------------
+
+    /**
+     * A decimal number for the screen, in the app language's style: "467.6250" in English, "467,6250" in German. Never
+     * grouped, digits always 0-9. Not for edit fields that are parsed back, files, logs, report.json, the web API or
+     * anything sent on the air: those keep {@code String.format(Locale.US, ...)}.
+     */
+    public static String decimal(double v, int places) { return decimal(locale(), v, places); }
+    /** {@link #decimal} with a sign always shown ("+1.5", "-0.4"), as {@code %+.Nf}. */
+    public static String signed(double v, int places) { return number(locale(), "%+." + places + "f", v); }
+    /** A frequency in MHz for the screen, {@code places} decimals: "467.6250" / "467,6250". */
+    public static String freqMhz(long hz, int places) { return decimal(hz / 1e6, places); }
+    /** One number in a {@code java.util.Formatter} spec of its own ("%4.1f"), with the app language's separator. */
+    public static String decimalf(String spec, double v) { return number(locale(), spec, v); }
+
+    /** A number already written with a point ("12.5", from code that trims zeros), with the app language's separator. */
+    public static String decimalText(String plain) { return decimalText(locale(), plain); }
+    static String decimalText(Locale l, String plain) { char sep = separator(l); return plain == null || sep == '.' ? plain : plain.replace('.', sep); }
+
+    static String decimal(Locale l, double v, int places) { return number(l, "%." + places + "f", v); }
+    static String number(Locale l, String spec, double v) {
+        String s = String.format(Locale.US, spec, v);
+        char sep = separator(l);
+        return sep == '.' ? s : s.replace('.', sep);
+    }
+    /** The locale's decimal separator; English and anything unknown keep the point. */
+    static char separator(Locale l) {
+        if (l == null || "en".equals(l.getLanguage())) return '.';
+        char sep = java.text.DecimalFormatSymbols.getInstance(l).getDecimalSeparator();
+        return sep == ',' ? ',' : '.';                                     // only the comma: never a script's own sign
+    }
+
+    /**
+     * A decimal typed by the user, with a point or a comma ("446.00625", "446,00625"). A comma counts as the decimal
+     * sign only when it is the one separator in the text, so lists split on commas before this never reach it.
+     */
+    public static double parseDecimal(String text) {
+        String t = text == null ? "" : text.trim();
+        if (t.indexOf('.') < 0 && t.indexOf(',') >= 0 && t.indexOf(',') == t.lastIndexOf(',')) t = t.replace(',', '.');
+        return Double.parseDouble(t);
+    }
+
+    /**
+     * A date/time format for the screen. English keeps {@code english} exactly as before (in {@code Locale.US}, or in
+     * the app's own English locale when {@code usEnglish} is false); every other language gets its own order and names
+     * for {@code skeleton} (an ICU skeleton such as "MMMdHHmm"), e.g. "28. Okt., 22:44" in German.
+     */
+    public static java.text.SimpleDateFormat dates(String english, String skeleton) { return dates(english, skeleton, true); }
+    public static java.text.SimpleDateFormat dates(String english, String skeleton, boolean usEnglish) {
+        Locale l = locale();
+        if ("en".equals(l.getLanguage()) || app == null) return new java.text.SimpleDateFormat(english, usEnglish ? Locale.US : l);
+        String p = null;
+        try { p = android.text.format.DateFormat.getBestDateTimePattern(l, skeleton); } catch (Throwable ignored) { }
+        return new java.text.SimpleDateFormat(p == null || p.isEmpty() ? english : p, l);
     }
 
     // ---- host tests: the English table from res/values ------------------------------------------------

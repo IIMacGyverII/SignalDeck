@@ -22,6 +22,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import com.macdmr.radio.ChannelStore;
 import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
+import com.macdmr.radio.i18n.Txt;
 
 import java.util.List;
 import java.util.Locale;
@@ -127,7 +128,7 @@ public final class RadioMedia {
     /** Push the current state: what is tuned, what is happening, whether it plays. */
     public void update(RadioService s, boolean playing, String status, String zone, boolean scanning) {
         ChannelStore.Channel ch = s.current();
-        String title = ch == null ? "SignalDeck" : ch.name;
+        String title = ch == null ? "SignalDeck" : ch.name;   // i18n: product name
         CarArt.State st = new CarArt.State();
         st.ch = ch; st.zone = zone; st.tx = s.isTransmitting(); st.rx = s.hearing(); st.scanning = scanning; st.ready = s.isReady(); st.muted = !playing;
         st.dbm = s.lastRssi(); st.caller = s.currentCallsign(); st.target = s.currentTarget(); st.zone = s.zoneLabelFor(ch);
@@ -150,8 +151,8 @@ public final class RadioMedia {
         session.setPlaybackState(new PlaybackStateCompat.Builder()
                 .setActions(actions)
                 .setState(state, PlaybackStateCompat.PLAYBACK_POSITION_UNKNOWN, 1f)
-                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder(ACTION_TALK, s.pttHeld() ? "Stop talking" : "Talk", s.pttHeld() ? R.drawable.ic_w_ptt_tx : R.drawable.ic_w_ptt).build())
-                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder(ACTION_SCAN, scanning ? "Stop scan" : "Scan", scanning ? R.drawable.ic_w_stop : R.drawable.ic_w_scan).build())
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder(ACTION_TALK, Txt.s(s.pttHeld() ? R.string.intercom_media_stop_talking : R.string.intercom_media_talk), s.pttHeld() ? R.drawable.ic_w_ptt_tx : R.drawable.ic_w_ptt).build())
+                .addCustomAction(new PlaybackStateCompat.CustomAction.Builder(ACTION_SCAN, Txt.s(scanning ? R.string.intercom_car_stop_scan : R.string.intercom_car_scan), scanning ? R.drawable.ic_w_stop : R.drawable.ic_w_scan).build())
                 .build());
     }
 }

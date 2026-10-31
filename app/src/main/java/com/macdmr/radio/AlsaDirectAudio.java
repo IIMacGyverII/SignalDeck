@@ -5,6 +5,7 @@
  * (keep this notice and the author credit, mark modified versions, no rights to the SignalDeck name or icon).
  */
 package com.macdmr.radio;
+// i18n: stays English (audio path diagnostics: the results go to the log, the Diagnostics page and the device report)
 
 import android.content.Context;
 import android.media.AudioAttributes;

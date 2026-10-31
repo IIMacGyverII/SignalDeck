@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -65,8 +66,8 @@ public final class RadioIdStore extends SQLiteOpenHelper {
     public long lastSync() { return ctx.getSharedPreferences("radioid", Context.MODE_PRIVATE).getLong("lastSync", 0); }
     public String status() {
         int n = count();
-        if (n == 0) return "not downloaded";
-        return String.format(Locale.US, "%,d IDs, updated %s", n, new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new java.util.Date(lastSync())));
+        if (n == 0) return Txt.s(R.string.channels_radioid_not_downloaded);
+        return Txt.s(R.string.channels_radioid_status, String.format(Locale.US, "%,d", n), new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new java.util.Date(lastSync())));
     }
 
     /** Download user.csv and replace the table. Blocking; call from a thread. Returns the number of rows imported. */
@@ -81,7 +82,7 @@ public final class RadioIdStore extends SQLiteOpenHelper {
             while ((n = in.read(b)) > 0) {
                 out.write(b, 0, n); got += n;
                 int pct = total > 0 ? (int) (got * 100 / total) : -1;
-                if (pct != lastPct && p != null) { lastPct = pct; p.update(pct >= 0 ? "Downloading… " + pct + "%" : String.format(Locale.US, "Downloading… %.1f MB", got / 1e6)); }
+                if (pct != lastPct && p != null) { lastPct = pct; p.update(pct >= 0 ? Txt.s(R.string.channels_radioid_downloading_pct, pct) : Txt.s(R.string.channels_radioid_downloading_mb, Txt.decimal(got / 1e6, 1))); }
             }
         } finally { c.disconnect(); }
         int rows = importCsv(f, p);
@@ -106,7 +107,7 @@ public final class RadioIdStore extends SQLiteOpenHelper {
             int n = 0;
             try {
                 db.delete("users", null, null);
-                android.database.sqlite.SQLiteStatement st = db.compileStatement("INSERT OR REPLACE INTO users (id,callsign,first,last,city,state,country) VALUES (?,?,?,?,?,?,?)");
+                android.database.sqlite.SQLiteStatement st = db.compileStatement("INSERT OR REPLACE INTO users (id,callsign,first,last,city,state,country) VALUES (?,?,?,?,?,?,?)");   // i18n: SQL
                 String line;
                 while ((line = r.readLine()) != null) {
                     if (line.isEmpty()) continue;
@@ -116,7 +117,7 @@ public final class RadioIdStore extends SQLiteOpenHelper {
                     st.clearBindings(); st.bindLong(1, id); st.bindString(2, v.get(iCall).trim());
                     st.bindString(3, col(v, iFirst)); st.bindString(4, col(v, iLast)); st.bindString(5, col(v, iCity)); st.bindString(6, col(v, iState)); st.bindString(7, col(v, iCountry));
                     st.executeInsert();
-                    if (++n % 20000 == 0 && p != null) p.update(String.format(Locale.US, "Importing… %,d", n));
+                    if (++n % 20000 == 0 && p != null) p.update(Txt.s(R.string.channels_radioid_importing, String.format(Locale.US, "%,d", n)));
                 }
                 db.setTransactionSuccessful();
             } finally { db.endTransaction(); }
@@ -133,7 +134,7 @@ public final class RadioIdStore extends SQLiteOpenHelper {
         List<String> out = new ArrayList<>(); StringBuilder sb = new StringBuilder(); boolean q = false;
         for (int i = 0; i < line.length(); i++) {
             char ch = line.charAt(i);
-            if (q) { if (ch == '"') { if (i + 1 < line.length() && line.charAt(i + 1) == '"') { sb.append('"'); i++; } else q = false; } else sb.append(ch); }
+            if (q) { if (ch == '"') { if (i + 1 < line.length() && line.charAt(i + 1) == '"') { sb.append('"'); i++; } else q = false; } else sb.append(ch); }   // i18n: CSV parser
             else if (ch == '"') q = true; else if (ch == ',') { out.add(sb.toString()); sb.setLength(0); } else sb.append(ch);
         }
         out.add(sb.toString());

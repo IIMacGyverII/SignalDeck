@@ -17,6 +17,7 @@ import java.util.Locale;
  * speed, sends the version query ({@code 68 34 01 01 …}) and records whatever comes back; reads and (if asked)
  * pulses the power-looking sysfs node; sniffs a second UART for raw PCM. Everything is appended to the latest
  * device report so the profile can be written from it.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class RadioProbe {
     public interface Progress { void step(String s); }

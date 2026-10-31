@@ -4,6 +4,9 @@
  */
 package com.macdmr.radio.fw;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,6 +17,7 @@ import com.macdmr.radio.ModuleEngine;
 import com.macdmr.radio.RadioEngine;
 import com.macdmr.radio.RadioService;
 import com.macdmr.radio.RootSetup;
+import com.macdmr.radio.i18n.Msg;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +44,9 @@ public final class FirmwareSession {
 
     private FirmwareSession() { }
 
+    /** Whether a finished line is the factory restore after a wrong tag (the page shows it green); any language. */
+    public static boolean isRestoredLine(String line) { return line != null && line.equals(Txt.s(R.string.device_fw_restored_tag, ImageTable.FACTORY.tag)); }
+
     /** The pre-flight list, safe to show before a load. A null image fails the hash check. */
     public static List<Check> inspect(RadioService svc, ImageTable.Row row, byte[] image) {
         Context c = svc.getApplicationContext();
@@ -54,8 +61,8 @@ public final class FirmwareSession {
         boolean busy = svc.isTransmitting() || svc.scanning() || svc.m17Running() || svc.ft8Running() || svc.packetActive() || svc.scope().running();
         String model = ImageTable.loaderModel(android.os.Build.MODEL, com.macdmr.radio.DeviceProfile.vendorModel());   // a GSI: the vendor partition names the phone
         String policy;
-        if (!fileOk) policy = "The file does not match the known image";
-        else if (row.unlisted && !Unlisted.allowed(c)) policy = "That file is not a known module image";
+        if (!fileOk) policy = Txt.s(R.string.device_fw_file_mismatch);
+        else if (row.unlisted && !Unlisted.allowed(c)) policy = Txt.s(R.string.device_fw_not_known_image);
         else if (row.unlisted) policy = ImageTable.unlistedPolicy(module, backup.verified, model, svc.profile().stockApp, FirmwareCatalog.rows(c));
         else policy = ImageTable.refuse(row, module, backup.sha256, backup.tag, model, svc.profile().stockApp, pkgVer, backup.verified, stockThere, FirmwareCatalog.rows(c));
         if (policy == null) {
@@ -64,13 +71,13 @@ public final class FirmwareSession {
         }
         String versionNote = ImageTable.versionWarning(backup.sha256, pkgVer);
         List<Check> checks = new ArrayList<>();
-        checks.add(new Check("Module answers", !module.isEmpty() || (row != null && row.factory), module.isEmpty() ? "No version yet" : module));
-        checks.add(new Check("Radio is idle", !busy, busy ? "Stop the transmission, scan or data mode first" : "Idle"));
-        checks.add(new Check("Stock app paused", !stockOn, stockOn ? "Take over the radio first" : "Paused"));
-        checks.add(new Check("Battery", (pct > 40 && charging) || pct > 60, pct + "% " + (charging ? "charging" : "on battery")));
-        checks.add(new Check("Image hash", fileOk, fileOk ? row.sha256.substring(0, 12) : "The file does not match the known image"));
-        checks.add(new Check("Factory backup", backup.verified, backup.verified ? backup.source : "Missing or it does not match"));
-        checks.add(new Check("This phone", policy == null, policy == null ? svc.profile().name + (versionNote == null ? "" : " · " + versionNote) : policy, versionNote != null && policy == null));
+        checks.add(new Check(Txt.s(R.string.device_fw_check_module), !module.isEmpty() || (row != null && row.factory), module.isEmpty() ? Txt.s(R.string.device_fw_check_module_none) : module));
+        checks.add(new Check(Txt.s(R.string.device_fw_check_idle), !busy, busy ? Txt.s(R.string.device_fw_check_idle_busy) : Txt.s(R.string.device_fw_check_idle_ok)));
+        checks.add(new Check(Txt.s(R.string.device_fw_check_stock), !stockOn, stockOn ? Txt.s(R.string.device_fw_check_stock_on) : Txt.s(R.string.device_fw_check_stock_ok)));
+        checks.add(new Check(Txt.s(R.string.device_fw_check_battery), (pct > 40 && charging) || pct > 60, Txt.s(charging ? R.string.device_fw_check_battery_charging : R.string.device_fw_check_battery_on, pct)));
+        checks.add(new Check(Txt.s(R.string.device_fw_check_hash), fileOk, fileOk ? row.sha256.substring(0, 12) : Txt.s(R.string.device_fw_file_mismatch)));
+        checks.add(new Check(Txt.s(R.string.device_fw_factory_backup), backup.verified, backup.verified ? backup.source : Txt.s(R.string.device_fw_check_backup_missing)));
+        checks.add(new Check(Txt.s(R.string.device_fw_check_phone), policy == null, policy == null ? svc.profile().name + (versionNote == null ? "" : " · " + versionNote) : policy, versionNote != null && policy == null));
         return checks;
     }
 
@@ -89,31 +96,31 @@ public final class FirmwareSession {
             if (row.unlisted) Unlisted.allow(c, false);
             String got = send(svc, row, image, ui, halt);
             if (got == null) return;
-            if (treatTagAsWrong) got = "DMR003.NOPE.V022";
+            if (treatTagAsWrong) got = "DMR003.NOPE.V022";   // i18n: module version string (test hook)
             ui.phase("verify");
             if (!row.tag.equals(got)) {
-                ui.log("tag " + got + " is not " + row.tag);
-                svc.history("fw", "Firmware load mismatch: wanted " + row.tag + ", module said " + got + ". Restoring the factory image.");
-                if (row.factory || backup.bytes == null) { ui.finished("The module answered " + (got.isEmpty() ? "nothing" : got) + " and the factory copy is not here"); return; }
-                ui.log("restoring the factory image");
+                ui.log("tag " + got + " is not " + row.tag);   // i18n: handshake log (developer)
+                svc.history("fw", Msg.of(R.string.device_fw_hist_mismatch, row.tag, got));
+                if (row.factory || backup.bytes == null) { ui.finished(got.isEmpty() ? Txt.s(R.string.device_fw_answered_nothing_no_copy) : Txt.s(R.string.device_fw_answered_no_copy, got)); return; }
+                ui.log("restoring the factory image");   // i18n: handshake log (developer)
                 String back = send(svc, ImageTable.FACTORY, backup.bytes, ui, new AtomicBoolean(false));
-                ui.finished(ImageTable.FACTORY.tag.equals(back) ? "Restored the factory image (" + back + ") because the tag did not match" : "Factory restore failed (" + back + ")");
+                ui.finished(ImageTable.FACTORY.tag.equals(back) ? Txt.s(R.string.device_fw_restored_tag, back) : Txt.s(R.string.device_fw_restore_failed, back));
                 return;
             }
             if (row.readBack) {
                 String sample = sample(svc, image, ui);
                 if (sample != null) {
-                    svc.history("fw", "Firmware " + got + " read-back failed. Restoring the factory image.");
+                    svc.history("fw", Msg.of(R.string.device_fw_hist_readback, got));
                     String back = send(svc, ImageTable.FACTORY, backup.bytes, ui, new AtomicBoolean(false));
-                    ui.finished(sample + (ImageTable.FACTORY.tag.equals(back) ? " Factory image restored." : " Factory restore failed."));
+                    ui.finished(Txt.s(ImageTable.FACTORY.tag.equals(back) ? R.string.device_fw_sample_restored : R.string.device_fw_sample_restore_failed, sample));
                     return;
                 }
             }
             if (row.unlisted) {
-                svc.history("fw", "unlisted image " + row.sha256);
+                svc.history("fw", "unlisted image " + row.sha256);   // i18n: history line: technical id
                 svc.log("unlisted image " + row.sha256);
-            } else svc.history("fw", "Firmware loaded: " + got);
-            ui.finished(got + (row.readBack ? " · flash sample matched" : ""));
+            } else svc.history("fw", Msg.of(R.string.device_fw_hist_loaded, got));
+            ui.finished(row.readBack ? Txt.s(R.string.device_fw_loaded_sample, got) : got);
         } finally {
             if (lock.isHeld()) lock.release();
         }
@@ -149,7 +156,7 @@ public final class FirmwareSession {
             return r.detail == null ? "" : r.detail.trim();
         } catch (Exception e) {
             ui.log("io-error " + e.getMessage());
-            ui.finished("io-error " + e.getMessage());
+            ui.finished("io-error " + e.getMessage());   // i18n: transfer result code (protocol)
             return null;
         } finally {
             if (diverted) engine.stopDivert();
@@ -159,7 +166,7 @@ public final class FirmwareSession {
 
     /** @return a failure sentence, or null when the first 4 KiB match */
     private static String sample(RadioService svc, byte[] image, Ui ui) {
-        ui.log("reading the first 4 KiB back");
+        ui.log("reading the first 4 KiB back");   // i18n: handshake log (developer)
         int off = 0;
         try {
             while (off < 4096) {
@@ -169,12 +176,12 @@ public final class FirmwareSession {
                 body[1] = (byte) off; body[2] = (byte) (off >> 8); body[3] = (byte) (off >> 16); body[4] = (byte) (off >> 24);
                 body[5] = (byte) n; body[6] = (byte) (n >> 8);
                 com.macdmr.radio.Frame pic = svc.engine().diag40(body, 800);
-                if (pic == null || pic.sr != 0 || pic.body == null || pic.body.length < n) return "Flash read failed at " + off;
-                for (int i = 0; i < n; i++) if (pic.body[i] != image[off + i]) return "Flash sample differs at byte " + (off + i);
+                if (pic == null || pic.sr != 0 || pic.body == null || pic.body.length < n) return Txt.s(R.string.device_fw_flash_read_at, off);
+                for (int i = 0; i < n; i++) if (pic.body[i] != image[off + i]) return Txt.s(R.string.device_fw_flash_differs, off + i);
                 off += n;
             }
-        } catch (IOException e) { return "Flash read failed: " + e.getMessage(); }
-        ui.log("4 KiB sample matched");
+        } catch (IOException e) { return Txt.s(R.string.device_fw_flash_read_error, String.valueOf(e.getMessage())); }
+        ui.log("4 KiB sample matched");   // i18n: handshake log (developer)
         return null;
     }
 

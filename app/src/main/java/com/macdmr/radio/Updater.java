@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
+
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -30,8 +32,8 @@ import java.util.Locale;
  * releases). Download through DownloadManager, then hand the file to the package installer.
  */
 public final class Updater {
-    private static final String LATEST = "https://api.github.com/repos/IIMacGyverII/SignalDeck/releases";
-    private static final String[] ASSET_PREFIXES = { "SignalDeck", "DMRRadio" };   // the app was called DMR Radio before 2026-10-20
+    private static final String LATEST = "https://api.github.com/repos/IIMacGyverII/SignalDeck/releases";   // i18n: URL
+    private static final String[] ASSET_PREFIXES = { "SignalDeck", "DMRRadio" };   // the app was called DMR Radio before 2026-10-20   // i18n: APK asset name prefixes (data)
 
     public static final class Release { public String tag, version, name, notes = "", apkUrl, apkName, published = ""; public long apkSize; public boolean prerelease; }
     private Updater() { }
@@ -42,7 +44,7 @@ public final class Updater {
     /** Every recent release that carries a SignalDeck APK, newest first as GitHub lists them (the module's own releases are skipped). */
     public static java.util.List<Release> fetchAll(int max) throws Exception {
         java.util.List<Release> out = new java.util.ArrayList<>();
-        HttpClient.Response r = HttpClient.get(LATEST + "?per_page=" + Math.min(100, max), null, 0L, "application/vnd.github+json");
+        HttpClient.Response r = HttpClient.get(LATEST + "?per_page=" + Math.min(100, max), null, 0L, "application/vnd.github+json");   // i18n: HTTP header value
         if (!r.isOk()) throw new Exception("GitHub API returned HTTP " + r.code);
         JSONArray rels = new JSONArray(r.bodyUtf8());
         for (int k = 0; k < rels.length(); k++) {
@@ -93,11 +95,10 @@ public final class Updater {
      */
     public static void show(final Context c) {
         final float d = com.macdmr.radio.ui.Theme.dp(c);
-        final android.widget.LinearLayout body = com.macdmr.radio.ui.Neo.sheetBody(c, "Updates");
+        final android.widget.LinearLayout body = com.macdmr.radio.ui.Neo.sheetBody(c, Txt.s(R.string.device_update_title), "radio");
         final boolean onBeta = BuildConfig.VERSION_NAME.contains("-");
-        body.addView(com.macdmr.radio.ui.Neo.sheetHint(c, "You have " + BuildConfig.VERSION_NAME + (onBeta ? " (a beta)" : " (a release)") + ". Two paths: Release, the finished builds, and Beta, the test builds. "
-                + "Betas are often made for one phone being tested, so read what changed before updating; nothing is installed until you tap Update."));
-        final android.widget.TextView status = com.macdmr.radio.ui.Neo.label(c, "Checking GitHub\u2026", com.macdmr.radio.ui.Neo.MUTED, 13, false);
+        body.addView(com.macdmr.radio.ui.Neo.sheetHint(c, Txt.s(onBeta ? R.string.device_update_intro_beta : R.string.device_update_intro_release, BuildConfig.VERSION_NAME)));
+        final android.widget.TextView status = com.macdmr.radio.ui.Neo.label(c, Txt.s(R.string.device_update_checking_github), com.macdmr.radio.ui.Neo.MUTED, 13, false);
         body.addView(status);
         final android.widget.LinearLayout paths = new android.widget.LinearLayout(c); paths.setOrientation(android.widget.LinearLayout.VERTICAL); body.addView(paths);
         com.macdmr.radio.ui.Neo.showSheet(c, body);
@@ -106,10 +107,10 @@ public final class Updater {
             try { all = fetchAll(100); } catch (Throwable t) { err = t.getMessage(); }
             final java.util.List<Release> fa = all; final String fe = err;
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                if (fe != null) { status.setText("Update check failed: " + fe); return; }
+                if (fe != null) { status.setText(Txt.s(R.string.device_update_failed, String.valueOf(fe))); return; }
                 status.setVisibility(android.view.View.GONE);
-                addPath(c, paths, "Release", UpdatePaths.path(fa, BuildConfig.VERSION_NAME, false), false, d);
-                addPath(c, paths, "Beta", UpdatePaths.path(fa, BuildConfig.VERSION_NAME, true), true, d);
+                addPath(c, paths, Txt.s(R.string.device_update_path_release), UpdatePaths.path(fa, BuildConfig.VERSION_NAME, false), false, d);
+                addPath(c, paths, Txt.s(R.string.device_update_path_beta), UpdatePaths.path(fa, BuildConfig.VERSION_NAME, true), true, d);
             });
         }, "update-paths").start();
     }
@@ -117,18 +118,22 @@ public final class Updater {
     private static void addPath(final Context c, android.widget.LinearLayout into, String title, final UpdatePaths.Path p, boolean beta, float d) {
         into.addView(com.macdmr.radio.ui.Neo.sheetSection(c, title));
         String head;
-        if (p.newest == null) head = beta ? "No beta published." : "No release yet: SignalDeck is still in beta.";
-        else if (!p.newer) head = "Nothing newer: the newest " + (beta ? "beta" : "release") + " is " + p.newest.version + (Updater.compareVersions(p.newest.version, BuildConfig.VERSION_NAME) == 0 ? " (yours)." : ".");
-        else head = p.newest.version + " is available" + (p.since.size() > 1 ? " (" + p.since.size() + " " + (beta ? "betas" : "releases") + " since yours)" : "") + ".";
-        if (p.downgrade) head = "You are on a beta newer than the newest release (" + p.newest.version + "). You can go back to it.";
+        if (p.newest == null) head = beta ? Txt.s(R.string.device_update_no_beta) : Txt.s(R.string.device_update_no_release);
+        else if (!p.newer) {
+            boolean yours = Updater.compareVersions(p.newest.version, BuildConfig.VERSION_NAME) == 0;
+            head = Txt.s(beta ? (yours ? R.string.device_update_newest_beta_yours : R.string.device_update_newest_beta) : (yours ? R.string.device_update_newest_release_yours : R.string.device_update_newest_release), p.newest.version);
+        }
+        else if (p.since.size() > 1) head = Txt.p(beta ? R.plurals.device_update_available_betas : R.plurals.device_update_available_releases, p.since.size(), p.newest.version, p.since.size());
+        else head = Txt.s(R.string.device_update_available, p.newest.version);
+        if (p.downgrade) head = Txt.s(R.string.device_update_downgrade_head, p.newest.version);
         android.widget.TextView h = com.macdmr.radio.ui.Neo.label(c, head, p.newer ? (beta ? com.macdmr.radio.ui.Neo.AMBER_LIGHT : com.macdmr.radio.ui.Neo.GREEN_LIGHT) : com.macdmr.radio.ui.Neo.TEXT_SOFT, 15, p.newer);
         into.addView(h);
         if (p.downgrade) { addDowngrade(c, into, p.newest, d); return; }
         if (!p.newer) return;
-        android.widget.TextView ch = com.macdmr.radio.ui.Neo.label(c, "What changed since " + BuildConfig.VERSION_NAME + ":\n\n" + UpdatePaths.changes(p, 6000), com.macdmr.radio.ui.Neo.TEXT_SOFT, 13, false);
+        android.widget.TextView ch = com.macdmr.radio.ui.Neo.label(c, Txt.s(R.string.device_update_changes, BuildConfig.VERSION_NAME, UpdatePaths.changes(p, 6000)), com.macdmr.radio.ui.Neo.TEXT_SOFT, 13, false);
         ch.setPadding(0, (int) (6 * d), 0, 0); ch.setTextIsSelectable(true);
         into.addView(ch);
-        android.widget.TextView go = com.macdmr.radio.ui.Neo.button(c, String.format(Locale.US, "Update to %s (%.1f MB)", p.newest.version, p.newest.apkSize / 1048576.0), "update", beta ? com.macdmr.radio.ui.Neo.AMBER : com.macdmr.radio.ui.Neo.GREEN);
+        android.widget.TextView go = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.device_update_to, p.newest.version, String.format(Locale.US, "%.1f", p.newest.apkSize / 1048576.0)), "update", beta ? com.macdmr.radio.ui.Neo.AMBER : com.macdmr.radio.ui.Neo.GREEN);
         android.widget.LinearLayout.LayoutParams l = new android.widget.LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT); l.topMargin = (int) (10 * d);
         into.addView(go, l);
         final Release rel = p.newest;
@@ -138,27 +143,27 @@ public final class Updater {
     /** Back from a beta to the newest release: its notes and a button; Android only allows an older version with root (pm install -d). */
     private static void addDowngrade(final Context c, android.widget.LinearLayout into, final Release rel, float d) {
         String n = UpdatePaths.plain(UpdatePaths.ownNotes(rel.notes));
-        android.widget.TextView ch = com.macdmr.radio.ui.Neo.label(c, "Release " + rel.version + (rel.published.isEmpty() ? "" : " (" + rel.published + ")") + ":\n\n" + (n.isEmpty() ? "(no notes)" : n.length() > 4000 ? n.substring(0, 4000) + "\u2026" : n),
+        android.widget.TextView ch = com.macdmr.radio.ui.Neo.label(c, rel.published.isEmpty() ? Txt.s(R.string.device_update_release_notes, rel.version, n.isEmpty() ? Txt.s(R.string.device_update_no_notes) : n.length() > 4000 ? n.substring(0, 4000) + "\u2026" : n)
+                        : Txt.s(R.string.device_update_release_notes_dated, rel.version, rel.published, n.isEmpty() ? Txt.s(R.string.device_update_no_notes) : n.length() > 4000 ? n.substring(0, 4000) + "\u2026" : n),
                 com.macdmr.radio.ui.Neo.TEXT_SOFT, 13, false);
         ch.setPadding(0, (int) (6 * d), 0, 0); ch.setTextIsSelectable(true);
         into.addView(ch);
-        android.widget.TextView go = com.macdmr.radio.ui.Neo.button(c, String.format(Locale.US, "Go back to release %s (%.1f MB)", rel.version, rel.apkSize / 1048576.0), "restore", com.macdmr.radio.ui.Neo.GREEN);
+        android.widget.TextView go = com.macdmr.radio.ui.Neo.button(c, Txt.s(R.string.device_update_back_button, rel.version, String.format(Locale.US, "%.1f", rel.apkSize / 1048576.0)), "restore", com.macdmr.radio.ui.Neo.GREEN);
         android.widget.LinearLayout.LayoutParams l = new android.widget.LinearLayout.LayoutParams(android.widget.LinearLayout.LayoutParams.MATCH_PARENT, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT); l.topMargin = (int) (10 * d);
         into.addView(go, l);
-        go.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle("Go back to release " + rel.version + "?")
-                .setMessage("This replaces " + BuildConfig.VERSION_NAME + " with the release " + rel.version + ". Your channels, settings, recordings and root access are kept; what was added in betas after " + rel.version + " goes away until the next release.\n\n"
-                        + "Android only installs an older version with root, which SignalDeck already has. SignalDeck closes and restarts as " + rel.version + "; if the radio was in use it comes back when you open the app.")
-                .setNegativeButton("Cancel", null).setPositiveButton("Go back", (dd, w) -> downgrade(c, rel)).show());
+        go.setOnClickListener(v -> new AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_update_back_q, rel.version))
+                .setMessage(Txt.s(R.string.device_update_back_msg, BuildConfig.VERSION_NAME, rel.version))
+                .setNegativeButton(Txt.s(R.string.common_cancel), null).setPositiveButton(Txt.s(R.string.device_update_back_go), (dd, w) -> downgrade(c, rel)).show());
     }
 
     /** Download the release, then install it over the beta with root (pm install -r -d), detached so it survives this app being replaced. */
     private static void downgrade(final Context c, final Release rel) {
         try {
             final DownloadManager dm = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
-            DownloadManager.Request req = new DownloadManager.Request(Uri.parse(rel.apkUrl)).setTitle("SignalDeck " + rel.version).setMimeType("application/vnd.android.package-archive")
+            DownloadManager.Request req = new DownloadManager.Request(Uri.parse(rel.apkUrl)).setTitle("SignalDeck " + rel.version).setMimeType("application/vnd.android.package-archive")   // i18n: product name and version (download title)
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, rel.apkName);
             final long id = dm.enqueue(req);
-            Toast.makeText(c, "Downloading " + rel.version + "\u2026 SignalDeck restarts as the release when it is installed", Toast.LENGTH_LONG).show();
+            Toast.makeText(c, Txt.s(R.string.device_update_back_downloading, rel.version), Toast.LENGTH_LONG).show();
             BroadcastReceiver done = new BroadcastReceiver() {
                 @Override public void onReceive(Context ctx, Intent i) {
                     if (i.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) != id) return;
@@ -167,18 +172,18 @@ public final class Updater {
                     try (android.database.Cursor cur = dm.query(new DownloadManager.Query().setFilterById(id))) {
                         if (cur != null && cur.moveToFirst()) { String u = cur.getString(cur.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI)); if (u != null) path = Uri.parse(u).getPath(); }
                     } catch (Throwable ignored) { }
-                    if (path == null || !path.endsWith(".apk")) { Toast.makeText(ctx, "Download failed", Toast.LENGTH_LONG).show(); return; }
+                    if (path == null || !path.endsWith(".apk")) { Toast.makeText(ctx, Txt.s(R.string.device_update_download_failed), Toast.LENGTH_LONG).show(); return; }
                     final String src = path;
-                    Toast.makeText(ctx, "Installing " + rel.version + " with root\u2026", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx, Txt.s(R.string.device_update_installing, rel.version), Toast.LENGTH_LONG).show();
                     new Thread(() -> {
                         String out = rootInstall(src);
-                        if (!out.contains("started")) new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> Toast.makeText(ctx, "Could not install with root: " + out, Toast.LENGTH_LONG).show());
+                        if (!out.contains("started")) new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> Toast.makeText(ctx, Txt.s(R.string.device_update_root_failed, out), Toast.LENGTH_LONG).show());
                     }, "downgrade").start();
                 }
             };
             if (Build.VERSION.SDK_INT >= 33) c.registerReceiver(done, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED);
             else c.registerReceiver(done, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        } catch (Throwable t) { Toast.makeText(c, "Could not start the download: " + t.getMessage(), Toast.LENGTH_LONG).show(); }
+        } catch (Throwable t) { Toast.makeText(c, Txt.s(R.string.device_update_start_failed, String.valueOf(t.getMessage())), Toast.LENGTH_LONG).show(); }
     }
 
     /**
@@ -187,49 +192,50 @@ public final class Updater {
      */
     public static String rootInstall(String apkPath) {
         String tmp = "/data/local/tmp/signaldeck_release.apk";
-        return RootSetup.run("cp '" + apkPath.replace("'", "") + "' " + tmp + " && chmod 644 " + tmp + " && (nohup sh -c 'pm install -r -d " + tmp + "; rm -f " + tmp + "' >/dev/null 2>&1 &) ; echo started");
+        return RootSetup.run("cp '" + apkPath.replace("'", "") + "' " + tmp + " && chmod 644 " + tmp + " && (nohup sh -c 'pm install -r -d " + tmp + "; rm -f " + tmp + "' >/dev/null 2>&1 &) ; echo started");   // i18n: shell command
     }
 
     public static void check(final Context c) {
-        Toast.makeText(c, "Checking for updates…", Toast.LENGTH_SHORT).show();
+        Toast.makeText(c, Txt.s(R.string.device_update_checking), Toast.LENGTH_SHORT).show();
         new Thread(() -> {
             try {
                 final Release rel = fetchLatest();
                 new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                    if (rel == null) { Toast.makeText(c, "No SignalDeck release published yet (you have " + BuildConfig.VERSION_NAME + ")", Toast.LENGTH_LONG).show(); return; }
-                    if (compareVersions(rel.version, BuildConfig.VERSION_NAME) <= 0) { Toast.makeText(c, "You are on the latest version (" + BuildConfig.VERSION_NAME + ")", Toast.LENGTH_LONG).show(); return; }
+                    if (rel == null) { Toast.makeText(c, Txt.s(R.string.device_update_none_published, BuildConfig.VERSION_NAME), Toast.LENGTH_LONG).show(); return; }
+                    if (compareVersions(rel.version, BuildConfig.VERSION_NAME) <= 0) { Toast.makeText(c, Txt.s(R.string.device_update_latest, BuildConfig.VERSION_NAME), Toast.LENGTH_LONG).show(); return; }
                     offer(c, rel);
                 });
-            } catch (final Throwable t) { new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> Toast.makeText(c, "Update check failed: " + t.getMessage(), Toast.LENGTH_LONG).show()); }
+            } catch (final Throwable t) { new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> Toast.makeText(c, Txt.s(R.string.device_update_failed, String.valueOf(t.getMessage())), Toast.LENGTH_LONG).show()); }
         }, "update-check").start();
     }
 
     private static void offer(final Context c, final Release rel) {
         String notes = rel.notes == null ? "" : rel.notes.trim(); if (notes.length() > 1500) notes = notes.substring(0, 1500) + "…";
-        new AlertDialog.Builder(c).setTitle("Update available: " + rel.version)
-                .setMessage("You have " + BuildConfig.VERSION_NAME + ".\n\n" + (notes.isEmpty() ? "" : "What's new:\n" + notes + "\n\n") + String.format(Locale.US, "Download %s (%.1f MB) and install? Android asks you to confirm the install; your channels and settings are kept.", rel.apkName, rel.apkSize / 1e6))
-                .setNegativeButton("Later", null).setPositiveButton("Download", (d, w) -> download(c, rel)).show();
+        String mb = String.format(Locale.US, "%.1f", rel.apkSize / 1e6);
+        new AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_update_offer_title, rel.version))
+                .setMessage(notes.isEmpty() ? Txt.s(R.string.device_update_offer, BuildConfig.VERSION_NAME, rel.apkName, mb) : Txt.s(R.string.device_update_offer_notes, BuildConfig.VERSION_NAME, notes, rel.apkName, mb))
+                .setNegativeButton(Txt.s(R.string.common_later), null).setPositiveButton(Txt.s(R.string.device_update_download), (d, w) -> download(c, rel)).show();
     }
 
     private static void download(final Context c, Release rel) {
         try {
             DownloadManager dm = (DownloadManager) c.getSystemService(Context.DOWNLOAD_SERVICE);
-            DownloadManager.Request req = new DownloadManager.Request(Uri.parse(rel.apkUrl)).setTitle("SignalDeck " + rel.version).setMimeType("application/vnd.android.package-archive")
+            DownloadManager.Request req = new DownloadManager.Request(Uri.parse(rel.apkUrl)).setTitle("SignalDeck " + rel.version).setMimeType("application/vnd.android.package-archive")   // i18n: product name and version (download title)
                     .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED).setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, rel.apkName);
             final long id = dm.enqueue(req);
-            Toast.makeText(c, "Downloading… the installer opens when it is done", Toast.LENGTH_LONG).show();
+            Toast.makeText(c, Txt.s(R.string.device_update_downloading), Toast.LENGTH_LONG).show();
             BroadcastReceiver done = new BroadcastReceiver() {
                 @Override public void onReceive(Context ctx, Intent i) {
                     if (i.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1) != id) return;
                     try { ctx.unregisterReceiver(this); } catch (Throwable ignored) { }
                     Uri u = dm.getUriForDownloadedFile(id);
-                    if (u == null) { Toast.makeText(ctx, "Download failed", Toast.LENGTH_LONG).show(); return; }
+                    if (u == null) { Toast.makeText(ctx, Txt.s(R.string.device_update_download_failed), Toast.LENGTH_LONG).show(); return; }
                     Intent inst = new Intent(Intent.ACTION_VIEW).setDataAndType(u, "application/vnd.android.package-archive").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    try { ctx.startActivity(inst); } catch (Throwable t) { Toast.makeText(ctx, "Open the downloaded APK from your Downloads to install it", Toast.LENGTH_LONG).show(); }
+                    try { ctx.startActivity(inst); } catch (Throwable t) { Toast.makeText(ctx, Txt.s(R.string.device_update_open_apk), Toast.LENGTH_LONG).show(); }
                 }
             };
             if (Build.VERSION.SDK_INT >= 33) c.registerReceiver(done, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED);
             else c.registerReceiver(done, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        } catch (Throwable t) { Toast.makeText(c, "Could not start the download: " + t.getMessage(), Toast.LENGTH_LONG).show(); }
+        } catch (Throwable t) { Toast.makeText(c, Txt.s(R.string.device_update_start_failed, String.valueOf(t.getMessage())), Toast.LENGTH_LONG).show(); }
     }
 }

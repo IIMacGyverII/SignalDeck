@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -102,18 +103,20 @@ public final class CustomPttKey {
 
     /** A plain name for the owner: "Volume up", "Headset button", "Key CD (mtk-kpd)". */
     public static String friendly(String device, String code) {
-        if (code == null) return "No key";
+        if (code == null) return Txt.s(R.string.device_ptt_no_key);
         boolean headset = device != null && device.toUpperCase(Locale.US).contains("ACCDET");
         switch (code) {
-            case "KEY_VOLUMEUP": return headset ? "Headset volume up" : "Volume up";
-            case "KEY_VOLUMEDOWN": return headset ? "Headset volume down" : "Volume down";
-            case "KEY_PLAYPAUSE": case "KEY_MEDIA": case "KEY_PHONE": return headset ? "Headset button" : "Play/pause button";
-            case "KEY_VOICECOMMAND": return headset ? "Headset button (hold)" : "Voice command button";
-            case "KEY_CAMERA": return "Camera button";
+            case "KEY_VOLUMEUP": return Txt.s(headset ? R.string.device_ptt_headset_volume_up : R.string.device_ptt_volume_up);
+            case "KEY_VOLUMEDOWN": return Txt.s(headset ? R.string.device_ptt_headset_volume_down : R.string.device_ptt_volume_down);
+            case "KEY_PLAYPAUSE": case "KEY_MEDIA": case "KEY_PHONE": return Txt.s(headset ? R.string.device_ptt_headset_button : R.string.device_ptt_play_pause);
+            case "KEY_VOICECOMMAND": return Txt.s(headset ? R.string.device_ptt_headset_button_hold : R.string.device_ptt_voice_command);
+            case "KEY_CAMERA": return Txt.s(R.string.device_ptt_camera_button);
             default:
                 String n = code.replaceFirst("^(KEY|BTN)_", "").replace('_', ' ');     // the kernel's name, e.g. CD, F9, 0
                 if (n.isEmpty()) n = code;
-                return (code.startsWith("BTN_") ? "Button " : "Key ") + n + (device == null || device.isEmpty() ? "" : " (" + device + ")");
+                boolean btn = code.startsWith("BTN_");
+                if (device == null || device.isEmpty()) return Txt.s(btn ? R.string.device_ptt_button_named : R.string.device_ptt_key_named, n);
+                return Txt.s(btn ? R.string.device_ptt_button_named_on : R.string.device_ptt_key_named_on, n, device);
         }
     }
 
@@ -140,24 +143,24 @@ public final class CustomPttKey {
     public static List<Finding> check(Device dev, String code, Seen s) {
         List<Finding> f = new ArrayList<>();
         String name = dev == null ? "" : dev.name;
-        if (s.officialPtt) f.add(new Finding(true, "This is the phone's own PTT key. It already transmits while Side PTT key is on, so it needs no learning."));
-        if ("KEY_POWER".equals(code)) f.add(new Finding(true, "The power key turns the screen off, and holding it opens the power menu."));
-        if (NAV.contains(code)) f.add(new Finding(true, "A navigation key (home, back, menu): the phone would act on it every time you talk."));
-        if (dev != null && dev.touch) f.add(new Finding(true, "That came from the touch screen (a gesture), not from a button."));
-        if (name.matches("(?i).*(fingerprint|fortsense|goodix|fpc|silead|chipone|uinput-).*")) f.add(new Finding(true, "That came from the fingerprint sensor, which reports swipes, not a button being held."));
-        if (s.holdMs < 0) f.add(new Finding(true, "The button never reported being let go. Hold it for about two seconds, then release it."));
-        else if (s.holdMs < MIN_HOLD_MS) f.add(new Finding(true, "It reported letting go after " + s.holdMs + " ms although it was held. This button doesn't report being held down, so it cannot work as push-to-talk."));
-        for (String app : s.opened) f.add(new Finding(false, "Pressing it also brought " + app + " to the front. That will happen every time you talk; change that button's setting in the phone's Settings, or choose another button."));
+        if (s.officialPtt) f.add(new Finding(true, Txt.s(R.string.device_ptt_check_own_ptt)));
+        if ("KEY_POWER".equals(code)) f.add(new Finding(true, Txt.s(R.string.device_ptt_check_power)));
+        if (NAV.contains(code)) f.add(new Finding(true, Txt.s(R.string.device_ptt_check_nav)));
+        if (dev != null && dev.touch) f.add(new Finding(true, Txt.s(R.string.device_ptt_check_touch)));
+        if (name.matches("(?i).*(fingerprint|fortsense|goodix|fpc|silead|chipone|uinput-).*")) f.add(new Finding(true, Txt.s(R.string.device_ptt_check_fingerprint)));
+        if (s.holdMs < 0) f.add(new Finding(true, Txt.s(R.string.device_ptt_check_no_release)));
+        else if (s.holdMs < MIN_HOLD_MS) f.add(new Finding(true, Txt.s(R.string.device_ptt_check_no_hold, String.valueOf(s.holdMs))));
+        for (String app : s.opened) f.add(new Finding(false, Txt.s(R.string.device_ptt_check_opens_app, app)));
         if ("KEY_VOLUMEUP".equals(code) || "KEY_VOLUMEDOWN".equals(code)) {
-            f.add(new Finding(false, "Outside SignalDeck the phone still changes the volume while you hold it. SignalDeck puts the volume back when you let go."));
-            if (s.volPtt && "KEY_VOLUMEUP".equals(code) && !name.toUpperCase(Locale.US).contains("ACCDET")) f.add(new Finding(false, "Volume-up transmits uses the same key on the Intercom page. It will be switched off, since this replaces it."));
+            f.add(new Finding(false, Txt.s(R.string.device_ptt_check_volume)));
+            if (s.volPtt && "KEY_VOLUMEUP".equals(code) && !name.toUpperCase(Locale.US).contains("ACCDET")) f.add(new Finding(false, Txt.s(R.string.device_ptt_check_vol_ptt)));
         }
         if (MEDIA.contains(code)) {
-            f.add(new Finding(false, "A media button: it still plays or pauses music, and a long hold may start the voice assistant."));
-            if (s.wheelTalk) f.add(new Finding(false, "Steering-wheel play/pause talks is on. In the car that setting already uses play/pause; both together are fine but do the same thing."));
+            f.add(new Finding(false, Txt.s(R.string.device_ptt_check_media)));
+            if (s.wheelTalk) f.add(new Finding(false, Txt.s(R.string.device_ptt_check_wheel)));
         }
-        if ("KEY_CAMERA".equals(code) || "KEY_CAMERA_FOCUS".equals(code)) f.add(new Finding(false, "The camera button may open the camera."));
-        if ("0005".equals(dev == null ? "" : dev.bus)) f.add(new Finding(false, "A Bluetooth button: it works while it is connected, and SignalDeck finds it again when it reconnects. Its battery and range decide whether a release gets through; the transmit limit (Device \u2192 Longest transmission) stops a stuck transmission."));
+        if ("KEY_CAMERA".equals(code) || "KEY_CAMERA_FOCUS".equals(code)) f.add(new Finding(false, Txt.s(R.string.device_ptt_check_camera)));
+        if ("0005".equals(dev == null ? "" : dev.bus)) f.add(new Finding(false, Txt.s(R.string.device_ptt_check_bluetooth)));
         return f;
     }
     public static boolean blocked(List<Finding> f) { for (Finding x : f) if (x.block) return true; return false; }
@@ -197,7 +200,7 @@ public final class CustomPttKey {
     /** The learn run's result: the key (null if none was pressed), its device and the checks. */
     public static final class Learned {
         public Key key; public Device device; public final Seen seen = new Seen(); public List<Finding> findings = new ArrayList<>(); public String error;
-        public String label() { return key == null ? "No key" : friendly(key.device, key.code); }
+        public String label() { return key == null ? Txt.s(R.string.device_ptt_no_key) : friendly(key.device, key.code); }
     }
 
     /**
@@ -208,7 +211,7 @@ public final class CustomPttKey {
     public static Learned learn(Context c, DeviceProfile profile, int seconds, Consumer<String> progress) {
         Learned out = new Learned();
         Map<String, Device> devices = parseDevices(RootSetup.run("getevent -pl 2>/dev/null"));
-        if (devices.isEmpty()) { out.error = "Could not read the phone's input devices. Learning a key needs root (Magisk)."; return out; }
+        if (devices.isEmpty()) { out.error = Txt.s(R.string.device_ptt_learn_no_devices); return out; }
         addBus(devices, RootSetup.run("cat /proc/bus/input/devices"));
         final boolean[] official = { false };
         android.content.BroadcastReceiver r = new android.content.BroadcastReceiver() { @Override public void onReceive(Context x, Intent i) { official[0] = true; } };
@@ -220,10 +223,10 @@ public final class CustomPttKey {
         long started = System.currentTimeMillis();
         Process p = null;
         try {
-            p = root("exec timeout " + seconds + " getevent -l");          // ends by itself: nothing left running as root
+            p = root("exec timeout " + seconds + " getevent -l");   // i18n: shell          // ends by itself: nothing left running as root
             BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line, path = null, code = null; long down = 0;
-            progress.accept("Press and hold the button you want to talk with, for about two seconds, then let go.");
+            progress.accept(Txt.s(R.string.device_ptt_learn_press));
             while ((line = br.readLine()) != null) {
                 Event e = parse(line); if (e == null) continue;
                 Device d = e.path == null ? null : devices.get(e.path);
@@ -231,18 +234,18 @@ public final class CustomPttKey {
                     if (e.value != 1 || (d != null && d.touch) || e.code.startsWith("BTN_TOUCH") || e.code.startsWith("BTN_TOOL")) continue;
                     path = e.path; code = e.code; down = System.currentTimeMillis();
                     out.device = d;
-                    progress.accept(friendly(d == null ? "" : d.name, code) + " is held… now let go.");
+                    progress.accept(Txt.s(R.string.device_ptt_learn_held, friendly(d == null ? "" : d.name, code)));
                 } else if (code.equals(e.code) && (path == null || path.equals(e.path)) && e.value == 0) {
                     out.seen.holdMs = System.currentTimeMillis() - down;
-                    progress.accept("Got it. Checking whether that button also does something else…");
+                    progress.accept(Txt.s(R.string.device_ptt_learn_got_it));
                     break;
                 }
             }
-            if (code == null) { out.error = "No button was pressed within " + seconds + " seconds."; return out; }
+            if (code == null) { out.error = Txt.s(R.string.device_ptt_learn_none, seconds); return out; }
             try { Thread.sleep(1500); } catch (InterruptedException ignored) { }
             out.key = new Key(out.device == null ? "" : out.device.name, code, androidKey[0]);
-            out.seen.opened.addAll(openedApps(RootSetup.run(String.format(Locale.US, "logcat -d -b events -T %d.000 | grep -E '(wm|am)_set_resumed_activity'", started / 1000)), c.getPackageName()));
-        } catch (Throwable t) { out.error = "Learning failed: " + t.getMessage(); return out; }
+            out.seen.opened.addAll(openedApps(RootSetup.run(String.format(Locale.US, "logcat -d -b events -T %d.000 | grep -E '(wm|am)_set_resumed_activity'", started / 1000)), c.getPackageName()));   // i18n: shell
+        } catch (Throwable t) { out.error = Txt.s(R.string.device_ptt_learn_failed, String.valueOf(t.getMessage())); return out; }
         finally {
             activityKey = null;
             if (p != null) p.destroy();
@@ -290,14 +293,14 @@ public final class CustomPttKey {
                 String path = null;
                 for (Device d : parseDevices(RootSetup.run("getevent -pl 2>/dev/null")).values()) if (d.name.equals(k.device) && d.keys.contains(k.code)) path = d.path;
                 if (path == null) {
-                    if (!missingLogged) { log.accept("custom PTT key: " + friendly(k.device, k.code) + " is not connected; waiting for it"); missingLogged = true; }
+                    if (!missingLogged) { log.accept("custom PTT key: " + friendly(k.device, k.code) + " is not connected; waiting for it"); missingLogged = true; }   // i18n: log
                     sleep(backoff); backoff = Math.min(backoff * 2, 60000); continue;
                 }
                 backoff = 5000; missingLogged = false;
                 try {
                     RootSetup.run("pkill -f 'getevent -ql ' || true");      // a reader left from before (it outlives its su client)
-                    Process p = root("exec getevent -ql " + path); proc = p;
-                    log.accept("custom PTT key: listening for " + friendly(k.device, k.code));
+                    Process p = root("exec getevent -ql " + path); proc = p;   // i18n: shell
+                    log.accept("custom PTT key: listening for " + friendly(k.device, k.code));   // i18n: log
                     BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
                     String line;
                     while (running && gen == g && (line = br.readLine()) != null) {
@@ -305,7 +308,7 @@ public final class CustomPttKey {
                         if (e.value == 1 && !held) { held = true; saveVolumes(k); ptt.accept(true); }
                         else if (e.value == 0 && held) release();
                     }
-                } catch (Throwable t) { log.accept("custom PTT key: " + t.getMessage()); }
+                } catch (Throwable t) { log.accept("custom PTT key: " + t.getMessage()); }   // i18n: log
                 release();                                   // the device went away while held: never leave the radio keyed
                 if (running && gen == g) sleep(3000);
             }

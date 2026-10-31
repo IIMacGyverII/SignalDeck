@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
+
 import android.content.Context;
 import android.os.Build;
 import android.os.Environment;
@@ -58,7 +60,7 @@ public final class FirmwareFinder {
         File cached;                                                       // a copy readable by the app (root-only files), deleted after use
         Found(String source, long size) { this.source = source; this.size = size; }
         public String name() { int s = Math.max(source.lastIndexOf('/'), source.lastIndexOf('!')); return source.substring(s + 1); }
-        public String line() { return String.format(Locale.US, "%s  %d bytes  sha256 %s%s%s", source, size, sha256, versions.isEmpty() ? "" : "  contains " + versions, known.isEmpty() ? "" : "  already known: " + known); }
+        public String line() { return String.format(Locale.US, "%s  %d bytes  sha256 %s%s%s", source, size, sha256, versions.isEmpty() ? "" : "  contains " + versions, known.isEmpty() ? "" : "  already known: " + known); }   // i18n: device report / SOURCES.txt text (English)
     }
 
     /**
@@ -86,7 +88,7 @@ public final class FirmwareFinder {
 
     /** The entry that stands in for the stock app's APK when none was found, so the report says so instead of saying nothing. */
     public static Found noStockApk(String profileStockApp) {
-        return new Found((profileStockApp == null || profileStockApp.isEmpty() ? "stock app" : profileStockApp) + "! (APK not found: not installed, or the package manager hides it and root gave no path)", 0);
+        return new Found((profileStockApp == null || profileStockApp.isEmpty() ? "stock app" : profileStockApp) + "! (APK not found: not installed, or the package manager hides it and root gave no path)", 0);   // i18n: device report / SOURCES.txt text (English)
     }
 
     /** The radio firmware files on this phone. Off the main thread; needs root for the system folders. */
@@ -95,10 +97,10 @@ public final class FirmwareFinder {
         File tmp = new File(c.getCacheDir(), "fwfind"); tmp.mkdirs();
         if (RootSetup.haveRoot()) scanFolders(FOLDERS, ROOT_FS, tmp, p, out);
         for (String apk : stockApks) {
-            p.step("Looking in " + new File(apk).getName());
+            p.step(Txt.s(R.string.device_fw_finder_looking, new File(apk).getName()));
             File readable = StockApk.readable(c, apk, "fwfind.apk");
             android.util.Log.i("FirmwareFinder", "apk " + apk + ": " + (readable == null ? "not readable" : "readable as " + readable.getPath()));
-            if (readable == null) { out.add(new Found(apk + "! (could not read)", 0)); continue; }
+            if (readable == null) { out.add(new Found(apk + "! (could not read)", 0)); continue; }   // i18n: device report / SOURCES.txt text (English)
             try (ZipFile z = new ZipFile(readable)) {
                 for (Enumeration<? extends ZipEntry> e = z.entries(); e.hasMoreElements(); ) {
                     ZipEntry ze = e.nextElement();
@@ -109,7 +111,7 @@ public final class FirmwareFinder {
                     f.cached = copy; digest(f);
                     out.add(f);
                 }
-            } catch (Throwable t) { out.add(new Found(apk + "! (could not read: " + t.getMessage() + ")", 0)); }
+            } catch (Throwable t) { out.add(new Found(apk + "! (could not read: " + t.getMessage() + ")", 0)); }   // i18n: device report / SOURCES.txt text (English)
             finally { if (!readable.getPath().equals(apk)) readable.delete(); }
         }
         com.macdmr.radio.fw.FirmwareCatalog.Doc cat = com.macdmr.radio.fw.FirmwareCatalog.cached(c);
@@ -135,17 +137,17 @@ public final class FirmwareFinder {
     static String known(String sha, List<com.macdmr.radio.fw.FirmwareCatalog.Image> catalogue, int appVersionCode) {
         if (sha == null || sha.length() != 64) return "";
         com.macdmr.radio.fw.ImageTable.Row r = com.macdmr.radio.fw.ImageTable.bySha(sha);
-        if (r != null) return r.tag + (r.factory ? ", the factory image for the " + r.model : ", a SignalDeck bench image for the " + r.model);
+        if (r != null) return r.tag + (r.factory ? ", the factory image for the " + r.model : ", a SignalDeck bench image for the " + r.model);   // i18n: device report / SOURCES.txt text (English)
         if (catalogue != null) for (com.macdmr.radio.fw.FirmwareCatalog.Image im : catalogue) {
             if (!sha.equalsIgnoreCase(im.sha256)) continue;
-            String model = im.model == null || im.model.isEmpty() ? "another phone" : "the " + im.model;
-            if (im.factory) return im.tag + ", the factory image for " + model;
-            if ("released".equals(im.status)) return im.tag + ", a released image for " + model;
+            String model = im.model == null || im.model.isEmpty() ? "another phone" : "the " + im.model;   // i18n: device report / SOURCES.txt text (English)
+            if (im.factory) return im.tag + ", the factory image for " + model;   // i18n: device report / SOURCES.txt text (English)
+            if ("released".equals(im.status)) return im.tag + ", a released image for " + model;   // i18n: device report / SOURCES.txt text (English)
             if ("released-min".equals(im.status))                              // released, but only for SignalDeck builds new enough (FirmwareCatalog.offered)
                 return com.macdmr.radio.fw.FirmwareCatalog.offered(im.status, im.minAppVersionCode, appVersionCode)
-                        ? im.tag + ", a released image for " + model
-                        : im.tag + ", a released image for " + model + " that needs a newer SignalDeck (version code " + im.minAppVersionCode + " or newer)";
-            return im.tag + ", a stock copy for " + model + " kept for research (not offered for loading)";
+                        ? im.tag + ", a released image for " + model   // i18n: device report / SOURCES.txt text (English)
+                        : im.tag + ", a released image for " + model + " that needs a newer SignalDeck (version code " + im.minAppVersionCode + " or newer)";   // i18n: device report / SOURCES.txt text (English)
+            return im.tag + ", a stock copy for " + model + " kept for research (not offered for loading)";   // i18n: device report / SOURCES.txt text (English)
         }
         return "";
     }
@@ -170,14 +172,14 @@ public final class FirmwareFinder {
     /** SignalDeck's and the old module's folder, where the user may also have put a radio image by hand. */
     static final String APP_DIR = "/sdcard/DMR";
     /** Folders under it that hold what the apps write themselves (serial captures, recordings, reports, logs...), never vendor images. */
-    static final java.util.Set<String> OWN_OUTPUT = new java.util.HashSet<>(java.util.Arrays.asList("uart_logs", "Audio", "DeviceReport", "Firmware",
-            "FoundFirmware", "APRS", "DMR_Backups", "SSTV", "NOAA", "Coverage", "Transcription", "RadioID"));
+    static final java.util.Set<String> OWN_OUTPUT = new java.util.HashSet<>(java.util.Arrays.asList("uart_logs", "Audio", "DeviceReport", "Firmware",   // i18n: folder names
+            "FoundFirmware", "APRS", "DMR_Backups", "SSTV", "NOAA", "Coverage", "Transcription", "RadioID"));   // i18n: folder names
     /** Under {@link #APP_DIR} only a module image counts: a .bin of at least this size with a module version string inside. */
     static final long APP_DIR_MIN_BYTES = 100 * 1024;
 
     static void scanFolders(String[] folders, Fs fs, File tmp, Progress p, List<Found> out) {
         for (String dir : folders) {
-            p.step("Looking in " + dir);
+            p.step(Txt.s(R.string.device_fw_finder_looking, dir));
             boolean shared = dir.endsWith("/firmware"), appDir = dir.equals(APP_DIR);
             for (String path : fs.files(dir)) {
                 if (shared && !RADIO_NAME.matcher(path).matches()) continue;
@@ -204,25 +206,25 @@ public final class FirmwareFinder {
 
     /** The report section: one line per file, then what to do with them. */
     public static String describe(List<Found> fs) {
-        if (fs.isEmpty()) return "no radio firmware files found in " + String.join(", ", FOLDERS) + " or in the stock app\n";
+        if (fs.isEmpty()) return "no radio firmware files found in " + String.join(", ", FOLDERS) + " or in the stock app\n";   // i18n: device report / SOURCES.txt text (English)
         StringBuilder s = new StringBuilder();
         boolean anyKnown = false, anyAuto = false;
         for (Found f : fs) { s.append("  ").append(f.line()).append('\n'); anyKnown |= !f.known.isEmpty(); anyAuto |= autoFlash(f.source); }
-        if (anyKnown) s.append("Files marked already known are in SignalDeck or its firmware catalogue: nobody needs a copy of those.\n");
-        if (anyAuto) s.append("Note: on some phones (Unihertz Atom XL, Ulefone Armor 3WT) the stock walkie-talkie app loads a .bin from " + AUTO_FLASH_DIR
-                + " into the radio module by itself when its name sorts after the module's version. Leave nothing there you do not mean to load.\n");
-        return s.append("Nothing was copied or sent. Copy files only if the SignalDeck maintainer asks for them, and hand them over privately: they are the phone maker's.\n").toString();
+        if (anyKnown) s.append("Files marked already known are in SignalDeck or its firmware catalogue: nobody needs a copy of those.\n");   // i18n: device report / SOURCES.txt text (English)
+        if (anyAuto) s.append("Note: on some phones (Unihertz Atom XL, Ulefone Armor 3WT) the stock walkie-talkie app loads a .bin from " + AUTO_FLASH_DIR   // i18n: device report / SOURCES.txt text (English)
+                + " into the radio module by itself when its name sorts after the module's version. Leave nothing there you do not mean to load.\n");   // i18n: device report / SOURCES.txt text (English)
+        return s.append("Nothing was copied or sent. Copy files only if the SignalDeck maintainer asks for them, and hand them over privately: they are the phone maker's.\n").toString();   // i18n: device report / SOURCES.txt text (English)
     }
 
     /** Copy the ticked files into Download/DMR/FoundFirmware/<model>/ with SOURCES.txt; returns the folder. */
     public static File copy(List<Found> ticked) throws Exception {
         File dir = new File(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "DMR/FoundFirmware"), safe(Build.MANUFACTURER + "_" + Build.MODEL));
         if (!dir.mkdirs() && !dir.isDirectory()) throw new Exception("cannot create " + dir);
-        StringBuilder src = new StringBuilder("Radio firmware files copied by SignalDeck " + BuildConfig.VERSION_NAME + " from " + Build.MANUFACTURER + " " + Build.MODEL + " (" + Build.DISPLAY + ")\n"
-                + "These belong to the phone maker. Share them only privately, never in a public place.\n\n");
+        StringBuilder src = new StringBuilder("Radio firmware files copied by SignalDeck " + BuildConfig.VERSION_NAME + " from " + Build.MANUFACTURER + " " + Build.MODEL + " (" + Build.DISPLAY + ")\n"   // i18n: device report / SOURCES.txt text (English)
+                + "These belong to the phone maker. Share them only privately, never in a public place.\n\n");   // i18n: device report / SOURCES.txt text (English)
         Set<String> used = new LinkedHashSet<>();
         for (Found f : ticked) {
-            if (f.cached == null || !f.cached.isFile()) { src.append("not copied (unreadable): ").append(f.source).append('\n'); continue; }
+            if (f.cached == null || !f.cached.isFile()) { src.append("not copied (unreadable): ").append(f.source).append('\n'); continue; }   // i18n: device report / SOURCES.txt text (English)
             String name = uniqueName(used, safe(f.name()));
             try (InputStream in = new FileInputStream(f.cached); OutputStream o = new FileOutputStream(new File(dir, name))) { pipe(in, o); }
             src.append(name).append("  <-  ").append(f.line()).append('\n');

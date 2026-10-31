@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ui;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -47,9 +49,9 @@ public final class FoxHuntDialog {
     public static void show(Context c, RadioService svc) {
         if (svc == null) return;
         float d = Theme.dp(c);
-        LinearLayout body = Neo.sheetBody(c, "Fox hunt");
+        LinearLayout body = Neo.sheetBody(c, Txt.s(R.string.modes_fox_title), "radio");
         ChannelStore.Channel ch = svc.current();
-        body.addView(Neo.sheetHint(c, "Listening on " + (ch == null ? "no channel" : ch.name + " (" + String.format(Locale.US, "%.4f", ch.rxFreq / 1e6) + " MHz)") + ". Walk or drive, point the phone where the signal is strongest and tap Mark; where the bearings cross is where the fox is."));
+        body.addView(Neo.sheetHint(c, ch == null ? Txt.s(R.string.modes_fox_hint_no_channel) : Txt.s(R.string.modes_fox_hint, ch.name, Txt.freqMhz(ch.rxFreq, 4))));
 
         final TextView big = Neo.text(c, "--", Neo.CYAN, 56, Neo.display(c)); big.setGravity(Gravity.CENTER);
         body.addView(big);
@@ -60,9 +62,9 @@ public final class FoxHuntDialog {
         // ---- prediction: which layers, the map (or the plot when no tiles load) ----
         final android.content.SharedPreferences fp = c.getSharedPreferences("fox", Context.MODE_PRIVATE);
         final boolean[] layerOn = { fp.getBoolean("predBearings", true), fp.getBoolean("predHeat", true), fp.getBoolean("predTerrain", false) };
-        final String[] layerKey = { "predBearings", "predHeat", "predTerrain" }, layerName = { "Bearings", "Heat map", "Terrain" };
+        final String[] layerKey = { "predBearings", "predHeat", "predTerrain" }, layerName = { Txt.s(R.string.modes_fox_pill_bearings), Txt.s(R.string.modes_fox_pill_heat), Txt.s(R.string.modes_fox_pill_terrain) };
         final int[] layerAccent = { Neo.CYAN, Neo.AMBER, Neo.GREEN };
-        body.addView(Neo.sheetSection(c, "Prediction"));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_fox_prediction)));
         LinearLayout pills = new LinearLayout(c);
         final TextView[] pill = new TextView[layerOn.length];
         for (int i = 0; i < pill.length; i++) {
@@ -73,10 +75,11 @@ public final class FoxHuntDialog {
         }
         body.addView(pills);
         // terrain: the download (once per area) and how high the fox's antenna is
-        final double[] aglChoices = { FoxPredictor.FOX_AGL, 10, 30 }; final String[] aglNames = { "Fox on the ground", "Fox on a roof (10 m)", "Fox on a tower (30 m)" };
+        final double[] aglChoices = { FoxPredictor.FOX_AGL, 10, 30 }; final String[] aglNames = { Txt.s(R.string.modes_fox_agl_ground), Txt.s(R.string.modes_fox_agl_roof), Txt.s(R.string.modes_fox_agl_tower) };
         final int[] agl = { Math.max(0, Math.min(2, fp.getInt("foxAgl", 0))) };
         final LinearLayout terrRow = new LinearLayout(c); terrRow.setBaselineAligned(false);
-        final TextView aglBtn = Neo.button(c, aglNames[agl[0]], null, Neo.GREEN), dlBtn = Neo.button(c, "Download terrain", "globe", Neo.GREEN);
+        final TextView aglBtn = Neo.button(c, aglNames[agl[0]], null, Neo.GREEN), dlBtn = Neo.button(c, Txt.s(R.string.modes_fox_download_terrain), "globe", Neo.GREEN);
+        final String[] dlMb = { "" };                                      // the download size in the button, for the dialog
         for (TextView b : new TextView[] { aglBtn, dlBtn }) { b.setTextSize(13.5f); Neo.fit(b); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (8 * d), (int) (3 * d), 0); terrRow.addView(b, lp); }
         dlBtn.setVisibility(View.GONE);
         terrRow.setVisibility(layerOn[2] ? View.VISIBLE : View.GONE);
@@ -89,19 +92,19 @@ public final class FoxHuntDialog {
         final HuntLayer layer = new HuntLayer(c);
         mapView.setOverlay(layer);
         view.addView(mapView); view.addView(plot); plot.setVisibility(View.GONE);
-        final TextView swap = Neo.chip(c, "Plot", Neo.CYAN);
+        final TextView swap = Neo.chip(c, Txt.s(R.string.modes_fox_chip_plot), Neo.CYAN);
         android.widget.FrameLayout.LayoutParams sl0 = new android.widget.FrameLayout.LayoutParams(android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, android.widget.FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.START);
         sl0.setMargins((int) (8 * d), (int) (8 * d), 0, 0); view.addView(swap, sl0);
         body.addView(view, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) (300 * d)));
-        swap.setOnClickListener(v -> { boolean toPlot = plot.getVisibility() != View.VISIBLE; plot.setVisibility(toPlot ? View.VISIBLE : View.GONE); mapView.setVisibility(toPlot ? View.GONE : View.VISIBLE); swap.setText(toPlot ? "MAP" : "PLOT"); });
-        body.addView(Neo.sheetHint(c, "Strength-based estimates are rough: walls, cars and your body change readings by 10 dB or more. Take marks in the open, spread out, and hold the phone the same way every time."));
+        swap.setOnClickListener(v -> { boolean toPlot = plot.getVisibility() != View.VISIBLE; plot.setVisibility(toPlot ? View.VISIBLE : View.GONE); mapView.setVisibility(toPlot ? View.GONE : View.VISIBLE); swap.setText(Txt.s(toPlot ? R.string.modes_fox_chip_map_caps : R.string.modes_fox_chip_plot_caps)); });
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_fox_rough_hint)));
 
         LinearLayout r1 = new LinearLayout(c); r1.setBaselineAligned(false);
-        TextView mark = Neo.button(c, "Mark", "locate", Neo.GREEN), beep = Neo.button(c, "Beeper off", "volume", Neo.CYAN), off = Neo.button(c, "Off-frequency", "vfo", Neo.AMBER);
+        TextView mark = Neo.button(c, Txt.s(R.string.modes_fox_mark), "locate", Neo.GREEN), beep = Neo.button(c, Txt.s(R.string.modes_fox_beeper_off), "volume", Neo.CYAN), off = Neo.button(c, Txt.s(R.string.modes_fox_off_freq), "vfo", Neo.AMBER);
         for (TextView b : new TextView[] { mark, beep, off }) { b.setTextSize(14); Neo.fit(b); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (8 * d), (int) (3 * d), 0); r1.addView(b, lp); }
         body.addView(r1);
         LinearLayout r2 = new LinearLayout(c); r2.setBaselineAligned(false);
-        TextView spin = Neo.button(c, "Spin", "spin", Neo.VIOLET), map = Neo.button(c, "Open in maps", "map", Neo.CYAN), clear = Neo.button(c, "Clear marks", "close", Neo.RED);
+        TextView spin = Neo.button(c, Txt.s(R.string.modes_fox_spin), "spin", Neo.VIOLET), map = Neo.button(c, Txt.s(R.string.modes_fox_open_maps), "map", Neo.CYAN), clear = Neo.button(c, Txt.s(R.string.modes_fox_clear_marks), "close", Neo.RED);
         for (TextView b : new TextView[] { spin, map, clear }) { b.setTextSize(14); Neo.fit(b); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (6 * d), (int) (3 * d), 0); r2.addView(b, lp); }
         body.addView(r2);
         // ---- which readings count: any signal, or only the fox's own transmissions (its tone, or its DMR ID and colour code) ----
@@ -110,13 +113,13 @@ public final class FoxHuntDialog {
         final double[] foxTone = { fp.getFloat("foxTone", -1) };            // -1 = the channel's tone squelch
         final int[] foxId = { fp.getInt("foxId", 0) }, foxCc = { fp.getInt("foxCc", -1) };
         final int[] autoM = { fp.getInt("autoMarkM", 0) };                   // 0 = auto-marks off
-        body.addView(Neo.sheetSection(c, "Fox signal"));
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_fox_signal_section)));
         LinearLayout fsRow = new LinearLayout(c);
-        final TextView anyPill = Neo.label(c, "Any signal", Neo.CYAN, 14, true), onlyPill = Neo.label(c, "Only the fox's", Neo.VIOLET, 14, true);
+        final TextView anyPill = Neo.label(c, Txt.s(R.string.modes_fox_any_signal), Neo.CYAN, 14, true), onlyPill = Neo.label(c, Txt.s(R.string.modes_fox_only_fox), Neo.VIOLET, 14, true);
         for (TextView t : new TextView[] { anyPill, onlyPill }) { t.setGravity(Gravity.CENTER); t.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d)); LinearLayout.LayoutParams pl = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f); pl.setMargins((int) (3 * d), 0, (int) (3 * d), 0); fsRow.addView(t, pl); }
         body.addView(fsRow);
         LinearLayout fsRow2 = new LinearLayout(c); fsRow2.setBaselineAligned(false);
-        final TextView setFox = Neo.button(c, "Set the fox", "radio", Neo.VIOLET), autoBtn = Neo.button(c, "Auto-marks off", "locate", Neo.GREEN);
+        final TextView setFox = Neo.button(c, Txt.s(R.string.modes_fox_set_fox), "radio", Neo.VIOLET), autoBtn = Neo.button(c, Txt.s(R.string.modes_fox_auto_off), "locate", Neo.GREEN);
         for (TextView b : new TextView[] { setFox, autoBtn }) { b.setTextSize(13.5f); Neo.fit(b); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (8 * d), (int) (3 * d), 0); fsRow2.addView(b, lp); }
         body.addView(fsRow2);
         final TextView foxState = Neo.label(c, "", Neo.MUTED, 12.5f, false); foxState.setPadding(0, (int) (6 * d), 0, 0); body.addView(foxState);
@@ -130,8 +133,8 @@ public final class FoxHuntDialog {
             gate.setFox(f);
             Neo.pillStyle(anyPill, !foxOnly[0], Neo.CYAN); Neo.pillStyle(onlyPill, foxOnly[0], Neo.VIOLET);
             setFox.setVisibility(foxOnly[0] ? View.VISIBLE : View.INVISIBLE);
-            setFox.setText("Fox: " + f.describe());
-            autoBtn.setText(autoM[0] == 0 ? "Auto-marks off" : "Auto-mark every " + autoM[0] + " m");
+            setFox.setText(Txt.s(R.string.modes_fox_fox_is, f.describe()));
+            autoBtn.setText(autoM[0] == 0 ? Txt.s(R.string.modes_fox_auto_off) : Txt.s(R.string.modes_fox_auto_every, autoM[0]));
         };
         applyFox.run();
         anyPill.setOnClickListener(v -> { foxOnly[0] = false; fp.edit().putBoolean("foxOnly", false).apply(); applyFox.run(); });
@@ -142,34 +145,34 @@ public final class FoxHuntDialog {
             if (cur != null && cur.isDigital()) {
                 LinearLayout col = new LinearLayout(c); col.setOrientation(LinearLayout.VERTICAL); col.setPadding((int) (20 * d), (int) (8 * d), (int) (20 * d), 0);
                 final android.widget.EditText idE = new android.widget.EditText(c), ccE = new android.widget.EditText(c);
-                idE.setHint("Fox DMR ID (empty = any caller)"); ccE.setHint("Colour code 0-15 (empty = any)");
+                idE.setHint(Txt.s(R.string.modes_fox_dmr_id_hint)); ccE.setHint(Txt.s(R.string.modes_fox_dmr_cc_hint));
                 for (android.widget.EditText e : new android.widget.EditText[] { idE, ccE }) { e.setInputType(android.text.InputType.TYPE_CLASS_NUMBER); e.setSingleLine(true); e.setTextColor(Neo.TEXT); e.setTypeface(Neo.uiSemi(c)); col.addView(e); }
                 if (foxId[0] > 0) idE.setText(String.valueOf(foxId[0])); if (foxCc[0] >= 0) ccE.setText(String.valueOf(foxCc[0]));
                 final int last = svc.lastCallerId();
-                AlertDialog.Builder b = new AlertDialog.Builder(c).setTitle("The fox on DMR").setView(col)
-                        .setPositiveButton("Save", (x, y) -> {
+                AlertDialog.Builder b = new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_fox_dmr_title)).setView(col)
+                        .setPositiveButton(Txt.s(R.string.common_save), (x, y) -> {
                             int id = 0, cc = -1;
                             try { id = Integer.parseInt(idE.getText().toString().trim()); } catch (RuntimeException ignored) { }
                             try { cc = Integer.parseInt(ccE.getText().toString().trim()); } catch (RuntimeException ignored) { }
                             foxId[0] = Math.max(0, Math.min(16_777_215, id)); foxCc[0] = cc < 0 || cc > 15 ? -1 : cc;
                             fp.edit().putInt("foxId", foxId[0]).putInt("foxCc", foxCc[0]).apply(); applyFox.run();
-                        }).setNegativeButton("Cancel", null);
-                if (last > 0) b.setNeutralButton("Last caller " + last, (x, y) -> { foxId[0] = last; fp.edit().putInt("foxId", last).apply(); applyFox.run(); });
+                        }).setNegativeButton(Txt.s(R.string.common_cancel), null);
+                if (last > 0) b.setNeutralButton(Txt.s(R.string.modes_fox_last_caller, String.valueOf(last)), (x, y) -> { foxId[0] = last; fp.edit().putInt("foxId", last).apply(); applyFox.run(); });
                 b.show();
                 return;
             }
             final java.util.List<String> items = new java.util.ArrayList<>(); final java.util.List<Double> tones = new java.util.ArrayList<>();
             String own = cur == null ? null : com.macdmr.radio.dsp.ToneTable.toneLabel(cur.rxType, cur.rxSubCode);
-            items.add(own == null || own.equals("—") ? "The channel's tone squelch (none set: any reception)" : "The channel's tone squelch (" + own + ")"); tones.add(-1.0);
+            items.add(own == null || own.equals("—") ? Txt.s(R.string.modes_fox_tone_channel_none) : Txt.s(R.string.modes_fox_tone_channel, own)); tones.add(-1.0);
             double heard = svc.heardToneHz();
-            if (heard > 0) { items.add(String.format(Locale.US, "The tone heard now (%.1f Hz)", heard)); tones.add(heard); }
-            items.add("Pick a CTCSS tone…"); tones.add(0.0);
-            new AlertDialog.Builder(c).setTitle("The fox's tone").setItems(items.toArray(new String[0]), (x, w) -> {
+            if (heard > 0) { items.add(Txt.s(R.string.modes_fox_tone_heard, Txt.decimal(heard, 1))); tones.add(heard); }
+            items.add(Txt.s(R.string.modes_fox_tone_pick)); tones.add(0.0);
+            new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_fox_tone_title)).setItems(items.toArray(new String[0]), (x, w) -> {
                 double t = tones.get(w);
                 if (t == 0) {
                     int n = com.macdmr.radio.dsp.ToneConverter.ctcssCount(); String[] ls = new String[n];
                     for (int i = 0; i < n; i++) ls[i] = com.macdmr.radio.dsp.ToneConverter.ctcssLabelAt(i) + " Hz";
-                    new AlertDialog.Builder(c).setTitle("CTCSS tone").setItems(ls, (x2, k) -> { foxTone[0] = com.macdmr.radio.dsp.ToneConverter.ctcssHz(k); fp.edit().putFloat("foxTone", (float) foxTone[0]).apply(); applyFox.run(); }).show();
+                    new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_fox_ctcss_title)).setItems(ls, (x2, k) -> { foxTone[0] = com.macdmr.radio.dsp.ToneConverter.ctcssHz(k); fp.edit().putFloat("foxTone", (float) foxTone[0]).apply(); applyFox.run(); }).show();
                     return;
                 }
                 foxTone[0] = t; fp.edit().putFloat("foxTone", (float) t).apply(); applyFox.run();
@@ -179,12 +182,12 @@ public final class FoxHuntDialog {
 
         if (!svc.profile().rssi) {                                          // no signal readings (the W6): only the fox side works
             for (int i = body.getChildCount() - 1; i >= 1; i--) body.removeViewAt(i);   // keep the title, drop the hunt
-            body.addView(Neo.sheetHint(c, "This radio does not report signal strength, so it cannot hunt a fox. It can be one: the beacon below is what the hunters look for."));
+            body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_fox_no_rssi)));
         }
-        body.addView(Neo.sheetSection(c, "Be the fox"));
-        final TextView foxBtn = Neo.button(c, svc.foxTxOn() ? "Stop the fox beacon" : "Start the fox beacon", "bolt", Neo.VIOLET);
+        body.addView(Neo.sheetSection(c, Txt.s(R.string.modes_fox_be_fox)));
+        final TextView foxBtn = Neo.button(c, Txt.s(svc.foxTxOn() ? R.string.modes_fox_beacon_stop : R.string.modes_fox_beacon_start), "bolt", Neo.VIOLET);
         body.addView(foxBtn, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-        body.addView(Neo.sheetHint(c, "Sends 5 seconds of beeps on this channel every minute (your callsign follows in Morse on amateur channels) until stopped or the channel changes, so others can hunt you. Hide the phone with a full battery."));
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_fox_beacon_hint)));
 
         // ---- live state ----
         final int[] peak = { -999 }; final boolean[] beeping = { false }; final int[] offset = { 0 };
@@ -207,7 +210,7 @@ public final class FoxHuntDialog {
             o.foxAgl = aglChoices[agl[0]]; o.cache = tcache;
             ChannelStore.Channel cur = svc.current(); if (cur != null && cur.rxFreq > 0) o.hz = cur.rxFreq;
             dlBtn.setVisibility(View.GONE);
-            if (!o.bearings && !o.heat) { pred[0] = null; layer.set(null, ms); plot.setEstimate(null); mapView.invalidate(); predNote.setText("Prediction off: the estimate is the bearing crossing, as without layers."); return; }
+            if (!o.bearings && !o.heat) { pred[0] = null; layer.set(null, ms); plot.setEstimate(null); mapView.invalidate(); predNote.setText(Txt.s(R.string.modes_fox_pred_off)); return; }
             final double[] box; if (ms.isEmpty()) box = null; else {
                 double s0 = 90, w0 = 180, n0 = -90, e0 = -180;
                 for (FoxHunt.Mark m : ms) { s0 = Math.min(s0, m.lat); n0 = Math.max(n0, m.lat); w0 = Math.min(w0, m.lon); e0 = Math.max(e0, m.lon); }
@@ -216,7 +219,7 @@ public final class FoxHuntDialog {
             }
             tbox[0] = box;
             final boolean useTerrain = o.terrain && o.heat && box != null;
-            if (useTerrain) predNote.setText("Working out the terrain\u2026");
+            if (useTerrain) predNote.setText(Txt.s(R.string.modes_fox_working_terrain));
             worker.execute(() -> {
                 int missing = 0;
                 if (useTerrain) {
@@ -227,9 +230,9 @@ public final class FoxHuntDialog {
                 final FoxPredictor.Result res = r; final int miss = missing;
                 h.post(() -> {
                     if (g != gen[0]) return;                            // a newer mark or toggle arrived meanwhile
-                    if (miss > 0) { dlBtn.setText(String.format(Locale.US, "Download terrain (about %.1f MB)", Math.max(0.1, miss * com.macdmr.radio.coverage.Terrain.TILE_BYTES / 1e6))); dlBtn.setVisibility(View.VISIBLE); }
+                    if (miss > 0) { dlMb[0] = Txt.decimal(Math.max(0.1, miss * com.macdmr.radio.coverage.Terrain.TILE_BYTES / 1e6), 1); dlBtn.setText(Txt.s(R.string.modes_fox_download_terrain_size, dlMb[0])); dlBtn.setVisibility(View.VISIBLE); }
                     pred[0] = res; layer.set(res, ms); plot.setEstimate(res); mapView.invalidate();
-                    predNote.setText(res == null ? "Mark a reading to start." : (res.note == null ? "" : "Not used yet: " + res.note + ". ") + (res.hasMap() ? "Shaded: where the fox probably is; bright outline 50 %, faint 90 %." : ""));
+                    predNote.setText(res == null ? Txt.s(R.string.modes_fox_mark_to_start) : res.note == null ? (res.hasMap() ? Txt.s(R.string.modes_fox_shaded) : "") : Txt.s(res.hasMap() ? R.string.modes_fox_not_used_shaded : R.string.modes_fox_not_used, res.note));
                     if (!ms.isEmpty()) {
                         if (res != null && res.hasMap() && (res.layers & FoxPredictor.HEAT) != 0) mapView.fitBox(res.south, res.west, res.north, res.east);
                         else {
@@ -249,14 +252,14 @@ public final class FoxHuntDialog {
         aglBtn.setOnClickListener(v -> { agl[0] = (agl[0] + 1) % aglChoices.length; aglBtn.setText(aglNames[agl[0]]); fp.edit().putInt("foxAgl", agl[0]).apply(); recompute.run(); });
         dlBtn.setOnClickListener(v -> {
             final double[] box = tbox[0]; if (box == null) return;
-            new AlertDialog.Builder(c).setTitle("Download terrain").setMessage("Ground heights for this area " + dlBtn.getText().toString().replace("Download terrain ", "") + ", downloaded once and kept on the phone for later hunts and the coverage maps, so the Terrain layer works offline afterwards.")
-                    .setPositiveButton("Download", (x, y) -> {
-                        dlBtn.setVisibility(View.GONE); predNote.setText("Downloading terrain\u2026");
+            new AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_fox_download_terrain)).setMessage(Txt.s(R.string.modes_fox_download_message, dlMb[0]))
+                    .setPositiveButton(Txt.s(R.string.modes_fox_download), (x, y) -> {
+                        dlBtn.setVisibility(View.GONE); predNote.setText(Txt.s(R.string.modes_fox_downloading));
                         worker.execute(() -> {
-                            String err = terrain.load(box[0], box[1], box[2], box[3], (done, total) -> h.post(() -> predNote.setText("Downloading terrain " + done + " of " + total + "\u2026")));
+                            String err = terrain.load(box[0], box[1], box[2], box[3], (done, total) -> h.post(() -> predNote.setText(Txt.s(R.string.modes_fox_downloading_n, done, total))));
                             h.post(() -> { if (err != null) Toast.makeText(c, err, Toast.LENGTH_LONG).show(); recompute.run(); });
                         });
-                    }).setNegativeButton("Not now", null).show();
+                    }).setNegativeButton(Txt.s(R.string.common_not_now), null).show();
         });
         { final Location l0 = here[0]; if (l0 != null) { mapView.setMe(l0.getLatitude(), l0.getLongitude(), l0.getAccuracy()); mapView.post(() -> mapView.center(l0.getLatitude(), l0.getLongitude(), 16)); } }
         final long opened = System.currentTimeMillis(); final boolean[] fellBack = { false };
@@ -285,7 +288,11 @@ public final class FoxHuntDialog {
                 if (dbm != -999 && dbm > peak[0]) peak[0] = dbm;
                 big.setText(dbm == -999 ? "--" : String.valueOf(dbm));
                 big.setTextColor(dbm >= -70 ? Neo.RED : dbm >= -93 ? Neo.AMBER : Neo.CYAN);
-                sub.setText((dbm == -999 ? "no reading" : "dBm  ·  " + SMeterView.sUnits(dbm)) + (peak[0] != -999 ? "  ·  peak " + peak[0] : "") + (offset[0] != 0 ? "  ·  tuned " + (offset[0] / 1000) + " kHz off" : ""));
+                List<String> facts = new java.util.ArrayList<>();
+                if (dbm == -999) facts.add(Txt.s(R.string.modes_fox_no_reading)); else { facts.add("dBm"); facts.add(SMeterView.sUnits(dbm)); }   // i18n: unit
+                if (peak[0] != -999) facts.add(Txt.s(R.string.modes_fox_peak, peak[0]));
+                if (offset[0] != 0) facts.add(Txt.s(R.string.modes_fox_tuned_off, offset[0] / 1000));
+                sub.setText(String.join(Txt.s(R.string.modes_dot_separator), facts));
                 meter.setDbm(dbm);
                 // the fox-signal gate: which readings count, the waiting mark, auto-marks
                 long now = System.currentTimeMillis(); ChannelStore.Channel cc0 = svc.current();
@@ -304,21 +311,25 @@ public final class FoxHuntDialog {
                 Location me0 = here[0];
                 if (me0 != null) {
                     int lv = gate.takeIfReady();
-                    if (lv != -999) addMark(c, svc, me0, lv, heading[0], Double.NaN, "Marked the fox at");
+                    if (lv != -999) addMark(c, svc, me0, lv, heading[0], Double.NaN, Txt.s(R.string.modes_fox_how_fox));
                     else if (autoM[0] > 0) {
                         List<FoxHunt.Mark> ms0 = svc.fox().marks(); FoxHunt.Mark last = ms0.isEmpty() ? null : ms0.get(ms0.size() - 1);
                         int al = gate.autoTake(true, last == null ? Double.NaN : FoxPredictor.metres(last.lat, last.lon, me0.getLatitude(), me0.getLongitude()), autoM[0]);
-                        if (al != -999) addMark(c, svc, me0, al, FoxSignalGate.steadyHeading(hring, 12), Double.NaN, "Auto-mark");
+                        if (al != -999) addMark(c, svc, me0, al, FoxSignalGate.steadyHeading(hring, 12), Double.NaN, Txt.s(R.string.modes_fox_how_auto));
                     }
                 }
-                { String mt = gate.waiting() ? "Waiting…" : "Mark"; if (!mt.contentEquals(mark.getText())) mark.setText(mt); }
+                { String mt = Txt.s(gate.waiting() ? R.string.modes_fox_mark_waiting : R.string.modes_fox_mark); if (!mt.contentEquals(mark.getText())) mark.setText(mt); }
                 FoxSignalGate.Fox ff = gate.fox();
-                foxState.setText(!ff.only ? (autoM[0] > 0 ? "Auto-marks: one mark per reception, once you have moved " + autoM[0] + " m from the last mark." : "Every reading counts, whoever transmits.")
-                        : (!ff.digital && ff.dcs && fn.softSq ? "Soft SQ holds the radio's squelch open, so DCS cannot tell the fox apart: turn Soft SQ off. " : "")
-                          + (gate.waiting() ? "Waiting for the fox… the mark is taken at its next transmission." : foxOn ? "The fox is on the air: readings count." : "The fox is not on the air: readings wait for it.")
-                          + (autoM[0] > 0 ? " Auto-marks every " + autoM[0] + " m." : ""));
+                List<String> st = new java.util.ArrayList<>();
+                if (!ff.only) st.add(autoM[0] > 0 ? Txt.s(R.string.modes_fox_state_auto, autoM[0]) : Txt.s(R.string.modes_fox_state_any));
+                else {
+                    if (!ff.digital && ff.dcs && fn.softSq) st.add(Txt.s(R.string.modes_fox_state_softsq));
+                    st.add(Txt.s(gate.waiting() ? R.string.modes_fox_state_waiting : foxOn ? R.string.modes_fox_state_on : R.string.modes_fox_state_off));
+                    if (autoM[0] > 0) st.add(Txt.s(R.string.modes_fox_state_auto_every, autoM[0]));
+                }
+                foxState.setText(String.join(Txt.s(R.string.modes_sentence_separator), st));
                 StringBuilder sb = new StringBuilder();
-                sb.append(Double.isNaN(heading[0]) ? "No compass" : String.format(Locale.US, "Pointing %03.0f° %s", heading[0], compass(heading[0])));
+                sb.append(Double.isNaN(heading[0]) ? Txt.s(R.string.modes_fox_no_compass) : Txt.s(R.string.modes_fox_pointing, String.format(Locale.US, "%03.0f", heading[0]), compass(heading[0])));
                 if (svc.fox().marks().size() != seen[0]) recompute.run();
                 ChannelStore.Channel chNow = svc.current(); int chKey = chNow == null ? 0 : chNow.number * 4 + (chNow.isDigital() ? 1 : 0) + chNow.rxType * 8 + chNow.rxSubCode * 64;
                 if (chKey != chSeen[0]) { chSeen[0] = chKey; applyFox.run(); }   // the channel (or its tone) changed: the fox's tone or DMR setting follows   // a mark added (or cleared)
@@ -326,11 +337,11 @@ public final class FoxHuntDialog {
                 if (est != null && me != null) {
                     double eLat = pr != null ? pr.lat : est.lat, eLon = pr != null ? pr.lon : est.lon;
                     float[] res = new float[2]; Location.distanceBetween(me.getLatitude(), me.getLongitude(), eLat, eLon, res);
-                    String what = pr != null ? (pr.layers == 0 ? "Strongest mark" : "Fox estimate (" + pr.layerNames() + (pr.confidence() != null ? ", " + pr.confidence() : "") + ")")
-                            : est.fromBearings ? "Fox estimate from " + est.used + " bearings" : "Strongest mark";
-                    if (res[0] < 10) sb.append("\n" + what + ": here (within 10 m)");   // closer than GPS can tell: a direction would be noise
-                    else sb.append(String.format(Locale.US, "\n%s: %s %s (%03.0f°)", what, com.macdmr.radio.region.Region.km() ? com.macdmr.radio.repeaters.GeoUtil.dist(res[0], true) : String.format(Locale.US, "%.2f mi", res[0] / 1609.344), compass(res[1]), (res[1] + 360) % 360));
-                } else if (svc.fox().marks().isEmpty()) sb.append("\nNo marks yet");
+                    String what = pr != null ? (pr.layers == 0 ? Txt.s(R.string.modes_fox_what_strongest) : pr.confidence() != null ? Txt.s(R.string.modes_fox_what_estimate_conf, pr.layerNames(), pr.confidenceText()) : Txt.s(R.string.modes_fox_what_estimate, pr.layerNames()))
+                            : est.fromBearings ? Txt.p(R.plurals.modes_fox_what_bearings, est.used, est.used) : Txt.s(R.string.modes_fox_what_strongest);
+                    if (res[0] < 10) sb.append("\n").append(Txt.s(R.string.modes_fox_here, what));   // closer than GPS can tell: a direction would be noise
+                    else sb.append(String.format(Locale.US, "\n%s: %s %s (%03.0f°)", what, com.macdmr.radio.region.Region.km() ? com.macdmr.radio.repeaters.GeoUtil.dist(res[0], true) : Txt.decimal(res[0] / 1609.344, 2) + " mi", compass(res[1]), (res[1] + 360) % 360));   // i18n: distance and bearing
+                } else if (svc.fox().marks().isEmpty()) sb.append("\n").append(Txt.s(R.string.modes_fox_no_marks));
                 info.setText(sb.toString());
                 plot.update(me, heading[0]);
                 if (me != null) mapView.setMe(me.getLatitude(), me.getLongitude(), me.getAccuracy());
@@ -346,45 +357,45 @@ public final class FoxHuntDialog {
         h.post(tick);
 
         mark.setOnClickListener(v -> {
-            if (svc.isTransmitting()) { Toast.makeText(c, "Not while transmitting: the reading would be your own signal", Toast.LENGTH_SHORT).show(); return; }
+            if (svc.isTransmitting()) { Toast.makeText(c, Txt.s(R.string.modes_fox_not_while_tx), Toast.LENGTH_SHORT).show(); return; }
             Location me = here[0]; int dbm = svc.lastRssi();
-            if (me == null) { Toast.makeText(c, "No position yet: turn on location", Toast.LENGTH_LONG).show(); return; }
+            if (me == null) { Toast.makeText(c, Txt.s(R.string.modes_fox_no_position), Toast.LENGTH_LONG).show(); return; }
             if (gate.fox().only) {                                          // only the fox's: from its transmission, now or at the next one
-                if (gate.waiting()) { gate.cancel(); Toast.makeText(c, "Mark cancelled", Toast.LENGTH_SHORT).show(); return; }
+                if (gate.waiting()) { gate.cancel(); Toast.makeText(c, Txt.s(R.string.modes_fox_mark_cancelled), Toast.LENGTH_SHORT).show(); return; }
                 gate.requestMark(); int lv = gate.takeIfReady();
-                if (lv != -999) addMark(c, svc, me, lv, heading[0], Double.NaN, "Marked the fox at");
-                else { Toast.makeText(c, "Waiting for the fox: the mark is taken at its next transmission (tap Mark again to cancel)", Toast.LENGTH_LONG).show(); }
+                if (lv != -999) addMark(c, svc, me, lv, heading[0], Double.NaN, Txt.s(R.string.modes_fox_how_fox));
+                else { Toast.makeText(c, Txt.s(R.string.modes_fox_mark_wait_toast), Toast.LENGTH_LONG).show(); }
                 return;
             }
-            if (dbm == -999) { Toast.makeText(c, "No signal reading yet", Toast.LENGTH_SHORT).show(); return; }
-            addMark(c, svc, me, dbm, heading[0], Double.NaN, "Marked");
+            if (dbm == -999) { Toast.makeText(c, Txt.s(R.string.modes_fox_no_signal), Toast.LENGTH_SHORT).show(); return; }
+            addMark(c, svc, me, dbm, heading[0], Double.NaN, Txt.s(R.string.modes_fox_how_marked));
         });
         spin.setOnClickListener(v -> {
-            if (svc.isTransmitting()) { Toast.makeText(c, "Not while transmitting: the reading would be your own signal", Toast.LENGTH_SHORT).show(); return; }
-            if (Double.isNaN(heading[0])) { Toast.makeText(c, "The spin needs the phone's compass", Toast.LENGTH_LONG).show(); return; }
-            if (here[0] == null) { Toast.makeText(c, "No position yet: turn on location", Toast.LENGTH_LONG).show(); return; }
+            if (svc.isTransmitting()) { Toast.makeText(c, Txt.s(R.string.modes_fox_not_while_tx), Toast.LENGTH_SHORT).show(); return; }
+            if (Double.isNaN(heading[0])) { Toast.makeText(c, Txt.s(R.string.modes_fox_spin_compass), Toast.LENGTH_LONG).show(); return; }
+            if (here[0] == null) { Toast.makeText(c, Txt.s(R.string.modes_fox_no_position), Toast.LENGTH_LONG).show(); return; }
             spinLastAt[0] = svc.lastRssiAt(); showSpin(c, svc, spinNow, here, gate);
         });
-        beep.setOnClickListener(v -> { beeping[0] = !beeping[0]; beep.setText(beeping[0] ? "Beeper on" : "Beeper off"); });
+        beep.setOnClickListener(v -> { beeping[0] = !beeping[0]; beep.setText(Txt.s(beeping[0] ? R.string.modes_fox_beeper_on : R.string.modes_fox_beeper_off)); });
         off.setOnClickListener(v -> {
             ChannelStore.Channel cur = svc.current(); if (cur == null) return;
             int[] steps = { 0, 10_000, 20_000, 30_000 };
             int k = 0; for (int i = 0; i < steps.length; i++) if (steps[i] == offset[0]) k = i;
             int next = steps[(k + 1) % steps.length];
             String e = svc.foxOffset(next);
-            if (e != null) { Toast.makeText(c, e, Toast.LENGTH_LONG).show(); if (offset[0] != 0) { svc.foxOffset(0); offset[0] = 0; off.setText("Off-frequency"); } return; }   // past the top of the band: the next tap starts again from the channel
+            if (e != null) { Toast.makeText(c, e, Toast.LENGTH_LONG).show(); if (offset[0] != 0) { svc.foxOffset(0); offset[0] = 0; off.setText(Txt.s(R.string.modes_fox_off_freq)); } return; }   // past the top of the band: the next tap starts again from the channel
             offset[0] = next; peak[0] = -999;
-            off.setText(next == 0 ? "Off-frequency" : "+" + (next / 1000) + " kHz");
+            off.setText(next == 0 ? Txt.s(R.string.modes_fox_off_freq) : Txt.s(R.string.modes_fox_offset, next / 1000));
         });
         map.setOnClickListener(v -> {
             FoxHunt.Estimate est = svc.fox().estimate(); FoxPredictor.Result pr = pred[0];
-            if (est == null) { Toast.makeText(c, "Mark a reading first", Toast.LENGTH_SHORT).show(); return; }
+            if (est == null) { Toast.makeText(c, Txt.s(R.string.modes_fox_mark_first), Toast.LENGTH_SHORT).show(); return; }
             double eLat = pr != null ? pr.lat : est.lat, eLon = pr != null ? pr.lon : est.lon;
-            try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(String.format(Locale.US, "geo:%f,%f?q=%f,%f(Fox)", eLat, eLon, eLat, eLon)))); } catch (Throwable t) { Toast.makeText(c, "No map app", Toast.LENGTH_SHORT).show(); }
+            try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(String.format(Locale.US, "geo:%f,%f?q=%f,%f(Fox)", eLat, eLon, eLat, eLon)))); } catch (Throwable t) { Toast.makeText(c, Txt.s(R.string.modes_fox_no_map_app), Toast.LENGTH_SHORT).show(); }   // i18n: geo URI
         });
-        clear.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle("Clear all marks?").setMessage("The marks, bearings and the estimate of this hunt are removed.")
-                .setPositiveButton("Clear", (dd, w) -> { svc.fox().clear(); peak[0] = -999; recompute.run(); }).setNegativeButton("Cancel", null).show());
-        foxBtn.setOnClickListener(v -> { String r = svc.setFoxTx(!svc.foxTxOn()); Toast.makeText(c, r, Toast.LENGTH_LONG).show(); foxBtn.setText(svc.foxTxOn() ? "Stop the fox beacon" : "Start the fox beacon"); });
+        clear.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.modes_fox_clear_confirm)).setMessage(Txt.s(R.string.modes_fox_clear_message))
+                .setPositiveButton(Txt.s(R.string.common_clear), (dd, w) -> { svc.fox().clear(); peak[0] = -999; recompute.run(); }).setNegativeButton(Txt.s(R.string.common_cancel), null).show());
+        foxBtn.setOnClickListener(v -> { String r = svc.setFoxTx(!svc.foxTxOn()); Toast.makeText(c, r, Toast.LENGTH_LONG).show(); foxBtn.setText(Txt.s(svc.foxTxOn() ? R.string.modes_fox_beacon_stop : R.string.modes_fox_beacon_start)); });
 
         AlertDialog a = Neo.showSheet(c, body);
         a.setOnDismissListener(x -> {
@@ -400,14 +411,14 @@ public final class FoxHuntDialog {
     /** The spin sheet: guidance while the hunter turns, then the fitted bearing to save as a mark (or a retry). The fox hunt's tick feeds {@code slot[0]}. */
     static void showSpin(Context c, RadioService svc, SpinBearing[] slot, Location[] here, FoxSignalGate gate) {
         float d = Theme.dp(c);
-        LinearLayout body = Neo.sheetBody(c, "Spin for the bearing");
-        body.addView(Neo.sheetHint(c, "Hold the phone flat against your chest, top pointing ahead, and turn slowly on the spot through a full circle (20 to 40 seconds). Your body hides the signal from behind: the strongest direction is toward the fox, the weakest away from it."));
+        LinearLayout body = Neo.sheetBody(c, Txt.s(R.string.modes_fox_spin_title), "radio");
+        body.addView(Neo.sheetHint(c, Txt.s(R.string.modes_fox_spin_hint)));
         final SpinView ring = new SpinView(c);
         body.addView(ring, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) (260 * d)));
-        final TextView guide = Neo.text(c, "Start turning", Neo.CYAN_LIGHT, 24, Neo.ui(c)); guide.setGravity(Gravity.CENTER); body.addView(guide);
+        final TextView guide = Neo.text(c, Txt.s(R.string.modes_fox_spin_start), Neo.CYAN_LIGHT, 24, Neo.ui(c)); guide.setGravity(Gravity.CENTER); body.addView(guide);
         final TextView detail = Neo.label(c, "", Neo.MUTED, 13, false); detail.setGravity(Gravity.CENTER); detail.setPadding(0, (int) (4 * d), 0, (int) (4 * d)); body.addView(detail);
         LinearLayout row = new LinearLayout(c); row.setBaselineAligned(false);
-        final TextView left = Neo.button(c, "Fit now", "check", Neo.AMBER), save = Neo.button(c, "Save mark", "locate", Neo.GREEN);
+        final TextView left = Neo.button(c, Txt.s(R.string.modes_fox_spin_fit), "check", Neo.AMBER), save = Neo.button(c, Txt.s(R.string.modes_fox_spin_save), "locate", Neo.GREEN);
         for (TextView b : new TextView[] { left, save }) { b.setTextSize(14); Neo.fit(b); LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f); lp.setMargins((int) (3 * d), (int) (8 * d), (int) (3 * d), 0); row.addView(b, lp); }
         save.setVisibility(View.GONE); body.addView(row);
         final SpinBearing.Result[] res = { null };
@@ -416,10 +427,10 @@ public final class FoxHuntDialog {
         final Runnable done = () -> {
             SpinBearing sp = slot[0]; if (sp == null) return;
             SpinBearing.Result r = sp.fit(); res[0] = r; ring.set(sp, r);
-            guide.setText(r.ok ? String.format(Locale.US, "Fox toward %03.0f\u00B0 %s", r.bearing, compass(r.bearing)) : "Try again");
+            guide.setText(r.ok ? Txt.s(R.string.modes_fox_spin_toward, String.format(Locale.US, "%03.0f", r.bearing), compass(r.bearing)) : Txt.s(R.string.modes_fox_spin_retry));
             guide.setTextColor(r.ok ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT);
-            detail.setText(r.ok ? String.format(Locale.US, "Within about \u00B1%.0f\u00B0 (from the %s, %.0f dB between strongest and weakest, %d readings)", r.sigma, r.fromNull ? "weakest direction, behind you" : "strongest direction", r.depth, r.samples) : r.retry);
-            left.setText("Spin again"); save.setVisibility(r.ok ? View.VISIBLE : View.GONE);
+            detail.setText(r.ok ? Txt.p(r.fromNull ? R.plurals.modes_fox_spin_within_null : R.plurals.modes_fox_spin_within_peak, r.samples, String.format(Locale.US, "%.0f", r.sigma), String.format(Locale.US, "%.0f", r.depth), r.samples) : r.retry);
+            left.setText(Txt.s(R.string.modes_fox_spin_again)); save.setVisibility(r.ok ? View.VISIBLE : View.GONE);
         };
         final Runnable upd = new Runnable() {
             @Override public void run() {
@@ -427,8 +438,9 @@ public final class FoxHuntDialog {
                 if (res[0] == null) {
                     ring.set(sp, null);
                     boolean wait = gate.fox().only && !gate.active(); String g = sp.guide();
-                    guide.setText(wait ? "Waiting for the fox" : g); guide.setTextColor(wait ? Neo.MUTED : "Slower".equals(g) ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);
-                    detail.setText(String.format(Locale.US, "%.0f %% of the circle  \u00B7  %d readings  \u00B7  turned %.0f\u00B0", sp.covered() * 100, sp.samples(), sp.turned()) + (wait ? "\nOnly the fox's transmissions count: keep turning slowly while it is on the air." : ""));
+                    guide.setText(wait ? Txt.s(R.string.modes_fox_spin_waiting) : g); guide.setTextColor(wait ? Neo.MUTED : sp.tooFast() ? Neo.AMBER_LIGHT : Neo.CYAN_LIGHT);
+                    String pct = String.format(Locale.US, "%.0f", sp.covered() * 100), turned = String.format(Locale.US, "%.0f", sp.turned());
+                    detail.setText(Txt.p(wait ? R.plurals.modes_fox_spin_progress_wait : R.plurals.modes_fox_spin_progress, sp.samples(), pct, sp.samples(), turned));
                     if (sp.complete()) done.run();
                 }
                 h.postDelayed(this, 250);
@@ -436,14 +448,14 @@ public final class FoxHuntDialog {
         };
         left.setOnClickListener(v -> {
             if (res[0] == null) { done.run(); return; }
-            res[0] = null; slot[0] = new SpinBearing(); left.setText("Fit now"); save.setVisibility(View.GONE); guide.setText("Start turning");
+            res[0] = null; slot[0] = new SpinBearing(); left.setText(Txt.s(R.string.modes_fox_spin_fit)); save.setVisibility(View.GONE); guide.setText(Txt.s(R.string.modes_fox_spin_start));
         });
         final AlertDialog a = Neo.showSheet(c, body);
         save.setOnClickListener(v -> {
             SpinBearing.Result r = res[0]; Location me = here[0];
             if (r == null || !r.ok) return;
-            if (me == null) { Toast.makeText(c, "No position yet: turn on location", Toast.LENGTH_LONG).show(); return; }
-            addMark(c, svc, me, (int) Math.round(r.peakDb), r.bearing, r.sigma, "Spin mark");
+            if (me == null) { Toast.makeText(c, Txt.s(R.string.modes_fox_no_position), Toast.LENGTH_LONG).show(); return; }
+            addMark(c, svc, me, (int) Math.round(r.peakDb), r.bearing, r.sigma, Txt.s(R.string.modes_fox_how_spin));
             a.dismiss();
         });
         a.setOnDismissListener(x -> { h.removeCallbacks(upd); slot[0] = null; });
@@ -496,7 +508,8 @@ public final class FoxHuntDialog {
     /** Save a mark here and say so. */
     static void addMark(Context c, RadioService svc, Location me, int dbm, double bearing, double sigma, String how) {
         svc.fox().add(new FoxHunt.Mark(me.getLatitude(), me.getLongitude(), dbm, bearing, System.currentTimeMillis(), sigma));
-        Toast.makeText(c, String.format(Locale.US, "%s %d dBm%s", how, dbm, Double.isNaN(bearing) ? "" : String.format(Locale.US, " toward %03.0f°", bearing) + (Double.isNaN(sigma) ? "" : String.format(Locale.US, " (±%.0f°)", sigma))), Toast.LENGTH_SHORT).show();
+        Toast.makeText(c, Double.isNaN(bearing) ? Txt.s(R.string.modes_fox_marked, how, dbm) : Double.isNaN(sigma) ? Txt.s(R.string.modes_fox_marked_toward, how, dbm, String.format(Locale.US, "%03.0f", bearing))
+                : Txt.s(R.string.modes_fox_marked_toward_sigma, how, dbm, String.format(Locale.US, "%03.0f", bearing), String.format(Locale.US, "%.0f", sigma)), Toast.LENGTH_SHORT).show();
     }
 
     static String compass(double deg) { String[] n = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" }; return n[(int) Math.round(((deg % 360) + 360) % 360 / 45.0) % 8]; }
@@ -517,7 +530,7 @@ public final class FoxHuntDialog {
             for (int i = 1; i <= 3; i++) cv.drawCircle(cx, cy, Math.min(cx, cy) * i / 3.2f, p);
             List<FoxHunt.Mark> ms = fox.marks(); FoxHunt.Estimate est = fox.estimate();
             if (est != null && pred != null) est = new FoxHunt.Estimate(pred.lat, pred.lon, true, 0);
-            if (me == null && ms.isEmpty()) { p.setStyle(Paint.Style.FILL); p.setColor(Neo.DIM); p.setTextSize(13 * d); p.setTextAlign(Paint.Align.CENTER); cv.drawText("Marks appear here", cx, cy, p); return; }
+            if (me == null && ms.isEmpty()) { p.setStyle(Paint.Style.FILL); p.setColor(Neo.DIM); p.setTextSize(13 * d); p.setTextAlign(Paint.Align.CENTER); cv.drawText(Txt.s(R.string.modes_fox_plot_empty), cx, cy, p); return; }
             double lat0 = me != null ? me.getLatitude() : ms.get(0).lat, lon0 = me != null ? me.getLongitude() : ms.get(0).lon, cos = Math.cos(Math.toRadians(lat0));
             double maxM = 50;
             for (FoxHunt.Mark m : ms) maxM = Math.max(maxM, dist(m.lat, m.lon, lat0, lon0, cos));
@@ -549,8 +562,8 @@ public final class FoxHuntDialog {
             }
             p.setStyle(Paint.Style.FILL); p.setColor(Neo.DIM); p.setTextSize(11 * d); p.setTextAlign(Paint.Align.LEFT);
             double ring = maxM / (0.9 * 3.2);                 // metres between rings
-            cv.drawText(com.macdmr.radio.region.Region.km() ? (ring >= 1000 ? String.format(Locale.US, "rings %.1f km apart", ring / 1000) : String.format(Locale.US, "rings %.0f m apart", ring))
-                    : ring >= 1609 ? String.format(Locale.US, "rings %.1f mi apart", ring / 1609.344) : String.format(Locale.US, "rings %.0f m apart", ring), 10 * d, hgt - 10 * d, p);
+            cv.drawText(com.macdmr.radio.region.Region.km() ? (ring >= 1000 ? Txt.s(R.string.modes_fox_rings_km, Txt.decimal(ring / 1000, 1)) : Txt.s(R.string.modes_fox_rings_m, String.format(Locale.US, "%.0f", ring)))
+                    : ring >= 1609 ? Txt.s(R.string.modes_fox_rings_mi, Txt.decimal(ring / 1609.344, 1)) : Txt.s(R.string.modes_fox_rings_m, String.format(Locale.US, "%.0f", ring)), 10 * d, hgt - 10 * d, p);
             cv.drawText("N ↑", w - 34 * d, 18 * d, p);
         }
         private static double dist(double la, double lo, double la0, double lo0, double cos) { double x = Math.toRadians(lo - lo0) * 6371000 * cos, y = Math.toRadians(la - la0) * 6371000; return Math.sqrt(x * x + y * y); }

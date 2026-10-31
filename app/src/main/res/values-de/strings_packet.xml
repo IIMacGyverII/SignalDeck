@@ -1,0 +1,1614 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Packet screens (PKT, APRS, messages, map, packet finder) and the packet engine, decoders and coverage map. See strings_common.xml
+     for the conventions. Anything sent on the air (APRS payloads, beacons, acks, telemetry, paths, SSTV overlays, KISS) and the
+     APRS-IS protocol stay in code, in English. -->
+<resources>
+
+    <!-- ==== Packet engine: history lines (shown in Last heard and on the intercom; %1$s etc. are callsigns, packet text and numbers as received), notifications, and the reasons returned to the PKT screens and SignalDeck Web. -->
+    <!-- APRS settings → Lead-in length choice: the default 1.6 s. Short (choice pill). -->
+    <string name="packet_lead_default">1,6 s (Standard)</string>
+    <!-- APRS settings → Lead-in length choice: no lead-in. Very short (choice pill). -->
+    <string name="packet_lead_none">Keiner</string>
+    <!-- APRS settings → What the lead-in is made of: a steady 1200 Hz tone. Short (choice pill). -->
+    <string name="packet_lead_kind_tone">Ton</string>
+    <!-- APRS settings → What the lead-in is made of: HDLC flags, the AX.25 standard. Short (choice pill). -->
+    <string name="packet_lead_kind_flags">Flags (Standard)</string>
+    <!-- APRS settings → What the lead-in is made of: silence. Short (choice pill). -->
+    <string name="packet_lead_kind_silence">Stille</string>
+    <!-- ==== SSTV receiver status (PKT → SSTV, the SSTV screen, SignalDeck Web). Lower case, one line. Robot 36 and the other mode names stay as they are. -->
+    <!-- SSTV status: the receiver is off. -->
+    <string name="packet_sstv_idle">aus</string>
+    <!-- SSTV status: continuous Robot 36 locked on. %1$d the line, %2$d the lines in the picture. -->
+    <string name="packet_sstv_receiving_line">empfange Robot 36, Zeile %1$d von %2$d</string>
+    <!-- SSTV status: continuous Robot 36 decoder waiting for a picture. -->
+    <string name="packet_sstv_listening_continuous">empfangsbereit (Robot 36 fortlaufend)</string>
+    <!-- SSTV status: a continuous Robot 36 picture is complete and saved. -->
+    <string name="packet_sstv_picture_received">Bild empfangen</string>
+    <!-- SSTV status: a picture is complete but could not be saved. -->
+    <string name="packet_sstv_picture_received_unsaved">Bild empfangen, Speichern fehlgeschlagen</string>
+    <!-- SSTV status: a partial picture was kept. %1$d the lines received. -->
+    <string name="packet_sstv_picture_partial">Bild empfangen (unvollständig, %1$d Zeilen)</string>
+    <!-- SSTV status: a partial picture that could not be saved. %1$d the lines received. -->
+    <string name="packet_sstv_picture_partial_unsaved">Bild empfangen (unvollständig, %1$d Zeilen), Speichern fehlgeschlagen</string>
+    <!-- SSTV status: a picture header (VIS) was heard. %1$s the mode name. -->
+    <string name="packet_sstv_receiving_mode">empfange %1$s</string>
+    <!-- SSTV status while a picture comes in: %1$d lines of %2$d. -->
+    <string name="packet_sstv_receiving_lines">empfange %1$d/%2$d</string>
+    <!-- SSTV status: the decoder switched mode mid-picture. %1$s the new mode name. -->
+    <string name="packet_sstv_mode_changed">Modus gewechselt zu %1$s</string>
+    <!-- SSTV status: picture done. %1$s the mode name. -->
+    <string name="packet_sstv_picture_complete">Bild fertig (%1$s)</string>
+    <!-- SSTV status: waiting for a picture header (VIS code). -->
+    <string name="packet_sstv_listening_vis">warte auf VIS-Code</string>
+    <!-- History line: an SSTV picture was received and saved to the Download/DMR/SSTV folder (keep the path). %1$s the mode name. -->
+    <string name="packet_sstv_event_received">📺 SSTV-Bild empfangen (%1$s) → Download/DMR/SSTV</string>
+    <!-- History line: a partial Robot 36 picture was saved. %1$d lines received of %2$d. Keep the path. -->
+    <string name="packet_sstv_event_received_partial">📺 SSTV-Bild empfangen (Robot 36, unvollständig: %1$d von %2$d Zeilen) → Download/DMR/SSTV</string>
+    <!-- Notification title when an SSTV picture arrives. One line. -->
+    <string name="packet_sstv_notify_received">SSTV-Bild empfangen</string>
+    <!-- Notification text for a partial Robot 36 picture. Short. -->
+    <string name="packet_sstv_notify_partial">Robot 36 (unvollständig)</string>
+    <!-- History line: an SSTV picture header was heard. %1$s the mode name. -->
+    <string name="packet_sstv_event_detected">📺 SSTV %1$s erkannt</string>
+    <!-- History line: a long SSTV picture was held back by the cool-down guard. %1$s the mode name, %2$s the guard's reason. -->
+    <string name="packet_sstv_event_held">⏳ %1$s nicht gesendet: %2$s</string>
+    <!-- History line: an SSTV picture went out. %1$s the mode name. -->
+    <string name="packet_sstv_event_sent">📺 SSTV %1$s gesendet</string>
+    <!-- Toast when sending SSTV without a picture. One line. -->
+    <string name="packet_sstv_err_no_picture">Kein Bild</string>
+    <!-- Toast when the chosen SSTV mode cannot be sent. One line. -->
+    <string name="packet_sstv_err_unsupported">Modus nicht unterstützt</string>
+    <!-- Toast when sending SSTV on a DMR channel. One line. -->
+    <string name="packet_sstv_err_analog">SSTV braucht einen Analogkanal</string>
+    <!-- Toast: the SSTV mode is longer than the transmit limit. %1$s the mode, %2$d its seconds, %3$s the limit ("2 min"). Device → Longest transmission is the setting's path. -->
+    <string name="packet_sstv_err_too_long">%1$s dauert %2$d s und überschreitet die Sendezeitbegrenzung (%3$s; Gerät → Längste Aussendung)</string>
+    <!-- ==== Reasons a packet action was refused (toasts, PKT screens, SignalDeck Web). One or two lines. -->
+    <!-- Toast: no callsign is set. PKT → Settings is where to set it. -->
+    <string name="packet_err_callsign_settings">Trage zuerst dein Rufzeichen ein (PKT → Einstellungen)</string>
+    <!-- Toast: no callsign is set. PKT → APRS settings is where to set it. -->
+    <string name="packet_err_callsign_aprs">Trage zuerst dein Rufzeichen ein (PKT → APRS-Einstellungen)</string>
+    <!-- Toast: no callsign is set (APRS-IS). -->
+    <string name="packet_err_callsign">Trage zuerst dein Rufzeichen ein</string>
+    <!-- Toast: packet cannot be sent on a DMR channel. -->
+    <string name="packet_err_analog">Packet-Radio braucht einen Analogkanal</string>
+    <!-- Toast: packet cannot be sent on a DMR channel. %1$s the APRS frequency ("144.390"). -->
+    <string name="packet_err_analog_aprs">Packet-Radio braucht einen Analogkanal: Stelle den APRS-Kanal ein (%1$s MHz in deiner Region)</string>
+    <!-- Toast: the terminal cannot connect on a DMR channel. -->
+    <string name="packet_err_analog_bbs">Packet-Radio braucht einen Analogkanal: Stelle die Frequenz der BBS oder des Knotens ein</string>
+    <!-- Toast: a weather report needs the phone's air-pressure sensor. -->
+    <string name="packet_err_no_barometer">Dieses Telefon hat kein Barometer</string>
+    <!-- Toast: no GPS position yet. -->
+    <string name="packet_err_no_fix">Noch keine Position</string>
+    <!-- Toast: no GPS position yet for a beacon, with a hint. -->
+    <string name="packet_err_no_fix_maps">Noch keine GPS-Position (Standort einschalten und einmal Maps öffnen)</string>
+    <!-- Toast: an APRS object needs a name. -->
+    <string name="packet_err_object_name">Gib dem Objekt einen Namen (höchstens 9 Zeichen)</string>
+    <!-- Toast: the bulletin text is empty. -->
+    <string name="packet_err_bulletin_empty">Schreib zuerst das Bulletin</string>
+    <!-- Toast: the bulletin text is too long (an APRS limit). -->
+    <string name="packet_err_bulletin_long">Bulletins haben höchstens 67 Zeichen</string>
+    <!-- Toast: the APRS message is too long (an APRS limit). -->
+    <string name="packet_err_message_long">APRS-Nachrichten haben höchstens 67 Zeichen</string>
+    <!-- Toast: there is no text or DTMF code to send. -->
+    <string name="packet_err_nothing_to_send">Nichts zu senden</string>
+    <!-- Toast: an APRS message needs a callsign to send to and some text. -->
+    <string name="packet_err_addressee_text">Empfänger und Text sind nötig</string>
+    <!-- History line: APRS telemetry went out. %1$d battery percent, %2$s volts, %3$s °C. -->
+    <string name="packet_telemetry_sent">📊 Telemetrie gesendet: Akku %1$d %%, %2$s V, %3$s °C</string>
+    <!-- History line: APRS telemetry went out. %1$d battery percent, %2$s volts, %3$s °C, %4$s the air pressure in hPa. -->
+    <string name="packet_telemetry_sent_hpa">📊 Telemetrie gesendet: Akku %1$d %%, %2$s V, %3$s °C, %4$s hPa</string>
+    <!-- History line: the weather report could not be sent. -->
+    <string name="packet_weather_not_sent">⛔ Wetterbericht nicht gesendet: kein Luftdruckwert</string>
+    <!-- History line: an APRS weather report went out. %1$s the pressure in hPa. -->
+    <string name="packet_weather_sent">⛅ Wetterbericht gesendet: %1$s hPa</string>
+    <!-- History line: an APRS object was placed. %1$s its name. -->
+    <string name="packet_object_placed">📌 Objekt gesetzt: %1$s</string>
+    <!-- History line: an APRS object was removed. %1$s its name. -->
+    <string name="packet_object_removed">📌 Objekt entfernt: %1$s</string>
+    <!-- History line: an APRS bulletin went out. %1$s the bulletin slot (BLN1), %2$s its text. -->
+    <string name="packet_bulletin_sent">📢 Bulletin %1$s gesendet: %2$s</string>
+    <!-- ==== Keyboard text modes (RTTY, PSK31): status line on the text-mode screen and PKT, and history lines. -->
+    <!-- Status: RTTY locked on. %1$s the mark tone in Hz. -->
+    <string name="packet_text_rtty_listening">RTTY: Empfang, Mark %1$s Hz</string>
+    <!-- Status: RTTY waiting for a signal. -->
+    <string name="packet_text_rtty_looking">RTTY: suche Signal</string>
+    <!-- Status: PSK31 locked on. %1$s the audio frequency in Hz. -->
+    <string name="packet_text_psk_listening">PSK31: Empfang auf %1$s Hz</string>
+    <!-- Status: PSK31 waiting for a signal. -->
+    <string name="packet_text_psk_looking">PSK31: suche Signal</string>
+    <!-- Status: the text-mode receiver is off. -->
+    <string name="packet_text_not_listening">Empfang aus</string>
+    <!-- Toast: text modes cannot be sent on a DMR channel. -->
+    <string name="packet_text_err_analog">Textbetriebsarten brauchen einen Analogkanal</string>
+    <!-- History line: RTTY went out through the module's tone generator. %1$s the text sent. -->
+    <string name="packet_text_rtty_sent_tones">⌨ RTTY gesendet (Tongenerator): %1$s</string>
+    <!-- History line: the tone generator refused, RTTY went out as audio. %1$s the reason. -->
+    <string name="packet_text_rtty_no_tones">⚠️ Tongenerator für RTTY nicht genutzt: %1$s; über den Audioweg gesendet</string>
+    <!-- History line: RTTY went out. %1$s the text sent. -->
+    <string name="packet_text_rtty_sent">⌨ RTTY gesendet: %1$s</string>
+    <!-- History line: PSK31 went out. %1$s the text sent. -->
+    <string name="packet_text_psk_sent">⌨ PSK31 gesendet: %1$s</string>
+    <!-- ==== Packet terminal (PKT → Terminal): the transcript, history lines, notification and refusals. -->
+    <!-- History line: the terminal link changed. %1$s the link state ("connected to N0ABC-1"). -->
+    <string name="packet_term_event_state">💻 Packet-Terminal: %1$s</string>
+    <!-- Notification title when another station connects to us. One line. -->
+    <string name="packet_term_notify_connection">Packet-Verbindung</string>
+    <!-- Toast: the station to connect to is not a callsign. Keep the example callsigns. -->
+    <string name="packet_term_err_callsign">Rufzeichen wie N0ABC oder N0ABC-1</string>
+    <!-- Toast: too many digipeaters in the path. -->
+    <string name="packet_term_err_digis">Höchstens zwei Digipeater</string>
+    <!-- Transcript line when calling a station (starts with "> "). %1$s the callsign. -->
+    <string name="packet_term_connecting">> verbinde mit %1$s</string>
+    <!-- Transcript line when calling a station through digipeaters. %1$s the callsign, %2$s the digipeaters (comma list). -->
+    <string name="packet_term_connecting_via">> verbinde mit %1$s über %2$s</string>
+    <!-- Toast: text typed while the terminal is not connected. -->
+    <string name="packet_term_err_not_connected">Nicht verbunden</string>
+    <!-- History line: a packet transmission was dropped on a DMR channel. %1$s what it was (English transmit label, e.g. "AX.25 1 frame"). -->
+    <string name="packet_event_not_sent_analog">⛔ Nicht gesendet (%1$s): Packet-Radio braucht einen Analogkanal</string>
+    <!-- History line: a packet transmission was dropped because the channel is DMR. %1$s what it was (English transmit label, e.g. "position beacon"). -->
+    <string name="packet_event_not_sent_dmr">⛔ Nicht gesendet (%1$s): Packet-Radio braucht einen Analogkanal, der aktuelle ist DMR</string>
+    <!-- ==== iGate and APRS-IS (internet APRS). -->
+    <!-- History line: an internet message for a nearby station was not sent on the radio. %1$s the APRS frequency, %2$s sender, %3$s addressee. -->
+    <string name="packet_igate_not_gated">🌐 Nicht auf Funk weitergeleitet (nicht auf %1$s): %2$s → %3$s</string>
+    <!-- History line: an internet message was sent on the radio. %1$s sender, %2$s addressee, %3$s the message. -->
+    <string name="packet_igate_gated">🌐→📡 Auf Funk weitergeleitet: %1$s → %2$s: %3$s</string>
+    <!-- APRS-IS status: not running. Lower case, very short (after "APRS-IS: "). -->
+    <string name="packet_is_off">aus</string>
+    <!-- APRS-IS status: logged in. %1$d packets gated to the internet. Lower case, short. -->
+    <string name="packet_is_connected">verbunden · %1$d weitergeleitet</string>
+    <!-- APRS-IS status: logged in without a valid passcode (receive only). %1$d packets gated. Lower case, short. -->
+    <string name="packet_is_connected_rx_only">verbunden, nur Empfang · %1$d weitergeleitet</string>
+    <!-- Notification title: an APRS message for you came over the internet. %1$s the sender. -->
+    <string name="packet_is_notify_message">APRS-IS-Nachricht von %1$s</string>
+    <!-- Toast: an internet APRS message needs a verified APRS-IS login (a passcode). -->
+    <string name="packet_is_err_not_verified">APRS-IS ist nicht mit verifiziertem Login verbunden</string>
+    <!-- Toast: the APRS-IS server connection failed while sending. -->
+    <string name="packet_is_err_send_failed">Senden über APRS-IS fehlgeschlagen</string>
+    <!-- History line: an APRS message went out over the internet. %1$s addressee, %2$s text. -->
+    <string name="packet_is_event_sent">🌐 An %1$s gesendet: %2$s</string>
+    <!-- Toast: the KISS TNC (for APRSdroid, YAAC) is already on. %1$d the TCP port. -->
+    <string name="packet_kiss_running">KISS-TNC läuft bereits auf 127.0.0.1:%1$d</string>
+    <!-- ==== Morse: the callsign ID and Morse heard. -->
+    <!-- Toast: the Morse ID cannot be sent on a DMR channel. -->
+    <string name="packet_morse_err_analog">Morse braucht einen Analogkanal</string>
+    <!-- History line: the Morse ID went out through the module's tone generator. %1$s your callsign. -->
+    <string name="packet_morse_sent_tones">🔤 Morse-Kennung %1$s gesendet (Tongenerator)</string>
+    <!-- History line: the tone generator refused, the Morse ID went out as audio. %1$s the reason. -->
+    <string name="packet_morse_no_tones">⚠️ Tongenerator für die Morse-Kennung nicht genutzt: %1$s; über den Audioweg gesendet</string>
+    <!-- History line: the Morse ID went out. %1$s your callsign. -->
+    <string name="packet_morse_sent">🔤 Morse-Kennung %1$s gesendet</string>
+    <!-- History line: the repeater's own callsign was heard in Morse. %1$s the callsign, %2$s the decoded text, %3$s the tone in Hz, %4$d the speed in words per minute. Note the two spaces before "(". -->
+    <string name="packet_morse_heard_repeater">🔤 Relaiskennung %1$s in Morse (passt zu diesem Kanal): %2$s  (%3$s Hz, %4$d WPM)</string>
+    <!-- History line: Morse was decoded. %1$s the text, %2$s the tone in Hz, %3$d words per minute. Note the two spaces before "(". -->
+    <string name="packet_morse_heard">🔤 Morse: %1$s  (%2$s Hz, %3$d WPM)</string>
+    <!-- ==== APRS on the radio: notifications and history lines. -->
+    <!-- Notification title: a message to one of your APRS groups. %1$s the group, %2$s the sender. -->
+    <string name="packet_aprs_notify_group">APRS-Gruppe %1$s: %2$s</string>
+    <!-- Notification title: an APRS message for you. %1$s the sender. -->
+    <string name="packet_aprs_notify_message">APRS-Nachricht von %1$s</string>
+    <!-- Notification title: an APRS bulletin was heard. %1$s the sender. -->
+    <string name="packet_aprs_notify_bulletin">APRS-Bulletin von %1$s</string>
+    <!-- History line: an APRS message went out on the radio. %1$s addressee, %2$s text. -->
+    <string name="packet_aprs_event_sent">📡 An %1$s gesendet: %2$s</string>
+    <!-- History line: an APRS emergency position report went out. -->
+    <string name="packet_emergency_sent_position">🆘 Notfallposition gesendet</string>
+    <!-- History line: an APRS emergency status report went out (no GPS fix). -->
+    <string name="packet_emergency_sent_status">🆘 Notfallstatus (ohne GPS-Position) gesendet</string>
+    <!-- History line: a position beacon went out. -->
+    <string name="packet_beacon_sent">📡 Beacon gesendet</string>
+    <!-- History line: a position beacon went out through a path. %1$s the path (WIDE1-1,WIDE2-1 or ARISS). -->
+    <string name="packet_beacon_sent_via">📡 Beacon gesendet über %1$s</string>
+    <!-- ==== DTMF. -->
+    <!-- Shown instead of the digits when a DTMF remote-control command (with its PIN) was heard. Short, lower case. -->
+    <string name="packet_dtmf_remote_command">Fernsteuerbefehl</string>
+    <!-- History line: DTMF digits were heard. %1$s the digits (or "remote command"). -->
+    <string name="packet_dtmf_heard">📟 DTMF %1$s</string>
+    <!-- History line: DTMF went out. %1$s the digits. -->
+    <string name="packet_dtmf_sent">📟 DTMF %1$s gesendet</string>
+    <!-- Toast: the DTMF code has characters that cannot be sent. -->
+    <string name="packet_dtmf_err_chars">Nur 0–9, A–D, * und # lassen sich senden</string>
+    <!-- Toast: DTMF cannot be sent on a DMR channel. -->
+    <string name="packet_dtmf_err_analog">DTMF braucht einen Analogkanal</string>
+    <!-- ==== Weather alert (SAME) history lines. -->
+    <!-- History line: the end-of-message burst of a weather alert. -->
+    <string name="packet_same_event_eom">⛈️ Wetterwarnung: Ende der Meldung</string>
+    <!-- History line: a weather alert. %1$s the alert line ("Tornado Warning — 1h00 — 3 areas"). -->
+    <string name="packet_same_event_alert">⛈️ %1$s</string>
+    <!-- History line: the 1050 Hz attention tone of a weather alert. -->
+    <string name="packet_same_event_attention">⛈️ Achtungston einer Wetterwarnung</string>
+
+    <!-- ==== Packet terminal: AX.25 link states (PKT → Terminal, between *** marks, and the history line "Packet terminal: …"). Lower case, one line. %1$s is a callsign. -->
+    <!-- Link state while calling a BBS or node. -->
+    <string name="packet_ax25_connecting">verbinde mit %1$s</string>
+    <!-- Link state: the call was cancelled before the other station answered. -->
+    <string name="packet_ax25_disconnected_cancelled">getrennt: abgebrochen</string>
+    <!-- Link state while hanging up. -->
+    <string name="packet_ax25_disconnecting">trenne</string>
+    <!-- Link state: the station never answered the call. -->
+    <string name="packet_ax25_disconnected_no_answer">getrennt: keine Antwort von %1$s</string>
+    <!-- Link state: the connection dropped. %1$d is the number of tries (6). -->
+    <string name="packet_ax25_disconnected_link_lost">getrennt: Verbindung verloren (keine Bestätigung nach %1$d Versuchen)</string>
+    <!-- Link state: another station called us and we accepted. Also the text of the "Packet connection" notification. -->
+    <string name="packet_ax25_connected_they_called">verbunden mit %1$s (Gegenstation hat gerufen)</string>
+    <!-- Link state: connected. -->
+    <string name="packet_ax25_connected">verbunden mit %1$s</string>
+    <!-- Link state: the link is closed. -->
+    <string name="packet_ax25_disconnected">getrennt</string>
+    <!-- Link state: the station refused the call (DM). -->
+    <string name="packet_ax25_disconnected_busy">getrennt: %1$s ist belegt oder lehnt ab</string>
+    <!-- Link state: the other station hung up. -->
+    <string name="packet_ax25_disconnected_by">getrennt: %1$s hat die Verbindung beendet</string>
+    <!-- Link state: the other station rejected a frame. FRMR is a protocol word, keep it. -->
+    <string name="packet_ax25_disconnected_frmr">getrennt: Frame abgelehnt (FRMR)</string>
+
+    <!-- ==== NOAA Weather Radio / EAS (SAME) alerts: PKT → Weather alerts list, the alert notification and its history line. -->
+    <!-- The end-of-message burst (NNNN) of an alert. -->
+    <string name="packet_same_end_of_message">Ende der Meldung</string>
+    <!-- Alert duration in the alert line: %1$d hours, %2$s minutes (two digits): "1h30". Very short. -->
+    <string name="packet_same_duration">%1$d:%2$s h</string>
+    <!-- Number of areas an alert covers, in the alert line. -->
+    <plurals name="packet_same_areas">
+        <item quantity="one">%1$d Gebiet</item>
+        <item quantity="other">%1$d Gebiete</item>
+    </plurals>
+    <!-- Alert line: %1$s the event name ("Tornado Warning"), %2$s the areas ("3 areas"). One line. -->
+    <string name="packet_same_summary">%1$s — %2$s</string>
+    <!-- Alert line: %1$s the event name, %2$s the areas, %3$s the sending station (as sent, e.g. KXYZ/NWS). One line. -->
+    <string name="packet_same_summary_sender">%1$s — %2$s — %3$s</string>
+    <!-- Alert line: %1$s the event name, %2$s the duration ("1h30"), %3$s the areas. One line. -->
+    <string name="packet_same_summary_dur">%1$s — %2$s — %3$s</string>
+    <!-- Alert line: %1$s the event name, %2$s the duration, %3$s the areas, %4$s the sending station. One line. -->
+    <string name="packet_same_summary_dur_sender">%1$s — %2$s — %3$s — %4$s</string>
+    <!-- SAME event names (the US National Weather Service / EAS list). Use the official name in your country where there is one. Title of the alert notification and start of the alert line. One line. -->
+    <!-- SAME event TOR. -->
+    <string name="packet_same_tor">Tornado-Warnung</string>
+    <!-- SAME event TOA. -->
+    <string name="packet_same_toa">Tornado-Vorwarnung</string>
+    <!-- SAME event SVR. -->
+    <string name="packet_same_svr">Warnung vor schwerem Gewitter</string>
+    <!-- SAME event SVA. -->
+    <string name="packet_same_sva">Vorwarnung vor schwerem Gewitter</string>
+    <!-- SAME event SVS. -->
+    <string name="packet_same_svs">Unwetter-Lagemeldung</string>
+    <!-- SAME event FFW. -->
+    <string name="packet_same_ffw">Sturzflutwarnung</string>
+    <!-- SAME event FFA. -->
+    <string name="packet_same_ffa">Sturzflut-Vorwarnung</string>
+    <!-- SAME event FFS. -->
+    <string name="packet_same_ffs">Sturzflut-Lagemeldung</string>
+    <!-- SAME event FLW. -->
+    <string name="packet_same_flw">Hochwasserwarnung</string>
+    <!-- SAME event FLA. -->
+    <string name="packet_same_fla">Hochwasser-Vorwarnung</string>
+    <!-- SAME event FLS. -->
+    <string name="packet_same_fls">Hochwasser-Lagemeldung</string>
+    <!-- SAME event WSW. -->
+    <string name="packet_same_wsw">Wintersturmwarnung</string>
+    <!-- SAME event WSA. -->
+    <string name="packet_same_wsa">Wintersturm-Vorwarnung</string>
+    <!-- SAME event BZW. -->
+    <string name="packet_same_bzw">Schneesturmwarnung</string>
+    <!-- SAME event HWW. -->
+    <string name="packet_same_hww">Sturmwarnung</string>
+    <!-- SAME event HWA. -->
+    <string name="packet_same_hwa">Sturm-Vorwarnung</string>
+    <!-- SAME event SMW. -->
+    <string name="packet_same_smw">Besondere Seewetterwarnung</string>
+    <!-- SAME event SPS. -->
+    <string name="packet_same_sps">Besonderer Wetterhinweis</string>
+    <!-- SAME event HUW. -->
+    <string name="packet_same_huw">Hurrikanwarnung</string>
+    <!-- SAME event HUA. -->
+    <string name="packet_same_hua">Hurrikan-Vorwarnung</string>
+    <!-- SAME event HLS. -->
+    <string name="packet_same_hls">Hurrikan-Lagemeldung</string>
+    <!-- SAME event TRW. -->
+    <string name="packet_same_trw">Tropensturmwarnung</string>
+    <!-- SAME event TRA. -->
+    <string name="packet_same_tra">Tropensturm-Vorwarnung</string>
+    <!-- SAME event TSW. -->
+    <string name="packet_same_tsw">Tsunami-Warnung</string>
+    <!-- SAME event TSA. -->
+    <string name="packet_same_tsa">Tsunami-Vorwarnung</string>
+    <!-- SAME event SSW. -->
+    <string name="packet_same_ssw">Sturmflutwarnung</string>
+    <!-- SAME event SSA. -->
+    <string name="packet_same_ssa">Sturmflut-Vorwarnung</string>
+    <!-- SAME event EWW. -->
+    <string name="packet_same_eww">Warnung vor extremem Wind</string>
+    <!-- SAME event DSW. -->
+    <string name="packet_same_dsw">Staubsturmwarnung</string>
+    <!-- SAME event FRW. -->
+    <string name="packet_same_frw">Brandwarnung</string>
+    <!-- SAME event FZW. -->
+    <string name="packet_same_fzw">Frostwarnung</string>
+    <!-- SAME event HMW. -->
+    <string name="packet_same_hmw">Gefahrstoffwarnung</string>
+    <!-- SAME event LEW. -->
+    <string name="packet_same_lew">Polizeiwarnung</string>
+    <!-- SAME event LAE. -->
+    <string name="packet_same_lae">Örtlicher Notfall</string>
+    <!-- SAME event NUW. -->
+    <string name="packet_same_nuw">Kernkraftwerk-Warnung</string>
+    <!-- SAME event RHW. -->
+    <string name="packet_same_rhw">Warnung vor Strahlengefahr</string>
+    <!-- SAME event SPW. -->
+    <string name="packet_same_spw">Warnung: In Gebäuden bleiben</string>
+    <!-- SAME event VOW. -->
+    <string name="packet_same_vow">Vulkanwarnung</string>
+    <!-- SAME event CAE. -->
+    <string name="packet_same_cae">Notfall: Kindesentführung</string>
+    <!-- SAME event CDW. -->
+    <string name="packet_same_cdw">Warnung: Gefahr für die Bevölkerung</string>
+    <!-- SAME event CEM. -->
+    <string name="packet_same_cem">Notfallmeldung für die Bevölkerung</string>
+    <!-- SAME event EVI. -->
+    <string name="packet_same_evi">Sofortige Evakuierung</string>
+    <!-- SAME event EQW. -->
+    <string name="packet_same_eqw">Erdbebenwarnung</string>
+    <!-- SAME event AVW. -->
+    <string name="packet_same_avw">Lawinenwarnung</string>
+    <!-- SAME event AVA. -->
+    <string name="packet_same_ava">Lawinen-Vorwarnung</string>
+    <!-- SAME event CFW. -->
+    <string name="packet_same_cfw">Küstenhochwasser-Warnung</string>
+    <!-- SAME event CFA. -->
+    <string name="packet_same_cfa">Küstenhochwasser-Vorwarnung</string>
+    <!-- SAME event EAN. -->
+    <string name="packet_same_ean">Nationaler Notfall: Aktivierung</string>
+    <!-- SAME event EAT. -->
+    <string name="packet_same_eat">Nationaler Notfall: Ende</string>
+    <!-- SAME event NIC. -->
+    <string name="packet_same_nic">Nationales Informationszentrum</string>
+    <!-- SAME event NPT. -->
+    <string name="packet_same_npt">Regelmäßiger landesweiter Test</string>
+    <!-- SAME event RMT. -->
+    <string name="packet_same_rmt">Monatlicher Pflichttest</string>
+    <!-- SAME event RWT. -->
+    <string name="packet_same_rwt">Wöchentlicher Pflichttest</string>
+    <!-- SAME event ADR. -->
+    <string name="packet_same_adr">Verwaltungsmeldung</string>
+    <!-- SAME event DMO. -->
+    <string name="packet_same_dmo">Übungs- oder Demowarnung</string>
+    <!-- SAME event BHW. -->
+    <string name="packet_same_bhw">Warnung vor biologischer Gefahr</string>
+    <!-- SAME event BWW. -->
+    <string name="packet_same_bww">Abkochgebot für Trinkwasser</string>
+    <!-- SAME event CHW. -->
+    <string name="packet_same_chw">Warnung vor chemischer Gefahr</string>
+    <!-- SAME event TOE. -->
+    <string name="packet_same_toe">Ausfall der Notrufnummer 911</string>
+    <!-- SAME event WFW. -->
+    <string name="packet_same_wfw">Waldbrandwarnung</string>
+    <!-- SAME event WFA. -->
+    <string name="packet_same_wfa">Waldbrand-Vorwarnung</string>
+
+    <!-- ==== SSTV receiver status (the VIS-started decoder). -->
+    <!-- SSTV receiver status before a picture starts. One line. -->
+    <string name="packet_sstv_rx_waiting_vis">Warte auf VIS-Code …</string>
+    <!-- SSTV receiver status while a picture comes in: %1$s the mode name ("Robot 36"), %2$d percent done. One line. -->
+    <string name="packet_sstv_rx_receiving">Empfange %1$s (%2$d %%)</string>
+    <!-- SSTV receiver status when the mode is not known. One line. -->
+    <string name="packet_sstv_rx_unknown_mode">Unbekannter Modus</string>
+
+    <!-- ==== APRS-IS connection status (after "APRS-IS: " on the APRS screen and PKT). Lower case, one line. -->
+    <!-- APRS-IS status while connecting. %1$s the server and port (rotate.aprs2.net:14580). -->
+    <string name="packet_is_status_connecting">verbinde mit %1$s</string>
+    <!-- APRS-IS status: logged in with a valid passcode. %1$s the server's name. -->
+    <string name="packet_is_status_verified">angemeldet (verifiziert) bei %1$s</string>
+    <!-- APRS-IS status: logged in without a valid passcode, so it can only receive. %1$s the server's name. -->
+    <string name="packet_is_status_unverified">angemeldet (nicht verifiziert: nur Empfang) bei %1$s</string>
+    <!-- APRS-IS status: the connection dropped. %1$d seconds until it tries again. -->
+    <string name="packet_is_status_retry">getrennt, neuer Versuch in %1$d s</string>
+    <!-- Toast: the KISS TNC is already on. %1$d the TCP port. -->
+    <string name="packet_kiss_err_running">läuft bereits auf Port %1$d</string>
+    <!-- ==== Coverage map (repeater coverage logging and the terrain prediction). -->
+    <!-- History line: coverage logging cannot start without the location permission. -->
+    <string name="packet_cov_event_no_permission">📶 Das Abdeckungs-Log braucht die Standortberechtigung</string>
+    <!-- History line: the repeater answered your transmission here. %1$s the channel name, %2$d the repeater's signal in dBm, %3$s in S units (S7). -->
+    <string name="packet_cov_event_keyed">📶 %1$s von hier aufgetastet (Nachlauf %2$d dBm, %3$s)</string>
+    <!-- History line: the repeater did not answer your transmission here. %1$s the channel name. -->
+    <string name="packet_cov_event_no_reply">📶 Keine Antwort von %1$s auf deine Aussendung</string>
+    <!-- Prediction note under the coverage map (Heard layer), no readings yet. %1$s the repeater power in W, %2$s its antenna height in m. Heard is the layer's name. -->
+    <string name="packet_cov_pred_rx_uncal_erp">Nicht kalibriert: %1$s W, Antenne %2$s m; Messwerte der Ebene Gehört verfeinern die Vorhersage</string>
+    <!-- Prediction note (Heard layer), no readings and no known power. -->
+    <string name="packet_cov_pred_rx_uncal">Nicht kalibriert: geht von einem 50-W-Relais aus; Messwerte der Ebene Gehört korrigieren das</string>
+    <!-- Prediction note (Heard layer): %1$d squares measured, %2$s the correction in dB with its sign (+3). -->
+    <string name="packet_cov_pred_rx_cal">Kalibriert mit %1$d gemessenen Rasterfeldern (%2$s dB)</string>
+    <!-- Prediction note (Heard layer): %1$d squares measured, %2$s the correction in dB with its sign, %3$s the antenna height in m worked out from the readings. -->
+    <string name="packet_cov_pred_rx_cal_fitted">Kalibriert mit %1$d gemessenen Rasterfeldern (%2$s dB, Antenne %3$s m, ermittelt)</string>
+    <!-- Prediction note (Key-ups layer) worked out from the Heard layer: %1$d squares, %2$s the correction in dB with its sign. -->
+    <string name="packet_cov_pred_tx_from_rx">Geschätzt aus %1$d Rasterfeldern der Ebene Gehört (%2$s dB); deine Auftastversuche verfeinern das</string>
+    <!-- Prediction note (Key-ups layer), no key-ups yet. -->
+    <string name="packet_cov_pred_tx_uncal">Nicht kalibriert: geht von einem 4-W-Handfunkgerät aus; deine Auftastversuche korrigieren das</string>
+    <!-- Prediction note (Key-ups layer): %1$d key-ups, %2$d of them keyed the repeater, %3$s the path loss limit in dB. -->
+    <string name="packet_cov_pred_tx_cal">Kalibriert mit %1$d Auftastversuchen (%2$d erfolgreich): Reichweitengrenze %3$s dB</string>
+    <!-- Progress line while the prediction runs. %1$d the measured squares. -->
+    <string name="packet_cov_pred_fitting">Passe die Antennenhöhe an %1$d gemessene Rasterfelder an</string>
+    <!-- Error when the prediction cannot load the terrain. %1$d tiles missing of %2$d. -->
+    <string name="packet_cov_terrain_missing">%1$d von %2$d Geländekacheln ließen sich nicht laden (keine Verbindung?)</string>
+
+    <!-- ==== APRS monitoring screen. -->
+    <!-- Counter label on the APRS screen, under a number. Capitals, very short (four share a row). -->
+    <string name="packet_aprs_stat_packets">PAKETE</string>
+    <!-- Counter label on the APRS screen, under a number. Capitals, very short (four share a row). -->
+    <string name="packet_aprs_stat_stations">STATIONEN</string>
+    <!-- Counter label on the APRS screen, under a number. Capitals, very short (four share a row). -->
+    <string name="packet_aprs_stat_for_you">FÜR DICH</string>
+    <!-- Counter label on the APRS screen, under a number. Capitals, very short (four share a row). -->
+    <string name="packet_aprs_stat_last">ZULETZT</string>
+    <!-- Tab on the APRS screen. Capitals, very short (three share a row). -->
+    <string name="packet_aprs_tab_live">LIVE</string>
+    <!-- Tab on the APRS screen. Capitals, very short (three share a row). -->
+    <string name="packet_aprs_tab_stations">STATIONEN</string>
+    <!-- Tab on the APRS screen. Capitals, very short (three share a row). -->
+    <string name="packet_aprs_tab_messages">NACHRICHTEN</string>
+    <!-- Button at the bottom of the APRS screen that opens the APRS message sheet. Short (three share a row). -->
+    <string name="packet_aprs_message">Nachricht</string>
+    <!-- Button at the bottom of the APRS screen that sends a position beacon. Short (three share a row). -->
+    <string name="packet_aprs_beacon">Beacon</string>
+    <!-- Button at the bottom of the APRS screen that opens the map. Short (three share a row). -->
+    <string name="packet_aprs_map">Karte</string>
+    <!-- ==== Subtitle of the APRS screen: parts joined with " · ". -->
+    <!-- APRS screen subtitle while listening to the space station. %1$s its frequency. Short. -->
+    <string name="packet_aprs_sub_iss">ISS APRS %1$s · Doppler-korrigiert</string>
+    <!-- APRS screen subtitle: the KISS TNC runs on the current channel. Short. -->
+    <string name="packet_aprs_sub_kiss_here">KISS-TNC auf diesem Kanal</string>
+    <!-- APRS screen subtitle: monitoring %1$s (the frequency). Short. -->
+    <string name="packet_aprs_sub_monitoring">Hört %1$s mit</string>
+    <!-- APRS screen subtitle, added part: the KISS TNC's TCP port %1$d. Very short. -->
+    <string name="packet_aprs_sub_kiss_port">KISS-TNC :%1$d</string>
+    <!-- APRS screen subtitle, added part: the KISS TNC's TCP port %1$d. Very short. -->
+    <string name="packet_aprs_sub_port">Port %1$d</string>
+    <!-- APRS screen subtitle, added part: no callsign is set. Short. -->
+    <string name="packet_aprs_sub_no_call">Rufzeichen in den Einstellungen eintragen</string>
+    <!-- ==== Switch chips on the APRS screen (tap to turn on or off). One short line each. -->
+    <!-- Chip: automatic beacons off. -->
+    <string name="packet_aprs_chip_beacon_off">Beacon aus</string>
+    <!-- Chip: a beacon every %1$d minutes. -->
+    <string name="packet_aprs_chip_beacon_min">Beacon %1$d min</string>
+    <!-- Chip: SmartBeaconing (a feature name, usually kept). -->
+    <string name="packet_aprs_chip_smart">SmartBeacon</string>
+    <!-- Chip: acknowledge messages automatically. -->
+    <string name="packet_aprs_chip_autoack">Auto-Ack</string>
+    <!-- Chip shown on a UHF-only radio, where auto-ack is off. -->
+    <string name="packet_aprs_chip_no_autoack">Kein Auto-Ack (UHF)</string>
+    <!-- Chip: the fill-in digipeater. -->
+    <string name="packet_aprs_chip_digi">Digipeater</string>
+    <!-- Chip: the APRS-IS link and its status (%1$s, e.g. "connected · 3 gated"). -->
+    <string name="packet_aprs_chip_is">APRS-IS: %1$s</string>
+    <!-- Divider in the live list before packets from before monitoring started, when none came since. Shown in capitals. Note the two spaces around ·. -->
+    <string name="packet_aprs_earlier_nothing">FRÜHER  ·  seit Beginn des Mithörens noch nichts</string>
+    <!-- Divider in the live list before packets from before monitoring started. Shown in capitals. -->
+    <string name="packet_aprs_earlier">FRÜHER</string>
+    <!-- The live list of the APRS screen is empty. -->
+    <string name="packet_aprs_live_empty">Empfang läuft. Jedes Paket, das das Funkgerät dekodiert, erscheint hier, sobald es ankommt: Positionen, Nachrichten, Status, Wetter, Objekte und alles, was du sendest.</string>
+    <!-- Stations card, details line: heard %1$d times. Very short. -->
+    <string name="packet_aprs_heard_n">%1$d× gehört</string>
+    <!-- The stations tab of the APRS screen is empty. -->
+    <string name="packet_aprs_stations_empty">Noch keine Positionen. Stationen erscheinen mit Entfernung und Richtung von dir aus, die neueste zuerst. Tippe auf das Rufzeichen für den Kontakt oder auf den Rest der Karte, um die Position in deiner Karten-App zu öffnen.</string>
+    <!-- Messages tab card heading for a message to you: %1$s the sender and addressee. Note the three spaces. -->
+    <string name="packet_aprs_for_you">%1$s   (für dich)</string>
+    <!-- Last line of a message card that can be answered. Short. -->
+    <string name="packet_aprs_tap_reply">Tippen zum Antworten</string>
+    <!-- The messages tab of the APRS screen is empty. -->
+    <string name="packet_aprs_msgs_empty">Noch keine Nachrichten. Hier stehen Nachrichten an dein Rufzeichen, an die Gruppen, denen du folgst, Bulletins und die Nachrichten, die du sendest.</string>
+    <!-- The messages tab of the APRS screen is empty (auto-ack is on). -->
+    <string name="packet_aprs_msgs_empty_ack">Noch keine Nachrichten. Hier stehen Nachrichten an dein Rufzeichen (automatisch bestätigt), an die Gruppen, denen du folgst, Bulletins und die Nachrichten, die du sendest.</string>
+    <!-- APRS screen card: what the packet was (a message to you). Lower case, short. -->
+    <string name="packet_aprs_kind_msg_mine">Nachricht für dich</string>
+    <!-- APRS screen card: what the packet was (a message). Lower case, short. -->
+    <string name="packet_aprs_kind_msg">Nachricht</string>
+    <!-- APRS screen card: what the packet was (a message you sent). Lower case, short. -->
+    <string name="packet_aprs_kind_msg_tx">Nachricht gesendet</string>
+    <!-- APRS screen card: what the packet was (an acknowledgement of your message). Lower case, short. -->
+    <string name="packet_aprs_kind_ack">bestätigt</string>
+    <!-- APRS screen card: what the packet was (your acknowledgement). Lower case, short. -->
+    <string name="packet_aprs_kind_ack_tx">von dir bestätigt</string>
+    <!-- APRS screen card: what the packet was (a rejection of your message). Lower case, short. -->
+    <string name="packet_aprs_kind_rej">abgelehnt</string>
+    <!-- APRS screen card: what the packet was (a position report). Lower case, short. -->
+    <string name="packet_aprs_kind_pos">Position</string>
+    <!-- APRS screen card: what the packet was (your beacon). Lower case, short. -->
+    <string name="packet_aprs_kind_beacon">dein Beacon</string>
+    <!-- APRS screen card: what the packet was (your beacon over APRS-IS). Lower case, short. -->
+    <string name="packet_aprs_kind_is_beacon">Internet-Beacon</string>
+    <!-- APRS screen card: what the packet was (a packet you repeated). Lower case, short. -->
+    <string name="packet_aprs_kind_digi">von dir digipeatet</string>
+    <!-- APRS screen card: what the packet was (a status report). Lower case, short. -->
+    <string name="packet_aprs_kind_status">Status</string>
+    <!-- APRS screen card: what the packet was (an APRS object). Lower case, short. -->
+    <string name="packet_aprs_kind_object">Objekt</string>
+    <!-- APRS screen card: what the packet was (an internet message you sent on the radio). Lower case, short. -->
+    <string name="packet_aprs_kind_igate">aus dem Internet weitergeleitet</string>
+    <!-- APRS screen card: what the packet was (anything else). Lower case, short. -->
+    <string name="packet_aprs_kind_packet">Paket</string>
+
+    <!-- Map status line while it loads. Short. -->
+    <string name="packet_map_loading">Wird geladen…</string>
+    <!-- Title of the map, and of its help sheet. One word. -->
+    <string name="packet_map_title">Karte</string>
+    <!-- Screen reader label of the map's close button. -->
+    <string name="packet_map_cd_close">Karte schließen</string>
+    <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
+    <string name="packet_map_pill_coverage">Abdeckung</string>
+    <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
+    <string name="packet_map_pill_repeaters">Relais</string>
+    <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
+    <string name="packet_map_pill_channels">Kanäle</string>
+    <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
+    <string name="packet_map_pill_help">Hilfe</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_zoom_in">Vergrößern</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_zoom_out">Verkleinern</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_me">Mein Standort</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_fit">Alles zeigen</string>
+    <!-- Screen reader label of a round button on the map. -->
+    <string name="packet_map_cd_here">Relais hier</string>
+    <!-- Toast when My position is tapped without a GPS fix. One line. -->
+    <string name="packet_map_err_no_fix">Noch keine GPS-Position: Standort einschalten</string>
+    <!-- Toast when Show everything has nothing to show. One line. -->
+    <string name="packet_map_err_nothing">Noch nichts anzuzeigen</string>
+    <!-- ==== Map status line (under the title). One line. -->
+    <!-- Status while Repeaters here searches. -->
+    <string name="packet_map_st_finding_here">Suche Relais um die Kartenmitte …</string>
+    <!-- Status after Repeaters here found nothing. %1$s the search radius ("30 mi"). -->
+    <string name="packet_map_st_none_here">Keine bekannten Relais im Umkreis von %1$s um die Kartenmitte</string>
+    <!-- Status after Repeaters here: %1$d repeaters found, %2$s the search radius (English keeps the plural form even for 1). -->
+    <plurals name="packet_map_st_n_here">
+        <item quantity="one">%1$d Relais im Umkreis von %2$s um die Kartenmitte</item>
+        <item quantity="other">%1$d Relais im Umkreis von %2$s um die Kartenmitte</item>
+    </plurals>
+    <!-- Repeaters filter pill while they load. Short. -->
+    <string name="packet_map_pill_repeaters_wait">Relais …</string>
+    <!-- Repeaters filter pill: %1$d on the map. Short. -->
+    <string name="packet_map_pill_repeaters_n">Relais %1$d</string>
+    <!-- Channels filter pill: %1$d on the map. Short. -->
+    <string name="packet_map_pill_channels_n">Kanäle %1$d</string>
+    <!-- Status without a GPS fix. -->
+    <string name="packet_map_st_no_fix">Keine GPS-Position: zeige alles mit Standort</string>
+    <!-- Status while repeaters near you load. -->
+    <string name="packet_map_st_finding">Suche Relais in deiner Nähe …</string>
+    <!-- Status when the map is ready. -->
+    <string name="packet_map_st_around">Um dich herum · Zoomen mit zwei Fingern, Markierung antippen</string>
+    <!-- ==== Station card on the map. -->
+    <!-- How long ago a station was heard: %1$d seconds. Inside "Heard …". Short. -->
+    <string name="packet_map_ago_s">vor %1$d s</string>
+    <!-- How long ago: %1$d minutes. Short. -->
+    <string name="packet_map_ago_min">vor %1$d min</string>
+    <!-- How long ago: %1$d hours. Short. -->
+    <string name="packet_map_ago_h">vor %1$d h</string>
+    <!-- How long ago: %1$d days (2 or more). Short. -->
+    <string name="packet_map_ago_days">vor %1$d Tagen</string>
+    <!-- Station card subtitle: %1$s the distance and direction from you ("2.4 mi NE"; empty without a fix). -->
+    <string name="packet_map_station_sub">APRS-Station · %1$s</string>
+    <!-- Station card: %1$s how long ago ("5 min ago"). -->
+    <string name="packet_map_heard">Gehört %1$s</string>
+    <!-- Station card: %1$s how long ago, %2$d times heard. -->
+    <string name="packet_map_heard_times">Gehört %1$s, %2$d-mal</string>
+    <!-- Station card: %1$s how long ago, %2$s the digipeater it came through. -->
+    <string name="packet_map_heard_via">Gehört %1$s über %2$s</string>
+    <!-- Station card: %1$s how long ago, %2$d times heard, %3$s the digipeater. -->
+    <string name="packet_map_heard_times_via">Gehört %1$s, %2$d-mal über %3$s</string>
+    <!-- Station card: speed, %1$s miles per hour. -->
+    <string name="packet_map_moving">Unterwegs mit %1$s mph</string>
+    <!-- Station card: speed and course, %1$s mph, %2$d degrees. -->
+    <string name="packet_map_moving_toward">Unterwegs mit %1$s mph Richtung %2$d°</string>
+    <!-- Station card: altitude, %1$d feet. -->
+    <string name="packet_map_altitude">Höhe %1$d ft</string>
+    <!-- ==== Repeater and channel cards on the map. -->
+    <!-- Repeater card title when the repeater has no callsign. One word. -->
+    <string name="packet_map_repeater">Relais</string>
+    <!-- Repeater card subtitle: %1$s the mode ("DMR CC1", "FM 100.0"), %2$s the distance and direction. -->
+    <string name="packet_map_repeater_sub">%1$s-Relais · %2$s</string>
+    <!-- Repeater card: %1$s the output (what you receive) and %2$s the input frequency, in MHz. -->
+    <string name="packet_map_repeater_freqs">Ausgabe %1$s MHz, Eingabe %2$s MHz</string>
+    <!-- Repeater card: the listed position is rough. -->
+    <string name="packet_map_repeater_approx">Position ist ungefähr</string>
+    <!-- Button on the repeater card that opens its details. Short. -->
+    <string name="packet_map_details">Details</string>
+    <!-- Channel card subtitle: %1$d the channel number, %2$s DMR or Analog, %3$s the distance and direction. -->
+    <string name="packet_map_channel_sub">Kanal %1$d · %2$s · %3$s</string>
+    <!-- Channel card: an analog (FM) channel. One word. -->
+    <string name="packet_map_analog">Analog</string>
+    <!-- Channel card: %1$s receive and %2$s transmit frequency in MHz (RX, TX are radio abbreviations). -->
+    <string name="packet_map_channel_freqs">RX %1$s MHz, TX %2$s MHz</string>
+    <!-- Button on the channel card that switches to it. Short. -->
+    <string name="packet_map_use_channel">Kanal einstellen</string>
+    <!-- Toast after switching to a channel from the map: %1$d its number, %2$s its name. -->
+    <string name="packet_map_channel_toast">Kanal %1$d: %2$s</string>
+    <!-- Button on the station card that opens the position in a maps app. Short. -->
+    <string name="packet_map_open_maps">In Maps öffnen</string>
+    <!-- Toast when no maps app is installed. One line. -->
+    <string name="packet_map_no_maps">Keine Karten-App</string>
+    <!-- ==== Coverage legend on the map (top left). -->
+    <!-- Legend line when the terrain prediction starts. -->
+    <string name="packet_map_pred_starting">Geländevorhersage: startet …</string>
+    <!-- Legend line while the prediction runs: %1$s what it is doing ("Fitting the antenna height …"). -->
+    <string name="packet_map_pred_progress">Geländevorhersage: %1$s</string>
+    <!-- Legend line when the prediction failed: %1$s why. -->
+    <string name="packet_map_pred_failed">Geländevorhersage fehlgeschlagen: %1$s</string>
+    <!-- Legend line under a finished prediction: %1$s its calibration note ("Calibrated with 12 measured squares (+3 dB)"). -->
+    <string name="packet_map_pred_done">Blasse Rasterfelder: Geländevorhersage. %1$s</string>
+    <!-- All repeaters together (legend heading, and the first row of the repeater list). Short. -->
+    <string name="packet_map_all_repeaters">Alle Relais</string>
+    <!-- Legend heading of the Heard layer: %1$s the repeater ("All repeaters" or its name). Heard is the layer's name. -->
+    <string name="packet_map_legend_heard">Gehört · %1$s</string>
+    <!-- Legend heading of the Key-ups layer: %1$s the repeater. Key-ups is the layer's name. -->
+    <string name="packet_map_legend_keyups">Auftasten · %1$s</string>
+    <!-- Left end of the colour scale: %1$s the S unit (S1). Very short. -->
+    <string name="packet_map_legend_weak">%1$s schwach</string>
+    <!-- Right end of the colour scale: %1$s the S unit (S9+20). Very short. -->
+    <string name="packet_map_legend_strong">%1$s stark</string>
+    <!-- Legend key of the Key-ups layer: green, the repeater answered. Very short. -->
+    <string name="packet_map_key_keyed">■ Aufgetastet</string>
+    <!-- Legend key of the Key-ups layer: red, no answer. Very short. -->
+    <string name="packet_map_key_no_reply">■ Keine Antwort</string>
+    <!-- Legend: no readings yet for the chosen repeater. -->
+    <string name="packet_map_legend_none_rep">Für dieses Relais noch nichts gemessen</string>
+    <!-- Legend: no readings yet at all. -->
+    <string name="packet_map_legend_none">Noch nichts gemessen: tippen, um das Protokoll zu starten</string>
+    <!-- Legend: %1$d squares measured (English keeps the plural form even for 1). -->
+    <plurals name="packet_map_legend_squares">
+        <item quantity="one">%1$d gemessenes 150-m-Rasterfeld · Rasterfeld antippen</item>
+        <item quantity="other">%1$d gemessene 150-m-Rasterfelder · Rasterfeld antippen</item>
+    </plurals>
+    <!-- ==== Coverage square cards (tap a square on the map). -->
+    <!-- Predicted square card title: about %1$d dBm, %2$s in S units. -->
+    <string name="packet_map_cell_about">Etwa %1$d dBm · %2$s</string>
+    <!-- Predicted square card subtitle: %1$s the repeater, %2$s the distance and direction. -->
+    <string name="packet_map_cell_predicted">Vorhergesagt · %1$s · %2$s</string>
+    <!-- Predicted square card (Heard layer), no prediction details: %1$d the assumed antenna height in m. Note the two spaces before "Trees". -->
+    <string name="packet_map_cell_pred_rx_none">Hier nicht gemessen: berechnet aus dem Gelände zwischen diesem Rasterfeld und dem Relais (Antenne %1$d m über Grund).  Bäume und Gebäude fehlen in den Geländedaten, im Wald und in der Stadt ist also mit weniger zu rechnen.</string>
+    <!-- Predicted square card (Heard layer): %1$d the antenna height in m, %2$s the calibration note. -->
+    <string name="packet_map_cell_pred_rx">Hier nicht gemessen: berechnet aus dem Gelände zwischen diesem Rasterfeld und dem Relais (Antenne %1$d m über Grund). %2$s. Bäume und Gebäude fehlen in den Geländedaten, im Wald und in der Stadt ist also mit weniger zu rechnen.</string>
+    <!-- Predicted square card (Heard layer) when the antenna height was fitted to the readings: %1$d the height in m, %2$s the calibration note. -->
+    <string name="packet_map_cell_pred_rx_fitted">Hier nicht gemessen: berechnet aus dem Gelände zwischen diesem Rasterfeld und dem Relais (Antenne %1$d m über Grund, an deine Messungen angepasst). %2$s. Bäume und Gebäude fehlen in den Geländedaten, im Wald und in der Stadt ist also mit weniger zu rechnen.</string>
+    <!-- Predicted square card title (Key-ups layer): %1$d dB of margin. -->
+    <string name="packet_map_cell_should_key">Sollte auftasten (%1$d dB Reserve)</string>
+    <!-- Predicted square card (Key-ups layer), no prediction details. Note the two spaces before "The". -->
+    <string name="packet_map_cell_pred_tx_none">Berechnet aus dem Gelände und einem typischen Handfunkgerät auf hoher Leistung.  Je mehr Auftastversuche du protokollierst, desto genauer wird das.</string>
+    <!-- Predicted square card (Key-ups layer): %1$s the calibration note. -->
+    <string name="packet_map_cell_pred_tx">Berechnet aus dem Gelände und einem typischen Handfunkgerät auf hoher Leistung. %1$s. Je mehr Auftastversuche du protokollierst, desto genauer wird das.</string>
+    <!-- Measured square card title: %1$d dBm, %2$s in S units. -->
+    <string name="packet_map_cell_dbm">%1$d dBm · %2$s</string>
+    <!-- Measured square card subtitle (Heard layer): %1$s the repeater (or the next string), %2$s the distance and direction. -->
+    <string name="packet_map_cell_heard">Gehört: %1$s · %2$s</string>
+    <!-- In the measured square subtitle when all repeaters are shown. -->
+    <string name="packet_map_cell_best">(bestes Relais hier)</string>
+    <!-- Measured square card (Heard layer): %1$d readings in the square. Key-ups is the other layer's name. -->
+    <plurals name="packet_map_cell_typical">
+        <item quantity="one">Typischer Wert aus %1$d Messung in diesem 150-m-Rasterfeld. Das ist das Signal des Relais am Telefon; ob das Telefon das Relais erreicht, zeigt die Ebene Auftasten.</item>
+        <item quantity="other">Typischer Wert aus %1$d Messungen in diesem 150-m-Rasterfeld. Das ist das Signal des Relais am Telefon; ob das Telefon das Relais erreicht, zeigt die Ebene Auftasten.</item>
+    </plurals>
+    <!-- Measured square card title (Key-ups layer): keyed %1$d times of %2$d tries. -->
+    <string name="packet_map_cell_keyed">%1$d von %2$d aufgetastet</string>
+    <!-- Measured square card title (Key-ups layer): no answer %1$d times. -->
+    <plurals name="packet_map_cell_no_reply">
+        <item quantity="one">%1$d-mal keine Antwort</item>
+        <item quantity="other">%1$d-mal keine Antwort</item>
+    </plurals>
+    <!-- Measured square card subtitle (Key-ups layer) when all repeaters are shown. Short. -->
+    <string name="packet_map_cell_any">Beliebiges Relais</string>
+    <!-- Measured square card (Key-ups layer): the repeater answered here. -->
+    <string name="packet_map_cell_keyed_body">Deine Aussendungen aus diesem Rasterfeld haben das Relais aufgetastet: Sein Nachlauf kam direkt nach dem Loslassen zurück.</string>
+    <!-- Measured square card (Key-ups layer): no answer here. -->
+    <string name="packet_map_cell_no_reply_body">Das Relais hat auf deine Aussendungen von hier nicht geantwortet, obwohl es dir anderswo antwortet. Versuche es mit hoher Leistung oder von einer besseren Stelle.</string>
+    <!-- ==== Coverage maps sheet (and its first-time introduction). -->
+    <!-- Title of the coverage maps sheet. One line. -->
+    <string name="packet_cov_title">Abdeckungskarten</string>
+    <!-- Badge on the coverage introduction: a new feature. Capitals, one word. -->
+    <string name="packet_cov_new">NEU</string>
+    <!-- Explanation on the coverage introduction. A few lines. -->
+    <string name="packet_cov_intro_1">Finde heraus, wo deine Relais wirklich funktionieren. Mit eingeschaltetem Abdeckungs-Log merkt sich die App, wie stark jedes Relais überall dort ist, wo du es hörst, und ob es antwortet, wenn du sendest. Sei einfach wie gewohnt zu Fuß oder mit dem Auto unterwegs; die Karte füllt sich von selbst.</string>
+    <!-- Explanation on the coverage introduction (Heard and Key-ups are the layer names). A few lines. -->
+    <string name="packet_cov_intro_2">Zwei Ebenen: Gehört zeigt das Signal des Relais bei dir, farbig von schwach (blau) bis stark (rot). Auftasten zeigt, wo deine eigenen Aussendungen das Relais geöffnet haben (grün) oder keine Antwort bekamen (rot) – meist die kürzere Reichweite.</string>
+    <!-- Explanation on the coverage introduction (Nearby repeaters is a page name). A few lines. -->
+    <string name="packet_cov_intro_3">Das funktioniert auf Kanälen mit Standort; Kanäle aus „Relais in der Nähe“ haben schon einen. Es wird nichts verschickt: Alles bleibt auf dem Telefon und lässt sich exportieren.</string>
+    <!-- Button on the coverage introduction. Short. -->
+    <string name="packet_cov_turn_on">Abdeckungs-Log einschalten</string>
+    <!-- Toast after coverage logging is turned on. One line. -->
+    <string name="packet_cov_on">Abdeckungs-Log ist an</string>
+    <!-- Toast after coverage logging is turned off. One line. -->
+    <string name="packet_cov_off">Abdeckungs-Log ist aus</string>
+    <!-- Explanation on the coverage maps sheet. A few lines. -->
+    <string name="packet_cov_hint">Gehört: das Signal des Relais an jedem Ort, an dem du es gehört hast. Auftasten: Orte, an denen deine Aussendung das Relais geöffnet hat (grün) oder keine Antwort bekam (rot).</string>
+    <!-- Explanation on the coverage maps sheet, on a radio without signal readings. A few lines. -->
+    <string name="packet_cov_hint_no_rssi">Gehört: das Signal des Relais an jedem Ort, an dem du es gehört hast. Auftasten: Orte, an denen deine Aussendung das Relais geöffnet hat (grün) oder keine Antwort bekam (rot). Dieses Funkgerät liefert keine Signalwerte, deshalb zeichnet es nur Auftastversuche auf; die Ebene Gehört bleibt leer.</string>
+    <!-- Switch on the coverage sheet. Short. -->
+    <string name="packet_cov_log">Abdeckung loggen</string>
+    <!-- Under the Log coverage switch: %1$d signal readings and %2$d transmissions stored. -->
+    <string name="packet_cov_log_sub">%1$d Messwerte, %2$d Aussendungen gespeichert</string>
+    <!-- Button on the coverage sheet that transmits a short test. Short. -->
+    <string name="packet_cov_test">Auftasttest hier</string>
+    <!-- Explanation on the coverage sheet. A few lines. -->
+    <string name="packet_cov_test_hint">Auf einem FM-Relaiskanal: sendet dein Rufzeichen in Morse (etwa 3 Sekunden, eine zulässige Kennung) und hält fest, ob das Relais von dieser Stelle aus geantwortet hat. Sparsam einsetzen.</string>
+    <!-- Title of the dialog that confirms the key-up test. One line. -->
+    <string name="packet_cov_test_title">Auftasttest senden?</string>
+    <!-- Text of that dialog: %1$s the channel name (or the next string). -->
+    <string name="packet_cov_test_msg">Sendet dein Rufzeichen in Morse auf %1$s und horcht auf den Nachlauf des Relais. Teste nur Relais, die du nutzen darfst.</string>
+    <!-- In the key-up test dialog when there is no channel name. -->
+    <string name="packet_cov_test_this_channel">diesem Kanal</string>
+    <!-- Toast when the key-up test starts. One line. -->
+    <string name="packet_cov_test_sending">Sende deine Kennung … das Ergebnis erscheint im Verlauf</string>
+    <!-- Section heading on the coverage sheet. One line, capitals. -->
+    <string name="packet_cov_show_section">Auf der Karte zeigen</string>
+    <!-- Layer choice: the Heard layer (the repeater's signal at each place). One word (three share a row). -->
+    <string name="packet_cov_layer_heard">Gehört</string>
+    <!-- Layer choice: the Key-ups layer (where your transmissions opened the repeater). One word (three share a row). -->
+    <string name="packet_cov_layer_keyups">Auftasten</string>
+    <!-- Under All repeaters in the coverage sheet's repeater list. One line. -->
+    <string name="packet_cov_all_sub">Das beste Relais in jedem Rasterfeld</string>
+    <!-- Under a repeater in the coverage sheet: %1$d readings, %2$d transmissions. -->
+    <string name="packet_cov_rep_sub">%1$d Messwerte · %2$d Aussendungen</string>
+    <!-- Under a repeater in the coverage sheet: %1$d readings, %2$d transmissions, %3$d of them answered. -->
+    <string name="packet_cov_rep_sub_keyed">%1$d Messwerte · %2$d Aussendungen (%3$d aufgetastet)</string>
+    <!-- Section heading on the coverage sheet. One line, capitals. -->
+    <string name="packet_cov_pred_section">Geländevorhersage</string>
+    <!-- Explanation on the coverage sheet. A few lines. -->
+    <string name="packet_cov_pred_pick">Wähle oben ein Relais (oder tippe auf der Karte auf ein Relais oder einen Kanal → Abdeckung), um seine Reichweite aus dem Gelände vorherzusagen, noch bevor du etwas gemessen hast.</string>
+    <!-- Switch on the coverage sheet. Short. -->
+    <string name="packet_cov_pred_show">Vorhersage zeigen</string>
+    <!-- Under that switch: %1$s the repeater. -->
+    <string name="packet_cov_pred_show_sub">Blasse Rasterfelder unter den gemessenen, für %1$s</string>
+    <!-- Label above the antenna height choices. One line. -->
+    <string name="packet_cov_ant_label">Antennenhöhe des Relais über Grund</string>
+    <!-- Choice pill: worked out automatically. Very short (six share a row). -->
+    <string name="packet_cov_auto">Auto</string>
+    <!-- Title of the dialog that sets the antenna height. One line. -->
+    <string name="packet_cov_ant_ask">Antennenhöhe über Grund (m)</string>
+    <!-- Explanation on the coverage sheet (Auto and Set are the pill names). A few lines. -->
+    <string name="packet_cov_ant_hint">Auto passt die Höhe an deine Messungen der Ebene Gehört an, sobald sie verschiedene Entfernungen abdecken (die Höhe bestimmt, wie weit das Signal über die Hügel trägt); bis dahin gilt 30 m. Wenn du sie kennst (Mastregister nennen die Masthöhen), trag sie unter Festlegen ein.</string>
+    <!-- Explanation on the coverage sheet (Unknown is the pill name). A few lines. -->
+    <string name="packet_cov_pwr_hint">Sendeleistung (effektive Strahlungsleistung, ERP). Unbekannt: Es wird von 50 W ausgegangen, und deine Messwerte der Ebene Gehört korrigieren den Pegel. NOAA-Wetterfunksender geben ihre Leistung an (meist 1000 W).</string>
+    <!-- Choice pill: transmitter power not known. Very short (six share a row). -->
+    <string name="packet_cov_unknown">Unbekannt</string>
+    <!-- Title of the dialog that sets the transmitter power. One line. -->
+    <string name="packet_cov_pwr_ask">Sendeleistung (W)</string>
+    <!-- Explanation on the coverage sheet. A few lines. -->
+    <string name="packet_cov_range_hint">Reichweite: Auto reicht so weit, wie Leistung und Antennenhöhe dieses Senders über flaches Gelände tragen (Hügel verkürzen das nur), bis zu 50 Meilen (etwa 80 km); eine feste Reichweite ist ein Minimum. Dein Standort und alles, was du gemessen hast, sind immer enthalten.</string>
+    <!-- Explanation on the coverage sheet (Terrain Tiles is a data set name). A few lines. -->
+    <string name="packet_cov_tiles_hint">Die Geländehöhen stammen aus den offenen Terrain Tiles (etwa 55 m Auflösung) und werden auf dem Telefon gespeichert. Die erste Vorhersage für ein Gebiet lädt sie herunter.</string>
+    <!-- Explanation on the coverage sheet. A few lines. -->
+    <string name="packet_cov_located">Das Protokoll funktioniert auf Kanälen mit Standort: %1$d deiner Kanäle haben einen (Kanaleditor → Standort; Kanäle aus „Relais in der Nähe“ bekommen ihn automatisch). Auftastversuche werden nur auf Relaiskanälen gewertet, bei denen Sende- und Empfangsfrequenz verschieden sind.</string>
+    <!-- Explanation on the coverage sheet when nothing is measured. A few lines. -->
+    <string name="packet_cov_located_none">Noch nichts gemessen. Das Protokoll funktioniert auf Kanälen mit Standort: %1$d deiner Kanäle haben einen (Kanaleditor → Standort; Kanäle aus „Relais in der Nähe“ bekommen ihn automatisch). Auftastversuche werden nur auf Relaiskanälen gewertet, bei denen Sende- und Empfangsfrequenz verschieden sind.</string>
+    <!-- Button on the coverage sheet that saves the readings as files. Short (two share a row). -->
+    <string name="packet_cov_export">Exportieren</string>
+    <!-- Toast after the coverage export: %1$s the folder name. Keep the path and file names. -->
+    <string name="packet_cov_exported">Gespeichert unter Download/DMR/Coverage/%1$s: zwei CSV-Dateien und coverage.kml für Google Earth</string>
+    <!-- Title of the dialog that deletes all coverage data. One line. -->
+    <string name="packet_cov_clear_all">Alle Abdeckungsdaten löschen?</string>
+    <!-- Title of the dialog that deletes one repeater's coverage data: %1$s its name. One line. -->
+    <string name="packet_cov_clear_one">Abdeckungsdaten für %1$s löschen?</string>
+    <!-- Text of the clear dialog. -->
+    <string name="packet_cov_clear_msg">Die gespeicherten Messwerte und Auftastversuche werden vom Telefon gelöscht. Exportiere vorher, wenn du eine Kopie behalten willst.</string>
+    <!-- Last choice pill (and dialog button) that takes any number. Very short. -->
+    <string name="packet_cov_set">Festlegen</string>
+    <!-- Hint in the number field: %1$d to %2$d. Short. -->
+    <string name="packet_cov_set_range">%1$d bis %2$d</string>
+    <!-- Toast when the number is out of range: between %1$d and %2$d. One line. -->
+    <string name="packet_cov_set_err">Zwischen %1$d und %2$d</string>
+    <!-- ==== Map help sheet (the Help pill). -->
+    <!-- Explanation on the map help sheet. A few lines. -->
+    <string name="packet_map_help_1">Grüne Punkte sind APRS-Stationen, die das Funkgerät gehört hat, an ihrer zuletzt gemeldeten Position (der Filter APRS blendet sie ein oder aus). Cyanfarbene Rauten sind FM-Relais, violette Rauten DMR-Relais im Umkreis von „Relais in der Nähe“. Orangefarbene Stecknadeln sind deine Kanäle mit Standort (im Kanaleditor festlegen). Der blaue Punkt bist du.</string>
+    <!-- Explanation on the map help sheet. A few lines. -->
+    <string name="packet_map_help_2">Zum Verschieben ziehen, zum Zoomen mit zwei Fingern spreizen oder doppelt tippen, für Details auf eine Markierung tippen. Die Filter oben blenden jede Art ein oder aus; die Schaltflächen rechts zoomen, springen zu deinem Standort zurück und zeigen alles auf dem Bildschirm.</string>
+    <!-- Explanation on the map help sheet. A few lines. -->
+    <string name="packet_map_help_3">Abdeckung: Der violette Filter zeigt, wo du jedes Relais gehört hast (Gehört) und wo deine Aussendungen es geöffnet haben (Auftasten). Dort schaltest du das Abdeckungs-Log ein; Hilfe → Abdeckungskarten erklärt alles.</string>
+    <!-- Explanation on the map help sheet. A few lines. -->
+    <string name="packet_map_help_4">Die Kartenkacheln kommen von OpenStreetMap und bleiben 30 Tage auf dem Telefon gespeichert, so dass Orte, die du dir angesehen hast, auch ohne Verbindung angezeigt werden.</string>
+
+    <!-- ==== Map (APRS stations and the coverage map). -->
+    <!-- Screen reader description of the map view. One or two words. -->
+    <string name="packet_map_cd">Karte</string>
+
+    <!-- ==== Messages page (DMR text, pages, M17 text). -->
+    <!-- Title of the Messages page. One or two words. -->
+    <string name="packet_msg_title">Nachrichten</string>
+    <!-- Subtitle of the Messages page when there are no conversations (shown in capitals). Short. -->
+    <string name="packet_msg_sub">DMR-Text</string>
+    <!-- Screen reader label of the header button that starts or stops the pager monitor (long press edits its frequencies). -->
+    <string name="packet_msg_cd_monitor">Pager-Mithören</string>
+    <!-- Button (and screen reader label of the + button) that starts a new DMR text. Short. -->
+    <string name="packet_msg_new">Neue Nachricht</string>
+    <!-- Heading of the empty Messages page. One line. -->
+    <string name="packet_msg_empty_title">Noch keine Nachrichten</string>
+    <!-- Explanation on the empty Messages page. A few lines, centred. -->
+    <string name="packet_msg_empty_body">Schreib einem Kontakt, einer Sprechgruppe oder dem Rufziel des aktuellen Kanals. Texte gehen über DMR-Kanäle; eingehende erscheinen hier und im Funk-Verlauf.</string>
+    <!-- Subtitle of the Messages page: how many conversations (shown in capitals). -->
+    <plurals name="packet_msg_conversations">
+        <item quantity="one">%1$d Unterhaltung</item>
+        <item quantity="other">%1$d Unterhaltungen</item>
+    </plurals>
+    <!-- Banner in a page thread when a page for another thread arrives. %1$s that page (sender and text). -->
+    <string name="packet_msg_also_heard">Ebenfalls gehört: %1$s</string>
+    <!-- Toast after the pager monitor stops. One line. -->
+    <string name="packet_msg_monitor_off">Pager-Mithören aus</string>
+    <!-- Title of the dialog that edits the pager monitor's frequencies. One line. -->
+    <string name="packet_msg_scan_title">Pager-Frequenzen</string>
+    <!-- Text of that dialog. Two lines. -->
+    <string name="packet_msg_scan_body">Hertz, durch Kommas getrennt. Das Mithören wartet auf jeder einen vollen Batch ab und bleibt, solange eine Präambel zu hören ist.</string>
+    <!-- Subtitle of a page thread (and its title when the sender has no name). One word. -->
+    <string name="packet_msg_kind_pager">Pager</string>
+    <!-- Hint in the text field of a page thread. One word. -->
+    <string name="packet_msg_hint_page">Pager-Text</string>
+    <!-- Hint in the text field of an M17 thread (M17 is a mode name). Short. -->
+    <string name="packet_msg_hint_m17">M17-Text</string>
+    <!-- Button under a page thread that saves the sender's pager address (RIC) as a contact. Short. -->
+    <string name="packet_msg_save_contact">Als Kontakt speichern</string>
+    <!-- Hint in the contact name field. One word. -->
+    <string name="packet_msg_ric_name">Name</string>
+    <!-- Title of the dialog that saves a pager address. %1$s the RIC (a pager address number). One line. -->
+    <string name="packet_msg_ric_title">RIC %1$s speichern</string>
+    <!-- Dialog button that mutes pages from this address. Short. -->
+    <string name="packet_msg_ric_mute">Stummschalten</string>
+    <!-- First choice in the new-message list: the talkgroup or ID the current channel calls. One line. -->
+    <string name="packet_msg_to_current">Rufziel des aktuellen Kanals</string>
+    <!-- Title of the new-message list. One line. -->
+    <string name="packet_msg_to_title">Nachricht an</string>
+    <!-- Toast when the current channel calls no talkgroup or ID. One line. -->
+    <string name="packet_msg_err_no_target">Der aktuelle Kanal hat kein Rufziel</string>
+    <!-- A talkgroup with no name: TG and its number. Very short. -->
+    <string name="packet_msg_peer_tg">TG %1$d</string>
+    <!-- An all call with no name: ALL and its number. Very short. -->
+    <string name="packet_msg_peer_all">ALL %1$d</string>
+    <!-- A DMR ID with no name: ID and its number. Very short. -->
+    <string name="packet_msg_peer_id">ID %1$d</string>
+    <!-- Subtitle of a text thread with a talkgroup. One word. -->
+    <string name="packet_msg_type_tg">Sprechgruppe</string>
+    <!-- Subtitle of a text thread with an all call. Short. -->
+    <string name="packet_msg_type_all">Sammelruf</string>
+    <!-- Subtitle of a private text thread. One word. -->
+    <string name="packet_msg_type_private">Einzelruf</string>
+    <!-- Note at the top of a text thread on an analog channel. One or two lines. -->
+    <string name="packet_msg_analog_note">Dieser Kanal ist analog: Wechsle auf einen DMR-Kanal, um Text zu senden.</string>
+    <!-- Screen reader label of the quick replies button, and the title of the quick replies list. One line. -->
+    <string name="packet_msg_quick">Schnellantworten</string>
+    <!-- Hint in the text field of a DMR text thread. One word. -->
+    <string name="packet_msg_hint">Nachricht</string>
+    <!-- Toast when sending a DMR text on an analog channel. One line. -->
+    <string name="packet_msg_err_analog">Wechsle auf einen DMR-Kanal, um Text zu senden</string>
+    <!-- Delivery mark under a text you sent: the other radio acknowledged it. Lower case, short. -->
+    <string name="packet_msg_st_delivered">✓✓ zugestellt</string>
+    <!-- Delivery mark: the text did not go out. Lower case, short. -->
+    <string name="packet_msg_st_failed">✖ nicht gesendet</string>
+    <!-- Delivery mark: sent, but no acknowledgement came back. Lower case, short. -->
+    <string name="packet_msg_st_no_ack">✓ gesendet, keine Bestätigung</string>
+    <!-- Delivery mark while the text goes out. Lower case, short. -->
+    <string name="packet_msg_st_sending">wird gesendet…</string>
+    <!-- Conversation card name for a page thread: PAGE and the sender. Note the two spaces. Capitals. -->
+    <string name="packet_msg_chip_page">PAGER  %1$s</string>
+    <!-- Conversation card: the last text was yours. %1$s the text. -->
+    <string name="packet_msg_you">Du: %1$s</string>
+    <!-- Last item in the quick replies list: edit the list. One line. -->
+    <string name="packet_msg_quick_edit">Schnellantworten bearbeiten …</string>
+    <!-- Text of the dialog that edits the quick replies. One line. -->
+    <string name="packet_msg_quick_body">Eine Nachricht pro Zeile.</string>
+
+    <!-- ==== Packet finder (searches the packet frequencies for BBSs, nodes and Winlink gateways). -->
+    <!-- Kind of station found: a Winlink e-mail gateway. Short. -->
+    <string name="packet_finder_kind_gateway">Winlink-Gateway</string>
+    <!-- Kind of station found: a packet bulletin board (BBS). Short. -->
+    <string name="packet_finder_kind_bbs">BBS</string>
+    <!-- Kind of station found: a packet node. Short. -->
+    <string name="packet_finder_kind_node">Knoten</string>
+    <!-- Kind of station found: a station identifying itself. Short. -->
+    <string name="packet_finder_kind_id">Stationskennung</string>
+    <!-- Kind of station found: a beacon. Short. -->
+    <string name="packet_finder_kind_beacon">Beacon</string>
+    <!-- Kind of station found: any other packet station. Short. -->
+    <string name="packet_finder_kind_station">Packet-Station</string>
+    <!-- Packet finder status: it has not run yet. One line. -->
+    <string name="packet_finder_status_idle">Läuft nicht</string>
+    <!-- Toast when saving the finder settings: %1$s the radio's bands ("400–480 MHz"), %2$s the frequencies it cannot tune. -->
+    <string name="packet_finder_err_bad_freq">Keine Frequenz, die das Funkgerät einstellen kann (%1$s): %2$s</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_running">Die Packet-Suche läuft bereits</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_take_over">Übernimm zuerst das Funkmodul</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_no_freqs">Keine der Packet-Frequenzen kann dieses Funkgerät einstellen (%1$s): Trag in den Einstellungen welche ein</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_tx">Nicht während des Sendens</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_sat">Gerade wird ein Satellitenüberflug verfolgt</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_winlink">Gerade läuft eine Winlink-Sitzung</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_no_engine">Die Packet-Engine läuft nicht</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_terminal">Das Packet-Terminal ist verbunden</string>
+    <!-- Toast when the packet finder cannot start. One or two lines. -->
+    <string name="packet_finder_err_monitoring">APRS-Mithören ist an: Schalte es zuerst aus</string>
+    <!-- History line: the packet finder started. %1$d frequencies, %2$d minutes on each, %3$s the end time (HH:mm). -->
+    <string name="packet_finder_event_started">🔎 Packet-Suche gestartet: %1$d Frequenzen, je %2$d min, bis %3$s</string>
+    <!-- How the search ended (inside "Packet finder …" lines). Lower case. -->
+    <string name="packet_finder_why_finished">beendet</string>
+    <!-- Packet finder status while it listens. %1$s the frequency in MHz. One line. -->
+    <string name="packet_finder_status_listening">Höre auf %1$s MHz</string>
+    <!-- How the search ended: you transmitted. Lower case. -->
+    <string name="packet_finder_why_tx">abgebrochen: du hast gesendet</string>
+    <!-- How the search ended: a satellite pass took the radio. Lower case. -->
+    <string name="packet_finder_why_satellite">abgebrochen für einen Satellitenüberflug</string>
+    <!-- How the search ended: the channel was changed. Lower case. -->
+    <string name="packet_finder_why_channel">abgebrochen: Kanal gewechselt</string>
+    <!-- How the search ended: stopped by you. Lower case. -->
+    <string name="packet_finder_why_stopped">gestoppt</string>
+    <!-- How the search ended: an error. %1$s the error (technical, English). -->
+    <string name="packet_finder_why_error">abgebrochen: %1$s</string>
+    <!-- Packet finder status after a search: %1$s how it ended ("finished"), %2$d frames decoded. One line. -->
+    <string name="packet_finder_status_last">Letzte Suche %1$s · %2$d Packet-Frames gehört</string>
+    <!-- History line: the packet finder ended. %1$s how ("finished", "stopped: you transmitted"), %2$s the stations listed ("3 stations"). -->
+    <string name="packet_finder_event_ended">🔎 Packet-Suche %1$s: %2$s in der Liste</string>
+    <!-- Stations in the packet finder list (inside the history line). -->
+    <plurals name="packet_finder_stations">
+        <item quantity="one">%1$d Station</item>
+        <item quantity="other">%1$d Stationen</item>
+    </plurals>
+    <!-- History line: the packet finder found a station. %1$s its callsign, %2$s its kind ("BBS"), %3$s the frequency in MHz. -->
+    <string name="packet_finder_event_found">🔎 Packet-Suche: %1$s (%2$s) auf %3$s MHz</string>
+
+    <!-- ==== Packet finder sheet (its title is packet_pkt_finder). -->
+    <!-- Explanation at the top of the packet finder sheet. A few lines. -->
+    <string name="packet_pfd_hint">Findet die Packet-Stationen in deiner Umgebung: Winlink-Gateways, BBS und Knoten. SignalDeck hört nur zu (es sendet nie), eine Frequenz nach der anderen, und listet jede Station auf, die es hört und die nicht reines APRS ist. Knoten melden sich nur alle 10 bis 30 Minuten, lass die Suche also ein bis zwei Stunden laufen (oder plane sie für die Nacht). Danach kehrt das Funkgerät auf seinen Kanal zurück.</string>
+    <!-- Line under the status while the finder runs: %1$s the end time, %2$d minutes per frequency, %3$d frequencies. -->
+    <string name="packet_pfd_sub_running">Bis %1$s · je %2$d min auf %3$d Frequenzen</string>
+    <!-- Line under the status when no frequency suits the radio: %1$s its bands. "Use my channels" is the button in Settings. -->
+    <string name="packet_pfd_sub_no_freqs">Keine Packet-Frequenz, die dieses Funkgerät einstellen kann (%1$s): Trag in den Einstellungen welche ein („Meine Kanäle verwenden“ übernimmt deine)</string>
+    <!-- Line under the status: %1$d frequencies, %2$d minutes each, for %3$d hours. -->
+    <string name="packet_pfd_sub_idle">%1$d Frequenzen, je %2$d min, für %3$d h (Einstellungen)</string>
+    <!-- Section heading when the finder has found nothing. One line, capitals. -->
+    <string name="packet_pfd_nothing">Noch nichts gehört</string>
+    <!-- Section heading over the stations found. %1$d how many. One line, capitals. -->
+    <string name="packet_pfd_heard">Gehört (%1$d)</string>
+    <!-- Details of a station found: %1$s its kind, %2$s the frequency in MHz, %3$d times heard, %4$s when last heard (day and time). -->
+    <string name="packet_pfd_row">%1$s · %2$s MHz · %3$d×, zuletzt %4$s</string>
+    <!-- Details of a station found: %1$s its kind, %2$s the frequency in MHz, %3$d its best signal in dBm, %4$d times heard, %5$s when last heard. -->
+    <string name="packet_pfd_row_dbm">%1$s · %2$s MHz · %3$d dBm · %4$d×, zuletzt %5$s</string>
+    <!-- Button under the stations found that empties the list. Short. -->
+    <string name="packet_pfd_clear">Liste leeren</string>
+    <!-- Title of the dialog that confirms emptying the finder list. One line. -->
+    <string name="packet_pfd_clear_q">Gefundene Stationen löschen?</string>
+    <!-- Toast when a station is tapped while the finder still runs. One line. -->
+    <string name="packet_pfd_err_running">Stoppe zuerst die Suche</string>
+    <!-- Choice for a Winlink gateway found: %1$s its frequency in MHz. One line. -->
+    <string name="packet_pfd_tune_winlink">%1$s einstellen und Winlink öffnen</string>
+    <!-- Choice for a station found. One line. -->
+    <string name="packet_pfd_tune_terminal_short">Einstellen und Packet-Terminal öffnen</string>
+    <!-- Choice for a station found: only tune the VFO. One line. -->
+    <string name="packet_pfd_just_tune">Nur einstellen</string>
+    <!-- Choice for a BBS or node found: %1$s its frequency in MHz. One line. -->
+    <string name="packet_pfd_tune_terminal">%1$s einstellen und Packet-Terminal öffnen</string>
+    <!-- Toast after tuning to a station found: %1$s the frequency in MHz. One line. -->
+    <string name="packet_pfd_vfo_on">VFO auf %1$s MHz (niedrige Leistung)</string>
+    <!-- ==== Packet finder settings dialog. -->
+    <!-- Explanation above the frequency list. Two or three lines. -->
+    <string name="packet_pfd_set_freqs">Frequenzen in MHz, durch Kommas getrennt (leer: die üblichen 2-m-Packet-Frequenzen 144,910–145,090). Ergänze die 70-cm-Packet-Frequenzen deiner Gegend, wenn du sie kennst.</string>
+    <!-- Button that fills in the frequencies of your own analog channels. Short. -->
+    <string name="packet_pfd_set_mine">Meine Kanäle verwenden</string>
+    <!-- Toast when none of your channels can be used. One line. -->
+    <string name="packet_pfd_set_mine_none">Keiner deiner Analogkanäle liegt in den Bändern dieses Funkgeräts</string>
+    <!-- Hint in the minutes field. One line. -->
+    <string name="packet_pfd_set_dwell">Minuten pro Frequenz</string>
+    <!-- Hint in the hours field. One line. -->
+    <string name="packet_pfd_set_hours">Wie viele Stunden</string>
+    <!-- Note under the two number fields. One line. -->
+    <string name="packet_pfd_set_note">Minuten pro Frequenz / Stunden insgesamt.</string>
+    <!-- Title of the packet finder settings dialog. One line. -->
+    <string name="packet_pfd_set_title">Einstellungen der Packet-Suche</string>
+    <!-- Toast when the minutes or hours are not numbers. One line. -->
+    <string name="packet_pfd_set_err_numbers">Nur Zahlen</string>
+    <!-- Dialog button that puts the finder settings back to the defaults. Short. -->
+    <string name="packet_pfd_set_defaults">Standardwerte</string>
+
+    <!-- ==== PKT sheet (the packet-radio tools). -->
+    <!-- Title of the PKT sheet. One line. -->
+    <string name="packet_pkt_title">Packet-Radio</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_running_now">Läuft gerade</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_digital_voice">Digitale Sprache</string>
+    <!-- Button on the PKT sheet while the M17 receiver runs. Short (two buttons share a row). -->
+    <string name="packet_pkt_m17_listening">M17 (Empfang läuft)</string>
+    <!-- Button on the PKT sheet that starts the M17 receiver. Short (two buttons share a row). -->
+    <string name="packet_pkt_m17_receive">M17-Empfang</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_m17_hint">M17 empfangen: Hör M17-Digitalsprachstationen auf diesem Kanal oder dem VFO, mit Rufzeichen und Nachricht des Anrufers (nur Empfang: Dieses Funkgerät kann kein M17 senden).</string>
+    <!-- Button on the PKT sheet that stops APRS monitoring. Short (two buttons share a row). -->
+    <string name="packet_pkt_stop_monitoring">Mithören stoppen</string>
+    <!-- Button on the PKT sheet that parks the radio on the APRS frequency (%1$s, e.g. 144.390). Short (two buttons share a row). -->
+    <string name="packet_pkt_monitor">%1$s mithören</string>
+    <!-- Button on the PKT sheet that stops the KISS TNC (a protocol name: keep KISS TNC). Short (two buttons share a row). -->
+    <string name="packet_pkt_kiss_stop">KISS-TNC stoppen</string>
+    <!-- Button on the PKT sheet that starts the KISS TNC for APRSdroid or YAAC (a protocol name: keep it). Short (two buttons share a row). -->
+    <string name="packet_pkt_kiss">KISS-TNC</string>
+    <!-- Toast after the KISS TNC stops. One line. -->
+    <string name="packet_pkt_kiss_stopped">KISS-TNC gestoppt</string>
+    <!-- Toast after the KISS TNC starts; %1$d the TCP port. App names stay. One line. -->
+    <string name="packet_pkt_kiss_on">KISS-TNC auf 127.0.0.1:%1$d – APRSdroid/YAAC darauf einstellen (TCP KISS)</string>
+    <!-- Button on the PKT sheet that opens the APRS message sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_send_message">Nachricht senden</string>
+    <!-- Button on the PKT sheet that sends one APRS position report. Short (two buttons share a row). -->
+    <string name="packet_pkt_position_beacon">Positions-Beacon</string>
+    <!-- Toast after a position beacon is queued for sending. One line. -->
+    <string name="packet_pkt_beacon_queued">Beacon eingereiht</string>
+    <!-- Button on the PKT sheet that opens the APRS object sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_object">Objekt …</string>
+    <!-- Button on the PKT sheet that opens the APRS bulletin sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_bulletin">Bulletin …</string>
+    <!-- Button on the PKT sheet that sends one APRS telemetry report. Short (two buttons share a row). -->
+    <string name="packet_pkt_telemetry">Telemetrie</string>
+    <!-- Toast after telemetry is queued. One line. -->
+    <string name="packet_pkt_telemetry_queued">Telemetrie eingereiht</string>
+    <!-- Button on the PKT sheet that sends one APRS weather report. Short (two buttons share a row). -->
+    <string name="packet_pkt_weather">Wetter</string>
+    <!-- Toast after a weather report is queued. One line. -->
+    <string name="packet_pkt_weather_queued">Wetterbericht eingereiht</string>
+    <!-- Button on the PKT sheet while a satellite is tracked (%1$s its name, e.g. ISS). Short (two buttons share a row). -->
+    <string name="packet_pkt_sat_tracking">Satelliten: verfolge %1$s</string>
+    <!-- Button on the PKT sheet that opens the satellite sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_sat_passes">Satellitenüberflüge</string>
+    <!-- Button on the PKT sheet that opens the band scope. Short (two buttons share a row). -->
+    <string name="packet_pkt_band_scope">Bandscope</string>
+    <!-- Button on the PKT sheet that opens the band conditions sheet. Short (two buttons share a row). -->
+    <string name="packet_pkt_conditions">VHF/UHF-Bedingungen</string>
+    <!-- Button on the PKT sheet that decodes APRS or SSTV from a saved recording. Short (two buttons share a row). -->
+    <string name="packet_pkt_decode_recording">Aufnahme dekodieren</string>
+    <!-- Button on the PKT sheet that stops listening to the space station. Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_aprs_stop">ISS-APRS stoppen</string>
+    <!-- Button on the PKT sheet that listens to the space station's APRS digipeater (%1$s its frequency, 145.825). Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_aprs">ISS-APRS %1$s</string>
+    <!-- Toast after ISS APRS stops. One line. -->
+    <string name="packet_pkt_iss_aprs_stopped">ISS-APRS gestoppt</string>
+    <!-- Button on the PKT sheet that sends a position report through the space station. Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_beacon">Beacon über die ISS</string>
+    <!-- Automatic beacons line: they are off. Lower case (inside the sentence). -->
+    <string name="packet_pkt_auto_off">aus</string>
+    <!-- Automatic beacons line: timed beacons. %1$d minutes. Lower case. -->
+    <string name="packet_pkt_auto_every">alle %1$d min</string>
+    <!-- Automatic beacons line: SmartBeaconing (a feature name, usually kept). -->
+    <string name="packet_pkt_auto_smart">SmartBeaconing</string>
+    <!-- Automatic beacons line, added to the list. Lower case. -->
+    <string name="packet_pkt_auto_telemetry">Telemetrie alle 30 min</string>
+    <!-- Automatic beacons line, added to the list. Lower case. -->
+    <string name="packet_pkt_auto_weather">Wetter alle 30 min</string>
+    <!-- Hint on the PKT sheet. %1$s what goes out automatically ("every 15 min, telemetry every 30 min"), %2$s the APRS frequency. -->
+    <string name="packet_pkt_auto_here">Automatische Beacons: %1$s (nur auf %2$s, einstellbar in den Einstellungen).</string>
+    <!-- Hint on the PKT sheet when the radio cannot tune the APRS frequency. %1$s what goes out automatically, %2$s the APRS frequency. -->
+    <string name="packet_pkt_auto_away">Automatische Beacons: %1$s (sie gehen auf %2$s raus, das dieses Funkgerät nicht einstellen kann).</string>
+    <!-- Sentence after the automatic beacons line when the two-way iGate is on. %1$d messages so far (English keeps the plural form even for 1). -->
+    <plurals name="packet_pkt_igate_on">
+        <item quantity="one">Zwei-Wege-iGate an: %1$d Internet-Nachricht auf Funk weitergeleitet.</item>
+        <item quantity="other">Zwei-Wege-iGate an: %1$d Internet-Nachrichten auf Funk weitergeleitet.</item>
+    </plurals>
+    <!-- Sentence after the automatic beacons line: the APRS message groups followed. %1$s the groups (CQ, ARES). -->
+    <string name="packet_pkt_groups">Gefolgte Gruppen: %1$s.</string>
+    <!-- Button on the PKT sheet that stops the internet APRS link. Short (two buttons share a row). -->
+    <string name="packet_pkt_is_stop">APRS-IS stoppen</string>
+    <!-- Button on the PKT sheet that starts the internet APRS link. Short (two buttons share a row). -->
+    <string name="packet_pkt_is_start">APRS-IS (Internet)</string>
+    <!-- Toast after APRS-IS stops. One line. -->
+    <string name="packet_pkt_is_off">APRS-IS aus</string>
+    <!-- Toast when APRS-IS starts; %1$s the server. One line. -->
+    <string name="packet_pkt_is_connecting">Verbinde mit %1$s</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_is_hint">APRS-IS: %1$s. Leitet das, was das Funkgerät hört, ins Internet weiter (mit Passcode), meldet deine Position online und stellt dir Internet-Nachrichten zu.</string>
+    <!-- Button on the PKT sheet that lists the APRS stations heard; %1$d how many. Short (two buttons share a row). -->
+    <string name="packet_pkt_stations_n">Gehörte Stationen (%1$d)</string>
+    <!-- Button on the PKT sheet that opens the APRS log. Short (two buttons share a row). -->
+    <string name="packet_pkt_aprs_log">APRS-Log</string>
+    <!-- Button on the PKT sheet that lists the bulletins heard. Short (two buttons share a row). -->
+    <string name="packet_pkt_bulletins">Bulletins</string>
+    <!-- Button on the PKT sheet that opens the APRS and packet settings. Short (two buttons share a row). -->
+    <string name="packet_pkt_settings">Einstellungen</string>
+    <!-- Where passive APRS decode runs (inside the hint below). Lower case. -->
+    <string name="packet_pkt_passive_every">jedem Analogkanal</string>
+    <!-- Where passive APRS decode runs: the channels flagged for it. Lower case. -->
+    <string name="packet_pkt_passive_flagged">markierten Kanälen</string>
+    <!-- Where passive APRS decode runs: nowhere. Lower case. -->
+    <string name="packet_pkt_passive_none">keinem Kanal (aus)</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_passive_here">Passives Dekodieren läuft auf %1$s. Beim Mithören bleibt das Funkgerät auf %2$s MHz (die APRS-Frequenz deiner Region, Gerät → Region) und bestätigt Nachrichten für dich. Dein Kanal kommt zurück, wenn du stoppst.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_passive_here_digi">Passives Dekodieren läuft auf %1$s. Beim Mithören bleibt das Funkgerät auf %2$s MHz (die APRS-Frequenz deiner Region, Gerät → Region), bestätigt Nachrichten für dich und digipeatet WIDE1-1. Dein Kanal kommt zurück, wenn du stoppst.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_passive_away">Passives Dekodieren läuft auf %1$s. Dieses Funkgerät kann %2$s MHz nicht einstellen, deshalb gibt es kein Mithören: APRS wird auf deinen eigenen Kanälen dekodiert. Dein Kanal kommt zurück, wenn du stoppst.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_passive_away_digi">Passives Dekodieren läuft auf %1$s. Dieses Funkgerät kann %2$s MHz nicht einstellen, deshalb gibt es kein Mithören: APRS wird auf deinen eigenen Kanälen dekodiert und WIDE1-1 digipeatet. Dein Kanal kommt zurück, wenn du stoppst.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_parrot_section">Simplex-Relais (Parrot)</string>
+    <!-- Button on the PKT sheet that stops the simplex repeater. Short (two buttons share a row). -->
+    <string name="packet_pkt_parrot_stop">Parrot stoppen</string>
+    <!-- Button on the PKT sheet that starts the simplex repeater. Short (two buttons share a row). -->
+    <string name="packet_pkt_parrot_start">Parrot auf diesem Kanal</string>
+    <!-- Start of the parrot hint while it runs. %1$d transmissions repeated so far. -->
+    <string name="packet_pkt_parrot_on">🦜 An, bisher %1$d wiederholt.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_parrot_hint">Nimmt jede auf diesem Kanal gehörte Aussendung auf und sendet sie eine Sekunde nach ihrem Ende zurück (bis 26 s). So hört eine Station, wie sie klingt, oder zwei Stationen, die sich gegenseitig nicht erreichen, sprechen über dich miteinander. Auf Amateurfunkkanälen wird dein Rufzeichen höchstens alle zehn Minuten in Morse gesendet. Die Rauschsperre muss bei Stille schließen (Rauschsperre über 0 oder Soft SQ); stoppt beim Kanalwechsel.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_text_modes">Textbetriebsarten</string>
+    <!-- Button on the PKT sheet that opens the text modes (mode names stay). Short (two buttons share a row). -->
+    <string name="packet_pkt_rtty_psk">RTTY und PSK31</string>
+    <!-- Button on the PKT sheet while FT8 runs. Short (two buttons share a row). -->
+    <string name="packet_pkt_ft8_running">FT8 (läuft)</string>
+    <!-- Button on the PKT sheet that starts FT8. Short (two buttons share a row). -->
+    <string name="packet_pkt_ft8">FT8 über FM</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_text_hint">Tastatur-Chat-Betriebsarten wie bei fldigi: %1$s. FT8 über FM: die WSJT-X-Betriebsart auf diesem FM-Kanal, mit automatischen QSOs (SSB-FT8 kann es nicht hören).</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_terminal_section">Packet-Terminal</string>
+    <!-- Button on the PKT sheet that opens the packet terminal. Short (two buttons share a row). -->
+    <string name="packet_pkt_terminal">Terminal (BBS, Knoten)</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_terminal_hint">Verbinde dich auf diesem Kanal mit einer Packet-Mailbox (BBS) oder einem Knoten: %1$s.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_finder_section">Packet-Suche</string>
+    <!-- Button on the PKT sheet while the packet finder runs. Short (two buttons share a row). -->
+    <string name="packet_pkt_finder_listening">Packet-Suche (hört)</string>
+    <!-- Button on the PKT sheet that opens the packet finder; %1$d stations found. Short (two buttons share a row). -->
+    <string name="packet_pkt_finder_found">Packet-Suche (%1$d gefunden)</string>
+    <!-- Button on the PKT sheet that opens the packet finder. Short (two buttons share a row). -->
+    <string name="packet_pkt_finder">Packet-Suche</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_finder_hint">Hört die Packet-Frequenzen ab und listet die BBS, Knoten und Winlink-Gateways auf, die sie hört (nur Empfang).</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_winlink_section">Winlink-E-Mail</string>
+    <!-- Button on the PKT sheet that opens Winlink; %1$d unread messages. Short (two buttons share a row). -->
+    <string name="packet_pkt_winlink_new">Winlink (%1$d neu)</string>
+    <!-- Button on the PKT sheet that opens Winlink (a service name). Short (two buttons share a row). -->
+    <string name="packet_pkt_winlink">Winlink</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_winlink_hint">E-Mail über Funk via Winlink-Packet-Gateway oder über das Internet: %1$s.</string>
+    <!-- End of the Winlink hint: nothing waits to be sent. Lower case. -->
+    <string name="packet_pkt_winlink_outbox_empty">Postausgang leer</string>
+    <!-- End of the Winlink hint: %1$d messages wait to be sent. Lower case. -->
+    <string name="packet_pkt_winlink_outbox">%1$d im Postausgang</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_exam_section">US-Prüfungstraining (englisch)</string>
+    <!-- Button on the PKT sheet that opens licence exam practice. Short (two buttons share a row). -->
+    <string name="packet_pkt_exam">Prüfungstraining</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_exam_hint">Fragenkataloge der US-Klassen Technician, General und Extra: Probeprüfungen, Lernen nach Unterabschnitt, Wiederholen der falsch beantworteten Fragen.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_logbook_section">Logbuch</string>
+    <!-- Button on the PKT sheet that opens the logbook; %1$d contacts logged. Short. -->
+    <plurals name="packet_pkt_logbook_n">
+        <item quantity="one">Logbuch (%1$d QSO)</item>
+        <item quantity="other">Logbuch (%1$d QSOs)</item>
+    </plurals>
+    <!-- Button on the PKT sheet during a park or summit activation; %1$s the reference (K-1234). Short (two buttons share a row). -->
+    <string name="packet_pkt_activating">Aktivierung %1$s</string>
+    <!-- Button on the PKT sheet that opens Parks and Summits on the Air (programme names). Short (two buttons share a row). -->
+    <string name="packet_pkt_pota">POTA / SOTA</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_logbook_hint">Deine QSOs mit Rapporten und die Stationen, die das Funkgerät selbst gehört hat; Export als ADIF.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_fox_section">Fuchsjagd</string>
+    <!-- Button on the PKT sheet that opens the fox hunt. Short (two buttons share a row). -->
+    <string name="packet_pkt_fox">Fuchsjagd</string>
+    <!-- Start of the fox hunt hint while the fox beacon transmits. -->
+    <string name="packet_pkt_fox_on">🦊 Der Fuchssender ist an.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_fox_hint">Finde einen versteckten Sender: Signalstärke live, Kompasspeilungen und eine Schätzung, wo der Fuchs ist. Oder sei selbst der Fuchs.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_fox_hint_tx">Sei der Fuchs: ein Beacon, das andere suchen. Dieses Funkgerät meldet keine Signalstärke und kann deshalb selbst keinen Fuchs jagen.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_forms_section">Nachrichtenformulare</string>
+    <!-- Button on the PKT sheet that opens the message forms; %1$d forms saved (ICS-213 is a form name). Short (two buttons share a row). -->
+    <string name="packet_pkt_forms">ICS-213 und Radiogramme (%1$d)</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_forms_hint">Füll ein ICS-213 oder ein Radiogramm aus, lies es auf Sendung vor oder schick es per APRS oder DMR-Text; an dich gesendete Formulare werden hier wieder zusammengesetzt.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_nets_section">Funkrunden</string>
+    <!-- Button on the PKT sheet that lists nets nearby. Short (two buttons share a row). -->
+    <string name="packet_pkt_nets_near">Funkrunden in der Nähe</string>
+    <!-- Button on the PKT sheet while you run a net; %1$s its name. Short (two buttons share a row). -->
+    <string name="packet_pkt_net_running">Runde läuft: %1$s</string>
+    <!-- Button on the PKT sheet that opens net control. Short (two buttons share a row). -->
+    <string name="packet_pkt_net_control">Rundenleitung</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_nets_hint">Funkrunden in der Nähe: gerade aktiv (NetLogger und was das Funkgerät hört), wann sie wiederkommen, Erinnerungen. Rundenleitung: Leite eine Runde mit Check-ins, Verkehr, Markierungen für „Verspätet“ und „Abgemeldet“ und einem Bericht am Ende.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_keyer_section">Sprachspeicher und Kennungs-Timer</string>
+    <!-- Button on the PKT sheet that opens the voice keyer. Short (two buttons share a row). -->
+    <string name="packet_pkt_keyer">Sprachspeicher</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_keyer_hint">Nimm einen CQ-Ruf, die Eröffnung einer Runde oder deine Kennung einmal auf und sende sie mit einem Tippen.</string>
+    <!-- Sentence after the voice keyer hint: the station-ID timer is not running. -->
+    <string name="packet_pkt_id_timer_idle">Der Kennungs-Timer startet, sobald du auf einem Amateurfunkkanal sprichst.</string>
+    <!-- Sentence after the voice keyer hint: time left to identify. %1$d minutes, %2$s seconds (two digits). -->
+    <string name="packet_pkt_id_within">Nenne dein Rufzeichen innerhalb von %1$d:%2$s.</string>
+    <!-- Sentence after the voice keyer hint: identify now. -->
+    <string name="packet_pkt_id_due">Die Kennung ist jetzt fällig.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_morse_section">Morse</string>
+    <!-- Button on the PKT sheet that transmits your callsign in Morse. Short (two buttons share a row). -->
+    <string name="packet_pkt_morse_id">Mein Rufzeichen in Morse senden</string>
+    <!-- Toast when the Morse ID starts; %1$s your callsign. One line. -->
+    <string name="packet_pkt_morse_sending">Sende %1$s in Morse</string>
+    <!-- Button on the PKT sheet that opens the Morse trainer. Short (two buttons share a row). -->
+    <string name="packet_pkt_morse_trainer">Morsetrainer</string>
+    <!-- Morse hint on the PKT sheet, first sentence: the decoder is on. -->
+    <string name="packet_pkt_morse_rx_on">Morsezeichen auf Analogkanälen (zum Beispiel die Kennung eines Relais) werden dekodiert und in den Verlauf geschrieben.</string>
+    <!-- Morse hint, first sentence: the decoder is off. -->
+    <string name="packet_pkt_morse_rx_off">Der Morse-Decoder ist aus (Einstellungen).</string>
+    <!-- Morse hint, second sentence: the Morse ID is on. -->
+    <string name="packet_pkt_morse_id_on">Dein Rufzeichen wird nach dem Sprechen auf Amateurfunkkanälen in Morse gesendet, höchstens alle zehn Minuten.</string>
+    <!-- Morse hint, second sentence: the Morse ID is off. -->
+    <string name="packet_pkt_morse_id_off">In den Einstellungen lässt sich dein Rufzeichen alle zehn Minuten nach dem Sprechen auf Amateurfunkkanälen in Morse anhängen.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_schedules_section">Geplante Aktionen</string>
+    <!-- Button on the PKT sheet that opens the scheduled operations. Short (two buttons share a row). -->
+    <string name="packet_pkt_schedules">Zeitpläne …</string>
+    <!-- Button on the PKT sheet that opens the scheduled operations; %1$d schedules. Short (two buttons share a row). -->
+    <string name="packet_pkt_schedules_n">Zeitpläne (%1$d) …</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_pager_section">Pager</string>
+    <!-- Button on the PKT sheet that opens the pager page (POCSAG is a protocol name). Short (two buttons share a row). -->
+    <string name="packet_pkt_pocsag_page">POCSAG-Nachricht</string>
+    <!-- Button on the PKT sheet that stops the pager receiver. Short (two buttons share a row). -->
+    <string name="packet_pkt_pager_stop">Pager-Empfang stoppen</string>
+    <!-- Button on the PKT sheet that starts the pager receiver. Short (two buttons share a row). -->
+    <string name="packet_pkt_pager_hear">Pager empfangen</string>
+    <!-- Toast after the pager receiver starts. One line. -->
+    <string name="packet_pkt_pager_listening">Pager-Empfang läuft</string>
+    <!-- Toast after the pager receiver stops. One line. -->
+    <string name="packet_pkt_pager_off">Pager-Empfang aus</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_pager_hint">Sende eine alphanumerische Pager-Nachricht an eine oder mehrere RICs in einer Aussendung. Deine Pager-RICs stehen in den APRS-Einstellungen. Mit der Firmware, mit der das Telefon ausgeliefert wurde, meldet die Seite, dass sie die Symbol-Engine braucht.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_sstv_section">SSTV-Bilder</string>
+    <!-- Button on the PKT sheet that stops the SSTV receiver. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_stop">Empfang stoppen</string>
+    <!-- Button on the PKT sheet that stops listening for the space station's pictures. Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_sstv_stop">ISS-SSTV stoppen</string>
+    <!-- Toast after ISS SSTV stops. One line. -->
+    <string name="packet_pkt_iss_sstv_stopped">ISS-SSTV gestoppt</string>
+    <!-- Button on the PKT sheet that tunes the SSTV calling frequency and listens. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_rx_144500">Empfang auf 144,500</string>
+    <!-- Button on the PKT sheet that listens for SSTV on this channel. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_rx_here">Hier empfangen</string>
+    <!-- Button on the PKT sheet that listens for the space station's pictures; %1$s its frequency. Short (two buttons share a row). -->
+    <string name="packet_pkt_iss_sstv">ISS-SSTV %1$s</string>
+    <!-- Button on the PKT sheet that shows the SSTV picture as it comes in. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_live">Live-Bild</string>
+    <!-- Button on the PKT sheet that transmits a picture by SSTV. Short (two buttons share a row). -->
+    <string name="packet_pkt_sstv_send">Bild senden</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_sstv_hint">Empfängt Robot-, Martin-, Scottie- und PD-Modi (VIS-Erkennung automatisch); Bilder werden unter Download/DMR/SSTV gespeichert. Gesendet wird in Robot 24 Color, Robot 12 BW oder Robot 8 BW, den Modi, die in die Sendezeitbegrenzung von 30 s dieses Funkgeräts passen.</string>
+    <!-- Button on the PKT sheet, DTMF row (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_send">DTMF senden</string>
+    <!-- Button on the PKT sheet, DTMF row (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_heard">Gehört</string>
+    <!-- Button on the PKT sheet, DTMF row (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_remote">Fernsteuerung …</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_dtmf_hint">Tonwahl-Töne auf jedem Analogkanal werden dekodiert und protokolliert.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_dtmf_hint_off">Tonwahl-Töne auf jedem Analogkanal werden dekodiert und protokolliert (Decoder in den Einstellungen aus).</string>
+    <!-- Button on the PKT sheet that lists the weather alerts heard (NOAA is the US weather service). Short (two buttons share a row). -->
+    <string name="packet_pkt_wx_show">NOAA-Wetterwarnungen zeigen</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_wx_away_hint">Deine Region (Gerät → Region) hat keinen Wetterfunk nach NOAA-Art, deshalb steckt der Decoder für SAME-Warnungen hier; er dekodiert trotzdem Warnungen, die auf 162,400–162,550 MHz zu hören sind.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_wx_away_hint_off">Deine Region (Gerät → Region) hat keinen Wetterfunk nach NOAA-Art, deshalb steckt der Decoder für SAME-Warnungen hier; er dekodiert trotzdem Warnungen, die auf 162,400–162,550 MHz zu hören sind (in den Einstellungen aus).</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_wx_section">NOAA-Wetterwarnungen</string>
+    <!-- Button on the PKT sheet that lists the weather alerts heard. Short (two buttons share a row). -->
+    <string name="packet_pkt_wx_heard">Gehörte Warnungen</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_wx_hint">SAME-Warnköpfe auf den Wetterkanälen 162,400–162,550 MHz werden automatisch dekodiert und lösen eine Benachrichtigung aus.</string>
+    <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
+    <string name="packet_pkt_wx_hint_off">SAME-Warnköpfe auf den Wetterkanälen 162,400–162,550 MHz werden automatisch dekodiert und lösen eine Benachrichtigung aus (in den Einstellungen aus).</string>
+    <!-- ==== APRS status line at the top of the APRS group on the PKT sheet ("N0ABC-7 · monitoring 144.390 · KISS client connected · 3 rx / 1 tx"). Lower case. -->
+    <!-- Status line: no callsign is set. -->
+    <string name="packet_pkt_status_no_call">kein Rufzeichen eingetragen</string>
+    <!-- Status line: APRS monitoring on %1$s (the frequency, 144.390). -->
+    <string name="packet_pkt_status_monitoring">hört %1$s mit</string>
+    <!-- Status line: only passive decoding. -->
+    <string name="packet_pkt_status_passive">passiv</string>
+    <!-- Status line with the KISS TNC on: %1$s monitoring or passive, %2$s the client state, %3$d frames received, %4$d sent. KISS is a protocol name. -->
+    <string name="packet_pkt_status_kiss">%1$s · KISS %2$s · %3$d rx / %4$d tx</string>
+    <!-- Status line: an app is connected to the KISS TNC. -->
+    <string name="packet_pkt_status_kiss_client">Client verbunden</string>
+    <!-- Status line: no app is connected to the KISS TNC yet. -->
+    <string name="packet_pkt_status_kiss_waiting">warte auf Client</string>
+    <!-- ==== APRS message sheet. -->
+    <!-- Title of the APRS message sheet. One line. -->
+    <string name="packet_pkt_msg_title">APRS-Nachricht</string>
+    <!-- Label above a text field on the APRS message sheet. One line. -->
+    <string name="packet_pkt_msg_to">An (Rufzeichen-SSID)</string>
+    <!-- Label above a text field on the APRS message sheet. One line. -->
+    <string name="packet_pkt_msg_text">Nachricht (höchstens 67 Zeichen)</string>
+    <!-- Hint on the APRS message sheet. %1$s your callsign (or the next string), %2$s the digipeater path (WIDE1-1,WIDE2-1). -->
+    <string name="packet_pkt_msg_hint">Gesendet von %1$s über %2$s mit Nachrichtennummer, damit die Gegenstation sie bestätigt.</string>
+    <!-- In the APRS message hint instead of your callsign when none is set. -->
+    <string name="packet_pkt_msg_no_call">(Rufzeichen in den Einstellungen eintragen)</string>
+    <!-- Toast after an APRS message is queued. One line. -->
+    <string name="packet_pkt_msg_queued">Nachricht eingereiht</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_pkt_gw_section">Gateways</string>
+    <!-- Button on the PKT sheet (APRS message sheet) that sends a text message through SMSGTE. Short (two buttons share a row). -->
+    <string name="packet_pkt_gw_sms">SMS an ein Telefon</string>
+    <!-- Button on the PKT sheet (APRS message sheet) that sends an email through EMAIL-2. Short (two buttons share a row). -->
+    <string name="packet_pkt_gw_email">E-Mail senden</string>
+    <!-- Explanation under a group of buttons on the APRS message sheet. A few lines. -->
+    <string name="packet_pkt_gw_hint">Internet-Gateways, die über APRS erreichbar sind: eine SMS an ein Telefon (SMSGTE, Nummern in den USA und Kanada) oder eine E-Mail (EMAIL-2) – praktisch, wo es kein Mobilfunknetz gibt, aber ein APRS-iGate dich hört.</string>
+    <!-- ==== Gateway sheets (text a phone, send an email through APRS). -->
+    <!-- Title of the text-a-phone sheet. SMSGTE is the gateway's callsign: keep it. One line. -->
+    <string name="packet_pkt_gw_sms_title">SMS an ein Telefon (SMSGTE)</string>
+    <!-- Title of the send-an-email sheet. EMAIL-2 is the gateway's callsign: keep it. One line. -->
+    <string name="packet_pkt_gw_email_title">E-Mail senden (EMAIL-2)</string>
+    <!-- Label above a text field on the text-a-phone sheet. One line. -->
+    <string name="packet_pkt_gw_phone">Telefonnummer (10 Ziffern)</string>
+    <!-- Label above a text field on the send-an-email sheet. One line. -->
+    <string name="packet_pkt_gw_address">E-Mail-Adresse</string>
+    <!-- Label above a text field on the gateway sheets. One line. -->
+    <string name="packet_pkt_gw_message">Nachricht</string>
+    <!-- Counter under the gateway message. %1$d characters left (English keeps the plural form even for 1). -->
+    <plurals name="packet_pkt_gw_left">
+        <item quantity="one">Noch %1$d Zeichen frei (APRS-Nachrichten fassen 67)</item>
+        <item quantity="other">Noch %1$d Zeichen frei (APRS-Nachrichten fassen 67)</item>
+    </plurals>
+    <!-- Counter under the gateway message when it is too long. %1$d characters over (English keeps the plural form even for 1). -->
+    <plurals name="packet_pkt_gw_too_long">
+        <item quantity="one">%1$d Zeichen zu lang</item>
+        <item quantity="other">%1$d Zeichen zu lang</item>
+    </plurals>
+    <!-- Explanation under a group of buttons on the text-a-phone sheet. A few lines. -->
+    <string name="packet_pkt_gw_sms_hint">Wird als APRS-Nachricht an SMSGTE gesendet, das die SMS an das Telefon schickt. Eine Antwort vom Telefon kommt als APRS-Nachricht an dein Rufzeichen zurück, wenn der SMSGTE-Dienst dich kennt (siehe smsgte.org). Für den Empfänger gelten die üblichen SMS-Gebühren.</string>
+    <!-- Explanation under a group of buttons on the send-an-email sheet. A few lines. -->
+    <string name="packet_pkt_gw_email_hint">Wird als APRS-Nachricht an EMAIL-2 gesendet, das den Text von deinem Rufzeichen aus per E-Mail verschickt. Die meisten E-Mail-Gateways antworten mit einer Bestätigung; Antworten per E-Mail werden nicht zurückgeleitet.</string>
+    <!-- Toast when the phone number is too short. One line. -->
+    <string name="packet_pkt_gw_err_phone">Zehnstellige Telefonnummer</string>
+    <!-- Toast when the email address has no @. One line. -->
+    <string name="packet_pkt_gw_err_email">E-Mail-Adresse</string>
+    <!-- Toast after a gateway message is queued. One line. -->
+    <string name="packet_pkt_gw_queued">Nachricht für das Gateway eingereiht</string>
+    <!-- ==== DTMF remote control sheet. -->
+    <!-- Title of the DTMF remote control sheet. One line. -->
+    <string name="packet_pkt_remote_title">DTMF-Fernsteuerung</string>
+    <!-- Switch on the DTMF remote sheet. One or two lines. -->
+    <string name="packet_pkt_remote_answer">DTMF-Befehle auf diesem Telefon beantworten</string>
+    <!-- Label above a text field on the DTMF remote sheet. One line. -->
+    <string name="packet_pkt_remote_pin">PIN (4 bis 6 Ziffern, behalte sie für dich)</string>
+    <!-- DTMF remote sheet, before the list of command digits. -->
+    <string name="packet_pkt_remote_intro">Gib von einem anderen Funkgerät aus die PIN und dann eine Befehlsziffer als eine Folge ein (ein * davor und ein # danach sind erlaubt). Das Telefon antwortet 1,5 Sekunden später auf dem Kanal:</string>
+    <!-- DTMF remote sheet, after the list of command digits. -->
+    <string name="packet_pkt_remote_outro">Drei falsche PINs innerhalb von zehn Minuten sperren die Fernsteuerung für zehn Minuten. Die PIN erscheint nie im Verlauf. Sprachantworten enden auf Amateurfunkkanälen mit deinem Rufzeichen in Morse.</string>
+    <!-- Toast when the remote PIN is not 4 to 6 digits. One line. -->
+    <string name="packet_pkt_remote_err_pin">Die PIN hat 4 bis 6 Ziffern</string>
+    <!-- Toast after the DTMF remote settings are saved with it on. One line. -->
+    <string name="packet_pkt_remote_on">DTMF-Fernsteuerung an</string>
+    <!-- Toast after the DTMF remote settings are saved with it off. One line. -->
+    <string name="packet_pkt_remote_off">DTMF-Fernsteuerung aus</string>
+    <!-- ==== APRS object sheet. -->
+    <!-- Title of the APRS object sheet. One line. -->
+    <string name="packet_pkt_obj_title">APRS-Objekt</string>
+    <!-- Label above a text field on the APRS object sheet (the examples are object names: keep them). One line. -->
+    <string name="packet_pkt_obj_name">Name (höchstens 9 Zeichen, z. B. NETCTL oder HAZARD)</string>
+    <!-- Label above a text field on the APRS object sheet. One line. -->
+    <string name="packet_pkt_obj_position">Position (Breite, Länge)</string>
+    <!-- Label above a text field on the APRS object sheet (the codes /N, /!, \!, /E, /. stay). One line. -->
+    <string name="packet_pkt_obj_symbol">Symbol (Tabelle + Code: /N Rundenleitung, /! Polizei, \\! Notfall, /E Veranstaltung, /. X)</string>
+    <!-- Label above a text field on the APRS object sheet. One line. -->
+    <string name="packet_pkt_obj_comment">Kommentar</string>
+    <!-- Explanation under a group of buttons on the APRS object sheet. A few lines. -->
+    <string name="packet_pkt_obj_hint">Ein Objekt ist eine Markierung auf der APRS-Karte aller, die dir gehört: der Standort der Rundenleitung, eine Veranstaltung, eine Gefahrenstelle. „Entfernen“ sendet es erneut als gelöscht. Die Position ist anfangs deine eigene; ändere sie, um das Objekt woanders zu platzieren.</string>
+    <!-- Button on the APRS object sheet that sends the object (three share a row). Very short. -->
+    <string name="packet_pkt_obj_place">Setzen</string>
+    <!-- Button on the APRS object sheet that sends the object as deleted (three share a row). Very short. -->
+    <string name="packet_pkt_obj_remove">Entfernen</string>
+    <!-- Toast after an APRS object is queued. One line. -->
+    <string name="packet_pkt_obj_queued">Objekt eingereiht</string>
+    <!-- Toast after an APRS object removal is queued. One line. -->
+    <string name="packet_pkt_obj_removal_queued">Entfernen eingereiht</string>
+    <!-- Toast when the object position cannot be read. One line. -->
+    <string name="packet_pkt_obj_err_position">Position: Breite, Länge in Grad (z. B. 39.74, -104.99)</string>
+    <!-- ==== APRS bulletin sheet. -->
+    <!-- Title of the APRS bulletin sheet. One line. -->
+    <string name="packet_pkt_bln_title">APRS-Bulletin</string>
+    <!-- Label above a text field on the APRS bulletin sheet. One line. -->
+    <string name="packet_pkt_bln_number">Bulletin-Nummer (0 bis 9)</string>
+    <!-- Label above a text field on the APRS bulletin sheet. One line. -->
+    <string name="packet_pkt_bln_text">Text (höchstens 67 Zeichen)</string>
+    <!-- Explanation under a group of buttons on the APRS bulletin sheet. A few lines. -->
+    <string name="packet_pkt_bln_hint">Ein Bulletin geht an alle in Reichweite (BLN0 bis BLN9) und wird nicht bestätigt; die meisten APRS-Apps zeigen Bulletins auf einer Anschlagtafel. Sende es erneut, damit es aktuell bleibt.</string>
+    <!-- Toast after an APRS bulletin is queued. One line. -->
+    <string name="packet_pkt_bln_queued">Bulletin eingereiht</string>
+    <!-- Title of the list of bulletins heard. One line. -->
+    <string name="packet_pkt_blnheard_title">Gehörte Bulletins</string>
+    <!-- The list of bulletins heard is empty (NWS: the US weather service's announcements). -->
+    <string name="packet_pkt_blnheard_empty">Noch keine Bulletins oder NWS-Meldungen gehört.</string>
+    <!-- Row heading in the bulletins heard list: %1$s the bulletin (BLN1), %2$s the sender. Note the two spaces. -->
+    <string name="packet_pkt_blnheard_row">%1$s  von %2$s</string>
+    <!-- ==== Send DTMF sheet. -->
+    <!-- Title of the send-DTMF sheet. One line. -->
+    <string name="packet_pkt_dtmf_title">DTMF senden</string>
+    <!-- Label above a text field on the send-DTMF sheet. One line. -->
+    <string name="packet_pkt_dtmf_keys">Tasten (0–9, A–D, *, #)</string>
+    <!-- Button on the send-DTMF sheet that transmits the keys (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_transmit">Senden</string>
+    <!-- Toast after DTMF is queued. One line. -->
+    <string name="packet_pkt_dtmf_queued">DTMF eingereiht</string>
+    <!-- Button on the send-DTMF sheet that opens the saved sequences (three share a row). Very short. -->
+    <string name="packet_pkt_dtmf_saved">Gespeichert …</string>
+    <!-- Last item in the saved DTMF list: save what is typed. One line. -->
+    <string name="packet_pkt_dtmf_save_as">💾 Aktuelle Tasten speichern als …</string>
+    <!-- Title of the saved DTMF sequences list. One line. -->
+    <string name="packet_pkt_dtmf_saved_title">Gespeicherte DTMF-Folgen</string>
+    <!-- Hint in the name field when saving a DTMF sequence. -->
+    <string name="packet_pkt_dtmf_name_hint">Name (z. B. Relais ein)</string>
+    <!-- Title of the dialog that names a DTMF sequence. %1$s the keys. -->
+    <string name="packet_pkt_dtmf_save_title">%1$s speichern</string>
+    <!-- Toast after something is saved. One line. -->
+    <string name="packet_pkt_saved">Gespeichert</string>
+    <!-- Dialog button in the saved DTMF list that deletes one. Short. -->
+    <string name="packet_pkt_dtmf_delete_one">Eine löschen …</string>
+    <!-- Title of the list that picks the DTMF sequence to delete. One line. -->
+    <string name="packet_pkt_dtmf_delete_which">Welche löschen?</string>
+    <!-- Toast after something is deleted. One line. -->
+    <string name="packet_pkt_deleted">Gelöscht</string>
+    <!-- Explanation under a group of buttons on the SSTV live picture sheet (keep the folder path). A few lines. -->
+    <string name="packet_pkt_sstv_live_hint">Das Bild baut sich Zeile für Zeile auf, während eine Aussendung dekodiert wird. Fertige Bilder liegen unter Download/DMR/SSTV.</string>
+    <!-- Toast when Send picture is opened from somewhere that cannot pick a picture. One line. -->
+    <string name="packet_pkt_sstv_err_main">Vom Hauptbildschirm aus öffnen</string>
+    <!-- SSTV mode list: a mode longer than 30 s (the cool-down guard applies). %1$s the mode and its length ("Martin M1 (≈115 s)"). Note the two spaces. -->
+    <string name="packet_pkt_sstv_mode_long">%1$s  · lang</string>
+    <!-- Title of the SSTV mode list. One line. -->
+    <string name="packet_pkt_sstv_mode_title">SSTV-Modus</string>
+    <!-- Toast when an SSTV picture starts going out; %1$s the mode. One line. -->
+    <string name="packet_pkt_sstv_sending">Sende %1$s</string>
+    <!-- Toast when the chosen picture cannot be opened. One line. -->
+    <string name="packet_pkt_sstv_err_read">Das Bild ließ sich nicht lesen</string>
+    <!-- ==== Stations heard list. -->
+    <!-- Title of the APRS stations heard list. One line. -->
+    <string name="packet_pkt_stations_title">Gehörte Stationen</string>
+    <!-- The stations heard list is empty. Mic-E and NMEA are APRS format names. -->
+    <string name="packet_pkt_stations_empty">Noch nichts dekodiert. Positionen, Mic-E, Objekte und NMEA-Meldungen landen hier, mit Entfernung und Richtung von dir aus.</string>
+    <!-- Row heading in the stations list: %1$s the callsign, %2$s the distance in miles, %3$s the compass direction (N, NE …). Note the two spaces. -->
+    <string name="packet_pkt_station_dist">%1$s  %2$s mi %3$s</string>
+    <!-- Stations list, details line: speed. %1$s miles per hour. Very short. -->
+    <string name="packet_pkt_station_mph">%1$s mph</string>
+    <!-- Stations list, details line: altitude. %1$d feet. Very short. -->
+    <string name="packet_pkt_station_ft">%1$d ft</string>
+    <!-- Stations list, details line: the digipeater it came through. %1$s its callsign. Very short. -->
+    <string name="packet_pkt_station_via">über %1$s</string>
+    <!-- Toast when no map app can show the station. One line. -->
+    <string name="packet_pkt_no_map_app">Keine Karten-App</string>
+    <!-- Button under the stations list that saves them as a GPX file (GPX is a file format). Short. -->
+    <string name="packet_pkt_export_gpx">GPX exportieren</string>
+    <!-- Toast after the GPX file is saved; %1$s the file name. Keep the folder path. One line. -->
+    <string name="packet_pkt_gpx_saved">Gespeichert: Download/DMR/APRS/%1$s</string>
+    <!-- Title of Android's share sheet for the GPX file. One line. -->
+    <string name="packet_pkt_share_gpx">GPX teilen</string>
+    <!-- Toast when the GPX file cannot be written; %1$s the system's reason. One line. -->
+    <string name="packet_pkt_export_failed">Export fehlgeschlagen: %1$s</string>
+    <!-- Button under the stations list that empties it. Short. -->
+    <string name="packet_pkt_clear_list">Liste leeren</string>
+    <!-- ==== APRS log. -->
+    <!-- Title of the APRS log. One line. -->
+    <string name="packet_pkt_log_title">APRS-Log</string>
+    <!-- The APRS log is empty. -->
+    <string name="packet_pkt_log_empty">Nachrichten, Bestätigungen, Beacons, Digipeats und Statusmeldungen erscheinen hier, die neuesten zuerst.</string>
+    <!-- APRS log row for a message to you: %1$s the sender and addressee ("💬 N0ABC → N0XYZ-7"). Note the two spaces. -->
+    <string name="packet_pkt_log_for_you">%1$s  (für dich)</string>
+    <!-- ==== DTMF heard list. -->
+    <!-- Title of the DTMF heard list. One line. -->
+    <string name="packet_pkt_dtmflog_title">Gehörte DTMF-Folgen</string>
+    <!-- The DTMF heard list is empty. -->
+    <string name="packet_pkt_dtmflog_empty">Noch keine DTMF-Folgen dekodiert.</string>
+    <!-- DTMF heard row: %1$s the time, %2$d the channel number, %3$s its name. "ch" is short for channel. Note the two spaces. -->
+    <string name="packet_pkt_dtmflog_row">%1$s  K. %2$d %3$s</string>
+    <!-- ==== Weather alerts heard list. -->
+    <!-- Title of the weather alerts heard list. One line. -->
+    <string name="packet_pkt_wxlog_title">Gehörte Wetterwarnungen</string>
+    <!-- The weather alerts list is empty. RWT is the SAME code of the weekly test: keep it. -->
+    <string name="packet_pkt_wxlog_empty">Noch keine SAME-Warnköpfe dekodiert. Stell einen NOAA-Wetterkanal ein; der wöchentliche Test (RWT) ist meist der erste, den du siehst.</string>
+    <!-- ==== APRS and packet settings sheet. -->
+    <!-- Title of the APRS and packet settings sheet. One line. -->
+    <string name="packet_set_title">APRS- &amp; Packet-Einstellungen</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_callsign">Dein Rufzeichen</string>
+    <!-- Label above a text field on the APRS settings (SSID is the APRS station number). One line. -->
+    <string name="packet_set_ssid">SSID (0–15; 7 = Handfunkgerät, 9 = mobil)</string>
+    <!-- Label above a text field on the APRS settings (RIC is a pager address). One line. -->
+    <string name="packet_set_rics">Deine Pager-RICs (POCSAG; eine oder mehrere, z. B. 1234567; 1234568)</string>
+    <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
+    <string name="packet_set_identity_hint">Rufzeichen, SSID und RICs bilden zusammen deine Stationsidentität: APRS und M17 senden unter dem Rufzeichen, deine Pager-Nachrichten tragen es als Absender, und die Pager-Seite hört auf deine RICs.</string>
+    <!-- Label above a text field on the APRS settings (the codes /[, />, /- stay). One line. -->
+    <string name="packet_set_symbol">Symbol (Tabelle + Code, z. B. /[ Person, /> Auto, /- Haus)</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_comment">Beacon-Kommentar</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_path">Digipeater-Pfad</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_kiss_port">KISS-TNC-Port</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_set_is_section">APRS-IS (Internet)</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_server">Server</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_port">Port</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_passcode">Passcode (-1 = nur Empfang; wird nie angezeigt oder protokolliert)</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_beacon_min">Internet-Beacon alle N Minuten (0 = aus)</string>
+    <!-- Label above a text field on the APRS settings, APRS-IS group. One line. -->
+    <string name="packet_set_is_comment">Kommentar des Internet-Beacons</string>
+    <!-- Section heading in the APRS settings. %1$s the APRS frequency. One line, shown in capitals. -->
+    <string name="packet_set_auto_section">Automatische Beacons (nur auf %1$s)</string>
+    <!-- Choice pill for automatic beacons: timed. Short. -->
+    <string name="packet_set_auto_every">Alle N Minuten</string>
+    <!-- Label of the automatic beacon choice. Short. -->
+    <string name="packet_set_beacon">Beacon</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_beacon_min">Alle N Minuten (Modus „Alle N Minuten“)</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_telemetry">Telemetrie alle 30 min (Akku, Spannung, Temperatur, Luftdruck, Signal)</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_weather">Wetterbericht alle 30 min (Luftdruck)</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_igate">Zwei-Wege-iGate: Internet-Nachrichten an hier gehörte Stationen werden auf Funk gesendet</string>
+    <!-- Label above a text field on the APRS settings. One line. -->
+    <string name="packet_set_groups">Nachrichtengruppen, denen ich folge (durch Kommas getrennt, z. B. CQ,ARES)</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_set_passive_section">Passives APRS-Dekodieren</string>
+    <!-- Choice pill for passive decode: only flagged channels. Short. -->
+    <string name="packet_set_passive_flagged">Markierte Kanäle</string>
+    <!-- Choice pill for passive decode: all analog channels. Short. -->
+    <string name="packet_set_passive_every">Jeder Analogkanal</string>
+    <!-- Label of the passive decode choice. Short. -->
+    <string name="packet_set_decode_on">Dekodieren auf</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_set_power_section">Sendeleistung</string>
+    <!-- Label of the transmit power choice. Short. -->
+    <string name="packet_set_power">Leistung</string>
+    <!-- Choice pill: high power, the default. Short. -->
+    <string name="packet_set_power_high">Hoch (Standard)</string>
+    <!-- Choice pill: low power. Short. -->
+    <string name="packet_set_power_low">Niedrig</string>
+    <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
+    <string name="packet_set_power_hint">Gilt auf den Frequenzen, die die App selbst einstellt: APRS-Mithören auf %1$s (automatische Beacons, Auto-Acks, Digipeats), ISS-APRS und sein Beacon sowie SSTV auf 144,500. Nachrichten und Beacons, die von einem deiner Kanäle aus gesendet werden, nutzen die Leistung dieses Kanals.</string>
+    <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
+    <string name="packet_set_lead_section">Packet-Vorlauf (Test)</string>
+    <!-- Label of the lead-in kind choice (tone, flags, silence). Short. -->
+    <string name="packet_set_lead_sound">Klang</string>
+    <!-- Label of the lead-in length choice. Short. -->
+    <string name="packet_set_lead_length">Länge</string>
+    <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
+    <string name="packet_set_lead_hint">Wird vor jedem Paket gesendet, während sich das Sende-Audio des Funkgeräts einschwingt (es geht erst etwa 1 s nach dem Träger auf Sendung). Flags (Standard) sind das übliche AX.25-TXDELAY, das jeder TNC sendet; Ton ist ein gleichmäßiger 1200-Hz-Ton; Stille ist unmodulierter Träger. Labortest mit 252 Paketen: Bei 1,6 s dekodieren alle drei gleich gut, Stille ist bei kurzer Länge am schwächsten. Kürzere Längen sind zum Testen mit deinen Digipeatern gedacht. SSTV und DTMF behalten ihren eigenen Vorlauf.</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_autoack">An mich gerichtete Nachrichten automatisch bestätigen (beim Mithören)</string>
+    <!-- Explanation under a group of buttons on the APRS settings. A few lines. -->
+    <string name="packet_set_autoack_off">Auto-Ack ist auf diesem Funkgerät aus: Es hat kein 2-m-Band, deshalb werden Nachrichten nicht automatisch bestätigt.</string>
+    <!-- Switch in the APRS settings (WIDE1-1 is a path name). One or two lines. -->
+    <string name="packet_set_digi">Lückenfüller-Digipeater für WIDE1-1 (beim Mithören)</string>
+    <!-- Switch in the APRS settings. One line. -->
+    <string name="packet_set_dtmf">DTMF-Decoder</string>
+    <!-- Switch in the APRS settings. One line. -->
+    <string name="packet_set_same">NOAA-SAME-Wetterwarnungen</string>
+    <!-- Switch in the APRS settings. One line. -->
+    <string name="packet_set_morse">Morse-Decoder</string>
+    <!-- Switch in the APRS settings. One or two lines. -->
+    <string name="packet_set_morse_id">Morse-Kennung nach dem Sprechen (Amateurfunkkanäle, alle 10 min)</string>
+    <!-- Toast when the callsign is not valid. One line. -->
+    <string name="packet_set_err_callsign">Rufzeichen: 1 bis 6 Buchstaben und Ziffern; die SSID kommt in ihr eigenes Feld</string>
+    <!-- Toast when the SSID is out of range. One line. -->
+    <string name="packet_set_err_ssid">Die SSID liegt zwischen 0 und 15</string>
+    <!-- Toast when a number in the settings cannot be read. One line. -->
+    <string name="packet_set_err_numbers">Prüfe die Zahlen</string>
+    <!-- State pill of a switch on the packet sheets: on. Very short, capitals. -->
+    <string name="packet_toggle_on">EIN</string>
+    <!-- State pill of a switch on the packet sheets: off. Very short, capitals. -->
+    <string name="packet_toggle_off">AUS</string>
+    <!-- ==== Joining text. -->
+    <!-- Between two whole sentences built separately (a space in English; empty for languages that write no space). -->
+    <string name="packet_sentence_sep">\u0020</string>
+    <!-- Between the items of a short list ("every 15 min, telemetry every 30 min"). -->
+    <string name="packet_list_sep">,\u0020</string>
+</resources>

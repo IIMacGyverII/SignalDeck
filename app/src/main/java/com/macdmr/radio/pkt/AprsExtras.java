@@ -37,9 +37,9 @@ public final class AprsExtras {
     }
 
     /** The definitions sent as messages to yourself: names, units and scaling (value = a·x² + b·x + c). */
-    public static final String PARM = "PARM.Battery,Volts,Temp,Pressure,Signal";
-    public static final String UNIT = "UNIT.%,V,C,hPa,dBm";
-    public static final String EQNS = "EQNS.0,1,0,0,0.01,3,0,1,-40,0,1,900,0,1,-140";
+    public static final String PARM = "PARM.Battery,Volts,Temp,Pressure,Signal";   // i18n: sent on air
+    public static final String UNIT = "UNIT.%,V,C,hPa,dBm";   // i18n: sent on air
+    public static final String EQNS = "EQNS.0,1,0,0,0.01,3,0,1,-40,0,1,900,0,1,-140";   // i18n: sent on air
 
     /** Raw telemetry values for {@link #EQNS}: battery %, volts, °C, sea-level hPa, dBm. */
     public static int[] telemetryValues(int batteryPct, double volts, double tempC, double hpa, int dbm) {
@@ -64,7 +64,7 @@ public final class AprsExtras {
         int gt = tnc2.indexOf('>'), colon = tnc2.indexOf(':', gt);
         if (gt <= 0 || colon < 0) return null;
         String src = tnc2.substring(0, gt), dst = tnc2.substring(gt + 1, colon).split(",")[0];
-        return "}" + src + ">" + dst + ",TCPIP," + myCall + "*" + tnc2.substring(colon);
+        return "}" + src + ">" + dst + ",TCPIP," + myCall + "*" + tnc2.substring(colon);   // i18n: sent on air
     }
 
     /**

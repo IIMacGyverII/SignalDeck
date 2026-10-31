@@ -20,7 +20,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.macdmr.radio.ChannelStore;
+import com.macdmr.radio.R;
 import com.macdmr.radio.RadioService;
+import com.macdmr.radio.i18n.Txt;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,7 +49,7 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
     private TextView analogNote;
     private ChannelStore.Contact peer;
     private final List<ChannelStore.Message> msgs = new ArrayList<>();
-    private final SimpleDateFormat tf = new SimpleDateFormat("HH:mm", java.util.Locale.US), df = new SimpleDateFormat("MMM d  HH:mm", java.util.Locale.US);
+    private final SimpleDateFormat tf = new SimpleDateFormat("HH:mm", java.util.Locale.US), df = Txt.dates("MMM d  HH:mm", "MMMdHHmm");
 
     public MessagesView(Context c) {
         super(c);
@@ -55,12 +57,12 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
         float d = Theme.dp(c);
         content = new FrameLayout(c);
         listPage = new LinearLayout(c); listPage.setOrientation(VERTICAL);
-        header = Neo.header(c, "Messages", "DMR text");
-        ImageView mon = Neo.iconButton(c, "scan", Neo.VIOLET, "Pager monitor");
+        header = Neo.header(c, Txt.s(R.string.packet_msg_title), Txt.s(R.string.packet_msg_sub));
+        ImageView mon = Neo.iconButton(c, "scan", Neo.VIOLET, Txt.s(R.string.packet_msg_cd_monitor));
         mon.setOnClickListener(v -> toggleMonitor());
         mon.setOnLongClickListener(v -> { editScan(); return true; });
         Neo.addAction(header, mon);
-        ImageView add = Neo.iconButton(c, "plus", Neo.GREEN, "New message");
+        ImageView add = Neo.iconButton(c, "plus", Neo.GREEN, Txt.s(R.string.packet_msg_new));
         add.setOnClickListener(v -> newMessage());
         Neo.addAction(header, add);
         listPage.addView(header);
@@ -73,10 +75,10 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
         empty = new LinearLayout(c); empty.setOrientation(VERTICAL); empty.setGravity(Gravity.CENTER_HORIZONTAL); empty.setPadding((int) (32 * d), (int) (70 * d), (int) (32 * d), 0);
         ImageView art = Neo.iconTile(c, "messages", Neo.CYAN, 96);
         empty.addView(art, new LayoutParams((int) (96 * d), (int) (96 * d)));
-        TextView et = Neo.text(c, "No messages yet", Neo.TEXT, 20, Neo.ui(c)); et.setPadding(0, (int) (22 * d), 0, 0); empty.addView(et);
-        TextView eb = Neo.text(c, "Write to a contact, a talkgroup or the current channel's call target. Texts travel on DMR channels; incoming ones appear here and in the intercom history.", Neo.MUTED, 14.5f, Neo.uiMedium(c));
+        TextView et = Neo.text(c, Txt.s(R.string.packet_msg_empty_title), Neo.TEXT, 20, Neo.ui(c)); et.setPadding(0, (int) (22 * d), 0, 0); empty.addView(et);
+        TextView eb = Neo.text(c, Txt.s(R.string.packet_msg_empty_body), Neo.MUTED, 14.5f, Neo.uiMedium(c));
         eb.setGravity(Gravity.CENTER); eb.setLineSpacing(0, 1.15f); eb.setPadding(0, (int) (8 * d), 0, (int) (22 * d)); empty.addView(eb);
-        TextView start = Neo.button(c, "New message", "plus", Neo.GREEN);
+        TextView start = Neo.button(c, Txt.s(R.string.packet_msg_new), "plus", Neo.GREEN);
         start.setOnClickListener(v -> newMessage());
         empty.addView(start, new LayoutParams((int) (220 * d), LayoutParams.WRAP_CONTENT));
         listPage.addView(empty);
@@ -92,7 +94,7 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
         if (svc == null) return;
         convs.clear(); convs.addAll(svc.conversations()); convAdapter.notifyDataSetChanged();
         empty.setVisibility(convs.isEmpty() ? VISIBLE : GONE);
-        Neo.headerSubtitle(header).setText(convs.isEmpty() ? "DMR TEXT" : (convs.size() + (convs.size() == 1 ? " conversation" : " conversations")).toUpperCase(java.util.Locale.US));
+        Neo.headerSubtitle(header).setText((convs.isEmpty() ? Txt.s(R.string.packet_msg_sub) : Txt.p(R.plurals.packet_msg_conversations, convs.size(), convs.size())).toUpperCase(Txt.locale()));
     }
 
     public boolean back() { if (threadPage != null) { content.removeView(threadPage); threadPage = null; peer = null; dataThread = null; if (svc != null) svc.watchingThread(""); reload(); return true; } return false; }
@@ -101,7 +103,7 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
     private TextView pageBanner;
 
     @Override public void onPage(String threadKey, String line) {
-        if (dataThread != null && threadKey != null && !threadKey.equals(dataThread) && pageBanner != null) { pageBanner.setText("Also heard: " + line); pageBanner.setVisibility(View.VISIBLE); }
+        if (dataThread != null && threadKey != null && !threadKey.equals(dataThread) && pageBanner != null) { pageBanner.setText(Txt.s(R.string.packet_msg_also_heard, line)); pageBanner.setVisibility(View.VISIBLE); }
         reload();
         if (dataThread != null && threadKey != null && threadKey.equals(dataThread)) loadData();
     }
@@ -109,10 +111,10 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
     private void toggleMonitor() {
         if (svc == null) return;
         boolean on = svc.pager() != null && svc.pager().monitoring();
-        if (on) { svc.pager().monitor(false); android.widget.Toast.makeText(getContext(), "Pager monitor off", android.widget.Toast.LENGTH_SHORT).show(); reload(); return; }
+        if (on) { svc.pager().monitor(false); android.widget.Toast.makeText(getContext(), Txt.s(R.string.packet_msg_monitor_off), android.widget.Toast.LENGTH_SHORT).show(); reload(); return; }
         int[] hz = scanHz();
         String e = svc.setPagerMonitor(true, hz, 1200);
-        android.widget.Toast.makeText(getContext(), e == null ? "Listening for pages" : e, android.widget.Toast.LENGTH_LONG).show();
+        android.widget.Toast.makeText(getContext(), e == null ? Txt.s(R.string.packet_pkt_pager_listening) : e, android.widget.Toast.LENGTH_LONG).show();
         reload();
     }
 
@@ -127,9 +129,9 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
         final android.widget.EditText et = new android.widget.EditText(getContext());
         et.setText(getContext().getSharedPreferences("pager", android.content.Context.MODE_PRIVATE).getString("scan", "467625000,467650000"));
         et.setTextColor(Neo.TEXT);
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Pager frequencies").setMessage("Hertz, separated by commas. Monitor waits a full batch on each, and stays while a preamble is heard.").setView(et)
-                .setPositiveButton("Save", (d, w) -> getContext().getSharedPreferences("pager", android.content.Context.MODE_PRIVATE).edit().putString("scan", et.getText().toString().trim()).apply())
-                .setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.packet_msg_scan_title)).setMessage(Txt.s(R.string.packet_msg_scan_body)).setView(et)
+                .setPositiveButton(Txt.s(R.string.common_save), (d, w) -> getContext().getSharedPreferences("pager", android.content.Context.MODE_PRIVATE).edit().putString("scan", et.getText().toString().trim()).apply())
+                .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void openDataThread(ChannelStore.Conversation cv) {
@@ -138,9 +140,9 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
         if (svc != null) svc.watchingThread(cv.threadKey);
         if (threadPage != null) content.removeView(threadPage);
         threadPage = new LinearLayout(c); threadPage.setOrientation(VERTICAL); threadPage.setBackground(Neo.page(c));
-        String kind = "page".equals(cv.transport) ? "Pager" : "M17";
+        String kind = "page".equals(cv.transport) ? Txt.s(R.string.packet_msg_kind_pager) : "M17";
         LinearLayout bar = Neo.header(c, cv.name == null || cv.name.isEmpty() ? kind : cv.name, kind);
-        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, "Back"); back.setOnClickListener(v -> back());
+        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, Txt.s(R.string.common_back)); back.setOnClickListener(v -> back());
         LayoutParams bl = new LayoutParams((int) (44 * d), (int) (44 * d)); bl.rightMargin = (int) (12 * d);
         bar.addView(back, 0, bl);
         threadPage.addView(bar);
@@ -155,18 +157,18 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
         if (svc == null || svc.pager() == null || !svc.pager().monitoring()) {
             LinearLayout compose = new LinearLayout(c); compose.setGravity(Gravity.CENTER_VERTICAL); compose.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (10 * d));
             compose.setBackgroundColor(Neo.BAR);
-            final android.widget.EditText input = new android.widget.EditText(c); input.setHint("page".equals(cv.transport) ? "Page" : "M17 text"); input.setTextColor(Neo.TEXT); input.setHintTextColor(Neo.DIM);
+            final android.widget.EditText input = new android.widget.EditText(c); input.setHint(Txt.s("page".equals(cv.transport) ? R.string.packet_msg_hint_page : R.string.packet_msg_hint_m17)); input.setTextColor(Neo.TEXT); input.setHintTextColor(Neo.DIM);
             input.setBackground(Neo.card(c, Neo.alpha(Neo.CYAN, 0x33), 14)); input.setPadding((int) (14 * d), (int) (8 * d), (int) (14 * d), (int) (8 * d));
             compose.addView(input, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             ImageView send = new ImageView(c); send.setImageDrawable(new Neo.IconDrawable("send", 0xFF04121A)); send.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-            int sp = (int) (12 * d); send.setPadding(sp, sp, sp, sp); send.setContentDescription("Send");
+            int sp = (int) (12 * d); send.setPadding(sp, sp, sp, sp); send.setContentDescription(Txt.s(R.string.common_send));
             android.graphics.drawable.GradientDrawable sg = new android.graphics.drawable.GradientDrawable(); sg.setShape(android.graphics.drawable.GradientDrawable.OVAL); sg.setColor(Neo.GREEN); send.setBackground(sg);
             LayoutParams sl = new LayoutParams((int) (46 * d), (int) (46 * d)); sl.leftMargin = (int) (8 * d);
             compose.addView(send, sl);
             send.setOnClickListener(v -> sendData(cv, input));
             threadPage.addView(compose);
             if ("page".equals(cv.transport) && cv.threadKey != null && cv.threadKey.startsWith("ric:")) {
-                TextView save = Neo.button(c, "Save as contact", "plus", Neo.CYAN);
+                TextView save = Neo.button(c, Txt.s(R.string.packet_msg_save_contact), "plus", Neo.CYAN);
                 save.setOnClickListener(v -> saveRic(cv));
                 threadPage.addView(save);
             }
@@ -201,29 +203,29 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
     }
 
     private void saveRic(ChannelStore.Conversation cv) {
-        final android.widget.EditText name = new android.widget.EditText(getContext()); name.setHint("Name"); name.setTextColor(Neo.TEXT);
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Save RIC " + cv.address).setView(name).setPositiveButton("Save", (d, w) -> {
+        final android.widget.EditText name = new android.widget.EditText(getContext()); name.setHint(Txt.s(R.string.packet_msg_ric_name)); name.setTextColor(Neo.TEXT);
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.packet_msg_ric_title, cv.address)).setView(name).setPositiveButton(Txt.s(R.string.common_save), (d, w) -> {
             ChannelStore.Contact ct = new ChannelStore.Contact(); ct.name = name.getText().toString().trim(); ct.rics = cv.address; ct.type = 0;
             if (!ct.name.isEmpty()) svc.store().insertContact(ct);
-        }).setNeutralButton("Mute", (d, w) -> { try { svc.muteRic(Integer.parseInt(cv.address), true); } catch (Exception ignored) { } }).setNegativeButton("Cancel", null).show();
+        }).setNeutralButton(Txt.s(R.string.packet_msg_ric_mute), (d, w) -> { try { svc.muteRic(Integer.parseInt(cv.address), true); } catch (Exception ignored) { } }).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void newMessage() {
         final Context c = getContext();
         if (svc == null) return;
         final List<ChannelStore.Contact> cts = svc.store().contacts();
-        String[] names = new String[cts.size() + 1]; names[0] = "Current channel's call target";
+        String[] names = new String[cts.size() + 1]; names[0] = Txt.s(R.string.packet_msg_to_current);
         for (int i = 0; i < cts.size(); i++) names[i + 1] = cts.get(i).name + "  (" + cts.get(i).number + ")";
-        new android.app.AlertDialog.Builder(c).setTitle("Message to").setItems(names, (dd, w) -> {
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.packet_msg_to_title)).setItems(names, (dd, w) -> {
             ChannelStore.Contact ct;
-            if (w == 0) { ChannelStore.Channel ch = svc.current(); if (ch == null || ch.txContact <= 0) { android.widget.Toast.makeText(c, "Current channel has no call target", android.widget.Toast.LENGTH_LONG).show(); return; }
+            if (w == 0) { ChannelStore.Channel ch = svc.current(); if (ch == null || ch.txContact <= 0) { android.widget.Toast.makeText(c, Txt.s(R.string.packet_msg_err_no_target), android.widget.Toast.LENGTH_LONG).show(); return; }
                 ct = new ChannelStore.Contact(); ct.number = ch.txContact; ct.type = ch.contactType; ct.name = svc.store().contactName(ch.txContact, ch.contactType); }
             else ct = cts.get(w - 1);
             openThread(ct);
         }).show();
     }
 
-    private static String peerLabel(ChannelStore.Contact ct) { return (ct.type == 1 ? "TG " : ct.type == 2 ? "ALL " : "ID ") + ct.number; }
+    private static String peerLabel(ChannelStore.Contact ct) { return Txt.s(ct.type == 1 ? R.string.packet_msg_peer_tg : ct.type == 2 ? R.string.packet_msg_peer_all : R.string.packet_msg_peer_id, ct.number); }
 
     public void openThread(ChannelStore.Contact ct) {
         final Context c = getContext(); float d = Theme.dp(c);
@@ -231,14 +233,14 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
         if (threadPage != null) content.removeView(threadPage);
         threadPage = new LinearLayout(c); threadPage.setOrientation(VERTICAL); threadPage.setBackground(Neo.page(c));
         String title = ct.name == null || ct.name.isEmpty() ? peerLabel(ct) : ct.name;
-        LinearLayout bar = Neo.header(c, title, ct.name == null || ct.name.isEmpty() ? (ct.type == 1 ? "Talkgroup" : ct.type == 2 ? "All call" : "Private") : peerLabel(ct));
-        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, "Back"); back.setOnClickListener(v -> back());
+        LinearLayout bar = Neo.header(c, title, ct.name == null || ct.name.isEmpty() ? Txt.s(ct.type == 1 ? R.string.packet_msg_type_tg : ct.type == 2 ? R.string.packet_msg_type_all : R.string.packet_msg_type_private) : peerLabel(ct));
+        ImageView back = Neo.iconButton(c, "left", Neo.CYAN, Txt.s(R.string.common_back)); back.setOnClickListener(v -> back());
         LayoutParams bl = new LayoutParams((int) (44 * d), (int) (44 * d)); bl.rightMargin = (int) (12 * d);
         bar.addView(back, 0, bl);
         LayoutParams avl = new LayoutParams((int) (38 * d), (int) (38 * d)); avl.rightMargin = (int) (10 * d);
         bar.addView(ContactsView.avatar(c, ct.type, ct.name, 38), 1, avl);
         threadPage.addView(bar);
-        analogNote = Neo.text(c, "This channel is analog: switch to a DMR channel to send text.", Neo.AMBER_LIGHT, 13.5f, Neo.uiSemi(c));
+        analogNote = Neo.text(c, Txt.s(R.string.packet_msg_analog_note), Neo.AMBER_LIGHT, 13.5f, Neo.uiSemi(c));
         analogNote.setGravity(Gravity.CENTER); analogNote.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (8 * d));
         analogNote.setBackground(Neo.outline(c, Neo.AMBER, 0x18, 10, 1));
         LayoutParams anl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); anl.setMargins((int) (16 * d), (int) (8 * d), (int) (16 * d), 0);
@@ -251,23 +253,23 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
 
         LinearLayout compose = new LinearLayout(c); compose.setGravity(Gravity.CENTER_VERTICAL); compose.setPadding((int) (12 * d), (int) (8 * d), (int) (12 * d), (int) (10 * d));
         compose.setBackgroundColor(Neo.BAR);
-        ImageView quick = Neo.iconButton(c, "bolt", Neo.AMBER, "Quick replies");
+        ImageView quick = Neo.iconButton(c, "bolt", Neo.AMBER, Txt.s(R.string.packet_msg_quick));
         LayoutParams ql = new LayoutParams((int) (44 * d), (int) (44 * d)); ql.rightMargin = (int) (8 * d);
         compose.addView(quick, ql);
-        final EditText input = new EditText(c); input.setHint("Message"); input.setTextColor(Neo.TEXT); input.setHintTextColor(Neo.DIM); input.setTextSize(16); input.setTypeface(Neo.uiSemi(c));
+        final EditText input = new EditText(c); input.setHint(Txt.s(R.string.packet_msg_hint)); input.setTextColor(Neo.TEXT); input.setHintTextColor(Neo.DIM); input.setTextSize(16); input.setTypeface(Neo.uiSemi(c));
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE); input.setMaxLines(3); input.setMinHeight((int) (44 * d));
         input.setBackground(Neo.card(c, Neo.alpha(Neo.CYAN, 0x33), 14)); input.setPadding((int) (14 * d), (int) (8 * d), (int) (14 * d), (int) (8 * d));
         quick.setOnClickListener(v -> quickReplies(input));
         compose.addView(input, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         ImageView send = new ImageView(c); send.setImageDrawable(new Neo.IconDrawable("send", 0xFF04121A)); send.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        int sp = (int) (12 * d); send.setPadding(sp, sp, sp, sp); send.setContentDescription("Send"); send.setClickable(true); send.setFocusable(true);
+        int sp = (int) (12 * d); send.setPadding(sp, sp, sp, sp); send.setContentDescription(Txt.s(R.string.common_send)); send.setClickable(true); send.setFocusable(true);
         android.graphics.drawable.GradientDrawable sg = new android.graphics.drawable.GradientDrawable(); sg.setShape(android.graphics.drawable.GradientDrawable.OVAL); sg.setColor(Neo.GREEN); send.setBackground(sg);
         LayoutParams sl = new LayoutParams((int) (46 * d), (int) (46 * d)); sl.leftMargin = (int) (8 * d);
         compose.addView(send, sl);
         send.setOnClickListener(v -> {
             String t = input.getText().toString().trim();
             if (t.isEmpty() || svc == null) return;
-            if (svc.current() == null || !svc.current().isDigital()) { android.widget.Toast.makeText(c, "Switch to a DMR channel to send text", android.widget.Toast.LENGTH_LONG).show(); return; }
+            if (svc.current() == null || !svc.current().isDigital()) { android.widget.Toast.makeText(c, Txt.s(R.string.packet_msg_err_analog), android.widget.Toast.LENGTH_LONG).show(); return; }
             input.setText("");
             svc.sendSms(peer, t);
             loadThread();
@@ -287,7 +289,7 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
 
     /** Delivery mark for an outgoing text: colour and wording by module status. */
     private static int statusColor(int status) { return status == 1 ? Neo.GREEN : status == 2 ? Neo.RED : status == 3 ? Neo.AMBER : Neo.DIM; }
-    private static String statusText(int status) { return status == 1 ? "✓✓ delivered" : status == 2 ? "✖ not sent" : status == 3 ? "✓ sent, no acknowledgement" : "sending…"; }
+    private static String statusText(int status) { return Txt.s(status == 1 ? R.string.packet_msg_st_delivered : status == 2 ? R.string.packet_msg_st_failed : status == 3 ? R.string.packet_msg_st_no_ack : R.string.packet_msg_st_sending); }
 
     private final class ConvAdapter extends BaseAdapter {
         @Override public int getCount() { return convs.size(); } @Override public Object getItem(int i) { return convs.get(i); } @Override public long getItemId(int i) { return i; }
@@ -318,16 +320,17 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
             LinearLayout av = row.findViewWithTag("av"); av.removeAllViews();
             av.addView(ContactsView.avatar(c, cv.type, cv.name, 46), new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
             ChannelStore.Contact tmp = new ChannelStore.Contact(); tmp.type = cv.type; tmp.number = cv.peer;
-            String chip = "page".equals(cv.transport) ? "PAGE  " : "m17".equals(cv.transport) ? "M17  " : "";
+            String who = cv.name == null || cv.name.isEmpty() ? peerLabel(tmp) : cv.name;
+            if ("page".equals(cv.transport)) who = Txt.s(R.string.packet_msg_chip_page, who); else if ("m17".equals(cv.transport)) who = "M17  " + who;
             String unread = cv.unread > 0 ? "  (" + cv.unread + ")" : "";
-            ((TextView) row.findViewWithTag("name")).setText(chip + (cv.name == null || cv.name.isEmpty() ? peerLabel(tmp) : cv.name) + unread);
+            ((TextView) row.findViewWithTag("name")).setText(who + unread);
             ((TextView) row.findViewWithTag("time")).setText(df.format(new Date(cv.lastTs)));
-            ((TextView) row.findViewWithTag("last")).setText((cv.outgoing ? "You: " : "") + cv.lastText);
+            ((TextView) row.findViewWithTag("last")).setText(cv.outgoing ? Txt.s(R.string.packet_msg_you, cv.lastText) : cv.lastText);
             return v;
         }
     }
 
-    private static final String DEFAULT_QUICK = "QSL\nCopy, I will call you back\nOn my way\nWhere are you?\nSwitch to the other channel\nAll OK here";
+    private static final String DEFAULT_QUICK = "QSL\nCopy, I will call you back\nOn my way\nWhere are you?\nSwitch to the other channel\nAll OK here";   // i18n: sent on air (default texts; the user edits the list)
     private java.util.List<String> quickList() {
         java.util.List<String> out = new java.util.ArrayList<>();
         for (String s : getContext().getSharedPreferences("radio", Context.MODE_PRIVATE).getString("quickReplies", DEFAULT_QUICK).split("\n")) if (!s.trim().isEmpty()) out.add(s.trim());
@@ -336,14 +339,14 @@ public class MessagesView extends LinearLayout implements RadioService.Listener 
     /** Canned texts: one tap fills the composer; the last entry edits the list. */
     private void quickReplies(final EditText input) {
         final java.util.List<String> q = quickList();
-        String[] items = new String[q.size() + 1]; for (int i = 0; i < q.size(); i++) items[i] = q.get(i); items[q.size()] = "Edit quick replies…";
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Quick replies").setItems(items, (d2, w) -> {
+        String[] items = new String[q.size() + 1]; for (int i = 0; i < q.size(); i++) items[i] = q.get(i); items[q.size()] = Txt.s(R.string.packet_msg_quick_edit);
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.packet_msg_quick)).setItems(items, (d2, w) -> {
             if (w < q.size()) { input.setText(q.get(w)); input.setSelection(input.getText().length()); return; }
             final EditText et = new EditText(getContext()); et.setText(String.join("\n", q)); et.setMinLines(5);
             et.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-            new android.app.AlertDialog.Builder(getContext()).setTitle("Quick replies").setMessage("One message per line.").setView(et)
-                    .setPositiveButton("Save", (d3, w3) -> getContext().getSharedPreferences("radio", Context.MODE_PRIVATE).edit().putString("quickReplies", et.getText().toString()).apply())
-                    .setNegativeButton("Cancel", null).show();
+            new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.packet_msg_quick)).setMessage(Txt.s(R.string.packet_msg_quick_body)).setView(et)
+                    .setPositiveButton(Txt.s(R.string.common_save), (d3, w3) -> getContext().getSharedPreferences("radio", Context.MODE_PRIVATE).edit().putString("quickReplies", et.getText().toString()).apply())
+                    .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
         }).show();
     }
 

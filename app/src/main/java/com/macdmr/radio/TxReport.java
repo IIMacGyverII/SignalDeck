@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
  * </pre>
  * Times in a key are milliseconds from the moment SignalDeck pressed the key; temperatures are null when unreadable.
  * The callsign and DMR ID configured in the app never appear in the exported file: {@link #redact} replaces them.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class TxReport {
     public static final int SCHEMA = 1;

@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Msg;
+import com.macdmr.radio.i18n.Txt;
 import android.graphics.Bitmap;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
@@ -46,7 +48,7 @@ import java.util.Locale;
  */
 public final class RecordingDecodeJob {
     public static final String SSTV = "sstv", APRS = "aprs";
-    public static final String UPLOADED = "Uploaded";
+    public static final String UPLOADED = "Uploaded";   // i18n: folder name
     static final String[] AUDIO = { ".wav", ".mp3", ".m4a", ".aac", ".ogg", ".opus", ".flac", ".3gp", ".amr" };
 
     public final String mode; public final File file;
@@ -94,9 +96,9 @@ public final class RecordingDecodeJob {
     /** Start decoding (null), or why not. */
     public static synchronized String start(String mode, File f, RadioService svc) {
         RecordingDecodeJob j = current;
-        if (j != null && !j.done) return "A recording is already being decoded (" + j.file.getName() + ")";
-        if (f == null || !f.isFile()) return "Recording not found";
-        if (!SSTV.equals(mode) && !APRS.equals(mode)) return "Unknown mode";
+        if (j != null && !j.done) return Txt.s(R.string.modes_rec_err_busy, j.file.getName());
+        if (f == null || !f.isFile()) return Txt.s(R.string.modes_rec_err_missing);
+        if (!SSTV.equals(mode) && !APRS.equals(mode)) return Txt.s(R.string.modes_rec_err_mode);
         final RecordingDecodeJob job = new RecordingDecodeJob(mode, f); current = job;
         Thread t = new Thread(() -> job.run(svc), "decode-recording"); t.setPriority(Thread.MIN_PRIORITY); t.start();
         return null;
@@ -105,41 +107,41 @@ public final class RecordingDecodeJob {
 
     private void run(RadioService svc) {
         try {
-            stage = "reading the recording";
+            stage = Txt.s(R.string.modes_rec_stage_reading); Msg sum;
             short[] s = load8k(file);
             long fromName = RecordingDecoder.startFromName(file.getName());
             final long start = fromName > 0 ? fromName : file.lastModified() - s.length * 1000L / RecordingDecoder.SR;
             String len = RecordingDecoder.clock(s.length * 1000L / RecordingDecoder.SR);
             if (APRS.equals(mode)) {
-                stage = "looking for APRS packets";
+                stage = Txt.s(R.string.modes_rec_stage_aprs);
                 int n = dec.aprs(s, new RecordingDecoder.Listener() {
                     @Override public void progress(int p) { percent = p; }
                     @Override public void packet(byte[] frame, long atMs) { packets.add(describe(frame, atMs, start)); }
                 });
-                if (dec.cancelled()) { summary = "Stopped"; return; }
+                if (dec.cancelled()) { summary = Txt.s(R.string.modes_rec_stopped); return; }
                 if (n > 0) try { Files.write(new File(file.getParentFile(), file.getName() + ".aprs.txt").toPath(), (String.join("\n", packets) + "\n").getBytes(StandardCharsets.UTF_8)); } catch (Throwable ignored) { }
-                summary = n == 0 ? "No packets in " + len + " of audio" : n + " packet" + (n == 1 ? "" : "s") + " in " + len + " of audio";
+                sum = n == 0 ? Msg.of(R.string.modes_rec_aprs_none, len) : Msg.plural(R.plurals.modes_rec_aprs_found, n, n, len);
             } else {
-                stage = "looking for SSTV headers (every mode)";
+                stage = Txt.s(R.string.modes_rec_stage_sstv);
                 List<long[]> spans = new ArrayList<>();                           // {startMs, endMs} of the pictures found by their header
                 int any = anyMode(s, start, spans);
-                if (dec.cancelled()) { summary = "Stopped"; return; }
-                stage = "looking for Robot 36 pictures without a header";
+                if (dec.cancelled()) { summary = Txt.s(R.string.modes_rec_stopped); return; }
+                stage = Txt.s(R.string.modes_rec_stage_robot);
                 final int[] extra = { 0 };
                 dec.sstv(s, new RecordingDecoder.Listener() {
                     @Override public void progress(int p) { percent = 50 + p / 2; }
                     @Override public void picture(int[] argb, int w, int h, int lines, boolean complete, long atMs) {
                         long from = atMs - lines * 150L;                          // Robot 36: 150 ms a line
                         for (long[] sp : spans) if (from < sp[1] && atMs > sp[0]) return;   // already saved from its header
-                        String n = save(Bitmap.createBitmap(argb, w, h, Bitmap.Config.ARGB_8888), "Robot36", complete, start + atMs); if (n != null) { pictures.add(n); extra[0]++; }
+                        String n = save(Bitmap.createBitmap(argb, w, h, Bitmap.Config.ARGB_8888), "Robot36", complete, start + atMs); if (n != null) { pictures.add(n); extra[0]++; }   // i18n: file name part
                     }
                 });
-                if (dec.cancelled()) { summary = "Stopped"; return; }
+                if (dec.cancelled()) { summary = Txt.s(R.string.modes_rec_stopped); return; }
                 int n = any + extra[0]; long whole = 0; for (String p : pictures) if (!p.contains("_partial")) whole++;
-                summary = n == 0 ? "No SSTV picture in " + len + " of audio" : n + " picture" + (n == 1 ? "" : "s") + " (" + whole + " complete) in " + len + " of audio, saved to Download/DMR/SSTV";
+                sum = n == 0 ? Msg.of(R.string.modes_rec_sstv_none, len) : Msg.plural(R.plurals.modes_rec_sstv_found, n, n, (int) whole, len);
             }
-            percent = 100;
-            if (svc != null) svc.history("pkt", "📼 Decoded " + file.getName() + ": " + summary);
+            summary = sum.text(); percent = 100;
+            if (svc != null) svc.history("pkt", Msg.of(R.string.modes_rec_event_decoded, file.getName(), sum));
         } catch (Throwable t) { error = t.getMessage() == null ? t.toString() : t.getMessage(); }
         finally { stage = ""; done = true; }
     }

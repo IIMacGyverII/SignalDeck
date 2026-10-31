@@ -6,6 +6,9 @@
  */
 package com.macdmr.radio.pkt;
 
+import com.macdmr.radio.R;
+import com.macdmr.radio.i18n.Txt;
+
 
 
 /**
@@ -67,7 +70,7 @@ public class AprsIsClient {
     public synchronized void stop() {
         running = false;
         closeQuietly();
-        setStatus("off", false);
+        setStatus(Txt.s(R.string.packet_is_off), false);
     }
 
     private void setStatus(String s, boolean conn) {
@@ -84,7 +87,7 @@ public class AprsIsClient {
         int backoffMs = 2000;
         while (running) {
             try {
-                setStatus("connecting to " + host + ":" + port, false);
+                setStatus(Txt.s(R.string.packet_is_status_connecting, host + ":" + port), false);
                 java.net.Socket s = new java.net.Socket();
                 s.connect(new java.net.InetSocketAddress(host, port), 15000);
                 s.setSoTimeout(120000);          // servers send a comment every ~20-30 s
@@ -106,8 +109,7 @@ public class AprsIsClient {
                     if (line.startsWith("#")) {
                         if (line.contains("logresp")) {
                             verified = line.contains(" verified");
-                            String st = (verified ? "logged in (verified)" : "logged in (unverified: receive-only)")
-                                    + " at " + serverName(line);
+                            String st = Txt.s(verified ? R.string.packet_is_status_verified : R.string.packet_is_status_unverified, serverName(line));
                             android.util.Log.d("aprsis", TAG + ": " + line);
                             setStatus(st, true);
                         }
@@ -122,11 +124,11 @@ public class AprsIsClient {
             closeQuietly();
             verified = false;
             if (!running) break;
-            setStatus("disconnected, retry in " + (backoffMs / 1000) + " s", false);
+            setStatus(Txt.s(R.string.packet_is_status_retry, backoffMs / 1000), false);
             try { Thread.sleep(backoffMs); } catch (InterruptedException ignored) { }
             backoffMs = Math.min(backoffMs * 2, 120000);
         }
-        setStatus("off", false);
+        setStatus(Txt.s(R.string.packet_is_off), false);
     }
 
     private static String serverName(String logresp) {
@@ -136,9 +138,9 @@ public class AprsIsClient {
     }
 
     String loginLine() {
-        StringBuilder sb = new StringBuilder("user ").append(login).append(" pass ").append(passcode)
-                .append(" vers DMRModHooks ").append(version);
-        if (filter != null && !filter.trim().isEmpty()) sb.append(" filter ").append(filter.trim());
+        StringBuilder sb = new StringBuilder("user ").append(login).append(" pass ").append(passcode)   // i18n: APRS-IS protocol
+                .append(" vers DMRModHooks ").append(version);   // i18n: APRS-IS protocol
+        if (filter != null && !filter.trim().isEmpty()) sb.append(" filter ").append(filter.trim());   // i18n: APRS-IS protocol
         return sb.toString();
     }
 
@@ -195,7 +197,7 @@ public class AprsIsClient {
     public static String gatedLine(String tnc2, String login) {
         if (!shouldGate(tnc2)) return null;
         int gt = tnc2.indexOf('>'), colon = tnc2.indexOf(':', gt);
-        return tnc2.substring(0, colon) + ",qAR," + login + tnc2.substring(colon);
+        return tnc2.substring(0, colon) + ",qAR," + login + tnc2.substring(colon);   // i18n: APRS-IS protocol
     }
 
     /** TNC2 text of an FCS-stripped AX.25 UI frame (H bits shown as '*'), or null. */

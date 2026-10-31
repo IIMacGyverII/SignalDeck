@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Button that closes a dialog without doing anything. Short (dialog button). -->
+    <string name="common_cancel">Abbrechen</string>
+    <!-- Button that keeps the changes made in a dialog or editor. Short (button). -->
+    <string name="common_save">Speichern</string>
+    <!-- Button that accepts a message or dialog. Short (button). -->
+    <string name="common_ok">OK</string>
+    <!-- Button that removes the item (a channel, zone, contact, recording…). Short (button). -->
+    <string name="common_delete">Löschen</string>
+    <!-- Button that closes a sheet or dialog. Short (button). -->
+    <string name="common_close">Schließen</string>
+    <!-- Button that sends a message (APRS, DMR text, Winlink…). On the radio it transmits. Short (button). -->
+    <string name="common_send">Senden</string>
+    <!-- Button that puts off an offer (an update, a check) without saying no for good. Short (button). -->
+    <string name="common_later">Später</string>
+    <!-- Button that goes on to the next step. Short (button). -->
+    <string name="common_continue">Weiter</string>
+    <!-- Button that empties a list or a field. Short (button). -->
+    <string name="common_clear">Leeren</string>
+    <!-- Button that starts something (a session, a net, a scan). Short (button). -->
+    <string name="common_start">Starten</string>
+    <!-- Button that stops what is running. Short (button). -->
+    <string name="common_stop">Stoppen</string>
+    <!-- Button that opens Android's share sheet. Short (button). -->
+    <string name="common_share">Teilen</string>
+    <!-- Button that declines an offer for now. Short (button). -->
+    <string name="common_not_now">Nicht jetzt</string>
+    <!-- Button that imports channels, contacts or a file. Short (button). -->
+    <string name="common_import">Importieren</string>
+    <!-- Button that goes back one step. Short (button). -->
+    <string name="common_back">Zurück</string>
+    <!-- Button that opens the editor for an item. Short (button). -->
+    <string name="common_edit">Bearbeiten</string>
+    <!-- Button that adds a new item. Short (button). -->
+    <string name="common_add">Hinzufügen</string>
+    <!-- Button that finishes a task and closes it. Short (button). -->
+    <string name="common_done">Fertig</string>
+    <!-- State of a switch or feature that is running. Very short. -->
+    <string name="common_on">Ein</string>
+    <!-- State of a switch or feature that is not running. Very short. -->
+    <string name="common_off">Aus</string>
+</resources>

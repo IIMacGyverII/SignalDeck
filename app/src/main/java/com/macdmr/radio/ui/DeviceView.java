@@ -47,7 +47,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         super(c);
         setOrientation(VERTICAL);   // background: the window's
         float d = Theme.dp(c);
-        header = Neo.header(c, "Device", "");
+        header = Neo.header(c, Txt.s(R.string.device_title), "");
         addView(header);
 
         ScrollView sv = new ScrollView(c); sv.setVerticalScrollBarEnabled(false);
@@ -73,19 +73,20 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         firmwareText.setOnClickListener(v -> {                               // the loader exists only on phones whose flash process was bench-tested
             if (host == null) return;
             if (com.macdmr.radio.DeviceProfile.detect().firmwareLoader()) host.openFirmware();
-            else android.widget.Toast.makeText(getContext(), "Loading module firmware is not certified on this phone yet: its flash process has not been tested. It is offered only on phones where it has been.", android.widget.Toast.LENGTH_LONG).show();
+            else android.widget.Toast.makeText(getContext(), Txt.s(R.string.device_link_fw_not_certified), android.widget.Toast.LENGTH_LONG).show();
         });
         variantText = Neo.text(c, "", Neo.AMBER_LIGHT, 13, Neo.ui(c)); variantText.setPadding(0, (int) (5 * d), 0, 0); variantText.setVisibility(GONE);
         tc.addView(variantText);
         variantText.setOnClickListener(v -> { com.macdmr.radio.FirmwareVariantCheck.Finding f = com.macdmr.radio.FirmwareVariantCheck.finding(getContext()); if (f != null) offerVariant(getContext(), f, this::refresh); });
         top.addView(tc, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
         hero.addView(top);
-        TextView contributeTop = Neo.button(c, "Contribute", "heart", Neo.VIOLET);
+        TextView contributeTop = Neo.button(c, Txt.s(R.string.device_contribute), "heart", Neo.VIOLET);
         LayoutParams ctl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); ctl.topMargin = (int) (12 * d);
         hero.addView(contributeTop, ctl);
         contributeTop.setOnClickListener(v -> contributeSheet());
         LinearLayout hb = new LinearLayout(c); hb.setBaselineAligned(false);
-        takeOver = Neo.button(c, "Take over", "takeover", Neo.GREEN); handBack = Neo.button(c, "Hand back", "handback", Neo.AMBER);
+        takeOver = Neo.button(c, Txt.s(R.string.device_link_take_over), "takeover", Neo.GREEN); handBack = Neo.button(c, Txt.s(R.string.device_link_hand_back), "handback", Neo.AMBER);
+        Neo.fit(takeOver, true); Neo.fit(handBack, true);                  // side by side: a long word (German) never breaks inside
         LayoutParams hl = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); hl.setMargins(0, (int) (12 * d), (int) (4 * d), 0);
         LayoutParams hr = new LayoutParams(0, LayoutParams.MATCH_PARENT, 1f); hr.setMargins((int) (4 * d), (int) (12 * d), 0, 0);
         hb.addView(takeOver, hl); hb.addView(handBack, hr);
@@ -93,87 +94,87 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         takeOver.setOnClickListener(v -> {
             if (svc == null) return;
             if (svc.profile().verified || svc.isReady()) { svc.bringUp(); return; }
-            new android.app.AlertDialog.Builder(getContext()).setTitle("Untested profile")
-                    .setMessage("SignalDeck has a profile for the " + svc.profile().name + ", written from its stock app and the owner's reports, but it has never run on this phone. Taking over pauses " + svc.profile().stockApp + " and opens the radio's serial ports. If it fails, the stock app is switched back on; Hand back or a reboot also gives it back.\n\nFirst run Device report → Generate device report and Radio probe (root) and share them: that is what turns this into a tested profile.")
-                    .setPositiveButton("Take over", (dd, w) -> svc.bringUp()).setNegativeButton("Cancel", null).show();
+            new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.device_link_untested_title))
+                    .setMessage(Txt.s(R.string.device_link_untested_msg, svc.profile().name, svc.profile().stockApp))
+                    .setPositiveButton(Txt.s(R.string.device_link_take_over), (dd, w) -> svc.bringUp()).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
         });
         handBack.setOnClickListener(v -> { if (svc != null) svc.shutDown(true); });
-        TextView exit = Neo.button(c, "Exit SignalDeck", "power", Neo.RED);
+        TextView exit = Neo.button(c, Txt.s(R.string.device_exit), "power", Neo.RED);
         LayoutParams el = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); el.topMargin = (int) (8 * d);
         hero.addView(exit, el);
         exit.setOnClickListener(v -> exitSheet());
-        TextView boot = Neo.button(c, "Keep access after reboot", "shield", Neo.CYAN);
+        TextView boot = Neo.button(c, Txt.s(R.string.device_link_keep_access), "shield", Neo.CYAN);
         LayoutParams bl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); bl.topMargin = (int) (8 * d);
         hero.addView(boot, bl);
         boot.setOnClickListener(v -> new Thread(() -> {
-            final String r = svc != null ? RootSetup.installBootModule(svc.profile(), getContext().getCacheDir()) : "service not ready";
-            post(() -> new android.app.AlertDialog.Builder(getContext()).setTitle("Boot persistence").setMessage(r).setPositiveButton("OK", null).show());
+            final String r = svc != null ? RootSetup.installBootModule(svc.profile(), getContext().getCacheDir()) : Txt.s(R.string.device_link_boot_not_ready);
+            post(() -> new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.device_link_boot_title)).setMessage(r).setPositiveButton(Txt.s(R.string.common_ok), null).show());
         }).start());
-        reportNow = Neo.button(c, "Help support this phone", "report", Neo.VIOLET);
+        reportNow = Neo.button(c, Txt.s(R.string.device_support), "report", Neo.VIOLET);
         hero.addView(reportNow, new LayoutParams(bl)); reportNow.setVisibility(GONE);
         reportNow.setOnClickListener(v -> supportMenu());
-        TextView note = Neo.text(c, "Needs root (Magisk). While this app owns the radio the stock walkie-talkie app is paused and its icon hidden; Hand back restores it. The Magisk module keeps the SELinux rules across reboots so the radio can be owned straight from boot.", Neo.MUTED, 13, Neo.uiMedium(c));
+        TextView note = Neo.text(c, Txt.s(R.string.device_link_note), Neo.MUTED, 13, Neo.uiMedium(c));
         note.setLineSpacing(0, 1.1f); note.setPadding(0, (int) (10 * d), 0, 0);
         hero.addView(note);
         body.addView(hero, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
         // ---- radio settings ----
-        LinearLayout set = card(body, "Radio settings");
+        LinearLayout set = card(body, Txt.s(R.string.device_set_title));
         ownAtBoot = sw(); hwPttSw = sw(); volPttSw = sw(); scanSqSw = sw(); voiceSw = sw(); styleSw = sw(); animSw = sw(); covSw = sw(); carMicSw = sw(); carCovSw = sw(); wheelSw = sw(); carScreenSw = sw();
-        LinearLayout regionRow = Neo.switchRow(c, "globe", Neo.CYAN, "Region", "", null);   // the region's defaults: APRS frequency, presets, units (Device → Region)
+        LinearLayout regionRow = Neo.switchRow(c, "globe", Neo.CYAN, Txt.s(R.string.device_set_region), "", null);   // the region's defaults: APRS frequency, presets, units (Device → Region)
         regionSub = (TextView) ((LinearLayout) regionRow.getChildAt(1)).getChildAt(1);
         regionRow.setOnClickListener(v -> RegionSheet.show(c, svc, this::updateRegion));
         addRow(set, regionRow); updateRegion();
         addRow(set, languageRow(c));
-        addRow(set, Neo.switchRow(c, "power", Neo.GREEN, "Own the radio at boot", "Otherwise the stock app is restored after a reboot", ownAtBoot));
-        addRow(set, Neo.switchRow(c, "ptt", Neo.AMBER, "Side PTT key", "The phone's hardware push-to-talk button transmits", hwPttSw));
-        addRow(set, Neo.switchRow(c, "volume", Neo.AMBER, "Volume-up transmits", "While the Intercom page is open", volPttSw));
+        addRow(set, Neo.switchRow(c, "power", Neo.GREEN, Txt.s(R.string.device_set_own_boot), Txt.s(R.string.device_set_own_boot_sub), ownAtBoot));
+        addRow(set, Neo.switchRow(c, "ptt", Neo.AMBER, Txt.s(R.string.device_set_side_ptt), Txt.s(R.string.device_set_side_ptt_sub), hwPttSw));
+        addRow(set, Neo.switchRow(c, "volume", Neo.AMBER, Txt.s(R.string.device_set_vol_ptt), Txt.s(R.string.device_set_vol_ptt_sub), volPttSw));
         customPttSw = sw();
-        LinearLayout keyRow = Neo.switchRow(c, "ptt", Neo.AMBER, "Custom PTT key", "Not set. Tap to learn a button: press the one you want", customPttSw);
+        LinearLayout keyRow = Neo.switchRow(c, "ptt", Neo.AMBER, Txt.s(R.string.device_set_custom_ptt), Txt.s(R.string.device_set_custom_ptt_sub), customPttSw);
         customPttSub = (TextView) ((LinearLayout) keyRow.getChildAt(1)).getChildAt(1);
         keyRow.setOnClickListener(v -> learnKeySheet());                      // the row learns; the switch turns the learned key on and off
         customPttSw.setOnChange(on -> { if (on && com.macdmr.radio.CustomPttKey.saved(c) == null) { customPttSw.setChecked(false); learnKeySheet(); return; } com.macdmr.radio.CustomPttKey.setEnabled(c, on); if (svc != null) svc.customPttChanged(); });
         addRow(set, keyRow);
-        addRow(set, Neo.switchRow(c, "softsq", Neo.CYAN, "Soft SQ while scanning", "Every analog channel, each at its own level (5 if never set)", scanSqSw));
-        addRow(set, Neo.switchRow(c, "voice", Neo.VIOLET, "Voice announcements", "Channel changes, caller names, keyword alerts", voiceSw));
+        addRow(set, Neo.switchRow(c, "softsq", Neo.CYAN, Txt.s(R.string.device_set_scan_sq), Txt.s(R.string.device_set_scan_sq_sub), scanSqSw));
+        addRow(set, Neo.switchRow(c, "voice", Neo.VIOLET, Txt.s(R.string.device_set_voice), Txt.s(R.string.device_set_voice_sub), voiceSw));
         addRow(set, rogerRow(c));
         addRow(set, txLimitRow(c));
-        addRow(set, Neo.switchRow(c, "intercom", Neo.CYAN, "New intercom look", "Off: the classic intercom page", styleSw));
+        addRow(set, Neo.switchRow(c, "intercom", Neo.CYAN, Txt.s(R.string.device_set_new_look), Txt.s(R.string.device_set_new_look_sub), styleSw));
         addRow(set, layoutRow(c));
-        addRow(set, Neo.switchRow(c, "diag", Neo.CYAN, "Animated panel when quiet", "Falling lines on an idle channel (uses a little battery)", animSw));
-        addRow(set, Neo.switchRow(c, "signal", Neo.VIOLET, "Coverage logging", com.macdmr.radio.DeviceProfile.detect().rssi ? "Records signal and key-ups with GPS for the coverage maps (Map → Coverage)"
-                : "Records your key-ups with GPS for the coverage map (Map → Coverage); this radio gives no signal readings, so nothing is logged as heard", covSw));
+        addRow(set, Neo.switchRow(c, "diag", Neo.CYAN, Txt.s(R.string.device_set_anim), Txt.s(R.string.device_set_anim_sub), animSw));
+        addRow(set, Neo.switchRow(c, "signal", Neo.VIOLET, Txt.s(R.string.device_set_coverage), com.macdmr.radio.DeviceProfile.detect().rssi ? Txt.s(R.string.device_set_coverage_sub_rssi)
+                : Txt.s(R.string.device_set_coverage_sub_no_rssi), covSw));
         roamSw = sw();
         if (com.macdmr.radio.DeviceProfile.detect().dmr())                       // talkgroups: DMR only
-            addRow(set, Neo.switchRow(c, "repeaters", Neo.GREEN, "DMR roaming", "While you travel, switch to the nearest repeater in this zone with the same talkgroup", roamSw));
-        roamSw.setOnChange(on -> { if (svc != null) { svc.setRoaming(on); android.widget.Toast.makeText(c, on ? "DMR roaming is on: it checks every 30 s while you move" : "DMR roaming is off", android.widget.Toast.LENGTH_SHORT).show(); } });
-        addRow(set, Neo.switchRow(c, "ptt", Neo.AMBER, "Car microphone in Android Auto", "Talk uses the car's microphone through its hands-free link", carMicSw));
+            addRow(set, Neo.switchRow(c, "repeaters", Neo.GREEN, Txt.s(R.string.device_set_roaming), Txt.s(R.string.device_set_roaming_sub), roamSw));
+        roamSw.setOnChange(on -> { if (svc != null) { svc.setRoaming(on); android.widget.Toast.makeText(c, on ? Txt.s(R.string.device_set_roaming_on) : Txt.s(R.string.device_set_roaming_off), android.widget.Toast.LENGTH_SHORT).show(); } });
+        addRow(set, Neo.switchRow(c, "ptt", Neo.AMBER, Txt.s(R.string.device_set_car_mic), Txt.s(R.string.device_set_car_mic_sub), carMicSw));
         carMicSw.setOnChange(on -> { if (svc != null) svc.setCarMic(on); });
-        autoWarn = Neo.switchRow(c, "alert", Neo.AMBER, "Android Auto is hiding this app", "Unknown sources is off, so the car does not list SignalDeck. Tap for the fix", null);
+        autoWarn = Neo.switchRow(c, "alert", Neo.AMBER, Txt.s(R.string.device_set_auto_hidden), Txt.s(R.string.device_set_auto_hidden_sub), null);
         autoWarnDiv = new View(c); autoWarnDiv.setBackgroundColor(Neo.DIVIDER);
         set.addView(autoWarnDiv, new LayoutParams(LayoutParams.MATCH_PARENT, 1)); set.addView(autoWarn);
         autoWarn.setOnClickListener(v -> autoTrustSheet());
         autoWarn.setVisibility(GONE); autoWarnDiv.setVisibility(GONE);
         checkAutoTrust();
-        addRow(set, Neo.switchRow(c, "signal", Neo.VIOLET, "Log coverage in the car", "Coverage logging while Android Auto is connected", carCovSw));
+        addRow(set, Neo.switchRow(c, "signal", Neo.VIOLET, Txt.s(R.string.device_set_car_cov), Txt.s(R.string.device_set_car_cov_sub), carCovSw));
         carCovSw.setOnChange(on -> { if (svc != null) svc.setCoverageInCar(on); });
-        addRow(set, Neo.switchRow(c, "ptt", Neo.RED, "Steering-wheel play/pause talks", "In Android Auto: the wheel's play/pause starts and stops transmitting", wheelSw));
+        addRow(set, Neo.switchRow(c, "ptt", Neo.RED, Txt.s(R.string.device_set_wheel), Txt.s(R.string.device_set_wheel_sub), wheelSw));
         wheelSw.setOnChange(on -> { if (svc != null) svc.setWheelTalk(on); });
-        LinearLayout nextRow = Neo.switchRow(c, "ptt", Neo.RED, "Steering-wheel Next talks", "Hold: hold Next to talk, press again if it keeps talking. Double-press: press twice to talk, once to stop. Tap to change", null);
-        nextTalkValue = Neo.chip(c, com.macdmr.radio.RadioService.NEXT_TALK_NAMES[com.macdmr.radio.ham.WheelNext.DOUBLE], Neo.RED); nextRow.addView(nextTalkValue);
-        nextRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.nextTalkMode() + 1) % 3; svc.setNextTalkMode(m); nextTalkValue.setText(com.macdmr.radio.RadioService.NEXT_TALK_NAMES[m]); });
+        LinearLayout nextRow = Neo.switchRow(c, "ptt", Neo.RED, Txt.s(R.string.device_set_wheel_next), Txt.s(R.string.device_set_wheel_next_sub), null);
+        nextTalkValue = Neo.chip(c, com.macdmr.radio.RadioService.nextTalkNames()[com.macdmr.radio.ham.WheelNext.DOUBLE], Neo.RED); nextRow.addView(nextTalkValue);
+        nextRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.nextTalkMode() + 1) % 3; svc.setNextTalkMode(m); nextTalkValue.setText(com.macdmr.radio.RadioService.nextTalkNames()[m]); });
         addRow(set, nextRow);
-        LinearLayout micRow = Neo.switchRow(c, "voice", Neo.RED, "Steering-wheel microphone", "Car (as a call): the car's microphone; stop with the wheel's hang-up or End. Phone: the phone's microphone; stop with the wheel. Tap to change", null);
-        wheelMicValue = Neo.chip(c, com.macdmr.radio.RadioService.WHEEL_MIC_NAMES[1], Neo.RED); micRow.addView(wheelMicValue);
-        micRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.wheelMic() + 1) % 2; svc.setWheelMic(m); wheelMicValue.setText(com.macdmr.radio.RadioService.WHEEL_MIC_NAMES[m]); });
+        LinearLayout micRow = Neo.switchRow(c, "voice", Neo.RED, Txt.s(R.string.device_set_wheel_mic), Txt.s(R.string.device_set_wheel_mic_sub), null);
+        wheelMicValue = Neo.chip(c, com.macdmr.radio.RadioService.wheelMicNames()[1], Neo.RED); micRow.addView(wheelMicValue);
+        micRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.wheelMic() + 1) % 2; svc.setWheelMic(m); wheelMicValue.setText(com.macdmr.radio.RadioService.wheelMicNames()[m]); });
         addRow(set, micRow);
-        LinearLayout voxRow = Neo.switchRow(c, "mon", Neo.RED, "Stop when I stop talking", "For transmissions started from the wheel: unkey after this much quiet. Tap to change", null);
-        voxValue = Neo.chip(c, com.macdmr.radio.RadioService.VOX_NAMES[1], Neo.RED); voxRow.addView(voxValue);
-        voxRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.voxStop() + 1) % com.macdmr.radio.RadioService.VOX_NAMES.length; svc.setVoxStop(m); voxValue.setText(com.macdmr.radio.RadioService.VOX_NAMES[m]); });
+        LinearLayout voxRow = Neo.switchRow(c, "mon", Neo.RED, Txt.s(R.string.device_set_vox), Txt.s(R.string.device_set_vox_sub), null);
+        voxValue = Neo.chip(c, com.macdmr.radio.RadioService.voxNames()[1], Neo.RED); voxRow.addView(voxValue);
+        voxRow.setOnClickListener(v -> { if (svc == null) return; int m = (svc.voxStop() + 1) % com.macdmr.radio.RadioService.voxNames().length; svc.setVoxStop(m); voxValue.setText(com.macdmr.radio.RadioService.voxNames()[m]); });
         addRow(set, voxRow);
-        addRow(set, Neo.switchRow(c, "intercom", Neo.CYAN, "Full-screen Radio controls in the car", "Off: a media app (works in every car). On: a big Talk screen instead; reconnect the car after changing", carScreenSw));
+        addRow(set, Neo.switchRow(c, "intercom", Neo.CYAN, Txt.s(R.string.device_set_car_screen), Txt.s(R.string.device_set_car_screen_sub), carScreenSw));
         carScreenSw.setOnChange(on -> { if (svc != null) svc.setCarControlsScreen(on); });
-        covSw.setOnChange(on -> { if (svc != null) { svc.setCoverageLogging(on); android.widget.Toast.makeText(c, on ? "Coverage logging is on" : "Coverage logging is off", android.widget.Toast.LENGTH_SHORT).show(); } });
+        covSw.setOnChange(on -> { if (svc != null) { svc.setCoverageLogging(on); android.widget.Toast.makeText(c, on ? Txt.s(R.string.device_set_coverage_on) : Txt.s(R.string.device_set_coverage_off), android.widget.Toast.LENGTH_SHORT).show(); } });
         animSw.setOnChange(on -> { if (host != null) host.animatedPanelChanged(on); });
         ownAtBoot.setOnChange(on -> { if (svc != null) svc.setOwnAtBoot(on); });
         hwPttSw.setOnChange(on -> { if (svc != null) svc.setHwPtt(on); });
@@ -183,55 +184,55 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         styleSw.setOnChange(on -> { IntercomView.setNewLook(c, on); if (host != null) host.intercomStyleChanged(); });
 
         // ---- SignalDeck Web ----
-        LinearLayout web = card(body, "SignalDeck Web");
+        LinearLayout web = card(body, "SignalDeck Web");   // i18n: product name
         webSw = sw(); webTxSw = sw();
-        LinearLayout webRow = Neo.switchRow(c, WEB_ICON, Neo.CYAN, "Web access", "Use SignalDeck from a browser on the same Wi-Fi", webSw);
+        LinearLayout webRow = Neo.switchRow(c, WEB_ICON, Neo.CYAN, Txt.s(R.string.device_web_access), Txt.s(R.string.device_web_access_sub), webSw);
         webSub = (TextView) ((LinearLayout) webRow.getChildAt(1)).getChildAt(1);
         addRow(web, webRow);
-        addRow(web, Neo.switchRow(c, "ptt", Neo.RED, "Allow transmit from the web", "Off: a browser can listen and change channels but never keys the radio", webTxSw));
-        LinearLayout pinRow = Neo.switchRow(c, "shield", Neo.AMBER, "New PIN", "Makes a new PIN and logs every browser out", null);
+        addRow(web, Neo.switchRow(c, "ptt", Neo.RED, Txt.s(R.string.device_web_allow_tx), Txt.s(R.string.device_web_allow_tx_sub), webTxSw));
+        LinearLayout pinRow = Neo.switchRow(c, "shield", Neo.AMBER, Txt.s(R.string.device_web_new_pin), Txt.s(R.string.device_web_new_pin_sub), null);
         pinRow.setOnClickListener(v -> { if (svc != null) { svc.web().newPin(); updateWeb(); } });
         addRow(web, pinRow);
         webSw.setOnChange(on -> { if (svc == null) return; String e = svc.web().setEnabled(on); if (e != null) android.widget.Toast.makeText(c, e, android.widget.Toast.LENGTH_LONG).show(); updateWeb(); });
         webTxSw.setOnChange(on -> { if (svc != null) svc.web().setAllowTx(on); });
 
         // ---- identity ----
-        LinearLayout id = card(body, "Your DMR ID");
+        LinearLayout id = card(body, Txt.s(R.string.device_id_title));
         LinearLayout idRow = new LinearLayout(c); idRow.setGravity(Gravity.CENTER_VERTICAL); idRow.setPadding((int) (14 * d), (int) (4 * d), (int) (14 * d), (int) (12 * d));
         idRow.addView(Neo.iconTile(c, "id", Neo.CYAN, 38), new LayoutParams((int) (38 * d), (int) (38 * d)));
         idText = Neo.text(c, "", Neo.CYAN, 22, Neo.mono(c)); idText.setPadding((int) (12 * d), 0, 0, 0);
         idRow.addView(idText, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        TextView setId = Neo.button(c, "Change", null, Neo.CYAN); setId.setMinHeight((int) (40 * d));
+        TextView setId = Neo.button(c, Txt.s(R.string.device_id_change), null, Neo.CYAN); setId.setMinHeight((int) (40 * d));
         idRow.addView(setId, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         id.addView(idRow);
         if (!com.macdmr.radio.DeviceProfile.detect().dmr()) id.setVisibility(GONE);    // no digital channels to send it on
         setId.setOnClickListener(v -> {
             final EditText e = new EditText(c); e.setInputType(InputType.TYPE_CLASS_NUMBER); e.setText(svc != null ? String.valueOf(svc.localId()) : "");
-            new android.app.AlertDialog.Builder(c).setTitle("Your DMR ID").setMessage("The radio sends this as the caller ID on digital channels.").setView(e)
-                    .setPositiveButton("Save", (dd, w) -> { try { int v2 = Integer.parseInt(e.getText().toString().trim()); if (v2 < 1 || v2 > 16776415) throw new NumberFormatException(); svc.setLocalId(v2); refresh(); } catch (Exception ex) { android.widget.Toast.makeText(c, "Enter an ID between 1 and 16776415", android.widget.Toast.LENGTH_LONG).show(); } })
-                    .setNegativeButton("Cancel", null).show();
+            new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_id_title)).setMessage(Txt.s(R.string.device_id_msg)).setView(e)
+                    .setPositiveButton(Txt.s(R.string.common_save), (dd, w) -> { try { int v2 = Integer.parseInt(e.getText().toString().trim()); if (v2 < 1 || v2 > 16776415) throw new NumberFormatException(); svc.setLocalId(v2); refresh(); } catch (Exception ex) { android.widget.Toast.makeText(c, Txt.s(R.string.device_id_bad), android.widget.Toast.LENGTH_LONG).show(); } })
+                    .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
         });
 
         // ---- the project's mission statement: its own button, above the tools ----
-        TextView mission = Neo.button(c, "Mission Statement", "star", Neo.VIOLET);
+        TextView mission = Neo.button(c, Txt.s(R.string.device_mission), "star", Neo.VIOLET);
         LayoutParams ml = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); ml.topMargin = (int) (18 * d);
         body.addView(mission, ml);
         mission.setOnClickListener(v -> missionSheet());
 
         // ---- tools ----
-        TextView th = Neo.caps(c, "Tools"); th.setPadding((int) (2 * d), (int) (18 * d), 0, (int) (8 * d)); body.addView(th);
-        LinearLayout backup = Neo.tile(c, "backup", Neo.GREEN, "Back up", "Five CSVs, CPS-ready");
-        LinearLayout restore = Neo.tile(c, "restore", Neo.AMBER, "Restore", "From a backup folder");
-        LinearLayout reimport = Neo.tile(c, "import", Neo.AMBER, "Re-import", "Channels from the stock app");
-        radioIdTile = Neo.tile(c, "globe", Neo.CYAN, "RadioID list", "");
-        LinearLayout report = Neo.tile(c, "report", Neo.VIOLET, "Device report", "Support reports and checks");
-        LinearLayout about = Neo.tile(c, "module", Neo.GREEN, "About this radio", "Specs and known quirks");
-        LinearLayout upd = Neo.tile(c, "update", Neo.CYAN, "Updates", "Release and beta builds");
-        LinearLayout help = Neo.tile(c, "help", Neo.GREEN, "Help & how-to", "Every screen explained");
-        LinearLayout diag = Neo.tile(c, "diag", Neo.AMBER, "Diagnostics", "Live protocol log");
-        LinearLayout widget = Neo.tile(c, "widget", Neo.VIOLET, "Home widget", "Channel, scan and Talk");
-        LinearLayout sos = Neo.tile(c, "alert", Neo.RED, "Emergency", "Send your position");
-        LinearLayout contribute = Neo.tile(c, "heart", Neo.VIOLET, "Contribute", "Donate, test, add a phone");
+        TextView th = Neo.caps(c, Txt.s(R.string.device_tools)); th.setPadding((int) (2 * d), (int) (18 * d), 0, (int) (8 * d)); body.addView(th);
+        LinearLayout backup = Neo.tile(c, "backup", Neo.GREEN, Txt.s(R.string.device_tool_backup), Txt.s(R.string.device_tool_backup_sub));
+        LinearLayout restore = Neo.tile(c, "restore", Neo.AMBER, Txt.s(R.string.device_restore), Txt.s(R.string.device_tool_restore_sub));
+        LinearLayout reimport = Neo.tile(c, "import", Neo.AMBER, Txt.s(R.string.device_tool_reimport), Txt.s(R.string.device_tool_reimport_sub));
+        radioIdTile = Neo.tile(c, "globe", Neo.CYAN, Txt.s(R.string.device_radioid), "");
+        LinearLayout report = Neo.tile(c, "report", Neo.VIOLET, Txt.s(R.string.device_report), Txt.s(R.string.device_tool_report_sub));
+        LinearLayout about = Neo.tile(c, "module", Neo.GREEN, Txt.s(R.string.device_about_radio), Txt.s(R.string.device_tool_about_sub));
+        LinearLayout upd = Neo.tile(c, "update", Neo.CYAN, Txt.s(R.string.device_tool_updates), Txt.s(R.string.device_tool_updates_sub));
+        LinearLayout help = Neo.tile(c, "help", Neo.GREEN, Txt.s(R.string.device_tool_help), Txt.s(R.string.device_tool_help_sub));
+        LinearLayout diag = Neo.tile(c, "diag", Neo.AMBER, Txt.s(R.string.device_tool_diag), Txt.s(R.string.device_tool_diag_sub));
+        LinearLayout widget = Neo.tile(c, "widget", Neo.VIOLET, Txt.s(R.string.device_widget), Txt.s(R.string.device_tool_widget_sub));
+        LinearLayout sos = Neo.tile(c, "alert", Neo.RED, Txt.s(R.string.device_tool_sos), Txt.s(R.string.device_tool_sos_sub));
+        LinearLayout contribute = Neo.tile(c, "heart", Neo.VIOLET, Txt.s(R.string.device_contribute), Txt.s(R.string.device_tool_contribute_sub));
         java.util.List<LinearLayout> tl = new java.util.ArrayList<>(java.util.Arrays.asList(backup, restore, reimport, radioIdTile, report, about, upd, help, diag, widget, sos, contribute));
         if (!com.macdmr.radio.DeviceProfile.detect().dmr()) tl.remove(radioIdTile);   // names for DMR IDs: nothing to look up without DMR
         if (tl.size() % 2 == 1) tl.add(null);
@@ -256,10 +257,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         sos.setOnClickListener(v -> EmergencyDialog.show(c, svc));
         contribute.setOnClickListener(v -> contributeSheet());
 
-        TextView foot = Neo.text(c, (com.macdmr.radio.DeviceProfile.detect().dmr()
-                ? "Backups are the five CSV files (Contacts, TG_Lists, Channels, Zones, DTMF) the DMRModHooks module and the OpenGD77 CPS fork use, in Download/DMR/DMR_Backups."
-                : "Backups are CSV files (Channels, Zones, DTMF and the others, in the layout the OpenGD77 CPS fork reads) in Download/DMR/DMR_Backups.")
-                + "\n\nSignalDeck " + com.macdmr.radio.BuildConfig.VERSION_NAME + ", the standalone edition of DMRModHooks.", Neo.DIM, 12.5f, Neo.uiMedium(c));
+        TextView foot = Neo.text(c, Txt.s(com.macdmr.radio.DeviceProfile.detect().dmr() ? R.string.device_foot_dmr : R.string.device_foot_analog, com.macdmr.radio.BuildConfig.VERSION_NAME), Neo.DIM, 12.5f, Neo.uiMedium(c));
         foot.setLineSpacing(0, 1.1f); foot.setPadding((int) (2 * d), (int) (8 * d), (int) (2 * d), 0);
         body.addView(foot);
     }
@@ -268,45 +266,45 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private void radioNotesSheet() {
         Context c = getContext(); float d = Theme.dp(c);
         com.macdmr.radio.RadioNotes.Entry e = com.macdmr.radio.RadioNotes.forActive(c);
-        LinearLayout box = Neo.sheetBody(c, "About this radio");
-        if (e == null) { box.addView(Neo.sheetHint(c, "No notes are available for this radio.")); Neo.showSheet(c, box); return; }
+        LinearLayout box = Neo.sheetBody(c, Txt.s(R.string.device_about_radio), "radio");
+        if (e == null) { box.addView(Neo.sheetHint(c, Txt.s(R.string.device_notes_none))); Neo.showSheet(c, box); return; }
         TextView name = Neo.text(c, e.name + (e.variant != null ? " · " + e.variant : ""), Neo.TEXT, 18, Neo.ui(c));
         name.setPadding((int) (2 * d), (int) (8 * d), 0, (int) (4 * d)); box.addView(name);
         int sc = "ok".equals(e.status) ? Neo.GREEN : "beta".equals(e.status) || "prog".equals(e.status) ? Neo.AMBER : Neo.RED;
         LinearLayout chips = new LinearLayout(c); chips.addView(Neo.chip(c, e.statusText(), sc)); box.addView(chips);
         box.addView(notesText(c, e.summary, Neo.TEXT, 15));
         if (e.radio != null) {
-            box.addView(Neo.sheetSection(c, "The radio"));
-            if (e.radio.module != null) box.addView(specRow(c, "Module", e.radio.module));
-            if (!e.radio.modes.isEmpty()) box.addView(specRow(c, "Modes", android.text.TextUtils.join(", ", e.radio.modes)));
-            if (!e.radio.bands.isEmpty()) box.addView(specRow(c, "Bands", com.macdmr.radio.RadioNotes.bandsText(e.radio)));
-            box.addView(specRow(c, "Power", e.radio.txPowerW == null ? "Not measured yet" : android.text.TextUtils.join(" / ", e.radio.txPowerW) + " W"));
-            if (e.radio.link != null) box.addView(specRow(c, "Connection", e.radio.link));
+            box.addView(Neo.sheetSection(c, Txt.s(R.string.device_notes_radio)));
+            if (e.radio.module != null) box.addView(specRow(c, Txt.s(R.string.device_notes_module), e.radio.module));
+            if (!e.radio.modes.isEmpty()) box.addView(specRow(c, Txt.s(R.string.device_notes_modes), android.text.TextUtils.join(", ", e.radio.modes)));
+            if (!e.radio.bands.isEmpty()) box.addView(specRow(c, Txt.s(R.string.device_notes_bands), com.macdmr.radio.RadioNotes.bandsText(e.radio)));
+            box.addView(specRow(c, Txt.s(R.string.device_notes_power), e.radio.txPowerW == null ? Txt.s(R.string.device_notes_power_unknown) : android.text.TextUtils.join(" / ", e.radio.txPowerW) + " W"));
+            if (e.radio.link != null) box.addView(specRow(c, Txt.s(R.string.device_notes_link), e.radio.link));
         }
         if (e.firmware != null) {
-            if (e.firmware.stock != null) box.addView(specRow(c, "Stock firmware", e.firmware.stock));
-            if (e.firmware.modified != null) box.addView(specRow(c, "Modified firmware", e.firmware.modified));
+            if (e.firmware.stock != null) box.addView(specRow(c, Txt.s(R.string.device_notes_fw_stock), e.firmware.stock));
+            if (e.firmware.modified != null) box.addView(specRow(c, Txt.s(R.string.device_notes_fw_mod), e.firmware.modified));
             if (e.firmware.note != null) box.addView(notesText(c, e.firmware.note, Neo.MUTED, 13));
         }
         if (!e.features.isEmpty()) {
-            box.addView(Neo.sheetSection(c, "What works"));
+            box.addView(Neo.sheetSection(c, Txt.s(R.string.device_notes_works)));
             for (com.macdmr.radio.RadioNotes.Feature f : e.features) {
                 int fc = "yes".equals(f.state) ? Neo.GREEN : "partial".equals(f.state) ? Neo.AMBER : "no".equals(f.state) ? Neo.RED : Neo.CYAN;
-                String st = "yes".equals(f.state) ? "Works" : "partial".equals(f.state) ? "Partly" : "no".equals(f.state) ? "No" : "Not tested";
+                String st = "yes".equals(f.state) ? Txt.s(R.string.device_notes_yes) : "partial".equals(f.state) ? Txt.s(R.string.device_notes_partly) : "no".equals(f.state) ? Txt.s(R.string.device_notes_no) : Txt.s(R.string.device_notes_untested);
                 box.addView(specRow(c, f.name, st + (f.note != null ? " · " + f.note : ""), fc));
             }
         }
         if (!e.quirks.isEmpty()) {
-            box.addView(Neo.sheetSection(c, "Known quirks"));
+            box.addView(Neo.sheetSection(c, Txt.s(R.string.device_notes_quirks)));
             for (com.macdmr.radio.RadioNotes.Quirk q : e.quirks) noteCard(c, box, q.title, q.text, null);
         }
         if (!e.measured.isEmpty()) {
-            box.addView(Neo.sheetSection(c, "Measured on our test unit"));
-            box.addView(Neo.sheetHint(c, "Measured on one test unit; your radio may differ."));
+            box.addView(Neo.sheetSection(c, Txt.s(R.string.device_notes_measured)));
+            box.addView(Neo.sheetHint(c, Txt.s(R.string.device_notes_measured_hint)));
             for (com.macdmr.radio.RadioNotes.Measured m : e.measured) noteCard(c, box, m.what, m.note, m.value);
         }
         for (com.macdmr.radio.RadioNotes.Section s : e.sections) { box.addView(Neo.sheetSection(c, s.head)); box.addView(notesText(c, s.text, Neo.TEXT, 14)); }
-        box.addView(Neo.sheetHint(c, "These notes are built into SignalDeck (" + e.id + ") and also in the project's repository under docs/radios."));
+        box.addView(Neo.sheetHint(c, Txt.s(R.string.device_notes_source, e.id)));
         Neo.showSheet(c, box);
     }
     private static TextView notesText(Context c, String s, int color, float sp) {
@@ -334,17 +332,17 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     }
 
     /** The project's mission statement (also at the top of the README). */
-    public static final String MISSION = "This project is a showcase of what an Android ham radio can do. It is built for innovation, and built on the innovation, discovery and hard work of those who came before me. I hope it inspires others to create, and to look for the next step.";
+    public static final String MISSION = "This project is a showcase of what an Android ham radio can do. It is built for innovation, and built on the innovation, discovery and hard work of those who came before me. I hope it inspires others to create, and to look for the next step.";   // i18n: also served to the web page (/api/mission); the sheet shows device_mission_text
     private void missionSheet() {
         Context c = getContext(); float d = Theme.dp(c);
-        LinearLayout box = Neo.sheetBody(c, "Mission Statement");
-        TextView t = Neo.text(c, "\u201C" + MISSION + "\u201D", Neo.TEXT, 20, Neo.uiMedium(c));
+        LinearLayout box = Neo.sheetBody(c, Txt.s(R.string.device_mission), "radio");
+        TextView t = Neo.text(c, Txt.s(R.string.device_mission_text), Neo.TEXT, 20, Neo.uiMedium(c));
         t.setLineSpacing(0, 1.18f); t.setPadding((int) (4 * d), (int) (14 * d), (int) (4 * d), (int) (10 * d));
         box.addView(t);
-        TextView by = Neo.text(c, "\u2014 IIMacGyverII, SignalDeck", Neo.VIOLET_LIGHT, 15, Neo.ui(c));
+        TextView by = Neo.text(c, "\u2014 IIMacGyverII, SignalDeck", Neo.VIOLET_LIGHT, 15, Neo.ui(c));   // i18n: the author's name
         by.setGravity(android.view.Gravity.END); by.setPadding(0, 0, (int) (4 * d), (int) (6 * d));
         box.addView(by);
-        box.addView(Neo.sheetSection(c, "About and license"));
+        box.addView(Neo.sheetSection(c, Txt.s(R.string.device_mission_legal)));
         TextView legal = Neo.text(c, com.macdmr.radio.About.legal(), Neo.MUTED, 13, Neo.uiMedium(c));
         legal.setLineSpacing(0, 1.12f); legal.setTextIsSelectable(true); legal.setPadding((int) (4 * d), 0, (int) (4 * d), (int) (6 * d));
         box.addView(legal);
@@ -353,26 +351,26 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
 
     /** Where donations go: Ko-fi, and GitHub Sponsors (shown already; the page answers once GitHub approves the account). */
     static final String DONATE_KOFI = "https://ko-fi.com/iimacgyverii";
-    static final String DONATE_SPONSORS = "https://github.com/sponsors/IIMacGyverII";   // owner 2026-10-30: in place before approval, so the link works the day GitHub approves it
+    static final String DONATE_SPONSORS = "https://github.com/sponsors/IIMacGyverII";   // i18n: URL. owner 2026-10-30: in place before approval, so the link works the day GitHub approves it
     static final String SITE = "https://signaldeckradio.com";
-    static final String REPO = "https://github.com/IIMacGyverII/SignalDeck";
+    static final String REPO = "https://github.com/IIMacGyverII/SignalDeck";   // i18n: URL
 
     /** Device → Contribute (top of the page and among the tools): the three ways to help the project, each with its link. */
     private void contributeSheet() {
         Context c = getContext();
-        LinearLayout box = Neo.sheetBody(c, "Contribute");
-        box.addView(Neo.sheetHint(c, "SignalDeck is a free and open-source project (GPL-3.0): free to use, free to study and free to improve, and it stays that way. If you like it, there are three ways to help it grow."));
-        box.addView(Neo.sheetSection(c, "1  Donate"));
-        box.addView(para(c, "If SignalDeck is useful to you, please consider a donation. Developing and maintaining it is expensive: donations buy more phones to develop for and make compatible, and keep new features coming. Any amount helps, and thank you."));
-        box.addView(linkButton(c, "Donate on Ko-fi", "heart", Neo.VIOLET, DONATE_KOFI));
-        if (DONATE_SPONSORS != null) box.addView(linkButton(c, "GitHub Sponsors", "heart", Neo.VIOLET, DONATE_SPONSORS));
-        box.addView(Neo.sheetSection(c, "2  Take part in the development"));
-        box.addView(para(c, "Test for bugs, come up with feature ideas, and talk with other SignalDeck users. Report a bug or suggest a feature on GitHub, or join the community on the website."));
+        LinearLayout box = Neo.sheetBody(c, Txt.s(R.string.device_contribute), "radio");
+        box.addView(Neo.sheetHint(c, Txt.s(R.string.device_contrib_intro)));
+        box.addView(Neo.sheetSection(c, Txt.s(R.string.device_contrib_donate)));
+        box.addView(para(c, Txt.s(R.string.device_contrib_donate_text)));
+        box.addView(linkButton(c, Txt.s(R.string.device_contrib_kofi), "heart", Neo.VIOLET, DONATE_KOFI));
+        if (DONATE_SPONSORS != null) box.addView(linkButton(c, "GitHub Sponsors", "heart", Neo.VIOLET, DONATE_SPONSORS));   // i18n: product name
+        box.addView(Neo.sheetSection(c, Txt.s(R.string.device_contrib_develop)));
+        box.addView(para(c, Txt.s(R.string.device_contrib_develop_text)));
         box.addView(linkButton(c, "signaldeckradio.com", "globe", Neo.CYAN, SITE));
-        box.addView(linkButton(c, "Report a bug or an idea", "report", Neo.CYAN, REPO + "/issues"));
-        box.addView(Neo.sheetSection(c, "3  Make your own phone compatible"));
-        box.addView(para(c, "Fork the project and make your phone work with it. When you think your phone is completely compatible, tell us: the work is reviewed and merged in, and everyone with that phone benefits. Help support this phone (under Device report) collects the facts a new phone needs."));
-        box.addView(linkButton(c, "SignalDeck on GitHub", "globe", Neo.GREEN, REPO));
+        box.addView(linkButton(c, Txt.s(R.string.device_contrib_issue), "report", Neo.CYAN, REPO + "/issues"));
+        box.addView(Neo.sheetSection(c, Txt.s(R.string.device_contrib_phone)));
+        box.addView(para(c, Txt.s(R.string.device_contrib_phone_text)));
+        box.addView(linkButton(c, Txt.s(R.string.device_contrib_repo), "globe", Neo.GREEN, REPO));
         Neo.showSheet(c, box);
     }
     private static TextView para(Context c, String s) {
@@ -388,7 +386,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         b.setLayoutParams(l);
         b.setOnClickListener(v -> {
             try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))); }
-            catch (Throwable t) { android.widget.Toast.makeText(c, "No browser to open " + url, android.widget.Toast.LENGTH_LONG).show(); }
+            catch (Throwable t) { android.widget.Toast.makeText(c, Txt.s(R.string.device_no_browser, url), android.widget.Toast.LENGTH_LONG).show(); }
         });
         return b;
     }
@@ -396,13 +394,13 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     /** Device → Home widget: the live widget as it will look, and a button that asks the launcher to add it. */
     private void widgetSheet() {
         Context c = getContext(); float d = Theme.dp(c);
-        LinearLayout box = Neo.sheetBody(c, "Home widget");
-        box.addView(Neo.sheetHint(c, "The channel, what the radio is doing, and previous / scan / next / Talk buttons on your home screen. Talk is tap to start, tap to stop, and ends by itself at the transmit limit (Longest transmission, 2 minutes unless you change it). The notification has the same channel and scan buttons."));
+        LinearLayout box = Neo.sheetBody(c, Txt.s(R.string.device_widget), "widget");
+        box.addView(Neo.sheetHint(c, Txt.s(R.string.device_widget_hint)));
         android.widget.FrameLayout holder = new android.widget.FrameLayout(c);
-        try { holder.addView(com.macdmr.radio.RadioWidget.build(c, com.macdmr.radio.RadioService.running).apply(c.getApplicationContext(), holder)); /* app context: the activity inflater swaps in AppCompat views, which RemoteViews refuses */ } catch (Throwable t) { holder.addView(Neo.sheetHint(c, "Preview unavailable: " + t.getMessage())); }
+        try { holder.addView(com.macdmr.radio.RadioWidget.build(c, com.macdmr.radio.RadioService.running).apply(c.getApplicationContext(), holder)); /* app context: the activity inflater swaps in AppCompat views, which RemoteViews refuses */ } catch (Throwable t) { holder.addView(Neo.sheetHint(c, Txt.s(R.string.device_widget_no_preview, t.getMessage()))); }
         LayoutParams hl = new LayoutParams(LayoutParams.MATCH_PARENT, (int) (150 * d)); hl.setMargins(0, (int) (10 * d), 0, (int) (12 * d));
         box.addView(holder, hl);
-        TextView add = Neo.button(c, "Add to home screen", "widget", Neo.VIOLET);
+        TextView add = Neo.button(c, Txt.s(R.string.device_widget_add), "widget", Neo.VIOLET);
         box.addView(add, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         final android.app.Dialog dlg = Neo.showSheet(c, box);
         add.setOnClickListener(v -> {
@@ -410,7 +408,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
             boolean asked = false;
             try { if (m.isRequestPinAppWidgetSupported()) asked = m.requestPinAppWidget(new android.content.ComponentName(c, com.macdmr.radio.RadioWidget.class), null, null); } catch (Throwable ignored) { }
             if (dlg != null) dlg.dismiss();
-            if (!asked) android.widget.Toast.makeText(c, "Long-press the home screen, choose Widgets and drag out SignalDeck", android.widget.Toast.LENGTH_LONG).show();
+            if (!asked) android.widget.Toast.makeText(c, Txt.s(R.string.device_widget_manual), android.widget.Toast.LENGTH_LONG).show();
         });
     }
 
@@ -422,15 +420,15 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         LayoutParams il = new LayoutParams(Theme.dp(c, 38), Theme.dp(c, 38)); il.rightMargin = Theme.dp(c, 12);
         row.addView(Neo.iconTile(c, "volume", Neo.GREEN, 38), il);
         LinearLayout col = new LinearLayout(c); col.setOrientation(VERTICAL);
-        col.addView(Neo.label(c, "Roger beep", Neo.TEXT, 16, true));
-        TextView sub = Neo.label(c, "A short tone when you release the talk key. Tap to change and hear it", Neo.MUTED, 13, false); sub.setPadding(0, Theme.dp(c, 2), 0, 0); col.addView(sub);
+        col.addView(Neo.label(c, Txt.s(R.string.device_roger), Neo.TEXT, 16, true));
+        TextView sub = Neo.label(c, Txt.s(R.string.device_roger_sub), Neo.MUTED, 13, false); sub.setPadding(0, Theme.dp(c, 2), 0, 0); col.addView(sub);
         row.addView(col, new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
-        rogerValue = Neo.chip(c, com.macdmr.radio.RadioService.ROGER_NAMES[svc != null ? svc.rogerStyle() : 0], Neo.GREEN);
+        rogerValue = Neo.chip(c, com.macdmr.radio.RadioService.rogerNames()[svc != null ? svc.rogerStyle() : 0], Neo.GREEN);
         row.addView(rogerValue);
         row.setOnClickListener(v -> {
             if (svc == null) return;
-            int s = (svc.rogerStyle() + 1) % com.macdmr.radio.RadioService.ROGER_NAMES.length;
-            svc.setRogerStyle(s); rogerValue.setText(com.macdmr.radio.RadioService.ROGER_NAMES[s]);
+            int s = (svc.rogerStyle() + 1) % com.macdmr.radio.RadioService.rogerNames().length;
+            svc.setRogerStyle(s); rogerValue.setText(com.macdmr.radio.RadioService.rogerNames()[s]);
             com.macdmr.radio.RadioService.previewRoger(s);
         });
         return row;
@@ -442,33 +440,33 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
      * the heat warning. An admin setting in Restricted mode ({@code svc.setTxLimit} refuses there).
      */
     private LinearLayout txLimitRow(final Context c) {
-        LinearLayout row = Neo.switchRow(c, "ptt", Neo.AMBER, "Longest transmission", "SignalDeck ends any transmission after this long; the heat guard still stops a long one if the phone gets hot. Tap to change", null);
+        LinearLayout row = Neo.switchRow(c, "ptt", Neo.AMBER, Txt.s(R.string.device_txlimit), Txt.s(R.string.device_txlimit_sub), null);
         txLimitValue = Neo.chip(c, com.macdmr.radio.TxLimit.name(svc != null ? svc.txLimitSetting() : com.macdmr.radio.TxLimit.DEFAULT_S), Neo.AMBER); row.addView(txLimitValue);
         row.setOnClickListener(v -> {
             if (svc == null) return;
-            if (!svc.adminAllowed("txlimit")) { android.widget.Toast.makeText(c, "The transmit limit is locked in Restricted mode", android.widget.Toast.LENGTH_LONG).show(); return; }
+            if (!svc.adminAllowed("txlimit")) { android.widget.Toast.makeText(c, Txt.s(R.string.device_txlimit_locked), android.widget.Toast.LENGTH_LONG).show(); return; }
             final int[] presets = com.macdmr.radio.TxLimit.PRESETS_S;
             int cur = svc.txLimitSetting(), sel = com.macdmr.radio.TxLimit.presetIndex(cur);
             String[] names = new String[presets.length + 1];
-            for (int i = 0; i < presets.length; i++) names[i] = com.macdmr.radio.TxLimit.name(presets[i]) + (presets[i] == com.macdmr.radio.TxLimit.DEFAULT_S ? " (default)" : "");
-            names[presets.length] = sel < 0 ? "Custom: " + com.macdmr.radio.TxLimit.name(cur) : "Custom\u2026";
-            new android.app.AlertDialog.Builder(c).setTitle("Longest transmission")
+            for (int i = 0; i < presets.length; i++) names[i] = (presets[i] == com.macdmr.radio.TxLimit.DEFAULT_S ? Txt.s(R.string.device_txlimit_default, com.macdmr.radio.TxLimit.name(presets[i])) : com.macdmr.radio.TxLimit.name(presets[i]));
+            names[presets.length] = sel < 0 ? Txt.s(R.string.device_txlimit_custom_value, com.macdmr.radio.TxLimit.name(cur)) : Txt.s(R.string.device_txlimit_custom);
+            new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_txlimit))
                     .setSingleChoiceItems(names, sel < 0 ? presets.length : sel, (dd, w) -> {
                         dd.dismiss();
                         if (w < presets.length) { confirmTxLimit(c, presets[w]); return; }
                         final EditText e = new EditText(c); e.setInputType(InputType.TYPE_CLASS_NUMBER); e.setText(String.valueOf(cur == com.macdmr.radio.TxLimit.NONE ? com.macdmr.radio.TxLimit.DEFAULT_S : cur));
-                        new android.app.AlertDialog.Builder(c).setTitle("Custom limit").setMessage("Whole seconds, " + com.macdmr.radio.TxLimit.MIN_CUSTOM_S + " or more.").setView(e)
-                                .setPositiveButton("Save", (d2, w2) -> { int s = com.macdmr.radio.TxLimit.parseCustom(e.getText().toString()); if (s < 0) android.widget.Toast.makeText(c, "Enter " + com.macdmr.radio.TxLimit.MIN_CUSTOM_S + " seconds or more", android.widget.Toast.LENGTH_LONG).show(); else confirmTxLimit(c, s); })
-                                .setNegativeButton("Cancel", null).show();
-                    }).setNegativeButton("Cancel", null).show();
+                        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_txlimit_custom_title)).setMessage(Txt.s(R.string.device_txlimit_custom_msg, com.macdmr.radio.TxLimit.MIN_CUSTOM_S)).setView(e)
+                                .setPositiveButton(Txt.s(R.string.common_save), (d2, w2) -> { int s = com.macdmr.radio.TxLimit.parseCustom(e.getText().toString()); if (s < 0) android.widget.Toast.makeText(c, Txt.s(R.string.device_txlimit_custom_bad, com.macdmr.radio.TxLimit.MIN_CUSTOM_S), android.widget.Toast.LENGTH_LONG).show(); else confirmTxLimit(c, s); })
+                                .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
+                    }).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
         });
         return row;
     }
     /** Longer than 2 minutes or No limit: the heat warning once, Continue / Cancel; then save. */
     private void confirmTxLimit(final Context c, final int s) {
         if (!com.macdmr.radio.TxLimit.needsWarning(s)) { saveTxLimit(c, s); return; }
-        new android.app.AlertDialog.Builder(c).setTitle(s == com.macdmr.radio.TxLimit.NONE ? "No time limit" : com.macdmr.radio.TxLimit.name(s) + " transmissions").setMessage(com.macdmr.radio.TxLimit.HEAT_WARNING)
-                .setPositiveButton("Continue", (dd, w) -> saveTxLimit(c, s)).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(c).setTitle(s == com.macdmr.radio.TxLimit.NONE ? Txt.s(R.string.device_txlimit_none_title) : Txt.s(R.string.device_txlimit_long_title, com.macdmr.radio.TxLimit.name(s))).setMessage(com.macdmr.radio.TxLimit.heatWarning())
+                .setPositiveButton(Txt.s(R.string.common_continue), (dd, w) -> saveTxLimit(c, s)).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
     private void saveTxLimit(Context c, int s) {
         if (svc == null) return;
@@ -499,67 +497,67 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private void doBackup() {
         final Context c = getContext(); if (svc == null) return;
         new Thread(() -> {
-            try { java.io.File dir = com.macdmr.radio.Backup.export(svc.store(), svc.packet() != null ? svc.packet().dtmfSaved() : null); post(() -> android.widget.Toast.makeText(c, "Backed up to Download/DMR/DMR_Backups/" + dir.getName(), android.widget.Toast.LENGTH_LONG).show()); }
-            catch (Throwable t) { post(() -> android.widget.Toast.makeText(c, "Backup failed: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show()); }
+            try { java.io.File dir = com.macdmr.radio.Backup.export(svc.store(), svc.packet() != null ? svc.packet().dtmfSaved() : null); post(() -> android.widget.Toast.makeText(c, Txt.s(R.string.device_backup_done, dir.getName()), android.widget.Toast.LENGTH_LONG).show()); }
+            catch (Throwable t) { post(() -> android.widget.Toast.makeText(c, Txt.s(R.string.device_backup_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show()); }
         }).start();
     }
 
     private void doRestore() {
         final Context c = getContext(); if (svc == null) return;
         final java.util.List<java.io.File> list = com.macdmr.radio.Backup.backups();
-        final String[] names = new String[list.size() + 1]; for (int i = 0; i < list.size(); i++) names[i] = list.get(i).getName(); names[list.size()] = "Browse for a backup folder…";
-        new android.app.AlertDialog.Builder(c).setTitle("Restore which backup?").setItems(names, (dd, w) -> {
+        final String[] names = new String[list.size() + 1]; for (int i = 0; i < list.size(); i++) names[i] = list.get(i).getName(); names[list.size()] = Txt.s(R.string.device_restore_browse);
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_restore_which)).setItems(names, (dd, w) -> {
             if (w == list.size()) {
                 if (!(c instanceof com.macdmr.radio.MainActivity)) return;
                 ((com.macdmr.radio.MainActivity) c).pickFolder(uri -> new Thread(() -> {
                     try { java.io.File dir = com.macdmr.radio.Backup.copyTree(c, uri); final String r = com.macdmr.radio.Backup.restore(svc.store(), dir); if (svc.packet() != null) for (java.util.Map.Entry<String, String> e : com.macdmr.radio.Backup.readDtmf(dir).entrySet()) svc.packet().dtmfSave(e.getKey(), e.getValue()); svc.selectChannel(svc.store().activeNumber()); post(() -> android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show()); }
-                    catch (Throwable t) { post(() -> android.widget.Toast.makeText(c, "Restore failed: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show()); }
+                    catch (Throwable t) { post(() -> android.widget.Toast.makeText(c, Txt.s(R.string.device_restore_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show()); }
                 }).start());
                 return;
             }
-            new android.app.AlertDialog.Builder(c).setTitle("Restore " + names[w] + "?")
-                .setMessage("Replaces every channel, contact and zone in this app with the backup (OpenGD77 CPS exports work too). History, messages and settings are kept.")
-                .setPositiveButton("Restore", (d3, w3) -> new Thread(() -> {
+            new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_restore_confirm, names[w]))
+                .setMessage(Txt.s(R.string.device_restore_msg))
+                .setPositiveButton(Txt.s(R.string.device_restore), (d3, w3) -> new Thread(() -> {
                     try { final String r = com.macdmr.radio.Backup.restore(svc.store(), list.get(w)); if (svc.packet() != null) for (java.util.Map.Entry<String, String> e : com.macdmr.radio.Backup.readDtmf(list.get(w)).entrySet()) svc.packet().dtmfSave(e.getKey(), e.getValue()); svc.selectChannel(svc.store().activeNumber()); post(() -> android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show()); }
-                    catch (Throwable t) { post(() -> android.widget.Toast.makeText(c, "Restore failed: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show()); }
-                }).start()).setNegativeButton("Cancel", null).show();
+                    catch (Throwable t) { post(() -> android.widget.Toast.makeText(c, Txt.s(R.string.device_restore_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show()); }
+                }).start()).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
         }).show();
     }
 
     private void doReimport() {
         final Context c = getContext(); if (svc == null) return;
         if (!svc.stockHasAreas()) {                                      // the W6's and the Xplore 1's stock app: one channel list
-            new android.app.AlertDialog.Builder(c).setTitle("Re-import the stock app's channels?").setMessage("Replaces all channels in SignalDeck with the ones saved in the phone's stock radio app.")
-                    .setPositiveButton("Import", (dd, w) -> new Thread(() -> { final String r = svc.reimportFromStock(null); post(() -> android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show()); }).start())
-                    .setNegativeButton("Cancel", null).show();
+            new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_reimport_title)).setMessage(Txt.s(R.string.device_reimport_msg))
+                    .setPositiveButton(Txt.s(R.string.common_import), (dd, w) -> new Thread(() -> { final String r = svc.reimportFromStock(null); post(() -> android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show()); }).start())
+                    .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
             return;
         }
         new Thread(() -> {
             final java.util.List<String> areas = svc.stockAreas();
             post(() -> {
                 String[] names = new String[areas.size()]; for (int i = 0; i < names.length; i++) names[i] = svc.stockImportsChannelsOnly() ? areas.get(i) : areas.get(i).replace('_', ' ').toUpperCase(java.util.Locale.US);
-                new android.app.AlertDialog.Builder(c).setTitle("Import which stock area?").setItems(names, (d1, w1) -> new android.app.AlertDialog.Builder(c).setTitle("Re-import " + names[w1] + "?").setMessage(svc.stockImportsChannelsOnly() ? "Replaces all channels in SignalDeck with that area's channels from the stock app." : "Replaces all channels, contacts, history and messages in this app with that area's current data from the stock app.")
-                        .setPositiveButton("Import", (dd, w) -> new Thread(() -> { final String r = svc.reimportFromStock(areas.get(w1)); post(() -> android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show()); }).start()).setNegativeButton("Cancel", null).show()).show();
+                new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_reimport_which)).setItems(names, (d1, w1) -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_reimport_confirm, names[w1])).setMessage(svc.stockImportsChannelsOnly() ? Txt.s(R.string.device_reimport_msg_channels) : Txt.s(R.string.device_reimport_msg_all))
+                        .setPositiveButton(Txt.s(R.string.common_import), (dd, w) -> new Thread(() -> { final String r = svc.reimportFromStock(areas.get(w1)); post(() -> android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show()); }).start()).setNegativeButton(Txt.s(R.string.common_cancel), null).show()).show();
             });
         }).start();
     }
 
     private void doRadioId() {
         final Context c = getContext(); if (svc == null) return;
-        new android.app.AlertDialog.Builder(c).setTitle("RadioID list").setMessage("Names for DMR IDs heard on air, downloaded from radioid.net and stored on the phone.\n\nNow: " + svc.radioId().status())
-                .setPositiveButton("Download / update", (dd, w) -> {
-                    final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("RadioID list").setMessage("Connecting to radioid.net…").setCancelable(false).create(); pd.show();
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_radioid)).setMessage(Txt.s(R.string.device_radioid_msg, svc.radioId().status()))
+                .setPositiveButton(Txt.s(R.string.device_radioid_download), (dd, w) -> {
+                    final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_radioid)).setMessage(Txt.s(R.string.device_radioid_connecting)).setCancelable(false).create(); pd.show();
                     new Thread(() -> {
-                        try { int n = svc.radioId().downloadAndImport(t -> post(() -> pd.setMessage(t))); post(() -> { pd.dismiss(); refresh(); android.widget.Toast.makeText(c, String.format(java.util.Locale.US, "%,d DMR IDs loaded", n), android.widget.Toast.LENGTH_LONG).show(); }); }
-                        catch (Throwable t) { post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, "Download failed: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show(); }); }
+                        try { int n = svc.radioId().downloadAndImport(t -> post(() -> pd.setMessage(t))); post(() -> { pd.dismiss(); refresh(); android.widget.Toast.makeText(c, Txt.p(R.plurals.device_radioid_loaded, n, String.format(java.util.Locale.US, "%,d", n)), android.widget.Toast.LENGTH_LONG).show(); }); }
+                        catch (Throwable t) { post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, Txt.s(R.string.device_radioid_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show(); }); }
                     }).start();
-                }).setNegativeButton("Close", null).show();
+                }).setNegativeButton(Txt.s(R.string.common_close), null).show();
     }
 
     private void reportMenu() {
         final Context c = getContext();
-        new android.app.AlertDialog.Builder(c).setTitle("Device report")
-                .setItems(new String[] { "Help support this phone (step by step)", "Generate device report", "Share last report", "Capture the PTT key (10 s)", "Radio probe (root)", "Open a GitHub issue with the facts filled in", "What is in it?", "Radio audio check (no sound, DMR or analog)" , "Second radio test (guided)", "Radio firmware files (root, you choose)", "Transmit test session (transmits)"}, (dd, w) -> {
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_report))
+                .setItems(new String[] { Txt.s(R.string.device_report_support), Txt.s(R.string.device_report_generate), Txt.s(R.string.device_report_share_last), Txt.s(R.string.device_report_capture), Txt.s(R.string.device_report_probe), Txt.s(R.string.device_report_issue), Txt.s(R.string.device_report_what), Txt.s(R.string.device_report_audio) , Txt.s(R.string.device_report_second), Txt.s(R.string.device_report_fwfiles), Txt.s(R.string.device_report_txtest)}, (dd, w) -> {
                     if (w == 10) { TxTestScreen.open(c, svc, this::shareReport); return; }
                     if (w == 9) { firmwareFilesIntro(); return; }
                     if (w == 7) { dmrAudioCheckIntro(); return; }
@@ -570,12 +568,12 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
                     else if (w == 3) captureKeys();
                     else if (w == 4) probe();
                     else if (w == 5) com.macdmr.radio.DeviceReport.openIssue(c);
-                    else new android.app.AlertDialog.Builder(c).setTitle("Device report").setMessage("For a phone that has no profile yet, or to help debug one: gathers the facts a profile needs (serial ports, radio-module nodes, the stock walkie-talkie app and its APK, vendor libraries, framework jars, services; with root also SELinux labels and the PTT key broadcasts), saves it under Download/DMR/DeviceReport and offers to share the zip to a GitHub issue. Nothing on the phone is changed.").setPositiveButton("OK", null).show();
+                    else new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_report)).setMessage(Txt.s(R.string.device_report_what_msg)).setPositiveButton(Txt.s(R.string.common_ok), null).show();
                 }).show();
     }
 
     /**
-     * "Help support this phone": the stages a new phone goes through, in order, each with its instructions and a status.
+     * Txt.s(R.string.device_support): the stages a new phone goes through, in order, each with its instructions and a status.
      * 1 Run all checks (receive only), 2 Listen check (a real station on a channel the owner picks), 3 Send the results.
      */
     public void supportMenu() {
@@ -583,39 +581,39 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         final android.content.SharedPreferences sp = c.getSharedPreferences("radio", Context.MODE_PRIVATE);
         final boolean s1 = sp.getLong("supportChecks", 0) > 0, s2 = sp.getLong("supportListen", 0) > 0;
         String[] rows = {
-                (s1 ? "✓ " : "") + "1  Run all checks\nAbout two minutes, only listens; needs Magisk root",
-                (sp.getLong("supportSecond", 0) > 0 ? "✓ " : s1 ? "" : "🔒 ") + "2  Second radio test (best)\nAny other FM radio: key it when asked; SignalDeck measures reception, the squelch, MON and tone squelch itself",
-                (s2 ? "✓ " : s1 ? "" : "🔒 ") + "2b Listen check (no other radio)\nTake over the radio, pick a channel where stations are heard, then static (10 s) and the station (50 s)",
-                ((s1 || s2 || sp.getLong("supportSecond", 0) > 0) ? "" : "🔒 ") + "3  Send the results\nShare the report zip (it starts with a summary), or open a GitHub issue",
-                "What is this?" };
-        new android.app.AlertDialog.Builder(c).setTitle("Help support this phone — " + svc.profile().name)
+                (s1 ? "✓ " : "") + Txt.s(R.string.device_support_step1),
+                (sp.getLong("supportSecond", 0) > 0 ? "✓ " : s1 ? "" : "🔒 ") + Txt.s(R.string.device_support_step2),
+                (s2 ? "✓ " : s1 ? "" : "🔒 ") + Txt.s(R.string.device_support_step2b),
+                ((s1 || s2 || sp.getLong("supportSecond", 0) > 0) ? "" : "🔒 ") + Txt.s(R.string.device_support_step3),
+                Txt.s(R.string.device_support_what) };
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_support_title, svc.profile().name))
                 .setItems(rows, (dd, w) -> {
                     if (w == 0) offerChecks(false);
-                    else if (w == 1) { if (s1) secondRadioIntro(); else locked("Run all checks first."); }
-                    else if (w == 2) { if (s1) listenCheckIntro(); else locked("Run all checks first."); }
-                    else if (w == 3) { if (s1 || s2 || sp.getLong("supportSecond", 0) > 0) shareReport(); else locked("Run all checks first, then a test."); }
-                    else new android.app.AlertDialog.Builder(c).setTitle("Help support this phone")
-                            .setMessage("Each step tells us something about how this phone's radio works. After each one, send the results (step 3): we write or fix this phone's profile from them, and you get a new version through Device → Updates. The steps only listen: nothing is transmitted.")
-                            .setPositiveButton("OK", null).show();
-                }).setNegativeButton("Close", null).show();
+                    else if (w == 1) { if (s1) secondRadioIntro(); else locked(Txt.s(R.string.device_support_locked)); }
+                    else if (w == 2) { if (s1) listenCheckIntro(); else locked(Txt.s(R.string.device_support_locked)); }
+                    else if (w == 3) { if (s1 || s2 || sp.getLong("supportSecond", 0) > 0) shareReport(); else locked(Txt.s(R.string.device_support_locked_send)); }
+                    else new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_support))
+                            .setMessage(Txt.s(R.string.device_support_what_msg))
+                            .setPositiveButton(Txt.s(R.string.common_ok), null).show();
+                }).setNegativeButton(Txt.s(R.string.common_close), null).show();
     }
 
     /** Which profile this phone uses, the profile list and its advisories; the owner decides about every advisory. */
     /** Exit: radio off (the usual way to finish), or back to the stock app. */
     private void exitSheet() {
         final Context c = getContext();
-        LinearLayout b = Neo.sheetBody(c, "Exit SignalDeck");
-        b.addView(Neo.sheetHint(c, "Closing the app or swiping it away leaves the radio running in the background (that is how it keeps receiving with the screen off). Exit stops it properly: it ends any transmission and everything running (scan, APRS, FT8, M17, satellite tracking, the parrot), stops the audio and closes the radio's serial port."));
+        LinearLayout b = Neo.sheetBody(c, Txt.s(R.string.device_exit), "radio");
+        b.addView(Neo.sheetHint(c, Txt.s(R.string.device_exit_hint)));
         final android.app.AlertDialog[] dlg = new android.app.AlertDialog[1];
-        TextView off = Neo.button(c, "Turn the radio off and exit", "power", Neo.RED);
+        TextView off = Neo.button(c, Txt.s(R.string.device_exit_off), "power", Neo.RED);
         off.setOnClickListener(v -> { dlg[0].dismiss(); if (c instanceof com.macdmr.radio.MainActivity) ((com.macdmr.radio.MainActivity) c).exitApp(false); });
         b.addView(off, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) (52 * Theme.dp(c))));
-        b.addView(Neo.sheetHint(c, "Switches the radio module's power off: it no longer receives or uses battery. Opening SignalDeck turns it on again (a few seconds)."));
-        TextView back = Neo.button(c, "Hand back to the stock app and exit", "handback", Neo.AMBER);
+        b.addView(Neo.sheetHint(c, Txt.s(R.string.device_exit_off_hint)));
+        TextView back = Neo.button(c, Txt.s(R.string.device_exit_handback), "handback", Neo.AMBER);
         back.setOnClickListener(v -> { dlg[0].dismiss(); if (c instanceof com.macdmr.radio.MainActivity) ((com.macdmr.radio.MainActivity) c).exitApp(true); });
         LinearLayout.LayoutParams bl = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, (int) (52 * Theme.dp(c))); bl.topMargin = (int) (10 * Theme.dp(c));
         b.addView(back, bl);
-        b.addView(Neo.sheetHint(c, "Switches the phone's own intercom app back on and leaves the radio to it." + (svc != null && svc.ownAtBoot() ? " SignalDeck still takes the radio back at the next reboot (Keep access after reboot)." : "") + " Scheduled operations still start SignalDeck at their time."));
+        b.addView(Neo.sheetHint(c, Txt.s(svc != null && svc.ownAtBoot() ? R.string.device_exit_handback_hint_boot : R.string.device_exit_handback_hint)));
         dlg[0] = Neo.showSheet(c, b);
     }
 
@@ -624,44 +622,44 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         final com.macdmr.radio.ProfileRegistry.Selection s = com.macdmr.radio.ProfileRegistry.selection();
         StringBuilder m = new StringBuilder(com.macdmr.radio.ProfileRegistry.describe(s)).append('.');
         long last = com.macdmr.radio.ProfileRegistry.lastCheck();
-        m.append("\n\nProfile list last checked: ").append(last == 0 ? "never" : android.text.format.DateFormat.getDateFormat(c).format(new java.util.Date(last)) + " " + android.text.format.DateFormat.getTimeFormat(c).format(new java.util.Date(last)));
-        if (com.macdmr.radio.ProfileRegistry.useBuiltIn()) m.append("\nUpdated profiles are switched off: the built-in profile is used.");
+        m.append(Txt.s(R.string.device_profsheet_last_checked, last == 0 ? Txt.s(R.string.device_profsheet_never) : android.text.format.DateFormat.getDateFormat(c).format(new java.util.Date(last)) + " " + android.text.format.DateFormat.getTimeFormat(c).format(new java.util.Date(last))));
+        if (com.macdmr.radio.ProfileRegistry.useBuiltIn()) m.append(Txt.s(R.string.device_profsheet_builtin));
         for (com.macdmr.radio.ProfileRegistry.Advisory a : s.advisories)
-            m.append("\n\n⚠ ").append(a.title).append(a.overridden ? " — you chose to keep using it" : "").append("\n").append(a.restrictionText()).append(".\n").append(a.why)
-                    .append(a.expires.isEmpty() ? "" : "\n(until " + a.expires + " unless renewed)");
-        m.append("\n\nTested profiles are part of each SignalDeck release and work without the internet. A newer revision, or an advisory about a problem, can come from the project's signed profile list. Changes other than transmit take effect the next time SignalDeck starts.");
-        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(c).setTitle("Phone profile").setMessage(m)
-                .setPositiveButton("Check now", (dd, w) -> new Thread(() -> { final String r = com.macdmr.radio.ProfileRegistry.fetch(); post(() -> { android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show(); refresh(); }); }).start())
-                .setNegativeButton(com.macdmr.radio.ProfileRegistry.useBuiltIn() ? "Allow updated profiles" : "Use the built-in profile", (dd, w) -> { com.macdmr.radio.ProfileRegistry.setUseBuiltIn(!com.macdmr.radio.ProfileRegistry.useBuiltIn()); refresh(); });
-        if (!s.advisories.isEmpty()) b.setNeutralButton("Advisories", (dd, w) -> advisoryList(s));
+            m.append(Txt.s(a.overridden ? R.string.device_advisory_line_kept : R.string.device_advisory_line, a.title, a.restrictionText(), a.why))
+                    .append(a.expires.isEmpty() ? "" : Txt.s(R.string.device_advisory_until, a.expires));
+        m.append(Txt.s(R.string.device_profsheet_note));
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_profsheet_title)).setMessage(m)
+                .setPositiveButton(Txt.s(R.string.device_profsheet_check), (dd, w) -> new Thread(() -> { final String r = com.macdmr.radio.ProfileRegistry.fetch(); post(() -> { android.widget.Toast.makeText(c, r, android.widget.Toast.LENGTH_LONG).show(); refresh(); }); }).start())
+                .setNegativeButton(com.macdmr.radio.ProfileRegistry.useBuiltIn() ? Txt.s(R.string.device_profsheet_allow) : Txt.s(R.string.device_profsheet_use_builtin), (dd, w) -> { com.macdmr.radio.ProfileRegistry.setUseBuiltIn(!com.macdmr.radio.ProfileRegistry.useBuiltIn()); refresh(); });
+        if (!s.advisories.isEmpty()) b.setNeutralButton(Txt.s(R.string.device_advisory_list), (dd, w) -> advisoryList(s));
         b.show();
     }
 
     private void advisoryList(final com.macdmr.radio.ProfileRegistry.Selection s) {
         final Context c = getContext();
         String[] rows = new String[s.advisories.size()];
-        for (int i = 0; i < rows.length; i++) { com.macdmr.radio.ProfileRegistry.Advisory a = s.advisories.get(i); rows[i] = (a.overridden ? "Overridden by you · " : "In effect · ") + a.title; }
-        new android.app.AlertDialog.Builder(c).setTitle("Advisories for this phone").setItems(rows, (dd, w) -> advisory(s.advisories.get(w))).setNegativeButton("Close", null).show();
+        for (int i = 0; i < rows.length; i++) { com.macdmr.radio.ProfileRegistry.Advisory a = s.advisories.get(i); rows[i] = Txt.s(a.overridden ? R.string.device_advisory_row_overridden : R.string.device_advisory_row_active, a.title); }
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_advisory_list_title)).setItems(rows, (dd, w) -> advisory(s.advisories.get(w))).setNegativeButton(Txt.s(R.string.common_close), null).show();
     }
 
     /** Keep or override one advisory: overriding takes two confirmations, restoring takes one. */
     private void advisory(final com.macdmr.radio.ProfileRegistry.Advisory a) {
         final Context c = getContext();
-        String body = a.restrictionText() + ".\n\nWhy: " + a.why + "\n\nIssued " + a.issued + (a.expires.isEmpty() ? "" : ", lapses " + a.expires + " unless renewed") + ".";
+        String body = a.expires.isEmpty() ? Txt.s(R.string.device_advisory_body, a.restrictionText(), a.why, a.issued) : Txt.s(R.string.device_advisory_body_lapses, a.restrictionText(), a.why, a.issued, a.expires);
         if (a.overridden) {
-            new android.app.AlertDialog.Builder(c).setTitle(a.title).setMessage(body + "\n\nYou chose to keep using it anyway.")
-                    .setPositiveButton("Apply the advisory again", (dd, w) -> { com.macdmr.radio.ProfileRegistry.setOverride(a.id, false); refresh(); }).setNegativeButton("Close", null).show();
+            new android.app.AlertDialog.Builder(c).setTitle(a.title).setMessage(Txt.s(R.string.device_advisory_body_kept, body))
+                    .setPositiveButton(Txt.s(R.string.device_advisory_reapply), (dd, w) -> { com.macdmr.radio.ProfileRegistry.setOverride(a.id, false); refresh(); }).setNegativeButton(Txt.s(R.string.common_close), null).show();
             return;
         }
         new android.app.AlertDialog.Builder(c).setTitle(a.title).setMessage(body)
-                .setPositiveButton("Keep restricted", null)
-                .setNegativeButton("Use it anyway…", (dd, w) -> new android.app.AlertDialog.Builder(c).setTitle("Use it anyway? (1 of 2)")
-                        .setMessage("This advisory says: " + a.restrictionText().toLowerCase(java.util.Locale.ROOT) + ", because:\n\n" + a.why + "\n\nIf you continue, SignalDeck works on this phone as if the advisory did not exist.")
-                        .setPositiveButton("Continue", (d2, w2) -> new android.app.AlertDialog.Builder(c).setTitle("Your decision (2 of 2)")
-                                .setMessage("It is your phone and your decision. You take responsibility for using this despite the advisory. This applies to this advisory only; you can apply it again at any time from the Device page.")
-                                .setPositiveButton("I understand, use it anyway", (d3, w3) -> { com.macdmr.radio.ProfileRegistry.setOverride(a.id, true); refresh(); android.widget.Toast.makeText(c, "Overridden: takes effect now for transmit, at the next start for the rest", android.widget.Toast.LENGTH_LONG).show(); })
-                                .setNegativeButton("Cancel", null).show())
-                        .setNegativeButton("Cancel", null).show())
+                .setPositiveButton(Txt.s(R.string.device_advisory_keep), null)
+                .setNegativeButton(Txt.s(R.string.device_advisory_override), (dd, w) -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_advisory_confirm1))
+                        .setMessage(Txt.s(R.string.device_advisory_confirm1_msg, a.restrictionText().toLowerCase(java.util.Locale.ROOT), a.why))
+                        .setPositiveButton(Txt.s(R.string.common_continue), (d2, w2) -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_advisory_confirm2))
+                                .setMessage(Txt.s(R.string.device_advisory_confirm2_msg))
+                                .setPositiveButton(Txt.s(R.string.device_advisory_confirm2_ok), (d3, w3) -> { com.macdmr.radio.ProfileRegistry.setOverride(a.id, true); refresh(); android.widget.Toast.makeText(c, Txt.s(R.string.device_advisory_overridden), android.widget.Toast.LENGTH_LONG).show(); })
+                                .setNegativeButton(Txt.s(R.string.common_cancel), null).show())
+                        .setNegativeButton(Txt.s(R.string.common_cancel), null).show())
                 .show();
     }
 
@@ -672,20 +670,20 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         if (customPttSw == null) return;
         Context c = getContext(); com.macdmr.radio.CustomPttKey.Key k = com.macdmr.radio.CustomPttKey.saved(c);
         customPttSw.setChecked(com.macdmr.radio.CustomPttKey.enabled(c));
-        customPttSub.setText(k == null ? "Not set. Tap to learn a button: press the one you want" : com.macdmr.radio.CustomPttKey.friendly(k.device, k.code) + " · tap to learn another");
+        customPttSub.setText(k == null ? Txt.s(R.string.device_set_custom_ptt_sub) : Txt.s(R.string.device_learn_learned, com.macdmr.radio.CustomPttKey.friendly(k.device, k.code)));
     }
 
     private void learnKeySheet() {
         final Context c = getContext(); float d = Theme.dp(c);
         if (svc == null) return;
         final com.macdmr.radio.CustomPttKey.Key had = com.macdmr.radio.CustomPttKey.saved(c);
-        LinearLayout box = Neo.sheetBody(c, "Learn a PTT key");
-        box.addView(Neo.sheetHint(c, "For a button that isn't the phone's own PTT key: another side key, a wired headset's button, a Bluetooth PTT button, a volume key. Tap Start, then press and hold the button for about two seconds and let go. Nothing transmits while learning.\n\nSignalDeck then checks the button: that it reports being held, that it isn't the power, home or back key, the touch screen or the fingerprint sensor, and whether pressing it also opened another app or does something else on the phone."
-                + (had == null ? "" : "\n\nNow: " + com.macdmr.radio.CustomPttKey.friendly(had.device, had.code) + ".")));
+        LinearLayout box = Neo.sheetBody(c, Txt.s(R.string.device_learn_title), "ptt");
+        box.addView(Neo.sheetHint(c, Txt.s(R.string.device_learn_hint)
+                + (had == null ? "" : Txt.s(R.string.device_learn_now, com.macdmr.radio.CustomPttKey.friendly(had.device, had.code)))));
         final TextView status = Neo.label(c, "", Neo.AMBER_LIGHT, 16, true); status.setPadding(0, (int) (8 * d), 0, (int) (4 * d)); status.setVisibility(GONE);
         box.addView(status);
         final LinearLayout found = new LinearLayout(c); found.setOrientation(VERTICAL); box.addView(found);
-        final TextView start = Neo.button(c, "Start", "ptt", Neo.AMBER), use = Neo.button(c, "Use this key", "check", Neo.GREEN), forget = Neo.button(c, "Forget the learned key", "close", Neo.RED);
+        final TextView start = Neo.button(c, Txt.s(R.string.common_start), "ptt", Neo.AMBER), use = Neo.button(c, Txt.s(R.string.device_learn_use), "check", Neo.GREEN), forget = Neo.button(c, Txt.s(R.string.device_learn_forget), "close", Neo.RED);
         LayoutParams bl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); bl.setMargins(0, (int) (10 * d), 0, 0);
         box.addView(start, bl); box.addView(use, new LayoutParams(bl)); box.addView(forget, new LayoutParams(bl));
         use.setVisibility(GONE); forget.setVisibility(had == null ? GONE : VISIBLE);
@@ -700,11 +698,11 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
             com.macdmr.radio.CustomPttKey.save(c, l.key);
             if (svc != null) svc.customPttChanged();
             refresh(); dlg.dismiss();
-            android.widget.Toast.makeText(c, l.label() + " now transmits" + (svc != null && !svc.profile().verified ? " (once this phone's profile is tested)" : ""), android.widget.Toast.LENGTH_LONG).show();
+            android.widget.Toast.makeText(c, Txt.s(svc != null && !svc.profile().verified ? R.string.device_learn_saved_untested : R.string.device_learn_saved, l.label()), android.widget.Toast.LENGTH_LONG).show();
         });
         start.setOnClickListener(v -> {
             start.setVisibility(GONE); use.setVisibility(GONE); forget.setVisibility(GONE); found.removeAllViews();
-            status.setVisibility(VISIBLE); status.setTextColor(Neo.AMBER_LIGHT); status.setText("Starting…");
+            status.setVisibility(VISIBLE); status.setTextColor(Neo.AMBER_LIGHT); status.setText(Txt.s(R.string.device_starting));
             final com.macdmr.radio.RadioService s = svc;
             s.setPttLearning(true);
             new Thread(() -> {
@@ -714,16 +712,16 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
                 final com.macdmr.radio.CustomPttKey.Learned r = l;
                 post(() -> {
                     last[0] = r;
-                    start.setText("Try again"); start.setVisibility(VISIBLE); forget.setVisibility(com.macdmr.radio.CustomPttKey.saved(c) == null ? GONE : VISIBLE);
+                    start.setText(Txt.s(R.string.device_learn_again)); start.setVisibility(VISIBLE); forget.setVisibility(com.macdmr.radio.CustomPttKey.saved(c) == null ? GONE : VISIBLE);
                     if (r.error != null) { status.setTextColor(Neo.AMBER_LIGHT); status.setText(r.error); return; }
                     boolean blocked = com.macdmr.radio.CustomPttKey.blocked(r.findings);
                     status.setTextColor(blocked ? Neo.RED : r.findings.isEmpty() ? Neo.GREEN_LIGHT : Neo.AMBER_LIGHT);
-                    status.setText(r.label() + (blocked ? ": can't be used" : r.findings.isEmpty() ? ": no conflicts found" : ": usable, but note"));
+                    status.setText(Txt.s(blocked ? R.string.device_learn_blocked : r.findings.isEmpty() ? R.string.device_learn_clean : R.string.device_learn_note, r.label()));
                     for (com.macdmr.radio.CustomPttKey.Finding f : r.findings) {
                         TextView t = Neo.label(c, (f.block ? "⛔  " : "⚠  ") + f.text, f.block ? 0xFFFFB3BC : Neo.TEXT_SOFT, 13.5f, false);
                         t.setPadding(0, (int) (6 * d), 0, 0); found.addView(t);
                     }
-                    if (!blocked) { use.setText(r.findings.isEmpty() ? "Use this key" : "Use it anyway"); use.setVisibility(VISIBLE); }
+                    if (!blocked) { use.setText(r.findings.isEmpty() ? Txt.s(R.string.device_learn_use) : Txt.s(R.string.device_learn_anyway)); use.setVisibility(VISIBLE); }
                 });
             }, "ptt-learn").start();
         });
@@ -732,29 +730,25 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     /** No audio on DMR: one minute on the current channel, a verdict, and everything that led to it in the report. */
     private void dmrAudioCheckIntro() {
         final Context c = getContext(); if (svc == null) return;
-        new android.app.AlertDialog.Builder(c).setTitle("Radio audio check")
-                .setMessage("For \u201Cno sound from the radio\u201D, on DMR or analog. SignalDeck checks the phone's system for the vendor audio service (custom ROMs may lack it), then listens on the current channel and records what the radio reports, whether audio arrived from the phone's radio audio service and how loud it was, and how the phone plays it.\n\n"
-                        + "Analog channel (easiest: a NOAA weather channel, it always has a station): first 10 seconds with the squelch held open (MON), so receiver noise must arrive even with nobody on the air, then one minute with the normal squelch.\n"
-                        + "DMR channel: one minute; have someone talk on the talkgroup meanwhile.\n\n"
-                        + "1. On the Intercom page, choose the channel.\n2. Tap Start.\n\n"
-                        + "Nothing transmits. The audio is only measured, never kept, and caller IDs are shortened in the report. At the end you can share the report." + (svc.isReady() ? "" : "\n\nSignalDeck does not have the radio yet: Take over first (the system checks still run)."))
-                .setPositiveButton("Start", (dd, w) -> runDmrAudioCheck()).setNegativeButton("Later", null).show();
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_audio))
+                .setMessage(Txt.s(R.string.device_audio_intro) + (svc.isReady() ? "" : Txt.s(R.string.device_audio_need_radio)))
+                .setPositiveButton(Txt.s(R.string.common_start), (dd, w) -> runDmrAudioCheck()).setNegativeButton(Txt.s(R.string.common_later), null).show();
     }
     private void runDmrAudioCheck() {
         final Context c = getContext(); final com.macdmr.radio.RadioService s = svc; if (s == null) return;
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Radio audio check").setMessage("Starting\u2026").setCancelable(false).create(); pd.show();
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_audio)).setMessage(Txt.s(R.string.device_starting)).setCancelable(false).create(); pd.show();
         new Thread(() -> {
             String r;
             try { r = com.macdmr.radio.DmrAudioCheck.run(c, s, s.isReady() ? 60 : 1, t -> post(() -> pd.setMessage(t))); }
-            catch (Throwable t) { r = "failed: " + t + "\n"; }
+            catch (Throwable t) { r = "failed: " + t + "\n"; }   // i18n: report text
             final String result = r;
-            com.macdmr.radio.DeviceReport.append("Radio audio check", result);
+            com.macdmr.radio.DeviceReport.append("Radio audio check", result);   // i18n: report section name (the report stays English)
             post(() -> {
                 pd.dismiss();
                 int a = result.indexOf("verdict:\n"), b = result.indexOf("\n\n", Math.max(0, a));
                 String v = a >= 0 && b > a ? result.substring(a + 9, b).trim() : result.substring(0, Math.min(600, result.length()));
-                new android.app.AlertDialog.Builder(c).setTitle("Radio audio check").setMessage(v + "\n\nThe full details are in the device report (Download/DMR/DeviceReport).")
-                        .setPositiveButton("Share the report", (d2, w2) -> shareReport()).setNegativeButton("Close", null).show();
+                new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_audio)).setMessage(Txt.s(R.string.device_audio_result, v))
+                        .setPositiveButton(Txt.s(R.string.device_share_report), (d2, w2) -> shareReport()).setNegativeButton(Txt.s(R.string.common_close), null).show();
             });
         }, "dmr-audio-check").start();
     }
@@ -762,51 +756,47 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     /** The guided second-radio test (SecondRadioTest): instructions, then a step at a time with Ready / Cancel. */
     private void secondRadioIntro() {
         final Context c = getContext(); if (svc == null) return;
-        if (!svc.isReady()) { locked("Take over the radio first (Device page)."); return; }
-        new android.app.AlertDialog.Builder(c).setTitle("Second radio test")
-                .setMessage("You need any other FM radio (a cheap handheld is fine) and about five minutes.\n\n1. On the Intercom page, choose an analog (FM) channel nobody uses, on a frequency the other radio can transmit on: VHF or UHF both work (this phone tunes " + com.macdmr.radio.DeviceProfile.detect().bandsText() + "). Licence-free examples: PMR446 channel 1, 446.00625 MHz (Europe); FRS channel 1, 462.5625 MHz (USA); or a ham simplex frequency if you are licensed.\n2. Set the other radio to the same frequency, no tone, low power, a few metres from this phone.\n3. Tap Start, then do what each step asks: SignalDeck measures everything itself.\n\nThis phone only listens: nothing is transmitted from it. The tone squelch part uses a temporary copy of the channel; your channel is not changed.")
-                .setPositiveButton("Start", (dd, w) -> runSecondRadioTest()).setNegativeButton("Later", null).show();
+        if (!svc.isReady()) { locked(Txt.s(R.string.device_take_over_first)); return; }
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_second))
+                .setMessage(Txt.s(R.string.device_second_intro, com.macdmr.radio.DeviceProfile.detect().bandsText()))
+                .setPositiveButton(Txt.s(R.string.common_start), (dd, w) -> runSecondRadioTest()).setNegativeButton(Txt.s(R.string.common_later), null).show();
     }
     private void runSecondRadioTest() {
         final Context c = getContext(); final com.macdmr.radio.RadioService s = svc; if (s == null) return;
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Second radio test").setMessage("Starting\u2026").setCancelable(false).create(); pd.show();
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_second)).setMessage(Txt.s(R.string.device_starting)).setCancelable(false).create(); pd.show();
         final boolean[] cancelled = { false };
         com.macdmr.radio.SecondRadioTest.Ui ui = new com.macdmr.radio.SecondRadioTest.Ui() {
             @Override public boolean ask(String title, String text) throws InterruptedException {
                 final java.util.concurrent.CountDownLatch l = new java.util.concurrent.CountDownLatch(1); final boolean[] go = { false };
                 post(() -> new android.app.AlertDialog.Builder(c).setTitle(title).setMessage(text).setCancelable(false)
-                        .setPositiveButton("Ready", (d2, w2) -> { go[0] = true; l.countDown(); }).setNegativeButton("Cancel the test", (d2, w2) -> { cancelled[0] = true; l.countDown(); }).show());
+                        .setPositiveButton(Txt.s(R.string.device_second_ready), (d2, w2) -> { go[0] = true; l.countDown(); }).setNegativeButton(Txt.s(R.string.device_second_cancel), (d2, w2) -> { cancelled[0] = true; l.countDown(); }).show());
                 l.await(); return go[0];
             }
             @Override public void status(String text) { post(() -> pd.setMessage(text)); }
         };
         new Thread(() -> {
             String r;
-            try { r = com.macdmr.radio.SecondRadioTest.run(s, ui); } catch (Throwable t) { r = "failed: " + t + "\n"; }
+            try { r = com.macdmr.radio.SecondRadioTest.run(s, ui); } catch (Throwable t) { r = "failed: " + t + "\n"; }   // i18n: report text
             final String result = r;
             if (com.macdmr.radio.DeviceReport.newestDir() == null) { try { com.macdmr.radio.DeviceReport.currentOrNew(c); } catch (Throwable ignored) { } }
-            com.macdmr.radio.DeviceReport.append("Second radio test", result);
+            com.macdmr.radio.DeviceReport.append("Second radio test", result);   // i18n: report section name (the report stays English)
             if (!cancelled[0]) c.getSharedPreferences("radio", Context.MODE_PRIVATE).edit().putLong("supportSecond", System.currentTimeMillis()).apply();
             post(() -> {
                 pd.dismiss();
                 StringBuilder v = new StringBuilder(); for (String line : result.split("\n")) { String t = line.trim(); if (t.matches("[0-9]\\. .*")) v.append(v.length() > 0 ? "\n" : "").append(t); else if (t.startsWith("verdict:")) v.append(" \u2014 ").append(t.substring(8).trim()); }
-                new android.app.AlertDialog.Builder(c).setTitle("Second radio test").setMessage((v.length() == 0 ? result : v.toString()) + "\n\nThe full results are in the device report; Share sends it (with a summary first).")
-                        .setPositiveButton("Share the report", (d2, w2) -> shareReport()).setNegativeButton("Close", null).show();
+                new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_second)).setMessage(Txt.s(R.string.device_second_result, v.length() == 0 ? result : v.toString()))
+                        .setPositiveButton(Txt.s(R.string.device_share_report), (d2, w2) -> shareReport()).setNegativeButton(Txt.s(R.string.common_close), null).show();
             });
         }, "second-radio-test").start();
     }
 
     private void listenCheckIntro() {
         final Context c = getContext(); if (svc == null) return;
-        String need = svc.isReady() ? "" : "\n\nSignalDeck does not have the radio yet: tap Take over on the Device page first.";
-        new android.app.AlertDialog.Builder(c).setTitle("Listen check")
-                .setMessage("1. On the Intercom page, choose a channel where you can hear stations right now (a busy repeater, a weather channel, a friend calling on another radio).\n"
-                        + "2. Come back here and tap Start.\n"
-                        + "3. Part 1, 10 seconds: SignalDeck holds the squelch open (MON), so the speaker should play something — static, or the station if it is talking; it asks what you heard. (Skipped on a DMR channel, which has no static.)\n"
-                        + "4. Part 2, 50 seconds with the normal squelch: it opens by itself when the station talks. SignalDeck records the signal strength and the audio; then say whether you heard the station clearly.\n\n"
-                        + "Turn the media volume up first." + need)
-                .setPositiveButton("Start", (dd, w) -> { if (svc.isReady()) runListenCheck(); else locked("Take over the radio first (Device page)."); })
-                .setNegativeButton("Later", null).show();
+        String need = svc.isReady() ? "" : Txt.s(R.string.device_listen_need_radio);
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_listen))
+                .setMessage(Txt.s(R.string.device_listen_intro) + need)
+                .setPositiveButton(Txt.s(R.string.common_start), (dd, w) -> { if (svc.isReady()) runListenCheck(); else locked(Txt.s(R.string.device_take_over_first)); })
+                .setNegativeButton(Txt.s(R.string.common_later), null).show();
     }
 
     /**
@@ -817,52 +807,54 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private void runListenCheck() {
         final Context c = getContext(); final com.macdmr.radio.RadioService s = svc; if (s == null) return;
         final com.macdmr.radio.ChannelStore.Channel ch = s.current();
-        if (ch != null && ch.isDigital()) { listenStation(s, "part 1 (static) skipped: DMR channel, no static to hear\n"); return; }
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Listen check · part 1 of 2: static").setMessage("Starting…").setCancelable(false).create(); pd.show();
+        if (ch != null && ch.isDigital()) { listenStation(s, "part 1 (static) skipped: DMR channel, no static to hear\n"); return; }   // i18n: report text
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_listen_part1)).setMessage(Txt.s(R.string.device_starting)).setCancelable(false).create(); pd.show();
         final boolean wasMon = s.monitorOn();
         new Thread(() -> {
             String r;
             try {
                 if (!wasMon) s.setMonitor(true);                       // squelch forced open: receiver noise plays even with nobody on the channel
-                r = com.macdmr.radio.FirstRunCheck.listenCheck(s, 10, t -> post(() -> pd.setMessage("Listen to the speaker: with the squelch held open you should hear something — static (a hiss), or the station if one is on the air.\n\n" + t)),
+                r = com.macdmr.radio.FirstRunCheck.listenCheck(s, 10, t -> post(() -> pd.setMessage(Txt.s(R.string.device_listen_part1_msg, t))),
                         new java.io.File(listenDir(c), "listen_static.wav"), 5000, false);         // 5 s of receiver noise: nothing private in it
-            } catch (Throwable t) { r = "failed: " + t + "\n"; }
+            } catch (Throwable t) { r = "failed: " + t + "\n"; }   // i18n: report text
             finally { if (!wasMon) s.setMonitor(false); }
             final String part1 = r;
             post(() -> {
                 pd.dismiss();
-                final String[] answers = { "Yes: static (a hiss)", "Yes: a station talking", "No sound at all", "Not sure" };
-                new android.app.AlertDialog.Builder(c).setTitle("Did you hear anything from the speaker?").setCancelable(false)
-                        .setItems(answers, (dd, w) -> listenStation(s, "part 1 (static, MON on, 10 s):\n" + part1 + "owner's answer: " + answers[w] + "\n")).show();
+                final int[] answerIds = { R.string.device_listen_ans_static, R.string.device_listen_ans_talking, R.string.device_listen_ans_none, R.string.device_listen_ans_unsure };
+                final String[] answers = new String[answerIds.length]; for (int i = 0; i < answers.length; i++) answers[i] = Txt.s(answerIds[i]);
+                new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_listen_q1)).setCancelable(false)
+                        .setItems(answers, (dd, w) -> listenStation(s, "part 1 (static, MON on, 10 s):\n" + part1 + "owner's answer: " + Txt.en(answerIds[w]) + "\n")).show();   // i18n: report text
             });
         }, "listen-check-static").start();
     }
 
     private void listenStation(final com.macdmr.radio.RadioService s, final String part1) {
         final Context c = getContext();
-        new android.app.AlertDialog.Builder(c).setTitle("Listen check · part 2 of 2: a station")
-                .setMessage("Now 50 seconds on this channel with the normal squelch. It opens by itself when a station is on the air: listen for it, then say whether you heard it clearly.")
-                .setCancelable(false).setPositiveButton("Start part 2", (d0, w0) -> {
-                    final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Listen check · part 2 of 2").setMessage("Starting…").setCancelable(false).create(); pd.show();
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_listen_part2))
+                .setMessage(Txt.s(R.string.device_listen_part2_msg))
+                .setCancelable(false).setPositiveButton(Txt.s(R.string.device_listen_part2_start), (d0, w0) -> {
+                    final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_listen_part2_progress)).setMessage(Txt.s(R.string.device_starting)).setCancelable(false).create(); pd.show();
                     new Thread(() -> {
                         String r;
                         try { r = com.macdmr.radio.FirstRunCheck.listenCheck(s, 50, t -> post(() -> pd.setMessage(t)),
                                 new java.io.File(listenDir(c), com.macdmr.radio.DeviceReport.STATION_CLIP), 20000, true); }   // up to 20 s, only while something is heard
-                        catch (Throwable t) { r = "failed: " + t + "\n"; }
-                        final String result = part1 + "\npart 2 (station, normal squelch, 50 s):\n" + r;
+                        catch (Throwable t) { r = "failed: " + t + "\n"; }   // i18n: report text
+                        final String result = part1 + "\npart 2 (station, normal squelch, 50 s):\n" + r;   // i18n: report text
                         post(() -> {
                             pd.dismiss();
-                            final String[] answers = { "Yes, clearly", "Yes, but distorted, choppy or too quiet", "No sound at all", "Nobody was talking" };
-                            new android.app.AlertDialog.Builder(c).setTitle("Did you hear the station?").setCancelable(false)
+                            final int[] answerIds = { R.string.device_listen_ans_clear, R.string.device_listen_ans_distorted, R.string.device_listen_ans_none, R.string.device_listen_ans_nobody };
+                            final String[] answers = new String[answerIds.length]; for (int i = 0; i < answers.length; i++) answers[i] = Txt.s(answerIds[i]);
+                            new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_listen_q2)).setCancelable(false)
                                     .setItems(answers, (dd, w) -> new Thread(() -> {
                                         java.io.File rep = com.macdmr.radio.DeviceReport.currentOrNew(c);             // never into an old, unrelated report
                                         if (rep != null) for (java.io.File w2 : new java.io.File[] { new java.io.File(listenDir(c), "listen_static.wav"), new java.io.File(listenDir(c), com.macdmr.radio.DeviceReport.STATION_CLIP) })
                                             if (w2.length() > 44) { com.macdmr.radio.DeviceReport.copyFile(w2, new java.io.File(rep, w2.getName())); w2.delete(); }
-                                        com.macdmr.radio.DeviceReport.append("Listen check", result + "owner's answer: " + answers[w] + "\n");
+                                        com.macdmr.radio.DeviceReport.append("Listen check", result + "owner's answer: " + Txt.en(answerIds[w]) + "\n");   // i18n: report text
                                         c.getSharedPreferences("radio", Context.MODE_PRIVATE).edit().putLong("supportListen", System.currentTimeMillis()).apply();
-                                        post(() -> new android.app.AlertDialog.Builder(c).setTitle("Listen check saved")
-                                                .setMessage(result + "\nYour answer: " + answers[w] + "\n\nNext: Help support this phone → 3 Send the results.")
-                                                .setPositiveButton("Send now", (d2, w2) -> shareReport()).setNegativeButton("Later", null).show());
+                                        post(() -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_listen_saved))
+                                                .setMessage(Txt.s(R.string.device_listen_saved_msg, result, answers[w]))
+                                                .setPositiveButton(Txt.s(R.string.device_listen_send), (d2, w2) -> shareReport()).setNegativeButton(Txt.s(R.string.common_later), null).show());
                                     }).start()).show();
                         });
                     }, "listen-check-station").start();
@@ -874,10 +866,10 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
 
     private void generateReport() {
         final Context c = getContext();
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Device report").setMessage("Starting…").setCancelable(false).create(); pd.show();
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_report)).setMessage(Txt.s(R.string.device_starting)).setCancelable(false).create(); pd.show();
         new Thread(() -> {
-            try { com.macdmr.radio.DeviceReport.generate(c, s -> post(() -> pd.setMessage(s + "…"))); post(() -> { pd.dismiss(); new android.app.AlertDialog.Builder(c).setTitle("Report ready").setMessage("Saved under Download/DMR/DeviceReport. If the phone has a side PTT key, run \"Capture the PTT key\" and, with root, the radio probe, then use Share last report, which explains what it contains.").setPositiveButton("OK", null).show(); }); }
-            catch (Throwable t) { post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, "Report failed: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show(); }); }
+            try { com.macdmr.radio.DeviceReport.generate(c, s -> post(() -> pd.setMessage(s + "…"))); post(() -> { pd.dismiss(); new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_report_ready)).setMessage(Txt.s(R.string.device_report_ready_msg)).setPositiveButton(Txt.s(R.string.common_ok), null).show(); }); }
+            catch (Throwable t) { post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, Txt.s(R.string.device_report_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show(); }); }
         }).start();
     }
 
@@ -905,17 +897,17 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private LinearLayout layoutRow(final Context c) {
         final String[] keys = { "auto", "regular", "compact" };
         final int hdp = c.getResources().getConfiguration().screenHeightDp;
-        final String[] names = { "Automatic (" + (IntercomView.compactFor(hdp, "auto") ? "compact" : "regular") + " on this phone, " + hdp + " dp tall)", "Regular", "Compact" };
+        final String[] names = { Txt.s(IntercomView.compactFor(hdp, "auto") ? R.string.device_layout_auto_compact : R.string.device_layout_auto_regular, hdp), Txt.s(R.string.device_layout_regular), Txt.s(R.string.device_layout_compact) };
         String cur = IntercomView.layoutPref(c); int sel = 0; for (int i = 0; i < keys.length; i++) if (keys[i].equals(cur)) sel = i;
-        final LinearLayout row = Neo.switchRow(c, "intercom", Neo.CYAN, "Intercom layout", names[sel], null);
+        final LinearLayout row = Neo.switchRow(c, "intercom", Neo.CYAN, Txt.s(R.string.device_layout), names[sel], null);
         final int pick = sel;
-        row.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle("Intercom layout")
+        row.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_layout))
                 .setSingleChoiceItems(names, pick, (dd, w) -> {
                     dd.dismiss();
                     if (keys[w].equals(IntercomView.layoutPref(c))) return;
                     IntercomView.setLayoutPref(c, keys[w]);
                     if (c instanceof android.app.Activity) ((android.app.Activity) c).recreate();   // the tab bar is sized when the screen is built
-                }).setNegativeButton("Cancel", null).show());
+                }).setNegativeButton(Txt.s(R.string.common_cancel), null).show());
         return row;
     }
 
@@ -923,21 +915,18 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         final Context c = getContext(); if (svc == null) return;
         final com.macdmr.radio.DeviceProfile dp = svc.profile();
         final boolean canTrial = dp.supported && !svc.isReady();
-        String msg = (firstLaunch ? (dp.supported ? "SignalDeck has a profile for this phone that has not been tested on it yet. " : "SignalDeck does not know this phone yet. ")
-                + "One run of the checks tells us what we need to make it work. It takes about two minutes.\n\n" : "")
-                + "What happens:\n• a device report (phone, ports, radio module, the stock walkie-talkie app; only reads)\n"
-                + "• 10 s to press the side PTT key a few times\n"
-                + "• with root, the stock walkie-talkie app is closed, then opened for 15 s so we can see how it starts the radio and what it sends to it (do not press PTT then), and closed again\n"
-                + "• with Magisk root, the radio probe (asks the module who it is on the serial ports the walkie-talkie app uses: the DMR version query and the SA818 AT handshake; switches the module on if it does not answer"
-                + (dp.supported ? "" : ", only on phones with a profile") + ")\n"
-                + (canTrial ? "• optionally a trial (30 seconds, about a minute and a half on an untested phone): SignalDeck takes the radio (receive only, nothing is transmitted), records what the module and the audio do"
-                        + (dp.verified ? "" : ", how its squelch, receive level and signal reading behave and which frequencies it tunes at the band edges") + ", then gives it back to " + dp.stockApp + "\n" : "")
-                + (dp.supported && !dp.stockApp.isEmpty() ? "\n" + dp.stockApp + " is closed for the checks; open it again afterwards as usual.\n" : "")
-                + "\nAt the end you get one zip to send us.";
-        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(c).setTitle(firstLaunch ? "Help us support this phone" : "Run all checks").setMessage(msg)
-                .setPositiveButton(canTrial ? "Checks + trial" : "Run checks", (dd, w) -> chooseApp(canTrial))
-                .setNegativeButton(firstLaunch ? "Later" : "Cancel", null);
-        if (canTrial) b.setNeutralButton("Checks only", (dd, w) -> chooseApp(false));
+        StringBuilder mb = new StringBuilder();
+        if (firstLaunch) mb.append(Txt.s(dp.supported ? R.string.device_checks_intro_known : R.string.device_checks_intro_unknown));
+        mb.append(Txt.s(R.string.device_checks_steps));
+        mb.append(Txt.s(dp.supported ? R.string.device_checks_probe : R.string.device_checks_probe_no_profile));
+        if (canTrial) mb.append(Txt.s(dp.verified ? R.string.device_checks_trial : R.string.device_checks_trial_untested, dp.stockApp));
+        if (dp.supported && !dp.stockApp.isEmpty()) mb.append(Txt.s(R.string.device_checks_stock_closed, dp.stockApp));
+        mb.append(Txt.s(R.string.device_checks_end));
+        String msg = mb.toString();
+        android.app.AlertDialog.Builder b = new android.app.AlertDialog.Builder(c).setTitle(firstLaunch ? Txt.s(R.string.device_checks_first_title) : Txt.s(R.string.device_checks)).setMessage(msg)
+                .setPositiveButton(canTrial ? Txt.s(R.string.device_checks_with_trial) : Txt.s(R.string.device_checks_run), (dd, w) -> chooseApp(canTrial))
+                .setNegativeButton(firstLaunch ? Txt.s(R.string.common_later) : Txt.s(R.string.common_cancel), null);
+        if (canTrial) b.setNeutralButton(Txt.s(R.string.device_checks_only), (dd, w) -> chooseApp(false));
         b.show();
     }
 
@@ -948,7 +937,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     private void chooseApp(final boolean trial) {
         final Context c = getContext(); if (svc == null) return;
         if (svc.isReady()) { runChecks(trial, null); return; }        // SignalDeck owns the radio: the stock app is not opened
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Run all checks").setMessage("Looking for the walkie-talkie app…").setCancelable(false).create(); pd.show();
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_checks)).setMessage(Txt.s(R.string.device_checks_finding_app)).setCancelable(false).create(); pd.show();
         final com.macdmr.radio.DeviceProfile dp = svc.profile();
         new Thread(() -> {
             final java.util.List<com.macdmr.radio.RadioAppFinder.App> ranked = com.macdmr.radio.RadioAppFinder.rank(c);
@@ -957,16 +946,16 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
                 pd.dismiss();
                 if (!root) { runChecks(trial, null); return; }
                 final java.util.List<String> pkgs = new java.util.ArrayList<>(); final java.util.List<String> rows = new java.util.ArrayList<>();
-                if (dp.supported && !dp.stockApp.isEmpty()) { pkgs.add(dp.stockApp); rows.add(appLabel(c, dp.stockApp) + "\n" + dp.stockApp + " · the stock app for the " + dp.name); }
-                for (com.macdmr.radio.RadioAppFinder.App a : ranked) if (pkgs.size() < 5 && a.launcher && !pkgs.contains(a.pkg)) { pkgs.add(a.pkg); rows.add(a.label + "\n" + a.pkg + " · " + String.join(", ", a.why)); }
+                if (dp.supported && !dp.stockApp.isEmpty()) { pkgs.add(dp.stockApp); rows.add(Txt.s(R.string.device_checks_app_stock, appLabel(c, dp.stockApp), dp.stockApp, dp.name)); }
+                for (com.macdmr.radio.RadioAppFinder.App a : ranked) if (pkgs.size() < 5 && a.launcher && !pkgs.contains(a.pkg)) { pkgs.add(a.pkg); rows.add(a.label + "\n" + a.pkg + " · " + a.whyText()); }
                 final String OTHER = "\u0000other";
-                pkgs.add(OTHER); rows.add("Choose another app…\nIf the walkie-talkie app is not listed");
-                pkgs.add(null); rows.add("None — skip this step");
+                pkgs.add(OTHER); rows.add(Txt.s(R.string.device_checks_app_other));
+                pkgs.add(null); rows.add(Txt.s(R.string.device_checks_app_none));
                 final int[] pick = { 0 };
-                new android.app.AlertDialog.Builder(c).setTitle("Open which walkie-talkie app for 15 s?")
+                new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_checks_app_title))
                         .setSingleChoiceItems(rows.toArray(new String[0]), 0, (dd, w) -> pick[0] = w)
-                        .setPositiveButton("Continue", (dd, w) -> { if (OTHER.equals(pkgs.get(pick[0]))) chooseAnyApp(trial); else runChecks(trial, pkgs.get(pick[0])); })
-                        .setNegativeButton("Cancel", null).show();
+                        .setPositiveButton(Txt.s(R.string.common_continue), (dd, w) -> { if (OTHER.equals(pkgs.get(pick[0]))) chooseAnyApp(trial); else runChecks(trial, pkgs.get(pick[0])); })
+                        .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
             });
         }, "radio-app-finder").start();
     }
@@ -981,16 +970,16 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         for (android.content.pm.ResolveInfo ri : ris) {
             String p = ri.activityInfo.packageName; if (p.equals(c.getPackageName()) || pkgs.contains(p)) continue;
             boolean sys = (ri.activityInfo.applicationInfo.flags & android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0;
-            all.add(new String[] { (sys ? "0" : "1") + String.valueOf(ri.loadLabel(pm)).toLowerCase(java.util.Locale.ROOT), p, String.valueOf(ri.loadLabel(pm)) + "\n" + p + (sys ? " · system app" : "") });
+            all.add(new String[] { (sys ? "0" : "1") + String.valueOf(ri.loadLabel(pm)).toLowerCase(java.util.Locale.ROOT), p, (sys ? Txt.s(R.string.device_checks_app_system, String.valueOf(ri.loadLabel(pm)), p) : String.valueOf(ri.loadLabel(pm)) + "\n" + p) });
             pkgs.add(p);
         }
         java.util.Collections.sort(all, (x, y) -> x[0].compareTo(y[0]));
         pkgs.clear(); for (String[] a : all) { pkgs.add(a[1]); rows.add(a[2]); }
-        new android.app.AlertDialog.Builder(c).setTitle("Which app is the walkie-talkie app?")
-                .setItems(rows.toArray(new String[0]), (dd, w) -> new android.app.AlertDialog.Builder(c).setTitle("Open " + rows.get(w).split("\n")[0] + " for 15 s?")
-                        .setMessage("The checks open it the way its icon does, record how it starts the radio, and close it again. Do not press PTT while it is open.")
-                        .setPositiveButton("Continue", (d2, w2) -> runChecks(trial, pkgs.get(w))).setNegativeButton("Back", (d2, w2) -> chooseAnyApp(trial)).show())
-                .setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_checks_any_title))
+                .setItems(rows.toArray(new String[0]), (dd, w) -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_checks_open_app, rows.get(w).split("\n")[0]))
+                        .setMessage(Txt.s(R.string.device_checks_open_app_msg))
+                        .setPositiveButton(Txt.s(R.string.common_continue), (d2, w2) -> runChecks(trial, pkgs.get(w))).setNegativeButton(Txt.s(R.string.common_back), (d2, w2) -> chooseAnyApp(trial)).show())
+                .setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private static String appLabel(Context c, String pkg) {
@@ -999,7 +988,7 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
 
     private void runChecks(final boolean trial, final String watchPkg) {
         final Context c = getContext(); if (svc == null) return;
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Checking this phone").setMessage("Starting…").setCancelable(false).create(); pd.show();
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_checks_running)).setMessage(Txt.s(R.string.device_starting)).setCancelable(false).create(); pd.show();
         final com.macdmr.radio.RadioService s = svc;
         new Thread(() -> {
             try {
@@ -1011,18 +1000,18 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
                 final String summary = k >= 0 ? rep.substring(k + 17).trim() : "";
                 post(() -> {
                     pd.dismiss();
-                    new android.app.AlertDialog.Builder(c).setTitle("Checks done")
-                            .setMessage((summary.isEmpty() ? "" : summary + "\n\n") + "Everything is in one zip (" + zip.length() / 1024 + " kB). Tap Send to share it by e-mail, a messenger or a cloud drive, or open a GitHub issue and drag the zip in.\n\nThe folder is also on the phone: Download/DMR/DeviceReport/" + (dir != null ? dir.getName() : "") + " (with a computer: adb pull /sdcard/Download/DMR/DeviceReport).")
-                            .setPositiveButton("Send", (dd, w) -> shareReport()).setNeutralButton("GitHub issue", (dd, w) -> com.macdmr.radio.DeviceReport.openIssue(c)).setNegativeButton("Close", null).show();
+                    new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_checks_done))
+                            .setMessage((summary.isEmpty() ? "" : summary + "\n\n") + Txt.s(R.string.device_checks_done_msg, String.valueOf(zip.length() / 1024), dir != null ? dir.getName() : ""))
+                            .setPositiveButton(Txt.s(R.string.common_send), (dd, w) -> shareReport()).setNeutralButton(Txt.s(R.string.device_checks_issue), (dd, w) -> com.macdmr.radio.DeviceReport.openIssue(c)).setNegativeButton(Txt.s(R.string.common_close), null).show();
                 });
-            } catch (Throwable t) { post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, "Checks failed: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show(); }); }
+            } catch (Throwable t) { post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, Txt.s(R.string.device_checks_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show(); }); }
         }, "first-run-check").start();
     }
 
     private void shareReport() {
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Share the device report")
-                .setMessage("The report holds phone model and build facts, serial-port and radio-module node names, the walkie-talkie app's package details, library and framework file names, running radio processes, and (with root) SELinux labels and short radio-related log excerpts with message text removed and long numbers masked. After Run all checks it also holds SignalDeck's own log (packet, position, message and caller lines removed; callsigns and IDs masked), the bytes the stock app exchanged with the radio module while it started (stock_serial.txt: commands, channel frequencies and the module's answers; radio IDs blanked) and, after the trial, a 5-second raw copy of what the radio received (rx_audio_raw.bin: whatever the channel carried). No accounts, contacts, messages, location or identifiers such as IMEI.\n\nThe copied stock walkie-talkie APK is the manufacturer's software: include it if you are comfortable posting it, or share without it (we can ask for it privately).")
-                .setPositiveButton("Share all", (dd, w) -> askStation(true)).setNeutralButton("Without the APK", (dd, w) -> askStation(false)).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.device_share_title))
+                .setMessage(Txt.s(R.string.device_share_msg))
+                .setPositiveButton(Txt.s(R.string.device_share_all), (dd, w) -> askStation(true)).setNeutralButton(Txt.s(R.string.device_share_no_apk), (dd, w) -> askStation(false)).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private static java.io.File listenDir(Context c) { java.io.File d = new java.io.File(c.getCacheDir(), "listen"); d.mkdirs(); return d; }
@@ -1032,82 +1021,80 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         java.io.File dir = com.macdmr.radio.DeviceReport.newestDir();
         if (dir == null || !new java.io.File(dir, com.macdmr.radio.DeviceReport.STATION_CLIP).exists()) { shareZip(withApks, false); return; }
         final boolean[] include = { false };
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Include the station recording?")
-                .setSingleChoiceItems(new String[] { "Leave it out", "Include it (up to 20 s of what the station sent; it may contain other people's voices)" }, 0, (dd, w) -> include[0] = w == 1)
-                .setPositiveButton("Share", (dd, w) -> shareZip(withApks, include[0])).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.device_share_station_q))
+                .setSingleChoiceItems(new String[] { Txt.s(R.string.device_share_station_no), Txt.s(R.string.device_share_station_yes) }, 0, (dd, w) -> include[0] = w == 1)
+                .setPositiveButton(Txt.s(R.string.common_share), (dd, w) -> shareZip(withApks, include[0])).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void captureKeys() {
         final Context c = getContext();
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Press the PTT key now").setMessage("Press and release the phone's side PTT button a few times within the next 10 seconds. Everything the phone reports for it is recorded.").setCancelable(false).create(); pd.show();
-        new Thread(() -> { final String r = com.macdmr.radio.DeviceReport.captureKeys(c, 10); final java.io.File dir = com.macdmr.radio.DeviceReport.append("PTT key capture", r); post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, dir == null ? "Captured, but generate a report first so it can be saved" : "Saved to the report", android.widget.Toast.LENGTH_LONG).show(); }); }).start();
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_capture_title)).setMessage(Txt.s(R.string.device_capture_msg)).setCancelable(false).create(); pd.show();
+        new Thread(() -> { final String r = com.macdmr.radio.DeviceReport.captureKeys(c, 10); final java.io.File dir = com.macdmr.radio.DeviceReport.append("PTT key capture", r); post(() -> { pd.dismiss(); android.widget.Toast.makeText(c, dir == null ? Txt.s(R.string.device_capture_no_report) : Txt.s(R.string.device_capture_saved), android.widget.Toast.LENGTH_LONG).show(); }); }).start();   // i18n: report section name (the report stays English)
     }
 
     /** Opt-in: list the phone's radio firmware files (name, size, SHA-256, version strings); copy only the ticked ones. */
     private void firmwareFilesIntro() {
         final Context c = getContext();
-        new android.app.AlertDialog.Builder(c).setTitle("Radio firmware files")
-                .setMessage("Needs Magisk root. Looks in the folders where radio phones keep their radio chip images, and in the stock walkie-talkie app, and lists what it finds: name, size, a fingerprint (SHA-256) and the module version written inside. SignalDeck's own files (serial captures, recordings, reports) are left out; in /sdcard/DMR only a module image counts. A file SignalDeck or its firmware catalogue already has is marked already known, so nobody needs a copy of it. "
-                        + "The list goes into the device report. Nothing is copied unless you tick files, and then only into Download/DMR/FoundFirmware on this phone; nothing is sent anywhere. "
-                        + "These files belong to the phone maker: share them only privately, and only if the SignalDeck maintainer asks.")
-                .setPositiveButton("Look", (dd, w) -> firmwareFilesScan()).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_fwfiles))
+                .setMessage(Txt.s(R.string.device_fwfiles_intro))
+                .setPositiveButton(Txt.s(R.string.device_fwfiles_look), (dd, w) -> firmwareFilesScan()).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void firmwareFilesScan() {
         final Context c = getContext();
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Radio firmware files").setMessage("Starting…").setCancelable(false).create(); pd.show();
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_fwfiles)).setMessage(Txt.s(R.string.device_starting)).setCancelable(false).create(); pd.show();
         new Thread(() -> {
             final com.macdmr.radio.RadioService rs = svc != null ? svc : com.macdmr.radio.RadioService.running;   // the page may not be attached yet
             final String stockApp = rs != null ? rs.profile().stockApp : "";
             java.util.List<String> apks = com.macdmr.radio.FirmwareFinder.stockApks(c, stockApp);   // each step guarded and logged; root pm path when the stock app is not visible
             final java.util.List<com.macdmr.radio.FirmwareFinder.Found> fs = com.macdmr.radio.FirmwareFinder.scan(c, apks, s -> post(() -> pd.setMessage(s + "…")));
             if (apks.isEmpty()) fs.add(com.macdmr.radio.FirmwareFinder.noStockApk(stockApp));
-            final java.io.File dir = com.macdmr.radio.DeviceReport.append("Radio firmware files found (root)", com.macdmr.radio.FirmwareFinder.describe(fs));
+            final java.io.File dir = com.macdmr.radio.DeviceReport.append("Radio firmware files found (root)", com.macdmr.radio.FirmwareFinder.describe(fs));   // i18n: report section name (the report stays English)
             post(() -> {
                 pd.dismiss();
                 final java.util.List<com.macdmr.radio.FirmwareFinder.Found> readable = new java.util.ArrayList<>();
                 for (com.macdmr.radio.FirmwareFinder.Found f : fs) if (f.size > 0 && !f.sha256.isEmpty() && !f.sha256.startsWith("(")) readable.add(f);
                 if (readable.isEmpty()) {
-                    new android.app.AlertDialog.Builder(c).setTitle("Radio firmware files").setMessage("None found that could be read." + (dir == null ? "" : " The search is in the device report.")).setPositiveButton("OK", null).show();
+                    new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_fwfiles)).setMessage(Txt.s(dir == null ? R.string.device_fwfiles_none : R.string.device_fwfiles_none_in_report)).setPositiveButton(Txt.s(R.string.common_ok), null).show();
                     com.macdmr.radio.FirmwareFinder.cleanUp(c); return;
                 }
                 String[] items = new String[readable.size()]; final boolean[] on = new boolean[items.length];
-                for (int i = 0; i < items.length; i++) { com.macdmr.radio.FirmwareFinder.Found f = readable.get(i); items[i] = f.name() + "\n" + (f.size / 1024) + " kB" + (f.versions.isEmpty() ? "" : " · " + f.versions) + (f.known.isEmpty() ? "" : "\nAlready known: " + f.known) + "\n" + f.source; }
-                new android.app.AlertDialog.Builder(c).setTitle(readable.size() + " found (listed in the report)").setMultiChoiceItems(items, on, (d2, w2, ch) -> on[w2] = ch)
-                        .setPositiveButton("Copy ticked", (d2, w2) -> {
+                for (int i = 0; i < items.length; i++) { com.macdmr.radio.FirmwareFinder.Found f = readable.get(i); items[i] = f.name() + "\n" + (f.size / 1024) + " kB" + (f.versions.isEmpty() ? "" : " · " + f.versions) + (f.known.isEmpty() ? "" : Txt.s(R.string.device_fwfiles_known, f.known)) + "\n" + f.source; }
+                new android.app.AlertDialog.Builder(c).setTitle(Txt.p(R.plurals.device_fwfiles_found, readable.size(), readable.size())).setMultiChoiceItems(items, on, (d2, w2, ch) -> on[w2] = ch)
+                        .setPositiveButton(Txt.s(R.string.device_fwfiles_copy), (d2, w2) -> {
                             java.util.List<com.macdmr.radio.FirmwareFinder.Found> ticked = new java.util.ArrayList<>();
                             for (int i = 0; i < on.length; i++) if (on[i]) ticked.add(readable.get(i));
                             if (ticked.isEmpty()) { com.macdmr.radio.FirmwareFinder.cleanUp(c); return; }
                             new Thread(() -> {
                                 String msg;
-                                try { java.io.File out = com.macdmr.radio.FirmwareFinder.copy(ticked); msg = "Copied " + ticked.size() + " file" + (ticked.size() == 1 ? "" : "s") + " to Download/DMR/FoundFirmware/" + out.getName() + " with a SOURCES.txt. Nothing was sent anywhere; share the folder privately if asked."; com.macdmr.radio.DeviceReport.append("Radio firmware files copied", msg + "\n"); }
-                                catch (Throwable t) { msg = "Copy failed: " + t.getMessage(); }
+                                try { java.io.File out = com.macdmr.radio.FirmwareFinder.copy(ticked); msg = Txt.p(R.plurals.device_fwfiles_copied, ticked.size(), ticked.size(), out.getName()); com.macdmr.radio.DeviceReport.append("Radio firmware files copied", Txt.enP(R.plurals.device_fwfiles_copied, ticked.size(), ticked.size(), out.getName()) + "\n"); }   // i18n: report section name; the report gets the English
+                                catch (Throwable t) { msg = Txt.s(R.string.device_fwfiles_copy_failed, t.getMessage()); }
                                 com.macdmr.radio.FirmwareFinder.cleanUp(c);
-                                final String m = msg; post(() -> new android.app.AlertDialog.Builder(c).setTitle("Radio firmware files").setMessage(m).setPositiveButton("OK", null).show());
+                                final String m = msg; post(() -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_fwfiles)).setMessage(m).setPositiveButton(Txt.s(R.string.common_ok), null).show());
                             }).start();
                         })
-                        .setNegativeButton("Copy nothing", (d2, w2) -> com.macdmr.radio.FirmwareFinder.cleanUp(c)).setCancelable(false).show();
+                        .setNegativeButton(Txt.s(R.string.device_fwfiles_copy_none), (d2, w2) -> com.macdmr.radio.FirmwareFinder.cleanUp(c)).setCancelable(false).show();
             });
         }).start();
     }
 
     private void probe() {
-        new android.app.AlertDialog.Builder(getContext()).setTitle("Radio probe").setMessage("Needs Magisk root. Reads the serial ports' SELinux labels, derives and applies the rules for this session, sends the module's version query on each port at several speeds, reads the power node and sniffs for a PCM stream. The stock walkie-talkie app should be closed. Also pulse the power node?")
-                .setPositiveButton("Probe", (dd, w) -> runProbe(false)).setNeutralButton(svc != null && svc.profile().supported ? "Probe + power pulse" : null, (dd, w) -> runProbe(true)).setNegativeButton("Cancel", null).show();
+        new android.app.AlertDialog.Builder(getContext()).setTitle(Txt.s(R.string.device_probe)).setMessage(Txt.s(R.string.device_probe_msg))
+                .setPositiveButton(Txt.s(R.string.device_probe_run), (dd, w) -> runProbe(false)).setNeutralButton(svc != null && svc.profile().supported ? Txt.s(R.string.device_probe_pulse) : null, (dd, w) -> runProbe(true)).setNegativeButton(Txt.s(R.string.common_cancel), null).show();
     }
 
     private void shareZip(final boolean withApks, final boolean withStation) {
         final Context c = getContext();
-        new Thread(() -> { try { final java.io.File zip = com.macdmr.radio.DeviceReport.zipNewest(c, withApks, withStation); post(() -> com.macdmr.radio.DeviceReport.share(c, zip)); } catch (Throwable t) { post(() -> android.widget.Toast.makeText(c, "No report yet: generate one first", android.widget.Toast.LENGTH_LONG).show()); } }).start();
+        new Thread(() -> { try { final java.io.File zip = com.macdmr.radio.DeviceReport.zipNewest(c, withApks, withStation); post(() -> com.macdmr.radio.DeviceReport.share(c, zip)); } catch (Throwable t) { post(() -> android.widget.Toast.makeText(c, Txt.s(R.string.device_share_none), android.widget.Toast.LENGTH_LONG).show()); } }).start();
     }
 
     private void runProbe(boolean pulse) {
         final Context c = getContext();
-        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle("Radio probe").setMessage("Starting…").setCancelable(false).create(); pd.show();
+        final android.app.AlertDialog pd = new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_probe)).setMessage(Txt.s(R.string.device_starting)).setCancelable(false).create(); pd.show();
         new Thread(() -> {
             final String r = com.macdmr.radio.RadioProbe.run(c, s -> post(() -> pd.setMessage(s + "…")), pulse);
-            final java.io.File dir = com.macdmr.radio.DeviceReport.append("Radio probe", r);
-            post(() -> { pd.dismiss(); new android.app.AlertDialog.Builder(c).setTitle("Radio probe").setMessage((dir == null ? "(generate a report first so this is saved)\n\n" : "") + (r.length() > 3000 ? r.substring(0, 3000) + "…" : r)).setPositiveButton("OK", null).show(); });
+            final java.io.File dir = com.macdmr.radio.DeviceReport.append("Radio probe", r);   // i18n: report section name (the report stays English)
+            post(() -> { pd.dismiss(); new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_probe)).setMessage(dir == null ? Txt.s(R.string.device_probe_not_saved, r.length() > 3000 ? r.substring(0, 3000) + "…" : r) : (r.length() > 3000 ? r.substring(0, 3000) + "…" : r)).setPositiveButton(Txt.s(R.string.common_ok), null).show(); });
         }).start();
     }
 
@@ -1143,15 +1130,15 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
     }
     private void autoTrustSheet() {
         Context c = getContext(); float d = Theme.dp(c);
-        LinearLayout box = Neo.sheetBody(c, "Show the radio in the car");
-        box.addView(Neo.sheetHint(c, "Android Auto only trusts apps installed from the Play Store. For SignalDeck it plays the sound and the steering-wheel buttons work, but the app is missing from the car's app list and tapping its card opens the app on the phone."));
+        LinearLayout box = Neo.sheetBody(c, Txt.s(R.string.device_auto_title), "radio");
+        box.addView(Neo.sheetHint(c, Txt.s(R.string.device_auto_hint)));
         box.addView(Neo.sheetHint(c, com.macdmr.radio.car.AutoTrust.steps(com.macdmr.radio.car.AutoTrust.last())));
-        TextView open = Neo.button(c, "Open Android Auto settings", "intercom", Neo.AMBER);
-        TextView again = Neo.button(c, "Check again", "update", Neo.CYAN);
+        TextView open = Neo.button(c, Txt.s(R.string.device_auto_open), "intercom", Neo.AMBER);
+        TextView again = Neo.button(c, Txt.s(R.string.device_auto_again), "update", Neo.CYAN);
         LayoutParams bl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); bl.setMargins(0, (int) (10 * d), 0, 0);
         box.addView(open, bl); box.addView(again, new LayoutParams(bl));
         final android.app.Dialog dlg = Neo.showSheet(c, box);
-        open.setOnClickListener(v -> { try { c.startActivity(com.macdmr.radio.car.AutoTrust.settingsIntent(c)); } catch (Throwable t) { android.widget.Toast.makeText(c, "Could not open Android Auto: " + t.getMessage(), android.widget.Toast.LENGTH_LONG).show(); } });
+        open.setOnClickListener(v -> { try { c.startActivity(com.macdmr.radio.car.AutoTrust.settingsIntent(c)); } catch (Throwable t) { android.widget.Toast.makeText(c, Txt.s(R.string.intercom_lastheard_open_auto_failed, t.getMessage()), android.widget.Toast.LENGTH_LONG).show(); } });
         again.setOnClickListener(v -> { dlg.dismiss(); checkAutoTrust(); });
     }
 
@@ -1160,28 +1147,22 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
 
     /** Ask whether to submit this phone's firmware variant: GitHub's issue form, filled in, in the browser. */
     public static void offerVariant(Context c, com.macdmr.radio.FirmwareVariantCheck.Finding f, Runnable after) {
-        new android.app.AlertDialog.Builder(c).setTitle("New firmware variant")
-                .setMessage("This phone's radio firmware is not in the SignalDeck firmware catalogue yet: " + f.why + ".\n\n"
-                        + "Submitting it lets the firmware project catalogue it, so SignalDeck recognises it and firmware work can cover it later. "
-                        + "GitHub opens in your browser with the phone model, the module version, the stock app's version and the firmware file's fingerprint filled in. "
-                        + "Check them and press Submit there (it needs a GitHub account). Nothing is sent unless you submit, and nothing in it identifies you.\n\n"
-                        + (f.fileToAttach() ? "The firmware file itself is new too: SignalDeck copies it to Download/DMR/FoundFirmware on this phone, and the issue says where it is. Attaching it is up to you: an attachment on the issue is public, anyone can download it, and the file belongs to the phone maker.\n\n"
-                                            : "The firmware file itself stays on this phone.\n\n")
-                        + "The notice stays on the Device page until the catalogue lists this firmware.")
-                .setPositiveButton("Open GitHub", (d, w) -> {
+        new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_variant))
+                .setMessage(Txt.s(R.string.device_variant_msg, f.why) + Txt.s(f.fileToAttach() ? R.string.device_variant_attach : R.string.device_variant_stays) + Txt.s(R.string.device_variant_notice))
+                .setPositiveButton(Txt.s(R.string.device_variant_open), (d, w) -> {
                     com.macdmr.radio.FirmwareVariantCheck.markOpened(c, f.key);
                     final android.os.Handler h = new android.os.Handler(android.os.Looper.getMainLooper());
                     new Thread(() -> {
                         final String url = com.macdmr.radio.FirmwareVariantCheck.prepareAttachment(c, f);
                         h.post(() -> {
-                            if (!url.equals(f.url)) android.widget.Toast.makeText(c, "Firmware file copied to Download/DMR/FoundFirmware: attach it in the issue if you choose", android.widget.Toast.LENGTH_LONG).show();
+                            if (!url.equals(f.url)) android.widget.Toast.makeText(c, Txt.s(R.string.device_variant_copied), android.widget.Toast.LENGTH_LONG).show();
                             try { c.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)); }
-                            catch (Throwable t) { android.widget.Toast.makeText(c, "No browser to open GitHub", android.widget.Toast.LENGTH_LONG).show(); }
+                            catch (Throwable t) { android.widget.Toast.makeText(c, Txt.s(R.string.device_variant_no_browser), android.widget.Toast.LENGTH_LONG).show(); }
                             if (after != null) after.run();
                         });
                     }, "fwvariant-file").start();
                 })
-                .setNegativeButton("Not now", null).show();
+                .setNegativeButton(Txt.s(R.string.common_not_now), null).show();
     }
 
     /** What the firmware line means; when the module runs other firmware, the stock version can be reset to it. */
@@ -1190,20 +1171,18 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         final Context c = getContext(); float d = Theme.dp(c);
         final String stock = svc.stockFirmware(), now = svc.moduleVersion().trim();
         boolean differs = com.macdmr.radio.Firmware.differs(stock, now);
-        LinearLayout box = Neo.sheetBody(c, "Radio module firmware");
-        box.addView(Neo.sheetHint(c, "Stock: " + (stock.isEmpty() ? "not known yet" : stock) + "\nNow: " + (now.isEmpty() ? "no answer from the module yet" : now)));
-        box.addView(Neo.sheetHint(c, "The stock version is the first one this phone's radio module reported to SignalDeck, kept for good, so you can always tell what the phone came with. "
-                + (differs ? "The module now reports another version, so other firmware is loaded. If the phone already had other firmware when SignalDeck first saw it, you can take the current version as stock."
-                           : "The module runs its stock firmware.")));
+        LinearLayout box = Neo.sheetBody(c, Txt.s(R.string.device_modfw_title), "radio");
+        box.addView(Neo.sheetHint(c, Txt.s(R.string.device_modfw_versions, stock.isEmpty() ? Txt.s(R.string.device_modfw_stock_unknown) : stock, now.isEmpty() ? Txt.s(R.string.device_modfw_no_answer) : now)));
+        box.addView(Neo.sheetHint(c, Txt.s(differs ? R.string.device_modfw_hint_differs : R.string.device_modfw_hint_stock)));
         final android.app.Dialog[] dlg = new android.app.Dialog[1];
         if (differs) {
-            TextView reset = Neo.button(c, "Take the current version as stock", "update", Neo.AMBER);
+            TextView reset = Neo.button(c, Txt.s(R.string.device_modfw_reset), "update", Neo.AMBER);
             LayoutParams bl = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT); bl.setMargins(0, (int) (10 * d), 0, 0);
             box.addView(reset, bl);
-            reset.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle("Take " + now + " as stock?")
-                    .setMessage("SignalDeck will no longer remember " + stock + " as the firmware this phone came with.")
-                    .setPositiveButton("Take as stock", (dd, w) -> { svc.setStockFirmwareToCurrent(); if (dlg[0] != null) dlg[0].dismiss(); refresh(); })
-                    .setNegativeButton("Cancel", null).show());
+            reset.setOnClickListener(v -> new android.app.AlertDialog.Builder(c).setTitle(Txt.s(R.string.device_modfw_reset_title, now))
+                    .setMessage(Txt.s(R.string.device_modfw_reset_msg, stock))
+                    .setPositiveButton(Txt.s(R.string.device_modfw_reset_ok), (dd, w) -> { svc.setStockFirmwareToCurrent(); if (dlg[0] != null) dlg[0].dismiss(); refresh(); })
+                    .setNegativeButton(Txt.s(R.string.common_cancel), null).show());
         }
         dlg[0] = Neo.showSheet(c, box);
     }
@@ -1215,22 +1194,22 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         if (svc == null) return;
         Context c = getContext(); float d = Theme.dp(c);
         Neo.headerSubtitle(header).setText(svc.profile().name.toUpperCase(java.util.Locale.US));
-        profileText.setText(svc.profile().controlPort + " · " + svc.profile().baud + " · " + (svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.TINY_SERVICE ? "vendor audio" : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.CAMCORDER ? "camcorder input" : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.EXTMODULE ? "extmodule audio socket" : "UART PCM") + ("sa818".equals(svc.profile().protocol) ? " · analog AT module" : ""));
+        profileText.setText(svc.profile().controlPort + " · " + svc.profile().baud + " · " + (svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.TINY_SERVICE ? Txt.s(R.string.device_status_audio_vendor) : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.CAMCORDER ? Txt.s(R.string.device_status_audio_camcorder) : svc.profile().audio == com.macdmr.radio.DeviceProfile.Audio.EXTMODULE ? Txt.s(R.string.device_status_audio_ext) : Txt.s(R.string.device_status_audio_uart)) + ("sa818".equals(svc.profile().protocol) ? " · " + Txt.s(R.string.device_status_analog_at) : ""));
         com.macdmr.radio.ProfileRegistry.Selection ps = com.macdmr.radio.ProfileRegistry.selection();
-        if (ps.profile.supported || !ps.advisories.isEmpty()) profileText.append(" · r" + ps.profile.revision + ("updated".equals(ps.source) ? " updated" : ""));
-        for (com.macdmr.radio.ProfileRegistry.Advisory a : ps.advisories) if (!a.overridden) { profileText.append(" · ⚠ advisory"); break; }
+        if (ps.profile.supported || !ps.advisories.isEmpty()) profileText.append(" · " + ("updated".equals(ps.source) ? Txt.s(R.string.device_status_rev_updated, String.valueOf(ps.profile.revision)) : "r" + ps.profile.revision));
+        for (com.macdmr.radio.ProfileRegistry.Advisory a : ps.advisories) if (!a.overridden) { profileText.append(" · " + Txt.s(R.string.device_status_advisory)); break; }
         String l = svc.link();
-        if (!svc.profile().verified && svc.profile().supported) profileText.append(" · untested");
+        if (!svc.profile().verified && svc.profile().supported) profileText.append(" · " + Txt.s(R.string.device_status_untested));
         String fwStock = svc.stockFirmware(), fwNow = svc.moduleVersion().trim();
-        firmwareText.setText(fwStock.isEmpty() ? "Module firmware" : com.macdmr.radio.Firmware.line(fwStock, fwNow));
+        firmwareText.setText(fwStock.isEmpty() ? Txt.s(R.string.device_status_module_fw) : com.macdmr.radio.Firmware.line(fwStock, fwNow));
         firmwareText.setVisibility(VISIBLE);
         firmwareText.setTextColor(com.macdmr.radio.Firmware.differs(fwStock, fwNow) ? Neo.AMBER_LIGHT : 0xFF9FB4C8);
         com.macdmr.radio.FirmwareVariantCheck.Finding vf = svc.profile().supported && svc.profile().firmwareCatalogued() ? com.macdmr.radio.FirmwareVariantCheck.finding(c) : null;
         variantText.setVisibility(vf == null ? GONE : VISIBLE);
-        if (vf != null) variantText.setText("\u26A0 Firmware not in the catalogue yet \u00B7 " + (vf.opened ? "sent to GitHub, waiting for the catalogue" : "tap to submit it"));
-        boolean ready = "ready".equals(l), unsupported = "unsupported".equals(l), bad = "no root".equals(l) || unsupported;
+        if (vf != null) variantText.setText(Txt.s(vf.opened ? R.string.device_status_variant_sent : R.string.device_status_variant_new));
+        boolean ready = "ready".equals(l), unsupported = "unsupported".equals(l), bad = "no root".equals(l) || unsupported;   // i18n: link state codes
         int accent = ready ? Neo.GREEN : bad ? Neo.AMBER : "stopped".equals(l) ? Neo.CYAN : Neo.AMBER;
-        linkText.setText(ready ? "This app owns the radio" : "no root".equals(l) ? "Root not granted (Magisk → Superuser)" : "stopped".equals(l) ? "The stock app owns the radio" : unsupported ? "No profile for this phone yet" : "Starting: " + l);
+        linkText.setText(ready ? Txt.s(R.string.device_status_ready) : "no root".equals(l) ? Txt.s(R.string.device_status_no_root) : "stopped".equals(l) ? Txt.s(R.string.device_status_stopped) : unsupported ? Txt.s(R.string.device_status_unsupported) : Txt.s(R.string.device_status_starting, l));   // i18n: "no root" and "stopped" are link state codes
         linkText.setTextColor(ready ? Neo.GREEN_LIGHT : accent == Neo.CYAN ? Neo.CYAN_LIGHT : Neo.AMBER_LIGHT);
         android.graphics.drawable.GradientDrawable dot = new android.graphics.drawable.GradientDrawable(); dot.setShape(android.graphics.drawable.GradientDrawable.OVAL); dot.setColor(accent);
         linkDot.setBackground(dot);
@@ -1240,14 +1219,14 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         heroIcon.setBackground(ib);
         takeOver.setVisibility(unsupported ? GONE : VISIBLE); handBack.setVisibility(unsupported ? GONE : VISIBLE); reportNow.setVisibility(unsupported || !svc.profile().verified ? VISIBLE : GONE);
         takeOver.setAlpha(ready ? 0.55f : 1f); handBack.setAlpha(ready ? 1f : 0.55f);
-        idText.setText("ID " + svc.localId());
-        if (rogerValue != null) rogerValue.setText(com.macdmr.radio.RadioService.ROGER_NAMES[svc.rogerStyle()]);
+        idText.setText(Txt.s(R.string.device_id_value, String.valueOf(svc.localId())));
+        if (rogerValue != null) rogerValue.setText(com.macdmr.radio.RadioService.rogerNames()[svc.rogerStyle()]);
         if (txLimitValue != null) txLimitValue.setText(com.macdmr.radio.TxLimit.name(svc.txLimitSetting()));
         ownAtBoot.setChecked(svc.ownAtBoot()); voiceSw.setChecked(svc.voiceOn()); hwPttSw.setChecked(svc.hwPtt()); scanSqSw.setChecked(svc.scanSoftSq());
         volPttSw.setChecked(c.getSharedPreferences("radio", Context.MODE_PRIVATE).getBoolean("volPtt", false));
         refreshCustomPtt();
-        styleSw.setChecked(IntercomView.newLook(c)); animSw.setChecked(IntercomView.animatedPanel(c)); covSw.setChecked(svc.coverage().enabled()); roamSw.setChecked(svc.roaming()); carMicSw.setChecked(svc.carMic()); carCovSw.setChecked(svc.coverageInCar()); wheelSw.setChecked(svc.wheelTalk()); nextTalkValue.setText(com.macdmr.radio.RadioService.NEXT_TALK_NAMES[svc.nextTalkMode()]);
-        wheelMicValue.setText(com.macdmr.radio.RadioService.WHEEL_MIC_NAMES[Math.max(0, Math.min(1, svc.wheelMic()))]); voxValue.setText(com.macdmr.radio.RadioService.VOX_NAMES[Math.max(0, Math.min(3, svc.voxStop()))]); carScreenSw.setChecked(svc.carControlsScreen());
+        styleSw.setChecked(IntercomView.newLook(c)); animSw.setChecked(IntercomView.animatedPanel(c)); covSw.setChecked(svc.coverage().enabled()); roamSw.setChecked(svc.roaming()); carMicSw.setChecked(svc.carMic()); carCovSw.setChecked(svc.coverageInCar()); wheelSw.setChecked(svc.wheelTalk()); nextTalkValue.setText(com.macdmr.radio.RadioService.nextTalkNames()[svc.nextTalkMode()]);
+        wheelMicValue.setText(com.macdmr.radio.RadioService.wheelMicNames()[Math.max(0, Math.min(1, svc.wheelMic()))]); voxValue.setText(com.macdmr.radio.RadioService.voxNames()[Math.max(0, Math.min(3, svc.voxStop()))]); carScreenSw.setChecked(svc.carControlsScreen());
         ((TextView) radioIdTile.findViewWithTag("sub")).setText(svc.radioId().status());
         updateWeb();
     }
@@ -1259,12 +1238,12 @@ public class DeviceView extends LinearLayout implements RadioService.Listener {
         if (svc == null || svc.web() == null || webSw == null) return;
         com.macdmr.radio.web.WebHost w = svc.web();
         webSw.setChecked(w.enabled()); webTxSw.setChecked(w.allowTx());
-        if (!w.enabled()) { webSub.setText("Use SignalDeck from a browser on the same Wi-Fi"); return; }
-        if (!w.running()) { webSub.setText("Not running" + (w.lastError() != null ? ": " + w.lastError() : "")); return; }
+        if (!w.enabled()) { webSub.setText(Txt.s(R.string.device_web_access_sub)); return; }
+        if (!w.running()) { webSub.setText(w.lastError() != null ? Txt.s(R.string.device_web_not_running_err, w.lastError()) : Txt.s(R.string.device_web_not_running)); return; }
         java.util.List<String> u = w.urls();
-        webSub.setText((u.isEmpty() ? "Connect to Wi-Fi to get an address" : "Open " + android.text.TextUtils.join("  or  ", u)) + "\nPIN  " + w.pin()
-                + (w.tlsRunning() && !u.isEmpty() ? "\nTo talk with a computer's microphone: " + w.secureUrls().get(0) + " (accept the certificate warning once; fingerprint " + com.macdmr.radio.web.WebTls.fingerprint().substring(0, 11) + "…)" : "")
-                + (w.clients() > 0 ? "\n" + w.clients() + " browser" + (w.clients() == 1 ? "" : "s") + " connected" : ""));
+        webSub.setText((u.isEmpty() ? Txt.s(R.string.device_web_no_address) : Txt.s(R.string.device_web_open, android.text.TextUtils.join(Txt.s(R.string.device_web_url_or), u))) + Txt.s(R.string.device_web_pin, w.pin())
+                + (w.tlsRunning() && !u.isEmpty() ? Txt.s(R.string.device_web_tls, w.secureUrls().get(0), com.macdmr.radio.web.WebTls.fingerprint().substring(0, 11)) : "")
+                + (w.clients() > 0 ? Txt.p(R.plurals.device_web_clients, w.clients(), w.clients()) : ""));
     }
 
     @Override public void onLink(String state) { refresh(); }

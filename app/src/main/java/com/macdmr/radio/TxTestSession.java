@@ -21,6 +21,7 @@ import java.util.Locale;
  * unverified profile); for each key it records what it saw ({@link TxReport.Key}), and asks the tester what only they
  * can know. The result is tx-report.json in the current device report folder plus a section in report.txt and
  * 00_SUMMARY.txt, with the configured callsign and DMR ID replaced. Runs on its own thread; the screen is {@link Ui}.
+ * i18n: stays English (developer report/bench text, plan §1)
  */
 public final class TxTestSession {
 

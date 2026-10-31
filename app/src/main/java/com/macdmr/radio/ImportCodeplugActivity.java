@@ -6,6 +6,7 @@
  */
 package com.macdmr.radio;
 
+import com.macdmr.radio.i18n.Txt;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -43,14 +44,14 @@ public class ImportCodeplugActivity extends Activity {
             } catch (Throwable ignored) { }
             final String fText = text, fName = name;
             runOnUiThread(() -> {
-                if (fText == null) Toast.makeText(this, "No SignalDeck channels or CHIRP CSV in what was shared", Toast.LENGTH_LONG).show();
+                if (fText == null) Toast.makeText(this, Txt.s(R.string.channels_import_nothing_shared), Toast.LENGTH_LONG).show();
                 else {
                     try {
                         File f = new File(getCacheDir(), "incoming_codeplug.txt");
                         try (FileOutputStream o = new FileOutputStream(f)) { o.write(fText.getBytes(StandardCharsets.UTF_8)); }
                         startActivity(new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP)
                                 .putExtra(MainActivity.EXTRA_CODEPLUG, true).putExtra(MainActivity.EXTRA_CODEPLUG_NAME, fName));
-                    } catch (Throwable t) { Toast.makeText(this, "Could not open it: " + t.getMessage(), Toast.LENGTH_LONG).show(); }
+                    } catch (Throwable t) { Toast.makeText(this, Txt.s(R.string.channels_import_open_failed, String.valueOf(t.getMessage())), Toast.LENGTH_LONG).show(); }
                 }
                 finish();
             });

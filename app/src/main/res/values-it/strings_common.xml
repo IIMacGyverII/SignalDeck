@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Words used on many screens. One file per screen group (strings_<group>.xml); every string has a comment above it
+  with its context and the space it has, for translators. Arguments are numbered (%1$s) so a translation can reorder
+  them. Logs, diagnostics, report.json, file formats and anything sent on the air stay in code, in English.
+-->
+<resources>
+    <!-- Button that closes a dialog without doing anything. Short (dialog button). -->
+    <string name="common_cancel">Annulla</string>
+    <!-- Button that keeps the changes made in a dialog or editor. Short (button). -->
+    <string name="common_save">Salva</string>
+    <!-- Button that accepts a message or dialog. Short (button). -->
+    <string name="common_ok">OK</string>
+    <!-- Button that removes the item (a channel, zone, contact, recording…). Short (button). -->
+    <string name="common_delete">Elimina</string>
+    <!-- Button that closes a sheet or dialog. Short (button). -->
+    <string name="common_close">Chiudi</string>
+    <!-- Button that sends a message (APRS, DMR text, Winlink…). On the radio it transmits. Short (button). -->
+    <string name="common_send">Invia</string>
+    <!-- Button that puts off an offer (an update, a check) without saying no for good. Short (button). -->
+    <string name="common_later">Più tardi</string>
+    <!-- Button that goes on to the next step. Short (button). -->
+    <string name="common_continue">Continua</string>
+    <!-- Button that empties a list or a field. Short (button). -->
+    <string name="common_clear">Svuota</string>
+    <!-- Button that starts something (a session, a net, a scan). Short (button). -->
+    <string name="common_start">Avvia</string>
+    <!-- Button that stops what is running. Short (button). -->
+    <string name="common_stop">Interrompi</string>
+    <!-- Button that opens Android's share sheet. Short (button). -->
+    <string name="common_share">Condividi</string>
+    <!-- Button that declines an offer for now. Short (button). -->
+    <string name="common_not_now">Non ora</string>
+    <!-- Button that imports channels, contacts or a file. Short (button). -->
+    <string name="common_import">Importa</string>
+    <!-- Button that goes back one step. Short (button). -->
+    <string name="common_back">Indietro</string>
+    <!-- Button that opens the editor for an item. Short (button). -->
+    <string name="common_edit">Modifica</string>
+    <!-- Button that adds a new item. Short (button). -->
+    <string name="common_add">Aggiungi</string>
+    <!-- Button that finishes a task and closes it. Short (button). -->
+    <string name="common_done">Fatto</string>
+    <!-- State of a switch or feature that is running. Very short. -->
+    <string name="common_on">On</string>
+    <!-- State of a switch or feature that is not running. Very short. -->
+    <string name="common_off">Off</string>
+</resources>

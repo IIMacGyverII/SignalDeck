@@ -6,6 +6,8 @@
  */
 package com.macdmr.radio.ham;
 
+import com.macdmr.radio.i18n.Txt;
+import com.macdmr.radio.R;
 import java.util.Locale;
 
 /**
@@ -267,14 +269,14 @@ public final class M17 {
 
     public static String protocolName(int id) {
         switch (id) {
-            case 0x00: return "raw";
-            case 0x01: return "AX.25";
+            case 0x00: return Txt.s(R.string.modes_m17_proto_raw);
+            case 0x01: return "AX.25";   // i18n: protocol name
             case 0x02: return "APRS";
             case 0x03: return "6LoWPAN";
             case 0x04: return "IPv4";
             case 0x05: return "SMS";
-            case 0x06: return "Winlink";
-            default: return "protocol " + id;
+            case 0x06: return "Winlink";   // i18n: protocol name
+            default: return Txt.s(R.string.modes_m17_proto_other, id);
         }
     }
 

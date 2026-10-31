@@ -5,6 +5,7 @@
  * (keep this notice and the author credit, mark modified versions, no rights to the SignalDeck name or icon).
  */
 package com.macdmr.radio.dsp;
+// i18n: stays English (DSP diagnostics for the log and the bench)
 
 /**
  * Software squelch for analog channels, as the module does it: the radio's own squelch is left open

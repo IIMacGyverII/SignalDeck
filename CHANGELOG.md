@@ -1,5 +1,11 @@
 # SignalDeck changelog
 
+## 2026-10-30 — Ulefone Armor 3WT: the Transmit test session may key it; the intercom app's half-second release
+
+| Backlog | Change | Files | Test |
+|---|---|---|---|
+| Owner decision 2026-10-30 ("i want transmit unlocked for the device report tests") | The Armor 3WT's untested profile now allows the guided Transmit test session (Device → Device report), as the Armor 20WT and Xplore 1 do; the Talk key, the side key, packet modes and the web stay off until the profile is tested. Keys follow its intercom app's release: after you let go the transmitter and microphone stay on 500 ms, then PTT off (new profile field `txReleaseHoldMs`, from the profile list too; 0 on every other phone), so the last word is not cut. The session's report names the 3WT's key path (extmodule's PTT control, no module key command) instead of `0x26`. Help (Untested profiles, Transmit test session) and radio notes updated. | `DeviceProfile`, `RadioService`, `TxTestSession`, `ui/HelpView`, `assets/radios/radios.json` | `Armor3wtProfileTest`; whole host suite. **Not device-tested.** |
+
 ## 2026-10-30 — Ulefone Armor 3WT: an untested profile that drives the radio through its own radio service
 
 | Backlog | Change | Files | Test |

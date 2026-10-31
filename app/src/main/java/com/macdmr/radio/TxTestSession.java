@@ -56,6 +56,8 @@ public final class TxTestSession {
     static String pttPath(DeviceProfile p) {
         String app = "SignalDeck's own key (the same path as the on-screen Talk key)";
         if ("agold".equals(p.protocol)) return app + " -> the USB bridge's PTT line (" + AgoldUsb.HANDLE_PTT + ")";
+        if ("agold-legacy".equals(p.protocol)) return app + " -> extmodule's PTT control (3 / 4) and transmit audio on its audio socket; no module key command"
+                + (p.txReleaseHoldMs > 0 ? "; key and microphone held " + p.txReleaseHoldMs + " ms past the release" : "");
         if ("sa818".equals(p.protocol) || p.rxLinesOn != null) return app + " -> phone lines " + lines(p.txLinesOn);
         if (p.txLinesOn != null) return app + " -> phone lines " + lines(p.txLinesOn) + ", released with " + lines(p.txLinesOff) + "; no 0x26"
                 + (p.txAudioOnSendStart ? "; the audio starts at the module's SEND_START (none sent without it)" : "")

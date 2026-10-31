@@ -2130,6 +2130,7 @@ public class RadioService extends Service implements RadioEngine.Events {
                     ui.removeCallbacks(txWatchdog);
                     Thread vh = voiceHeat; voiceHeat = null; if (vh != null) vh.interrupt();
                     boolean tail = false;
+                    if (profile.txReleaseHoldMs > 0) try { Thread.sleep(profile.txReleaseHoldMs); } catch (InterruptedException ignored) { }   // the 3WT's intercom app: key and microphone run on after the release
                     try {
                         short[] roger = rogerPcm(rogerStyle());
                         ChannelStore.Channel tc = current;

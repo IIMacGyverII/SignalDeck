@@ -23,15 +23,15 @@ SignalDeck does not load module firmware on this phone: no module image exists (
 | Feature | State | Note |
 |---|---|---|
 | FM receive | Not tested |  |
-| FM transmit | Not tested | Locked until the profile is tested |
+| FM transmit | Not tested | Only in the guided Transmit test session until the profile is tested |
 | DMR receive | Not tested | No caller ID: the module's call-info answer is not decoded yet |
-| DMR transmit | Not tested | Locked until the profile is tested |
+| DMR transmit | Not tested | Only in the guided Transmit test session until the profile is tested |
 
 ## Known quirks
 
 ### Untested profile
 
-This profile comes from an owner's device report, the phone's intercom app and its radio daemon. It has not run on the phone yet, so SignalDeck does not take over the radio by itself and never transmits on it. Owners can help with Device, Run all checks.
+This profile comes from an owner's device report, the phone's intercom app and its radio daemon. It has not run on the phone yet, so SignalDeck does not take over the radio by itself, and it transmits only in the guided Transmit test session (Device, Device report). Owners can help with Device, Run all checks, then that session.
 
 ### Needs the radio daemon
 
@@ -51,6 +51,6 @@ The bands are what the phone's intercom app accepts, 100 to 470 MHz without the 
 
 ### Side key
 
-The side key reaches only the kernel, not apps, on the custom ROM in the report. SignalDeck reads it with root as its default custom PTT key; it does nothing until transmit is unlocked.
+The side key reaches only the kernel, not apps, on the custom ROM in the report. SignalDeck reads it with root as its default custom PTT key; until the profile is tested it keys nothing outside the Transmit test session.
 
 [All radios](README.md)

@@ -2990,8 +2990,17 @@ public class RadioService extends Service implements RadioEngine.Events {
     /** The transmit test session's view of the module's status replies (Device report → Transmit test session); null otherwise. */
     public volatile java.util.function.BiConsumer<Integer, String> statusTap;
 
+    /**
+     * With the promiscuous flag on (0x40 op 15), the module's start/stop gate reports EVERY call it passes, the listed ones
+     * included, as 10 / 11 (MIX_DIGITAL_RX_START / _STOP) instead of 1 / 2 (firmware reading 2026-10-31; first seen on FW26,
+     * 2026-10-28). On a digital channel that is a reception like 1 / 2: the receive gate, the history and the caller query all
+     * follow it. With the flag off the module never posts 10 / 11.
+     */
+    static int rxStatusFor(int code, boolean digital) { return digital && (code == 10 || code == 11) ? code - 9 : code; }
+
     @Override public void status(int code, String name) {
         java.util.function.BiConsumer<Integer, String> tap = statusTap; if (tap != null) try { tap.accept(code, name); } catch (Throwable ignored) { }
+        code = rxStatusFor(code, current != null && current.isDigital());
         if ((code == 1 || code == 2) && audio instanceof ExtModuleAudio) ((ExtModuleAudio) audio).reception(code == 1);   // the 3WT: extmodule streams receive audio only between these
         switch (code) {
             case 1: if (agoldBridge() && receiving) { if (synthRx) { synthRx = false; lineReported(); log("reception line caught up with the signal"); if (!captureRunning()) bridgeCapture(true); } break; }   // a capture closed for silence reopens   // already open: an edge after a signal-started reception

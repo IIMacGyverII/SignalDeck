@@ -782,7 +782,7 @@
     <!-- Quick-pick chip: the channels of one zone. Very short (four chips share a row). -->
     <string name="channels_share_quick_zone">Zona…</string>
     <!-- Toast when there is no zone to pick from. Short. -->
-    <string name="channels_share_no_zones">Ainda não há zonas</string>
+    <string name="channels_share_no_zones">Nenhuma zona ainda</string>
     <!-- Dialog title above the list of zones (the sentence ends with the zone). Short. -->
     <string name="channels_share_pick_zone_title">Escolher os canais da zona</string>
     <!-- Section heading (capitals) above the switches of what to include. One word. -->

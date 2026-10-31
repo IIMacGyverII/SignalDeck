@@ -523,7 +523,7 @@
     <!-- APRS screen card: what the packet was (an internet message you sent on the radio). Lower case, short. -->
     <string name="packet_aprs_kind_igate">repassada da internet</string>
     <!-- APRS screen card: what the packet was (anything else). Lower case, short. -->
-    <string name="packet_aprs_kind_packet">pacote</string>
+    <string name="packet_aprs_kind_packet">packet</string>
 
     <!-- Map status line while it loads. Short. -->
     <string name="packet_map_loading">Carregando…</string>
@@ -540,9 +540,9 @@
     <!-- Filter pill at the top of the map. One word (five share a scrolling row). -->
     <string name="packet_map_pill_help">Ajuda</string>
     <!-- Screen reader label of a round button on the map. -->
-    <string name="packet_map_cd_zoom_in">Aproximar</string>
+    <string name="packet_map_cd_zoom_in">Aumentar zoom</string>
     <!-- Screen reader label of a round button on the map. -->
-    <string name="packet_map_cd_zoom_out">Afastar</string>
+    <string name="packet_map_cd_zoom_out">Diminuir zoom</string>
     <!-- Screen reader label of a round button on the map. -->
     <string name="packet_map_cd_me">Minha posição</string>
     <!-- Screen reader label of a round button on the map. -->
@@ -919,7 +919,7 @@
     <!-- Toast when the packet finder cannot start. One or two lines. -->
     <string name="packet_finder_err_no_freqs">Nenhuma das frequências de packet é sintonizável neste rádio (%1$s): adicione algumas nas Configurações</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
-    <string name="packet_finder_err_tx">Não durante a transmissão</string>
+    <string name="packet_finder_err_tx">Não é possível durante a transmissão</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
     <string name="packet_finder_err_sat">Uma passagem de satélite está sendo acompanhada</string>
     <!-- Toast when the packet finder cannot start. One or two lines. -->
@@ -1022,7 +1022,7 @@
     <!-- Button on the PKT sheet while the M17 receiver runs. Short (two buttons share a row). -->
     <string name="packet_pkt_m17_listening">M17 (escutando)</string>
     <!-- Button on the PKT sheet that starts the M17 receiver. Short (two buttons share a row). -->
-    <string name="packet_pkt_m17_receive">Receber M17</string>
+    <string name="packet_pkt_m17_receive">Recepção M17</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
     <string name="packet_pkt_m17_hint">Receber M17: ouça estações de voz digital M17 neste canal ou no VFO, com o indicativo e a mensagem de quem chama (só recepção: este rádio não transmite M17).</string>
     <!-- Button on the PKT sheet that stops APRS monitoring. Short (two buttons share a row). -->
@@ -1194,7 +1194,7 @@
     <!-- Button on the PKT sheet that opens Parks and Summits on the Air (programme names). Short (two buttons share a row). -->
     <string name="packet_pkt_pota">POTA / SOTA</string>
     <!-- Explanation under a group of buttons on the PKT sheet. A few lines. -->
-    <string name="packet_pkt_logbook_hint">Seus QSOs com reportagens de sinal e as estações que o rádio ouviu sozinho; exporta em ADIF.</string>
+    <string name="packet_pkt_logbook_hint">Seus QSOs com reportes de sinal e as estações que o rádio ouviu sozinho; exporta em ADIF.</string>
     <!-- Section heading on the PKT sheet. One line, shown in capitals. -->
     <string name="packet_pkt_fox_section">Caça à raposa</string>
     <!-- Button on the PKT sheet that opens the fox hunt. Short (two buttons share a row). -->

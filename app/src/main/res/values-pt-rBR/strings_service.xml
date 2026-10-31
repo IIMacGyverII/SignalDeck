@@ -108,7 +108,7 @@
     <!-- The next ISS pass, inside other messages. %1$s is the day and time ("Tue 14:05"), %2$s the highest elevation in degrees. Short. -->
     <string name="service_iss_pass_when">%1$s (máx. %2$s°)</string>
     <!-- Refusal (toast) when the ISS orbit has not been downloaded yet. "Satellite passes" is the name of a screen. One line. -->
-    <string name="service_iss_no_orbit">Ainda sem órbita da ISS: abra Passagens de satélites uma vez para baixá-la</string>
+    <string name="service_iss_no_orbit">Ainda sem órbita da ISS: abra Passagens de satélite uma vez para baixá-la</string>
     <!-- Message when no ISS pass high enough comes within a day. One line. -->
     <string name="service_iss_no_pass">Nenhuma passagem da ISS acima de 10° nas próximas 24 horas</string>
     <!-- History line when ISS tracking resumes after the app restarted. %1$s is the mode (SSTV or APRS). Starts with an emoji; keep it. -->
@@ -118,9 +118,9 @@
     <!-- SAFETY: history line when SignalDeck refused to transmit a data or tone transmission on a receive-only channel. Starts with an emoji; keep it. -->
     <string name="service_tx_blocked_receive_only">⛔ TX bloqueado: canal só de recepção</string>
     <!-- SAFETY: history line when a transmission was refused because it is longer than the transmit limit. %1$s is what was to be sent (an English label such as "APRS beacon"), %2$d its length in seconds, %3$s the limit ("2 min"). Device → Longest transmission is the setting. Starts with an emoji; keep it. -->
-    <string name="service_tx_too_long_limit">⛔ Longo demais para transmitir (%1$s, %2$d s; o limite de TX é %3$s, Dispositivo → Transmissão máxima)</string>
+    <string name="service_tx_too_long_limit">⛔ Longo demais para enviar (%1$s, %2$d s; o limite de TX é %3$s, Dispositivo → Transmissão máxima)</string>
     <!-- SAFETY: history line when a transmission was refused because it is longer than its sender allows. %1$s is what was to be sent (an English label), %2$d its length in seconds, %3$d the sender's maximum in seconds. Starts with an emoji; keep it. -->
-    <string name="service_tx_too_long_sender">⛔ Longo demais para transmitir (%1$s, %2$d s; este recurso permite no máximo %3$d s)</string>
+    <string name="service_tx_too_long_sender">⛔ Longo demais para enviar (%1$s, %2$d s; este recurso permite no máximo %3$d s)</string>
     <!-- History line when a data transmission was not sent because the radio never reported that it transmits. %1$s is what was to be sent (an English label). Starts with an emoji; keep it. -->
     <string name="service_tx_not_reported">⚠️ %1$s não enviado: o rádio não informou que estava transmitindo</string>
     <!-- History line after a transmission longer than 30 s. %1$d is its length in seconds, %2$s what was sent (an English label, or "voice"), %3$s the heat guard's state. Starts with an emoji; keep it. -->
@@ -178,7 +178,7 @@
     <!-- Refusal (toast) when a talkgroup is picked while not on a saved DMR channel. One line. -->
     <string name="service_tg_needs_dmr">Escolha o talkgroup em um canal DMR salvo</string>
     <!-- Refusal (toast) for an action that cannot run while transmitting. Short. -->
-    <string name="service_not_while_tx">Não durante a transmissão</string>
+    <string name="service_not_while_tx">Não é possível durante a transmissão</string>
     <!-- History line when a talkgroup is picked for the current DMR channel for now. %1$d is the talkgroup, %2$s the channel name, %3$d the channel's own talkgroup. -->
     <string name="service_tg_override">TG %1$d em %2$s até você trocar de canal (o canal mantém o %3$d)</string>
     <!-- History line when the DMR channel goes back to its own talkgroup. %1$s is the channel name, %2$d its talkgroup. -->
@@ -348,7 +348,7 @@
     <!-- Refusal (toast) when something is to be sent while the radio already transmits. Short. -->
     <string name="service_already_tx">Já está transmitindo</string>
     <!-- Refusal (toast) when there is nothing to send. Short. -->
-    <string name="service_nothing_to_send">Nada a enviar</string>
+    <string name="service_nothing_to_send">Nada para enviar</string>
     <!-- SAFETY: refusal (toast) when tones would last longer than the transmit limit. %1$d is their length in seconds, %2$s the limit ("2 min"). Device → Longest transmission is the setting. -->
     <string name="service_tones_over_limit">Passa do limite de TX (%1$d s; Dispositivo → Transmissão máxima está em %2$s)</string>
     <!-- History warning when the module firmware refused to start the tone queue. Starts with an emoji; keep it. -->
@@ -358,9 +358,9 @@
     <!-- History line after tones were sent through the module's tone generator. %1$s is what was sent (an English label), %2$d its length in seconds. Starts with an emoji; keep it. -->
     <string name="service_tones_sent">🔉 %1$s pelo gerador de tons do módulo (%2$d s)</string>
     <!-- SAFETY: history line when the heat guard ended a long transmission. %1$s is what was sent (an English label), %2$s the reason (temperatures). Starts with an emoji; keep it. -->
-    <string name="service_heat_stop">⛔ %1$s interrompido antes do fim: %2$s. Deixe o celular esfriar antes da próxima transmissão longa.</string>
+    <string name="service_heat_stop">⛔ %1$s parou antes do fim: %2$s. Deixe o celular esfriar antes da próxima transmissão longa.</string>
     <!-- SAFETY: history line when the heat guard ended a transmission at 30 s. %1$s is what was sent (an English label), %2$s the reason. Starts with an emoji; keep it. -->
-    <string name="service_heat_cap">⛔ %1$s interrompido aos 30 s: %2$s</string>
+    <string name="service_heat_cap">⛔ %1$s parou aos 30 s: %2$s</string>
     <!-- History line after an FM reception. %1$d is its length in seconds. Starts with an emoji; keep it. -->
     <string name="service_rx_received">📻 Recebido: %1$d s</string>
     <!-- History line after an M17 transmission ended. Starts with an emoji; keep it. Short. -->
@@ -636,7 +636,7 @@
     <!-- Scheduled operation: send an APRS position beacon. One line. -->
     <string name="service_sched_beacon">Enviar um beacon APRS</string>
     <!-- Scheduled operation: check Winlink e-mail through a radio gateway. One line. -->
-    <string name="service_sched_winlink_radio">Verificar e-mail Winlink (gateway de rádio)</string>
+    <string name="service_sched_winlink_radio">Verificar e-mail Winlink (gateway por rádio)</string>
     <!-- Scheduled operation: check Winlink e-mail over the internet. One line. -->
     <string name="service_sched_winlink_net">Verificar e-mail Winlink (internet)</string>
     <!-- Scheduled operation: the packet finder (listen for packet stations). BBSs, nodes and gateways are kinds of packet station. One line. -->

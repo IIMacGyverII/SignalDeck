@@ -20,7 +20,7 @@
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
     <string name="channel_editor_h_pos">Posição opcional da estação ou repetidora que este canal alcança. Com ela, a página Rádio mostra o nome do lugar, a distância e o azimute a partir de você. Minha posição preenche a última localização conhecida do celular.</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
-    <string name="channel_editor_h_rxonly">Só recepção: este canal nunca transmite. Enquanto você estiver nele, o botão de falar, a tecla lateral, as mensagens de voz, os beacons, as respostas e qualquer outra transmissão são recusados (para um posto de escuta, um canal para o qual você não tem licença, uma frequência que deve ficar em silêncio). Canais de meteorologia NOAA, marítimos e ferroviários são sempre só recepção, independentemente deste ajuste.</string>
+    <string name="channel_editor_h_rxonly">Só recepção: este canal nunca transmite. Enquanto você estiver nele, o botão Falar, a tecla lateral, as mensagens de voz, os beacons, as respostas e qualquer outra transmissão são recusados (para um posto de escuta, um canal para o qual você não tem licença, uma frequência que deve ficar em silêncio). Canais de meteorologia NOAA, marítimos e ferroviários são sempre só recepção, independentemente deste ajuste.</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
     <string name="channel_editor_h_power">Potência de transmissão. Alta vai mais longe e gasta mais bateria; Baixa basta para rádios por perto. Alguns serviços limitam a potência (o FRS, por exemplo).</string>
     <!-- Help card of a channel editor field (the i button), also on SignalDeck Web. Paragraph. -->
@@ -118,7 +118,7 @@
     <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. The channel never transmits. -->
     <string name="channel_editor_o_rx_only">Só recepção</string>
     <!-- Label of a field in the channel editor (also the title of its help card, without the bracket). One line. The radio module's relay setting. -->
-    <string name="channel_editor_l_relay">Relay (repetidora)</string>
+    <string name="channel_editor_l_relay">Repetidora</string>
     <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Relay setting. -->
     <string name="channel_editor_o_disconnect">Desconectar</string>
     <!-- A choice of a channel editor field (tap cycles through them). Short: it sits in a pill at the end of the row. Relay setting (recommended). -->

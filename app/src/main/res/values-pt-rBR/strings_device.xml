@@ -104,11 +104,11 @@
     <!-- Settings row title: the steering wheel's Next key transmits. One line. -->
     <string name="device_set_wheel_next">Próxima do volante transmite</string>
     <!-- Subtitle of "Steering-wheel Next talks": the two modes. May wrap to three lines. -->
-    <string name="device_set_wheel_next_sub">Segurar: segure Próxima para falar; pressione de novo se continuar transmitindo. Duplo toque: pressione duas vezes para falar e uma para parar. Toque para mudar</string>
+    <string name="device_set_wheel_next_sub">Segurar: segure Próxima para falar; pressione de novo se continuar transmitindo. Dois toques: pressione duas vezes para falar e uma para parar. Toque para mudar</string>
     <!-- Settings row title: which microphone a wheel transmission uses. One line. -->
     <string name="device_set_wheel_mic">Microfone para o volante</string>
     <!-- Subtitle of "Steering-wheel microphone". May wrap to three lines. -->
-    <string name="device_set_wheel_mic_sub">Carro (como uma chamada): o microfone do carro; pare com o botão de desligar do volante ou Encerrar. Celular: o microfone do celular; pare pelo volante. Toque para mudar</string>
+    <string name="device_set_wheel_mic_sub">Carro (como chamada): o microfone do carro; pare com o botão de desligar do volante ou Encerrar. Celular: o microfone do celular; pare pelo volante. Toque para mudar</string>
     <!-- Settings row title: unkey a wheel transmission after silence. One line. -->
     <string name="device_set_vox">Parar quando eu parar de falar</string>
     <!-- Subtitle of "Stop when I stop talking". May wrap. -->
@@ -422,7 +422,7 @@
 
     <!-- ==== Exit SignalDeck sheet ==== -->
     <!-- SAFETY: first hint on the Exit sheet: closing the app keeps the radio running; Exit stops it properly. A paragraph. -->
-    <string name="device_exit_hint">Fechar o app ou deslizá-lo para fora deixa o rádio funcionando em segundo plano (é assim que ele continua recebendo com a tela apagada). Sair encerra tudo corretamente: termina qualquer transmissão e tudo o que estiver rodando (varredura, APRS, FT8, M17, rastreamento de satélites, o papagaio), para o áudio e fecha a porta serial do rádio.</string>
+    <string name="device_exit_hint">Fechar o app ou deslizá-lo para fora deixa o rádio funcionando em segundo plano (é assim que ele continua recebendo com a tela apagada). Sair encerra tudo corretamente: termina qualquer transmissão e tudo o que estiver rodando (varredura, APRS, FT8, M17, acompanhamento de satélites, o papagaio), para o áudio e fecha a porta serial do rádio.</string>
     <!-- Button on the Exit sheet: switch the radio module off and exit. One line, full width. -->
     <string name="device_exit_off">Desligar o rádio e sair</string>
     <!-- SAFETY: hint under "Turn the radio off and exit". -->
@@ -930,29 +930,29 @@
     <!-- SAFETY: the same, on phones whose radio uses the USB port (USB to a computer is off). Two lines. -->
     <string name="device_firstrun_watch_open_bridged">O app de rádio do fabricante fica aberto por 15 s – não aperte o PTT (enquanto isso, o USB para o computador fica desligado)</string>
     <!-- Progress line of the trial take-over (receive only): squelch check with squelch level 0. One line. -->
-    <string name="device_firstrun_trial_squelch_alone">Ensaio: teste de squelch, só squelch 0</string>
+    <string name="device_firstrun_trial_squelch_alone">Teste prático: verificação do squelch, só squelch 0</string>
     <!-- Progress line of the trial: squelch check with squelch 0 and the monitor (MON) on. One line. -->
-    <string name="device_firstrun_trial_squelch_monitor">Ensaio: teste de squelch, squelch 0 e MON</string>
+    <string name="device_firstrun_trial_squelch_monitor">Teste prático: verificação do squelch, squelch 0 e monitor</string>
     <!-- Progress line of the trial: receive level at a module volume step. %1$d is the step (1–8). One line. -->
-    <string name="device_firstrun_trial_level">Ensaio: nível de recepção no volume %1$d</string>
+    <string name="device_firstrun_trial_level">Teste prático: nível de recepção no volume %1$d</string>
     <!-- Progress line of the trial: timing the signal reading after a retune. %1$d is the run (1 to 5). One line. -->
-    <string name="device_firstrun_trial_retune">Ensaio: leitura do sinal após ressintonizar, %1$d de 5</string>
+    <string name="device_firstrun_trial_retune">Teste prático: leitura do sinal após ressintonizar, %1$d de 5</string>
     <!-- Progress line of the trial: testing a band edge (nothing transmitted). %1$s is the frequency (446.000). One line. -->
-    <string name="device_firstrun_trial_band_edges">Ensaio: limites da banda, %1$s MHz</string>
+    <string name="device_firstrun_trial_band_edges">Teste prático: limites da banda, %1$s MHz</string>
     <!-- Progress line of the trial on the Armor 3WT: the extmodule daemon's receive stream for 5 s. "extmodule" is the daemon's name. One line. -->
-    <string name="device_firstrun_trial_extmodule">Ensaio: fluxo de recepção do extmodule, 5 s</string>
+    <string name="device_firstrun_trial_extmodule">Teste prático: fluxo de recepção do extmodule, 5 s</string>
     <!-- Progress line of the trial: a query command to the module. %1$s is its code (0x2F). One line. -->
-    <string name="device_firstrun_trial_command">Ensaio: comando %1$s ao módulo (consulta)</string>
+    <string name="device_firstrun_trial_command">Teste prático: comando %1$s ao módulo (consulta)</string>
     <!-- SAFETY: progress line: SignalDeck takes the radio over from the stock app for the trial; it only receives. One line. -->
-    <string name="device_firstrun_trial_take_over">Ensaio: assumindo o rádio (só recepção)</string>
+    <string name="device_firstrun_trial_take_over">Teste prático: assumindo o rádio (só recepção)</string>
     <!-- Progress line during the trial take-over. %1$s is the radio link state as the service reports it (English: "opening port", "ready"…). One line. -->
-    <string name="device_firstrun_trial_link">Ensaio: %1$s</string>
+    <string name="device_firstrun_trial_link">Teste prático: %1$s</string>
     <!-- Progress line of the trial: listening with the squelch held open. %1$s is the frequency (446.00625). One line. -->
-    <string name="device_firstrun_trial_listening">Ensaio: escutando em %1$s MHz com o squelch aberto</string>
+    <string name="device_firstrun_trial_listening">Teste prático: escutando em %1$s MHz com o squelch aberto</string>
     <!-- Progress line of the trial: reading the signal strength and the audio stream. One line. -->
-    <string name="device_firstrun_trial_reading">Ensaio: lendo a intensidade do sinal e o áudio</string>
+    <string name="device_firstrun_trial_reading">Teste prático: lendo a intensidade do sinal e o áudio</string>
     <!-- SAFETY: progress line: the trial ends and the radio goes back to the stock app. One line. -->
-    <string name="device_firstrun_trial_hand_back">Ensaio: devolvendo o rádio</string>
+    <string name="device_firstrun_trial_hand_back">Teste prático: devolvendo o rádio</string>
     <!-- Name of the temporary receive-only channel the trial tunes (shown on the Intercom meanwhile). %1$s is its frequency in MHz (446.00625). Keep short (a channel name). -->
     <string name="device_firstrun_listen_channel">Teste de escuta %1$s</string>
 
@@ -1183,7 +1183,7 @@
     <!-- SAFETY: Message of the first dialog before unlisted firmware files are allowed: what the user takes on. A paragraph. -->
     <string name="device_fw_unlisted_q1">Um arquivo não listado não vem do catálogo. Depois de carregado, não é possível verificá-lo além da string de versão. Este projeto não se responsabiliza por ele, e você é responsável pelo que o rádio transmitir.</string>
     <!-- SAFETY: Title of the second of two dialogs before unlisted firmware files are allowed. One line. -->
-    <string name="device_fw_unlisted_q2_title">Decisão sua (2 de 2)</string>
+    <string name="device_fw_unlisted_q2_title">A decisão é sua (2 de 2)</string>
     <!-- SAFETY: Message of the second dialog before unlisted firmware files are allowed. A short paragraph. -->
     <string name="device_fw_unlisted_q2">O rádio é seu e a decisão é sua. A chave se desativa sozinha depois de um carregamento. Você pode ativá-la de novo mais tarde.</string>
     <!-- SAFETY: Confirm button of the second dialog: allows unlisted firmware files. Dialog button, keep short. -->
@@ -1486,7 +1486,7 @@
     <!-- Toast after the update check when no build is published. %1$s is the installed version. One line. -->
     <string name="device_update_none_published">Nenhuma versão do SignalDeck publicada ainda (você tem a %1$s)</string>
     <!-- Toast after the update check when nothing newer exists. %1$s is the installed version. One line. -->
-    <string name="device_update_latest">Você está na versão mais recente (%1$s)</string>
+    <string name="device_update_latest">Você já está na versão mais recente (%1$s)</string>
     <!-- Title of the dialog that offers a newer build. %1$s is its version. One line. -->
     <string name="device_update_offer_title">Atualização disponível: %1$s</string>
     <!-- Message of the update offer when the build has no notes. %1$s is the installed version, %2$s the APK file name, %3$s its size in MB. Two paragraphs. -->

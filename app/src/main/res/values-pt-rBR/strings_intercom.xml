@@ -703,7 +703,7 @@
     <!-- Toast when more than 32 receive talkgroups are entered. One line. -->
     <string name="intercom_vfo_too_many_groups_toast">No máximo 32 talkgroups de recepção</string>
     <!-- Toast when a number field does not parse. Short. -->
-    <string name="intercom_vfo_check_numbers_toast">Verifique os números</string>
+    <string name="intercom_vfo_check_numbers_toast">Confira os números</string>
     <!-- Message of the Save as channel dialog, above the name field. One line. -->
     <string name="intercom_vfo_name_prompt">Nome do novo canal:</string>
     <!-- Name given to a channel saved from the VFO when the name field is left empty. Stored as the channel name. Short. -->
@@ -1159,7 +1159,7 @@
     <!-- Switch row title on the Nets sheet: remind before a scheduled net. Short. -->
     <string name="intercom_nets_remind">Lembrar</string>
     <!-- Switch row subtitle under "Remind me". One line. -->
-    <string name="intercom_nets_remind_sub">10 minutos antes de uma roda em Em breve</string>
+    <string name="intercom_nets_remind_sub">10 minutos antes de uma roda em Próximas</string>
     <!-- Switch row title on the Nets sheet: alert when a net opens. Short. -->
     <string name="intercom_nets_live">Avisar quando uma roda começar</string>
     <!-- Switch row subtitle under "Tell me when a net starts". Up to two lines. -->
@@ -1215,7 +1215,7 @@
     <!-- Shown under "On the air near you" when nothing is in session. -->
     <string name="intercom_nets_none_near">Nenhuma roda no ar nos seus canais ou nas repetidoras próximas agora. O NetLogger só lista rodas cuja coordenação o usa; as outras o rádio identifica enquanto escuta (uma sequência longa de transmissões de várias estações).</string>
     <!-- Section title on the Nets sheet: scheduled nets. Short, shown in caps; also named in "Remind me". -->
-    <string name="intercom_nets_coming_section">Em breve</string>
+    <string name="intercom_nets_coming_section">Próximas</string>
     <!-- Shown under "Coming up" when there is no schedule yet. -->
     <string name="intercom_nets_coming_none">Nada ainda. Os horários vêm da última semana do NetLogger nos seus canais e nas repetidoras próximas, e do que o rádio ouve: uma roda no mesmo canal, no mesmo horário e no mesmo dia da semana por duas semanas seguidas (ou três dias seguidos) vira um horário agendado.</string>
     <!-- Part of a scheduled-net subtitle. %1$d typical length in minutes. -->
@@ -1289,7 +1289,7 @@
     <!-- Title of the net editor when editing a saved net. One line. -->
     <string name="intercom_netedit_edit_title">Editar roda</string>
     <!-- Hint at the top of the net editor. -->
-    <string name="intercom_netedit_hint">Uma roda ou encontro que você conhece. Aparece em Rodas, Em breve; pode lembrar você 10 minutos antes; tocar nela sintoniza o canal.</string>
+    <string name="intercom_netedit_hint">Uma roda ou encontro que você conhece. Aparece em Rodas, Próximas; pode lembrar você 10 minutos antes; tocar nela sintoniza o canal.</string>
     <!-- Section title of the name field in the net editor. One word, shown in caps. -->
     <string name="intercom_netedit_name">Nome</string>
     <!-- Example in the empty name field of the net editor. -->

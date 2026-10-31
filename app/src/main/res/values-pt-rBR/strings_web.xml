@@ -120,9 +120,9 @@
     <!-- Reply after tuning the VFO. %1$s: the frequency, e.g. "145.5000". -->
     <string name="web_vfo_tuned">VFO %1$s MHz</string>
     <!-- Reply after leaving the VFO. -->
-    <string name="web_vfo_back">De volta ao canal</string>
+    <string name="web_vfo_back">Voltar ao canal</string>
     <!-- Error: no channel with this number. %1$d: the number. -->
-    <string name="web_no_channel">Canal %1$d inexistente</string>
+    <string name="web_no_channel">Canal %1$d não existe</string>
     <!-- Error: the channel to delete is gone. -->
     <string name="web_no_such_channel">Canal inexistente</string>
     <!-- Reply after starring a channel. %1$d: its number. -->
@@ -208,9 +208,9 @@
     <!-- Reply after starting to send an SSTV picture. %1$s: the SSTV mode name (e.g. "Robot 36"), not translated. -->
     <string name="web_sstv_sending">Enviando a imagem em %1$s</string>
     <!-- Reply after stopping ISS tracking. -->
-    <string name="web_iss_stopped">Rastreamento parado</string>
+    <string name="web_iss_stopped">Acompanhamento parado</string>
     <!-- Reply after starting ISS tracking. %1$s: "aprs" or "sstv". -->
-    <string name="web_iss_tracking">Rastreando a ISS (%1$s)</string>
+    <string name="web_iss_tracking">Acompanhando a ISS (%1$s)</string>
     <!-- Reply after the orbit download. -->
     <string name="web_sat_updated">Órbitas e lista de satélites FM atualizadas</string>
     <!-- Shown on a satellite's card: the orbit download has no orbit for it. -->
@@ -218,7 +218,7 @@
     <!-- Error: no orbit for a satellite. %1$s: the satellite's name. -->
     <string name="web_sat_no_orbit">Sem órbita para %1$s</string>
     <!-- Reply after starting to track a satellite pass. %1$s: the satellite's name. -->
-    <string name="web_sat_tracking">Rastreando %1$s</string>
+    <string name="web_sat_tracking">Acompanhando %1$s</string>
     <!-- Error: the pass to track is already over. -->
     <string name="web_sat_pass_gone">Essa passagem já terminou</string>
     <!-- Error: the satellite asked for is not in the list. -->
@@ -264,7 +264,7 @@
     <!-- Reply after starting a Winlink connection. -->
     <string name="web_wl_connecting">Conectando</string>
     <!-- Reply after starting a Winlink radio connection. %1$s: the frequency, e.g. "145.0500". -->
-    <string name="web_wl_tuning">Sintonizando %1$s MHz; conexão em alguns segundos</string>
+    <string name="web_wl_tuning">Sintonizando %1$s MHz, conectando em alguns segundos</string>
     <!-- Error: a Maidenhead grid square. The examples stay as they are. -->
     <string name="web_wl_grid">Locator no formato JO01 ou JO01ab</string>
     <!-- Error: the Winlink attachment is gone. -->
@@ -322,7 +322,7 @@
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_voice_label">Anúncios por voz</string>
     <!-- Setting description under its name. -->
-    <string name="web_set_voice_sub">Troca de canal, nome de quem chama, alertas de palavra-chave</string>
+    <string name="web_set_voice_sub">Troca de canal, nomes de quem chama, alertas de palavra-chave</string>
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_keywords_label">Alertas de palavra-chave</string>
     <!-- Setting description under its name. -->
@@ -362,7 +362,7 @@
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_wheelmic_label">Microfone para o volante</string>
     <!-- Setting description under its name. -->
-    <string name="web_set_wheelmic_sub">Do carro (como uma chamada) ou do celular</string>
+    <string name="web_set_wheelmic_sub">Do carro (como chamada) ou do celular</string>
     <!-- Setting name on the web Settings page. One line. -->
     <string name="web_set_voxstop_label">Parar quando eu parar de falar</string>
     <!-- Setting description under its name. -->
@@ -392,9 +392,9 @@
     <!-- Reply after turning the APRS-IS internet link off. -->
     <string name="web_tool_is_off">APRS-IS desativado</string>
     <!-- Reply after turning the KISS TNC on. KISS TNC is a protocol name. -->
-    <string name="web_tool_kiss_on">KISS TNC ativado</string>
+    <string name="web_tool_kiss_on">TNC KISS ativado</string>
     <!-- Reply after turning the KISS TNC off. -->
-    <string name="web_tool_kiss_off">KISS TNC desativado</string>
+    <string name="web_tool_kiss_off">TNC KISS desativado</string>
     <!-- Error: the DTMF digits typed are not valid. -->
     <string name="web_dtmf_format">DTMF: de 1 a 32 caracteres entre 0-9, A-D, * e #</string>
     <!-- Reply after sending DTMF digits. %1$s: the digits. -->
@@ -458,7 +458,7 @@
     <!-- Reply after saving a zone. %1$s: its name. -->
     <string name="web_zone_saved">Zona %1$s salva</string>
     <!-- Error: the zone is gone. -->
-    <string name="web_zone_none">Zona inexistente</string>
+    <string name="web_zone_none">Essa zona não existe</string>
     <!-- Reply after deleting a zone. %1$s: its name. -->
     <string name="web_zone_deleted">Zona %1$s excluída</string>
     <!-- Reply after a backup. %1$s: the backup folder's name. The path stays as it is. -->

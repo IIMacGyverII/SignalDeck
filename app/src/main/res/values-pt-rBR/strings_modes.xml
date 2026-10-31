@@ -430,7 +430,7 @@
     <!-- FT8 error: the callsign cannot be encoded in FT8. Toast. -->
     <string name="modes_ft8_err_call_unsendable">Seu indicativo não pode ser enviado em FT8</string>
     <!-- History line: the callsign is non-standard, so CQ goes out without the grid. WSJT-X is a program's name. Two lines. -->
-    <string name="modes_ft8_event_nonstandard">⚠️ Seu indicativo não é padrão para o FT8 (mais de três letras no sufixo ou um prefixo incomum), então o CQ sai sem o seu grid, como o WSJT-X enviaria</string>
+    <string name="modes_ft8_event_nonstandard">⚠️ Seu indicativo não é padrão para o FT8 (mais de três letras no sufixo ou um prefixo incomum), então o CQ sai sem o seu locator, como o WSJT-X enviaria</string>
     <!-- History line: an FT8 contact finished. %1$s the other station's callsign. One line. -->
     <string name="modes_ft8_event_complete">📡 QSO FT8 com %1$s concluído</string>
     <!-- History line: an FT8 contact was logged. %1$s callsign (and grid), %2$s the report sent, %3$s the report received ("-" if none). One line. -->
@@ -1131,13 +1131,13 @@
     <!-- Status line. %1$s the station status ("Listening"), %2$s the audio transmit frequency in Hz. One line. -->
     <string name="modes_ft8_status_line">%1$s\u0020 ·\u0020 transmite em %2$s Hz</string>
     <!-- The same with the grid sent. %3$s the grid ("FN42"). One line. -->
-    <string name="modes_ft8_status_line_grid">%1$s\u0020 ·\u0020 transmite em %2$s Hz\u0020 ·\u0020 grid %3$s</string>
+    <string name="modes_ft8_status_line_grid">%1$s\u0020 ·\u0020 transmite em %2$s Hz\u0020 ·\u0020 locator %3$s</string>
     <!-- Period button: transmit in the first period (seconds :00 and :30). Third of a row. -->
     <string name="modes_ft8_period_first">TX 1º (:00 :30)</string>
     <!-- Period button: transmit in the second period (seconds :15 and :45). Third of a row. -->
     <string name="modes_ft8_period_second">TX 2º (:15 :45)</string>
     <!-- Empty decode list. RR73 and 73 are FT8 messages; WSJT-X is a program. Two paragraphs. -->
-    <string name="modes_ft8_empty_hint">Escutando. A cada 15 s o último slot é decodificado e listado aqui, o mais recente no topo. Toque num CQ para responder; o app conduz a troca sozinho (grid, reportagem, R-reportagem, RR73, 73) e registra o QSO.\n\nO FT8 em FM fala com estações que enviam áudio FT8 neste canal FM: outro SignalDeck, ou o WSJT-X através de um rádio FM. Não ouve FT8 em SSB (144,174 / 432,174 MHz), e o FM só deixa passar a estação mais forte de cada slot.</string>
+    <string name="modes_ft8_empty_hint">Escutando. A cada 15 s o último slot é decodificado e listado aqui, o mais recente no topo. Toque num CQ para responder; o app conduz a troca sozinho (locator, reporte, R-reporte, RR73, 73) e registra o QSO.\n\nO FT8 em FM fala com estações que enviam áudio FT8 neste canal FM: outro SignalDeck, ou o WSJT-X através de um rádio FM. Não ouve FT8 em SSB (144,174 / 432,174 MHz), e o FM só deixa passar a estação mais forte de cada slot.</string>
     <!-- Toast after tapping a decode, first period. %1$s the callsign. One line. -->
     <string name="modes_ft8_calling_first">Chamando %1$s no 1º período</string>
     <!-- Toast after tapping a decode, second period. %1$s the callsign. One line. -->
@@ -1153,9 +1153,9 @@
     <!-- Title of the FT8 settings sheet. One line. -->
     <string name="modes_ft8_settings_title">Configurações do FT8</string>
     <!-- Section heading (capitals): the grid locator sent. One line. -->
-    <string name="modes_ft8_grid_section">Grid enviado com CQ e respostas</string>
+    <string name="modes_ft8_grid_section">Locator enviado com CQ e respostas</string>
     <!-- Grid hint. %1$s the grid in use ("FN42", or modes_ft8_grid_none). Three lines. -->
-    <string name="modes_ft8_grid_hint">O FT8 envia um grid Maidenhead de 4 caracteres (cerca de 100 x 200 km). Deixe vazio para usar a localização do celular, digite um para fixá-lo ou digite - para não enviar grid. Agora: %1$s.</string>
+    <string name="modes_ft8_grid_hint">O FT8 envia um locator Maidenhead de 4 caracteres (cerca de 100 x 200 km). Deixe vazio para usar a localização do celular, digite um para fixá-lo ou digite - para não enviar locator. Agora: %1$s.</string>
     <!-- No grid is sent. Lower case, one word. -->
     <string name="modes_ft8_grid_none">nenhum</string>
     <!-- Hint in the grid field when empty: the phone's location is used. Short. -->
@@ -1169,7 +1169,7 @@
     <!-- Button: empty the decode list. Half width. -->
     <string name="modes_ft8_clear_list">Limpar lista</string>
     <!-- Toast: the grid typed is not valid. FN42 is an example. One line. -->
-    <string name="modes_ft8_grid_invalid">Um grid tem duas letras de A a R e dois dígitos, como FN42</string>
+    <string name="modes_ft8_grid_invalid">Um locator tem duas letras de A a R e dois dígitos, como FN42</string>
     <!-- Clock hint before any decode. DT is the time-offset column. Two lines. -->
     <string name="modes_ft8_clock_hint">O FT8 precisa que seu relógio esteja a cerca de um segundo do da outra estação. O celular acerta o relógio pela rede; depois das primeiras decodificações, a coluna DT mostra a diferença.</string>
     <!-- Clock hint: the time offset is small. %1$s the average offset in seconds ("+0.3"). One line. -->
@@ -1284,15 +1284,15 @@
     <string name="modes_log_title">Logbook</string>
     <!-- Top line with the user's grid. %1$s the grid ("FN42ab"), %2$d grid squares worked. One line. -->
     <plurals name="modes_log_grids_here">
-        <item quantity="one">Você está em %1$s\u0020 ·\u0020 grids trabalhados: %2$d</item>
-        <item quantity="many">Você está em %1$s\u0020 ·\u0020 %2$d grids trabalhados</item>
-        <item quantity="other">Você está em %1$s\u0020 ·\u0020 %2$d grids trabalhados</item>
+        <item quantity="one">Você está em %1$s\u0020 ·\u0020 locators trabalhados: %2$d</item>
+        <item quantity="many">Você está em %1$s\u0020 ·\u0020 %2$d locators trabalhados</item>
+        <item quantity="other">Você está em %1$s\u0020 ·\u0020 %2$d locators trabalhados</item>
     </plurals>
     <!-- Top line without a position. %1$d grid squares worked. One line. -->
     <plurals name="modes_log_grids">
-        <item quantity="one">Grids trabalhados: %1$d</item>
-        <item quantity="many">%1$d grids trabalhados</item>
-        <item quantity="other">%1$d grids trabalhados</item>
+        <item quantity="one">Locators trabalhados: %1$d</item>
+        <item quantity="many">%1$d locators trabalhados</item>
+        <item quantity="other">%1$d locators trabalhados</item>
     </plurals>
     <!-- Part of modes_log_hint: the contacts logged. %1$d a count. -->
     <plurals name="modes_log_contacts">
@@ -1307,7 +1307,7 @@
         <item quantity="other">%1$d estações ouvidas</item>
     </plurals>
     <!-- Logbook explanation. %1$s the contacts ("3 contacts"), %2$s the stations heard ("12 stations heard"). RadioID is a service name; ADIF is the log file format. A paragraph. -->
-    <string name="modes_log_hint">%1$s, %2$s. As estações ouvidas são registradas sozinhas (chamadas DMR com indicativo no RadioID, estações APRS, identificações em CW); toque numa para preencher as reportagens e marcá-la como QSO. Exporte em ADIF para o seu programa de log ou serviço de QSL.</string>
+    <string name="modes_log_hint">%1$s, %2$s. As estações ouvidas são registradas sozinhas (chamadas DMR com indicativo no RadioID, estações APRS, identificações em CW); toque numa para preencher os reportes e marcá-la como QSO. Exporte em ADIF para o seu programa de log ou serviço de QSL.</string>
     <!-- Button: log a contact by hand. Half width. -->
     <string name="modes_log_add">Adicionar QSO</string>
     <!-- Button: save and share the log as an ADIF file. Half width. -->
@@ -1345,15 +1345,15 @@
     <!-- Button that cycles the mode. %1$s the mode (FM, DMR, PKT, CW). Full width. -->
     <string name="modes_log_mode">Modo: %1$s</string>
     <!-- Field label: report sent; 59 is a typical report. Short. -->
-    <string name="modes_log_f_sent">Reportagem enviada (p. ex. 59)</string>
+    <string name="modes_log_f_sent">Reporte enviado (p. ex. 59)</string>
     <!-- Field label: report received. Short. -->
-    <string name="modes_log_f_rcvd">Reportagem recebida</string>
+    <string name="modes_log_f_rcvd">Reporte recebido</string>
     <!-- Field label: the other operator's name. Short. -->
     <string name="modes_log_f_name">Nome</string>
     <!-- Field label: where the other station is (QTH). Short. -->
     <string name="modes_log_f_qth">QTH</string>
     <!-- Field label: Maidenhead grid square. Short. -->
-    <string name="modes_log_f_grid">Grid</string>
+    <string name="modes_log_f_grid">Locator</string>
     <!-- Button: look the callsign up online (HamDB). Full width. -->
     <string name="modes_log_lookup">Consultar o indicativo</string>
     <!-- Toast: Look up needs a callsign. One line. -->
@@ -1365,7 +1365,7 @@
     <!-- Toast after a lookup. %1$s the name found, %2$s the licence class ("Extra"). One line. -->
     <string name="modes_log_found_class">%1$s, classe %2$s</string>
     <!-- Field label: notes. Short. -->
-    <string name="modes_log_f_notes">Observações</string>
+    <string name="modes_log_f_notes">Notas</string>
     <!-- Toggle button: the entry is a contact (QSO). Full width. -->
     <string name="modes_log_was_qso">Foi um QSO</string>
     <!-- Toggle button: the station was only heard. Full width. -->
@@ -1604,15 +1604,15 @@
     <!-- Log sheet fact: the activator's reference. %1$s POTA or SOTA, %2$s the reference. Short. -->
     <string name="modes_pota_their_ref">%1$s da outra estação: %2$s</string>
     <!-- Section heading above the report sent. Short. -->
-    <string name="modes_pota_f_sent">Reportagem enviada</string>
+    <string name="modes_pota_f_sent">Reporte enviado</string>
     <!-- Section heading above the other station's reference. One line. -->
     <string name="modes_pota_f_their_ref">Parque ou cume do outro (park-to-park, opcional)</string>
     <!-- Section heading above the notes. Short. -->
-    <string name="modes_pota_f_notes">Observações (opcional)</string>
+    <string name="modes_pota_f_notes">Notas (opcional)</string>
     <!-- Toast: no valid callsign. One line. -->
     <string name="modes_pota_enter_call">Informe um indicativo</string>
     <!-- Toast after logging. %1$s the callsign. One line. -->
-    <string name="modes_pota_logged">%1$s registrado</string>
+    <string name="modes_pota_logged">QSO com %1$s registrado</string>
     <!-- Toast after logging during an activation. %1$s callsign, %2$d contacts today, %3$d needed. One line. -->
     <string name="modes_pota_logged_count">%1$s registrado (%2$d de %3$d hoje)</string>
     <!-- Duplicate warning title. %1$s the callsign. One line. -->
@@ -1650,7 +1650,7 @@
     <!-- Line after a session with the detailed log on; "Session log" and "Share log" are button names. Two lines. -->
     <string name="modes_wl_log_recorded">Registro detalhado gravado: Registro da sessão → Compartilhar registro, tenha funcionado ou não. Obrigado!</string>
     <!-- Line when no password is set. Two lines. -->
-    <string name="modes_wl_no_password">Nenhuma senha Winlink definida ainda (Configurações): ela é necessária para a sua caixa postal depois que seu indicativo estiver cadastrado.</string>
+    <string name="modes_wl_no_password">Nenhuma senha do Winlink definida ainda (Configurações): ela é necessária para a sua caixa postal depois que seu indicativo estiver cadastrado.</string>
     <!-- Folder name: received mail. One word. -->
     <string name="modes_wl_inbox">Caixa de entrada</string>
     <!-- Folder name: mail waiting to be sent. Short. -->
@@ -1736,11 +1736,11 @@
     <!-- Password field hint when one is stored. One line. -->
     <string name="modes_wl_set_password_set">Senha (definida; deixe vazio para manter, - para apagar)</string>
     <!-- Password field hint. Short. -->
-    <string name="modes_wl_set_password">Senha Winlink</string>
+    <string name="modes_wl_set_password">Senha do Winlink</string>
     <!-- Grid field hint; JO01 is an example. Short. -->
-    <string name="modes_wl_set_grid">Grid (opcional, p. ex. JO01)</string>
+    <string name="modes_wl_set_grid">Locator (opcional, p. ex. JO01)</string>
     <!-- Under the grid field. One line. -->
-    <string name="modes_wl_set_grid_hint">O grid é enviado ao gateway no login (opcional).</string>
+    <string name="modes_wl_set_grid_hint">O locator é enviado ao gateway no login (opcional).</string>
     <!-- Check box: the detailed diagnostic log. Two lines. -->
     <string name="modes_wl_set_diag">Registro de diagnóstico detalhado (tempos, bytes brutos do protocolo, todos os quadros de rádio)</string>
     <!-- Check box: include message data in the log. One line. -->
@@ -1750,7 +1750,7 @@
     <!-- Title of the Winlink settings dialog. One line. -->
     <string name="modes_wl_set_title">Configurações do Winlink</string>
     <!-- Toast: the grid is not valid. One line. -->
-    <string name="modes_wl_set_grid_invalid">Grid no formato JO01 ou JO01ab</string>
+    <string name="modes_wl_set_grid_invalid">Locator no formato JO01 ou JO01ab</string>
     <!-- Title of the session log sheet. One line. -->
     <string name="modes_wl_log_title">Registro da sessão Winlink</string>
     <!-- Session log before any session. Short. -->
@@ -1966,7 +1966,7 @@
     <!-- Info line: no marks. Short. -->
     <string name="modes_fox_no_marks">Nenhuma marcação ainda</string>
     <!-- Toast: Mark and Spin are refused while transmitting. One line. -->
-    <string name="modes_fox_not_while_tx">Não durante a transmissão: a leitura seria o seu próprio sinal</string>
+    <string name="modes_fox_not_while_tx">Não é possível durante a transmissão: a leitura seria o seu próprio sinal</string>
     <!-- Toast: no location yet. One line. -->
     <string name="modes_fox_no_position">Ainda sem posição: ative a localização</string>
     <!-- Toast: the waiting mark was cancelled. Short. -->
